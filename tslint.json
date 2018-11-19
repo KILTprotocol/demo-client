@@ -1,4 +1,5 @@
 {
+  "defaultSeverity": "warning",
   "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
   "linterOptions": {
     "exclude": [
@@ -8,6 +9,8 @@
     ]
   },
   "rules": {
-    "semicolon": [true, "never"]
+    "semicolon": [true, "never"],
+    "interface-over-type-literal": false,
+    "no-console": false
   }
 }
