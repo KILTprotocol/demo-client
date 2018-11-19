@@ -4,7 +4,7 @@ phases:
   pre_build:
     commands:
     - echo Run tests...
-    - docker build -t prototype-client . && docker run prototype-client yarn test
+    - docker build -t prototype-client . && docker run prototype-client yarn testCI
     - echo Test run completed successfully!
     - echo Logging in to Amazon ECR...
     - aws --version
