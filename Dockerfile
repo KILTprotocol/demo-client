@@ -1,4 +1,4 @@
-FROM node:10-alpine
+FROM nginx:stable-alpine
 
 # Create app directory
 WORKDIR /app
@@ -8,6 +8,7 @@ RUN apk add yarn
 COPY . ./
 
 RUN yarn install
+RUN yarn build
 
-EXPOSE 3000
-CMD [ "yarn", "run", "start"]
+EXPOSE 80
+RUN cp -R build/* /usr/share/nginx/html
