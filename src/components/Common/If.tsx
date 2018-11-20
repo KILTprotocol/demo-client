@@ -6,7 +6,7 @@ type Props = {
   else?: any
 }
 
-const If: React.FunctionComponent<Props> = props => {
+const If: React.FunctionComponent<Props> = (props) => {
   if (props.condition) {
     return props.then
   }
