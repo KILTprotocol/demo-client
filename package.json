@@ -2,7 +2,7 @@
   "name": "kilt-prototype-client",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "./",
   "dependencies": {
     "@types/react-router-dom": "^4.3.1",
     "@types/react-test-renderer": "^16.0.3",
