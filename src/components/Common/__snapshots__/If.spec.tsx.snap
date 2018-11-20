@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`If Component renders false condition 1`] = `
+<div>
+  Else
+</div>
+`;
+
+exports[`If Component renders false condition without else 1`] = `null`;
+
+exports[`If Component renders true condition 1`] = `
+<div>
+  Then
+</div>
+`;
+
+exports[`If Component renders true condition without else 1`] = `
+<div>
+  Then
+</div>
+`;
