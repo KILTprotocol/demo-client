@@ -4,8 +4,7 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "@types/react-router-dom": "^4.3.1",
-    "@types/react-test-renderer": "^16.0.3",
+    "@polkadot/api": "^0.31.123",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-router-dom": "^4.3.1",
@@ -25,6 +24,8 @@
     "@types/react": "^16.7.6",
     "@types/react-dom": "^16.0.9",
     "@types/react-router": "^4.4.1",
+    "@types/react-router-dom": "^4.3.1",
+    "@types/react-test-renderer": "^16.0.3",
     "typescript": "^3.1.6"
   }
 }
