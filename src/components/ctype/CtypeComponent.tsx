@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
-import If from '../Common/If'
+import If from '../../common/If'
 
 type Props = RouteComponentProps<{
   hash?: string

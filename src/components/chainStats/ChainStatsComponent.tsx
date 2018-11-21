@@ -3,7 +3,7 @@ import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 import blockchainService from 'src/services/BlockchainService'
-import If from '../Common/If'
+import If from '../../common/If'
 
 type Props = RouteComponentProps<{
   host: string
