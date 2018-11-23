@@ -6,6 +6,7 @@
   "dependencies": {
     "@kiltprotocol/prototype-sdk": "^0.0.3",
     "@polkadot/api": "^0.31.123",
+    "@polkadot/util-crypto": "^0.33.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-router-dom": "^4.3.1",

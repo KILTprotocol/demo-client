@@ -139,10 +139,42 @@
     tweetnacl "^1.0.0"
     xxhashjs "^0.2.2"
 
+"@polkadot/util-crypto@^0.33.1":
+  version "0.33.1"
+  resolved "https://registry.yarnpkg.com/@polkadot/util-crypto/-/util-crypto-0.33.1.tgz#05307e5fb635543b07d47cf5f2eaee83434d5d03"
+  integrity sha512-GPMJBrm9PGgBlw2PHjtsAjDx4aaV1Zx1JFVuPKD1+tpE9eUnWStPIJJnzowSMiGwOUNtrmx55eTZbBtTSkrMZw==
+  dependencies:
+    "@babel/runtime" "^7.1.5"
+    "@polkadot/util" "^0.33.1"
+    "@types/bip39" "^2.4.0"
+    bip39 "^2.5.0"
+    blakejs "^1.1.0"
+    js-sha3 "^0.8.0"
+    tweetnacl "^1.0.0"
+    xxhashjs "^0.2.2"
+
 "@polkadot/util@^0.32.21":
   version "0.32.21"
   resolved "https://registry.yarnpkg.com/@polkadot/util/-/util-0.32.21.tgz#8e2da9a204faad6e34df6fbb959e06eed4de4faa"
   integrity sha512-jNPKEPkSxAfOsEZXSFCLIsow4CxKy0GtZzWgLfMBz4plT+Y/2JH4ZdPIIoqRRDoyy1uk3UmWi7g3sOe8gdzakA==
+  dependencies:
+    "@babel/runtime" "^7.1.5"
+    "@types/bn.js" "^4.11.3"
+    "@types/camelcase" "^4.1.0"
+    "@types/deasync" "^0.1.0"
+    "@types/ip-regex" "^2.0.0"
+    "@types/xxhashjs" "^0.1.1"
+    bn.js "^4.11.8"
+    camelcase "^5.0.0"
+    chalk "^2.4.1"
+    deasync "^0.1.14"
+    ip-regex "^3.0.0"
+    moment "^2.22.2"
+
+"@polkadot/util@^0.33.1":
+  version "0.33.1"
+  resolved "https://registry.yarnpkg.com/@polkadot/util/-/util-0.33.1.tgz#51df8d60ce8ba3934ac464f99e38a8cd13549f2b"
+  integrity sha512-a0pT7J+bpyMd1MqJojgSbD10/leRpe03MaQXeirI5OxpheMUK+HBE3HWqrYQBzH7dORpncWRzHxpf0VY61AG+g==
   dependencies:
     "@babel/runtime" "^7.1.5"
     "@types/bn.js" "^4.11.3"
