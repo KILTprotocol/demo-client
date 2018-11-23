@@ -6,7 +6,10 @@
   "dependencies": {
     "@kiltprotocol/prototype-sdk": "^0.0.3",
     "@polkadot/api": "^0.31.123",
+    "@polkadot/util": "^0.33.1",
     "@polkadot/util-crypto": "^0.33.1",
+    "immutability-helper": "^2.8.1",
+    "lodash": "^4.17.11",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-router-dom": "^4.3.1",
@@ -22,6 +25,7 @@
   },
   "devDependencies": {
     "@types/jest": "^23.3.9",
+    "@types/lodash": "^4.14.118",
     "@types/node": "^10.12.9",
     "@types/react": "^16.7.6",
     "@types/react-dom": "^16.0.9",
