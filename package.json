@@ -4,6 +4,7 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
+    "@kiltprotocol/prototype-sdk": "^0.0.3",
     "@polkadot/api": "^0.31.123",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",

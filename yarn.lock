@@ -25,6 +25,11 @@
   dependencies:
     regenerator-runtime "^0.12.0"
 
+"@kiltprotocol/prototype-sdk@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@kiltprotocol/prototype-sdk/-/prototype-sdk-0.0.3.tgz#dd3fd37759b7b87b3a909f138dc9c4cf1e465995"
+  integrity sha512-e9Q3i1zsFDEXZydylMJTytutxKb0UsCsO1kk6B+rHvWsuqE3Zb9/hEcsW3yVtNXutn0SW7zYnhm7m7Mqa7verg==
+
 "@polkadot/api@^0.31.123":
   version "0.31.123"
   resolved "https://registry.yarnpkg.com/@polkadot/api/-/api-0.31.123.tgz#9b0ad8d20bcc58ccef5b193149eca4c12c1027bc"
