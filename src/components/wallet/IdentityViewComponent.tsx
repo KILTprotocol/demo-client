@@ -1,5 +1,3 @@
-
-
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
@@ -11,7 +9,6 @@ type Props = {
 } & RouteComponentProps<{}>
 
 class IdentityViewComponent extends React.Component<Props, {}> {
-
   constructor(props: Props) {
     super(props)
   }
@@ -25,7 +22,9 @@ class IdentityViewComponent extends React.Component<Props, {}> {
           <li>Phrase: {identity.phrase}</li>
           <li>Seed (as hex): {identity.seedAsHex}</li>
           <li>Public Key: {identity.publicKey}</li>
-          <li><button onClick={this.onDelete}>Remove</button></li>
+          <li>
+            <button onClick={this.onDelete}>Remove</button>
+          </li>
         </ul>
       </div>
     )

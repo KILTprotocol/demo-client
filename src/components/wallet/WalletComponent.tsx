@@ -7,34 +7,46 @@ import { withRouter } from 'react-router-dom'
 import Identity from '../../types/Identity'
 import IdentityViewComponent from './IdentityViewComponent'
 
-
 type Props = RouteComponentProps<{}>
 type State = {
-  identities: { [key: string]: Identity },
+  identities: { [key: string]: Identity }
   randomPhrase: string
 }
 
 class WalletComponent extends React.Component<Props, State> {
-
   constructor(props: Props) {
     super(props)
     this.state = {
       identities: {}, // TODO: load from localStorage
-      randomPhrase: mnemonic.mnemonicGenerate()
+      randomPhrase: mnemonic.mnemonicGenerate(),
     }
   }
 
   public render() {
-    const identities = values(this.state.identities).map((identity: Identity) => <IdentityViewComponent key={identity.seedAsHex} identity={identity} onDelete={this.removeIdentity} />)
+    const identities = values(this.state.identities).map(
+      (identity: Identity) => (
+        <IdentityViewComponent
+          key={identity.seedAsHex}
+          identity={identity}
+          onDelete={this.removeIdentity}
+        />
+      )
+    )
 
     return (
       <div>
         <h1>Wallet</h1>
         <hr />
-        <input type='text' value={this.state.randomPhrase} onChange={this.setRandomPhrase} />
+        <input
+          type="text"
+          value={this.state.randomPhrase}
+          onChange={this.setRandomPhrase}
+        />
         <button onClick={this.createRandomPhrase}>create random phrase</button>
         <br />
-        <button onClick={this.addIdentity}>Add new identity from phrase (duplicates not permitted)</button>
+        <button onClick={this.addIdentity}>
+          Add new identity from phrase (duplicates not permitted)
+        </button>
         <hr />
         {identities}
       </div>
