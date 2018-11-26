@@ -2,11 +2,11 @@ import * as React from 'react'
 
 type Props = {
   condition: boolean
-  then: any,
+  then: any
   else?: any
 }
 
-const If: React.FunctionComponent<Props> = (props) => {
+const If: React.FunctionComponent<Props> = props => {
   if (props.condition) {
     return props.then
   }

@@ -10,13 +10,12 @@ type Props = RouteComponentProps<{
 }>
 type State = {
   host: string
-  chainName?: string,
-  chainVersion?: string,
+  chainName?: string
+  chainVersion?: string
   chainType?: string
 }
 
 class ChainStatsComponent extends React.Component<Props, State> {
-
   private api: ApiPromise
 
   private mounted = false
@@ -25,7 +24,7 @@ class ChainStatsComponent extends React.Component<Props, State> {
     super(props)
 
     this.state = {
-      host: decodeURIComponent(this.props.match.params.host)
+      host: decodeURIComponent(this.props.match.params.host),
     }
   }
 
@@ -46,7 +45,11 @@ class ChainStatsComponent extends React.Component<Props, State> {
     ])
 
     if (this.mounted) {
-      this.setState({ chainName: name.toString(), chainVersion: version.toString(), chainType: type.toString() })
+      this.setState({
+        chainName: name.toString(),
+        chainType: type.toString(),
+        chainVersion: version.toString(),
+      })
     }
   }
 
@@ -62,14 +65,21 @@ class ChainStatsComponent extends React.Component<Props, State> {
         <h1 className="App-title">Chain Stats</h1>
         Demo module to interact with substrate blockchain
         <hr />
-        <If condition={!!host} then={
-          <div>
-            <div>Host: {host}</div>
-            <If condition={!!chainName} then={<div>Name: {chainName}</div>} />
-            <If condition={!!chainVersion} then={<div>Version: {chainVersion}</div>} />
-            <If condition={!!chainType} then={<div>Type: {chainType}</div>} />
-          </div>
-        } else={'No Host given'} />
+        <If
+          condition={!!host}
+          then={
+            <div>
+              <div>Host: {host}</div>
+              <If condition={!!chainName} then={<div>Name: {chainName}</div>} />
+              <If
+                condition={!!chainVersion}
+                then={<div>Version: {chainVersion}</div>}
+              />
+              <If condition={!!chainType} then={<div>Type: {chainType}</div>} />
+            </div>
+          }
+          else={'No Host given'}
+        />
       </div>
     )
   }

@@ -1,3 +1,11 @@
+# KILT client readme
+
+## Installation
+You might have to configure yarn to use the npm registry to access the private repositories there.
+Execute `yarn config set @kiltprotocol:registry https://registry.npmjs.org` and login to npm with `npm login`.
+
+
+# Readme from "Create React App"
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>

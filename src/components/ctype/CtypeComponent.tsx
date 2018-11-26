@@ -8,7 +8,6 @@ type Props = RouteComponentProps<{
 }>
 
 class CtypeComponent extends React.Component<Props, {}> {
-
   constructor(props: Props) {
     super(props)
   }
@@ -18,16 +17,20 @@ class CtypeComponent extends React.Component<Props, {}> {
     return (
       <div>
         <h1 className="App-title">Ctype Manager</h1>
-        <If condition={!!hash} then={
-          <div>
-            Current hash: {hash}
-          </div>
-        } else={
-          <ul>
-            <li><Link to={'/ctype/123'}>CTYPE 123</Link></li>
-            <li><Link to={'/ctype/ABC'}>CTYPE ABC</Link></li>
-          </ul>
-        } />
+        <If
+          condition={!!hash}
+          then={<div>Current hash: {hash}</div>}
+          else={
+            <ul>
+              <li>
+                <Link to={'/ctype/123'}>CTYPE 123</Link>
+              </li>
+              <li>
+                <Link to={'/ctype/ABC'}>CTYPE ABC</Link>
+              </li>
+            </ul>
+          }
+        />
       </div>
     )
   }
