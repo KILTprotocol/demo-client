@@ -5,6 +5,7 @@ import Identity from 'src/types/Identity'
 
 type Props = {
   identity: Identity
+  alias: string
   onDelete: (seedAsHex: string) => void
 } & RouteComponentProps<{}>
 
@@ -14,11 +15,12 @@ class IdentityViewComponent extends React.Component<Props, {}> {
   }
 
   public render() {
-    const { identity } = this.props
+    const { identity, alias } = this.props
 
     return (
       <div style={{ borderBottom: '1px solid grey', padding: '1rem' }}>
         <ul>
+          <li>Alias: {alias}</li>
           <li>Phrase: {identity.phrase}</li>
           <li>Seed (as hex): {identity.seedAsHex}</li>
           <li>Public Key: {identity.publicKey}</li>

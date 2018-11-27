@@ -1,33 +1,40 @@
 import * as mnemonic from '@polkadot/util-crypto/mnemonic'
-import update from 'immutability-helper'
 import values from 'lodash/values'
 import * as React from 'react'
+import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
+
+import { removeUser, saveUser } from '../../state/ducks/wallet'
 import Identity from '../../types/Identity'
 import IdentityViewComponent from './IdentityViewComponent'
 
-type Props = RouteComponentProps<{}>
+type Props = RouteComponentProps<{}> & {
+  saveUser: (alias: string, identity: Identity) => void
+  removeUser: (seedAsHex: string) => void
+  identities: { [key: string]: { alias: string; identity: Identity } }
+}
 type State = {
-  identities: { [key: string]: Identity }
   randomPhrase: string
+  alias: string
 }
 
 class WalletComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      identities: {}, // TODO: load from localStorage
+      alias: '',
       randomPhrase: mnemonic.mnemonicGenerate(),
     }
   }
 
   public render() {
-    const identities = values(this.state.identities).map(
-      (identity: Identity) => (
+    const identities = values(this.props.identities).map(
+      ({ alias, identity }) => (
         <IdentityViewComponent
           key={identity.seedAsHex}
           identity={identity}
+          alias={alias}
           onDelete={this.removeIdentity}
         />
       )
@@ -37,6 +44,8 @@ class WalletComponent extends React.Component<Props, State> {
       <div>
         <h1>Wallet</h1>
         <hr />
+        <h3>Add new identity from phrase</h3>
+        <h4>(duplicates not permitted)</h4>
         <input
           type="text"
           value={this.state.randomPhrase}
@@ -44,9 +53,13 @@ class WalletComponent extends React.Component<Props, State> {
         />
         <button onClick={this.createRandomPhrase}>create random phrase</button>
         <br />
-        <button onClick={this.addIdentity}>
-          Add new identity from phrase (duplicates not permitted)
-        </button>
+        <input
+          type="text"
+          placeholder="Name"
+          value={this.state.alias}
+          onChange={this.setAlias}
+        />
+        <button onClick={this.addIdentity}>Add</button>
         <hr />
         {identities}
       </div>
@@ -55,10 +68,7 @@ class WalletComponent extends React.Component<Props, State> {
 
   private addIdentity = () => {
     const identity = new Identity(this.state.randomPhrase)
-    const newPartialState = {}
-    newPartialState[identity.seedAsHex] = identity
-    const newState = update(this.state.identities, { $merge: newPartialState })
-    this.setState({ identities: newState })
+    this.props.saveUser(this.state.alias, identity)
     // TODO: add to localStorage
   }
 
@@ -70,11 +80,36 @@ class WalletComponent extends React.Component<Props, State> {
     this.setState({ randomPhrase: e.currentTarget.value })
   }
 
+  private setAlias = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ alias: e.currentTarget.value })
+  }
+
   private removeIdentity = (seedAsHex: string) => {
-    const newState = update(this.state.identities, { $unset: [seedAsHex] })
-    this.setState({ identities: newState })
+    this.props.removeUser(seedAsHex)
     // TODO: remove from localStorage
   }
 }
 
-export default withRouter(WalletComponent)
+const mapStateToProps = (state: any) => {
+  return {
+    identities: state.wallet,
+  }
+}
+
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    removeUser: (seedAsHex: string) => {
+      dispatch(removeUser(seedAsHex))
+    },
+    saveUser: (alias: string, identity: Identity) => {
+      dispatch(saveUser(alias, identity))
+    },
+  }
+}
+
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WalletComponent)
+)
