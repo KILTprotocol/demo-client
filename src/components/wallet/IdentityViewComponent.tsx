@@ -23,7 +23,7 @@ class IdentityViewComponent extends React.Component<Props, {}> {
           <li>Alias: {alias}</li>
           <li>Phrase: {identity.phrase}</li>
           <li>Seed (as hex): {identity.seedAsHex}</li>
-          <li>Public Key: {identity.publicKey}</li>
+          <li>Public Key: {identity.publicKeyAsHex}</li>
           <li>
             <button onClick={this.onDelete}>Remove</button>
           </li>

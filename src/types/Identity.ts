@@ -1,6 +1,6 @@
 import * as mnemonic from '@polkadot/util-crypto/mnemonic'
 import * as nacl from '@polkadot/util-crypto/nacl'
-import { KeypairType } from "@polkadot/util-crypto/types"
+import { KeypairType } from '@polkadot/util-crypto/types'
 import * as u8a from '@polkadot/util/u8a'
 
 export default class Identity {
@@ -47,5 +47,9 @@ export default class Identity {
 
   get seedAsHex() {
     return this._seedAsHex
+  }
+
+  get publicKeyAsHex() {
+    return u8a.u8aToHex(this._keyPair.publicKey)
   }
 }
