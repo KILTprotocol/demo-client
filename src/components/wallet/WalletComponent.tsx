@@ -5,7 +5,12 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 
-import { removeUser, saveUser } from '../../state/ducks/wallet'
+import {
+  IWalletState,
+  removeUser,
+  saveUser,
+  WalletAction,
+} from '../../state/ducks/wallet'
 import Identity from '../../types/Identity'
 import IdentityViewComponent from './IdentityViewComponent'
 
@@ -69,7 +74,6 @@ class WalletComponent extends React.Component<Props, State> {
   private addIdentity = () => {
     const identity = new Identity(this.state.randomPhrase)
     this.props.saveUser(this.state.alias, identity)
-    // TODO: add to localStorage
   }
 
   private createRandomPhrase = () => {
@@ -86,17 +90,17 @@ class WalletComponent extends React.Component<Props, State> {
 
   private removeIdentity = (seedAsHex: string) => {
     this.props.removeUser(seedAsHex)
-    // TODO: remove from localStorage
   }
 }
 
-const mapStateToProps = (state: any) => {
+// types
+const mapStateToProps = (state: { wallet: IWalletState }) => {
   return {
     identities: state.wallet,
   }
 }
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: (action: WalletAction) => void) => {
   return {
     removeUser: (seedAsHex: string) => {
       dispatch(removeUser(seedAsHex))
