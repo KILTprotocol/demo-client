@@ -9,6 +9,7 @@ const HeaderComponent: React.FunctionComponent = props => {
         <img src={logo} alt="logo" />
       </Link>
       <br />
+      <Link to="/wallet">Wallet </Link>
       <Link to="/ctype">CTYPE manager </Link>
       <Link to="/chain-stats">Chain stats </Link>
     </header>

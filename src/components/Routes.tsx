@@ -3,6 +3,7 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 import ChainStatsComponent from './chainStats/ChainStatsComponent'
 import CtypeComponent from './ctype/CtypeComponent'
 import RootComponent from './root/RootComponent'
+import WalletComponent from './wallet/WalletComponent'
 
 const Routes: React.FunctionComponent<{}> = props => {
   const defaultLocalhost = encodeURIComponent('ws://127.0.0.1:9944')
@@ -10,6 +11,7 @@ const Routes: React.FunctionComponent<{}> = props => {
 
   return (
     <Switch>
+      <Route path={'/wallet'} component={WalletComponent} />
       <Route path={'/chain-stats/:host'} component={ChainStatsComponent} />
       <Route
         path={'/chain-stats'}
