@@ -24,7 +24,7 @@
     "test": "react-scripts-ts test --env=jsdom",
     "testCI": "CI=true react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
-    "lint": "tslint 'src/**/*.ts?'",
+    "lint": "tslint 'src/**/*.tsx' 'src/**/*.ts'",
     "commit": "git-cz"
   },
   "husky": {
