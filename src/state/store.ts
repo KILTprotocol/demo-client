@@ -4,9 +4,11 @@ import Identity from '../types/Identity'
 import walletReducer from './ducks/wallet'
 
 declare global {
+  /* tslint:disable */
   interface Window {
     __REDUX_DEVTOOLS_EXTENSION__: any
   }
+  /* tslint:enable */
 }
 
 const localState = localStorage.getItem('reduxState')
