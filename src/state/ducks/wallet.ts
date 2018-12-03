@@ -1,20 +1,40 @@
 import Identity from '../../types/Identity'
 
+// Types & Interfaces
 type Action = {
-  type?: string
-  payload?: any
+  type: string
+  payload: any
 }
+interface ISaveAction extends Action {
+  payload: {
+    alias: string
+    identity: Identity
+  }
+}
+interface IRemoveAction extends Action {
+  payload: string
+}
+type WalletAction = ISaveAction | IRemoveAction
 
-type State = any
+interface IWalletState {
+  [index: string]: {
+    alias: string
+    identity: Identity
+  }
+}
 
 // Actions
 const SAVE_USER = 'client/wallet/SAVE_USER'
 const REMOVE_USER = 'client/wallet/REMOVE_USER'
 
 // Reducer
-export default function reducer(state: State = {}, action: Action = {}) {
+export default function reducer(
+  state: IWalletState = {},
+  action: WalletAction
+) {
   switch (action.type) {
     case SAVE_USER:
+      action = action as ISaveAction
       const { alias, identity } = action.payload
       state = {
         [identity.seedAsHex]: {
@@ -25,6 +45,7 @@ export default function reducer(state: State = {}, action: Action = {}) {
       }
       break
     case REMOVE_USER:
+      action = action as IRemoveAction
       const { [action.payload]: value, ...rest } = state
       state = rest
       break
