@@ -12,6 +12,7 @@ interface IRemoveAction extends Action {
   payload: string
 }
 export type WalletAction = ISaveAction | IRemoveAction
+
 export interface IWalletState {
   [index: string]: {
     alias: string
@@ -28,11 +29,11 @@ export default function reducer(
   state: IWalletState = {},
   action: WalletAction
 ): IWalletState {
+  let newState: IWalletState = {}
   switch (action.type) {
     case SAVE_USER:
-      action = action as ISaveAction
-      const { alias, identity } = action.payload
-      state = {
+      const { alias, identity } = (action as ISaveAction).payload
+      newState = {
         [identity.seedAsHex]: {
           alias,
           identity,
@@ -41,12 +42,12 @@ export default function reducer(
       }
       break
     case REMOVE_USER:
-      action = action as IRemoveAction
-      const { [action.payload]: value, ...rest } = state
-      state = rest
+      const { [(action as IRemoveAction).payload]: value, ...rest } = state
+      newState = rest
       break
   }
-  return state
+
+  return newState
 }
 
 // Action Creators
