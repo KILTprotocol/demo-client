@@ -1,14 +1,14 @@
-FROM nginx:stable-alpine
+FROM node:10-alpine
 
-# Create app directory
 WORKDIR /app
 
-RUN apk add yarn
+RUN apk add yarn python make g++ binutils binutils-dev
 
 COPY . ./
 
+RUN yarn config set @kiltprotocol:registry https://registry.npmjs.org
 RUN yarn install
-RUN yarn build
 
-EXPOSE 80
-RUN cp -R build/* /usr/share/nginx/html
+EXPOSE 3000
+
+CMD ["yarn", "start"]
