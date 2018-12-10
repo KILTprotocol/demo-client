@@ -74,6 +74,7 @@ class WalletComponent extends React.Component<Props, State> {
   private addIdentity = () => {
     const identity = new Identity(this.state.randomPhrase)
     this.props.saveUser(this.state.alias, identity)
+    this.createRandomPhrase()
   }
 
   private createRandomPhrase = () => {

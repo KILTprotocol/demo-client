@@ -29,17 +29,16 @@ export default function reducer(
   state: IWalletState = {},
   action: WalletAction
 ): IWalletState {
-  let newState: IWalletState = {}
+  let newState: IWalletState = { ...state }
+
   switch (action.type) {
     case SAVE_USER:
       const { alias, identity } = (action as ISaveAction).payload
       newState = {
-        [identity.seedAsHex]: {
-          alias,
-          identity,
-        },
         ...state,
+        [identity.seedAsHex]: { alias, identity },
       }
+
       break
     case REMOVE_USER:
       const { [(action as IRemoveAction).payload]: value, ...rest } = state
