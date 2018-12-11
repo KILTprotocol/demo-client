@@ -25,7 +25,7 @@ const store = createStore(
 )
 
 store.subscribe(() => {
-  localStorage.setItem('reduxState', JSON.stringify(store.getState()))
+  localStorage.setItem('reduxState', serialize(store.getState()))
 })
 
 export default store
@@ -37,11 +37,26 @@ function deserialize(obj: any): { wallet: IWalletState } {
     const o = obj.wallet[key]
     wallet[key] = {
       alias: o.alias,
-      identity: new Identity(o.identity._phrase),
+      identity: new Identity(o.phrase),
     }
   })
 
   return {
     wallet: Immutable.Map(wallet),
   }
+}
+
+function serialize(state: { wallet: IWalletState }): any {
+  const obj: {
+    wallet: Array<{ alias: string; phrase: string }>
+  } = {
+    wallet: [],
+  }
+
+  obj.wallet = state.wallet
+    .toList()
+    .map(i => ({ alias: i.alias, phrase: i.identity.phrase }))
+    .toArray()
+
+  return JSON.stringify(obj)
 }
