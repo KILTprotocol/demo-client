@@ -1,17 +1,15 @@
 import * as mnemonic from '@polkadot/util-crypto/mnemonic'
-// import Immutable from 'immutable'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
-
 import {
   IAliasIdentity,
   IWalletState,
   removeUser,
   saveUser,
   WalletAction,
-} from '../../state/ducks/wallet'
+} from '../../state/ducks/Wallet'
 import Identity from '../../types/Identity'
 import IdentityViewComponent from './IdentityViewComponent'
 

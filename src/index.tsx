@@ -8,14 +8,15 @@ import 'skeleton-css/css/skeleton.css'
 import './index.css'
 
 import App from './App'
-import store from './state/store'
+import persistentStore from './state/PersistentStore'
 
 // import registerServiceWorker from './registerServiceWorker'
 
 ReactDOM.render(
-  <Provider store={store}>
+  <Provider store={persistentStore.store}>
     <App />
   </Provider>,
   document.getElementById('root') as HTMLElement
 )
+
 // registerServiceWorker()
