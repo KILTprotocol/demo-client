@@ -3,20 +3,18 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
-import {
-  IAliasIdentity,
-  IWalletState,
-  removeUser,
-  saveUser,
+import WalletRedux, {
   WalletAction,
-} from '../../state/ducks/Wallet'
+  WalletState,
+  WalletStateEntry,
+} from '../../state/ducks/WalletRedux'
 import Identity from '../../types/Identity'
 import IdentityViewComponent from './IdentityViewComponent'
 
 type Props = RouteComponentProps<{}> & {
   saveUser: (alias: string, identity: Identity) => void
   removeUser: (seedAsHex: string) => void
-  identities: IAliasIdentity[]
+  identities: WalletStateEntry[]
 }
 type State = {
   randomPhrase: string
@@ -33,12 +31,12 @@ class WalletComponent extends React.Component<Props, State> {
   }
 
   public render() {
-    const identities = this.props.identities.map((identity: IAliasIdentity) => {
+    const identities = this.props.identities.map((entry: WalletStateEntry) => {
       return (
         <IdentityViewComponent
-          key={identity.identity.seedAsHex}
-          identity={identity.identity}
-          alias={identity.alias}
+          key={entry.identity.seedAsHex}
+          identity={entry.identity}
+          alias={entry.alias}
           onDelete={this.removeIdentity}
         />
       )
@@ -93,8 +91,7 @@ class WalletComponent extends React.Component<Props, State> {
   }
 }
 
-// types
-const mapStateToProps = (state: { wallet: IWalletState }) => {
+const mapStateToProps = (state: { wallet: WalletState }) => {
   return {
     identities: state.wallet.toList().toArray(),
   }
@@ -103,10 +100,10 @@ const mapStateToProps = (state: { wallet: IWalletState }) => {
 const mapDispatchToProps = (dispatch: (action: WalletAction) => void) => {
   return {
     removeUser: (seedAsHex: string) => {
-      dispatch(removeUser(seedAsHex))
+      dispatch(WalletRedux.removeUserAction(seedAsHex))
     },
     saveUser: (alias: string, identity: Identity) => {
-      dispatch(saveUser(alias, identity))
+      dispatch(WalletRedux.saveUserAction(alias, identity))
     },
   }
 }

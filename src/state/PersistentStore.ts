@@ -1,7 +1,7 @@
 import Immutable from 'immutable'
 import { combineReducers, createStore, Store } from 'redux'
 import Identity from '../types/Identity'
-import walletReducer, { IWalletState } from './ducks/Wallet'
+import WalletRedux, { WalletState } from './ducks/WalletRedux'
 
 declare global {
   /* tslint:disable */
@@ -18,7 +18,7 @@ class PersistentStore {
 
   private static NAME = 'reduxState'
 
-  private static deserialize(obj: any): { wallet: IWalletState } {
+  private static deserialize(obj: any): { wallet: WalletState } {
     const wallet = {}
 
     Object.keys(obj.wallet).forEach(key => {
@@ -34,7 +34,7 @@ class PersistentStore {
     }
   }
 
-  private static serialize(state: { wallet: IWalletState }): any {
+  private static serialize(state: { wallet: WalletState }): any {
     const obj: {
       wallet: Array<{ alias: string; phrase: string }>
     } = {
@@ -60,7 +60,7 @@ class PersistentStore {
     }
 
     this._store = createStore(
-      combineReducers({ wallet: walletReducer }),
+      combineReducers({ wallet: WalletRedux.reducer }),
       persistedState,
       window.__REDUX_DEVTOOLS_EXTENSION__ &&
         window.__REDUX_DEVTOOLS_EXTENSION__()
