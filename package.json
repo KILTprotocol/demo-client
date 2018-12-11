@@ -9,6 +9,7 @@
     "@polkadot/util": "^0.33.1",
     "@polkadot/util-crypto": "^0.33.1",
     "immutability-helper": "^2.8.1",
+    "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
@@ -16,7 +17,8 @@
     "react-router-dom": "^4.3.1",
     "react-scripts-ts": "3.1.0",
     "react-test-renderer": "^16.6.3",
-    "skeleton-css": "^2.0.4"
+    "skeleton-css": "^2.0.4",
+    "transit-immutable-js": "^0.7.0"
   },
   "scripts": {
     "start": "react-scripts-ts start",

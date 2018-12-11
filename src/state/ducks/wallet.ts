@@ -1,3 +1,4 @@
+import Immutable from 'immutable'
 import Identity from '../../types/Identity'
 import Action from '../Action'
 
@@ -13,12 +14,12 @@ interface IRemoveAction extends Action {
 }
 export type WalletAction = ISaveAction | IRemoveAction
 
-export interface IWalletState {
-  [index: string]: {
-    alias: string
-    identity: Identity
-  }
+export interface IAliasIdentity {
+  alias: string
+  identity: Identity
 }
+
+export type IWalletState = Immutable.Map<string, IAliasIdentity>
 
 // Actions
 const SAVE_USER = 'client/wallet/SAVE_USER'
@@ -26,27 +27,19 @@ const REMOVE_USER = 'client/wallet/REMOVE_USER'
 
 // Reducer
 export default function reducer(
-  state: IWalletState = {},
+  state: IWalletState = Immutable.Map(),
   action: WalletAction
 ): IWalletState {
-  let newState: IWalletState = { ...state }
-
   switch (action.type) {
     case SAVE_USER:
       const { alias, identity } = (action as ISaveAction).payload
-      newState = {
-        ...state,
-        [identity.seedAsHex]: { alias, identity },
-      }
-
-      break
+      return state.set(identity.seedAsHex, { alias, identity })
     case REMOVE_USER:
-      const { [(action as IRemoveAction).payload]: value, ...rest } = state
-      newState = rest
-      break
+      const key = (action as IRemoveAction).payload
+      return state.delete(key)
+    default:
+      return state
   }
-
-  return newState
 }
 
 // Action Creators

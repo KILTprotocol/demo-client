@@ -1,5 +1,5 @@
+import Immutable from 'immutable'
 import { combineReducers, createStore } from 'redux'
-
 import Identity from '../types/Identity'
 import walletReducer, { IWalletState } from './ducks/wallet'
 
@@ -31,17 +31,17 @@ store.subscribe(() => {
 export default store
 
 function deserialize(obj: any): { wallet: IWalletState } {
-  const state = {
-    wallet: {},
-  }
+  const wallet = {}
 
   Object.keys(obj.wallet).forEach(key => {
     const o = obj.wallet[key]
-    state.wallet[key] = {
+    wallet[key] = {
       alias: o.alias,
       identity: new Identity(o.identity._phrase),
     }
   })
 
-  return state
+  return {
+    wallet: Immutable.Map(wallet),
+  }
 }

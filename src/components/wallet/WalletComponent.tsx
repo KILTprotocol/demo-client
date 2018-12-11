@@ -1,11 +1,12 @@
 import * as mnemonic from '@polkadot/util-crypto/mnemonic'
-import values from 'lodash/values'
+// import Immutable from 'immutable'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 
 import {
+  IAliasIdentity,
   IWalletState,
   removeUser,
   saveUser,
@@ -17,7 +18,7 @@ import IdentityViewComponent from './IdentityViewComponent'
 type Props = RouteComponentProps<{}> & {
   saveUser: (alias: string, identity: Identity) => void
   removeUser: (seedAsHex: string) => void
-  identities: { [key: string]: { alias: string; identity: Identity } }
+  identities: IAliasIdentity[]
 }
 type State = {
   randomPhrase: string
@@ -34,16 +35,16 @@ class WalletComponent extends React.Component<Props, State> {
   }
 
   public render() {
-    const identities = values(this.props.identities).map(
-      ({ alias, identity }) => (
+    const identities = this.props.identities.map((identity: IAliasIdentity) => {
+      return (
         <IdentityViewComponent
-          key={identity.seedAsHex}
-          identity={identity}
-          alias={alias}
+          key={identity.identity.seedAsHex}
+          identity={identity.identity}
+          alias={identity.alias}
           onDelete={this.removeIdentity}
         />
       )
-    )
+    })
 
     return (
       <div>
@@ -97,7 +98,7 @@ class WalletComponent extends React.Component<Props, State> {
 // types
 const mapStateToProps = (state: { wallet: IWalletState }) => {
   return {
-    identities: state.wallet,
+    identities: state.wallet.toList().toArray(),
   }
 }
 
