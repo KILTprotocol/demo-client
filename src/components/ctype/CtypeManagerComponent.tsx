@@ -4,16 +4,17 @@ import { Link, withRouter } from 'react-router-dom'
 import If from '../../common/If'
 import ctypeRepository from '../../services/CtypeRepository'
 import { CType } from '../../types/Ctype'
+import CtypeViewComponent from './CtypeViewComponent'
 
 type Props = RouteComponentProps<{
-  hash?: string
+  ctypeKey?: string
 }>
 
 type State = {
   ctypes: CType[]
 }
 
-class CtypeComponent extends React.Component<Props, State> {
+class CtypeManagerComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
@@ -27,7 +28,7 @@ class CtypeComponent extends React.Component<Props, State> {
   }
 
   public render() {
-    const hash = this.props.match.params.hash
+    const ctypeKey = this.props.match.params.ctypeKey
 
     const list = this.state.ctypes.map(ctype => (
       <li key={ctype.key}>
@@ -39,8 +40,8 @@ class CtypeComponent extends React.Component<Props, State> {
       <div>
         <h1 className="App-title">Ctype Manager</h1>
         <If
-          condition={!!hash}
-          then={<div>Current hash: {hash}</div>}
+          condition={!!ctypeKey}
+          then={<CtypeViewComponent ctypeKey={ctypeKey as string} />}
           else={<ul>{list}</ul>}
         />
       </div>
@@ -53,4 +54,4 @@ class CtypeComponent extends React.Component<Props, State> {
   }
 }
 
-export default withRouter(CtypeComponent)
+export default withRouter(CtypeManagerComponent)

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import Optional from 'typescript-optional'
 import { CType } from '../types/Ctype'
 
 // TODO: add tests, create interface for this class to be implemented as mock (for other tests)
@@ -9,8 +8,10 @@ class CtypeRepository {
     process.env.REACT_APP_SERVICE_PORT
   }/ctype`
 
-  public async findByKey(key: string): Promise<Optional<CType>> {
-    return Promise.reject('implement')
+  public async findByKey(key: string): Promise<CType> {
+    const response = await axios.get(`${CtypeRepository.URL}/${key}`)
+    const ctype = response.data as CType
+    return ctype
   }
 
   public async findAll(): Promise<CType[]> {
