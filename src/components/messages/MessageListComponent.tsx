@@ -22,9 +22,6 @@ class MessageListComponent extends React.Component<Props, State> {
     fetch(`http://localhost:3000/messaging/inbox/${this.pubKey}`)
       .then(response => response.json())
       .then((messages: any) => {
-
-        console.log('messages', messages)
-
         this.setState({ messages })
       })
   }
