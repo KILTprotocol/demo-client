@@ -12,8 +12,8 @@ import Identity from '../../types/Identity'
 import IdentityViewComponent from './IdentityViewComponent'
 
 type Props = RouteComponentProps<{}> & {
-  saveUser: (alias: string, identity: Identity) => void
-  removeUser: (seedAsHex: string) => void
+  saveIdentity: (alias: string, identity: Identity) => void
+  removeIdentity: (seedAsHex: string) => void
   identities: WalletStateEntry[]
 }
 type State = {
@@ -31,16 +31,14 @@ class WalletComponent extends React.Component<Props, State> {
   }
 
   public render() {
-    const identities = this.props.identities.map((entry: WalletStateEntry) => {
-      return (
-        <IdentityViewComponent
-          key={entry.identity.seedAsHex}
-          identity={entry.identity}
-          alias={entry.alias}
-          onDelete={this.removeIdentity}
-        />
-      )
-    })
+    const identities = this.props.identities.map((entry: WalletStateEntry) => (
+      <IdentityViewComponent
+        key={entry.identity.seedAsHex}
+        identity={entry.identity}
+        alias={entry.alias}
+        onDelete={this.removeIdentity}
+      />
+    ))
 
     return (
       <div>
@@ -70,7 +68,7 @@ class WalletComponent extends React.Component<Props, State> {
 
   private addIdentity = () => {
     const identity = new Identity(this.state.randomPhrase)
-    this.props.saveUser(this.state.alias, identity)
+    this.props.saveIdentity(this.state.alias, identity)
     this.createRandomPhrase()
   }
 
@@ -87,23 +85,26 @@ class WalletComponent extends React.Component<Props, State> {
   }
 
   private removeIdentity = (seedAsHex: string) => {
-    this.props.removeUser(seedAsHex)
+    this.props.removeIdentity(seedAsHex)
   }
 }
 
 const mapStateToProps = (state: { wallet: WalletState }) => {
   return {
-    identities: state.wallet.toList().toArray(),
+    identities: state.wallet
+      .get('identities')
+      .toList()
+      .toArray(),
   }
 }
 
 const mapDispatchToProps = (dispatch: (action: WalletAction) => void) => {
   return {
-    removeUser: (seedAsHex: string) => {
-      dispatch(WalletRedux.removeUserAction(seedAsHex))
+    removeIdentity: (seedAsHex: string) => {
+      dispatch(WalletRedux.removeIdentityAction(seedAsHex))
     },
-    saveUser: (alias: string, identity: Identity) => {
-      dispatch(WalletRedux.saveUserAction(alias, identity))
+    saveIdentity: (alias: string, identity: Identity) => {
+      dispatch(WalletRedux.saveIdentityAction(alias, identity))
     },
   }
 }

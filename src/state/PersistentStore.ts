@@ -1,7 +1,7 @@
 import Immutable from 'immutable'
 import { combineReducers, createStore, Store } from 'redux'
 import Identity from '../types/Identity'
-import WalletRedux, { WalletState } from './ducks/WalletRedux'
+import WalletRedux, { WalletState, WalletStateEntry } from './ducks/WalletRedux'
 
 declare global {
   /* tslint:disable */
@@ -18,33 +18,57 @@ class PersistentStore {
 
   private static NAME = 'reduxState'
 
+  // TODO: use interface/type for (de)serialized state, instead of any
   private static deserialize(obj: any): { wallet: WalletState } {
-    const wallet = {}
+    const identities = {}
+    let selected: WalletStateEntry | null = null
 
-    Object.keys(obj.wallet).forEach(key => {
-      const o = obj.wallet[key]
-      wallet[key] = {
-        alias: o.alias,
-        identity: new Identity(o.phrase),
+    // TODO: move to WalletRedux as every state needs a special implementation
+    Object.keys(obj.wallet.identities).forEach(i => {
+      const o = obj.wallet.identities[i]
+      const identity = new Identity(o.phrase)
+      const entry = { alias: o.alias, identity }
+      identities[identity.seedAsHex] = entry
+
+      if (
+        obj.wallet.selectedIdentityAsSeedAsHex &&
+        obj.wallet.selectedIdentityAsSeedAsHex === identity.seedAsHex
+      ) {
+        selected = entry
       }
     })
 
     return {
-      wallet: Immutable.Map(wallet),
+      wallet: WalletRedux.createState({
+        identities: Immutable.Map(identities),
+        selected,
+      }),
     }
   }
 
   private static serialize(state: { wallet: WalletState }): any {
     const obj: {
-      wallet: Array<{ alias: string; phrase: string }>
+      wallet: {
+        identities: Array<{ alias: string; phrase: string }>
+        selectedIdentityAsSeedAsHex?: string
+      }
     } = {
-      wallet: [],
+      wallet: {
+        identities: [],
+      },
     }
 
-    obj.wallet = state.wallet
+    // TODO: move to WalletRedux as every state needs a special implementation
+    obj.wallet.identities = state.wallet
+      .get('identities')
       .toList()
       .map(i => ({ alias: i.alias, phrase: i.identity.phrase }))
       .toArray()
+
+    const selected = state.wallet.get('selected')
+    if (selected) {
+      obj.wallet.selectedIdentityAsSeedAsHex = selected.identity.seedAsHex
+    }
 
     return JSON.stringify(obj)
   }

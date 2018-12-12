@@ -11,44 +11,81 @@ interface ISaveAction extends Action {
 interface IRemoveAction extends Action {
   payload: string
 }
+interface ISelectAction extends Action {
+  payload: string
+}
 
-type WalletAction = ISaveAction | IRemoveAction
+type WalletAction = ISaveAction | IRemoveAction | ISelectAction
 
 type WalletStateEntry = {
   alias: string
   identity: Identity
 }
 
-type WalletState = Immutable.Map<string, WalletStateEntry>
+type WalletState = Immutable.Record<{
+  identities: Immutable.Map<string, WalletStateEntry>
+  selected: WalletStateEntry | null
+}>
 
 class WalletRedux {
   public static reducer(
-    state: WalletState = Immutable.Map(),
+    state: WalletState = WalletRedux.createState(),
     action: WalletAction
   ): WalletState {
     switch (action.type) {
-      case WalletRedux.ACTIONS.SAVE_USER:
+      case WalletRedux.ACTIONS.SAVE_IDENTITY:
         const { alias, identity } = (action as ISaveAction).payload
-        return state.set(identity.seedAsHex, { alias, identity })
-      case WalletRedux.ACTIONS.REMOVE_USER:
-        const key = (action as IRemoveAction).payload
-        return state.delete(key)
+        return state.setIn(['identities', identity.seedAsHex], {
+          alias,
+          identity,
+        })
+      case WalletRedux.ACTIONS.REMOVE_IDENTITY:
+        const seedAsHex1 = (action as IRemoveAction).payload
+        return state.deleteIn(['identities', seedAsHex1])
+      case WalletRedux.ACTIONS.SELECT_IDENTITY:
+        const seedAsHex2 = (action as ISelectAction).payload
+        const selectedIdentity = state.getIn(['identities', seedAsHex2])
+        return state.set('selected', selectedIdentity)
       default:
         return state
     }
   }
 
-  public static saveUserAction(alias: string, identity: Identity): ISaveAction {
-    return { type: WalletRedux.ACTIONS.SAVE_USER, payload: { alias, identity } }
+  public static saveIdentityAction(
+    alias: string,
+    identity: Identity
+  ): ISaveAction {
+    return {
+      payload: { alias, identity },
+      type: WalletRedux.ACTIONS.SAVE_IDENTITY,
+    }
   }
 
-  public static removeUserAction(seedAsHex: string): IRemoveAction {
-    return { type: WalletRedux.ACTIONS.REMOVE_USER, payload: seedAsHex }
+  public static removeIdentityAction(seedAsHex: string): IRemoveAction {
+    return {
+      payload: seedAsHex,
+      type: WalletRedux.ACTIONS.REMOVE_IDENTITY,
+    }
+  }
+
+  public static selectIdentityAction(seedAsHex: string): ISelectAction {
+    return {
+      payload: seedAsHex,
+      type: WalletRedux.ACTIONS.SELECT_IDENTITY,
+    }
+  }
+
+  public static createState(obj?: any) {
+    return Immutable.Record({
+      identities: Immutable.Map<string, WalletStateEntry>(),
+      selected: null,
+    })(obj)
   }
 
   private static ACTIONS = {
-    REMOVE_USER: 'client/wallet/REMOVE_USER',
-    SAVE_USER: 'client/wallet/SAVE_USER',
+    REMOVE_IDENTITY: 'client/wallet/REMOVE_IDENTITY',
+    SAVE_IDENTITY: 'client/wallet/SAVE_IDENTITY',
+    SELECT_IDENTITY: 'client/wallet/SELECT_IDENTITY',
   }
 }
 
