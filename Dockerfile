@@ -10,7 +10,9 @@ COPY . ./
 ARG KILT_NPM_AUTH_TOKEN=""
 RUN echo "//registry.npmjs.org/:_authToken=$KILT_NPM_AUTH_TOKEN" > .npmrc
 RUN yarn config set @kiltprotocol:registry https://registry.npmjs.org
-RUN yarn install && yarn build
+RUN yarn install
+# RUN yarn testCI
+RUN yarn build
 
 FROM nginx:alpine
 COPY --from=builder /app/build/ /usr/share/nginx/html/

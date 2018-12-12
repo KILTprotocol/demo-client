@@ -4,7 +4,7 @@ phases:
   pre_build:
     commands:
     - echo Run tests...
-    - docker build --build-arg KILT_NPM_AUTH_TOKEN=$KILT_NPM_AUTH_TOKEN -t prototype-client .  && docker run prototype-client yarn testCI
+    - docker build --build-arg KILT_NPM_AUTH_TOKEN=$KILT_NPM_AUTH_TOKEN -t prototype-client .
     - echo Test run completed successfully!
     - echo Logging in to Amazon ECR...
     - aws --version
