@@ -12,7 +12,9 @@ const Routes: React.FunctionComponent<{}> = props => {
 
   function getNodeWsAddress() {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    return `${protocol}://${process.env.REACT_APP_NODE_HOST}:${process.env.REACT_APP_NODE_WS_PORT}`
+    return `${protocol}://${process.env.REACT_APP_NODE_HOST}:${
+      process.env.REACT_APP_NODE_WS_PORT
+    }`
   }
 
   return (
@@ -21,7 +23,11 @@ const Routes: React.FunctionComponent<{}> = props => {
       <Route path={'/chain-stats/:host'} component={ChainStatsComponent} />
       <Route
         path={'/chain-stats'}
-        children={<Redirect to={`/chain-stats/${encodeURIComponent(nodeWebsocketUrl)}`} />}
+        children={
+          <Redirect
+            to={`/chain-stats/${encodeURIComponent(nodeWebsocketUrl)}`}
+          />
+        }
       />
       <Route path={'/ctype/:hash'} component={CtypeComponent} />
       <Route path={'/ctype'} component={CtypeComponent} />
