@@ -3,6 +3,8 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
+import { Button, Input } from 'semantic-ui-react'
+
 import WalletRedux, {
   WalletAction,
   WalletState,
@@ -68,8 +70,28 @@ class WalletComponent extends React.Component<Props, State> {
 
   private addIdentity = () => {
     const identity = new Identity(this.state.randomPhrase)
-    this.props.saveIdentity(this.state.alias, identity)
-    this.createRandomPhrase()
+
+    // TODO: move to service and or effect
+    fetch('http://localhost:3000/contacts', {
+      body: JSON.stringify({
+        key: identity.publicKeyAsHex,
+        name: this.state.alias,
+      }),
+      cache: 'no-cache',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      method: 'POST',
+      mode: 'cors',
+    }).then(
+      response => {
+        this.props.saveIdentity(this.state.alias, identity)
+        this.createRandomPhrase()
+      },
+      error => {
+        console.error('failed to POST new identity', error)
+      }
+    )
   }
 
   private createRandomPhrase = () => {
