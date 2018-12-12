@@ -9,6 +9,7 @@
     "@polkadot/util": "^0.33.1",
     "@polkadot/util-crypto": "^0.33.1",
     "axios": "^0.18.0",
+    "gulp": "^3.9.1",
     "immutability-helper": "^2.8.1",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
@@ -18,11 +19,14 @@
     "react-router-dom": "^4.3.1",
     "react-scripts-ts": "3.1.0",
     "react-test-renderer": "^16.6.3",
-    "skeleton-css": "^2.0.4"
+    "semantic-ui": "^2.4.2",
+    "semantic-ui-react": "^0.83.0"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
+    "build-semantic": "cd src/semantic && gulp build-css build-assets",
+    "watch-semantic": "cd src/semantic && yarn run build-semantic && gulp watch",
+    "start": "yarn run build-semantic && react-scripts-ts start",
+    "build": "yarn run build-semantic && react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "testCI": "CI=true react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
