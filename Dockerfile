@@ -9,7 +9,6 @@ COPY . ./
 # docker built --build-arg KILT_NPM_AUTH_TOKEN=xxx ...
 ARG KILT_NPM_AUTH_TOKEN=""
 RUN echo "//registry.npmjs.org/:_authToken=$KILT_NPM_AUTH_TOKEN" > .npmrc
-RUN less .npmrc
 RUN yarn config set @kiltprotocol:registry https://registry.npmjs.org
 RUN yarn install && yarn build
 
