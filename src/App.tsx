@@ -4,6 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import './App.css'
 import HeaderComponent from './components/header/HeaderComponent'
 import Routes from './components/Routes'
+import './dist/semantic.min.css'
 
 class App extends React.Component {
   public render() {
