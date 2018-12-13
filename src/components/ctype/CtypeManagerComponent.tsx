@@ -73,8 +73,8 @@ class CtypeManagerComponent extends React.Component<Props, State> {
           console.log(`current status ${status.type}`)
           console.log(status)
         })
-        .then((hash: any) => {
-          console.log(`submitted with hash ${hash}`)
+        .then((_hash: any) => {
+          console.log(`submitted with hash ${_hash}`)
         })
     }
   }

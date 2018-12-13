@@ -19,7 +19,6 @@ class MessageListComponent extends React.Component<Props, State> {
   }
 
   public render() {
-    console.log('render', this.props.selectedIdentity)
     return (
       <section>
         <h1>Message List</h1>
@@ -48,18 +47,12 @@ class MessageListComponent extends React.Component<Props, State> {
         this.getMessages(props.selectedIdentity)
         break
       default:
-        console.log(
-          'this.props.selectedIdentity, props.selectedIdentity',
-          this.props.selectedIdentity,
-          props.selectedIdentity
-        )
         this.setState({ messageOutput: 'Could not retrieve messages' })
     }
   }
 
   private getMessages(identity: WalletStateEntry | null) {
     if (identity) {
-      // todo: change when identity select works
       fetch(
         `http://localhost:3000/messaging/inbox/${
           identity.identity.publicKeyAsHex
@@ -92,8 +85,6 @@ class MessageListComponent extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: { wallet: WalletState }) => {
-  console.log(state.wallet.get('selected'))
-
   return {
     selectedIdentity: state.wallet.get('selected'),
   }

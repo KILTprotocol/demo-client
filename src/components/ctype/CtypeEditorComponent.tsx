@@ -1,14 +1,13 @@
-import * as React from 'react'
-
-import 'codemirror/lib/codemirror.css'
-import 'codemirror/mode/javascript/javascript.js'
-import './codemirror.css'
-import { Controlled as CodeMirror } from 'react-codemirror2'
-
 import Ajv from 'ajv'
 import MetaSchema from 'ajv/lib/refs/json-schema-draft-07.json'
 
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/mode/javascript/javascript.js'
+
 import { js as beautify } from 'js-beautify'
+import * as React from 'react'
+import { Controlled as CodeMirror } from 'react-codemirror2'
+import './codemirror.css'
 
 type Props = {
   schema: string

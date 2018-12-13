@@ -46,16 +46,14 @@ class IdentitySelectorComponent extends React.Component<Props, State> {
     }
 
     return (
-      <div>
-        <Dropdown
-          placeholder="Select an identity"
-          fluid={true}
-          selection={true}
-          options={identities}
-          defaultValue={defaultValue}
-          onChange={this.selectIdentity}
-        />
-      </div>
+      <Dropdown
+        placeholder="Select an identity"
+        fluid={true}
+        selection={true}
+        options={identities}
+        defaultValue={defaultValue}
+        onChange={this.selectIdentity}
+      />
     )
   }
 
