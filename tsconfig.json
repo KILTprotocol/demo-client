@@ -28,6 +28,7 @@
     "webpack",
     "jest",
     "src/setupTests.ts",
-    "config"
+    "config",
+    "semantic"
   ]
 }

@@ -6,7 +6,7 @@
       "config/**/*.js",
       "node_modules/**/*.ts",
       "coverage/lcov-report/*.js",
-      "src/semantic/**/*.js"
+      "semantic/**/*.js"
     ]
   },
   "rulesDirectory": ["tslint-plugin-prettier"],

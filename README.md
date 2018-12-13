@@ -10,6 +10,13 @@ Place a file `.npmrc` in the root directory and paste a valid auth token for the
 //registry.npmjs.org/:_authToken=xxx
 ```
 
+## Build and Run
+
+This project is using semantic UI. Source code in /semantic will be build by `yarn start` and places within /src/dist.
+
+If you are likely to adapt the theme or anything regarding semantic UI, use `yarn run watch-semantic`. This will push new code automatically to /src/dist, which triggers a reload of the app (by previous `yarn start`)
+
+
 ## Run in docker container
 
 ### Build docker image
