@@ -40,9 +40,7 @@ class ContactListComponent extends React.Component<Props, State> {
             send message
           </Button>
           {/*TODO: remove when identity selection available*/}
-          <Link to={`/messages/inbox/${contact.key}`}>
-            view messages
-          </Link>
+          <Link to={`/messages/inbox/${contact.key}`}>view messages</Link>
         </li>
       )
     })
@@ -54,9 +52,9 @@ class ContactListComponent extends React.Component<Props, State> {
     // TODO: move to service and or effect
     fetch('http://localhost:3000/messaging', {
       body: JSON.stringify({
-        sender: key,
-        receiver: key,
         message: 'message an ' + key,
+        receiver: key,
+        sender: key,
       }),
       cache: 'no-cache',
       headers: {

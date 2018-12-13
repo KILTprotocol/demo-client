@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 interface Props {
-  match: any,
+  match: any
 }
 
 interface State {
@@ -9,8 +9,7 @@ interface State {
 }
 
 class MessageListComponent extends React.Component<Props, State> {
-
-  pubKey: string
+  public pubKey: string
 
   constructor(props: Props) {
     super(props)
@@ -38,15 +37,16 @@ class MessageListComponent extends React.Component<Props, State> {
   private getMessages() {
     if (this.state.messages.length) {
       return this.state.messages.map((message: any) => (
-          <li key={message.id}>
-            <h4>from:</h4>
-            <p>{message.receiver}</p>
-            <h4>message:</h4>
-            <p>{message.message}</p>
-            <br /><br /><br />
-          </li>
-        )
-      )
+        <li key={message.id}>
+          <h4>from:</h4>
+          <p>{message.receiver}</p>
+          <h4>message:</h4>
+          <p>{message.message}</p>
+          <br />
+          <br />
+          <br />
+        </li>
+      ))
     } else {
       return 'No messages found'
     }

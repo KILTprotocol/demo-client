@@ -34,7 +34,10 @@ const Routes: React.FunctionComponent<{}> = props => {
       <Route path={'/ctype/:ctypeKey'} component={CtypeManagerComponent} />
       <Route path={'/ctype'} component={CtypeManagerComponent} />
       <Route path={'/contacts'} component={ContactListComponent} />
-      <Route path={'/messages/inbox/:pubKey'} component={MessageListComponent} />
+      <Route
+        path={'/messages/inbox/:pubKey'}
+        component={MessageListComponent}
+      />
       <Route component={RootComponent} />
     </Switch>
   )
