@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+
 import logo from '../../assets/logo.png'
-import IdentitySelectorComponent from './IdentitySelectorComponent'
 import './headerComponent.less'
+import IdentitySelectorComponent from './IdentitySelectorComponent'
 
 const HeaderComponent: React.FunctionComponent = props => {
   return (
