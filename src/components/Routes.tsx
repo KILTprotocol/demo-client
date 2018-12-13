@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 import ChainStatsComponent from './chainStats/ChainStatsComponent'
-import CtypeComponent from './ctype/CtypeComponent'
+import CtypeManagerComponent from './ctype/CtypeManagerComponent'
 import RootComponent from './root/RootComponent'
 import WalletComponent from './wallet/WalletComponent'
 
@@ -29,8 +29,8 @@ const Routes: React.FunctionComponent<{}> = props => {
           />
         }
       />
-      <Route path={'/ctype/:hash'} component={CtypeComponent} />
-      <Route path={'/ctype'} component={CtypeComponent} />
+      <Route path={'/ctype/:ctypeKey'} component={CtypeManagerComponent} />
+      <Route path={'/ctype'} component={CtypeManagerComponent} />
       <Route component={RootComponent} />
     </Switch>
   )
