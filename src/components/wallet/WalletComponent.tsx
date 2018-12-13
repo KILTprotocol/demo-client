@@ -48,20 +48,20 @@ class WalletComponent extends React.Component<Props, State> {
         <hr />
         <h3>Add new identity from phrase</h3>
         <h4>(duplicates not permitted)</h4>
-        <input
+        <Input
           type="text"
           value={this.state.randomPhrase}
           onChange={this.setRandomPhrase}
         />
-        <button onClick={this.createRandomPhrase}>create random phrase</button>
+        <Button onClick={this.createRandomPhrase}>create random phrase</Button>
         <br />
-        <input
+        <Input
           type="text"
           placeholder="Name"
           value={this.state.alias}
           onChange={this.setAlias}
         />
-        <button onClick={this.addIdentity}>Add</button>
+        <Button onClick={this.addIdentity}>Add</Button>
         <hr />
         {identities}
       </div>

@@ -1,16 +1,19 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
+import { Dropdown, DropdownItemProps } from 'semantic-ui-react'
 import WalletRedux, {
   WalletAction,
   WalletState,
   WalletStateEntry,
 } from '../../state/ducks/WalletRedux'
 
-type Props = {
+type Props = RouteComponentProps<{}> & {
   selectIdentity: (seedAsHex: string) => void
   options: Array<{ alias: string; publicKeyAsHex: string; seedAsHex: string }>
   selected: WalletStateEntry | null
 }
+
 type State = {
   randomPhrase: string
   alias: string
@@ -18,30 +21,51 @@ type State = {
 
 class IdentitySelectorComponent extends React.Component<Props, State> {
   public render() {
-    const identities = this.props.options.map(option => {
-      return (
-        <option value={option.seedAsHex} key={option.seedAsHex}>
-          {option.alias} {option.publicKeyAsHex.substr(0, 10)}
-        </option>
-      )
+    const identities: DropdownItemProps[] = this.props.options.map(option => {
+      return {
+        key: option.publicKeyAsHex,
+        text: `${option.alias} (${option.publicKeyAsHex.substr(0, 10)}...)`,
+        value: option.seedAsHex,
+      }
+    })
+
+    identities.push({
+      key: 'create',
+      text: `Create an identity`,
+      value: 'create',
     })
 
     let defaultValue
-    if (this.props.selected !== null) {
-      defaultValue = this.props.selected.identity.seedAsHex
+    if (this.props.selected) {
+      const defaultIdentity = identities.find(identity => {
+        return identity.value === this.props.selected!.identity.seedAsHex
+      })
+      if (defaultIdentity && defaultIdentity.value) {
+        defaultValue = defaultIdentity.value
+      }
     }
 
     return (
-      <select onChange={this.selectIdentity} defaultValue={defaultValue}>
-        <option key={0}>Nothing selected</option>
-        {identities}
-      </select>
+      <div>
+        <Dropdown
+          placeholder="Select an identity"
+          fluid={true}
+          selection={true}
+          options={identities}
+          defaultValue={defaultValue}
+          onChange={this.selectIdentity}
+        />
+      </div>
     )
   }
 
-  private selectIdentity = (event: React.FormEvent<HTMLSelectElement>) => {
-    const publicKeyAsHex = event.currentTarget.value
-    this.props.selectIdentity(publicKeyAsHex)
+  private selectIdentity = (event: any, selectedOption: any) => {
+    if (selectedOption.value === 'create') {
+      this.props.history.push('/wallet')
+    } else {
+      const publicKeyAsHex = selectedOption.value
+      this.props.selectIdentity(publicKeyAsHex)
+    }
   }
 }
 
@@ -71,4 +95,4 @@ const mapDispatchToProps = (dispatch: (action: WalletAction) => void) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(IdentitySelectorComponent)
+)(withRouter(IdentitySelectorComponent))

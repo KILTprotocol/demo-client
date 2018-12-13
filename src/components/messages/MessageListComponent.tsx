@@ -1,56 +1,102 @@
 import * as React from 'react'
+import { connect } from 'react-redux'
+import { WalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
 
 interface Props {
-  match: any
+  selectedIdentity: WalletStateEntry | null
 }
 
 interface State {
-  messages: any[]
+  messageOutput: HTMLElement | string
 }
 
 class MessageListComponent extends React.Component<Props, State> {
-  public pubKey: string
-
   constructor(props: Props) {
     super(props)
     this.state = {
-      messages: [],
+      messageOutput: '',
     }
-    // todo: change when identity select works
-    this.pubKey = this.props.match.params.pubKey
-    fetch(`http://localhost:3000/messaging/inbox/${this.pubKey}`)
-      .then(response => response.json())
-      .then((messages: any) => {
-        this.setState({ messages })
-      })
   }
 
   public render() {
+    console.log('render', this.props.selectedIdentity)
     return (
       <section>
         <h1>Message List</h1>
-        <ul>{this.getMessages()}</ul>
+        <ul>{this.state.messageOutput}</ul>
       </section>
     )
   }
 
-  private getMessages() {
-    if (this.state.messages.length) {
-      return this.state.messages.map((message: any) => (
-        <li key={message.id}>
-          <h4>from:</h4>
-          <p>{message.receiver}</p>
-          <h4>message:</h4>
-          <p>{message.message}</p>
-          <br />
-          <br />
-          <br />
-        </li>
-      ))
+  public componentDidMount() {
+    if (!!this.props.selectedIdentity) {
+      this.setState({ messageOutput: 'Fetching messages' })
+      this.getMessages(this.props.selectedIdentity)
     } else {
-      return 'No messages found'
+      this.setState({ messageOutput: 'Could not retrieve messages' })
+    }
+  }
+
+  public componentWillReceiveProps(props: any) {
+    switch (true) {
+      case !this.props.selectedIdentity && !!props.selectedIdentity:
+      case !!this.props.selectedIdentity &&
+        !!props.selectedIdentity &&
+        props.selectedIdentity.identity.publicKeyAsHex !==
+          this.props.selectedIdentity!.identity.publicKeyAsHex:
+        this.setState({ messageOutput: 'Fetching messages' })
+        this.getMessages(props.selectedIdentity)
+        break
+      default:
+        console.log(
+          'this.props.selectedIdentity, props.selectedIdentity',
+          this.props.selectedIdentity,
+          props.selectedIdentity
+        )
+        this.setState({ messageOutput: 'Could not retrieve messages' })
+    }
+  }
+
+  private getMessages(identity: WalletStateEntry | null) {
+    if (identity) {
+      // todo: change when identity select works
+      fetch(
+        `http://localhost:3000/messaging/inbox/${
+          identity.identity.publicKeyAsHex
+        }`
+      )
+        .then(response => response.json())
+        .then((messages: any) => {
+          let messageOutput
+          if (messages.length) {
+            messageOutput = messages.map((message: any) => (
+              <li key={message.id}>
+                <h4>from:</h4>
+                <p>{message.receiver}</p>
+                <h4>message:</h4>
+                <p>{message.message}</p>
+                <br />
+                <br />
+                <br />
+              </li>
+            ))
+          } else {
+            messageOutput =
+              'No messages found for ' +
+              this.props.selectedIdentity!.identity.publicKeyAsHex
+          }
+          this.setState({ messageOutput })
+        })
     }
   }
 }
 
-export default MessageListComponent
+const mapStateToProps = (state: { wallet: WalletState }) => {
+  console.log(state.wallet.get('selected'))
+
+  return {
+    selectedIdentity: state.wallet.get('selected'),
+  }
+}
+
+export default connect(mapStateToProps)(MessageListComponent)

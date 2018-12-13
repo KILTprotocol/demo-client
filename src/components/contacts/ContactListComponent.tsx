@@ -1,8 +1,11 @@
 import * as React from 'react'
-import { Link } from 'react-router-dom'
-import { Button } from 'semantic-ui-react'
+import { connect } from 'react-redux'
+import { Button, Icon } from 'semantic-ui-react'
+import { WalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
 
-interface Props {}
+interface Props {
+  selectedIdentity: WalletStateEntry | null
+}
 
 interface State {
   contacts: any[]
@@ -35,35 +38,45 @@ class ContactListComponent extends React.Component<Props, State> {
       return (
         <li key={contact.key}>
           {contact.name} / {contact.key}
-          <br />
-          <Button onClick={this.sendMessage.bind(this, contact.key)}>
-            send message
+          <Button
+            icon={true}
+            onClick={this.sendMessage.bind(this, contact.key)}
+          >
+            <Icon name="send" />
           </Button>
-          {/*TODO: remove when identity selection available*/}
-          <Link to={`/messages/inbox/${contact.key}`}>view messages</Link>
         </li>
       )
     })
   }
 
-  private sendMessage = (key: string): void => {
-    // set own id
+  private sendMessage = (publicKeyAsHex: string): void => {
+    if (this.props.selectedIdentity) {
+      console.log(
+        'this.props.selectedIdentity.identity.publicKeyAsHex',
+        this.props.selectedIdentity.identity.publicKeyAsHex
+      )
 
-    // TODO: move to service and or effect
-    fetch('http://localhost:3000/messaging', {
-      body: JSON.stringify({
-        message: 'message an ' + key,
-        receiver: key,
-        sender: key,
-      }),
-      cache: 'no-cache',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      method: 'POST',
-      mode: 'cors',
-    })
+      fetch('http://localhost:3000/messaging', {
+        body: JSON.stringify({
+          message: 'message an ' + publicKeyAsHex,
+          receiver: publicKeyAsHex,
+          sender: this.props.selectedIdentity.identity.publicKeyAsHex,
+        }),
+        cache: 'no-cache',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        method: 'POST',
+        mode: 'cors',
+      })
+    }
   }
 }
 
-export default ContactListComponent
+const mapStateToProps = (state: { wallet: WalletState }) => {
+  return {
+    selectedIdentity: state.wallet.get('selected'),
+  }
+}
+
+export default connect(mapStateToProps)(ContactListComponent)
