@@ -15,7 +15,6 @@ import CtypeViewComponent from './CtypeViewComponent'
 
 type Props = RouteComponentProps<{
   ctypeKey?: string
-  hash?: string
 }>
 
 type State = {
