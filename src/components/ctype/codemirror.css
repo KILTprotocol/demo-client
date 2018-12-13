@@ -1,0 +1,6 @@
+.cm-s-default .cm-variable,
+.cm-s-default .cm-punctuation,
+.cm-s-default .cm-property,
+.cm-s-default .cm-operator {
+  color: #0000c9;
+}
