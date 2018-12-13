@@ -25,6 +25,7 @@
   "scripts": {
     "build-semantic": "cd src/semantic && gulp build-css build-assets",
     "watch-semantic": "cd src/semantic && yarn run build-semantic && gulp watch",
+    "postinstall": "node config/postinstall.js",
     "start": "yarn run build-semantic && react-scripts-ts start",
     "build": "yarn run build-semantic && react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
