@@ -1,23 +1,20 @@
 import * as mnemonic from '@polkadot/util-crypto/mnemonic'
-import values from 'lodash/values'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
-
-import {
-  IWalletState,
-  removeUser,
-  saveUser,
+import WalletRedux, {
   WalletAction,
-} from '../../state/ducks/wallet'
+  WalletState,
+  WalletStateEntry,
+} from '../../state/ducks/WalletRedux'
 import Identity from '../../types/Identity'
 import IdentityViewComponent from './IdentityViewComponent'
 
 type Props = RouteComponentProps<{}> & {
-  saveUser: (alias: string, identity: Identity) => void
-  removeUser: (seedAsHex: string) => void
-  identities: { [key: string]: { alias: string; identity: Identity } }
+  saveIdentity: (alias: string, identity: Identity) => void
+  removeIdentity: (seedAsHex: string) => void
+  identities: WalletStateEntry[]
 }
 type State = {
   randomPhrase: string
@@ -34,16 +31,14 @@ class WalletComponent extends React.Component<Props, State> {
   }
 
   public render() {
-    const identities = values(this.props.identities).map(
-      ({ alias, identity }) => (
-        <IdentityViewComponent
-          key={identity.seedAsHex}
-          identity={identity}
-          alias={alias}
-          onDelete={this.removeIdentity}
-        />
-      )
-    )
+    const identities = this.props.identities.map((entry: WalletStateEntry) => (
+      <IdentityViewComponent
+        key={entry.identity.seedAsHex}
+        identity={entry.identity}
+        alias={entry.alias}
+        onDelete={this.removeIdentity}
+      />
+    ))
 
     return (
       <div>
@@ -73,7 +68,8 @@ class WalletComponent extends React.Component<Props, State> {
 
   private addIdentity = () => {
     const identity = new Identity(this.state.randomPhrase)
-    this.props.saveUser(this.state.alias, identity)
+    this.props.saveIdentity(this.state.alias, identity)
+    this.createRandomPhrase()
   }
 
   private createRandomPhrase = () => {
@@ -89,24 +85,26 @@ class WalletComponent extends React.Component<Props, State> {
   }
 
   private removeIdentity = (seedAsHex: string) => {
-    this.props.removeUser(seedAsHex)
+    this.props.removeIdentity(seedAsHex)
   }
 }
 
-// types
-const mapStateToProps = (state: { wallet: IWalletState }) => {
+const mapStateToProps = (state: { wallet: WalletState }) => {
   return {
-    identities: state.wallet,
+    identities: state.wallet
+      .get('identities')
+      .toList()
+      .toArray(),
   }
 }
 
 const mapDispatchToProps = (dispatch: (action: WalletAction) => void) => {
   return {
-    removeUser: (seedAsHex: string) => {
-      dispatch(removeUser(seedAsHex))
+    removeIdentity: (seedAsHex: string) => {
+      dispatch(WalletRedux.removeIdentityAction(seedAsHex))
     },
-    saveUser: (alias: string, identity: Identity) => {
-      dispatch(saveUser(alias, identity))
+    saveIdentity: (alias: string, identity: Identity) => {
+      dispatch(WalletRedux.saveIdentityAction(alias, identity))
     },
   }
 }
