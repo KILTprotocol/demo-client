@@ -5,14 +5,9 @@ import { Link, withRouter } from 'react-router-dom'
 import blockchainService from 'src/services/BlockchainService'
 import { ApiPromise } from '@polkadot/api'
 
-import { Keyring } from '@polkadot/keyring'
+import pair from '@polkadot/keyring/pair'
 import { stringToU8a, u8aToHex } from '@polkadot/util'
-import {
-  keccakAsU8a,
-  naclKeypairFromSeed,
-  naclSign,
-  naclVerify,
-} from '@polkadot/util-crypto'
+import { keccakAsU8a, naclKeypairFromSeed } from '@polkadot/util-crypto'
 
 import CtypeEditorComponent from './CtypeEditorComponent'
 
@@ -50,29 +45,14 @@ class CtypeComponent extends React.Component<Props, {}> {
   }
 
   public async submit() {
-    // needs hash and signature
-
     const seedAlice = 'Alice'.padEnd(32, ' ')
-
-    const keyring = new Keyring()
-
-    const Alice = keyring.addFromSeed(stringToU8a(seedAlice))
-    console.log(keyring)
-
-    const { secretKey, publicKey: pubKey } = naclKeypairFromSeed(
-      stringToU8a(seedAlice)
-    )
+    const { secretKey, publicKey } = naclKeypairFromSeed(stringToU8a(seedAlice))
+    const Alice = pair({ publicKey, secretKey })
 
     const hash = keccakAsU8a(this.state.schema)
 
-    // Both approaches lead to same signature
-    const messageSignature = naclSign(hash, secretKey)
-    console.log(`Message signature: ${u8aToHex(messageSignature)}`)
     const signature = Alice.sign(hash)
     console.log(`Signature: ${u8aToHex(signature)}`)
-
-    const isValidSignature = naclVerify(hash, messageSignature, pubKey)
-    console.log(`Was the message correctly signed? ${isValidSignature}`)
 
     const ctypeAdd = this.api.tx.ctype.add(hash, signature)
 
