@@ -142,9 +142,11 @@
   }
 
   & > .actions {
+    clear: both;
     margin: {
       top: $base-padding;
     }
+    overflow: hidden;
 
     & button {
       float: right;

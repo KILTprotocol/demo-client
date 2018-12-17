@@ -61,8 +61,10 @@ class CtypeManagerComponent extends React.Component<Props, State> {
     const { secretKey, publicKey } = naclKeypairFromSeed(stringToU8a(seedAlice))
     const Alice = pair({ publicKey, secretKey })
 
+    console.log('this.state', this.state)
+
     const { name, ctype } = this.state
-    const hash = keccakAsU8a(ctype)
+    const hash = keccakAsU8a(JSON.stringify(ctype))
 
     const signature = Alice.sign(hash)
     console.log(`Signature: ${u8aToHex(signature)}`)
@@ -79,13 +81,13 @@ class CtypeManagerComponent extends React.Component<Props, State> {
         })
         .then((_hash: any) => {
           console.log(`submitted with hash ${_hash}`)
-          const ctype: CType = {
-            key: u8aToHex(hash),
-            name,
+          const _ctype: CType = {
             // TODO: use selected user
             author: 'Alice',
+            key: u8aToHex(hash),
+            name,
           }
-          ctypeRepository.register(ctype).then(() => {
+          ctypeRepository.register(_ctype).then(() => {
             this.init()
           })
         })
