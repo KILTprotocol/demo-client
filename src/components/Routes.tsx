@@ -1,9 +1,14 @@
 import * as React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
+
+import WalletComponent from './wallet/WalletComponent'
+
 import ChainStatsComponent from './chainStats/ChainStatsComponent'
 import CtypeManagerComponent from './ctype/CtypeManagerComponent'
+
+import ClaimCreate from './claim/ClaimCreate'
+
 import RootComponent from './root/RootComponent'
-import WalletComponent from './wallet/WalletComponent'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
@@ -31,6 +36,9 @@ const Routes: React.FunctionComponent<{}> = props => {
       />
       <Route path={'/ctype/:ctypeKey'} component={CtypeManagerComponent} />
       <Route path={'/ctype'} component={CtypeManagerComponent} />
+
+      <Route path="/claim/new/:ctypeKey" component={ClaimCreate} />
+
       <Route component={RootComponent} />
     </Switch>
   )
