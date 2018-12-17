@@ -2,7 +2,8 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 
-import './index.css'
+import './index.scss'
+import 'select2-component/dist/select2.min.css'
 
 import App from './App'
 import persistentStore from './state/PersistentStore'

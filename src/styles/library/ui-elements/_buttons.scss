@@ -1,0 +1,86 @@
+@mixin button-base {
+  height: $base-button-height;
+  line-height: $base-button-height;
+  text-align: center;
+  padding: 0 $base-padding;
+  outline: none;
+  vertical-align: middle;
+  cursor: pointer;
+
+  &[disabled] {
+    @include opacity(0.3);
+  }
+}
+
+// NORMAL BUTTONS
+@mixin button {
+  @include button-base;
+  @include border-radius($base-border-radius);
+
+  min-width: 150px;
+  padding: 0 2*$base-padding;
+  border: $base-border;
+  font-size: $base-font-size;
+  line-height: $base-font-size;
+}
+
+@mixin button-primary {
+  @include button;
+
+  background: $color-primary;
+  color: white;
+  border: none;
+}
+
+@mixin button-secondary {
+  @include button;
+
+  border-color: $color-primary;
+  color: $color-primary;
+  background: $color-white;
+}
+
+// ICON BUTTONS
+$base-icon-size: $base-button-height * 2 / 3;
+
+@mixin button-icon-only-base($icon-size: $base-icon-size) {
+  @include button-base;
+  @include transition($base-transition);
+
+  position: relative;
+  width: $base-button-height;
+  padding: 0;
+  background: none;
+  color: $color-grey-dark;
+  font-size: $icon-size;
+  line-height: 0;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: $color-primary;
+  }
+}
+
+@mixin button-icon-only($icon-size: $base-icon-size) {
+  @include button-icon-only-base($icon-size);
+
+  &:before {
+    @extend %centerHV;
+
+    position: absolute;
+  }
+}
+
+@mixin button-icon-only-i($icon-size: $base-icon-size) {
+  @include button-icon-only-base($icon-size);
+
+  & i {
+    @extend %centerHV;
+
+    position: absolute;
+    font-size: $icon-size;
+  }
+}
+
+// MISC BUTTONS
