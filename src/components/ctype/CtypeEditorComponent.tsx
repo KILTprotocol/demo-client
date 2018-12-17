@@ -2,8 +2,8 @@ import * as React from 'react'
 
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/mode/javascript/javascript.js'
-import './codemirror.css'
 import { Controlled as CodeMirror } from 'react-codemirror2'
+import './codemirror.css'
 
 import Ajv from 'ajv'
 import MetaSchema from 'ajv/lib/refs/json-schema-draft-07.json'
