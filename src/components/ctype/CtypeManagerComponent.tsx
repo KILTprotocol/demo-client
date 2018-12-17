@@ -33,9 +33,9 @@ class CtypeManagerComponent extends React.Component<Props, State> {
 
     this.state = {
       connected: false,
-      name: '',
-      ctype: { 'title': 'My New CType' },
+      ctype: { title: 'My New CType' },
       ctypes: [],
+      name: '',
     }
 
     this.submit = this.submit.bind(this)

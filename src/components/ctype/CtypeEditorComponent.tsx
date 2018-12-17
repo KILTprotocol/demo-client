@@ -19,13 +19,13 @@ interface State {
 }
 
 class CtypeEditorComponent extends React.Component<Props, State> {
-  schema: common.Schema
+  private schema: common.Schema
 
   constructor(props: Props) {
     super(props)
     this.schema = CTypeInputModel as common.Schema
     this.state = {
-      isValid: false
+      isValid: false,
     }
   }
 
@@ -33,10 +33,12 @@ class CtypeEditorComponent extends React.Component<Props, State> {
     return (
       <section className="ctype-editor">
         <div className="schema-based-json-editor">
-          <JSONEditor schema={this.schema}
-                      initialValue={this.props.ctype}
-                      updateValue={this.updateCType}
-                      icon="fontawesome5" />
+          <JSONEditor
+            schema={this.schema}
+            initialValue={this.props.ctype}
+            updateValue={this.updateCType}
+            icon="fontawesome5"
+          />
           <div className="actions">
             <button
               className="submit-ctype"
@@ -45,10 +47,7 @@ class CtypeEditorComponent extends React.Component<Props, State> {
             >
               Submit
             </button>
-            <button
-              className="cancel-ctype"
-              onClick={this.cancel}
-            >
+            <button className="cancel-ctype" onClick={this.cancel}>
               Cancel
             </button>
           </div>
@@ -59,7 +58,7 @@ class CtypeEditorComponent extends React.Component<Props, State> {
 
   private updateCType = (ctype: any, _isValid: boolean) => {
     this.setState({
-      isValid: _isValid
+      isValid: _isValid,
     })
     this.props.updateCType(ctype)
   }
