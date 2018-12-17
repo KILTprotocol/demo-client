@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { CType } from '../types/Ctype'
 
 // TODO: add tests, create interface for this class to be implemented as mock (for other tests)
@@ -20,8 +20,9 @@ class CtypeRepository {
     return ctypes
   }
 
-  public async register(cType: CType): Promise<CType> {
-    return Promise.reject('implement')
+  public async register(cType: CType): Promise<AxiosResponse> {
+    const response = await axios.post(CtypeRepository.URL, cType)
+    return response
   }
 
   public async removeAll() {

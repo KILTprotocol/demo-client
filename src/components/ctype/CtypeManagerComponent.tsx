@@ -21,6 +21,7 @@ type State = {
   ctypes: CType[]
   connected: boolean
   schema: string
+  name: string
 }
 
 class CtypeManagerComponent extends React.Component<Props, State> {
@@ -34,6 +35,7 @@ class CtypeManagerComponent extends React.Component<Props, State> {
       connected: false,
       ctypes: [],
       schema: '{ "title": "My New Schema" }',
+      name: '',
     }
 
     this.submit = this.submit.bind(this)
@@ -54,11 +56,13 @@ class CtypeManagerComponent extends React.Component<Props, State> {
   }
 
   public async submit() {
+    // TODO: use selected user
     const seedAlice = 'Alice'.padEnd(32, ' ')
     const { secretKey, publicKey } = naclKeypairFromSeed(stringToU8a(seedAlice))
     const Alice = pair({ publicKey, secretKey })
 
-    const hash = keccakAsU8a(this.state.schema)
+    const { name, schema } = this.state
+    const hash = keccakAsU8a(schema)
 
     const signature = Alice.sign(hash)
     console.log(`Signature: ${u8aToHex(signature)}`)
@@ -73,8 +77,17 @@ class CtypeManagerComponent extends React.Component<Props, State> {
           console.log(`current status ${status.type}`)
           console.log(status)
         })
-        .then((hash: any) => {
-          console.log(`submitted with hash ${hash}`)
+        .then((_hash: any) => {
+          console.log(`submitted with hash ${_hash}`)
+          const ctype: CType = {
+            key: u8aToHex(hash),
+            name,
+            // TODO: use selected user
+            author: 'Alice',
+          }
+          ctypeRepository.register(ctype).then(() => {
+            this.init()
+          })
         })
     }
   }
@@ -91,6 +104,12 @@ class CtypeManagerComponent extends React.Component<Props, State> {
     return (
       <div>
         <h1 className="App-title">Ctype Manager</h1>
+        <input
+          type="text"
+          onChange={this.updateName}
+          placeholder="Name"
+          value={this.state.name}
+        />
         <CtypeEditorComponent
           schema={this.state.schema}
           updateSchema={this.updateSchema}
@@ -118,6 +137,11 @@ class CtypeManagerComponent extends React.Component<Props, State> {
   private updateSchema = (schema: string) => {
     this.setState({
       schema,
+    })
+  }
+  private updateName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({
+      name: e.target.value,
     })
   }
 }
