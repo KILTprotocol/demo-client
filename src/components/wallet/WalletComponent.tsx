@@ -3,6 +3,9 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
+import { Button, Input } from 'semantic-ui-react'
+import ContactRepository from '../../services/ContactRepository'
+
 import WalletRedux, {
   WalletAction,
   WalletState,
@@ -46,20 +49,20 @@ class WalletComponent extends React.Component<Props, State> {
         <hr />
         <h3>Add new identity from phrase</h3>
         <h4>(duplicates not permitted)</h4>
-        <input
+        <Input
           type="text"
           value={this.state.randomPhrase}
           onChange={this.setRandomPhrase}
         />
-        <button onClick={this.createRandomPhrase}>create random phrase</button>
+        <Button onClick={this.createRandomPhrase}>create random phrase</Button>
         <br />
-        <input
+        <Input
           type="text"
           placeholder="Name"
           value={this.state.alias}
           onChange={this.setAlias}
         />
-        <button onClick={this.addIdentity}>Add</button>
+        <Button onClick={this.addIdentity}>Add</Button>
         <hr />
         {identities}
       </div>
@@ -68,8 +71,18 @@ class WalletComponent extends React.Component<Props, State> {
 
   private addIdentity = () => {
     const identity = new Identity(this.state.randomPhrase)
-    this.props.saveIdentity(this.state.alias, identity)
-    this.createRandomPhrase()
+    ContactRepository.add({
+      key: identity.publicKeyAsHex,
+      name: this.state.alias,
+    }).then(
+      () => {
+        this.props.saveIdentity(this.state.alias, identity)
+        this.createRandomPhrase()
+      },
+      error => {
+        console.error('failed to POST new identity', error)
+      }
+    )
   }
 
   private createRandomPhrase = () => {
