@@ -10,7 +10,7 @@ import blockchainService from '../../services/BlockchainService'
 import ctypeRepository from '../../services/CtypeRepository'
 import { CType } from '../../types/Ctype'
 import CtypeEditorComponent from './CtypeEditorComponent'
-import './cTypeManager.scss'
+import './CtypeManagerComponent.scss'
 import CtypeViewComponent from './CtypeViewComponent'
 
 type Props = RouteComponentProps<{

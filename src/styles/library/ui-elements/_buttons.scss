@@ -41,7 +41,7 @@
 }
 
 // ICON BUTTONS
-$base-icon-size: $base-button-height * 2 / 3;
+$base-icon-size: $base-font-size;
 
 @mixin button-icon-only-base($icon-size: $base-icon-size) {
   @include button-base;

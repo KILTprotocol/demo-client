@@ -1,45 +1,14 @@
 @mixin breakpoint($name, $padding: 0) {
-    @if ($name == 'xs') {
+    @if ($name == 'phone') {
         @media (max-width: 479px + $padding) {
             @content;
         }
-    } @else if ($name == 's') {
-        @media (min-width: 480px + $padding) and (max-width: 767px + $padding) {
-            @content;
-        }
-    } @else if ($name == 'm') {
-        @media (min-width: 768px + $padding) and (max-width: 991px + $padding) {
-            @content;
-        }
-    } @else if ($name == 'l') {
-        @media (min-width: 992px + $padding) {
-            @content;
-        }
-    } @else if ($name == 'xl') {
-        @media (min-width: 1540px + $padding) {
-            @content;
-        }
-    } @else if ($name == 'xs-s') {
-        @media (max-width: 767px + $padding) {
-            @content;
-        }
-    } @else if ($name == 'xs-m') {
-        @media (max-width: 991px + $padding) {
-            @content;
-        }
-    } @else if ($name == 'xs-l') {
-        // no media query necessary
-        @content;
-    } @else if ($name == 's-m') {
-        @media (min-width: 480px + $padding) and (max-width: 991px + $padding) {
-            @content;
-        }
-    } @else if ($name == 's-l') {
+    } @else if ($name == 'tablet') {
         @media (min-width: 480px + $padding) {
             @content;
         }
-    } @else if ($name == 'm-l') {
-        @media (min-width: 768px + $padding) {
+    } @else if ($name == 'desktop') {
+        @media (min-width: 1024px + $padding) {
             @content;
         }
     }
@@ -51,8 +20,8 @@
     }
 }
 
-@mixin breakpointAbove($breakpointBelow) {
-    @media (min-width: $breakpointBelow) {
+@mixin breakpointAbove($breakpointAbove) {
+    @media (min-width: $breakpointAbove) {
         @content;
     }
 }

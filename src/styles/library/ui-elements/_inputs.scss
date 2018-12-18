@@ -11,8 +11,6 @@
   font-size: $font-size-base;
 
   &:focus {
-    border-color: $color-secondary;
-    background: $color-secondary;
-    color: $color-font-inverted;
+    border-color: $color-primary;
   }
 }
