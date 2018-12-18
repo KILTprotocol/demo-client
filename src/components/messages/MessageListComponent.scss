@@ -6,6 +6,8 @@
   }
 
   & .delete {
-    @include button-icon-only($icon-delete)
+    &:before {
+      @include icon($icon-remove)
+    }
   }
 }

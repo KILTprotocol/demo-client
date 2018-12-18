@@ -1,0 +1,18 @@
+%enlargeTouchArea {
+
+    html.touch & {
+        position: relative;
+
+        $height: 40px;
+
+        &:after {
+            content: '';
+            position: absolute;
+            display: block;
+            height: $height;
+            width: 100%;
+            top: 50%;
+            margin-top: -$height/2;
+        }
+    }
+}

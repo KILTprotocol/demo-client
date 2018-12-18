@@ -18,8 +18,15 @@ class CtypeRepository {
     return fetch(`${CtypeRepository.URL}`).then(response => response.json())
   }
 
-  public async register(cType: CType): Promise<CType> {
-    return Promise.reject('implement')
+  public async register(cType: CType): Promise<Response> {
+    console.log(cType)
+    return fetch(CtypeRepository.URL, {
+      body: JSON.stringify(cType),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'post',
+    })
   }
 
   public async removeAll() {

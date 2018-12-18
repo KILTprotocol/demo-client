@@ -1,0 +1,15 @@
+// MARGIN / PADDING
+$base-padding: 20px;
+
+// TRANSITION
+$base-transition-time: 0.2s;
+$base-transition: all $base-transition-time ease-in-out;
+
+// BORDER
+$base-border-radius: 4px;
+$base-border-width: 1px;
+$base-border: $base-border-width solid $color-grey;
+
+// MISC
+$base-input-height: 36px;
+$base-button-height: $base-input-height;

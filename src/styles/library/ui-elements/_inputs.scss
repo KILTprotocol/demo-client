@@ -1,0 +1,16 @@
+@mixin input {
+  @include border-radius($base-border-radius);
+  @include transition($base-transition);
+  @include baseFont;
+
+  height: $base-input-height;
+  padding: 0 $base-padding/2;
+  border: $base-border;
+  line-height: $base-input-height;
+  outline: none;
+  font-size: $font-size-base;
+
+  &:focus {
+    border-color: $color-primary;
+  }
+}
