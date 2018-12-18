@@ -1,6 +1,4 @@
 import { CTypeInputModel } from '@kiltprotocol/prototype-sdk'
-import 'codemirror/lib/codemirror.css'
-import 'codemirror/mode/javascript/javascript.js'
 import * as React from 'react'
 import * as common from 'schema-based-json-editor'
 import SchemaEditorComponent from '../schema-editor/SchemaEditorComponent'
