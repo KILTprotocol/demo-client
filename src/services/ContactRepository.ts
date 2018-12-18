@@ -13,11 +13,11 @@ class ContactRepository {
     return fetch(`${ContactRepository.URL}`).then(response => response.json())
   }
 
-  public async add(contact: Contact): Promise<Contact> {
+  public async add(contact: Contact): Promise<Response> {
     return fetch(`${ContactRepository.URL}`, {
       ...BasePostParams,
       body: JSON.stringify(contact),
-    }).then(response => response.json())
+    })
   }
 }
 
