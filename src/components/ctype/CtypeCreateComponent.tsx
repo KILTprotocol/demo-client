@@ -42,8 +42,6 @@ class CtypeCreateComponent extends React.Component<Props, State> {
     // TODO: test error handling
     this.api = await blockchainService.connect()
     this.setState({ connected: true })
-    // @ts-ignore
-    window.api = this.api
   }
 
   public async submit() {
