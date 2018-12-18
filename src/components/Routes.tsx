@@ -4,6 +4,7 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 import WalletComponent from './wallet/WalletComponent'
 
 import ChainStatsComponent from './chainStats/ChainStatsComponent'
+import CtypeCreateComponent from './ctype/CtypeCreateComponent'
 import CtypeManagerComponent from './ctype/CtypeManagerComponent'
 
 import ClaimCreate from './claim/ClaimCreate'
@@ -34,6 +35,7 @@ const Routes: React.FunctionComponent<{}> = props => {
           />
         }
       />
+      <Route path={'/ctype/new'} component={CtypeCreateComponent} />
       <Route path={'/ctype/:ctypeKey'} component={CtypeManagerComponent} />
       <Route path={'/ctype'} component={CtypeManagerComponent} />
 
