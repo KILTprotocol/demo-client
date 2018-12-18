@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 import ChainStatsComponent from './chainStats/ChainStatsComponent'
 import ContactListComponent from './contacts/ContactListComponent'
+import CtypeCreateComponent from './ctype/CtypeCreateComponent'
 import CtypeManagerComponent from './ctype/CtypeManagerComponent'
 import MessageListComponent from './messages/MessageListComponent'
 import RootComponent from './root/RootComponent'
@@ -31,6 +32,7 @@ const Routes: React.FunctionComponent<{}> = props => {
           />
         }
       />
+      <Route path={'/ctype/new'} component={CtypeCreateComponent} />
       <Route path={'/ctype/:ctypeKey'} component={CtypeManagerComponent} />
       <Route path={'/ctype'} component={CtypeManagerComponent} />
       <Route path={'/contacts'} component={ContactListComponent} />

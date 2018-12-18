@@ -1,0 +1,15 @@
+@import "styles/select2-overrides";
+
+.App {
+  text-align: center;
+}
+
+// base form elements
+input {
+
+  &[type=text],
+  &[type=password],
+  &[type=uri-reference] {
+    @include input;
+  }
+}

@@ -1,0 +1,27 @@
+@mixin breakpoint($name, $padding: 0) {
+    @if ($name == 'phone') {
+        @media (max-width: 479px + $padding) {
+            @content;
+        }
+    } @else if ($name == 'tablet') {
+        @media (min-width: 480px + $padding) {
+            @content;
+        }
+    } @else if ($name == 'desktop') {
+        @media (min-width: 1024px + $padding) {
+            @content;
+        }
+    }
+}
+
+@mixin breakpointBelow($breakpointBelow) {
+    @media (max-width: $breakpointBelow - 1) {
+        @content;
+    }
+}
+
+@mixin breakpointAbove($breakpointAbove) {
+    @media (min-width: $breakpointAbove) {
+        @content;
+    }
+}
