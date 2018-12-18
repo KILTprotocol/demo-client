@@ -1,6 +1,6 @@
 import { Message } from '../components/messages/Message'
 import Identity from '../types/Identity'
-import { BasePostParams } from './BaseRepository'
+import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 
 // TODO: add tests, create interface for this class to be implemented as mock
 // (for other tests)
@@ -38,8 +38,10 @@ class MessageRepository {
     }).then(response => response.json())
   }
 
-  public async removeByMessageId(messageId: string, myIdentity: Identity) {
-    return Promise.reject('implement')
+  public async deleteByMessageId(messageId: string) {
+    return fetch(`${MessageRepository.URL}/${messageId}`, {
+      ...BaseDeleteParams,
+    })
   }
 }
 

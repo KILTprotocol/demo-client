@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+
 import MessageRepository from '../../services/MessageRepository'
 import { WalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
 import { Message } from './Message'
+import './MessageListComponent.scss'
 
 interface Props {
   selectedIdentity?: WalletStateEntry
@@ -24,26 +26,36 @@ class MessageListComponent extends React.Component<Props, State> {
     let messageOutput
     if (Array.isArray(this.state.messageOutput)) {
       messageOutput = (
-        <ul>
-          {this.state.messageOutput.map((message: Message) => (
-            <li key={message.id}>
-              <h4>from:</h4>
-              <p>{message.receiver}</p>
-              <h4>message:</h4>
-              <p>{message.message}</p>
-              <br />
-              <br />
-              <br />
-            </li>
-          ))}
-        </ul>
+        <table>
+          <thead>
+            <tr>
+              <th>from:</th>
+              <th>message:</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.messageOutput.map((message: Message) => (
+              <tr key={message.id}>
+                <td>{message.receiver}</td>
+                <td>{message.message}</td>
+                <td>
+                  <button
+                    className="delete"
+                    onClick={this.deleteMessage(message)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )
     } else {
       messageOutput = this.state.messageOutput
     }
 
     return (
-      <section>
+      <section className="message-list">
         <h1>Message List</h1>
         {messageOutput}
       </section>
@@ -85,20 +97,31 @@ class MessageListComponent extends React.Component<Props, State> {
   }
 
   private getMessages(identity?: WalletStateEntry) {
-    if (identity) {
-      MessageRepository.findByMyIdentity(identity.identity).then(
+    // if we didn't not get a identity by params
+    // we assume we wanna fetch the message for current identity
+    const _identity = identity || this.props.selectedIdentity
+    let messageOutput
+    if (_identity) {
+      MessageRepository.findByMyIdentity(_identity.identity).then(
         (messages: Message[]) => {
-          let messageOutput
           if (messages.length) {
             messageOutput = messages
           } else {
-            messageOutput =
-              'No messages found for ' +
-              this.props.selectedIdentity!.identity.publicKeyAsHex
+            messageOutput = 'No messages found'
           }
           this.setState({ messageOutput })
         }
       )
+    } else {
+      this.setState({ messageOutput: 'No messages found' })
+    }
+  }
+
+  private deleteMessage = (message: Message): (() => void) => () => {
+    if (message.id) {
+      MessageRepository.deleteByMessageId(message.id).then(() => {
+        this.getMessages()
+      })
     }
   }
 }

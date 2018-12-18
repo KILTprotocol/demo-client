@@ -1,0 +1,11 @@
+.message-list {
+
+  & th,
+  & td {
+    text-align: left;
+  }
+
+  & .delete {
+    @include button-icon-only($icon-delete)
+  }
+}

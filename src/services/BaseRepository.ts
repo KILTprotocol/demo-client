@@ -10,3 +10,8 @@ export const BasePostParams: Partial<RequestInit> = {
   ...BaseFetchParams,
   method: 'POST',
 }
+
+export const BaseDeleteParams: Partial<RequestInit> = {
+  ...BaseFetchParams,
+  method: 'DELETE',
+}
