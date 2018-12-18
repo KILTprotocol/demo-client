@@ -1,4 +1,5 @@
 import { CType } from '../types/Ctype'
+import { BasePostParams } from './BaseRepository'
 
 // TODO: add tests, create interface for this class to be implemented as mock
 // (for other tests)
@@ -19,13 +20,9 @@ class CtypeRepository {
   }
 
   public async register(cType: CType): Promise<Response> {
-    console.log(cType)
     return fetch(CtypeRepository.URL, {
+      ...BasePostParams,
       body: JSON.stringify(cType),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'post',
     })
   }
 
