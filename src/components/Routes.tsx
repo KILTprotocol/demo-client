@@ -9,6 +9,7 @@ import CtypeCreateComponent from './ctype/CtypeCreateComponent'
 import CtypeManagerComponent from './ctype/CtypeManagerComponent'
 
 import ClaimCreate from './claim/ClaimCreate'
+import ClaimList from './claim/ClaimList'
 
 import MessageListComponent from './messages/MessageListComponent'
 import RootComponent from './root/RootComponent'
@@ -42,6 +43,7 @@ const Routes: React.FunctionComponent<{}> = props => {
       <Route path={'/ctype'} component={CtypeManagerComponent} />
 
       <Route path="/claim/new/:ctypeKey" component={ClaimCreate} />
+      <Route path="/claim" component={ClaimList} />
 
       <Route path={'/contacts'} component={ContactListComponent} />
       <Route path={'/messages'} component={MessageListComponent} />
