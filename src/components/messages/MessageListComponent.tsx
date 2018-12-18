@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import MessageRepository from '../../services/MessageRepository'
 import { WalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
 import { Message } from './Message'
 
@@ -85,13 +86,8 @@ class MessageListComponent extends React.Component<Props, State> {
 
   private getMessages(identity?: WalletStateEntry) {
     if (identity) {
-      fetch(
-        `http://localhost:3000/messaging/inbox/${
-          identity.identity.publicKeyAsHex
-        }`
-      )
-        .then(response => response.json())
-        .then((messages: Message[]) => {
+      MessageRepository.findByMyIdentity(identity.identity).then(
+        (messages: Message[]) => {
           let messageOutput
           if (messages.length) {
             messageOutput = messages
@@ -101,7 +97,8 @@ class MessageListComponent extends React.Component<Props, State> {
               this.props.selectedIdentity!.identity.publicKeyAsHex
           }
           this.setState({ messageOutput })
-        })
+        }
+      )
     }
   }
 }

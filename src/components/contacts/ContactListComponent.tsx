@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Button, Icon } from 'semantic-ui-react'
+import ContactRepository from '../../services/ContactRepository'
+import MessageRepository from '../../services/MessageRepository'
 import { WalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
 import { Contact } from './Contact'
 
@@ -21,11 +23,9 @@ class ContactListComponent extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    fetch('http://localhost:3000/contacts')
-      .then(response => response.json())
-      .then((contacts: Contact[]) => {
-        this.setState({ contacts })
-      })
+    ContactRepository.findAll().then((contacts: Contact[]) => {
+      this.setState({ contacts })
+    })
   }
 
   public render() {
@@ -52,18 +52,10 @@ class ContactListComponent extends React.Component<Props, State> {
 
   private sendMessage = (publicKeyAsHex: string): (() => void) => () => {
     if (this.props.selectedIdentity) {
-      fetch('http://localhost:3000/messaging', {
-        body: JSON.stringify({
-          message: 'message an ' + publicKeyAsHex,
-          receiver: publicKeyAsHex,
-          sender: this.props.selectedIdentity.identity.publicKeyAsHex,
-        }),
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-        },
-        method: 'POST',
-        mode: 'cors',
+      MessageRepository.send({
+        message: 'message an ' + publicKeyAsHex,
+        receiver: publicKeyAsHex,
+        sender: this.props.selectedIdentity.identity.publicKeyAsHex,
       })
     }
   }

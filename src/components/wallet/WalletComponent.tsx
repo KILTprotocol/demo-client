@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 import { Button, Input } from 'semantic-ui-react'
+import ContactRepository from '../../services/ContactRepository'
 
 import WalletRedux, {
   WalletAction,
@@ -70,21 +71,11 @@ class WalletComponent extends React.Component<Props, State> {
 
   private addIdentity = () => {
     const identity = new Identity(this.state.randomPhrase)
-
-    // TODO: move to service and or effect
-    fetch('http://localhost:3000/contacts', {
-      body: JSON.stringify({
-        key: identity.publicKeyAsHex,
-        name: this.state.alias,
-      }),
-      cache: 'no-cache',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      method: 'POST',
-      mode: 'cors',
+    ContactRepository.add({
+      key: identity.publicKeyAsHex,
+      name: this.state.alias,
     }).then(
-      response => {
+      () => {
         this.props.saveIdentity(this.state.alias, identity)
         this.createRandomPhrase()
       },
