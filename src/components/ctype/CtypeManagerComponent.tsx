@@ -1,130 +1,61 @@
-import pair from '@polkadot/keyring/pair'
-import { stringToU8a, u8aToHex } from '@polkadot/util'
-import { keccakAsU8a, naclKeypairFromSeed } from '@polkadot/util-crypto'
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
-import { Link, withRouter } from 'react-router-dom'
+import { Link, Route, Switch } from 'react-router-dom'
 
-import If from '../../common/If'
-import blockchainService from '../../services/BlockchainService'
 import ctypeRepository from '../../services/CtypeRepository'
 import { CType } from '../../types/Ctype'
-import CtypeEditorComponent from './CtypeEditorComponent'
-import './CtypeManagerComponent.scss'
 import CtypeViewComponent from './CtypeViewComponent'
 
-type Props = RouteComponentProps<{
-  ctypeKey?: string
-}>
+type Props = {}
 
 type State = {
-  name: string
-  connected: boolean
   ctypes: CType[]
-  ctype: any
 }
 
 class CtypeManagerComponent extends React.Component<Props, State> {
-  // @ts-ignore
-  private api: ApiPromise
-
   constructor(props: Props) {
     super(props)
-
     this.state = {
-      connected: false,
-      ctype: { title: 'My New CType' },
       ctypes: [],
-      name: '',
     }
-
-    this.submit = this.submit.bind(this)
   }
 
   public componentDidMount() {
     void this.init()
-    this.connect()
-  }
-
-  public async connect() {
-    // TODO: test unmount and host change
-    // TODO: test error handling
-    this.api = await blockchainService.connect()
-    this.setState({ connected: true })
-    // @ts-ignore
-    window.api = this.api
-  }
-
-  public async submit() {
-    // TODO: use selected user
-    const seedAlice = 'Alice'.padEnd(32, ' ')
-    const { secretKey, publicKey } = naclKeypairFromSeed(stringToU8a(seedAlice))
-    const Alice = pair({ publicKey, secretKey })
-
-    console.log('this.state', this.state)
-
-    const { name, ctype } = this.state
-    const hash = keccakAsU8a(JSON.stringify(ctype))
-
-    const signature = Alice.sign(hash)
-    console.log(`Signature: ${u8aToHex(signature)}`)
-
-    const ctypeAdd = this.api.tx.ctype.add(hash, signature)
-
-    const nonce = await this.api.query.system.accountNonce(Alice.address())
-    if (nonce) {
-      const signed = ctypeAdd.sign(Alice, nonce.toHex())
-      signed
-        .send((status: any) => {
-          console.log(`current status ${status.type}`)
-          console.log(status)
-        })
-        .then((_hash: any) => {
-          console.log(`submitted with hash ${_hash}`)
-          const _ctype: CType = {
-            // TODO: use selected user
-            author: 'Alice',
-            key: u8aToHex(hash),
-            name,
-          }
-          ctypeRepository.register(_ctype).then(() => {
-            this.init()
-          })
-        })
-    }
   }
 
   public render() {
-    const ctypeKey = this.props.match.params.ctypeKey
-
     const list = this.state.ctypes.map(ctype => (
       <li key={ctype.key}>
-        <Link to={`/ctype/${ctype.key}`}>{ctype.key}</Link>
+        <Link to={`/ctype/${ctype.key}`}>
+          {ctype.author}: {ctype.name}
+        </Link>
       </li>
     ))
 
+    const viewComponent = ({
+      match,
+    }: RouteComponentProps<{ ctypeKey: string }>) => (
+      <React.Fragment>
+        <Link to="/ctype">Go back</Link>
+        <CtypeViewComponent ctypeKey={match.params.ctypeKey} />
+      </React.Fragment>
+    )
+    const listComponent = () => (
+      <React.Fragment>
+        <Link to="/ctype/new">Create new CTYPE</Link>
+        <ul>{list}</ul>
+      </React.Fragment>
+    )
+
     return (
-      <section className="ctype-manager">
+      <div>
         <h1 className="App-title">Ctype Manager</h1>
-        <input
-          type="text"
-          onChange={this.updateName}
-          placeholder="Name"
-          value={this.state.name}
-        />
-        <CtypeEditorComponent
-          ctype={this.state.ctype}
-          updateCType={this.updateCType}
-          submit={this.submit}
-          connected={this.state.connected}
-        />
-        <br />
-        <If
-          condition={!!ctypeKey}
-          then={<CtypeViewComponent ctypeKey={ctypeKey as string} />}
-          else={<ul>{list}</ul>}
-        />
-      </section>
+        <Switch>
+          <Route path={'/ctype/:ctypeKey'} render={viewComponent} />
+          <Route render={listComponent} />
+        </Switch>
+      </div>
     )
   }
 
@@ -132,17 +63,6 @@ class CtypeManagerComponent extends React.Component<Props, State> {
     const ctypes = await ctypeRepository.findAll()
     this.setState({ ctypes })
   }
-
-  private updateCType = (ctype: string) => {
-    this.setState({
-      ctype,
-    })
-  }
-  private updateName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      name: e.target.value,
-    })
-  }
 }
 
-export default withRouter(CtypeManagerComponent)
+export default CtypeManagerComponent
