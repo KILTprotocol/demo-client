@@ -71,6 +71,7 @@ class CtypeCreateComponent extends React.Component<Props, State> {
           const ctype: CType = {
             // TODO: use selected user
             author: 'Alice',
+            definition: JSON.parse(schema),
             key: u8aToHex(hash),
             name,
           }
