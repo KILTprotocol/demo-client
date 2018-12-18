@@ -10,12 +10,14 @@ import ctypeRepository from '../../services/CtypeRepository'
 import { CType } from '../../types/Ctype'
 import CtypeEditorComponent from './CtypeEditorComponent'
 
+import './CtypeManagerComponent.scss'
+
 type Props = {}
 
 type State = {
-  connected: boolean
-  schema: string
   name: string
+  connected: boolean
+  ctype: any
 }
 
 class CtypeCreateComponent extends React.Component<Props, State> {
@@ -26,8 +28,8 @@ class CtypeCreateComponent extends React.Component<Props, State> {
 
     this.state = {
       connected: false,
+      ctype: { title: 'My New CType' },
       name: '',
-      schema: '{ "title": "My New Schema" }',
     }
 
     this.submit = this.submit.bind(this)
@@ -50,8 +52,10 @@ class CtypeCreateComponent extends React.Component<Props, State> {
     const { secretKey, publicKey } = naclKeypairFromSeed(stringToU8a(seedAlice))
     const Alice = pair({ publicKey, secretKey })
 
-    const { name, schema } = this.state
-    const hash = keccakAsU8a(schema)
+    console.log('this.state', this.state)
+
+    const { name, ctype } = this.state
+    const hash = keccakAsU8a(JSON.stringify(ctype))
 
     const signature = Alice.sign(hash)
     console.log(`Signature: ${u8aToHex(signature)}`)
@@ -68,14 +72,15 @@ class CtypeCreateComponent extends React.Component<Props, State> {
         })
         .then((_hash: any) => {
           console.log(`submitted with hash ${_hash}`)
-          const ctype: CType = {
+          const _ctype: CType = {
             // TODO: use selected user
             author: 'Alice',
-            definition: JSON.parse(schema),
+            // TODO add ctype
+            definition: {},
             key: u8aToHex(hash),
             name,
           }
-          ctypeRepository.register(ctype).then(() => {
+          ctypeRepository.register(_ctype).then(() => {
             // TODO go back
           })
         })
@@ -84,7 +89,7 @@ class CtypeCreateComponent extends React.Component<Props, State> {
 
   public render() {
     return (
-      <div>
+      <section className="ctype-manager">
         <h1 className="App-title">Ctype Manager</h1>
         <input
           type="text"
@@ -93,23 +98,18 @@ class CtypeCreateComponent extends React.Component<Props, State> {
           value={this.state.name}
         />
         <CtypeEditorComponent
-          schema={this.state.schema}
-          updateSchema={this.updateSchema}
+          ctype={this.state.ctype}
+          updateCType={this.updateCType}
+          submit={this.submit}
+          connected={this.state.connected}
         />
-        <br />
-        <button
-          disabled={this.state.connected ? false : true}
-          onClick={this.submit}
-        >
-          Submit
-        </button>
-      </div>
+      </section>
     )
   }
 
-  private updateSchema = (schema: string) => {
+  private updateCType = (ctype: string) => {
     this.setState({
-      schema,
+      ctype,
     })
   }
   private updateName = (e: React.ChangeEvent<HTMLInputElement>) => {

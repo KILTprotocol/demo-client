@@ -1,0 +1,24 @@
+@mixin baseFont {
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-weight: 400;
+}
+
+@mixin baseFont-bold {
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-weight: 600;
+}
+
+@mixin icon($icon) {
+  content: $icon;
+  font-family: '#{$icomoon-font-family}' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
