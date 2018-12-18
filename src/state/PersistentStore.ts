@@ -1,4 +1,5 @@
 import { combineReducers, createStore, Store } from 'redux'
+import Claims, { ClaimsState, ClaimsStateSerialized } from './ducks/Claims'
 import WalletRedux, {
   WalletState,
   WalletStateSerialized,
@@ -14,10 +15,12 @@ declare global {
 
 type State = {
   wallet: WalletState
+  claims: ClaimsState
 }
 
 type SerializedState = {
   wallet: WalletStateSerialized
+  claims: ClaimsStateSerialized
 }
 
 class PersistentStore {
@@ -29,12 +32,14 @@ class PersistentStore {
 
   private static deserialize(obj: SerializedState): State {
     return {
+      claims: Claims.deserialize(obj.claims),
       wallet: WalletRedux.deserialize(obj.wallet),
     }
   }
 
   private static serialize(state: State): string {
     const obj: SerializedState = {
+      claims: Claims.serialize(state.claims),
       wallet: WalletRedux.serialize(state.wallet),
     }
 
@@ -52,7 +57,7 @@ class PersistentStore {
     }
 
     this._store = createStore(
-      combineReducers({ wallet: WalletRedux.reducer }),
+      combineReducers({ wallet: WalletRedux.reducer, claims: Claims.reducer }),
       persistedState,
       window.__REDUX_DEVTOOLS_EXTENSION__ &&
         window.__REDUX_DEVTOOLS_EXTENSION__()

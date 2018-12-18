@@ -9,9 +9,14 @@ import * as common from 'schema-based-json-editor'
 import ctypeRepository from '../../services/CtypeRepository'
 import SchemaEditorComponent from '../schema-editor/SchemaEditorComponent'
 
+import { Claim } from 'src/types/Claim'
+import Claims, { ClaimsAction } from '../../state/ducks/Claims'
+
 type Props = RouteComponentProps<{
   ctypeKey: string
-}>
+}> & {
+  saveClaim: (alias: string, claim: Claim) => void
+}
 
 type State = {
   claim: any
@@ -51,7 +56,11 @@ class ClaimCreate extends Component<Props, State> {
       <div className="ClaimCreate">
         <h1>New Claim</h1>
         <div>Ctype: {match.params.ctypeKey}</div>
-        <input type="text" placeholder="Name" />
+        <input
+          type="text"
+          placeholder="Alias"
+          onChange={this.handleNameChange}
+        />
         <br />
         {ctype && (
           <SchemaEditorComponent
@@ -60,7 +69,9 @@ class ClaimCreate extends Component<Props, State> {
             updateValue={this.updateClaim}
           />
         )}
-        <button type="submit">Submit</button>
+        <button type="submit" onClick={this.handleSubmit}>
+          Submit
+        </button>
       </div>
     )
   }
@@ -72,35 +83,33 @@ class ClaimCreate extends Component<Props, State> {
     this.setState({ claim })
   }
 
-  private handleSubmit() {}
+  private handleSubmit() {
+    const { saveClaim } = this.props
+    const { name, claim }: State = this.state
+
+    saveClaim(name, { contents: claim })
+  }
 
   private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ name: e.target.value })
   }
 }
 
-/* const mapStateToProps = (state: { wallet: WalletState }) => {
+const mapStateToProps = () => {
+  return {}
+}
+
+const mapDispatchToProps = (dispatch: (action: ClaimsAction) => void) => {
   return {
-    identities: state.wallet
-      .get('identities')
-      .toList()
-      .toArray(),
+    saveClaim: (alias: string, claim: Claim) => {
+      dispatch(Claims.saveAction(alias, claim))
+    },
   }
 }
 
-const mapDispatchToProps = (dispatch: (action: WalletAction) => void) => {
-  return {
-    removeIdentity: (seedAsHex: string) => {
-      dispatch(WalletRedux.removeIdentityAction(seedAsHex))
-    },
-    saveIdentity: (alias: string, identity: Identity) => {
-      dispatch(WalletRedux.saveIdentityAction(alias, identity))
-    },
-  }
-} */
-
 export default withRouter(
-  connect()(ClaimCreate)
-  // mapStateToProps,
-  // mapDispatchToProps
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(ClaimCreate)
 )
