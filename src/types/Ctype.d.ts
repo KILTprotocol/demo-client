@@ -4,5 +4,5 @@ export type CType = {
   key: string
   name: string
   author: string
-  definition: object
+  definition: string
 }
