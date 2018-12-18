@@ -84,6 +84,7 @@ class CtypeManagerComponent extends React.Component<Props, State> {
             name,
             // TODO: use selected user
             author: 'Alice',
+            definition: JSON.parse(schema),
           }
           ctypeRepository.register(ctype).then(() => {
             this.init()

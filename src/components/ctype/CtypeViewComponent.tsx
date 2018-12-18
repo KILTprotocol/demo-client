@@ -34,6 +34,7 @@ class CtypeViewComponent extends React.Component<Props, State> {
         <div>Key: {ctype.key}</div>
         <div>Name: {ctype.name}</div>
         <div>Author: {ctype.author}</div>
+        <div>Definition: {JSON.stringify(ctype.definition)}</div>
       </div>
     )
   }
