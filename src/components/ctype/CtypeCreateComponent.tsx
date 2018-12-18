@@ -1,3 +1,4 @@
+import { ApiPromise } from '@polkadot/api'
 import * as React from 'react'
 
 import pair from '@polkadot/keyring/pair'
@@ -18,7 +19,6 @@ type State = {
 }
 
 class CtypeCreateComponent extends React.Component<Props, State> {
-  // @ts-ignore
   private api: ApiPromise
 
   constructor(props: Props) {
