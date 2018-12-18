@@ -2,13 +2,14 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { Button, Icon } from 'semantic-ui-react'
 import { WalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
+import { Contact } from './Contact'
 
 interface Props {
-  selectedIdentity: WalletStateEntry | null
+  selectedIdentity?: WalletStateEntry
 }
 
 interface State {
-  contacts: any[]
+  contacts: Contact[]
 }
 
 class ContactListComponent extends React.Component<Props, State> {
@@ -17,9 +18,12 @@ class ContactListComponent extends React.Component<Props, State> {
     this.state = {
       contacts: [],
     }
+  }
+
+  public componentDidMount() {
     fetch('http://localhost:3000/contacts')
       .then(response => response.json())
-      .then((contacts: any) => {
+      .then((contacts: Contact[]) => {
         this.setState({ contacts })
       })
   }
@@ -33,15 +37,12 @@ class ContactListComponent extends React.Component<Props, State> {
     )
   }
 
-  private getContacts() {
-    return this.state.contacts.map((contact: any) => {
+  private getContacts(): JSX.Element[] {
+    return this.state.contacts.map((contact: Contact) => {
       return (
         <li key={contact.key}>
           {contact.name} / {contact.key}
-          <Button
-            icon={true}
-            onClick={this.sendMessage.bind(this, contact.key)}
-          >
+          <Button icon={true} onClick={this.sendMessage(contact.key)}>
             <Icon name="send" />
           </Button>
         </li>
@@ -49,13 +50,8 @@ class ContactListComponent extends React.Component<Props, State> {
     })
   }
 
-  private sendMessage = (publicKeyAsHex: string): void => {
+  private sendMessage = (publicKeyAsHex: string): (() => void) => () => {
     if (this.props.selectedIdentity) {
-      console.log(
-        'this.props.selectedIdentity.identity.publicKeyAsHex',
-        this.props.selectedIdentity.identity.publicKeyAsHex
-      )
-
       fetch('http://localhost:3000/messaging', {
         body: JSON.stringify({
           message: 'message an ' + publicKeyAsHex,

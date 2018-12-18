@@ -1,12 +1,18 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import { Dropdown, DropdownItemProps } from 'semantic-ui-react'
+import { Dropdown, DropdownItemProps, DropdownProps } from 'semantic-ui-react'
 import WalletRedux, {
   WalletAction,
   WalletState,
   WalletStateEntry,
 } from '../../state/ducks/WalletRedux'
+
+const addIdentity = {
+  key: 'create',
+  text: `Create an identity`,
+  value: 'create',
+}
 
 type Props = RouteComponentProps<{}> & {
   selectIdentity: (seedAsHex: string) => void
@@ -29,19 +35,15 @@ class IdentitySelectorComponent extends React.Component<Props, State> {
       }
     })
 
-    identities.push({
-      key: 'create',
-      text: `Create an identity`,
-      value: 'create',
-    })
+    identities.push(addIdentity)
 
     let defaultValue
     if (this.props.selected) {
-      const defaultIdentity = identities.find(identity => {
+      const selectedIdentity = identities.find(identity => {
         return identity.value === this.props.selected!.identity.seedAsHex
       })
-      if (defaultIdentity && defaultIdentity.value) {
-        defaultValue = defaultIdentity.value
+      if (selectedIdentity && selectedIdentity.value) {
+        defaultValue = selectedIdentity.value
       }
     }
 
@@ -57,11 +59,14 @@ class IdentitySelectorComponent extends React.Component<Props, State> {
     )
   }
 
-  private selectIdentity = (event: any, selectedOption: any) => {
+  private selectIdentity = (
+    event: React.SyntheticEvent<HTMLElement>,
+    selectedOption: DropdownProps
+  ) => {
     if (selectedOption.value === 'create') {
       this.props.history.push('/wallet')
     } else {
-      const publicKeyAsHex = selectedOption.value
+      const publicKeyAsHex = selectedOption.value as string
       this.props.selectIdentity(publicKeyAsHex)
     }
   }

@@ -5,7 +5,7 @@
     "exclude": [
       "**/*.json",
       "config/**/*.js",
-      "node_modules/**/*.ts",
+      "node_modules/**/*.*",
       "coverage/lcov-report/*.js",
       "semantic/**/*.js"
     ]

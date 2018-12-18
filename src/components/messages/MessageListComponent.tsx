@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { WalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
+import { Message } from './Message'
 
 interface Props {
-  selectedIdentity: WalletStateEntry | null
+  selectedIdentity?: WalletStateEntry
 }
 
 interface State {
-  messageOutput: HTMLElement | string
+  messageOutput: Message[] | string
 }
 
 class MessageListComponent extends React.Component<Props, State> {
@@ -19,16 +20,37 @@ class MessageListComponent extends React.Component<Props, State> {
   }
 
   public render() {
+    let messageOutput
+    if (Array.isArray(this.state.messageOutput)) {
+      messageOutput = (
+        <ul>
+          {this.state.messageOutput.map((message: Message) => (
+            <li key={message.id}>
+              <h4>from:</h4>
+              <p>{message.receiver}</p>
+              <h4>message:</h4>
+              <p>{message.message}</p>
+              <br />
+              <br />
+              <br />
+            </li>
+          ))}
+        </ul>
+      )
+    } else {
+      messageOutput = this.state.messageOutput
+    }
+
     return (
       <section>
         <h1>Message List</h1>
-        <ul>{this.state.messageOutput}</ul>
+        {messageOutput}
       </section>
     )
   }
 
   public componentDidMount() {
-    if (!!this.props.selectedIdentity) {
+    if (this.props.selectedIdentity) {
       this.setState({ messageOutput: 'Fetching messages' })
       this.getMessages(this.props.selectedIdentity)
     } else {
@@ -36,22 +58,32 @@ class MessageListComponent extends React.Component<Props, State> {
     }
   }
 
-  public componentWillReceiveProps(props: any) {
-    switch (true) {
-      case !this.props.selectedIdentity && !!props.selectedIdentity:
-      case !!this.props.selectedIdentity &&
-        !!props.selectedIdentity &&
-        props.selectedIdentity.identity.publicKeyAsHex !==
-          this.props.selectedIdentity!.identity.publicKeyAsHex:
-        this.setState({ messageOutput: 'Fetching messages' })
-        this.getMessages(props.selectedIdentity)
-        break
-      default:
-        this.setState({ messageOutput: 'Could not retrieve messages' })
+  public componentWillReceiveProps(props: Props) {
+    if (this.selectIdForTheFirstTime(props) || this.changeId(props)) {
+      this.setState({ messageOutput: 'Fetching messages' })
+      this.getMessages(props.selectedIdentity)
+    } else {
+      this.setState({ messageOutput: 'Could not retrieve messages' })
     }
   }
 
-  private getMessages(identity: WalletStateEntry | null) {
+  private selectIdForTheFirstTime(props: Props) {
+    return !this.props.selectedIdentity && !!props.selectedIdentity
+  }
+
+  private changeId(props: Props) {
+    return (
+      // old and new ids are existent
+      // (we need to verify this for the next condition)
+      !!this.props.selectedIdentity &&
+      !!props.selectedIdentity &&
+      // if the publicKeys of old and new identities are different
+      props.selectedIdentity.identity.publicKeyAsHex !==
+        this.props.selectedIdentity.identity.publicKeyAsHex
+    )
+  }
+
+  private getMessages(identity?: WalletStateEntry) {
     if (identity) {
       fetch(
         `http://localhost:3000/messaging/inbox/${
@@ -59,20 +91,10 @@ class MessageListComponent extends React.Component<Props, State> {
         }`
       )
         .then(response => response.json())
-        .then((messages: any) => {
+        .then((messages: Message[]) => {
           let messageOutput
           if (messages.length) {
-            messageOutput = messages.map((message: any) => (
-              <li key={message.id}>
-                <h4>from:</h4>
-                <p>{message.receiver}</p>
-                <h4>message:</h4>
-                <p>{message.message}</p>
-                <br />
-                <br />
-                <br />
-              </li>
-            ))
+            messageOutput = messages
           } else {
             messageOutput =
               'No messages found for ' +
