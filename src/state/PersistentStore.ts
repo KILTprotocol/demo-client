@@ -1,7 +1,8 @@
-import Immutable from 'immutable'
 import { combineReducers, createStore, Store } from 'redux'
-import Identity from '../types/Identity'
-import WalletRedux, { WalletState, WalletStateEntry } from './ducks/WalletRedux'
+import WalletRedux, {
+  WalletState,
+  WalletStateSerialized,
+} from './ducks/WalletRedux'
 
 declare global {
   /* tslint:disable */
@@ -11,6 +12,14 @@ declare global {
   /* tslint:enable */
 }
 
+type State = {
+  wallet: WalletState
+}
+
+type SerializedState = {
+  wallet: WalletStateSerialized
+}
+
 class PersistentStore {
   public get store() {
     return this._store
@@ -18,56 +27,15 @@ class PersistentStore {
 
   private static NAME = 'reduxState'
 
-  // TODO: use interface/type for (de)serialized state, instead of any
-  private static deserialize(obj: any): { wallet: WalletState } {
-    const identities = {}
-    let selected: WalletStateEntry | null = null
-
-    // TODO: move to WalletRedux as every state needs a special implementation
-    Object.keys(obj.wallet.identities).forEach(i => {
-      const o = obj.wallet.identities[i]
-      const identity = new Identity(o.phrase)
-      const entry = { alias: o.alias, identity }
-      identities[identity.seedAsHex] = entry
-
-      if (
-        obj.wallet.selectedIdentityAsSeedAsHex &&
-        obj.wallet.selectedIdentityAsSeedAsHex === identity.seedAsHex
-      ) {
-        selected = entry
-      }
-    })
-
+  private static deserialize(obj: SerializedState): State {
     return {
-      wallet: WalletRedux.createState({
-        identities: Immutable.Map(identities),
-        selected,
-      }),
+      wallet: WalletRedux.deserialize(obj.wallet),
     }
   }
 
-  private static serialize(state: { wallet: WalletState }): any {
-    const obj: {
-      wallet: {
-        identities: Array<{ alias: string; phrase: string }>
-        selectedIdentityAsSeedAsHex?: string
-      }
-    } = {
-      wallet: {
-        identities: [],
-      },
-    }
-
-    // TODO: move to WalletRedux as every state needs a special implementation
-    obj.wallet.identities = state.wallet
-      .get('identities')
-      .toList()
-      .map(i => ({ alias: i.alias, phrase: i.identity.phrase }))
-      .toArray()
-
-    const selected = state.wallet.get('selected')
-    if (selected) {
-      obj.wallet.selectedIdentityAsSeedAsHex = selected.identity.seedAsHex
+  private static serialize(state: State): string {
+    const obj: SerializedState = {
+      wallet: WalletRedux.serialize(state.wallet),
     }
 
     return JSON.stringify(obj)
@@ -77,10 +45,10 @@ class PersistentStore {
 
   constructor() {
     const localState = localStorage.getItem(PersistentStore.NAME)
-    let persistedState = {}
+    let persistedState = {} as State
     if (localState) {
-      persistedState = JSON.parse(localState)
-      persistedState = PersistentStore.deserialize(persistedState)
+      const storedState = JSON.parse(localState)
+      persistedState = PersistentStore.deserialize(storedState)
     }
 
     this._store = createStore(
