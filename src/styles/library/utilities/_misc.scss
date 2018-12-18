@@ -1,0 +1,87 @@
+// text related
+%forceWordWrap {
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal !important;
+}
+
+@mixin hyphens($value: auto) {
+    -moz-hyphens: $value;
+    hyphens: $value;
+}
+
+/////////////////////
+
+@mixin calc($property, $expression) {
+    #{$property}: -webkit-calc(#{$expression});
+    #{$property}: -moz-calc(#{$expression});
+    #{$property}: calc(#{$expression});
+}
+
+@mixin fullSize($margin: 0) {
+    position: absolute;
+    top: $margin;
+    right: $margin;
+    bottom: $margin;
+    left: $margin;
+}
+
+@mixin clipPath($value) {
+    clip-path: $value;
+    -webkit-clip-path: $value;
+}
+
+%closeWithClickOutside {
+
+    &.hide {
+        display: none;
+    }
+
+    &.show {
+        @include fullSize();
+
+        position: fixed;
+        display: block;
+        cursor: default;
+    }
+}
+
+@mixin backgroundUnderlines($vSize, $bgColor: transparent, $lineColor: black) {
+    $underlineStart: 84%;
+    $underlineEnd: 90%;
+    @include background-image(repeating-linear-gradient(
+            $bgColor,
+            $bgColor $underlineStart,
+            $lineColor $underlineStart,
+            $lineColor $underlineEnd,
+            $bgColor $underlineEnd,
+            $bgColor 100%
+    ));
+    background-size: 100% $vSize;
+}
+
+@mixin img2x($url, $ext) {
+    $url2x: $url + '_2x.' + $ext;
+    $url: $url + '.' + $ext;
+
+    & {
+        background-image: url($url);
+    }
+
+    @media screen and (-webkit-min-device-pixel-ratio: 1.5),
+    screen and (min-resolution: 144dpi) {
+        & {
+            background-image: url($url2x);
+        }
+    }
+}
+
+@mixin linkBehaviour {
+    color: $color-primary;
+    cursor: pointer;
+
+    &:hover {
+        color: $color-primary-hover;
+    }
+}

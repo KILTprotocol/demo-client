@@ -4,11 +4,13 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 import WalletComponent from './wallet/WalletComponent'
 
 import ChainStatsComponent from './chainStats/ChainStatsComponent'
+import ContactListComponent from './contacts/ContactListComponent'
 import CtypeCreateComponent from './ctype/CtypeCreateComponent'
 import CtypeManagerComponent from './ctype/CtypeManagerComponent'
 
 import ClaimCreate from './claim/ClaimCreate'
 
+import MessageListComponent from './messages/MessageListComponent'
 import RootComponent from './root/RootComponent'
 
 const Routes: React.FunctionComponent<{}> = props => {
@@ -41,6 +43,8 @@ const Routes: React.FunctionComponent<{}> = props => {
 
       <Route path="/claim/new/:ctypeKey" component={ClaimCreate} />
 
+      <Route path={'/contacts'} component={ContactListComponent} />
+      <Route path={'/messages'} component={MessageListComponent} />
       <Route component={RootComponent} />
     </Switch>
   )

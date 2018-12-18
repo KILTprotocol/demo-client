@@ -1,0 +1,24 @@
+@function pxToEm($px, $basePx: $font-size-base) {
+    @return $pixels / $context * 1em;
+}
+
+@function getIconSize($desiredIconSize: $base-button-icon-size) {
+
+    // ratio measured exemplary with $icon-ic_close
+    // to get that icon in 16px size we need to set a font-size of 24px
+    $ratio: 24px / 16px;
+
+    @return $desiredIconSize * $ratio;
+}
+
+@function sqrt($r) {
+    $x0: 1;
+    $x1: $x0;
+
+    @for $i from 1 through 10 {
+        $x1: $x0 - ($x0 * $x0 - abs($r)) / (2 * $x0);
+        $x0: $x1;
+    }
+
+    @return $x1;
+}
