@@ -19,6 +19,12 @@ body {
   @include baseFont;
 
   margin: 0;
-  padding: 0;
+  padding: {
+    top: $header-height;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  };
+  background: $color-background;
   color: $color-font;
 }

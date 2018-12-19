@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import { Dropdown, DropdownItemProps, DropdownProps } from 'semantic-ui-react'
+import { Select2, Select2Option } from 'select2-react-component'
 import WalletRedux, {
   WalletAction,
   WalletState,
@@ -9,8 +9,7 @@ import WalletRedux, {
 } from '../../state/ducks/WalletRedux'
 
 const addIdentity = {
-  key: 'create',
-  text: `Create an identity`,
+  label: `Create an identity`,
   value: 'create',
 }
 
@@ -25,12 +24,11 @@ type State = {
   alias: string
 }
 
-class IdentitySelectorComponent extends React.Component<Props, State> {
+class IdentitySelector extends React.Component<Props, State> {
   public render() {
-    const identities: DropdownItemProps[] = this.props.options.map(option => {
+    const identities: Select2Option[] = this.props.options.map(option => {
       return {
-        key: option.publicKeyAsHex,
-        text: `${option.alias} (${option.publicKeyAsHex.substr(0, 10)}...)`,
+        label: `${option.alias} (${option.publicKeyAsHex.substr(0, 10)}...)`,
         value: option.seedAsHex,
       }
     })
@@ -48,26 +46,21 @@ class IdentitySelectorComponent extends React.Component<Props, State> {
     }
 
     return (
-      <Dropdown
-        placeholder="Select an identity"
-        fluid={true}
-        selection={true}
-        options={identities}
-        defaultValue={defaultValue}
-        onChange={this.selectIdentity}
-      />
+      <div>
+        <Select2
+          data={identities}
+          value={defaultValue}
+          update={this.selectIdentity}
+        />
+      </div>
     )
   }
 
-  private selectIdentity = (
-    event: React.SyntheticEvent<HTMLElement>,
-    selectedOption: DropdownProps
-  ) => {
-    if (selectedOption.value === 'create') {
+  private selectIdentity = (value: any) => {
+    if (value === 'create') {
       this.props.history.push('/wallet')
     } else {
-      const publicKeyAsHex = selectedOption.value as string
-      this.props.selectIdentity(publicKeyAsHex)
+      this.props.selectIdentity(value)
     }
   }
 }
@@ -98,4 +91,4 @@ const mapDispatchToProps = (dispatch: (action: WalletAction) => void) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(IdentitySelectorComponent))
+)(withRouter(IdentitySelector))

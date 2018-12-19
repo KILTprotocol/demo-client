@@ -27,15 +27,12 @@
     "sass-loader": "^7.1.0",
     "sass-resources-loader": "^2.0.0",
     "select2-component": "^5.5.1",
-    "semantic-ui": "^2.4.2",
-    "semantic-ui-react": "^0.83.0"
+    "select2-react-component": "^5.5.1"
   },
   "scripts": {
-    "build-semantic": "cd semantic && gulp build-css build-assets",
-    "watch-semantic": "cd semantic && yarn run build-semantic && gulp watch",
     "postinstall": "node config/postinstall.js",
-    "start": "yarn run build-semantic && react-scripts-ts start",
-    "build": "yarn run build-semantic && react-scripts-ts build",
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "testCI": "CI=true react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",

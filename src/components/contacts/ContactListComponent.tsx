@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Button, Icon } from 'semantic-ui-react'
 import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
 import { WalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
@@ -42,9 +41,7 @@ class ContactListComponent extends React.Component<Props, State> {
       return (
         <li key={contact.key}>
           {contact.name} / {contact.key}
-          <Button icon={true} onClick={this.sendMessage(contact.key)}>
-            <Icon name="send" />
-          </Button>
+          <button onClick={this.sendMessage(contact.key)}>Send</button>
         </li>
       )
     })
