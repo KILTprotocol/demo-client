@@ -7,7 +7,7 @@ $tablet: 480px;
       @content;
     }
   } @else if ($name == 'phone') {
-    @media (max-width: 479px + $padding) {
+    @media (max-width: $tablet - 1px + $padding) {
       @content;
     }
   } @else if ($name == 'tablet') {

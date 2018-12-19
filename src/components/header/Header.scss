@@ -83,11 +83,19 @@
         position: relative;
         display: block;
         max-width: $tablet;
-        background: $color-white;
+        background: $color-purple;
         text-align: left;
         border: {
           right: $base-border;
-          bottom: $base-border;
+          top: $base-border;
+        }
+
+        &.current {
+
+          & a {
+            background: transparent;
+            color: $color-primary;
+          }
         }
 
         & a {
@@ -98,7 +106,7 @@
           height: $base-input-height;
           padding: 0 $base-padding;
           line-height: $base-input-height;
-          color: $color-font;
+          color: $color-white;
           text-decoration: none;
 
           &:hover,
@@ -106,19 +114,6 @@
           &:active {
             background: $color-primary;
             color: $color-white;
-          }
-        }
-
-        &:first-child {
-          padding-top: $base-padding/2;
-        }
-
-        &.current {
-
-          & a {
-            background: $color-grey !important;
-            color: $color-font !important;
-            cursor: default;
           }
         }
       }
@@ -141,17 +136,23 @@
       & li {
         display: inline-block;
 
+        &.current {
+
+          & a {
+            color: $color-primary !important;
+          }
+        }
+
         & a {
           padding: $base-padding/4 0;
           margin: 0 $base-padding/2;
           color: $color-white;
           text-decoration: none;
-        }
 
-        &.current {
-
-          & a {
-            border-bottom: $base-border-width solid $color-white;
+          &:hover,
+          &:focus,
+          &:active {
+            color: $color-primary;
           }
         }
       }
