@@ -11,7 +11,14 @@ describe('PersistentStore', () => {
     const assertStateToBeDeserializedAsExpected = (state: State) => {
       const serialized: string = serialize(state)
       const deserialized = deserialize(serialized)
-      expect(JSON.stringify(deserialized)).toEqual(JSON.stringify(state))
+
+      const sortedA = JSON.stringify(state, Object.keys(serialized).sort())
+      const sortedB = JSON.stringify(
+        deserialized,
+        Object.keys(deserialized).sort()
+      )
+
+      expect(sortedA).toEqual(sortedB)
       expect(state).toBeDefined()
       expect(serialized.length).toBeGreaterThan(0)
       expect(deserialized).toBeDefined()
