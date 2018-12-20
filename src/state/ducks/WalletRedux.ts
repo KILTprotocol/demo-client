@@ -142,4 +142,9 @@ class WalletRedux {
 }
 
 export default WalletRedux
-export { ImmutableWalletState, WalletStateSerialized, WalletStateEntry, WalletAction }
+export {
+  ImmutableWalletState,
+  WalletStateSerialized,
+  WalletStateEntry,
+  WalletAction,
+}

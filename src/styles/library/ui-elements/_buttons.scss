@@ -62,11 +62,13 @@ $base-icon-size: $base-font-size;
   }
 }
 
-@mixin button-icon-only($icon-size: $base-icon-size) {
+@mixin button-icon-only($icon, $icon-size: $base-icon-size) {
   @include button-icon-only-base($icon-size);
 
   &:before {
     @extend %centerHV;
+
+    @include icon($icon);
 
     position: absolute;
   }

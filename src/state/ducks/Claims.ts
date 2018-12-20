@@ -1,7 +1,7 @@
 import Immutable from 'immutable'
+import ErrorService from '../../services/ErrorService'
 import { Claim } from '../../types/Claim'
 import Action from '../Action'
-import ErrorService from '../../services/ErrorService'
 
 interface SaveAction extends Action {
   payload: {
