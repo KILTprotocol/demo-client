@@ -2,11 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { Select2, Select2Option } from 'select2-react-component'
-import WalletRedux, {
-  ImmutableWalletState,
-  WalletAction,
-  WalletStateEntry,
-} from '../../state/ducks/WalletRedux'
+import * as Wallet from '../../state/ducks/Wallet'
 import { u8aToHex } from '@polkadot/util'
 
 const addIdentity = {
@@ -17,7 +13,7 @@ const addIdentity = {
 type Props = RouteComponentProps<{}> & {
   selectIdentity: (seedAsHex: string) => void
   options: Array<{ alias: string; publicKeyAsHex: string; seedAsHex: string }>
-  selected: WalletStateEntry | null
+  selected: Wallet.Entry | null
 }
 
 type State = {
@@ -66,7 +62,7 @@ class IdentitySelector extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
+const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
     options: state.wallet
       .get('identities')
@@ -81,10 +77,10 @@ const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
   }
 }
 
-const mapDispatchToProps = (dispatch: (action: WalletAction) => void) => {
+const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
   return {
     selectIdentity: (seedAsHex: string) => {
-      dispatch(WalletRedux.selectIdentityAction(seedAsHex))
+      dispatch(Wallet.Store.selectIdentityAction(seedAsHex))
     },
   }
 }

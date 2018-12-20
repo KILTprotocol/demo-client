@@ -2,10 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import MessageRepository from '../../services/MessageRepository'
-import {
-  ImmutableWalletState,
-  WalletStateEntry,
-} from '../../state/ducks/WalletRedux'
+import * as Wallet from '../../state/ducks/Wallet'
 import { MessageD } from '../../types/Message'
 import './MessageList.scss'
 import u8aToU8a from '@polkadot/util/u8a/toU8a'
@@ -14,7 +11,7 @@ import { EncryptedAsymmetric } from '@kiltprotocol/prototype-sdk/build/crypto/Cr
 import u8aToString from '@polkadot/util/u8a/toString'
 
 interface Props {
-  selectedIdentity?: WalletStateEntry
+  selectedIdentity?: Wallet.Entry
 }
 
 interface State {
@@ -103,7 +100,7 @@ class MessageList extends React.Component<Props, State> {
     )
   }
 
-  private getMessages(identity?: WalletStateEntry) {
+  private getMessages(identity?: Wallet.Entry) {
     // if we didn't not get a identity by params
     // we assume we wanna fetch the message for current identity
     const _identity = identity || this.props.selectedIdentity
@@ -149,7 +146,7 @@ class MessageList extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
+const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
     selectedIdentity: state.wallet.get('selected'),
   }

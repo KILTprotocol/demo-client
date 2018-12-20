@@ -2,17 +2,14 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
-import {
-  ImmutableWalletState,
-  WalletStateEntry,
-} from '../../state/ducks/WalletRedux'
+import * as Wallet from '../../state/ducks/Wallet'
 import { Contact } from '../../types/Contact'
 import { Crypto } from '@kiltprotocol/prototype-sdk'
 import u8aToU8a from '@polkadot/util/u8a/toU8a'
 import u8aToHex from '@polkadot/util/u8a/toHex'
 
 interface Props {
-  selectedIdentity?: WalletStateEntry
+  selectedIdentity?: Wallet.Entry
 }
 
 interface State {
@@ -76,7 +73,7 @@ class ContactList extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
+const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
     selectedIdentity: state.wallet.get('selected'),
   }

@@ -5,11 +5,7 @@ import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 import ContactRepository from '../../services/ContactRepository'
 
-import WalletRedux, {
-  ImmutableWalletState,
-  WalletAction,
-  WalletStateEntry,
-} from '../../state/ducks/WalletRedux'
+import * as Wallet from '../../state/ducks/Wallet'
 import IdentityViewComponent from '../IdentityView/IdentityView'
 import { Identity } from '@kiltprotocol/prototype-sdk'
 import { u8aToHex } from '@polkadot/util'
@@ -17,7 +13,7 @@ import { u8aToHex } from '@polkadot/util'
 type Props = RouteComponentProps<{}> & {
   saveIdentity: (alias: string, identity: Identity) => void
   removeIdentity: (seedAsHex: string) => void
-  identities: WalletStateEntry[]
+  identities: Wallet.Entry[]
 }
 type State = {
   randomPhrase: string
@@ -34,7 +30,7 @@ class WalletView extends React.Component<Props, State> {
   }
 
   public render() {
-    const identities = this.props.identities.map((entry: WalletStateEntry) => (
+    const identities = this.props.identities.map((entry: Wallet.Entry) => (
       <IdentityViewComponent
         key={entry.identity.seedAsHex}
         identity={entry.identity}
@@ -105,7 +101,7 @@ class WalletView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
+const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
     identities: state.wallet
       .get('identities')
@@ -114,13 +110,13 @@ const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
   }
 }
 
-const mapDispatchToProps = (dispatch: (action: WalletAction) => void) => {
+const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
   return {
     removeIdentity: (seedAsHex: string) => {
-      dispatch(WalletRedux.removeIdentityAction(seedAsHex))
+      dispatch(Wallet.Store.removeIdentityAction(seedAsHex))
     },
     saveIdentity: (alias: string, identity: Identity) => {
-      dispatch(WalletRedux.saveIdentityAction(alias, identity))
+      dispatch(Wallet.Store.saveIdentityAction(alias, identity))
     },
   }
 }
