@@ -70,7 +70,9 @@ class WalletComponent extends React.Component<Props, State> {
   }
 
   private addIdentity = () => {
-    const identity = Identity.buildFromMnemonic(this.state.randomPhrase)
+    const identity: Identity = Identity.buildFromMnemonic(
+      this.state.randomPhrase
+    )
     ContactRepository.add({
       encryptionKey: u8aToHex(identity.boxKeyPair.publicKey),
       key: u8aToHex(identity.signKeyPair.publicKey),
