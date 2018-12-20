@@ -26,28 +26,28 @@ type SerializedState = {
   claims: ClaimsStateSerialized
 }
 
+function deserialize(obj: SerializedState): State {
+  return {
+    claims: Claims.deserialize(obj.claims),
+    wallet: WalletRedux.deserialize(obj.wallet),
+  }
+}
+
+function serialize(state: State): string {
+  const obj: SerializedState = {
+    claims: Claims.serialize(state.claims),
+    wallet: WalletRedux.serialize(state.wallet),
+  }
+
+  return JSON.stringify(obj)
+}
+
 class PersistentStore {
   public get store() {
     return this._store
   }
 
   private static NAME = 'reduxState'
-
-  private static deserialize(obj: SerializedState): State {
-    return {
-      claims: Claims.deserialize(obj.claims),
-      wallet: WalletRedux.deserialize(obj.wallet),
-    }
-  }
-
-  private static serialize(state: State): string {
-    const obj: SerializedState = {
-      claims: Claims.serialize(state.claims),
-      wallet: WalletRedux.serialize(state.wallet),
-    }
-
-    return JSON.stringify(obj)
-  }
 
   private _store: Store
 
@@ -56,7 +56,7 @@ class PersistentStore {
     let persistedState = {} as State
     if (localState) {
       const storedState = JSON.parse(localState)
-      persistedState = PersistentStore.deserialize(storedState)
+      persistedState = deserialize(storedState)
     }
 
     this._store = createStore(
@@ -69,10 +69,11 @@ class PersistentStore {
     this._store.subscribe(() => {
       localStorage.setItem(
         PersistentStore.NAME,
-        PersistentStore.serialize(this._store.getState())
+        serialize(this._store.getState())
       )
     })
   }
 }
 
 export default new PersistentStore()
+export { serialize, deserialize }
