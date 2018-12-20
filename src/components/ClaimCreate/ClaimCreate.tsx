@@ -8,7 +8,7 @@ import * as common from 'schema-based-json-editor'
 
 import ctypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
-import SchemaEditorComponent from '../schema-editor/SchemaEditorComponent'
+import SchemaEditor from '../SchemaEditor/SchemaEditor'
 
 import { Claim } from 'src/types/Claim'
 import Claims, { ClaimsAction } from '../../state/ducks/Claims'
@@ -69,7 +69,7 @@ class ClaimCreate extends Component<Props, State> {
               onChange={this.handleNameChange}
             />
             <br />
-            <SchemaEditorComponent
+            <SchemaEditor
               schema={ctype!.getClaimInputModel() as common.Schema}
               initialValue={claim}
               updateValue={this.updateClaim}

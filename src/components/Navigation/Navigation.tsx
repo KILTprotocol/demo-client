@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
-import './Header.scss'
+import '../_Header/Header.scss'
 
 type NavLink = {
   url: string

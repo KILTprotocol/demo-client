@@ -2,7 +2,7 @@ import * as React from 'react'
 import { JSONEditor } from 'react-schema-based-json-editor'
 import * as common from 'schema-based-json-editor'
 
-import './SchemaEditorComponent.scss'
+import './SchemaEditor.scss'
 
 type Props = {
   schema: common.Schema
@@ -12,7 +12,7 @@ type Props = {
 
 type State = {}
 
-class SchemaEditorComponent extends React.Component<Props, State> {
+class SchemaEditor extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
   }
@@ -31,4 +31,4 @@ class SchemaEditorComponent extends React.Component<Props, State> {
   }
 }
 
-export default SchemaEditorComponent
+export default SchemaEditor

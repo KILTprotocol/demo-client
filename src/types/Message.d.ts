@@ -1,4 +1,4 @@
-export interface Message {
+export interface MessageD {
   id?: string
   sender: string
   senderKey: string

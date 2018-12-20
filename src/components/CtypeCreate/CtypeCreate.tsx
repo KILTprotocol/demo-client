@@ -8,9 +8,9 @@ import { keccakAsU8a, naclKeypairFromSeed } from '@polkadot/util-crypto'
 import blockchainService from '../../services/BlockchainService'
 import ctypeRepository from '../../services/CtypeRepository'
 import { CType } from '../../types/Ctype'
-import CtypeEditorComponent from './CtypeEditorComponent'
+import CtypeEditor from '../CtypeEditor/CtypeEditor'
 
-import './CtypeManagerComponent.scss'
+import '../CtypeManager/CtypeManager.scss'
 
 type Props = {}
 
@@ -20,7 +20,7 @@ type State = {
   ctype: any
 }
 
-class CtypeCreateComponent extends React.Component<Props, State> {
+class CtypeCreate extends React.Component<Props, State> {
   private api: ApiPromise
 
   constructor(props: Props) {
@@ -97,7 +97,7 @@ class CtypeCreateComponent extends React.Component<Props, State> {
           placeholder="Name"
           value={this.state.name}
         />
-        <CtypeEditorComponent
+        <CtypeEditor
           ctype={this.state.ctype}
           updateCType={this.updateCType}
           submit={this.submit}
@@ -119,4 +119,4 @@ class CtypeCreateComponent extends React.Component<Props, State> {
   }
 }
 
-export default CtypeCreateComponent
+export default CtypeCreate

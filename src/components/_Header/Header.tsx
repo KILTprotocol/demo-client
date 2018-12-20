@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 
 import logo from '../../assets/kilt_negative.svg'
 import './Header.scss'
-import IdentitySelectorComponent from './IdentitySelector'
-import Navigation from './Navigation'
+import IdentitySelectorComponent from '../IdentitySelector/IdentitySelector'
+import Navigation from '../Navigation/Navigation'
 
 type Props = {}
 

@@ -1,7 +1,7 @@
 import { Demo } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
-class RootComponent extends React.Component {
+class Root extends React.Component {
   public render() {
     return (
       <div>
@@ -12,4 +12,4 @@ class RootComponent extends React.Component {
   }
 }
 
-export default RootComponent
+export default Root

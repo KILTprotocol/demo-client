@@ -1,9 +1,9 @@
 import { CTypeInputModel } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import * as common from 'schema-based-json-editor'
-import SchemaEditorComponent from '../schema-editor/SchemaEditorComponent'
+import SchemaEditor from '../SchemaEditor/SchemaEditor'
 
-import './CtypeEditorComponent.scss'
+import './CtypeEditor.scss'
 
 type Props = {
   ctype: string
@@ -16,7 +16,7 @@ type State = {
   isValid: boolean
 }
 
-class CtypeEditorComponent extends React.Component<Props, State> {
+class CtypeEditor extends React.Component<Props, State> {
   private schema: common.Schema
 
   constructor(props: Props) {
@@ -30,7 +30,7 @@ class CtypeEditorComponent extends React.Component<Props, State> {
   public render() {
     return (
       <section className="ctype-editor">
-        <SchemaEditorComponent
+        <SchemaEditor
           schema={this.schema}
           initialValue={this.props.ctype}
           updateValue={this.updateCType}
@@ -69,4 +69,4 @@ class CtypeEditorComponent extends React.Component<Props, State> {
   }
 }
 
-export default CtypeEditorComponent
+export default CtypeEditor

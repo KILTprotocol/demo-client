@@ -10,7 +10,7 @@ type Props = {
   onDelete: (seedAsHex: string) => void
 } & RouteComponentProps<{}>
 
-class IdentityViewComponent extends React.Component<Props, {}> {
+class IdentityView extends React.Component<Props, {}> {
   constructor(props: Props) {
     super(props)
   }
@@ -41,4 +41,4 @@ class IdentityViewComponent extends React.Component<Props, {}> {
   }
 }
 
-export default withRouter(IdentityViewComponent)
+export default withRouter(IdentityView)

@@ -15,7 +15,7 @@ type State = {
   chainType?: string
 }
 
-class ChainStatsComponent extends React.Component<Props, State> {
+class ChainStats extends React.Component<Props, State> {
   private api: ApiPromise
 
   private mounted = false
@@ -85,4 +85,4 @@ class ChainStatsComponent extends React.Component<Props, State> {
   }
 }
 
-export default withRouter(ChainStatsComponent)
+export default withRouter(ChainStats)

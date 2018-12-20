@@ -4,7 +4,7 @@ import { Link, Route, Switch } from 'react-router-dom'
 
 import ctypeRepository from '../../services/CtypeRepository'
 import { CType } from '../../types/Ctype'
-import CtypeViewComponent from './CtypeViewComponent'
+import CtypeView from '../CtypeView/CtypeView'
 
 type Props = {}
 
@@ -12,7 +12,7 @@ type State = {
   ctypes: CType[]
 }
 
-class CtypeManagerComponent extends React.Component<Props, State> {
+class CtypeManager extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -38,7 +38,7 @@ class CtypeManagerComponent extends React.Component<Props, State> {
     }: RouteComponentProps<{ ctypeKey: string }>) => (
       <React.Fragment>
         <Link to="/ctype">Go back</Link>
-        <CtypeViewComponent ctypeKey={match.params.ctypeKey} />
+        <CtypeView ctypeKey={match.params.ctypeKey} />
       </React.Fragment>
     )
     const listComponent = () => (
@@ -65,4 +65,4 @@ class CtypeManagerComponent extends React.Component<Props, State> {
   }
 }
 
-export default CtypeManagerComponent
+export default CtypeManager

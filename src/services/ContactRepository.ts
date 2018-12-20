@@ -1,4 +1,4 @@
-import { Contact } from '../components/contacts/Contact'
+import { Contact } from '../types/Contact'
 import { BasePostParams } from './BaseRepository'
 
 // TODO: add tests, create interface for this class to be implemented as mock

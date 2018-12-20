@@ -6,7 +6,7 @@ import {
   ImmutableWalletState,
   WalletStateEntry,
 } from '../../state/ducks/WalletRedux'
-import { Contact } from './Contact'
+import { Contact } from '../../types/Contact'
 import { Crypto } from '@kiltprotocol/prototype-sdk'
 import u8aToU8a from '@polkadot/util/u8a/toU8a'
 import u8aToHex from '@polkadot/util/u8a/toHex'
@@ -19,7 +19,7 @@ interface State {
   contacts: Contact[]
 }
 
-class ContactListComponent extends React.Component<Props, State> {
+class ContactList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -82,4 +82,4 @@ const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
   }
 }
 
-export default connect(mapStateToProps)(ContactListComponent)
+export default connect(mapStateToProps)(ContactList)

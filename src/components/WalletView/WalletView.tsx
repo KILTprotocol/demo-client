@@ -10,7 +10,7 @@ import WalletRedux, {
   WalletAction,
   WalletStateEntry,
 } from '../../state/ducks/WalletRedux'
-import IdentityViewComponent from './IdentityViewComponent'
+import IdentityViewComponent from '../IdentityView/IdentityView'
 import { Identity } from '@kiltprotocol/prototype-sdk'
 import { u8aToHex } from '@polkadot/util'
 
@@ -24,7 +24,7 @@ type State = {
   alias: string
 }
 
-class WalletComponent extends React.Component<Props, State> {
+class WalletView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -129,5 +129,5 @@ export default withRouter(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )(WalletComponent)
+  )(WalletView)
 )

@@ -1,4 +1,4 @@
-import { Message } from '../components/messages/Message'
+import { MessageD } from '../types/Message'
 import { Identity } from '@kiltprotocol/prototype-sdk'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import { u8aToHex } from '@polkadot/util'
@@ -14,7 +14,7 @@ class MessageRepository {
   public async findByMessageId(
     messageId: string,
     myIdentity: Identity
-  ): Promise<Message> {
+  ): Promise<MessageD> {
     return fetch(
       `${MessageRepository.URL}/inbox/${u8aToHex(
         myIdentity.signKeyPair.publicKey
@@ -22,7 +22,7 @@ class MessageRepository {
     ).then(response => response.json())
   }
 
-  public async findByMyIdentity(myIdentity: Identity): Promise<Message[]> {
+  public async findByMyIdentity(myIdentity: Identity): Promise<MessageD[]> {
     return fetch(
       `${MessageRepository.URL}/inbox/${u8aToHex(
         myIdentity.signKeyPair.publicKey
@@ -32,11 +32,11 @@ class MessageRepository {
 
   public async findByMyIdentities(
     myIdentities: Identity[]
-  ): Promise<Message[]> {
+  ): Promise<MessageD[]> {
     return Promise.reject('implement')
   }
 
-  public async send(message: Message): Promise<Message> {
+  public async send(message: MessageD): Promise<MessageD> {
     return fetch(`${MessageRepository.URL}`, {
       ...BasePostParams,
       body: JSON.stringify(message),

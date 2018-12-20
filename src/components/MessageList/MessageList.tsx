@@ -6,8 +6,8 @@ import {
   ImmutableWalletState,
   WalletStateEntry,
 } from '../../state/ducks/WalletRedux'
-import { Message } from './Message'
-import './MessageListComponent.scss'
+import { MessageD } from '../../types/Message'
+import './MessageList.scss'
 import u8aToU8a from '@polkadot/util/u8a/toU8a'
 import { Crypto } from '@kiltprotocol/prototype-sdk'
 import { EncryptedAsymmetric } from '@kiltprotocol/prototype-sdk/build/crypto/Crypto'
@@ -18,10 +18,10 @@ interface Props {
 }
 
 interface State {
-  messageOutput: Message[] | string
+  messageOutput: MessageD[] | string
 }
 
-class MessageListComponent extends React.Component<Props, State> {
+class MessageList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -42,7 +42,7 @@ class MessageListComponent extends React.Component<Props, State> {
             </tr>
           </thead>
           <tbody>
-            {this.state.messageOutput.map((message: Message) => (
+            {this.state.messageOutput.map((message: MessageD) => (
               <tr key={message.id}>
                 <td>{message.sender}</td>
                 <td>{message.message}</td>
@@ -110,7 +110,7 @@ class MessageListComponent extends React.Component<Props, State> {
     let messageOutput
     if (_identity) {
       MessageRepository.findByMyIdentity(_identity.identity).then(
-        (messages: Message[]) => {
+        (messages: MessageD[]) => {
           if (messages.length) {
             for (const m of messages) {
               const ea: EncryptedAsymmetric = {
@@ -140,7 +140,7 @@ class MessageListComponent extends React.Component<Props, State> {
     }
   }
 
-  private deleteMessage = (message: Message): (() => void) => () => {
+  private deleteMessage = (message: MessageD): (() => void) => () => {
     if (message.id) {
       MessageRepository.deleteByMessageId(message.id).then(() => {
         this.getMessages()
@@ -155,4 +155,4 @@ const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
   }
 }
 
-export default connect(mapStateToProps)(MessageListComponent)
+export default connect(mapStateToProps)(MessageList)

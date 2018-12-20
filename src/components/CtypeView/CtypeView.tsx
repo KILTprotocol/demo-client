@@ -12,7 +12,7 @@ type State = {
   ctype?: CType
 }
 
-class CtypeViewComponent extends React.Component<Props, State> {
+class CtypeView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
@@ -50,4 +50,4 @@ class CtypeViewComponent extends React.Component<Props, State> {
   }
 }
 
-export default CtypeViewComponent
+export default CtypeView
