@@ -17,16 +17,18 @@ type ClaimsStateEntry = {
   claim: Claim
 }
 
-type ClaimsState = Immutable.Record<{
+type ClaimsState = {
   claims: Immutable.Map<string, ClaimsStateEntry>
-}>
+}
+
+type ImmutableClaimsState = Immutable.Record<ClaimsState>
 
 type ClaimsStateSerialized = {
   claims: Array<{ alias: string; claim: string }>
 }
 
 class Claims {
-  public static serialize(claimsState: ClaimsState) {
+  public static serialize(claimsState: ImmutableClaimsState) {
     const serialized: ClaimsStateSerialized = {
       claims: [],
     }
@@ -42,7 +44,7 @@ class Claims {
 
   public static deserialize(
     claimsStateSerialized: ClaimsStateSerialized
-  ): ClaimsState {
+  ): ImmutableClaimsState {
     if (!claimsStateSerialized) {
       return Claims.createState({
         claims: Immutable.Map(),
@@ -54,9 +56,9 @@ class Claims {
     Object.keys(claimsStateSerialized.claims).forEach(i => {
       const o = claimsStateSerialized.claims[i]
       try {
-      const claim = JSON.parse(o.claim) as Claim
-      const entry = { alias: o.alias, claim }
-      claims[o.alias] = entry
+        const claim = JSON.parse(o.claim) as Claim
+        const entry = { alias: o.alias, claim }
+        claims[o.alias] = entry
       } catch (e) {
         ErrorService.log(e)
       }
@@ -68,9 +70,9 @@ class Claims {
   }
 
   public static reducer(
-    state: ClaimsState = Claims.createState(),
+    state: ImmutableClaimsState = Claims.createState(),
     action: ClaimsAction
-  ): ClaimsState {
+  ): ImmutableClaimsState {
     switch (action.type) {
       case Claims.ACTIONS.SAVE_CLAIM:
         const { alias, claim } = (action as SaveAction).payload
@@ -90,7 +92,7 @@ class Claims {
     }
   }
 
-  public static createState(obj?: any): ClaimsState {
+  public static createState(obj?: ClaimsState): ImmutableClaimsState {
     return Immutable.Record({
       claims: Immutable.Map<string, ClaimsStateEntry>(),
     })(obj)
@@ -102,4 +104,9 @@ class Claims {
 }
 
 export default Claims
-export { ClaimsState, ClaimsStateSerialized, ClaimsStateEntry, ClaimsAction }
+export {
+  ImmutableClaimsState,
+  ClaimsStateSerialized,
+  ClaimsStateEntry,
+  ClaimsAction,
+}

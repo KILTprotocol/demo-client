@@ -22,10 +22,12 @@ type WalletStateEntry = {
   identity: Identity
 }
 
-type WalletState = Immutable.Record<{
+type WalletState = {
   identities: Immutable.Map<string, WalletStateEntry>
   selected: WalletStateEntry | null
-}>
+}
+
+type ImmutableWalletState = Immutable.Record<WalletState>
 
 type WalletStateSerialized = {
   identities: Array<{ alias: string; phrase: string }>
@@ -33,7 +35,7 @@ type WalletStateSerialized = {
 }
 
 class WalletRedux {
-  public static serialize(walletState: WalletState) {
+  public static serialize(walletState: ImmutableWalletState) {
     const wallet: WalletStateSerialized = {
       identities: [],
     }
@@ -54,7 +56,7 @@ class WalletRedux {
 
   public static deserialize(
     walletStateSerialized: WalletStateSerialized
-  ): WalletState {
+  ): ImmutableWalletState {
     const identities = {}
     let selected: WalletStateEntry | null = null
 
@@ -79,9 +81,9 @@ class WalletRedux {
   }
 
   public static reducer(
-    state: WalletState = WalletRedux.createState(),
+    state: ImmutableWalletState = WalletRedux.createState(),
     action: WalletAction
-  ): WalletState {
+  ): ImmutableWalletState {
     switch (action.type) {
       case WalletRedux.ACTIONS.SAVE_IDENTITY:
         const { alias, identity } = (action as ISaveAction).payload
@@ -125,11 +127,11 @@ class WalletRedux {
     }
   }
 
-  public static createState(obj?: any): WalletState {
+  public static createState(obj?: WalletState): ImmutableWalletState {
     return Immutable.Record({
       identities: Immutable.Map<string, WalletStateEntry>(),
       selected: null,
-    })(obj)
+    } as WalletState)(obj)
   }
 
   private static ACTIONS = {
@@ -140,4 +142,4 @@ class WalletRedux {
 }
 
 export default WalletRedux
-export { WalletState, WalletStateSerialized, WalletStateEntry, WalletAction }
+export { ImmutableWalletState, WalletStateSerialized, WalletStateEntry, WalletAction }

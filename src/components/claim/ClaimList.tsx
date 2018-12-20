@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { ClaimsState, ClaimsStateEntry } from 'src/state/ducks/Claims'
+import { ClaimsStateEntry, ImmutableClaimsState } from 'src/state/ducks/Claims'
 
 type Props = {
   claims: ClaimsStateEntry[]
@@ -27,7 +27,7 @@ class ClaimList extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { claims: ClaimsState }) => {
+const mapStateToProps = (state: { claims: ImmutableClaimsState }) => {
   return {
     claims: state.claims
       .get('claims')

@@ -1,7 +1,7 @@
 import { combineReducers, createStore, Store } from 'redux'
-import Claims, { ClaimsState, ClaimsStateSerialized } from './ducks/Claims'
+import Claims, { ImmutableClaimsState, ClaimsStateSerialized } from './ducks/Claims'
 import WalletRedux, {
-  WalletState,
+  ImmutableWalletState,
   WalletStateSerialized,
 } from './ducks/WalletRedux'
 
@@ -14,8 +14,8 @@ declare global {
 }
 
 type State = {
-  wallet: WalletState
-  claims: ClaimsState
+  wallet: ImmutableWalletState
+  claims: ImmutableClaimsState
 }
 
 type SerializedState = {
