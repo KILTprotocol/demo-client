@@ -1,10 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { ClaimsStateEntry, ImmutableClaimsState } from 'src/state/ducks/Claims'
+import * as Claims from '../../state/ducks/Claims'
 
 type Props = {
-  claims: ClaimsStateEntry[]
+  claims: Claims.Entry[]
 }
 type State = {}
 
@@ -14,7 +14,7 @@ class ClaimList extends React.Component<Props, State> {
 
     return (
       <section className="ClaimList">
-        <h1>ClaimList</h1>
+        <h1>My Claims</h1>
         <ul>
           {claims.map(claim => (
             <li key={claim.alias}>
@@ -27,7 +27,7 @@ class ClaimList extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { claims: ImmutableClaimsState }) => {
+const mapStateToProps = (state: { claims: Claims.ImmutableState }) => {
   return {
     claims: state.claims
       .get('claims')

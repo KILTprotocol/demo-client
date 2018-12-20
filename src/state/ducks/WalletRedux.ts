@@ -1,17 +1,17 @@
 import Immutable from 'immutable'
-import Action from '../Action'
+import KiltAction from '../../types/Action'
 import { Identity } from '@kiltprotocol/prototype-sdk'
 
-interface ISaveAction extends Action {
+interface ISaveAction extends KiltAction {
   payload: {
     alias: string
     identity: Identity
   }
 }
-interface IRemoveAction extends Action {
+interface IRemoveAction extends KiltAction {
   payload: string
 }
-interface ISelectAction extends Action {
+interface ISelectAction extends KiltAction {
   payload: string
 }
 

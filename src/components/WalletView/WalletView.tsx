@@ -45,7 +45,7 @@ class WalletView extends React.Component<Props, State> {
 
     return (
       <section className="WalletView">
-        <h1>Wallet</h1>
+        <h1>Wallet / My Identities</h1>
         <hr />
         <h3>Add new identity from phrase</h3>
         <h4>(duplicates not permitted)</h4>

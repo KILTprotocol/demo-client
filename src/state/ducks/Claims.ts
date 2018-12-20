@@ -1,39 +1,39 @@
 import Immutable from 'immutable'
 import ErrorService from '../../services/ErrorService'
+import KiltAction from '../../types/Action'
 import { Claim } from '../../types/Claim'
-import Action from '../Action'
 
-interface SaveAction extends Action {
+interface SaveAction extends KiltAction {
   payload: {
     alias: string
     claim: Claim
   }
 }
 
-type ClaimsAction = SaveAction
+type Action = SaveAction
 
-type ClaimsStateEntry = {
+type Entry = {
   alias: string
   claim: Claim
 }
 
-type ClaimsState = {
-  claims: Immutable.Map<string, ClaimsStateEntry>
+type State = {
+  claims: Immutable.Map<string, Entry>
 }
 
-type ImmutableClaimsState = Immutable.Record<ClaimsState>
+type ImmutableState = Immutable.Record<State>
 
-type ClaimsStateSerialized = {
+type SerializedState = {
   claims: Array<{ alias: string; claim: string }>
 }
 
-class Claims {
-  public static serialize(claimsState: ImmutableClaimsState) {
-    const serialized: ClaimsStateSerialized = {
+class Store {
+  public static serialize(state: ImmutableState) {
+    const serialized: SerializedState = {
       claims: [],
     }
 
-    serialized.claims = claimsState
+    serialized.claims = state
       .get('claims')
       .toList()
       .map(i => ({ alias: i.alias, claim: JSON.stringify(i.claim) }))
@@ -43,10 +43,10 @@ class Claims {
   }
 
   public static deserialize(
-    claimsStateSerialized: ClaimsStateSerialized
-  ): ImmutableClaimsState {
+    claimsStateSerialized: SerializedState
+  ): ImmutableState {
     if (!claimsStateSerialized) {
-      return Claims.createState({
+      return Store.createState({
         claims: Immutable.Map(),
       })
     }
@@ -64,17 +64,17 @@ class Claims {
       }
     })
 
-    return Claims.createState({
+    return Store.createState({
       claims: Immutable.Map(claims),
     })
   }
 
   public static reducer(
-    state: ImmutableClaimsState = Claims.createState(),
-    action: ClaimsAction
-  ): ImmutableClaimsState {
+    state: ImmutableState = Store.createState(),
+    action: Action
+  ): ImmutableState {
     switch (action.type) {
-      case Claims.ACTIONS.SAVE_CLAIM:
+      case Store.ACTIONS.SAVE_CLAIM:
         const { alias, claim } = (action as SaveAction).payload
         return state.setIn(['claims', alias], {
           alias,
@@ -88,13 +88,13 @@ class Claims {
   public static saveAction(alias: string, claim: Claim): SaveAction {
     return {
       payload: { alias, claim },
-      type: Claims.ACTIONS.SAVE_CLAIM,
+      type: Store.ACTIONS.SAVE_CLAIM,
     }
   }
 
-  public static createState(obj?: ClaimsState): ImmutableClaimsState {
+  public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
-      claims: Immutable.Map<string, ClaimsStateEntry>(),
+      claims: Immutable.Map<string, Entry>(),
     })(obj)
   }
 
@@ -103,10 +103,4 @@ class Claims {
   }
 }
 
-export default Claims
-export {
-  ImmutableClaimsState,
-  ClaimsStateSerialized,
-  ClaimsStateEntry,
-  ClaimsAction,
-}
+export { Store, ImmutableState, SerializedState, Entry, Action }

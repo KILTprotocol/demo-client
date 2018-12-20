@@ -50,7 +50,7 @@ class CtypeManager extends React.Component<Props, State> {
 
     return (
       <section className="CtypeManager">
-        <h1 className="App-title">Ctype Manager</h1>
+        <h1>Registry CTYPES</h1>
         <Switch>
           <Route path={'/ctype/:ctypeKey'} render={viewComponent} />
           <Route render={listComponent} />

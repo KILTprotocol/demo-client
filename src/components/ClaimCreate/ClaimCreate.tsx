@@ -1,17 +1,15 @@
+import { CType } from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
-
-import { CType } from '@kiltprotocol/prototype-sdk'
 import * as common from 'schema-based-json-editor'
 
 import ctypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
+import * as Claims from '../../state/ducks/Claims'
+import { Claim } from '../../types/Claim'
 import SchemaEditor from '../SchemaEditor/SchemaEditor'
-
-import { Claim } from 'src/types/Claim'
-import Claims, { ClaimsAction } from '../../state/ducks/Claims'
 
 type Props = RouteComponentProps<{
   ctypeKey: string
@@ -109,10 +107,10 @@ const mapStateToProps = () => {
   return {}
 }
 
-const mapDispatchToProps = (dispatch: (action: ClaimsAction) => void) => {
+const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
     saveClaim: (alias: string, claim: Claim) => {
-      dispatch(Claims.saveAction(alias, claim))
+      dispatch(Claims.Store.saveAction(alias, claim))
     },
   }
 }

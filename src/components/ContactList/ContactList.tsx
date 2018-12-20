@@ -36,7 +36,7 @@ class ContactList extends React.Component<Props, State> {
   public render() {
     return (
       <section className="ContactList">
-        <h1>Contact List</h1>
+        <h1>Registry Contacts</h1>
         <ul>{this.getContacts()}</ul>
       </section>
     )
