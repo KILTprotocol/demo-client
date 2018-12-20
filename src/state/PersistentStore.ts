@@ -26,7 +26,9 @@ type SerializedState = {
   claims: ClaimsStateSerialized
 }
 
-function deserialize(obj: SerializedState): State {
+function deserialize(str?: string | null): State {
+  const obj: SerializedState = JSON.parse(str ? str : '{}')
+
   return {
     claims: Claims.deserialize(obj.claims),
     wallet: WalletRedux.deserialize(obj.wallet),
@@ -55,8 +57,7 @@ class PersistentStore {
     const localState = localStorage.getItem(PersistentStore.NAME)
     let persistedState = {} as State
     if (localState) {
-      const storedState = JSON.parse(localState)
-      persistedState = deserialize(storedState)
+      persistedState = deserialize(localState)
     }
 
     this._store = createStore(
