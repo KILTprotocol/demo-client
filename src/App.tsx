@@ -2,7 +2,7 @@ import * as React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 
 import './App.scss'
-import Header from './components/_Header/Header'
+import Header from './components/Header/Header'
 import Routes from './components/Routes'
 
 class App extends React.Component {

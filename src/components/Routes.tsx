@@ -3,7 +3,7 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 
 import WalletComponent from './WalletView/WalletView'
 
-import ChainStats from './_ChainStats/ChainStats'
+import ChainStats from './ChainStats/ChainStats'
 import ContactList from './ContactList/ContactList'
 import CtypeCreate from './CtypeCreate/CtypeCreate'
 import CtypeManager from './CtypeManager/CtypeManager'
@@ -12,7 +12,7 @@ import ClaimCreate from './ClaimCreate/ClaimCreate'
 import ClaimList from './ClaimList/ClaimList'
 
 import MessageList from './MessageList/MessageList'
-import Root from './_Root/Root'
+import Root from './Root/Root'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
