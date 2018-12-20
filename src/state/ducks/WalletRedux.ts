@@ -1,6 +1,6 @@
 import Immutable from 'immutable'
 import Action from '../Action'
-import {Identity} from "@kiltprotocol/prototype-sdk";
+import { Identity } from '@kiltprotocol/prototype-sdk'
 
 interface ISaveAction extends Action {
   payload: {
@@ -43,7 +43,10 @@ class WalletRedux {
     wallet.identities = walletState
       .get('identities')
       .toList()
-      .map(i => ({ alias: i.alias, phrase: i.identity.phrase ? i.identity.phrase : '' }))
+      .map(i => ({
+        alias: i.alias,
+        phrase: i.identity.phrase ? i.identity.phrase : '',
+      }))
       .toArray()
 
     const selected = walletState.get('selected')

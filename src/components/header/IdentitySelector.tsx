@@ -7,7 +7,7 @@ import WalletRedux, {
   WalletAction,
   WalletStateEntry,
 } from '../../state/ducks/WalletRedux'
-import {u8aToHex} from '@polkadot/util';
+import { u8aToHex } from '@polkadot/util'
 
 const addIdentity = {
   label: `Create an identity`,

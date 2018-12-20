@@ -8,10 +8,10 @@ import {
 } from '../../state/ducks/WalletRedux'
 import { Message } from './Message'
 import './MessageListComponent.scss'
-import u8aToU8a from "@polkadot/util/u8a/toU8a";
-import {Crypto} from "@kiltprotocol/prototype-sdk";
-import {EncryptedAsymmetric} from "@kiltprotocol/prototype-sdk/build/crypto/Crypto";
-import u8aToString from "@polkadot/util/u8a/toString";
+import u8aToU8a from '@polkadot/util/u8a/toU8a'
+import { Crypto } from '@kiltprotocol/prototype-sdk'
+import { EncryptedAsymmetric } from '@kiltprotocol/prototype-sdk/build/crypto/Crypto'
+import u8aToString from '@polkadot/util/u8a/toString'
 
 interface Props {
   selectedIdentity?: WalletStateEntry
@@ -113,16 +113,20 @@ class MessageListComponent extends React.Component<Props, State> {
         (messages: Message[]) => {
           if (messages.length) {
             for (const m of messages) {
-                let ea : EncryptedAsymmetric = {
-                    box: u8aToU8a(m.message),
-                    nonce: u8aToU8a(m.nonce),
-                };
-                let decoded = Crypto.decryptAsymmetric(ea, u8aToU8a(m.senderEncryptionKey), _identity.identity.boxKeyPair.secretKey);
-                if (!decoded) {
-                    m.message = "ERROR DECODING MESSAGE";
-                } else {
-                    m.message = u8aToString(decoded);
-                }
+              const ea: EncryptedAsymmetric = {
+                box: u8aToU8a(m.message),
+                nonce: u8aToU8a(m.nonce),
+              }
+              const decoded = Crypto.decryptAsymmetric(
+                ea,
+                u8aToU8a(m.senderEncryptionKey),
+                _identity.identity.boxKeyPair.secretKey
+              )
+              if (!decoded) {
+                m.message = 'ERROR DECODING MESSAGE'
+              } else {
+                m.message = u8aToString(decoded)
+              }
             }
             messageOutput = messages
           } else {
