@@ -17,6 +17,9 @@ const HeaderComponent: React.FunctionComponent = props => {
             <Link to="/ctype">CTYPE manager</Link>
           </Menu.Item>
           <Menu.Item>
+            <Link to="/claim">Claims</Link>
+          </Menu.Item>
+          <Menu.Item>
             <Link to="/chain-stats">Chain stats</Link>
           </Menu.Item>
           <Menu.Item>

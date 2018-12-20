@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Link } from 'react-router-dom'
 
 import { CType } from 'src/types/Ctype'
 import ctypeRepository from '../../services/CtypeRepository'
@@ -36,6 +37,9 @@ class CtypeViewComponent extends React.Component<Props, State> {
         <div>Name: {ctype.name}</div>
         <div>Author: {ctype.author}</div>
         <div>Definition: {ctype.definition}</div>
+        <div>
+          <Link to={`/claim/new/${ctype.key}`}>New Claim</Link>
+        </div>
       </div>
     )
   }

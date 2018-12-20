@@ -3,7 +3,10 @@ import { connect } from 'react-redux'
 import { Button, Icon } from 'semantic-ui-react'
 import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
-import { WalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
+import {
+  ImmutableWalletState,
+  WalletStateEntry,
+} from '../../state/ducks/WalletRedux'
 import { Contact } from './Contact'
 
 interface Props {
@@ -61,7 +64,7 @@ class ContactListComponent extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: WalletState }) => {
+const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
   return {
     selectedIdentity: state.wallet.get('selected'),
   }

@@ -1,5 +1,3 @@
-import 'codemirror/lib/codemirror.css'
-import 'codemirror/mode/javascript/javascript.js'
 import * as React from 'react'
 import { JSONEditor } from 'react-schema-based-json-editor'
 import * as common from 'schema-based-json-editor'
