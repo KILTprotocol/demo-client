@@ -63,19 +63,22 @@ class WalletRedux {
     const identities = {}
     let selected: WalletStateEntry | null = null
 
-    Object.keys(walletStateSerialized.identities).forEach(i => {
-      const o = walletStateSerialized.identities[i]
-      const identity = Identity.buildFromMnemonic(o.phrase)
-      const entry = { alias: o.alias, identity }
-      identities[identity.seedAsHex] = entry
+    if (walletStateSerialized && walletStateSerialized.identities) {
+      Object.keys(walletStateSerialized.identities).forEach(i => {
+        const o = walletStateSerialized.identities[i]
+        const identity = Identity.buildFromMnemonic(o.phrase)
+        const entry = { alias: o.alias, identity }
+        identities[identity.seedAsHex] = entry
 
-      if (
-        walletStateSerialized.selectedIdentityAsSeedAsHex &&
-        walletStateSerialized.selectedIdentityAsSeedAsHex === identity.seedAsHex
-      ) {
-        selected = entry
-      }
-    })
+        if (
+          walletStateSerialized.selectedIdentityAsSeedAsHex &&
+          walletStateSerialized.selectedIdentityAsSeedAsHex ===
+            identity.seedAsHex
+        ) {
+          selected = entry
+        }
+      })
+    }
 
     return WalletRedux.createState({
       identities: Immutable.Map(identities),
