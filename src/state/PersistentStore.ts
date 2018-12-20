@@ -77,4 +77,4 @@ class PersistentStore {
 }
 
 export default new PersistentStore()
-export { serialize, deserialize }
+export { serialize, deserialize, State }
