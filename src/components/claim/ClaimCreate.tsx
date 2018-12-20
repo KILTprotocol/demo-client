@@ -45,8 +45,8 @@ class ClaimCreate extends Component<Props, State> {
     const { ctypeKey } = this.props.match.params
     ctypeRepository.findByKey(ctypeKey).then(dbCtype => {
       try {
-      const ctype = CType.fromInputModel(JSON.parse(dbCtype.definition))
-      this.setState({ ctype })
+        const ctype = CType.fromInputModel(JSON.parse(dbCtype.definition))
+        this.setState({ ctype })
       } catch (e) {
         ErrorService.log(e)
       }
@@ -61,31 +61,36 @@ class ClaimCreate extends Component<Props, State> {
       <div className="ClaimCreate">
         <h1>New Claim</h1>
         <div>Ctype: {match.params.ctypeKey}</div>
-        <input
-          type="text"
-          placeholder="Alias"
-          onChange={this.handleNameChange}
-        />
-        <br />
         {ctype && (
-          <SchemaEditorComponent
-            schema={ctype!.getClaimInputModel() as common.Schema}
-            initialValue={claim}
-            updateValue={this.updateClaim}
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="Alias"
+              onChange={this.handleNameChange}
+            />
+            <br />
+            <SchemaEditorComponent
+              schema={ctype!.getClaimInputModel() as common.Schema}
+              initialValue={claim}
+              updateValue={this.updateClaim}
+            />
+
+            <div className="actions">
+              <button type="submit" onClick={this.handleSubmit}>
+                Submit
+              </button>
+            </div>
+          </div>
         )}
-        <button type="submit" onClick={this.handleSubmit}>
-          Submit
-        </button>
       </div>
     )
   }
 
   private updateClaim = (claim: common.ValueType, isValid: boolean) => {
     this.setState({
+      claim,
       isValid,
     })
-    this.setState({ claim })
   }
 
   private handleSubmit() {
