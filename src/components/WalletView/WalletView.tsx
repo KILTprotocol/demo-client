@@ -44,7 +44,7 @@ class WalletView extends React.Component<Props, State> {
     ))
 
     return (
-      <div>
+      <section className="WalletView">
         <h1>Wallet</h1>
         <hr />
         <h3>Add new identity from phrase</h3>
@@ -65,7 +65,7 @@ class WalletView extends React.Component<Props, State> {
         <button onClick={this.addIdentity}>Add</button>
         <hr />
         {identities}
-      </div>
+      </section>
     )
   }
 

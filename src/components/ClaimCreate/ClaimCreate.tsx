@@ -58,7 +58,7 @@ class ClaimCreate extends Component<Props, State> {
     const { ctype, claim }: State = this.state
 
     return (
-      <div className="ClaimCreate">
+      <section className="ClaimCreate">
         <h1>New Claim</h1>
         <div>Ctype: {match.params.ctypeKey}</div>
         {ctype && (
@@ -82,7 +82,7 @@ class ClaimCreate extends Component<Props, State> {
             </div>
           </div>
         )}
-      </div>
+      </section>
     )
   }
 

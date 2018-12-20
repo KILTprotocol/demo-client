@@ -2,9 +2,9 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import logo from '../../assets/kilt_negative.svg'
-import './Header.scss'
 import IdentitySelectorComponent from '../IdentitySelector/IdentitySelector'
 import Navigation from '../Navigation/Navigation'
+import './Header.scss'
 
 type Props = {}
 
@@ -30,16 +30,18 @@ class Header extends React.Component<Props, State> {
 
     return (
       <header className={classes.join(' ')}>
-        <button className="menu" onClick={this.toggleNavigation} />
-        <div className="navigation-container" onClick={this.closeNavigation}>
-          <Navigation selectRoute={this.closeNavigation} />
-        </div>
-        <div className="logo-id">
-          <Link to="/" className="logo">
-            <img src={logo} alt="logo" />
-          </Link>
-          <IdentitySelectorComponent />
-        </div>
+        <section>
+          <button className="menu" onClick={this.toggleNavigation} />
+          <div className="navigation-container" onClick={this.closeNavigation}>
+            <Navigation selectRoute={this.closeNavigation} />
+          </div>
+          <div className="logo-id">
+            <Link to="/" className="logo">
+              <img src={logo} alt="logo" />
+            </Link>
+            <IdentitySelectorComponent />
+          </div>
+        </section>
       </header>
     )
   }

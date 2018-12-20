@@ -31,7 +31,7 @@ class CtypeView extends React.Component<Props, State> {
     }
 
     return (
-      <div>
+      <section className="CtypeView">
         <div>Id: {ctype._id}</div>
         <div>Key: {ctype.key}</div>
         <div>Name: {ctype.name}</div>
@@ -40,7 +40,7 @@ class CtypeView extends React.Component<Props, State> {
         <div>
           <Link to={`/claim/new/${ctype.key}`}>New Claim</Link>
         </div>
-      </div>
+      </section>
     )
   }
 

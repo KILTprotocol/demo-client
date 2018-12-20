@@ -62,7 +62,7 @@ class MessageList extends React.Component<Props, State> {
     }
 
     return (
-      <section className="message-list">
+      <section className="MessageList">
         <h1>Message List</h1>
         {messageOutput}
       </section>

@@ -7,6 +7,7 @@ type NavLink = {
   label: string
 }
 const links: NavLink[] = [
+  { url: '', label: 'Home' },
   { url: 'wallet', label: 'Wallet' },
   { url: 'ctype', label: 'CTYPE manager' },
   { url: 'claim', label: 'Claims' },
@@ -16,7 +17,7 @@ const links: NavLink[] = [
 ]
 
 type Props = RouteComponentProps<{}> & {
-  selectRoute: () => void
+  selectRoute?: () => void
 }
 
 type State = {}
@@ -54,7 +55,9 @@ class Navigation extends React.Component<Props, State> {
   private selectRoute = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation()
     const { selectRoute } = this.props
-    selectRoute()
+    if (selectRoute) {
+      selectRoute()
+    }
   }
 }
 

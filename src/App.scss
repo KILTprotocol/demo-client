@@ -1,5 +1,20 @@
 @import "styles/select2-overrides";
 
+// base elements
+section {
+  width: 100%;
+  max-width: $base-content-max-width;
+  margin: auto;
+}
+
+h1 {
+  background: $color-purple;
+  color: $color-white;
+  width: 100%;
+  margin-top: $base-padding;
+  padding: $base-padding/4 $base-padding;
+}
+
 // base form elements
 input {
 

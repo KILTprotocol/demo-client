@@ -19,7 +19,7 @@ class IdentityView extends React.Component<Props, {}> {
     const { identity, alias } = this.props
 
     return (
-      <div style={{ borderBottom: '1px solid grey', padding: '1rem' }}>
+      <section className="IdentityView">
         <ul>
           <li>Alias: {alias}</li>
           <li>Phrase: {identity.phrase}</li>
@@ -32,7 +32,7 @@ class IdentityView extends React.Component<Props, {}> {
             <button onClick={this.onDelete}>Remove</button>
           </li>
         </ul>
-      </div>
+      </section>
     )
   }
 

@@ -61,7 +61,7 @@ class ChainStats extends React.Component<Props, State> {
     const { host, chainName, chainVersion, chainType } = this.state
 
     return (
-      <div>
+      <section className="ChainStats">
         <h1 className="App-title">Chain Stats</h1>
         Demo module to interact with substrate blockchain
         <hr />
@@ -80,7 +80,7 @@ class ChainStats extends React.Component<Props, State> {
           }
           else={'No Host given'}
         />
-      </div>
+      </section>
     )
   }
 }

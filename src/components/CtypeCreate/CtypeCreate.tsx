@@ -89,8 +89,8 @@ class CtypeCreate extends React.Component<Props, State> {
 
   public render() {
     return (
-      <section className="ctype-manager">
-        <h1 className="App-title">Ctype Manager</h1>
+      <section className="CtypeCreate">
+        <h1 className="App-title">Create CTYPE</h1>
         <input
           type="text"
           onChange={this.updateName}

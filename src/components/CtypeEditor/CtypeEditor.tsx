@@ -29,7 +29,7 @@ class CtypeEditor extends React.Component<Props, State> {
 
   public render() {
     return (
-      <section className="ctype-editor">
+      <section className="CtypeEditor">
         <SchemaEditor
           schema={this.schema}
           initialValue={this.props.ctype}

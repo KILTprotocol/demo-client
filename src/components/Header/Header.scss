@@ -1,14 +1,20 @@
 .Header {
   position: fixed;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
   top: 0;
   left: 0;
   width: 100%;
   height: $header-height;
   background: $color-purple;
+
+  & > section {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
 
   & .menu {
     @include button-icon-only($icon-navicon, 20px);

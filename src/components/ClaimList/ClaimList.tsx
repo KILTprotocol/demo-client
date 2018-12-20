@@ -13,7 +13,7 @@ class ClaimList extends React.Component<Props, State> {
     const { claims } = this.props
 
     return (
-      <div className="ClaimList">
+      <section className="ClaimList">
         <h1>ClaimList</h1>
         <ul>
           {claims.map(claim => (
@@ -22,7 +22,7 @@ class ClaimList extends React.Component<Props, State> {
             </li>
           ))}
         </ul>
-      </div>
+      </section>
     )
   }
 }

@@ -49,13 +49,13 @@ class CtypeManager extends React.Component<Props, State> {
     )
 
     return (
-      <div>
+      <section className="CtypeManager">
         <h1 className="App-title">Ctype Manager</h1>
         <Switch>
           <Route path={'/ctype/:ctypeKey'} render={viewComponent} />
           <Route render={listComponent} />
         </Switch>
-      </div>
+      </section>
     )
   }
 
