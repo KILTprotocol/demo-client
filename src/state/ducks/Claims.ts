@@ -1,6 +1,7 @@
 import Immutable from 'immutable'
 import { Claim } from '../../types/Claim'
 import Action from '../Action'
+import ErrorService from '../../services/ErrorService'
 
 interface SaveAction extends Action {
   payload: {
@@ -52,9 +53,13 @@ class Claims {
 
     Object.keys(claimsStateSerialized.claims).forEach(i => {
       const o = claimsStateSerialized.claims[i]
+      try {
       const claim = JSON.parse(o.claim) as Claim
       const entry = { alias: o.alias, claim }
       claims[o.alias] = entry
+      } catch (e) {
+        ErrorService.log(e)
+      }
     })
 
     return Claims.createState({

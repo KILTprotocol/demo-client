@@ -7,6 +7,7 @@ import { CType } from '@kiltprotocol/prototype-sdk'
 import * as common from 'schema-based-json-editor'
 
 import ctypeRepository from '../../services/CtypeRepository'
+import ErrorService from '../../services/ErrorService'
 import SchemaEditorComponent from '../schema-editor/SchemaEditorComponent'
 
 import { Claim } from 'src/types/Claim'
@@ -43,8 +44,12 @@ class ClaimCreate extends Component<Props, State> {
   public componentDidMount() {
     const { ctypeKey } = this.props.match.params
     ctypeRepository.findByKey(ctypeKey).then(dbCtype => {
+      try {
       const ctype = CType.fromInputModel(JSON.parse(dbCtype.definition))
       this.setState({ ctype })
+      } catch (e) {
+        ErrorService.log(e)
+      }
     })
   }
 
