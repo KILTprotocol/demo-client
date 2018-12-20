@@ -6,8 +6,8 @@ import { withRouter } from 'react-router-dom'
 import ContactRepository from '../../services/ContactRepository'
 
 import WalletRedux, {
+  ImmutableWalletState,
   WalletAction,
-  WalletState,
   WalletStateEntry,
 } from '../../state/ducks/WalletRedux'
 import Identity from '../../types/Identity'
@@ -101,7 +101,7 @@ class WalletComponent extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: WalletState }) => {
+const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
   return {
     identities: state.wallet
       .get('identities')

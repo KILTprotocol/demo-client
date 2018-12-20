@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import MessageRepository from '../../services/MessageRepository'
-import { WalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
+import { ImmutableWalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
 import { Message } from './Message'
 import './MessageListComponent.scss'
 
@@ -126,7 +126,7 @@ class MessageListComponent extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: WalletState }) => {
+const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
   return {
     selectedIdentity: state.wallet.get('selected'),
   }

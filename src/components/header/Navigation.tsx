@@ -9,6 +9,7 @@ type NavLink = {
 const links: NavLink[] = [
   { url: 'wallet', label: 'Wallet' },
   { url: 'ctype', label: 'CTYPE manager' },
+  { url: 'claim', label: 'Claims'},
   { url: 'chain-stats', label: 'Chain stats' },
   { url: 'contacts', label: 'Contacts' },
   { url: 'messages', label: 'Messages' },

@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { Select2, Select2Option } from 'select2-react-component'
 import WalletRedux, {
+  ImmutableWalletState,
   WalletAction,
-  WalletState,
   WalletStateEntry,
 } from '../../state/ducks/WalletRedux'
 
@@ -65,7 +65,7 @@ class IdentitySelector extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: WalletState }) => {
+const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
   return {
     options: state.wallet
       .get('identities')
