@@ -2,7 +2,10 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import MessageRepository from '../../services/MessageRepository'
-import { ImmutableWalletState, WalletStateEntry } from '../../state/ducks/WalletRedux'
+import {
+  ImmutableWalletState,
+  WalletStateEntry,
+} from '../../state/ducks/WalletRedux'
 import { Message } from './Message'
 import './MessageListComponent.scss'
 

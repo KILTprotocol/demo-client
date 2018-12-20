@@ -1,5 +1,8 @@
 import { combineReducers, createStore, Store } from 'redux'
-import Claims, { ImmutableClaimsState, ClaimsStateSerialized } from './ducks/Claims'
+import Claims, {
+  ClaimsStateSerialized,
+  ImmutableClaimsState,
+} from './ducks/Claims'
 import WalletRedux, {
   ImmutableWalletState,
   WalletStateSerialized,
