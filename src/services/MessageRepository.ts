@@ -1,6 +1,7 @@
 import { Message } from '../components/messages/Message'
-import Identity from '../types/Identity'
+import { Identity } from '@kiltprotocol/prototype-sdk'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
+import { u8aToHex } from '@polkadot/util'
 
 // TODO: add tests, create interface for this class to be implemented as mock
 // (for other tests)
@@ -15,13 +16,17 @@ class MessageRepository {
     myIdentity: Identity
   ): Promise<Message> {
     return fetch(
-      `${MessageRepository.URL}/inbox/${myIdentity.publicKeyAsHex}/${messageId}`
+      `${MessageRepository.URL}/inbox/${u8aToHex(
+        myIdentity.signKeyPair.publicKey
+      )}/${messageId}`
     ).then(response => response.json())
   }
 
   public async findByMyIdentity(myIdentity: Identity): Promise<Message[]> {
     return fetch(
-      `${MessageRepository.URL}/inbox/${myIdentity.publicKeyAsHex}`
+      `${MessageRepository.URL}/inbox/${u8aToHex(
+        myIdentity.signKeyPair.publicKey
+      )}`
     ).then(response => response.json())
   }
 

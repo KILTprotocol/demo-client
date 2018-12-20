@@ -4,10 +4,7 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "@kiltprotocol/prototype-sdk": "^0.0.3",
-    "@polkadot/api": "^0.31.123",
-    "@polkadot/util": "^0.33.1",
-    "@polkadot/util-crypto": "^0.33.1",
+    "@kiltprotocol/prototype-sdk": "^0.0.8",
     "ajv": "^6.6.1",
     "codemirror": "^5.42.0",
     "compass-mixins": "^0.12.10",

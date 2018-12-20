@@ -7,6 +7,7 @@ import WalletRedux, {
   WalletAction,
   WalletStateEntry,
 } from '../../state/ducks/WalletRedux'
+import { u8aToHex } from '@polkadot/util'
 
 const addIdentity = {
   label: `Create an identity`,
@@ -73,7 +74,7 @@ const mapStateToProps = (state: { wallet: ImmutableWalletState }) => {
       .toArray()
       .map(identity => ({
         alias: identity.alias,
-        publicKeyAsHex: identity.identity.publicKeyAsHex,
+        publicKeyAsHex: u8aToHex(identity.identity.signKeyPair.publicKey),
         seedAsHex: identity.identity.seedAsHex,
       })),
     selected: state.wallet.get('selected'),
