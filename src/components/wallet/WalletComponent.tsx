@@ -10,8 +10,9 @@ import WalletRedux, {
   WalletAction,
   WalletStateEntry,
 } from '../../state/ducks/WalletRedux'
-import Identity from '../../types/Identity'
 import IdentityViewComponent from './IdentityViewComponent'
+import {Identity} from "@kiltprotocol/prototype-sdk";
+import {u8aToHex} from '@polkadot/util';
 
 type Props = RouteComponentProps<{}> & {
   saveIdentity: (alias: string, identity: Identity) => void
@@ -69,9 +70,10 @@ class WalletComponent extends React.Component<Props, State> {
   }
 
   private addIdentity = () => {
-    const identity = new Identity(this.state.randomPhrase)
+    const identity = Identity.buildFromMnemonic(this.state.randomPhrase)
     ContactRepository.add({
-      key: identity.publicKeyAsHex,
+      key: u8aToHex(identity.signKeyPair.publicKey),
+      encryptionKey: u8aToHex(identity.boxKeyPair.publicKey),
       name: this.state.alias,
     }).then(
       () => {

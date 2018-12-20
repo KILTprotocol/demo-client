@@ -8,6 +8,10 @@ import {
 } from '../../state/ducks/WalletRedux'
 import { Message } from './Message'
 import './MessageListComponent.scss'
+import u8aToU8a from "@polkadot/util/u8a/toU8a";
+import {Crypto} from "@kiltprotocol/prototype-sdk";
+import {EncryptedAsymmetric} from "@kiltprotocol/prototype-sdk/build/crypto/Crypto";
+import u8aToString from "@polkadot/util/u8a/toString";
 
 interface Props {
   selectedIdentity?: WalletStateEntry
@@ -40,7 +44,7 @@ class MessageListComponent extends React.Component<Props, State> {
           <tbody>
             {this.state.messageOutput.map((message: Message) => (
               <tr key={message.id}>
-                <td>{message.receiver}</td>
+                <td>{message.sender}</td>
                 <td>{message.message}</td>
                 <td>
                   <button
@@ -94,8 +98,8 @@ class MessageListComponent extends React.Component<Props, State> {
       !!this.props.selectedIdentity &&
       !!props.selectedIdentity &&
       // if the publicKeys of old and new identities are different
-      props.selectedIdentity.identity.publicKeyAsHex !==
-        this.props.selectedIdentity.identity.publicKeyAsHex
+      props.selectedIdentity.identity.seedAsHex !==
+        this.props.selectedIdentity.identity.seedAsHex
     )
   }
 
@@ -108,6 +112,18 @@ class MessageListComponent extends React.Component<Props, State> {
       MessageRepository.findByMyIdentity(_identity.identity).then(
         (messages: Message[]) => {
           if (messages.length) {
+            for (const m of messages) {
+                let ea : EncryptedAsymmetric = {
+                    box: u8aToU8a(m.message),
+                    nonce: u8aToU8a(m.nonce),
+                };
+                let decoded = Crypto.decryptAsymmetric(ea, u8aToU8a(m.senderEncryptionKey), _identity.identity.boxKeyPair.secretKey);
+                if (!decoded) {
+                    m.message = "ERROR DECODING MESSAGE";
+                } else {
+                    m.message = u8aToString(decoded);
+                }
+            }
             messageOutput = messages
           } else {
             messageOutput = 'No messages found'
