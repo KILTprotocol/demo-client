@@ -7,13 +7,13 @@ import { BasePostParams } from './BaseRepository'
 class ContactRepository {
   private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
     process.env.REACT_APP_SERVICE_PORT
-  }/contacts`
+    }/contacts`
 
-  public async findAll(): Promise<Contact[]> {
+  public static async findAll(): Promise<Contact[]> {
     return fetch(`${ContactRepository.URL}`).then(response => response.json())
   }
 
-  public async add(contact: Contact): Promise<Response> {
+  public static async add(contact: Contact): Promise<Response> {
     return fetch(`${ContactRepository.URL}`, {
       ...BasePostParams,
       body: JSON.stringify(contact),
@@ -21,4 +21,4 @@ class ContactRepository {
   }
 }
 
-export default new ContactRepository()
+export default ContactRepository
