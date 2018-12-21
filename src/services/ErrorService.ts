@@ -1,13 +1,13 @@
 export type ErrorCategory =
-  'JSON.parse'
+  | 'JSON.parse'
   | 'fetch.GET'
   | 'fetch.POST'
   | 'fetch.DELETE'
 
 type QualifiedError = {
-  category: ErrorCategory,
-  error: Error,
-  message?: string,
+  category: ErrorCategory
+  error: Error
+  message?: string
 }
 
 class ErrorService {
@@ -15,13 +15,11 @@ class ErrorService {
 
   public log(category: ErrorCategory, error: Error, message?: string) {
     console.error(error)
-    this.errors.push(
-      {
-        category,
-        error,
-        message,
-      }
-    )
+    this.errors.push({
+      category,
+      error,
+      message,
+    })
   }
 }
 

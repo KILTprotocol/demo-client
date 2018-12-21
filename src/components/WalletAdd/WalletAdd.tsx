@@ -36,7 +36,6 @@ class WalletAdd extends React.Component<Props, State> {
         <h4>(duplicates not permitted)</h4>
 
         <div className="inputs">
-
           <div className="name">
             <label>Name</label>
             <div>
@@ -56,18 +55,21 @@ class WalletAdd extends React.Component<Props, State> {
                 value={this.state.randomPhrase}
                 onChange={this.setRandomPhrase}
               />
-              <button onClick={this.createRandomPhrase}
-                      title="Create random phrase" />
+              <button
+                onClick={this.createRandomPhrase}
+                title="Create random phrase"
+              />
             </div>
           </div>
 
           <div className="actions">
-            <button onClick={this.addIdentity}
-                    disabled={!this.state.randomPhrase || !this.state.alias}>
+            <button
+              onClick={this.addIdentity}
+              disabled={!this.state.randomPhrase || !this.state.alias}
+            >
               Add
             </button>
           </div>
-
         </div>
       </section>
     )
@@ -87,11 +89,7 @@ class WalletAdd extends React.Component<Props, State> {
         this.props.history.push('/wallet')
       },
       error => {
-        ErrorService.log(
-          'fetch.POST',
-          error,
-          'failed to POST new identity'
-        )
+        ErrorService.log('fetch.POST', error, 'failed to POST new identity')
       }
     )
   }
@@ -110,6 +108,7 @@ class WalletAdd extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
+  // TODO: empty block causes tslint warning, check how to handle this
 }
 
 const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {

@@ -22,10 +22,7 @@ class IdentityView extends React.Component<Props, {}> {
   public render() {
     const { identity, alias, selected } = this.props
 
-    const classes = [
-      'IdentityView',
-      selected ? 'selected' : ''
-    ]
+    const classes = ['IdentityView', selected ? 'selected' : '']
 
     return (
       <tbody className={classes.join(' ')}>

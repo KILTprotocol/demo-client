@@ -23,11 +23,13 @@ class WalletView extends React.Component<Props, State> {
 
   public render() {
     const identities = this.props.identities.map((entry: Wallet.Entry) => {
-        let selected = false
-        if (this.props.selected) {
-          selected = entry.identity.seedAsHex === this.props.selected.identity.seedAsHex
-        }
-        return <IdentityViewComponent
+      let selected = false
+      if (this.props.selected) {
+        selected =
+          entry.identity.seedAsHex === this.props.selected.identity.seedAsHex
+      }
+      return (
+        <IdentityViewComponent
           key={entry.identity.seedAsHex}
           identity={entry.identity}
           alias={entry.alias}
@@ -35,9 +37,8 @@ class WalletView extends React.Component<Props, State> {
           onDelete={this.removeIdentity}
           onSelect={this.selectIdentity}
         />
-      }
-    )
-
+      )
+    })
 
     const actions = (
       <div className="actions">
@@ -51,9 +52,7 @@ class WalletView extends React.Component<Props, State> {
       <section className="WalletView">
         <h1>Wallet / My Identities</h1>
         {actions}
-        <table>
-          {identities}
-        </table>
+        <table>{identities}</table>
         {actions}
       </section>
     )

@@ -23,7 +23,6 @@ type State = {
 
 class IdentitySelector extends React.Component<Props, State> {
   public render() {
-
     const identities: Select2Option[] = this.props.options.map(option => {
       return {
         label: `${option.alias} (${option.publicKeyAsHex.substr(0, 10)}...)`,
