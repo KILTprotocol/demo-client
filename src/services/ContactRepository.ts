@@ -5,10 +5,6 @@ import { BasePostParams } from './BaseRepository'
 // (for other tests)
 
 class ContactRepository {
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-    }/contacts`
-
   public static async findAll(): Promise<Contact[]> {
     return fetch(`${ContactRepository.URL}`).then(response => response.json())
   }
@@ -19,6 +15,10 @@ class ContactRepository {
       body: JSON.stringify(contact),
     })
   }
+
+  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/contacts`
 }
 
 export default ContactRepository

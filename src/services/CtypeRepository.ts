@@ -5,10 +5,6 @@ import { BasePostParams } from './BaseRepository'
 // (for other tests)
 
 class CtypeRepository {
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/ctype`
-
   public static async findByKey(key: string): Promise<CType> {
     return fetch(`${CtypeRepository.URL}/${key}`).then(response =>
       response.json()
@@ -29,6 +25,10 @@ class CtypeRepository {
   public static async removeAll() {
     return Promise.reject('implement')
   }
+
+  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/ctype`
 }
 
 export default CtypeRepository
