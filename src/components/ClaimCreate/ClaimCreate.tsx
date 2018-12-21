@@ -46,7 +46,7 @@ class ClaimCreate extends Component<Props, State> {
         const ctype = CType.fromInputModel(JSON.parse(dbCtype.definition))
         this.setState({ ctype })
       } catch (e) {
-        ErrorService.log(e)
+        ErrorService.log('JSON.parse', e)
       }
     })
   }

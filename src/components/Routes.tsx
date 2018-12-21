@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
-import WalletComponent from './WalletView/WalletView'
-
 import ChainStats from './ChainStats/ChainStats'
+
+import ClaimCreate from './ClaimCreate/ClaimCreate'
+import ClaimList from './ClaimList/ClaimList'
 import ContactList from './ContactList/ContactList'
 import CtypeCreate from './CtypeCreate/CtypeCreate'
 import CtypeManager from './CtypeManager/CtypeManager'
 
-import ClaimCreate from './ClaimCreate/ClaimCreate'
-import ClaimList from './ClaimList/ClaimList'
-
 import MessageList from './MessageList/MessageList'
 import Root from './Root/Root'
+import WalletAdd from './WalletAdd/WalletAdd'
+import WalletView from './WalletView/WalletView'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
@@ -23,12 +23,13 @@ const Routes: React.FunctionComponent<{}> = props => {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
     return `${protocol}://${process.env.REACT_APP_NODE_HOST}:${
       process.env.REACT_APP_NODE_WS_PORT
-    }`
+      }`
   }
 
   return (
     <Switch>
-      <Route path={'/wallet'} component={WalletComponent} />
+      <Route path={'/wallet/add'} component={WalletAdd} />
+      <Route path={'/wallet'} component={WalletView} />
       <Route path={'/chain-stats/:host'} component={ChainStats} />
       <Route
         path={'/chain-stats'}

@@ -60,7 +60,7 @@ class Store {
         const entry = { alias: o.alias, claim }
         claims[o.alias] = entry
       } catch (e) {
-        ErrorService.log(e)
+        ErrorService.log('JSON.parse', e)
       }
     })
 

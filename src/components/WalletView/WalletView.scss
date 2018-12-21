@@ -1,0 +1,32 @@
+.WalletView {
+
+  & table {
+    $label-width: 30%;
+
+    width: 100%;
+
+    & td {
+
+      &:first-child {
+        width: $label-width;
+      }
+
+      &:last-child {
+        width: 100% - $label-width;
+      }
+    }
+
+    & tr {
+
+      &:first-child {
+
+        & td {
+
+          &:last-child {
+            @include baseFont-bold;
+          }
+        }
+      }
+    }
+  }
+}

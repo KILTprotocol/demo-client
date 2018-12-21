@@ -1,9 +1,9 @@
+import { u8aToHex } from '@polkadot/util'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { Select2, Select2Option } from 'select2-react-component'
 import * as Wallet from '../../state/ducks/Wallet'
-import { u8aToHex } from '@polkadot/util'
 
 const addIdentity = {
   label: `Create an identity`,
@@ -13,7 +13,7 @@ const addIdentity = {
 type Props = RouteComponentProps<{}> & {
   selectIdentity: (seedAsHex: string) => void
   options: Array<{ alias: string; publicKeyAsHex: string; seedAsHex: string }>
-  selected: Wallet.Entry | null
+  selected?: Wallet.Entry
 }
 
 type State = {
@@ -23,6 +23,7 @@ type State = {
 
 class IdentitySelector extends React.Component<Props, State> {
   public render() {
+
     const identities: Select2Option[] = this.props.options.map(option => {
       return {
         label: `${option.alias} (${option.publicKeyAsHex.substr(0, 10)}...)`,
@@ -32,24 +33,22 @@ class IdentitySelector extends React.Component<Props, State> {
 
     identities.push(addIdentity)
 
-    let defaultValue
+    let currentValue
     if (this.props.selected) {
       const selectedIdentity = identities.find(identity => {
         return identity.value === this.props.selected!.identity.seedAsHex
       })
       if (selectedIdentity && selectedIdentity.value) {
-        defaultValue = selectedIdentity.value
+        currentValue = selectedIdentity.value
       }
     }
 
     return (
-      <div>
-        <Select2
-          data={identities}
-          value={defaultValue}
-          update={this.selectIdentity}
-        />
-      </div>
+      <Select2
+        data={identities}
+        value={currentValue}
+        update={this.selectIdentity}
+      />
     )
   }
 

@@ -5,14 +5,19 @@ section {
   width: 100%;
   max-width: $base-content-max-width;
   margin: auto;
+  padding: $base-padding;
+
+  & section {
+    padding: 0;
+  }
 }
 
 h1 {
-  background: $color-purple;
-  color: $color-white;
+  @include baseFont;
+
   width: 100%;
   margin-top: $base-padding;
-  padding: $base-padding/4 $base-padding;
+  text-align: center;
 }
 
 // base form elements
@@ -22,5 +27,22 @@ input {
   &[type=password],
   &[type=uri-reference] {
     @include input;
+  }
+}
+
+.actions {
+  padding: {
+    top: $base-padding;
+  }
+  overflow: hidden;
+  clear: both;
+
+  & button {
+    @include button;
+
+    float: right;
+    margin: {
+      left: $base-padding/2;
+    }
   }
 }
