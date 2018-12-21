@@ -10,10 +10,6 @@ import * as Wallet from '../state/ducks/Wallet'
 // (for other tests)
 
 class MessageRepository {
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-    }/messaging`
-
   public static async findByMessageId(
     messageId: string,
     myIdentity: Identity
@@ -25,7 +21,9 @@ class MessageRepository {
     ).then(response => response.json())
   }
 
-  public static async findByMyIdentity(myIdentity: Identity): Promise<MessageD[]> {
+  public static async findByMyIdentity(
+    myIdentity: Identity
+  ): Promise<MessageD[]> {
     return fetch(
       `${MessageRepository.URL}/inbox/${u8aToHex(
         myIdentity.signKeyPair.publicKey
@@ -54,12 +52,8 @@ class MessageRepository {
       nonce: u8aToHex(encryptedMessage.nonce),
       receiverKey: receiver.key,
       sender: sender.alias,
-      senderEncryptionKey: u8aToHex(
-        sender.identity.boxKeyPair.publicKey
-      ),
-      senderKey: u8aToHex(
-        sender.identity.signKeyPair.publicKey
-      ),
+      senderEncryptionKey: u8aToHex(sender.identity.boxKeyPair.publicKey),
+      senderKey: u8aToHex(sender.identity.signKeyPair.publicKey),
     }
     return fetch(`${MessageRepository.URL}`, {
       ...BasePostParams,
@@ -72,6 +66,9 @@ class MessageRepository {
       ...BaseDeleteParams,
     })
   }
+  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/messaging`
 }
 
 export default MessageRepository
