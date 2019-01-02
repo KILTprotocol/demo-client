@@ -1,5 +1,4 @@
-import { Identity } from '@kiltprotocol/prototype-sdk'
-import { u8aToHex } from '@polkadot/util'
+import { Blockchain, Identity } from '@kiltprotocol/prototype-sdk'
 import * as mnemonic from '@polkadot/util-crypto/mnemonic'
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -10,6 +9,7 @@ import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
 import * as Wallet from '../../state/ducks/Wallet'
 import './WalletAdd.scss'
+import BlockchainService from '../../services/BlockchainService'
 
 type Props = RouteComponentProps<{}> & {
   saveIdentity: (alias: string, identity: Identity) => void
@@ -75,23 +75,43 @@ class WalletAdd extends React.Component<Props, State> {
     )
   }
 
-  private addIdentity = () => {
+  private addIdentity = async () => {
     const identity: Identity = Identity.buildFromMnemonic(
       this.state.randomPhrase
     )
-    ContactRepository.add({
-      encryptionKey: u8aToHex(identity.boxKeyPair.publicKey),
-      key: u8aToHex(identity.signKeyPair.publicKey),
-      name: this.state.alias,
-    }).then(
-      () => {
-        this.props.saveIdentity(this.state.alias, identity)
-        this.props.history.push('/wallet')
-      },
-      error => {
-        ErrorService.log('fetch.POST', error, 'failed to POST new identity')
-      }
-    )
+
+    const blockchain: Blockchain = await BlockchainService.connect()
+    const alice = Identity.buildFromSeedString('Alice')
+    blockchain
+      .makeTransfer(alice, identity.signKeyringPair.address(), 1000)
+      .then(
+        () => {
+          ContactRepository.add({
+            encryptionKey: identity.boxPublicKeyAsHex,
+            key: identity.signPublicKeyAsHex,
+            name: this.state.alias,
+          }).then(
+            () => {
+              this.props.saveIdentity(this.state.alias, identity)
+              this.props.history.push('/wallet')
+            },
+            error => {
+              ErrorService.log(
+                'fetch.POST',
+                error,
+                'failed to POST new identity'
+              )
+            }
+          )
+        },
+        error => {
+          ErrorService.log(
+            'fetch.POST',
+            error,
+            'failed to transfer initial tokens to identity'
+          )
+        }
+      )
   }
 
   private createRandomPhrase = () => {

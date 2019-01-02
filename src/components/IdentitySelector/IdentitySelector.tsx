@@ -1,4 +1,3 @@
-import { u8aToHex } from '@polkadot/util'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
@@ -68,7 +67,7 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
       .toArray()
       .map(identity => ({
         alias: identity.alias,
-        publicKeyAsHex: u8aToHex(identity.identity.signKeyPair.publicKey),
+        publicKeyAsHex: identity.identity.signPublicKeyAsHex,
         seedAsHex: identity.identity.seedAsHex,
       })),
     selected: state.wallet.get('selected'),
