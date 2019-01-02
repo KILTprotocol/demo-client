@@ -1,24 +1,24 @@
-import { Contact } from '../components/contacts/Contact'
+import { Contact } from '../types/Contact'
 import { BasePostParams } from './BaseRepository'
 
 // TODO: add tests, create interface for this class to be implemented as mock
 // (for other tests)
 
 class ContactRepository {
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/contacts`
-
-  public async findAll(): Promise<Contact[]> {
+  public static async findAll(): Promise<Contact[]> {
     return fetch(`${ContactRepository.URL}`).then(response => response.json())
   }
 
-  public async add(contact: Contact): Promise<Response> {
+  public static async add(contact: Contact): Promise<Response> {
     return fetch(`${ContactRepository.URL}`, {
       ...BasePostParams,
       body: JSON.stringify(contact),
     })
   }
+
+  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/contacts`
 }
 
-export default new ContactRepository()
+export default ContactRepository

@@ -1,12 +1,6 @@
 import { combineReducers, createStore, Store } from 'redux'
-import Claims, {
-  ClaimsStateSerialized,
-  ImmutableClaimsState,
-} from './ducks/Claims'
-import WalletRedux, {
-  ImmutableWalletState,
-  WalletStateSerialized,
-} from './ducks/WalletRedux'
+import * as Claims from './ducks/Claims'
+import * as Wallet from './ducks/Wallet'
 
 declare global {
   /* tslint:disable */
@@ -17,13 +11,13 @@ declare global {
 }
 
 type State = {
-  wallet: ImmutableWalletState
-  claims: ImmutableClaimsState
+  claims: Claims.ImmutableState
+  wallet: Wallet.ImmutableState
 }
 
 type SerializedState = {
-  wallet: WalletStateSerialized
-  claims: ClaimsStateSerialized
+  claims: Claims.SerializedState
+  wallet: Wallet.SerializedState
 }
 
 class PersistentStore {
@@ -35,15 +29,15 @@ class PersistentStore {
 
   private static deserialize(obj: SerializedState): State {
     return {
-      claims: Claims.deserialize(obj.claims),
-      wallet: WalletRedux.deserialize(obj.wallet),
+      claims: Claims.Store.deserialize(obj.claims),
+      wallet: Wallet.Store.deserialize(obj.wallet),
     }
   }
 
   private static serialize(state: State): string {
     const obj: SerializedState = {
-      claims: Claims.serialize(state.claims),
-      wallet: WalletRedux.serialize(state.wallet),
+      claims: Claims.Store.serialize(state.claims),
+      wallet: Wallet.Store.serialize(state.wallet),
     }
 
     return JSON.stringify(obj)
@@ -60,7 +54,10 @@ class PersistentStore {
     }
 
     this._store = createStore(
-      combineReducers({ wallet: WalletRedux.reducer, claims: Claims.reducer }),
+      combineReducers({
+        claims: Claims.Store.reducer,
+        wallet: Wallet.Store.reducer,
+      }),
       persistedState,
       window.__REDUX_DEVTOOLS_EXTENSION__ &&
         window.__REDUX_DEVTOOLS_EXTENSION__()

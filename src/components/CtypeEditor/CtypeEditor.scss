@@ -1,0 +1,10 @@
+.CtypeEditor {
+
+  & .submit-ctype {
+    @include button-primary;
+  }
+
+  & .cancel-ctype {
+    @include button-secondary;
+  }
+}

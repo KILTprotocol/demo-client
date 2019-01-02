@@ -1,0 +1,40 @@
+.WalletAdd {
+  $name-width: 30%;
+
+  & .inputs {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  & input {
+    display: block;
+    width: calc(100% - #{$base-button-height});
+    margin: {
+      right: $base-button-height;
+    }
+  }
+
+  & .name {
+    width: $name-width;
+  }
+
+  & .phrase {
+    position: relative;
+    width: 100% - $name-width;
+
+    & button {
+      @include button-icon-only($icon-refresh, 28px);
+
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      border: none;
+    }
+  }
+
+  & .actions {
+    width: 100%;
+  }
+}

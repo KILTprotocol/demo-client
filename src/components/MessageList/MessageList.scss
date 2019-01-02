@@ -1,0 +1,13 @@
+.MessageList {
+
+  & th,
+  & td {
+    text-align: left;
+  }
+
+  & .delete {
+    &:before {
+      @include icon($icon-remove)
+    }
+  }
+}

@@ -1,5 +1,25 @@
 @import "styles/select2-overrides";
 
+// base elements
+section {
+  width: 100%;
+  max-width: $base-content-max-width;
+  margin: auto;
+  padding: $base-padding;
+
+  & section {
+    padding: 0;
+  }
+}
+
+h1 {
+  @include baseFont;
+
+  width: 100%;
+  margin-top: $base-padding;
+  text-align: center;
+}
+
 // base form elements
 input {
 
@@ -7,5 +27,22 @@ input {
   &[type=password],
   &[type=uri-reference] {
     @include input;
+  }
+}
+
+.actions {
+  padding: {
+    top: $base-padding;
+  }
+  overflow: hidden;
+  clear: both;
+
+  & button {
+    @include button;
+
+    float: right;
+    margin: {
+      left: $base-padding/2;
+    }
   }
 }

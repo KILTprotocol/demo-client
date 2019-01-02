@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
-import WalletComponent from './wallet/WalletComponent'
+import ChainStats from './ChainStats/ChainStats'
 
-import ChainStatsComponent from './chainStats/ChainStatsComponent'
-import ContactListComponent from './contacts/ContactListComponent'
-import CtypeCreateComponent from './ctype/CtypeCreateComponent'
-import CtypeManagerComponent from './ctype/CtypeManagerComponent'
+import ClaimCreate from './ClaimCreate/ClaimCreate'
+import ClaimList from './ClaimList/ClaimList'
+import ContactList from './ContactList/ContactList'
+import CtypeCreate from './CtypeCreate/CtypeCreate'
+import CtypeManager from './CtypeManager/CtypeManager'
 
-import ClaimCreate from './claim/ClaimCreate'
-import ClaimList from './claim/ClaimList'
-
-import MessageListComponent from './messages/MessageListComponent'
-import RootComponent from './root/RootComponent'
+import MessageList from './MessageList/MessageList'
+import Root from './Root/Root'
+import WalletAdd from './WalletAdd/WalletAdd'
+import WalletView from './WalletView/WalletView'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
@@ -28,8 +28,9 @@ const Routes: React.FunctionComponent<{}> = props => {
 
   return (
     <Switch>
-      <Route path={'/wallet'} component={WalletComponent} />
-      <Route path={'/chain-stats/:host'} component={ChainStatsComponent} />
+      <Route path={'/wallet/add'} component={WalletAdd} />
+      <Route path={'/wallet'} component={WalletView} />
+      <Route path={'/chain-stats/:host'} component={ChainStats} />
       <Route
         path={'/chain-stats'}
         children={
@@ -38,16 +39,16 @@ const Routes: React.FunctionComponent<{}> = props => {
           />
         }
       />
-      <Route path={'/ctype/new'} component={CtypeCreateComponent} />
-      <Route path={'/ctype/:ctypeKey'} component={CtypeManagerComponent} />
-      <Route path={'/ctype'} component={CtypeManagerComponent} />
+      <Route path={'/ctype/new'} component={CtypeCreate} />
+      <Route path={'/ctype/:ctypeKey'} component={CtypeManager} />
+      <Route path={'/ctype'} component={CtypeManager} />
 
       <Route path="/claim/new/:ctypeKey" component={ClaimCreate} />
       <Route path="/claim" component={ClaimList} />
 
-      <Route path={'/contacts'} component={ContactListComponent} />
-      <Route path={'/messages'} component={MessageListComponent} />
-      <Route component={RootComponent} />
+      <Route path={'/contacts'} component={ContactList} />
+      <Route path={'/messages'} component={MessageList} />
+      <Route component={Root} />
     </Switch>
   )
 }

@@ -1,0 +1,169 @@
+.Header {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: $header-height;
+  background: $color-purple;
+
+  & > section {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+  }
+
+  & .menu {
+    @include button-icon-only($icon-navicon, 20px);
+
+    margin: {
+      right: $base-padding/2;
+    }
+    border: none;
+    color: $color-white;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: $color-white;
+    }
+  }
+
+  & .logo-id {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    align-items: center;
+
+    & > * {
+      margin-left: $base-padding/2;
+    }
+  }
+
+  & .logo {
+    display: block;
+    height: 30px;
+
+    & img {
+      height: 100%;
+      width: auto;
+    }
+  }
+
+  &.open-navigation {
+
+    & .navigation {
+      display: block;
+    }
+  }
+
+  @include breakpoint('phone-tablet-only'){
+
+    & .navigation {
+      position: fixed;
+      z-index: 200;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      display: none;
+      list-style-type: none;
+      width: 100%;
+      margin: 0;
+      padding: $header-height 0 0;
+      overflow: auto;
+
+      &:before {
+        content: '';
+        position: absolute;
+        top: $header-height;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: transparentize($color-background, 0.9);
+      }
+
+      & li {
+        position: relative;
+        display: block;
+        max-width: $tablet;
+        background: $color-purple;
+        text-align: left;
+        border: {
+          right: $base-border;
+          top: $base-border;
+        }
+
+        &.current {
+
+          & a {
+            background: transparent;
+            color: $color-primary;
+          }
+        }
+
+        & a {
+          @include ellipsis;
+
+          display: block;
+          width: 100%;
+          height: $base-input-height;
+          padding: 0 $base-padding;
+          line-height: $base-input-height;
+          color: $color-white;
+          text-decoration: none;
+
+          &:hover,
+          &:focus,
+          &:active {
+            background: $color-primary;
+            color: $color-white;
+          }
+        }
+      }
+    }
+  }
+
+  @include breakpoint('desktop') {
+
+    & .menu {
+      display: none;
+      pointer-events: none;
+    }
+
+    & .navigation {
+      display: block !important;
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+
+      & li {
+        display: inline-block;
+
+        &.current {
+
+          & a {
+            color: $color-primary !important;
+          }
+        }
+
+        & a {
+          padding: $base-padding/4 0;
+          margin: {
+            right: $base-padding;
+          }
+          color: $color-white;
+          text-decoration: none;
+
+          &:hover,
+          &:focus,
+          &:active {
+            color: $color-primary;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,9 +1,25 @@
-class ErrorService {
-  private errors: Error[] = []
+export type ErrorCategory =
+  | 'JSON.parse'
+  | 'fetch.GET'
+  | 'fetch.POST'
+  | 'fetch.DELETE'
 
-  public log(e: Error) {
-    console.error(e)
-    this.errors.push(e)
+type QualifiedError = {
+  category: ErrorCategory
+  error: Error
+  message?: string
+}
+
+class ErrorService {
+  private errors: QualifiedError[] = []
+
+  public log(category: ErrorCategory, error: Error, message?: string) {
+    console.error(error)
+    this.errors.push({
+      category,
+      error,
+      message,
+    })
   }
 }
 
