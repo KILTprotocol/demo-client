@@ -1,9 +1,9 @@
-import { ApiPromise } from '@polkadot/api'
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 import If from '../../common/If'
 import blockchainService from '../../services/BlockchainService'
+import { Blockchain } from '@kiltprotocol/prototype-sdk'
 
 type Props = RouteComponentProps<{
   host: string
@@ -16,7 +16,7 @@ type State = {
 }
 
 class ChainStats extends React.Component<Props, State> {
-  private api: ApiPromise
+  private blockchain: Blockchain
 
   private mounted = false
 
@@ -36,12 +36,12 @@ class ChainStats extends React.Component<Props, State> {
   public async connect() {
     // TODO: test unmount and host change
     // TODO: test error handling
-    this.api = await blockchainService.connect(this.state.host)
+    this.blockchain = await blockchainService.connect(this.state.host)
 
     const [name, version, type] = await Promise.all([
-      this.api.rpc.system.name(),
-      this.api.rpc.system.version(),
-      this.api.rpc.system.chain(),
+      this.blockchain.api.rpc.system.name(),
+      this.blockchain.api.rpc.system.version(),
+      this.blockchain.api.rpc.system.chain(),
     ])
 
     if (this.mounted) {

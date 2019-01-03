@@ -153,13 +153,13 @@
   dependencies:
     find-up "^2.1.0"
 
-"@kiltprotocol/prototype-sdk@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@kiltprotocol/prototype-sdk/-/prototype-sdk-0.0.8.tgz#5f767208dc66ed3543cff0607ac39325045adbfd"
-  integrity sha512-9hIHRa+qZ3tdXOtJyzuSeSv0frD+zXnsXv8uU7F4J6TEnZnVe5QWZtofBNz7+10nhugaQ36mj8bez5cQ5epRiQ==
+"@kiltprotocol/prototype-sdk@^0.0.16":
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/@kiltprotocol/prototype-sdk/-/prototype-sdk-0.0.16.tgz#8b84ee4c9d34bbd93ffad9009332f9a7c58e871e"
+  integrity sha512-WkN6cOA/3SiigoiUHv2GPog1CVwmr5LghJfDUZs2riaD1q0v45kbtzuirBiKCtLYullkOzJpqitJXY5ba/1nDQ==
   dependencies:
     "@polkadot/api" "^0.33.19"
-    "@polkadot/util" "^0.33.13"
+    "@polkadot/util" "^0.33.22"
     "@polkadot/util-crypto" "^0.33.13"
     ajv "^6.6.1"
 
@@ -283,10 +283,29 @@
     tweetnacl "^1.0.0"
     xxhashjs "^0.2.2"
 
-"@polkadot/util@^0.33.13", "@polkadot/util@^0.33.17", "@polkadot/util@^0.33.21":
+"@polkadot/util@^0.33.17", "@polkadot/util@^0.33.21":
   version "0.33.21"
   resolved "https://registry.yarnpkg.com/@polkadot/util/-/util-0.33.21.tgz#e8ae1790dc576271831b08ec25845190ab28e8da"
   integrity sha512-z9izrNzdLs/dMe6T58IN+a53aoXH5/H3wsQEV5Dr5sBd7uybXbEsAQ+6jIOJd5mqucMXEdqfvkOydMmHkyXvDw==
+  dependencies:
+    "@babel/runtime" "^7.2.0"
+    "@types/bn.js" "^4.11.3"
+    "@types/camelcase" "^4.1.0"
+    "@types/deasync" "^0.1.0"
+    "@types/ip-regex" "^2.0.0"
+    "@types/xxhashjs" "^0.1.1"
+    bn.js "^4.11.8"
+    camelcase "^5.0.0"
+    chalk "^2.4.1"
+    core-js "^2.6.1"
+    deasync "^0.1.14"
+    ip-regex "^3.0.0"
+    moment "^2.23.0"
+
+"@polkadot/util@^0.33.22":
+  version "0.33.26"
+  resolved "https://registry.yarnpkg.com/@polkadot/util/-/util-0.33.26.tgz#186ac1f398da8608e693f27cc528df9cbeb8412c"
+  integrity sha512-ZpbjiUp950RNRDkIXGtnWNWQCbZlMoBQQChByDDuhG6LeVxewszeP1jO+uK4RCrMbwz8aDUI9J/z1ApoLvbAzw==
   dependencies:
     "@babel/runtime" "^7.2.0"
     "@types/bn.js" "^4.11.3"

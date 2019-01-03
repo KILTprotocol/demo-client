@@ -5,10 +5,8 @@ import MessageRepository from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
 import { MessageD } from '../../types/Message'
 import './MessageList.scss'
-import u8aToU8a from '@polkadot/util/u8a/toU8a'
 import { Crypto } from '@kiltprotocol/prototype-sdk'
-import { EncryptedAsymmetric } from '@kiltprotocol/prototype-sdk/build/crypto/Crypto'
-import u8aToString from '@polkadot/util/u8a/toString'
+import { EncryptedAsymmetricString } from '@kiltprotocol/prototype-sdk/build/crypto/Crypto'
 
 interface Props {
   selectedIdentity?: Wallet.Entry
@@ -110,19 +108,19 @@ class MessageList extends React.Component<Props, State> {
         (messages: MessageD[]) => {
           if (messages.length) {
             for (const m of messages) {
-              const ea: EncryptedAsymmetric = {
-                box: u8aToU8a(m.message),
-                nonce: u8aToU8a(m.nonce),
+              const ea: EncryptedAsymmetricString = {
+                box: m.message,
+                nonce: m.nonce,
               }
-              const decoded = Crypto.decryptAsymmetric(
+              const decoded: string | false = Crypto.decryptAsymmetricAsStr(
                 ea,
-                u8aToU8a(m.senderEncryptionKey),
+                m.senderEncryptionKey,
                 _identity.identity.boxKeyPair.secretKey
               )
               if (!decoded) {
                 m.message = 'ERROR DECODING MESSAGE'
               } else {
-                m.message = u8aToString(decoded)
+                m.message = decoded
               }
             }
             messageOutput = messages

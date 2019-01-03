@@ -1,5 +1,4 @@
 import { Identity } from '@kiltprotocol/prototype-sdk'
-import { u8aToHex } from '@polkadot/util'
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
@@ -40,11 +39,11 @@ class IdentityView extends React.Component<Props, {}> {
         </tr>
         <tr>
           <td>Public Key:</td>
-          <td>{u8aToHex(identity.signKeyPair.publicKey)}</td>
+          <td>{identity.signPublicKeyAsHex}</td>
         </tr>
         <tr>
           <td>Encryption Public Key:</td>
-          <td>{u8aToHex(identity.boxKeyPair.publicKey)}</td>
+          <td>{identity.boxPublicKeyAsHex}</td>
         </tr>
         <tr>
           <td colSpan={2} className="actions">

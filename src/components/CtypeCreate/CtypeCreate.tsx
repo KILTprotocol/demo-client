@@ -1,18 +1,18 @@
-import { ApiPromise } from '@polkadot/api'
 import * as React from 'react'
 
-import pair from '@polkadot/keyring/pair'
-import { stringToU8a, u8aToHex } from '@polkadot/util'
-import { keccakAsU8a, naclKeypairFromSeed } from '@polkadot/util-crypto'
-
-import blockchainService from '../../services/BlockchainService'
 import ctypeRepository from '../../services/CtypeRepository'
-import { CType } from '../../types/Ctype'
+import * as CTypeModel from '../../types/Ctype'
 import CtypeEditor from '../CtypeEditor/CtypeEditor'
 
 import '../CtypeManager/CtypeManager.scss'
+import { Blockchain, CType } from '@kiltprotocol/prototype-sdk'
+import * as Wallet from '../../state/ducks/Wallet'
+import { connect } from 'react-redux'
+import BlockchainService from '../../services/BlockchainService'
 
-type Props = {}
+type Props = {
+  selectedIdentity?: Wallet.Entry
+}
 
 type State = {
   name: string
@@ -21,7 +21,7 @@ type State = {
 }
 
 class CtypeCreate extends React.Component<Props, State> {
-  private api: ApiPromise
+  private blockchain: Blockchain
 
   constructor(props: Props) {
     super(props)
@@ -42,47 +42,32 @@ class CtypeCreate extends React.Component<Props, State> {
   public async connect() {
     // TODO: test unmount and host change
     // TODO: test error handling
-    this.api = await blockchainService.connect()
+    this.blockchain = await BlockchainService.connect()
     this.setState({ connected: true })
   }
 
   public async submit() {
-    // TODO: use selected user
-    const seedAlice = 'Alice'.padEnd(32, ' ')
-    const { secretKey, publicKey } = naclKeypairFromSeed(stringToU8a(seedAlice))
-    const Alice = pair({ publicKey, secretKey })
-
-    console.log('this.state', this.state)
-
-    const { name, ctype } = this.state
-    const hash = keccakAsU8a(JSON.stringify(ctype))
-
-    const signature = Alice.sign(hash)
-    console.log(`Signature: ${u8aToHex(signature)}`)
-
-    const ctypeAdd = this.api.tx.ctype.add(hash, signature)
-
-    const nonce = await this.api.query.system.accountNonce(Alice.address())
-    if (nonce) {
-      const signed = ctypeAdd.sign(Alice, nonce.toHex())
-      signed
-        .send((status: any) => {
-          console.log(`current status ${status.type}`)
-          console.log(status)
-        })
-        .then((_hash: any) => {
-          console.log(`submitted with hash ${_hash}`)
-          const _ctype: CType = {
-            // TODO: use selected user
-            author: 'Alice',
-            // TODO add ctype
-            definition: JSON.stringify(ctype),
-            key: u8aToHex(hash),
-            name,
+    if (this.props.selectedIdentity) {
+      const _author: string = this.props.selectedIdentity.alias
+      const ctype = CType.fromInputModel(this.state.ctype)
+      ctype
+        .store(this.blockchain, this.props.selectedIdentity.identity, () => {
+          console.log('finalized ctype registration')
+          const _ctype: CTypeModel.CType = {
+            author: _author,
+            definition: JSON.stringify(ctype.getModel()),
+            key: ctype.getModel().hash,
+            name: this.state.name,
           }
           ctypeRepository.register(_ctype).then(() => {
             // TODO go back
           })
+        })
+        .then((_hash: any) => {
+          console.log('submitted with hash ' + _hash)
+        })
+        .catch(() => {
+          // TODO: error handling?
         })
     }
   }
@@ -119,4 +104,10 @@ class CtypeCreate extends React.Component<Props, State> {
   }
 }
 
-export default CtypeCreate
+const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
+  return {
+    selectedIdentity: state.wallet.get('selected'),
+  }
+}
+
+export default connect(mapStateToProps)(CtypeCreate)
