@@ -153,10 +153,10 @@
   dependencies:
     find-up "^2.1.0"
 
-"@kiltprotocol/prototype-sdk@^0.0.16":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@kiltprotocol/prototype-sdk/-/prototype-sdk-0.0.16.tgz#8b84ee4c9d34bbd93ffad9009332f9a7c58e871e"
-  integrity sha512-WkN6cOA/3SiigoiUHv2GPog1CVwmr5LghJfDUZs2riaD1q0v45kbtzuirBiKCtLYullkOzJpqitJXY5ba/1nDQ==
+"@kiltprotocol/prototype-sdk@^0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@kiltprotocol/prototype-sdk/-/prototype-sdk-0.0.17.tgz#2ad26f751d4f852a1e75d99e63ff31df82c6f8a6"
+  integrity sha512-8qjtO9XuuDCpYnNWoiMIeW9NFOdFGV7g1Gt4QY1Q05keIUEboHWd7KKviTOuRa0R9W1LtGcTcIGaZ5tgoc7j+w==
   dependencies:
     "@polkadot/api" "^0.33.19"
     "@polkadot/util" "^0.33.22"
