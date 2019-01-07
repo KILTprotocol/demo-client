@@ -3,7 +3,9 @@
 ## Installation
 You might have to configure yarn to use the npm registry to access the private repositories there.
 Execute 
-```yarn config set @kiltprotocol:registry https://registry.npmjs.org``` 
+```
+yarn config set @kiltprotocol:registry https://registry.npmjs.org
+``` 
 and either
 
 * login to npm with `npm login`, or
