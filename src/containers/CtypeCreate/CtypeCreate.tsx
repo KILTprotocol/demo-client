@@ -2,7 +2,7 @@ import { Blockchain, CType } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import CtypeEditor from '../../dumb_components/CtypeEditor/CtypeEditor'
+import CtypeEditor from '../../components/CtypeEditor/CtypeEditor'
 
 import '../CtypeManager/CtypeManager.scss'
 import BlockchainService from '../../services/BlockchainService'

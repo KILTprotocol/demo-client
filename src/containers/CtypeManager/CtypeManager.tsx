@@ -7,7 +7,7 @@ import {
   withRouter,
 } from 'react-router-dom'
 
-import CtypeView from '../../dumb_components/CtypeView/CtypeView'
+import CtypeView from '../../components/CtypeView/CtypeView'
 import CtypeRepository from '../../services/CtypeRepository'
 import { CType } from '../../types/Ctype'
 

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 import * as common from 'schema-based-json-editor'
-import SchemaEditor from '../../dumb_components/SchemaEditor/SchemaEditor'
+import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 
 import CtypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
