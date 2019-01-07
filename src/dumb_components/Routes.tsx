@@ -1,18 +1,16 @@
 import * as React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
-import ChainStats from './ChainStats/ChainStats'
-
-import ClaimCreate from './ClaimCreate/ClaimCreate'
-import ClaimList from './ClaimList/ClaimList'
-import ContactList from './ContactList/ContactList'
-import CtypeCreate from './CtypeCreate/CtypeCreate'
-import CtypeManager from './CtypeManager/CtypeManager'
-
-import MessageList from './MessageList/MessageList'
+import ChainStats from '../smart_containers/ChainStats/ChainStats'
+import ClaimCreate from '../smart_containers/ClaimCreate/ClaimCreate'
+import ClaimList from '../smart_containers/ClaimList/ClaimList'
+import ContactList from '../smart_containers/ContactList/ContactList'
+import CtypeCreate from '../smart_containers/CtypeCreate/CtypeCreate'
+import CtypeManager from '../smart_containers/CtypeManager/CtypeManager'
+import MessageList from '../smart_containers/MessageList/MessageList'
+import WalletAdd from '../smart_containers/WalletAdd/WalletAdd'
+import WalletView from '../smart_containers/WalletView/WalletView'
 import Root from './Root/Root'
-import WalletAdd from './WalletAdd/WalletAdd'
-import WalletView from './WalletView/WalletView'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')

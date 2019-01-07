@@ -1,17 +1,17 @@
 import { Identity } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-import { RouteComponentProps } from 'react-router'
-import { withRouter } from 'react-router-dom'
 
 import './IdentityView.scss'
 
 type Props = {
+  // input
   identity: Identity
   alias: string
   selected: boolean
+  // output
   onDelete: (seedAsHex: string) => void
   onSelect: (seedAsHex: string) => void
-} & RouteComponentProps<{}>
+}
 
 class IdentityView extends React.Component<Props, {}> {
   constructor(props: Props) {
@@ -64,4 +64,4 @@ class IdentityView extends React.Component<Props, {}> {
   }
 }
 
-export default withRouter(IdentityView)
+export default IdentityView

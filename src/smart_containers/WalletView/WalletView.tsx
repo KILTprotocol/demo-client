@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 
 import * as Wallet from '../../state/ducks/Wallet'
-import IdentityViewComponent from '../IdentityView/IdentityView'
+import IdentityViewComponent from '../../dumb_components/IdentityView/IdentityView'
 import './WalletView.scss'
 
 type Props = RouteComponentProps<{}> & {

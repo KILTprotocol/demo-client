@@ -1,0 +1,16 @@
+.IdentitySelector {
+
+  & .select2 {
+
+    &-results {
+
+      &__option {
+
+        &:last-child {
+          white-space: nowrap;
+          border-top: $base-border;
+        }
+      }
+    }
+  }
+}

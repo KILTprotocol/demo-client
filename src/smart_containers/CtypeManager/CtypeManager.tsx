@@ -1,15 +1,21 @@
 import * as React from 'react'
-import { RouteComponentProps } from 'react-router'
-import { Link, Route, Switch } from 'react-router-dom'
+import {
+  Link,
+  Route,
+  RouteComponentProps,
+  Switch,
+  withRouter,
+} from 'react-router-dom'
 
-import ctypeRepository from '../../services/CtypeRepository'
+import CtypeView from '../../dumb_components/CtypeView/CtypeView'
+import CtypeRepository from '../../services/CtypeRepository'
 import { CType } from '../../types/Ctype'
-import CtypeView from '../CtypeView/CtypeView'
 
-type Props = {}
+type Props = RouteComponentProps<{ ctypeKey: string }> & {}
 
 type State = {
   ctypes: CType[]
+  currentCtype?: CType
 }
 
 class CtypeManager extends React.Component<Props, State> {
@@ -22,9 +28,14 @@ class CtypeManager extends React.Component<Props, State> {
 
   public componentDidMount() {
     void this.init()
+
+    if (this.props.match.params.ctypeKey) {
+      this.getCurrentCtype()
+    }
   }
 
   public render() {
+    // List view
     const list = this.state.ctypes.map(ctype => (
       <li key={ctype.key}>
         <Link to={`/ctype/${ctype.key}`}>
@@ -32,21 +43,22 @@ class CtypeManager extends React.Component<Props, State> {
         </Link>
       </li>
     ))
-
-    const viewComponent = ({
-      match,
-    }: RouteComponentProps<{ ctypeKey: string }>) => (
-      <React.Fragment>
-        <Link to="/ctype">Go back</Link>
-        <CtypeView ctypeKey={match.params.ctypeKey} />
-      </React.Fragment>
-    )
     const listComponent = () => (
       <React.Fragment>
         <Link to="/ctype/new">Create new CTYPE</Link>
         <ul>{list}</ul>
       </React.Fragment>
     )
+
+    // detail view
+    const viewComponent = () => {
+      return (
+        <React.Fragment>
+          <Link to="/ctype">Go back</Link>
+          <CtypeView ctype={this.state.currentCtype} />
+        </React.Fragment>
+      )
+    }
 
     return (
       <section className="CtypeManager">
@@ -60,9 +72,16 @@ class CtypeManager extends React.Component<Props, State> {
   }
 
   private async init() {
-    const ctypes = await ctypeRepository.findAll()
+    const ctypes = await CtypeRepository.findAll()
     this.setState({ ctypes })
+  }
+
+  private getCurrentCtype() {
+    const currentCtype = this.state.ctypes.find(
+      (ctype: CType) => ctype.key === this.props.match.params.ctypeKey
+    )
+    this.setState({ currentCtype })
   }
 }
 
-export default CtypeManager
+export default withRouter(CtypeManager)
