@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import logo from '../../assets/kilt_negative.svg'
-import IdentitySelectorComponent from '../IdentitySelector/IdentitySelector'
+import IdentitySelectorComponent from '../../containers/IdentitySelector/IdentitySelector'
 import Navigation from '../Navigation/Navigation'
 import './Header.scss'
 

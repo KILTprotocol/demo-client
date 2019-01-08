@@ -10,25 +10,17 @@ type Props = {
   updateValue: (value: common.ValueType, _isValid: boolean) => void
 }
 
-type State = {}
-
-class SchemaEditor extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-  }
-
-  public render() {
-    return (
-      <div className="schema-based-json-editor">
-        <JSONEditor
-          schema={this.props.schema}
-          initialValue={this.props.initialValue}
-          updateValue={this.props.updateValue}
-          icon="fontawesome5"
-        />
-      </div>
-    )
-  }
+const SchemaEditor = (props: Props) => {
+  return (
+    <div className="schema-based-json-editor">
+      <JSONEditor
+        schema={props.schema}
+        initialValue={props.initialValue}
+        updateValue={props.updateValue}
+        icon="fontawesome5"
+      />
+    </div>
+  )
 }
 
 export default SchemaEditor

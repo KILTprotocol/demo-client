@@ -2,7 +2,10 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { Select2, Select2Option } from 'select2-react-component'
+
 import * as Wallet from '../../state/ducks/Wallet'
+
+import './IdentitySelector.scss'
 
 const addIdentity = {
   label: `Create an identity`,
@@ -24,35 +27,27 @@ class IdentitySelector extends React.Component<Props, State> {
   public render() {
     const identities: Select2Option[] = this.props.options.map(option => {
       return {
-        label: `${option.alias} (${option.publicKeyAsHex.substr(0, 10)}...)`,
+        label: `${option.alias} (${option.seedAsHex.substr(0, 10)}...)`,
         value: option.seedAsHex,
       }
     })
 
     identities.push(addIdentity)
 
-    let currentValue
-    if (this.props.selected) {
-      const selectedIdentity = identities.find(identity => {
-        return identity.value === this.props.selected!.identity.seedAsHex
-      })
-      if (selectedIdentity && selectedIdentity.value) {
-        currentValue = selectedIdentity.value
-      }
-    }
-
     return (
-      <Select2
-        data={identities}
-        value={currentValue}
-        update={this.selectIdentity}
-      />
+      <section className="IdentitySelector">
+        <Select2
+          data={identities}
+          value={this.props.selected!.identity.seedAsHex}
+          update={this.selectIdentity}
+        />
+      </section>
     )
   }
 
   private selectIdentity = (value: any) => {
     if (value === 'create') {
-      this.props.history.push('/wallet')
+      this.props.history.push('/wallet/add')
     } else {
       this.props.selectIdentity(value)
     }

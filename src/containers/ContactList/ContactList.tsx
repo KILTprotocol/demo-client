@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+
 import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'

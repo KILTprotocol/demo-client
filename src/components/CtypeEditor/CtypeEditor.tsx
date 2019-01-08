@@ -1,72 +1,44 @@
 import { CTypeInputModel } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+
 import * as common from 'schema-based-json-editor'
 import SchemaEditor from '../SchemaEditor/SchemaEditor'
 
 import './CtypeEditor.scss'
 
 type Props = {
-  ctype: string
-  updateCType: (ctype: any) => void
-  submit: () => void
+  // input
   connected: boolean
-}
-
-type State = {
+  ctype: string
   isValid: boolean
+  // output
+  cancel: () => void
+  submit: () => void
+  updateCType: (ctype: any, isValid: boolean) => void
 }
 
-class CtypeEditor extends React.Component<Props, State> {
-  private schema: common.Schema
-
-  constructor(props: Props) {
-    super(props)
-    this.schema = CTypeInputModel as common.Schema
-    this.state = {
-      isValid: false,
-    }
-  }
-
-  public render() {
-    return (
-      <section className="CtypeEditor">
-        <SchemaEditor
-          schema={this.schema}
-          initialValue={this.props.ctype}
-          updateValue={this.updateCType}
-        />
-        <div className="actions">
-          <button
-            className="submit-ctype"
-            disabled={!this.props.connected || !this.state.isValid}
-            onClick={this.submit}
-          >
-            Submit
-          </button>
-          <button className="cancel-ctype" onClick={this.cancel}>
-            Cancel
-          </button>
-        </div>
-      </section>
-    )
-  }
-
-  private updateCType = (ctype: common.ValueType, _isValid: boolean) => {
-    this.setState({
-      isValid: _isValid,
-    })
-    this.props.updateCType(ctype)
-  }
-
-  private submit = () => {
-    if (this.props.connected && this.state.isValid) {
-      this.props.submit()
-    }
-  }
-
-  private cancel = () => {
-    // do something
-  }
+const CtypeEditor = (props: Props) => {
+  return (
+    <section className="CtypeEditor">
+      <SchemaEditor
+        schema={CTypeInputModel as common.Schema}
+        initialValue={props.ctype}
+        updateValue={props.updateCType}
+      />
+      <div className="actions">
+        <button
+          className="submit-ctype"
+          disabled={!props.connected || !props.isValid}
+          onClick={props.submit}
+        >
+          Submit
+        </button>
+        <button className="cancel-ctype" onClick={props.cancel}>
+          Cancel
+        </button>
+      </div>
+    </section>
+  )
 }
 
 export default CtypeEditor

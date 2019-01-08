@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import * as Claims from '../../state/ducks/Claims'
 
 type Props = {
@@ -8,22 +9,10 @@ type Props = {
 }
 type State = {}
 
-class ClaimList extends React.Component<Props, State> {
+class ClaimView extends React.Component<Props, State> {
   public render() {
     const { claims } = this.props
-
-    return (
-      <section className="ClaimList">
-        <h1>My Claims</h1>
-        <ul>
-          {claims.map(claim => (
-            <li key={claim.alias}>
-              {claim.alias}: {JSON.stringify(claim.claim)}
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
+    return <ClaimListView claims={claims} />
   }
 }
 
@@ -36,4 +25,4 @@ const mapStateToProps = (state: { claims: Claims.ImmutableState }) => {
   }
 }
 
-export default connect(mapStateToProps)(ClaimList)
+export default connect(mapStateToProps)(ClaimView)

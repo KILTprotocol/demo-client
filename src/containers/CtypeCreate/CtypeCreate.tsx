@@ -1,23 +1,25 @@
-import * as React from 'react'
-
-import ctypeRepository from '../../services/CtypeRepository'
-import * as CTypeModel from '../../types/Ctype'
-import CtypeEditor from '../CtypeEditor/CtypeEditor'
-
-import '../CtypeManager/CtypeManager.scss'
 import { Blockchain, CType } from '@kiltprotocol/prototype-sdk'
-import * as Wallet from '../../state/ducks/Wallet'
+import * as React from 'react'
 import { connect } from 'react-redux'
-import BlockchainService from '../../services/BlockchainService'
+import { RouteComponentProps, withRouter } from 'react-router'
 
-type Props = {
+import CtypeEditor from '../../components/CtypeEditor/CtypeEditor'
+import BlockchainService from '../../services/BlockchainService'
+import ctypeRepository from '../../services/CtypeRepository'
+import * as Wallet from '../../state/ducks/Wallet'
+import * as CTypeModel from '../../types/Ctype'
+
+import './CtypeCreate.scss'
+
+type Props = RouteComponentProps<{}> & {
   selectedIdentity?: Wallet.Entry
 }
 
 type State = {
-  name: string
   connected: boolean
   ctype: any
+  isValid: boolean
+  name: string
 }
 
 class CtypeCreate extends React.Component<Props, State> {
@@ -29,10 +31,12 @@ class CtypeCreate extends React.Component<Props, State> {
     this.state = {
       connected: false,
       ctype: { title: 'My New CType' },
+      isValid: false,
       name: '',
     }
 
     this.submit = this.submit.bind(this)
+    this.cancel = this.cancel.bind(this)
   }
 
   public componentDidMount() {
@@ -47,7 +51,11 @@ class CtypeCreate extends React.Component<Props, State> {
   }
 
   public async submit() {
-    if (this.props.selectedIdentity) {
+    if (
+      this.props.selectedIdentity &&
+      this.state.connected &&
+      this.state.isValid
+    ) {
       const _author: string = this.props.selectedIdentity.alias
       const ctype = CType.fromInputModel(this.state.ctype)
       ctype
@@ -76,25 +84,35 @@ class CtypeCreate extends React.Component<Props, State> {
     return (
       <section className="CtypeCreate">
         <h1 className="App-title">Create CTYPE</h1>
-        <input
-          type="text"
-          onChange={this.updateName}
-          placeholder="Name"
-          value={this.state.name}
-        />
+        <div className="Ctype-name">
+          <label>Name</label>
+          <input
+            type="text"
+            onChange={this.updateName}
+            value={this.state.name}
+          />
+        </div>
         <CtypeEditor
           ctype={this.state.ctype}
           updateCType={this.updateCType}
           submit={this.submit}
+          cancel={this.cancel}
           connected={this.state.connected}
+          isValid={this.state.isValid}
         />
       </section>
     )
   }
 
-  private updateCType = (ctype: string) => {
+  private cancel() {
+    // TODO: goto CTYPE list or previous screen?
+    this.props.history.push('/ctype')
+  }
+
+  private updateCType = (ctype: string, isValid: boolean) => {
     this.setState({
       ctype,
+      isValid,
     })
   }
   private updateName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,4 +128,4 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   }
 }
 
-export default connect(mapStateToProps)(CtypeCreate)
+export default connect(mapStateToProps)(withRouter(CtypeCreate))

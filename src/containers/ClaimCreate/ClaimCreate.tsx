@@ -2,14 +2,14 @@ import { CType } from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import * as common from 'schema-based-json-editor'
+import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 
-import ctypeRepository from '../../services/CtypeRepository'
+import CtypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
 import * as Claims from '../../state/ducks/Claims'
 import { Claim } from '../../types/Claim'
-import SchemaEditor from '../SchemaEditor/SchemaEditor'
 
 type Props = RouteComponentProps<{
   ctypeKey: string
@@ -34,21 +34,30 @@ class ClaimCreate extends Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
-
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleNameChange = this.handleNameChange.bind(this)
+    this.updateClaim = this.updateClaim.bind(this)
   }
 
   public componentDidMount() {
     const { ctypeKey } = this.props.match.params
-    ctypeRepository.findByKey(ctypeKey).then(dbCtype => {
-      try {
-        const ctype = CType.fromInputModel(JSON.parse(dbCtype.definition))
-        this.setState({ ctype })
-      } catch (e) {
-        ErrorService.log('JSON.parse', e)
+    CtypeRepository.findByKey(ctypeKey).then(
+      dbCtype => {
+        try {
+          const ctype = CType.fromInputModel(JSON.parse(dbCtype.definition))
+          this.setState({ ctype })
+        } catch (e) {
+          ErrorService.log('JSON.parse', e)
+        }
+      },
+      error => {
+        ErrorService.log(
+          'fetch.GET',
+          error,
+          `could not retrieve ctype with key ${ctypeKey}`
+        )
       }
-    })
+    )
   }
 
   public render() {
@@ -80,11 +89,17 @@ class ClaimCreate extends Component<Props, State> {
             </div>
           </div>
         )}
+        {!ctype && (
+          <p>
+            No CTYPEs found. Please{' '}
+            <Link to="/ctype/new">create a new CTYPE</Link>.
+          </p>
+        )}
       </section>
     )
   }
 
-  private updateClaim = (claim: common.ValueType, isValid: boolean) => {
+  private updateClaim(claim: common.ValueType, isValid: boolean) {
     this.setState({
       claim,
       isValid,

@@ -9,7 +9,6 @@ type Props = RouteComponentProps<{
   host: string
 }>
 type State = {
-  host: string
   chainName?: string
   chainVersion?: string
   chainType?: string
@@ -20,12 +19,13 @@ class ChainStats extends React.Component<Props, State> {
 
   private mounted = false
 
+  private nodeWebsocketAddress: string
+
   constructor(props: Props) {
     super(props)
+    this.state = {}
 
-    this.state = {
-      host: decodeURIComponent(this.props.match.params.host),
-    }
+    this.nodeWebsocketAddress = this.getNodeWebsocketUrl()
   }
 
   public componentDidMount() {
@@ -36,7 +36,7 @@ class ChainStats extends React.Component<Props, State> {
   public async connect() {
     // TODO: test unmount and host change
     // TODO: test error handling
-    this.blockchain = await blockchainService.connect(this.state.host)
+    this.blockchain = await blockchainService.connect(this.nodeWebsocketAddress)
 
     const [name, version, type] = await Promise.all([
       this.blockchain.api.rpc.system.name(),
@@ -58,30 +58,31 @@ class ChainStats extends React.Component<Props, State> {
   }
 
   public render() {
-    const { host, chainName, chainVersion, chainType } = this.state
+    const { chainName, chainVersion, chainType } = this.state
 
     return (
       <section className="ChainStats">
         <h1>Chain Stats</h1>
         Demo module to interact with substrate blockchain
         <hr />
-        <If
-          condition={!!host}
-          then={
-            <div>
-              <div>Host: {host}</div>
-              <If condition={!!chainName} then={<div>Name: {chainName}</div>} />
-              <If
-                condition={!!chainVersion}
-                then={<div>Version: {chainVersion}</div>}
-              />
-              <If condition={!!chainType} then={<div>Type: {chainType}</div>} />
-            </div>
-          }
-          else={'No Host given'}
-        />
+        <div>
+          <div>Host: {this.nodeWebsocketAddress}</div>
+          <If condition={!!chainName} then={<div>Name: {chainName}</div>} />
+          <If
+            condition={!!chainVersion}
+            then={<div>Version: {chainVersion}</div>}
+          />
+          <If condition={!!chainType} then={<div>Type: {chainType}</div>} />
+        </div>
       </section>
     )
+  }
+
+  private getNodeWebsocketUrl() {
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+    return `${protocol}://${process.env.REACT_APP_NODE_HOST}:${
+      process.env.REACT_APP_NODE_WS_PORT
+    }`
   }
 }
 
