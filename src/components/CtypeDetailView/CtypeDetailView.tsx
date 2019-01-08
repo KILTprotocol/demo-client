@@ -7,9 +7,11 @@ type Props = {
   ctype?: CType
 }
 
-const CtypeView = (props: Props) => {
+const CtypeDetailView = (props: Props) => {
   return props.ctype ? (
-    <section className="CtypeView">
+    <section className="CtypeDetailView">
+      <Link to="/ctype">Go back</Link>
+      <hr />
       <div>Id: {props.ctype._id}</div>
       <div>Key: {props.ctype.key}</div>
       <div>Name: {props.ctype.name}</div>
@@ -20,8 +22,8 @@ const CtypeView = (props: Props) => {
       </div>
     </section>
   ) : (
-    <section className="CtypeView">Given CTYPE key is not valid.</section>
+    <section className="CtypeDetailView">Given CTYPE key is not valid.</section>
   )
 }
 
-export default CtypeView
+export default CtypeDetailView

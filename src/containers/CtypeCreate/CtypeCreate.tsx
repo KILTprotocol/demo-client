@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import CtypeEditor from '../../components/CtypeEditor/CtypeEditor'
 
-import '../CtypeManager/CtypeManager.scss'
+import '../CtypeView/CtypeView.scss'
 import BlockchainService from '../../services/BlockchainService'
 
 import ctypeRepository from '../../services/CtypeRepository'
