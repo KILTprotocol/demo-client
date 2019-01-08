@@ -15,6 +15,11 @@ and either
 //registry.npmjs.org/:_authToken=xxx
 ```
 
+Then install
+```
+yarn install
+```
+
 ## Build and Run
 
 This project is using semantic UI. Source code in /semantic will be build by `yarn start` and places within /src/dist.
