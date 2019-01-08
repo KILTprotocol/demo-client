@@ -7,18 +7,18 @@ type Props = {
   ctype?: CType
 }
 
-const CtypeDetailView = (props: Props) => {
-  return props.ctype ? (
+const CtypeDetailView = ({ ctype }: Props) => {
+  return ctype ? (
     <section className="CtypeDetailView">
       <Link to="/ctype">Go back</Link>
       <hr />
-      <div>Id: {props.ctype._id}</div>
-      <div>Key: {props.ctype.key}</div>
-      <div>Name: {props.ctype.name}</div>
-      <div>Author: {props.ctype.author}</div>
-      <div>Definition: {props.ctype.definition}</div>
+      <div>Id: {ctype._id}</div>
+      <div>Key: {ctype.key}</div>
+      <div>Name: {ctype.name}</div>
+      <div>Author: {ctype.author}</div>
+      <div>Definition: {ctype.definition}</div>
       <div>
-        <Link to={`/claim/new/${props.ctype.key}`}>New Claim</Link>
+        <Link to={`/claim/new/${ctype.key}`}>New Claim</Link>
       </div>
     </section>
   ) : (

@@ -25,7 +25,9 @@ type State = {
 
 class IdentitySelector extends React.Component<Props, State> {
   public render() {
-    const identities: Select2Option[] = this.props.options.map(option => {
+    const { options, selected } = this.props
+
+    const identities: Select2Option[] = options.map(option => {
       return {
         label: `${option.alias} (${option.seedAsHex.substr(0, 10)}...)`,
         value: option.seedAsHex,
@@ -38,7 +40,7 @@ class IdentitySelector extends React.Component<Props, State> {
       <section className="IdentitySelector">
         <Select2
           data={identities}
-          value={this.props.selected!.identity.seedAsHex}
+          value={selected && selected!.identity.seedAsHex}
           update={this.selectIdentity}
         />
       </section>
