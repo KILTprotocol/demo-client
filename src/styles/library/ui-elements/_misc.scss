@@ -22,3 +22,50 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@mixin card {
+  @include box-shadow(2px 2px 5px $color-grey);
+  @include border-radius($base-border-radius);
+
+  padding: $base-padding/2 0;
+  background: $color-white;
+  border: $base-border;
+}
+
+@mixin label_input_combo {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: $base-padding/2 $base-padding;
+
+  & > label {
+    $breakpoint: 600px;
+
+    @include label;
+    @include baseFont-bold;
+
+    text-align: left;
+    color: $color-primary;
+
+    &,
+    & + input,
+    & + .select2 {
+      width: 100%;
+    }
+
+    & + input {
+      @include input;
+    }
+
+    @include breakpointAbove($breakpoint) {
+      $input-width: 70%;
+
+      width: 100% - $input-width;
+
+      & + input,
+      & + .select2 {
+        width: $input-width;
+      }
+    }
+  }
+}

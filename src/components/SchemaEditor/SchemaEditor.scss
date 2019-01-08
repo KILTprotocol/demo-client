@@ -1,5 +1,4 @@
 .schema-based-json-editor {
-  $breakpoint: 600px;
 
   &,
   & + .actions {
@@ -37,20 +36,12 @@
   }
 
   &--card {
-    @include box-shadow(2px 2px 5px $color-grey);
-    @include border-radius($base-border-radius);
-
-    padding: $base-padding/2 0;
-    background: $color-white;
-    border: $base-border;
+    @include card;
 
     & .schema-based-json-editor {
 
       &--row {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        padding: $base-padding/2 $base-padding;
+        @include label_input_combo;
       }
     }
 
@@ -73,35 +64,6 @@
 
     padding: 0;
     border: none;
-  }
-
-  & label {
-    @include label;
-    @include baseFont-bold;
-
-    text-align: left;
-    color: $color-primary;
-
-    &,
-    & + input,
-    & + .select2 {
-      width: 100%;
-    }
-
-    & + input {
-      @include input;
-    }
-
-    @include breakpointAbove($breakpoint) {
-      $input-width: 70%;
-
-      width: 100% - $input-width;
-
-      & + input,
-      & + .select2 {
-        width: $input-width;
-      }
-    }
   }
 
   &--button {
@@ -163,6 +125,13 @@
           left: 0;
         }
       }
+    }
+  }
+
+  & > &--row {
+
+    & > h3 {
+      display: none;
     }
   }
 }

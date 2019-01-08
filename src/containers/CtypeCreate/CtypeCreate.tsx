@@ -2,14 +2,14 @@ import { Blockchain, CType } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
+
 import CtypeEditor from '../../components/CtypeEditor/CtypeEditor'
-
-import '../CtypeView/CtypeView.scss'
 import BlockchainService from '../../services/BlockchainService'
-
 import ctypeRepository from '../../services/CtypeRepository'
 import * as Wallet from '../../state/ducks/Wallet'
 import * as CTypeModel from '../../types/Ctype'
+
+import './CtypeCreate.scss'
 
 type Props = RouteComponentProps<{}> & {
   selectedIdentity?: Wallet.Entry
@@ -84,12 +84,14 @@ class CtypeCreate extends React.Component<Props, State> {
     return (
       <section className="CtypeCreate">
         <h1 className="App-title">Create CTYPE</h1>
-        <input
-          type="text"
-          onChange={this.updateName}
-          placeholder="Name"
-          value={this.state.name}
-        />
+        <div className="Ctype-name">
+          <label>Name</label>
+          <input
+            type="text"
+            onChange={this.updateName}
+            value={this.state.name}
+          />
+        </div>
         <CtypeEditor
           ctype={this.state.ctype}
           updateCType={this.updateCType}

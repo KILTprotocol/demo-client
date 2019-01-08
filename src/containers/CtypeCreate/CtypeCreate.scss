@@ -1,0 +1,12 @@
+.CtypeCreate {
+
+  & .Ctype-name {
+    @include card;
+    @include label_input_combo;
+
+    margin: {
+      bottom: -$base-border-width;
+    }
+    padding: $base-padding;
+  }
+}
