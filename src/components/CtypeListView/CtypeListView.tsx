@@ -14,9 +14,11 @@ const CtypeListView = (props: Props) => {
       {props.ctypes && !!props.ctypes.length && (
         <table>
           <thead>
-            <th>Author</th>
-            <th>CTYPE name</th>
-            <th>Actions</th>
+            <tr>
+              <th>Author</th>
+              <th>CTYPE name</th>
+              <th>Actions</th>
+            </tr>
           </thead>
           <tbody>
             {props.ctypes.map(ctype => (

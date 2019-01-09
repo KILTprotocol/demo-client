@@ -15,8 +15,10 @@ const ClaimListView = (props: Props) => {
       {props.claims && !!props.claims.length && (
         <table>
           <thead>
-            <th>Alias</th>
-            <th>Claim JSON</th>
+            <tr>
+              <th>Alias</th>
+              <th>Claim JSON</th>
+            </tr>
           </thead>
           <tbody>
             {props.claims.map(claim => (
