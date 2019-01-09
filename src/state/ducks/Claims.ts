@@ -5,14 +5,20 @@ import { Claim } from '../../types/Claim'
 
 interface SaveAction extends KiltAction {
   payload: {
+    id: string
     alias: string
     claim: Claim
   }
 }
 
-type Action = SaveAction
+interface RemoveAction extends KiltAction {
+  payload: string
+}
+
+type Action = SaveAction | RemoveAction
 
 type Entry = {
+  id: string
   alias: string
   claim: Claim
 }
@@ -24,7 +30,7 @@ type State = {
 type ImmutableState = Immutable.Record<State>
 
 type SerializedState = {
-  claims: Array<{ alias: string; claim: string }>
+  claims: Array<{ id: string; alias: string; claim: string }>
 }
 
 class Store {
@@ -36,7 +42,7 @@ class Store {
     serialized.claims = state
       .get('claims')
       .toList()
-      .map(i => ({ alias: i.alias, claim: JSON.stringify(i.claim) }))
+      .map(i => ({ id: i.id, alias: i.alias, claim: JSON.stringify(i.claim) }))
       .toArray()
 
     return serialized
@@ -57,8 +63,8 @@ class Store {
       const o = claimsStateSerialized.claims[i]
       try {
         const claim = JSON.parse(o.claim) as Claim
-        const entry = { alias: o.alias, claim }
-        claims[o.alias] = entry
+        const entry = { id: o.id, alias: o.alias, claim }
+        claims[o.id] = entry
       } catch (e) {
         ErrorService.log('JSON.parse', e)
       }
@@ -75,20 +81,34 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.SAVE_CLAIM:
-        const { alias, claim } = (action as SaveAction).payload
-        return state.setIn(['claims', alias], {
+        const { id, alias, claim } = (action as SaveAction).payload
+        return state.setIn(['claims', id], {
           alias,
           claim,
+          id,
         })
+      case Store.ACTIONS.REMOVE_CLAIM:
+        return state.deleteIn(['claims', (action as RemoveAction).payload])
       default:
         return state
     }
   }
 
-  public static saveAction(alias: string, claim: Claim): SaveAction {
+  public static saveAction(
+    id: string,
+    alias: string,
+    claim: Claim
+  ): SaveAction {
     return {
-      payload: { alias, claim },
+      payload: { id, alias, claim },
       type: Store.ACTIONS.SAVE_CLAIM,
+    }
+  }
+
+  public static removeAction(id: string): RemoveAction {
+    return {
+      payload: id,
+      type: Store.ACTIONS.REMOVE_CLAIM,
     }
   }
 
@@ -99,6 +119,7 @@ class Store {
   }
 
   private static ACTIONS = {
+    REMOVE_CLAIM: 'client/claims/REMOVE_CLAIM',
     SAVE_CLAIM: 'client/claims/SAVE_CLAIM',
   }
 }

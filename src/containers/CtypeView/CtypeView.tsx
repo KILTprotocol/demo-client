@@ -42,7 +42,7 @@ class CtypeView extends React.Component<Props, State> {
     const { ctypeKey } = this.props.match.params
     return (
       <section className="CtypeView">
-        <h1>Registry CTYPES</h1>
+        <h1>CTYPES</h1>
         {!!ctypeKey && <CtypeDetailView ctype={this.state.currentCtype} />}
         {!ctypeKey && <CtypeListView ctypes={this.state.ctypes} />}
       </section>

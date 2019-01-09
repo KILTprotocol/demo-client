@@ -10,11 +10,12 @@ import CtypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
 import * as Claims from '../../state/ducks/Claims'
 import { Claim } from '../../types/Claim'
+import { v4 as uuid } from 'uuid'
 
 type Props = RouteComponentProps<{
   ctypeKey: string
 }> & {
-  saveClaim: (alias: string, claim: Claim) => void
+  saveClaim: (id: string, alias: string, claim: Claim) => void
 }
 
 type State = {
@@ -84,7 +85,11 @@ class ClaimCreate extends Component<Props, State> {
             />
 
             <div className="actions">
-              <button type="submit" onClick={this.handleSubmit}>
+              <button
+                type="submit"
+                onClick={this.handleSubmit}
+                disabled={!this.state.name || this.state.name.length === 0}
+              >
                 Submit
               </button>
             </div>
@@ -111,7 +116,9 @@ class ClaimCreate extends Component<Props, State> {
     const { saveClaim } = this.props
     const { name, claim }: State = this.state
 
-    saveClaim(name, { contents: claim })
+    const id: string = uuid()
+    saveClaim(id, name, { contents: claim })
+    this.props.history.push('/claim')
   }
 
   private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -125,8 +132,8 @@ const mapStateToProps = () => {
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    saveClaim: (alias: string, claim: Claim) => {
-      dispatch(Claims.Store.saveAction(alias, claim))
+    saveClaim: (id: string, alias: string, claim: Claim) => {
+      dispatch(Claims.Store.saveAction(id, alias, claim))
     },
   }
 }

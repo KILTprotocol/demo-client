@@ -28,6 +28,7 @@ const Routes: React.FunctionComponent<{}> = props => {
       <Route path={'/ctype'} component={CtypeView} />
 
       <Route path={'/claim/new/:ctypeKey'} component={ClaimCreate} />
+      <Route path={'/claim/:id'} component={ClaimView} />
       <Route path={'/claim'} component={ClaimView} />
 
       <Route component={Root} />
