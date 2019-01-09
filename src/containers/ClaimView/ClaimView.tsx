@@ -8,6 +8,7 @@ import ClaimDetailView from 'src/components/ClaimDetailView/ClaimDetailView'
 
 type Props = RouteComponentProps<{ id: string }> & {
   claims: Claims.Entry[]
+  removeClaim: (id: string) => void
 }
 
 type State = {}
@@ -15,9 +16,7 @@ type State = {}
 class ClaimView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    this.state = {
-      currentClaim: undefined,
-    }
+    this.deleteClaim = this.deleteClaim.bind(this)
   }
 
   public render() {
@@ -28,7 +27,12 @@ class ClaimView extends React.Component<Props, State> {
     }
     return (
       <section className="ClaimView">
-        {!!id && <ClaimDetailView claim={currentClaim} />}
+        {!!id && (
+          <ClaimDetailView
+            claim={currentClaim}
+            removeClaim={this.deleteClaim}
+          />
+        )}
         {!id && <ClaimListView claims={this.props.claims} />}
       </section>
     )
@@ -38,6 +42,12 @@ class ClaimView extends React.Component<Props, State> {
     return this.props.claims.find(
       (claim: Claims.Entry) => claim.id === this.props.match.params.id
     )
+  }
+
+  private deleteClaim(id: string) {
+    const { removeClaim } = this.props
+    removeClaim(id)
+    this.props.history.push('/claim')
   }
 }
 
@@ -50,4 +60,15 @@ const mapStateToProps = (state: { claims: Claims.ImmutableState }) => {
   }
 }
 
-export default connect(mapStateToProps)(ClaimView)
+const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
+  return {
+    removeClaim: (id: string) => {
+      dispatch(Claims.Store.removeAction(id))
+    },
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ClaimView)

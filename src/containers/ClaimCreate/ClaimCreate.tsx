@@ -85,7 +85,11 @@ class ClaimCreate extends Component<Props, State> {
             />
 
             <div className="actions">
-              <button type="submit" onClick={this.handleSubmit}>
+              <button
+                type="submit"
+                onClick={this.handleSubmit}
+                disabled={!this.state.name || this.state.name.length === 0}
+              >
                 Submit
               </button>
             </div>

@@ -11,7 +11,11 @@ interface SaveAction extends KiltAction {
   }
 }
 
-type Action = SaveAction
+interface RemoveAction extends KiltAction {
+  payload: string
+}
+
+type Action = SaveAction | RemoveAction
 
 type Entry = {
   id: string
@@ -83,6 +87,8 @@ class Store {
           claim,
           id,
         })
+      case Store.ACTIONS.REMOVE_CLAIM:
+        return state.deleteIn(['claims', (action as RemoveAction).payload])
       default:
         return state
     }
@@ -99,6 +105,13 @@ class Store {
     }
   }
 
+  public static removeAction(id: string): RemoveAction {
+    return {
+      payload: id,
+      type: Store.ACTIONS.REMOVE_CLAIM,
+    }
+  }
+
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
       claims: Immutable.Map<string, Entry>(),
@@ -106,6 +119,7 @@ class Store {
   }
 
   private static ACTIONS = {
+    REMOVE_CLAIM: 'client/claims/REMOVE_CLAIM',
     SAVE_CLAIM: 'client/claims/SAVE_CLAIM',
   }
 }
