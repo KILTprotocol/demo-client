@@ -21,6 +21,7 @@ class ClaimView extends React.Component<Props, State> {
 
   public render() {
     const { id } = this.props.match.params
+    const { claims } = this.props
     let currentClaim
     if (id) {
       currentClaim = this.getCurrentClaim()
@@ -33,15 +34,17 @@ class ClaimView extends React.Component<Props, State> {
             removeClaim={this.deleteClaim}
           />
         )}
-        {!id && <ClaimListView claims={this.props.claims} />}
+        {!id && (
+          <ClaimListView claims={claims} removeClaim={this.deleteClaim} />
+        )}
       </section>
     )
   }
 
   private getCurrentClaim(): Claims.Entry | undefined {
-    return this.props.claims.find(
-      (claim: Claims.Entry) => claim.id === this.props.match.params.id
-    )
+    const { id } = this.props.match.params
+    const { claims } = this.props
+    return claims.find((claim: Claims.Entry) => claim.id === id)
   }
 
   private deleteClaim(id: string) {

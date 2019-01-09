@@ -25,7 +25,7 @@ class ClaimDetailView extends Component<Props, State> {
         <div>Id: {claim.id}</div>
         <div>Contents: {JSON.stringify(claim.claim.contents)}</div>
         <div className="actions">
-          <button type="delete" onClick={this.handleDelete}>
+          <button className="deleteClaim" onClick={this.handleDelete}>
             Delete
           </button>
         </div>
