@@ -29,6 +29,15 @@ class CtypeView extends React.Component<Props, State> {
     }
   }
 
+  public componentDidUpdate() {
+    const { match } = this.props
+    const { currentCtype } = this.state
+
+    if (!currentCtype && match.params.ctypeKey) {
+      this.getCurrentCtype()
+    }
+  }
+
   public render() {
     const { ctypeKey } = this.props.match.params
     return (
@@ -49,7 +58,9 @@ class CtypeView extends React.Component<Props, State> {
     const currentCtype = this.state.ctypes.find(
       (ctype: CType) => ctype.key === this.props.match.params.ctypeKey
     )
-    this.setState({ currentCtype })
+    if (currentCtype) {
+      this.setState({ currentCtype })
+    }
   }
 }
 

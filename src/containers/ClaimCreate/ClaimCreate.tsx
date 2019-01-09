@@ -44,7 +44,8 @@ class ClaimCreate extends Component<Props, State> {
     CtypeRepository.findByKey(ctypeKey).then(
       dbCtype => {
         try {
-          const ctype = CType.fromInputModel(JSON.parse(dbCtype.definition))
+          const parsedDefinition = JSON.parse(dbCtype.definition)
+          const ctype = new CType(parsedDefinition)
           this.setState({ ctype })
         } catch (e) {
           ErrorService.log('JSON.parse', e)
