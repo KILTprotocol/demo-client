@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import * as Claims from '../../state/ducks/Claims'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 import ClaimDetailView from 'src/components/ClaimDetailView/ClaimDetailView'
 
 type Props = RouteComponentProps<{ id: string }> & {
@@ -74,4 +74,4 @@ const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ClaimView)
+)(withRouter(ClaimView))
