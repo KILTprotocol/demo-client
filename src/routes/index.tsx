@@ -11,25 +11,32 @@ import CtypeView from '../containers/CtypeView/CtypeView'
 import MessageList from '../containers/MessageList/MessageList'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
 import WalletView from '../containers/WalletView/WalletView'
+import requiresIdentity from './RequiresIdentity'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
   return (
     <Switch>
       <Route path={'/chain-stats'} component={ChainStats} />
-      <Route path={'/contacts'} component={ContactList} />
-      <Route path={'/messages'} component={MessageList} />
+      <Route path={'/contacts'} component={requiresIdentity(ContactList)} />
+      <Route path={'/messages'} component={requiresIdentity(MessageList)} />
 
       <Route path={'/wallet/add'} component={WalletAdd} />
       <Route path={'/wallet'} component={WalletView} />
 
-      <Route path={'/ctype/new'} component={CtypeCreate} />
-      <Route path={'/ctype/:ctypeKey'} component={CtypeView} />
-      <Route path={'/ctype'} component={CtypeView} />
+      <Route path={'/ctype/new'} component={requiresIdentity(CtypeCreate)} />
+      <Route
+        path={'/ctype/:ctypeKey'}
+        component={requiresIdentity(CtypeView)}
+      />
+      <Route path={'/ctype'} component={requiresIdentity(CtypeView)} />
 
-      <Route path={'/claim/new/:ctypeKey'} component={ClaimCreate} />
-      <Route path={'/claim/:id'} component={ClaimView} />
-      <Route path={'/claim'} component={ClaimView} />
+      <Route
+        path={'/claim/new/:ctypeKey'}
+        component={requiresIdentity(ClaimCreate)}
+      />
+      <Route path={'/claim/:id'} component={requiresIdentity(ClaimView)} />
+      <Route path={'/claim'} component={requiresIdentity(ClaimView)} />
 
       <Route component={Root} />
     </Switch>

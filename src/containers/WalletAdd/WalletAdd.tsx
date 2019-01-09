@@ -4,19 +4,20 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
+import BlockchainService from '../../services/BlockchainService'
 
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
 import * as Wallet from '../../state/ducks/Wallet'
 import './WalletAdd.scss'
-import BlockchainService from '../../services/BlockchainService'
 
 type Props = RouteComponentProps<{}> & {
   saveIdentity: (alias: string, identity: Identity) => void
 }
 type State = {
-  randomPhrase: string
   alias: string
+  pendingAdd: boolean
+  randomPhrase: string
 }
 
 class WalletAdd extends React.Component<Props, State> {
@@ -24,11 +25,13 @@ class WalletAdd extends React.Component<Props, State> {
     super(props)
     this.state = {
       alias: '',
+      pendingAdd: false,
       randomPhrase: mnemonic.mnemonicGenerate(),
     }
   }
 
   public render() {
+    const { alias, randomPhrase, pendingAdd } = this.state
     return (
       <section className="WalletAdd">
         <h1>Add Identity</h1>
@@ -52,7 +55,7 @@ class WalletAdd extends React.Component<Props, State> {
             <div>
               <input
                 type="text"
-                value={this.state.randomPhrase}
+                value={randomPhrase}
                 onChange={this.setRandomPhrase}
               />
               <button
@@ -65,7 +68,7 @@ class WalletAdd extends React.Component<Props, State> {
           <div className="actions">
             <button
               onClick={this.addIdentity}
-              disabled={!this.state.randomPhrase || !this.state.alias}
+              disabled={!randomPhrase || !alias || pendingAdd}
             >
               Add
             </button>
@@ -76,6 +79,9 @@ class WalletAdd extends React.Component<Props, State> {
   }
 
   private addIdentity = async () => {
+    this.setState({
+      pendingAdd: true,
+    })
     const identity: Identity = Identity.buildFromMnemonic(
       this.state.randomPhrase
     )
@@ -94,6 +100,9 @@ class WalletAdd extends React.Component<Props, State> {
             () => {
               this.props.saveIdentity(this.state.alias, identity)
               this.props.history.push('/wallet')
+              this.setState({
+                pendingAdd: false,
+              })
             },
             error => {
               ErrorService.log(
@@ -101,6 +110,9 @@ class WalletAdd extends React.Component<Props, State> {
                 error,
                 'failed to POST new identity'
               )
+              this.setState({
+                pendingAdd: false,
+              })
             }
           )
         },
@@ -110,6 +122,9 @@ class WalletAdd extends React.Component<Props, State> {
             error,
             'failed to transfer initial tokens to identity'
           )
+          this.setState({
+            pendingAdd: false,
+          })
         }
       )
   }
@@ -129,6 +144,7 @@ class WalletAdd extends React.Component<Props, State> {
 
 const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   // TODO: empty block causes tslint warning, check how to handle this
+  return {}
 }
 
 const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
