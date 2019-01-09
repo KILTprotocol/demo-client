@@ -17,14 +17,16 @@ const ClaimListView = (props: Props) => {
           <thead>
             <tr>
               <th>Alias</th>
-              <th>Claim JSON</th>
+              <th>Contents</th>
             </tr>
           </thead>
           <tbody>
             {props.claims.map(claim => (
               <tr key={claim.alias}>
-                <td>{claim.alias}</td>
-                <td>{JSON.stringify(claim.claim)}</td>
+                <td>
+                  <Link to={`/claim/${claim.id}`}>{claim.alias}</Link>
+                </td>
+                <td>{JSON.stringify(claim.claim.contents)}</td>
               </tr>
             ))}
           </tbody>
