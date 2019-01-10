@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 const NoIdentities = () => {
   return (
     <section className="NoIdentities">
-      No identities found. Please{' '}
+      <span>No identities found. Please </span>
       <Link to="/wallet/add">Create a new identity</Link>.
     </section>
   )
