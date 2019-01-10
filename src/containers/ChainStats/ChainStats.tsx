@@ -24,8 +24,6 @@ class ChainStats extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {}
-
-    this.nodeWebsocketAddress = this.getNodeWebsocketUrl()
   }
 
   public componentDidMount() {
@@ -36,7 +34,7 @@ class ChainStats extends React.Component<Props, State> {
   public async connect() {
     // TODO: test unmount and host change
     // TODO: test error handling
-    this.blockchain = await blockchainService.connect(this.nodeWebsocketAddress)
+    this.blockchain = await blockchainService.connect()
 
     const [name, version, type] = await Promise.all([
       this.blockchain.api.rpc.system.name(),
@@ -76,13 +74,6 @@ class ChainStats extends React.Component<Props, State> {
         </div>
       </section>
     )
-  }
-
-  private getNodeWebsocketUrl() {
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    return `${protocol}://${process.env.REACT_APP_NODE_HOST}:${
-      process.env.REACT_APP_NODE_WS_PORT
-    }`
   }
 }
 

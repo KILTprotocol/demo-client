@@ -2,10 +2,16 @@ import { Blockchain } from '@kiltprotocol/prototype-sdk'
 
 class BlockchainService {
   public static async connect(
-    host: string = 'ws://127.0.0.1:9944'
+    host: string = this.getNodeWebsocketUrl()
   ): Promise<Blockchain> {
-    // TODO: select host: 'ws://127.0.0.1:9944' or boot node? depending on environment
     return Blockchain.build(host)
+  }
+
+  public static getNodeWebsocketUrl() {
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+    return `${protocol}://${process.env.REACT_APP_NODE_HOST}:${
+      process.env.REACT_APP_NODE_WS_PORT
+    }`
   }
 }
 
