@@ -66,7 +66,10 @@ class ChainStats extends React.Component<Props, State> {
         <hr />
         <div>
           <If condition={!chainName} then={<div>Connecting...</div>} />
-          <If condition={!!chainName} then={<div>Blockchain node: {this.nodeWebsocketAddress}</div>} />
+          <If
+            condition={!!chainName}
+            then={<div>Blockchain node: {this.nodeWebsocketAddress}</div>}
+          />
           <If condition={!!chainName} then={<div>Name: {chainName}</div>} />
           <If
             condition={!!chainVersion}
