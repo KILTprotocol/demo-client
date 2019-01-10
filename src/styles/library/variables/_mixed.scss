@@ -17,3 +17,6 @@ $base-border-width: 1px;
 $base-border: $base-border-width solid $color-grey;
 
 // MISC
+$z-index-content: 1;
+$z-index-header: 100;
+$z-index-modal: 1000;

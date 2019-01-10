@@ -1,14 +1,10 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
 
 import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
-import * as Wallet from '../../state/ducks/Wallet'
 import { Contact } from '../../types/Contact'
 
-interface Props {
-  selectedIdentity?: Wallet.Entry
-}
+interface Props {}
 
 interface State {
   contacts: Contact[]
@@ -49,20 +45,8 @@ class ContactList extends React.Component<Props, State> {
   }
 
   private sendMessage = (contact: Contact): (() => void) => () => {
-    if (this.props.selectedIdentity) {
-      MessageRepository.send(
-        this.props.selectedIdentity,
-        contact,
-        'Hello ' + contact.name
-      )
-    }
+    MessageRepository.send(contact, 'Hello ' + contact.name)
   }
 }
 
-const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
-  return {
-    selectedIdentity: state.wallet.get('selected'),
-  }
-}
-
-export default connect(mapStateToProps)(ContactList)
+export default ContactList

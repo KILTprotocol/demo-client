@@ -46,3 +46,7 @@ input {
     }
   }
 }
+
+.react-select-container {
+  @include react-select;
+}

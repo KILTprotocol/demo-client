@@ -1,15 +1,16 @@
 .IdentitySelector {
 
-  & .select2 {
+  & .react-select {
 
-    &-results {
+    &-container {
+      width: 200px;
+    }
 
-      &__option {
+    &__option {
+      white-space: nowrap;
 
-        &:last-child {
-          white-space: nowrap;
-          border-top: $base-border;
-        }
+      &:last-child {
+        border-top: $base-border;
       }
     }
   }
