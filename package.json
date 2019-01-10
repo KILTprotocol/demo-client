@@ -41,8 +41,6 @@
     "react-test-renderer": "^16.6.3",
     "resolve": "1.6.0",
     "sass-resources-loader": "^2.0.0",
-    "select2-component": "^5.5.1",
-    "select2-react-component": "^5.5.1",
     "source-map-loader": "^0.2.1",
     "ts-jest": "22.0.1",
     "ts-loader": "^2.3.7",

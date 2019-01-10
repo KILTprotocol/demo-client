@@ -7958,7 +7958,7 @@ select2-component@5, select2-component@^5.5.1:
     "@types/node" "*"
     tslib "1"
 
-select2-react-component@5, select2-react-component@^5.5.1:
+select2-react-component@5:
   version "5.5.1"
   resolved "https://registry.yarnpkg.com/select2-react-component/-/select2-react-component-5.5.1.tgz#47f9528cd8f6dade6a327f52db286b02a4741f97"
   dependencies:
