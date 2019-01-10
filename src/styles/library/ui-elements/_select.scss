@@ -15,6 +15,10 @@
       background: $color-white !important;
       color: $color-font !important;
 
+      &--is-selected {
+        background: transparentize($color-primary, 0.8) !important;
+      }
+
       &:hover {
         background: $color-primary !important;
         color: $color-font-inverted !important;

@@ -120,7 +120,8 @@ class ClaimView extends React.Component<Props, State> {
         isClearable={true}
         isSearchable={true}
         isMulti={true}
-        name="attestants"
+        closeMenuOnSelect={false}
+        name="selectAttestants"
         options={options}
         onChange={this.onSelectAttestants}
         filterOption={createFilter(this.filterConfig)}

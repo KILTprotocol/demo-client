@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import { Select2, Select2Option } from 'select2-react-component'
+import Select from 'react-select'
 
 import * as Wallet from '../../state/ducks/Wallet'
 
@@ -12,9 +12,14 @@ const addIdentity = {
   value: 'create',
 }
 
+type SelectIdentityOption = {
+  label: string
+  value: string
+}
+
 type Props = RouteComponentProps<{}> & {
   selectIdentity: (seedAsHex: string) => void
-  options: Array<{ alias: string; publicKeyAsHex: string; seedAsHex: string }>
+  identities: SelectIdentityOption[]
   selected?: Wallet.Entry
 }
 
@@ -25,47 +30,53 @@ type State = {
 
 class IdentitySelector extends React.Component<Props, State> {
   public render() {
-    const { options, selected } = this.props
-
-    const identities: Select2Option[] = options.map(option => {
-      return {
-        label: `${option.alias} (${option.seedAsHex.substr(0, 10)}...)`,
-        value: option.seedAsHex,
-      }
-    })
+    const { identities, selected } = this.props
 
     identities.push(addIdentity)
 
+    let selectedIdentity
+    if (selected) {
+      selectedIdentity = identities.find(
+        (identity: SelectIdentityOption) =>
+          identity.value === selected.identity.seedAsHex
+      )
+    }
+
     return (
       <section className="IdentitySelector">
-        <Select2
-          data={identities}
-          value={selected && selected!.identity.seedAsHex}
-          update={this.selectIdentity}
+        <Select
+          className="react-select-container"
+          classNamePrefix="react-select"
+          isClearable={false}
+          isSearchable={false}
+          isMulti={false}
+          name="selectIdentity"
+          options={identities}
+          value={selectedIdentity}
+          onChange={this.selectIdentity}
         />
       </section>
     )
   }
 
-  private selectIdentity = (value: any) => {
-    if (value === 'create') {
+  private selectIdentity = (selectedOption: SelectIdentityOption) => {
+    if (selectedOption.value === 'create') {
       this.props.history.push('/wallet/add')
     } else {
-      this.props.selectIdentity(value)
+      this.props.selectIdentity(selectedOption.value)
     }
   }
 }
 
 const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
-    options: state.wallet
+    identities: state.wallet
       .get('identities')
       .toList()
       .toArray()
       .map(identity => ({
-        alias: identity.alias,
-        publicKeyAsHex: identity.identity.signPublicKeyAsHex,
-        seedAsHex: identity.identity.seedAsHex,
+        label: identity.alias,
+        value: identity.identity.seedAsHex,
       })),
     selected: state.wallet.get('selected'),
   }
