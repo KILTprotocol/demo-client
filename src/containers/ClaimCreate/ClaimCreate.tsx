@@ -97,7 +97,7 @@ class ClaimCreate extends Component<Props, State> {
         )}
         {!ctype && (
           <p>
-            No CTYPEs found. Please{' '}
+            <span>No CTYPEs found. Please </span>
             <Link to="/ctype/new">create a new CTYPE</Link>.
           </p>
         )}

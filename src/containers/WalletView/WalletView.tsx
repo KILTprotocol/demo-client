@@ -51,7 +51,6 @@ class WalletView extends React.Component<Props, State> {
     return (
       <section className="WalletView">
         <h1>Wallet / My Identities</h1>
-        {actions}
         <table>{identities}</table>
         {actions}
       </section>
