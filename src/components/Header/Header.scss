@@ -1,6 +1,6 @@
 .Header {
   position: fixed;
-  z-index: 1000;
+  z-index: $z-index-header;
   top: 0;
   left: 0;
   width: 100%;

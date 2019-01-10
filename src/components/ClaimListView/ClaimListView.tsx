@@ -5,7 +5,8 @@ import * as Claims from '../../state/ducks/Claims'
 
 type Props = {
   claims: Claims.Entry[]
-  removeClaim: (id: string) => void
+  onRemoveClaim: (id: string) => void
+  onRequestAttestation: (id: string) => void
 }
 
 type State = {}
@@ -38,12 +39,18 @@ class ClaimListView extends React.Component<Props, State> {
                     <Link to={`/claim/${claim.id}`}>{claim.alias}</Link>
                   </td>
                   <td>{JSON.stringify(claim.claim.contents)}</td>
-                  <td>
+                  <td className="actions">
                     <button
                       className="deleteClaim"
                       onClick={this.handleDelete(claim.id)}
                     >
                       Delete
+                    </button>
+                    <button
+                      className="requestAttestation"
+                      onClick={this.requestAttestation(claim.id)}
+                    >
+                      Request Attestation
                     </button>
                   </td>
                 </tr>
@@ -54,9 +61,15 @@ class ClaimListView extends React.Component<Props, State> {
       </section>
     )
   }
+
   private handleDelete = (id: string): (() => void) => () => {
-    const { removeClaim } = this.props
-    removeClaim(id)
+    const { onRemoveClaim } = this.props
+    onRemoveClaim(id)
+  }
+
+  private requestAttestation = (id: string): (() => void) => () => {
+    const { onRequestAttestation } = this.props
+    onRequestAttestation(id)
   }
 }
 

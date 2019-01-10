@@ -4,7 +4,8 @@ import * as Claims from '../../state/ducks/Claims'
 
 type Props = {
   claim?: Claims.Entry
-  removeClaim: (id: string) => void
+  onRemoveClaim: (id: string) => void
+  onRequestAttestation: (id: string) => void
 }
 
 type State = {}
@@ -13,6 +14,7 @@ class ClaimDetailView extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.handleDelete = this.handleDelete.bind(this)
+    this.requestAttestation = this.requestAttestation.bind(this)
   }
 
   public render() {
@@ -28,6 +30,12 @@ class ClaimDetailView extends Component<Props, State> {
           <button className="deleteClaim" onClick={this.handleDelete}>
             Delete
           </button>
+          <button
+            className="requestAttestation"
+            onClick={this.requestAttestation}
+          >
+            Request Attestation
+          </button>
         </div>
       </section>
     ) : (
@@ -36,9 +44,16 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   private handleDelete() {
-    const { claim, removeClaim }: Props = this.props
+    const { claim, onRemoveClaim }: Props = this.props
     if (claim) {
-      removeClaim(claim.id)
+      onRemoveClaim(claim.id)
+    }
+  }
+
+  private requestAttestation() {
+    const { claim, onRequestAttestation }: Props = this.props
+    if (claim) {
+      onRequestAttestation(claim.id)
     }
   }
 }

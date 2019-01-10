@@ -1,0 +1,65 @@
+.Modal {
+  position: fixed;
+  z-index: $z-index-modal;
+  max-width: none;
+  margin: 0;
+
+  &,
+  & .backdrop {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: transparentize($color-black, 0.5);
+  }
+
+  & .backdrop {
+    position: absolute;
+    z-index: $z-index-modal + 1;
+  }
+
+  & .container {
+    @extend %centerHV;
+
+    @include border-radius($base-border-radius);
+
+    position: absolute;
+    z-index: $z-index-modal + 2;
+    width: 100%;
+    max-width: 640px;
+    background: $color-white;
+    border: $base-border;
+  }
+
+  & header {
+    @include baseFont-bold;
+
+    padding: $base-padding/2 $base-padding;
+    font-size: 20px;
+  }
+
+  & .body {
+    padding: $base-padding/2 $base-padding;
+    border: {
+      top: $base-border;
+      bottom: $base-border;
+    }
+  }
+
+  & footer {
+    padding: $base-padding/2 $base-padding;
+    text-align: right;
+
+    & button {
+      @include button-secondary;
+
+      margin: {
+        left: $base-padding/2;
+      }
+
+      &.confirm {
+        @include button-primary;
+      }
+    }
+  }
+}
