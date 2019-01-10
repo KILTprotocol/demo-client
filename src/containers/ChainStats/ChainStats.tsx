@@ -2,7 +2,7 @@ import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 import If from '../../common/If'
-import blockchainService from '../../services/BlockchainService'
+import BlockchainService from '../../services/BlockchainService'
 import { Blockchain } from '@kiltprotocol/prototype-sdk'
 
 type Props = RouteComponentProps<{
@@ -34,7 +34,8 @@ class ChainStats extends React.Component<Props, State> {
   public async connect() {
     // TODO: test unmount and host change
     // TODO: test error handling
-    this.blockchain = await blockchainService.connect()
+    this.nodeWebsocketAddress = BlockchainService.getNodeWebsocketUrl()
+    this.blockchain = await BlockchainService.connect()
 
     const [name, version, type] = await Promise.all([
       this.blockchain.api.rpc.system.name(),
@@ -64,7 +65,8 @@ class ChainStats extends React.Component<Props, State> {
         Demo module to interact with substrate blockchain
         <hr />
         <div>
-          <div>Host: {this.nodeWebsocketAddress}</div>
+          <If condition={!chainName} then={<div>Connecting...</div>} />
+          <If condition={!!chainName} then={<div>Blockchain node: {this.nodeWebsocketAddress}</div>} />
           <If condition={!!chainName} then={<div>Name: {chainName}</div>} />
           <If
             condition={!!chainVersion}
