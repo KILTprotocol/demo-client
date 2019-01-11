@@ -27,7 +27,27 @@ class MessageRepository {
   ): Promise<MessageD[]> {
     return fetch(
       `${MessageRepository.URL}/inbox/${myIdentity.signPublicKeyAsHex}`
-    ).then(response => response.json())
+    )
+      .then(response => response.json())
+      .then((messages: MessageD[]) => {
+        for (const m of messages) {
+          const ea: EncryptedAsymmetricString = {
+            box: m.message,
+            nonce: m.nonce,
+          }
+          const decoded: string | false = Crypto.decryptAsymmetricAsStr(
+              ea,
+              m.senderEncryptionKey,
+              myIdentity.boxKeyPair.secretKey
+          )
+          if (!decoded) {
+            m.message = 'ERROR DECODING MESSAGE'
+          } else {
+            m.message = decoded
+          }
+        }
+        return messages
+      })
   }
 
   public static async findByMyIdentities(

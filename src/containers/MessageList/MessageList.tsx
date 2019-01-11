@@ -5,8 +5,6 @@ import MessageRepository from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
 import { MessageD } from '../../types/Message'
 import './MessageList.scss'
-import { Crypto } from '@kiltprotocol/prototype-sdk'
-import { EncryptedAsymmetricString } from '@kiltprotocol/prototype-sdk/build/crypto/Crypto'
 
 interface Props {
   selectedIdentity?: Wallet.Entry
@@ -107,22 +105,6 @@ class MessageList extends React.Component<Props, State> {
       MessageRepository.findByMyIdentity(_identity.identity).then(
         (messages: MessageD[]) => {
           if (messages.length) {
-            for (const m of messages) {
-              const ea: EncryptedAsymmetricString = {
-                box: m.message,
-                nonce: m.nonce,
-              }
-              const decoded: string | false = Crypto.decryptAsymmetricAsStr(
-                ea,
-                m.senderEncryptionKey,
-                _identity.identity.boxKeyPair.secretKey
-              )
-              if (!decoded) {
-                m.message = 'ERROR DECODING MESSAGE'
-              } else {
-                m.message = decoded
-              }
-            }
             messageOutput = messages
           } else {
             messageOutput = 'No messages found'
