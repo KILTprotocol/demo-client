@@ -1,0 +1,17 @@
+.MessageListView {
+
+  & th,
+  & td {
+    text-align: left;
+  }
+
+  & .actions {
+    padding: 0;
+  }
+
+  & .delete {
+    @include button-icon-only($icon-trash-o);
+
+    border: none;
+  }
+}

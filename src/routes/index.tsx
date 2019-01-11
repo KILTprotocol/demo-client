@@ -19,7 +19,12 @@ const Routes: React.FunctionComponent<{}> = props => {
     <Switch>
       <Route path={'/chain-stats'} component={ChainStats} />
       <Route path={'/contacts'} component={requiresIdentity(ContactList)} />
+
       <Route path={'/messages'} component={requiresIdentity(MessageList)} />
+      <Route
+        path={'/messages/:messageId'}
+        component={requiresIdentity(MessageList)}
+      />
 
       <Route path={'/wallet/add'} component={WalletAdd} />
       <Route path={'/wallet'} component={WalletView} />

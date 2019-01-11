@@ -97,6 +97,7 @@ class Modal extends React.Component<Props, State> {
         this.handleConfirm()
         break
       case 'confirm':
+      case 'blank':
         this.handleCancel()
         break
     }

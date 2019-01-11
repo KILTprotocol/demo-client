@@ -49,6 +49,7 @@ $base-icon-size: $base-font-size;
 
   position: relative;
   width: $base-button-height;
+  min-width: auto;
   padding: 0;
   background: none;
   color: $color-grey-dark;

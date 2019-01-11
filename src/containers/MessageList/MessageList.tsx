@@ -1,127 +1,188 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import Loading from '../../components/Loading/Loading'
 
+import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
+import MessageListView from '../../components/MessageListView/MessageListView'
+import Modal from '../../components/Modal/Modal'
+import ContactRepository from '../../services/ContactRepository'
+import ErrorService from '../../services/ErrorService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
-import { MessageD } from '../../types/Message'
-import './MessageList.scss'
+import { Contact } from '../../types/Contact'
+import {
+  ApproveAttestationForClaim,
+  Message,
+  MessageBodyType,
+} from '../../types/Message'
 
 interface Props {
   selectedIdentity?: Wallet.Entry
 }
 
 interface State {
-  messageOutput: MessageD[] | string
+  messages: Message[]
+  fetching: boolean
+  currentMessage?: Message
 }
 
 class MessageList extends React.Component<Props, State> {
+  private messageModal: Modal | null
+
   constructor(props: Props) {
     super(props)
     this.state = {
-      messageOutput: '',
+      fetching: false,
+      messages: [],
     }
+    this.onDeleteMessage = this.onDeleteMessage.bind(this)
+    this.onOpenMessage = this.onOpenMessage.bind(this)
+    this.onCloseMessage = this.onCloseMessage.bind(this)
+    this.attestCurrentClaim = this.attestCurrentClaim.bind(this)
   }
 
   public render() {
-    let messageOutput
-    if (Array.isArray(this.state.messageOutput)) {
-      messageOutput = (
-        <table>
-          <thead>
-            <tr>
-              <th>from:</th>
-              <th>message:</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.messageOutput.map((message: MessageD) => (
-              <tr key={message.id}>
-                <td>{message.sender}</td>
-                <td>{message.message}</td>
-                <td>
-                  <button
-                    className="delete"
-                    onClick={this.deleteMessage(message)}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )
-    } else {
-      messageOutput = this.state.messageOutput
-    }
-
+    const { messages, currentMessage, fetching } = this.state
     return (
       <section className="MessageList">
         <h1>My Messages</h1>
-        {messageOutput}
+        {!fetching && !!messages && !!messages.length && (
+          <MessageListView
+            messages={messages}
+            onDelete={this.onDeleteMessage}
+            onOpen={this.onOpenMessage}
+          />
+        )}
+        {!fetching && !!currentMessage && (
+          <Modal
+            ref={el => {
+              this.messageModal = el
+            }}
+            type="blank"
+            header={`Message from ${currentMessage.sender}`}
+            onCancel={this.onCloseMessage}
+          >
+            <MessageDetailView
+              message={currentMessage}
+              onDelete={this.onDeleteMessage}
+            >
+              {this.getMessageActions()}
+            </MessageDetailView>
+          </Modal>
+        )}
+        {fetching && <Loading />}
       </section>
     )
   }
 
   public componentDidMount() {
-    if (this.props.selectedIdentity) {
-      this.setState({ messageOutput: 'Fetching messages' })
-      this.getMessages(this.props.selectedIdentity)
-    } else {
-      this.setState({ messageOutput: 'Could not retrieve messages' })
-    }
+    this.setState({ fetching: true })
+    this.getMessages()
   }
 
   public componentWillReceiveProps(props: Props) {
-    if (this.selectIdForTheFirstTime(props) || this.changeId(props)) {
-      this.setState({ messageOutput: 'Fetching messages' })
-      this.getMessages(props.selectedIdentity)
-    } else {
-      this.setState({ messageOutput: 'Could not retrieve messages' })
+    this.setState({ fetching: true })
+    this.getMessages()
+  }
+
+  private onDeleteMessage(id: string) {
+    const { currentMessage } = this.state
+    MessageRepository.deleteByMessageId(id).then(() => {
+      this.getMessages()
+      if (currentMessage) {
+        this.onCloseMessage()
+      }
+    })
+  }
+
+  private getMessageActions() {
+    const { currentMessage } = this.state
+    const messageBodyType: MessageBodyType | undefined =
+      currentMessage && currentMessage.body && currentMessage.body.type
+
+    switch (messageBodyType) {
+      case 'request-attestation-for-claim':
+        return <button onClick={this.attestCurrentClaim}>Attest Claim</button>
+      default:
+        return ''
     }
   }
 
-  private selectIdForTheFirstTime(props: Props) {
-    return !this.props.selectedIdentity && !!props.selectedIdentity
-  }
-
-  private changeId(props: Props) {
-    return (
-      // old and new ids are existent
-      // (we need to verify this for the next condition)
-      !!this.props.selectedIdentity &&
-      !!props.selectedIdentity &&
-      // if the publicKeys of old and new identities are different
-      props.selectedIdentity.identity.seedAsHex !==
-        this.props.selectedIdentity.identity.seedAsHex
+  private onOpenMessage(message: Message) {
+    this.setState(
+      {
+        currentMessage: message,
+      },
+      () => {
+        if (this.messageModal) {
+          this.messageModal.show()
+        }
+      }
     )
   }
 
-  private getMessages(identity?: Wallet.Entry) {
-    // if we didn't not get a identity by params
-    // we assume we wanna fetch the message for current identity
-    const _identity = identity || this.props.selectedIdentity
-    let messageOutput
-    if (_identity) {
-      MessageRepository.findByMyIdentity(_identity.identity).then(
-        (messages: MessageD[]) => {
-          if (messages.length) {
-            messageOutput = messages
-          } else {
-            messageOutput = 'No messages found'
-          }
-          this.setState({ messageOutput })
+  private onCloseMessage() {
+    this.setState({
+      currentMessage: undefined,
+    })
+  }
+
+  private getMessages() {
+    const { selectedIdentity } = this.props
+    if (selectedIdentity) {
+      MessageRepository.findByMyIdentity(selectedIdentity.identity).then(
+        (messages: Message[]) => {
+          this.setState({
+            fetching: false,
+            messages,
+          })
         }
       )
     } else {
-      this.setState({ messageOutput: 'No messages found' })
+      this.setState({
+        fetching: false,
+        messages: [],
+      })
     }
   }
 
-  private deleteMessage = (message: MessageD): (() => void) => () => {
-    if (message.id) {
-      MessageRepository.deleteByMessageId(message.id).then(() => {
-        this.getMessages()
-      })
+  private attestCurrentClaim() {
+    const { currentMessage } = this.state
+
+    if (currentMessage) {
+      ContactRepository.findAll().then(
+        (contacts: Contact[]) => {
+          const receiver: Contact | undefined = contacts.find(
+            (contact: Contact) => contact.key === currentMessage.senderKey
+          )
+          const messageBody: ApproveAttestationForClaim = currentMessage.body as ApproveAttestationForClaim
+          if (receiver && messageBody) {
+            MessageRepository.send(receiver, {
+              content: messageBody.content,
+              type: 'approve-attestation-for-claim',
+            }).then(
+              ()=>{
+                this.onCloseMessage()
+                this.getMessages()
+              }
+            )
+          } else {
+            ErrorService.log('fetch.GET', {
+              message: `Could not resolve contact ${
+                currentMessage.senderKey
+              } from list of all contacts`,
+              name: 'resolve contact error',
+            })
+          }
+        },
+        error => {
+          ErrorService.log(
+            'fetch.GET',
+            error,
+            'Could not retrieve all contacts from registry'
+          )
+        }
+      )
     }
   }
 }

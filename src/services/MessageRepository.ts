@@ -3,7 +3,7 @@ import { EncryptedAsymmetricString } from '@kiltprotocol/prototype-sdk/build/cry
 import PersistentStore from '../state/PersistentStore'
 
 import { Contact } from '../types/Contact'
-import { MessageD } from '../types/Message'
+import { Message, MessageBody } from '../types/Message'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import ErrorService from './ErrorService'
 
@@ -14,7 +14,7 @@ class MessageRepository {
   public static async findByMessageId(
     messageId: string,
     myIdentity: Identity
-  ): Promise<MessageD> {
+  ): Promise<Message> {
     return fetch(
       `${MessageRepository.URL}/inbox/${
         myIdentity.signPublicKeyAsHex
@@ -24,26 +24,35 @@ class MessageRepository {
 
   public static async findByMyIdentity(
     myIdentity: Identity
-  ): Promise<MessageD[]> {
+  ): Promise<Message[]> {
     return fetch(
       `${MessageRepository.URL}/inbox/${myIdentity.signPublicKeyAsHex}`
     )
       .then(response => response.json())
-      .then((messages: MessageD[]) => {
+      .then((messages: Message[]) => {
         for (const m of messages) {
           const ea: EncryptedAsymmetricString = {
             box: m.message,
             nonce: m.nonce,
           }
           const decoded: string | false = Crypto.decryptAsymmetricAsStr(
-              ea,
-              m.senderEncryptionKey,
-              myIdentity.boxKeyPair.secretKey
+            ea,
+            m.senderEncryptionKey,
+            myIdentity.boxKeyPair.secretKey
           )
           if (!decoded) {
             m.message = 'ERROR DECODING MESSAGE'
           } else {
             m.message = decoded
+          }
+          try {
+            m.body = JSON.parse(m.message)
+          } catch (e) {
+            ErrorService.log(
+              'JSON.parse',
+              e,
+              `Could not parse message body of message ${m.id} ($m.message)`
+            )
           }
         }
         return messages
@@ -52,22 +61,22 @@ class MessageRepository {
 
   public static async findByMyIdentities(
     myIdentities: Identity[]
-  ): Promise<MessageD[]> {
+  ): Promise<Message[]> {
     return Promise.reject('implement')
   }
 
   public static async send(
     receiver: Contact,
-    message: string
-  ): Promise<MessageD> {
+    messageBody: MessageBody
+  ): Promise<Message> {
     try {
       const sender = PersistentStore.store.getState().wallet.selected
       const encryptedMessage: EncryptedAsymmetricString = Crypto.encryptAsymmetricAsStr(
-        message,
+        JSON.stringify(messageBody),
         receiver.encryptionKey,
         sender.identity.boxKeyPair.secretKey
       )
-      const messageObj: MessageD = {
+      const messageObj: Message = {
         message: encryptedMessage.box,
         nonce: encryptedMessage.nonce,
         receiverKey: receiver.key,
@@ -80,7 +89,11 @@ class MessageRepository {
         body: JSON.stringify(messageObj),
       }).then(response => response.json())
     } catch (error) {
-      ErrorService.log('fetch.POST', error, 'error just before sending message')
+      ErrorService.log(
+        'fetch.POST',
+        error,
+        'error just before sending messageBody'
+      )
       return Promise.reject()
     }
   }

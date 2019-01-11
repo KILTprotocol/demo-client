@@ -1,7 +1,6 @@
 import * as React from 'react'
 
 import ContactRepository from '../../services/ContactRepository'
-import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 
 interface Props {}
@@ -38,14 +37,9 @@ class ContactList extends React.Component<Props, State> {
       return (
         <li key={contact.key}>
           {contact.name} / {contact.key}
-          <button onClick={this.sendMessage(contact)}>Send</button>
         </li>
       )
     })
-  }
-
-  private sendMessage = (contact: Contact): (() => void) => () => {
-    MessageRepository.send(contact, 'Hello ' + contact.name)
   }
 }
 
