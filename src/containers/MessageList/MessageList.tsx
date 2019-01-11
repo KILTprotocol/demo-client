@@ -160,12 +160,10 @@ class MessageList extends React.Component<Props, State> {
             MessageRepository.send(receiver, {
               content: messageBody.content,
               type: 'approve-attestation-for-claim',
-            }).then(
-              ()=>{
-                this.onCloseMessage()
-                this.getMessages()
-              }
-            )
+            }).then(() => {
+              this.onCloseMessage()
+              this.getMessages()
+            })
           } else {
             ErrorService.log('fetch.GET', {
               message: `Could not resolve contact ${
