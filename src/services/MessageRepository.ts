@@ -19,7 +19,9 @@ class MessageRepository {
       `${MessageRepository.URL}/inbox/${
         myIdentity.signPublicKeyAsHex
       }/${messageId}`
-    ).then(response => response.json())
+    )
+      .then(response => response.json())
+      .then(message => MessageRepository.decryptMessage(message, myIdentity))
   }
 
   public static async findByMyIdentity(
@@ -30,30 +32,8 @@ class MessageRepository {
     )
       .then(response => response.json())
       .then((messages: Message[]) => {
-        for (const m of messages) {
-          const ea: EncryptedAsymmetricString = {
-            box: m.message,
-            nonce: m.nonce,
-          }
-          const decoded: string | false = Crypto.decryptAsymmetricAsStr(
-            ea,
-            m.senderEncryptionKey,
-            myIdentity.boxKeyPair.secretKey
-          )
-          if (!decoded) {
-            m.message = 'ERROR DECODING MESSAGE'
-          } else {
-            m.message = decoded
-          }
-          try {
-            m.body = JSON.parse(m.message)
-          } catch (e) {
-            ErrorService.log(
-              'JSON.parse',
-              e,
-              `Could not parse message body of message ${m.id} ($m.message)`
-            )
-          }
+        for (const message of messages) {
+          MessageRepository.decryptMessage(message, myIdentity)
         }
         return messages
       })
@@ -102,6 +82,36 @@ class MessageRepository {
     return fetch(`${MessageRepository.URL}/${messageId}`, {
       ...BaseDeleteParams,
     })
+  }
+
+  private static decryptMessage(
+    message: Message,
+    myIdentity: Identity
+  ): Message {
+    const ea: EncryptedAsymmetricString = {
+      box: message.message,
+      nonce: message.nonce,
+    }
+    const decoded: string | false = Crypto.decryptAsymmetricAsStr(
+      ea,
+      message.senderEncryptionKey,
+      myIdentity.boxKeyPair.secretKey
+    )
+    if (!decoded) {
+      message.message = 'ERROR DECODING MESSAGE'
+    } else {
+      message.message = decoded
+    }
+    try {
+      message.body = JSON.parse(message.message)
+    } catch (e) {
+      ErrorService.log(
+        'JSON.parse',
+        e,
+        `Could not parse message body of message ${message.id} ($m.message)`
+      )
+    }
+    return message
   }
 
   private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
