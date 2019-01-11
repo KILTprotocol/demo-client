@@ -84,6 +84,10 @@ class MessageRepository {
     })
   }
 
+  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/messaging`
+
   private static decryptMessage(
     message: Message,
     myIdentity: Identity
@@ -113,10 +117,6 @@ class MessageRepository {
     }
     return message
   }
-
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/messaging`
 }
 
 export default MessageRepository
