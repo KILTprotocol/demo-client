@@ -13,9 +13,9 @@ export type Message = {
 }
 
 export enum MessageBodyType {
-  REQUEST_ATTESTATION_FOR_CLAIM,
-  APPROVE_ATTESTATION_FOR_CLAIM,
-  REQUEST_CLAIM_FOR_CTYPE,
+  REQUEST_ATTESTATION_FOR_CLAIM = 'request-attestation-for-claim',
+  APPROVE_ATTESTATION_FOR_CLAIM = 'approve-attestation-for-claim',
+  REQUEST_CLAIM_FOR_CTYPE = 'request-claim-for-ctype',
 }
 
 interface MessageBodyBase {
