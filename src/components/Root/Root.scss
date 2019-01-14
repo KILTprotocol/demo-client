@@ -1,0 +1,9 @@
+.Root {
+
+  & .Navigation {
+
+    & ul {
+      list-style-type: none;
+    }
+  }
+}
