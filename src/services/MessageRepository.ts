@@ -3,7 +3,7 @@ import { EncryptedAsymmetricString } from '@kiltprotocol/prototype-sdk/build/cry
 import PersistentStore from '../state/PersistentStore'
 
 import { Contact } from '../types/Contact'
-import { MessageD } from '../types/Message'
+import { Message, MessageBody } from '../types/Message'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import ErrorService from './ErrorService'
 
@@ -14,40 +14,49 @@ class MessageRepository {
   public static async findByMessageId(
     messageId: string,
     myIdentity: Identity
-  ): Promise<MessageD> {
+  ): Promise<Message> {
     return fetch(
       `${MessageRepository.URL}/inbox/${
         myIdentity.signPublicKeyAsHex
       }/${messageId}`
-    ).then(response => response.json())
+    )
+      .then(response => response.json())
+      .then(message => MessageRepository.decryptMessage(message, myIdentity))
   }
 
   public static async findByMyIdentity(
     myIdentity: Identity
-  ): Promise<MessageD[]> {
+  ): Promise<Message[]> {
     return fetch(
       `${MessageRepository.URL}/inbox/${myIdentity.signPublicKeyAsHex}`
-    ).then(response => response.json())
+    )
+      .then(response => response.json())
+      .then((messages: Message[]) => {
+        for (const message of messages) {
+          MessageRepository.decryptMessage(message, myIdentity)
+        }
+        return messages
+      })
   }
 
   public static async findByMyIdentities(
     myIdentities: Identity[]
-  ): Promise<MessageD[]> {
+  ): Promise<Message[]> {
     return Promise.reject('implement')
   }
 
   public static async send(
     receiver: Contact,
-    message: string
-  ): Promise<MessageD> {
+    messageBody: MessageBody
+  ): Promise<Message> {
     try {
       const sender = PersistentStore.store.getState().wallet.selected
       const encryptedMessage: EncryptedAsymmetricString = Crypto.encryptAsymmetricAsStr(
-        message,
+        JSON.stringify(messageBody),
         receiver.encryptionKey,
         sender.identity.boxKeyPair.secretKey
       )
-      const messageObj: MessageD = {
+      const messageObj: Message = {
         message: encryptedMessage.box,
         nonce: encryptedMessage.nonce,
         receiverKey: receiver.key,
@@ -60,7 +69,11 @@ class MessageRepository {
         body: JSON.stringify(messageObj),
       }).then(response => response.json())
     } catch (error) {
-      ErrorService.log('fetch.POST', error, 'error just before sending message')
+      ErrorService.log(
+        'fetch.POST',
+        error,
+        'error just before sending messageBody'
+      )
       return Promise.reject()
     }
   }
@@ -74,6 +87,36 @@ class MessageRepository {
   private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
     process.env.REACT_APP_SERVICE_PORT
   }/messaging`
+
+  private static decryptMessage(
+    message: Message,
+    myIdentity: Identity
+  ): Message {
+    const ea: EncryptedAsymmetricString = {
+      box: message.message,
+      nonce: message.nonce,
+    }
+    const decoded: string | false = Crypto.decryptAsymmetricAsStr(
+      ea,
+      message.senderEncryptionKey,
+      myIdentity.boxKeyPair.secretKey
+    )
+    if (!decoded) {
+      message.message = 'ERROR DECODING MESSAGE'
+    } else {
+      message.message = decoded
+    }
+    try {
+      message.body = JSON.parse(message.message)
+    } catch (e) {
+      ErrorService.log(
+        'JSON.parse',
+        e,
+        `Could not parse message body of message ${message.id} ($m.message)`
+      )
+    }
+    return message
+  }
 }
 
 export default MessageRepository

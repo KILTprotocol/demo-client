@@ -11,6 +11,7 @@ import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
+import { MessageBodyType } from '../../types/Message'
 
 type SelectOption = {
   value: string
@@ -153,16 +154,18 @@ class ClaimView extends React.Component<Props, State> {
   private onFinishRequestAttestation() {
     const { claims } = this.props
 
-    this.selectedAttestants.forEach((attestant: Contact) => {
-      MessageRepository.send(
-        attestant,
-        `Please attest claim ${JSON.stringify(
-          claims.find(
-            (claim: Claims.Entry) => claim.id === this.claimIdToAttest
-          )
-        )}`
-      )
-    })
+    const claimToAttest = claims.find(
+      (claim: Claims.Entry) => claim.id === this.claimIdToAttest
+    )
+
+    if (claimToAttest) {
+      this.selectedAttestants.forEach((attestant: Contact) => {
+        MessageRepository.send(attestant, {
+          content: claimToAttest,
+          type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+        })
+      })
+    }
   }
 }
 

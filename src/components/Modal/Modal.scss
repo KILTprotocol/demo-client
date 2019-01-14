@@ -35,20 +35,26 @@
     @include baseFont-bold;
 
     padding: $base-padding/2 $base-padding;
+    border: {
+      bottom: $base-border;
+    }
     font-size: 20px;
   }
 
   & .body {
     padding: $base-padding/2 $base-padding;
-    border: {
-      top: $base-border;
-      bottom: $base-border;
+
+    & footer {
+      margin: $base-padding (-$base-padding) (-$base-padding/2);
     }
   }
 
   & footer {
     padding: $base-padding/2 $base-padding;
     text-align: right;
+    border: {
+      top: $base-border;
+    }
 
     & button {
       @include button-secondary;
