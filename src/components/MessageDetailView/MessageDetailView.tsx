@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Message } from '../../types/Message'
+import Code from '../Code/Code'
 
 type Props = {
   message: Message
@@ -22,9 +23,7 @@ class MessageDetailView extends React.Component<Props, State> {
         <h4>Subject: {message.body ? message.body.type : message.message}</h4>
         <div>
           Contents:{' '}
-          {message.body
-            ? JSON.stringify(message.body.content)
-            : message.message}
+          {message.body ? <Code>{message.body.content}</Code> : message.message}
         </div>
         <footer>
           {children}
