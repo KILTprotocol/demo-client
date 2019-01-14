@@ -36,7 +36,7 @@ class MessageListView extends React.Component<Props, State> {
               {messages.map((message: Message) => (
                 <tr key={message.id}>
                   <td>{message.sender}</td>
-                  <td>
+                  <td className="message">
                     <div onClick={this.openMessage(message)}>
                       {message.body ? message.body.type : message.message}
                     </div>
@@ -45,6 +45,10 @@ class MessageListView extends React.Component<Props, State> {
                     <button
                       className="delete"
                       onClick={this.handleDelete(message.id)}
+                    />
+                    <button
+                      className="open"
+                      onClick={this.openMessage(message)}
                     />
                   </td>
                 </tr>

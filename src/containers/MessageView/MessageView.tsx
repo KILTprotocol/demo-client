@@ -26,7 +26,7 @@ interface State {
   currentMessage?: Message
 }
 
-class MessageList extends React.Component<Props, State> {
+class MessageView extends React.Component<Props, State> {
   private messageModal: Modal | null
 
   constructor(props: Props) {
@@ -80,9 +80,13 @@ class MessageList extends React.Component<Props, State> {
     this.getMessages()
   }
 
-  public componentWillReceiveProps(props: Props) {
-    this.setState({ fetching: true })
-    this.getMessages()
+  public componentDidUpdate(prevProps: Props) {
+    const { selectedIdentity: previousSelected } = prevProps
+    const { selectedIdentity: currentSelected } = this.props
+    if (currentSelected !== previousSelected) {
+      this.setState({ fetching: true })
+      this.getMessages()
+    }
   }
 
   private onDeleteMessage(id: string) {
@@ -101,7 +105,7 @@ class MessageList extends React.Component<Props, State> {
       currentMessage && currentMessage.body && currentMessage.body.type
 
     switch (messageBodyType) {
-      case 'request-attestation-for-claim':
+      case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return <button onClick={this.attestCurrentClaim}>Attest Claim</button>
       default:
         return ''
@@ -159,7 +163,7 @@ class MessageList extends React.Component<Props, State> {
           if (receiver && messageBody) {
             MessageRepository.send(receiver, {
               content: messageBody.content,
-              type: 'approve-attestation-for-claim',
+              type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
             }).then(() => {
               this.onCloseMessage()
               this.getMessages()
@@ -191,4 +195,4 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   }
 }
 
-export default connect(mapStateToProps)(MessageList)
+export default connect(mapStateToProps)(MessageView)

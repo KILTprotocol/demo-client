@@ -12,10 +12,11 @@ export type Message = {
   body?: MessageBody
 }
 
-export type MessageBodyType =
-  | 'request-attestation-for-claim'
-  | 'approve-attestation-for-claim'
-  | 'request-claim-for-ctype'
+export enum MessageBodyType {
+  REQUEST_ATTESTATION_FOR_CLAIM,
+  APPROVE_ATTESTATION_FOR_CLAIM,
+  REQUEST_CLAIM_FOR_CTYPE,
+}
 
 interface MessageBodyBase {
   content: Claims.Entry | CType['key']
@@ -24,17 +25,17 @@ interface MessageBodyBase {
 
 export interface RequestAttestationForClaim extends MessageBodyBase {
   content: Claims.Entry
-  type: 'request-attestation-for-claim'
+  type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
 }
 
 export interface ApproveAttestationForClaim extends MessageBodyBase {
   content: Claims.Entry
-  type: 'approve-attestation-for-claim'
+  type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM
 }
 
 export interface RequestClaimForCtype extends MessageBodyBase {
   content: CType['key']
-  type: 'request-claim-for-ctype'
+  type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE
 }
 
 export type MessageBody =

@@ -14,4 +14,19 @@
 
     border: none;
   }
+
+  & .open {
+    @include button-icon-only($icon-eye);
+
+    border: none;
+  }
+
+  & .message {
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+      color: $color-primary;
+    }
+  }
 }
