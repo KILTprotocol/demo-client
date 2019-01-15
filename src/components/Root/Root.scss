@@ -62,7 +62,7 @@
         }
       }
 
-      $icons: (wallet: 'Wallet', ctype: '', claim: 'Claim', chain-stats: '', contacts: '', messages: '');
+      $icons: (wallet: 'Wallet', ctype: 'Ctype', claim: 'Claim', chain-stats: 'Settings', contacts: 'Contact', messages: 'Message');
 
       @each $class, $icon in $icons {
 

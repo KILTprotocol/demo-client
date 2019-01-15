@@ -16,6 +16,8 @@ import {
   MessageBodyType,
 } from '../../types/Message'
 
+import './MessageList.scss'
+
 interface Props {
   selectedIdentity?: Wallet.Entry
 }

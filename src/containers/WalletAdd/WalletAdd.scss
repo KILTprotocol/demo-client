@@ -94,14 +94,6 @@
 
   & .actions {
     width: 100%;
-
-    & .cancel {
-      @include button-secondary;
-    }
-
-    & .add {
-      @include button-primary;
-    }
   }
 
   @include breakpoint('desktop') {

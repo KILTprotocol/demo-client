@@ -3,6 +3,8 @@ import * as React from 'react'
 import ContactRepository from '../../services/ContactRepository'
 import { Contact } from '../../types/Contact'
 
+import './ContactList.scss'
+
 interface Props {}
 
 interface State {
@@ -26,14 +28,15 @@ class ContactList extends React.Component<Props, State> {
   public render() {
     return (
       <section className="ContactList">
-        <h1>Registry Contacts</h1>
+        <h1>Contacts</h1>
         <ul>{this.getContacts()}</ul>
       </section>
     )
   }
 
   private getContacts(): JSX.Element[] {
-    return this.state.contacts.map((contact: Contact) => {
+    const { contacts } = this.state
+    return contacts.map((contact: Contact) => {
       return (
         <li key={contact.key}>
           {contact.name} / {contact.key}

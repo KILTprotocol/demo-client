@@ -33,11 +33,4 @@
       }
     }
   }
-
-  & .actions {
-
-    & .add {
-      @include button-primary;
-    }
-  }
 }

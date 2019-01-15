@@ -60,7 +60,7 @@ input {
 
     section > & {
 
-      &:first-child{
+      &:last-child{
         @include button-primary;
       }
     }

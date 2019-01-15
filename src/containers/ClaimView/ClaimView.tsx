@@ -13,6 +13,8 @@ import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
 import { MessageBodyType } from '../../types/Message'
 
+import './ClaimView.scss'
+
 type SelectOption = {
   value: string
   label: string
