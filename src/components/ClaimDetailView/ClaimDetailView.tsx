@@ -34,6 +34,7 @@ class ClaimDetailView extends Component<Props, State> {
           Contents: <Code>{claim.contents}</Code>
         </div>
         <div>Signature: {claim.signature}</div>
+        <div>Owner: {claim.owner}</div>
         <div>Verified: {verified ? 'true' : 'false'}</div>
         <div className="actions">
           <button
