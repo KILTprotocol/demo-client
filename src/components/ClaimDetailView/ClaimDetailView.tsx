@@ -30,6 +30,7 @@ class ClaimDetailView extends Component<Props, State> {
         <Link to="/claim">Go back</Link>
         <hr />
         <div>Id: {claim.id}</div>
+        <div>Ctype: {claim.ctype}</div>
         <div>
           Contents: <Code>{claim.contents}</Code>
         </div>
