@@ -27,14 +27,14 @@ class ClaimDetailView extends Component<Props, State> {
         <div>Id: {claim.id}</div>
         <div>Contents: {JSON.stringify(claim.claim.contents)}</div>
         <div className="actions">
-          <button className="deleteClaim" onClick={this.handleDelete}>
-            Delete
-          </button>
           <button
             className="requestAttestation"
             onClick={this.requestAttestation}
           >
             Request Attestation
+          </button>
+          <button className="deleteClaim" onClick={this.handleDelete}>
+            Delete
           </button>
         </div>
       </section>

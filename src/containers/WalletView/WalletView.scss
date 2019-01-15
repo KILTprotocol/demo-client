@@ -1,5 +1,9 @@
 .WalletView {
 
+  & h1 {
+    @include h1('Wallet');
+  }
+
   & table {
     $label-width: 30%;
 
@@ -27,6 +31,13 @@
           }
         }
       }
+    }
+  }
+
+  & .actions {
+
+    & .add {
+      @include button-primary;
     }
   }
 }

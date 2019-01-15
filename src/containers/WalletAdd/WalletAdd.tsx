@@ -3,7 +3,7 @@ import * as mnemonic from '@polkadot/util-crypto/mnemonic'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
 import BlockchainService from '../../services/BlockchainService'
 import ContactRepository from '../../services/ContactRepository'
@@ -18,6 +18,8 @@ type State = {
   alias: string
   pendingAdd: boolean
   randomPhrase: string
+  useMyPhrase: boolean
+  myPhrase: string
 }
 
 class WalletAdd extends React.Component<Props, State> {
@@ -25,22 +27,29 @@ class WalletAdd extends React.Component<Props, State> {
     super(props)
     this.state = {
       alias: '',
+      myPhrase: '',
       pendingAdd: false,
       randomPhrase: mnemonic.mnemonicGenerate(),
+      useMyPhrase: false,
     }
+    this.togglePhrase = this.togglePhrase.bind(this)
   }
 
   public render() {
-    const { alias, randomPhrase, pendingAdd } = this.state
+    const {
+      alias,
+      randomPhrase,
+      pendingAdd,
+      useMyPhrase,
+      myPhrase,
+    } = this.state
     return (
       <section className="WalletAdd">
-        <h1>Add Identity</h1>
-        <h3>Add new identity from phrase</h3>
-        <h4>(duplicates not permitted)</h4>
+        <h1>Create ID</h1>
 
         <div className="inputs">
           <div className="name">
-            <label>Name</label>
+            <label>Name your ID</label>
             <div>
               <input
                 type="text"
@@ -50,41 +59,91 @@ class WalletAdd extends React.Component<Props, State> {
             </div>
           </div>
 
-          <div className="phrase">
-            <label>Phrase</label>
-            <div>
-              <input
-                type="text"
-                value={randomPhrase}
-                onChange={this.setRandomPhrase}
-              />
-              <button
-                onClick={this.createRandomPhrase}
-                title="Create random phrase"
-              />
+          {!useMyPhrase && (
+            <div className="phrase">
+              <label>
+                Seed Phrase
+                <button
+                  onClick={this.createRandomPhrase}
+                  title="Create random phrase"
+                />
+              </label>
+              <div>{randomPhrase}</div>
             </div>
-          </div>
+          )}
 
-          <div className="actions">
-            <button
-              onClick={this.addIdentity}
-              disabled={!randomPhrase || !alias || pendingAdd}
-            >
-              Add
-            </button>
-          </div>
+          {useMyPhrase && (
+            <div className="phrase">
+              <label>Seed Phrase</label>
+              <div>
+                <input
+                  type="text"
+                  value={myPhrase}
+                  onChange={this.setMyPhrase}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div
+          className={`toggle-phrase ${useMyPhrase ? 'checked' : ''}`}
+          onClick={this.togglePhrase}
+        >
+          Import Seed Phrase
+        </div>
+
+        <div className="actions">
+          <Link className="cancel" to="/wallet">
+            Cancel
+          </Link>
+          <button
+            className="add"
+            onClick={this.addIdentity}
+            disabled={
+              (useMyPhrase && !myPhrase) ||
+              (!useMyPhrase && !randomPhrase) ||
+              !alias ||
+              pendingAdd
+            }
+          >
+            Add
+          </button>
         </div>
       </section>
     )
   }
 
+  private togglePhrase() {
+    const { useMyPhrase } = this.state
+    this.setState({
+      useMyPhrase: !useMyPhrase,
+    })
+  }
+
   private addIdentity = async () => {
+    const { alias, myPhrase, randomPhrase, useMyPhrase } = this.state
+
     this.setState({
       pendingAdd: true,
     })
-    const identity: Identity = Identity.buildFromMnemonic(
-      this.state.randomPhrase
-    )
+
+    let identity: Identity
+    const usePhrase = useMyPhrase ? myPhrase : randomPhrase
+
+    try {
+      identity = Identity.buildFromMnemonic(usePhrase)
+    } catch (error) {
+      ErrorService.log(
+        'identity.create',
+        error,
+        `failed to create identity from phrase '${usePhrase}'`
+      )
+      this.setState({
+        pendingAdd: false,
+      })
+      return
+    }
 
     const blockchain: Blockchain = await BlockchainService.connect()
     const alice = Identity.buildFromSeedString('Alice')
@@ -95,10 +154,10 @@ class WalletAdd extends React.Component<Props, State> {
           ContactRepository.add({
             encryptionKey: identity.boxPublicKeyAsHex,
             key: identity.signPublicKeyAsHex,
-            name: this.state.alias,
+            name: alias,
           }).then(
             () => {
-              this.props.saveIdentity(this.state.alias, identity)
+              this.props.saveIdentity(alias, identity)
               this.props.history.push('/wallet')
               this.setState({
                 pendingAdd: false,
@@ -133,8 +192,8 @@ class WalletAdd extends React.Component<Props, State> {
     this.setState({ randomPhrase: mnemonic.mnemonicGenerate() })
   }
 
-  private setRandomPhrase = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ randomPhrase: e.currentTarget.value })
+  private setMyPhrase = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ myPhrase: e.currentTarget.value })
   }
 
   private setAlias = (e: React.ChangeEvent<HTMLInputElement>) => {

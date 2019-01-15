@@ -36,6 +36,7 @@
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  align-items: center;
   padding: $base-padding/2 $base-padding;
 
   & > label {
@@ -48,8 +49,9 @@
     color: $color-primary;
 
     &,
-    & + input,
-    & + .select2 {
+    & + * {
+      @extend %ellipsis;
+
       width: 100%;
     }
 
@@ -62,8 +64,7 @@
 
       width: 100% - $input-width;
 
-      & + input,
-      & + .select2 {
+      & + * {
         width: $input-width;
       }
     }

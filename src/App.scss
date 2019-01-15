@@ -15,9 +15,15 @@ section {
 h1 {
   @include baseFont;
 
+  display: flex;
+  align-items: center;
   width: 100%;
-  margin-top: $base-padding;
-  text-align: center;
+  height: $h1-icon-size;
+  margin: {
+    top: $base-padding;
+    bottom: 2*$base-padding;
+  }
+  text-transform: uppercase;
 }
 
 // base form elements
@@ -31,22 +37,48 @@ input {
 }
 
 .actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
   padding: {
     top: $base-padding;
   }
   overflow: hidden;
   clear: both;
 
-  & button {
-    @include button;
+  & button,
+  & a {
+    @extend %ellipsis;
 
-    float: right;
+    @include button-secondary;
+
     margin: {
       left: $base-padding/2;
+    }
+
+    section > & {
+
+      &:first-child{
+        @include button-primary;
+      }
     }
   }
 }
 
 .react-select-container {
   @include react-select;
+}
+
+table {
+  width: 100%;
+  text-align: left;
+
+  & th {
+
+    &.actions {
+      text-align: right;
+    }
+  }
 }

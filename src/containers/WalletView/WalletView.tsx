@@ -40,19 +40,15 @@ class WalletView extends React.Component<Props, State> {
       )
     })
 
-    const actions = (
-      <div className="actions">
-        <Link to="/wallet/add">
-          <button type="button">Add Identity</button>
-        </Link>
-      </div>
-    )
-
     return (
       <section className="WalletView">
         <h1>Wallet / My Identities</h1>
         <table>{identities}</table>
-        {actions}
+        <div className="actions">
+          <Link to="/wallet/add" className="add">
+            Add Identity
+          </Link>
+        </div>
       </section>
     )
   }

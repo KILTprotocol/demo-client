@@ -10,14 +10,13 @@ type Props = {
 const CtypeListView = (props: Props) => {
   return (
     <section className="CtypeListView">
-      <Link to="/ctype/new">Create new CTYPE</Link>
       {props.ctypes && !!props.ctypes.length && (
         <table>
           <thead>
             <tr>
               <th>Author</th>
               <th>CTYPE name</th>
-              <th>Actions</th>
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -28,13 +27,18 @@ const CtypeListView = (props: Props) => {
                   <Link to={`/ctype/${ctype.key}`}>{ctype.name}</Link>
                 </td>
                 <td>
-                  <Link to={`/claim/new/${ctype.key}`}>Create Claim</Link>
+                  <div className="actions">
+                    <Link to={`/claim/new/${ctype.key}`}>Create Claim</Link>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
+      <div className="actions">
+        <Link to="/ctype/new">Create new CTYPE</Link>
+      </div>
     </section>
   )
 }

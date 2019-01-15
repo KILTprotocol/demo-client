@@ -1,9 +1,86 @@
 .Root {
 
   & .Navigation {
+    $icon-size: 50px;
+    $tile-width: 200px;
 
     & ul {
       list-style-type: none;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: left;
+      margin: 0;
+      padding: 0;
+
+      &:after {
+        content: "";
+        flex: auto;
+      }
+    }
+
+    & li {
+      width: $tile-width;
+      margin: $base-padding/2;
+
+      & a {
+        @include transition($base-transition);
+        @include border-radius($base-border-radius);
+        @include baseFont-bold;
+
+        position: relative;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        width: 100%;
+        min-height: $icon-size + $base-padding;
+        padding: $base-padding/2;
+        background: $color-grey;
+        color: $color-primary;
+        text-decoration: none;
+
+        &:before {
+          content: '';
+          display: block;
+          width: $icon-size;
+          height: $icon-size;
+          margin-right: $base-padding/2;
+          background: {
+            position: center;
+            repeat: no-repeat;
+            size: contain;
+          }
+        }
+
+        & span {
+          position: relative;
+        }
+
+        &:hover {
+          background: $color-primary;
+          color: $color-font-inverted;
+        }
+      }
+
+      $icons: (wallet: 'Wallet', ctype: '', claim: 'Claim', chain-stats: '', contacts: '', messages: '');
+
+      @each $class, $icon in $icons {
+
+        @if($icon != ''){
+
+          &.#{$class} {
+
+            & a {
+
+              &:before {
+                background: {
+                  image: url('~src/assets/#{$icon}.svg')
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

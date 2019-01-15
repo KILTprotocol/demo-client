@@ -9,7 +9,7 @@ type NavLink = {
 const links: NavLink[] = [
   { url: '', label: 'Home' },
   { url: 'wallet', label: 'Wallet' },
-  { url: 'ctype', label: 'CTYPE manager' },
+  { url: 'ctype', label: 'CTYPEs' },
   { url: 'claim', label: 'Claims' },
   { url: 'chain-stats', label: 'Chain stats' },
   { url: 'contacts', label: 'Contacts' },
@@ -44,7 +44,7 @@ class Navigation extends React.Component<Props, State> {
             return (
               <li className={classes.join(' ')} key={link.url}>
                 <Link to={`/${link.url}`} onClick={this.selectRoute}>
-                  {link.label}
+                  <span>{link.label}</span>
                 </Link>
               </li>
             )

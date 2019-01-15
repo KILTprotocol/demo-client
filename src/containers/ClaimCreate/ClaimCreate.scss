@@ -1,0 +1,15 @@
+.ClaimCreate {
+
+  & .Claim-base {
+    @include card;
+
+    & > div {
+      @include label_input_combo;
+
+      margin: {
+        bottom: -$base-border-width;
+      }
+      padding: $base-padding;
+    }
+  }
+}

@@ -25,7 +25,7 @@
 
     position: absolute;
     z-index: $z-index-modal + 2;
-    width: 100%;
+    width: calc(100% - #{$base-padding*2});
     max-width: 640px;
     background: $color-white;
     border: $base-border;
@@ -50,7 +50,7 @@
   }
 
   & footer {
-    padding: $base-padding/2 $base-padding;
+    padding: $base-padding/2 $base-padding 0;
     text-align: right;
     border: {
       top: $base-border;
@@ -61,6 +61,7 @@
 
       margin: {
         left: $base-padding/2;
+        bottom: $base-padding/2;
       }
 
       &.confirm {
