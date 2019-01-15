@@ -9,6 +9,7 @@ type Props = {
   preventCloseOnConfirm?: boolean
   onCancel?: () => void
   onConfirm?: () => void
+  catchBackdropClick?: boolean
 }
 
 type State = {
@@ -91,15 +92,17 @@ class Modal extends React.Component<Props, State> {
   }
 
   private handleBackdropClick() {
-    const { type } = this.props
-    switch (type) {
-      case 'alert':
-        this.handleConfirm()
-        break
-      case 'confirm':
-      case 'blank':
-        this.handleCancel()
-        break
+    const { type, catchBackdropClick } = this.props
+    if (!catchBackdropClick) {
+      switch (type) {
+        case 'alert':
+          this.handleConfirm()
+          break
+        case 'confirm':
+        case 'blank':
+          this.handleCancel()
+          break
+      }
     }
   }
 }

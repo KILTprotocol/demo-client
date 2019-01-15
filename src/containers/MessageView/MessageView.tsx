@@ -16,7 +16,7 @@ import {
   MessageBodyType,
 } from '../../types/Message'
 
-import './MessageList.scss'
+import './MessageView.scss'
 
 interface Props {
   selectedIdentity?: Wallet.Entry
@@ -46,7 +46,7 @@ class MessageView extends React.Component<Props, State> {
   public render() {
     const { messages, currentMessage, fetching } = this.state
     return (
-      <section className="MessageList">
+      <section className="MessageView">
         <h1>My Messages</h1>
         {!fetching && !!messages && !!messages.length && (
           <MessageListView

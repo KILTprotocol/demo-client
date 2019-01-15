@@ -27,6 +27,7 @@ type Props = RouteComponentProps<{ id: string }> & {
 
 type State = {
   attestants: Contact[]
+  isSelectAttestantsOpen: boolean
 }
 
 class ClaimView extends React.Component<Props, State> {
@@ -44,12 +45,14 @@ class ClaimView extends React.Component<Props, State> {
     super(props)
     this.state = {
       attestants: [],
+      isSelectAttestantsOpen: false,
     }
     this.deleteClaim = this.deleteClaim.bind(this)
     this.onRequestAttestation = this.onRequestAttestation.bind(this)
     this.onCancelRequestAttestation = this.onCancelRequestAttestation.bind(this)
     this.onFinishRequestAttestation = this.onFinishRequestAttestation.bind(this)
     this.onSelectAttestants = this.onSelectAttestants.bind(this)
+    this.setSelectAttestantsOpen = this.setSelectAttestantsOpen.bind(this)
   }
 
   public componentDidMount() {
@@ -61,6 +64,8 @@ class ClaimView extends React.Component<Props, State> {
   public render() {
     const { id } = this.props.match.params
     const { claims } = this.props
+    const { isSelectAttestantsOpen } = this.state
+
     let currentClaim
     if (id) {
       currentClaim = this.getCurrentClaim()
@@ -89,6 +94,7 @@ class ClaimView extends React.Component<Props, State> {
           header="Select Attestant(s):"
           onCancel={this.onCancelRequestAttestation}
           onConfirm={this.onFinishRequestAttestation}
+          catchBackdropClick={isSelectAttestantsOpen}
         >
           {this.getSelectAttestants()}
         </Modal>
@@ -127,6 +133,8 @@ class ClaimView extends React.Component<Props, State> {
         name="selectAttestants"
         options={options}
         onChange={this.onSelectAttestants}
+        onMenuOpen={this.setSelectAttestantsOpen(true)}
+        onMenuClose={this.setSelectAttestantsOpen(false, 500)}
         filterOption={createFilter(this.filterConfig)}
       />
     )
@@ -168,6 +176,15 @@ class ClaimView extends React.Component<Props, State> {
         })
       })
     }
+  }
+
+  private setSelectAttestantsOpen = (
+    isSelectAttestantsOpen: boolean,
+    delay = 0
+  ) => () => {
+    setTimeout(() => {
+      this.setState({ isSelectAttestantsOpen })
+    }, delay)
   }
 }
 
