@@ -1,5 +1,5 @@
 import * as Claims from '../state/ducks/Claims'
-import { CType } from './Ctype'
+import { CType, CTypeMessageBody } from './Ctype'
 
 export type Message = {
   id?: string
@@ -19,7 +19,7 @@ export enum MessageBodyType {
 }
 
 interface MessageBodyBase {
-  content: Claims.Entry | CType['key']
+  content: Claims.Entry | CType['key'] | CTypeMessageBody
   type: MessageBodyType
 }
 
@@ -34,7 +34,7 @@ export interface ApproveAttestationForClaim extends MessageBodyBase {
 }
 
 export interface RequestClaimForCtype extends MessageBodyBase {
-  content: CType['key']
+  content: CTypeMessageBody
   type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE
 }
 
@@ -42,22 +42,3 @@ export type MessageBody =
   | RequestAttestationForClaim
   | ApproveAttestationForClaim
   | RequestClaimForCtype
-
-// attempt for some systematic for message message type
-// interface _MessageBodyType {
-//   intent: 'request' | 'approve' | 'decline' | 'revoke'
-//   action: 'attestation' | 'verification' | 'claim'
-//   for: 'claim' | 'ctype'
-// }
-//
-// interface RequestAttestationClaim extends _MessageBodyType {
-//   intent: 'request'
-//   action: 'attestation'
-//   for: 'claim'
-// }
-//
-// interface ApproveAttestationClaim extends _MessageBodyType {
-//   intent: 'approve'
-//   action: 'attestation'
-//   for: 'claim'
-// }

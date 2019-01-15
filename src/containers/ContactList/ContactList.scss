@@ -1,6 +1,26 @@
 .ContactList {
 
-  & h1 {
-    @include h1('Contact');
+    & h1 {
+      @include h1('Contact');
+    }
+
+    & th,
+    & td {
+      text-align: left;
+    }
+  
+    & .actions {
+      padding: 0;
+    }
+  
+    & .requestClaimForVerification {
+      @include button-icon-only($icon-wpforms);
+  
+      border: none;
+    }
+    
+    & .contactName {
+        font-weight:bold
+    }
   }
-}
+  

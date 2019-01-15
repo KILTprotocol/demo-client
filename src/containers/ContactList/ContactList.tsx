@@ -1,7 +1,15 @@
 import * as React from 'react'
 
+import Select, { createFilter } from 'react-select'
+import { Config } from 'react-select/lib/filters'
+
 import ContactRepository from '../../services/ContactRepository'
 import { Contact } from '../../types/Contact'
+import { CType } from '../../types/Ctype'
+import Modal from '../../components/Modal/Modal'
+import CtypeRepository from '../../services/CtypeRepository'
+import MessageRepository from '../../services/MessageRepository'
+import { RequestClaimForCtype, MessageBodyType } from '../../types/Message'
 
 import './ContactList.scss'
 
@@ -9,40 +17,160 @@ interface Props {}
 
 interface State {
   contacts: Contact[]
+  ctypes: CType[]
+}
+
+type SelectOption = {
+  value: string
+  label: string
 }
 
 class ContactList extends React.Component<Props, State> {
+  private selectAttestantModal: Modal | null
+  private selectedCtype: CType | undefined
+  private selectedContact: Contact | undefined
+  private filterConfig: Config = {
+    ignoreAccents: true,
+    ignoreCase: true,
+    matchFrom: 'any',
+    trim: true,
+  }
+
   constructor(props: Props) {
     super(props)
     this.state = {
       contacts: [],
+      ctypes: [],
     }
+    this.onCancelRequestAttestation = this.onCancelRequestAttestation.bind(this)
+    this.onFinishRequestAttestation = this.onFinishRequestAttestation.bind(this)
+    this.onRequestClaimForVerification = this.onRequestClaimForVerification.bind(
+      this
+    )
+    this.onSelectCtype = this.onSelectCtype.bind(this)
   }
 
   public componentDidMount() {
     ContactRepository.findAll().then((contacts: Contact[]) => {
       this.setState({ contacts })
     })
+    CtypeRepository.findAll().then((ctypes: CType[]) => {
+      this.setState({ ctypes })
+      console.log('ctypes', ctypes)
+    })
   }
 
   public render() {
+    const contacts = this.state.contacts
     return (
       <section className="ContactList">
         <h1>Contacts</h1>
-        <ul>{this.getContacts()}</ul>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Key</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {contacts.map((contact: Contact) => (
+              <tr key={contact.key}>
+                <td className="contactName">{contact.name}</td>
+                <td>{contact.key}</td>
+                <td className="actions">
+                  <button
+                    className="requestClaimForVerification"
+                    title="Request claim for verification"
+                    onClick={this.onRequestClaimForVerification(contact)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <Modal
+          ref={el => {
+            this.selectAttestantModal = el
+          }}
+          type="confirm"
+          header="Select CTYPE"
+          onCancel={this.onCancelRequestAttestation}
+          onConfirm={this.onFinishRequestAttestation}
+        >
+          {this.getSelectCtypes()}
+        </Modal>
       </section>
     )
   }
 
-  private getContacts(): JSX.Element[] {
-    const { contacts } = this.state
-    return contacts.map((contact: Contact) => {
-      return (
-        <li key={contact.key}>
-          {contact.name} / {contact.key}
-        </li>
-      )
-    })
+  private getSelectCtypes() {
+    const { ctypes } = this.state
+
+    const options: SelectOption[] = ctypes.map((ctype: CType) => ({
+      label: ctype.name,
+      value: ctype.key,
+    }))
+
+    console.log('options', options)
+    return (
+      <Select
+        className="react-select-container"
+        classNamePrefix="react-select"
+        isClearable={false}
+        isSearchable={true}
+        isDisabled={false}
+        isMulti={false}
+        isRtl={false}
+        closeMenuOnSelect={true}
+        name="selectCtypes"
+        options={options}
+        onChange={this.onSelectCtype}
+        filterOption={createFilter(this.filterConfig)}
+      />
+    )
+  }
+
+  private onSelectCtype(selectedOption: SelectOption) {
+    console.log('selectedOptions', selectedOption)
+    const { ctypes } = this.state
+
+    this.selectedCtype = ctypes.find(
+      (ctype: CType) => selectedOption.value === ctype.key
+    )
+  }
+
+  private onCancelRequestAttestation() {
+    this.selectedCtype = undefined
+  }
+
+  private onFinishRequestAttestation() {
+    console.log('selected contact', this.selectedContact)
+    console.log('selected CTYPE', this.selectedCtype)
+
+    if (this.selectedContact && this.selectedCtype) {
+      const cTypeMessageBody = {
+        key: this.selectedCtype.key,
+        name: this.selectedCtype.name,
+        author: this.selectedCtype.author
+      }
+      const request: RequestClaimForCtype = {
+        type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE,
+        content: cTypeMessageBody,
+      }
+
+      MessageRepository.send(this.selectedContact, request)
+    }
+  }
+
+  private onRequestClaimForVerification = (
+    contact?: Contact
+  ): (() => void) => () => {
+    this.selectedContact = contact
+    if (this.selectAttestantModal) {
+      this.selectAttestantModal.show()
+    }
   }
 }
 
