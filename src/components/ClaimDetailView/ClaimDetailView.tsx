@@ -6,8 +6,8 @@ import * as Claims from '../../state/ducks/Claims'
 
 type Props = {
   claim?: Claims.Entry
-  onRemoveClaim: (id: string) => void
-  onRequestAttestation: (id: string) => void
+  onRemoveClaim: (hash: string) => void
+  onRequestAttestation: (hash: string) => void
 }
 
 type State = {}
@@ -29,7 +29,7 @@ class ClaimDetailView extends Component<Props, State> {
         <h1>{claim.alias}</h1>
         <Link to="/claim">Go back</Link>
         <hr />
-        <div>Id: {claim.id}</div>
+        <div>Hash: {claim.hash}</div>
         <div>Ctype: {claim.ctype}</div>
         <div>
           Contents: <Code>{claim.contents}</Code>
@@ -57,14 +57,14 @@ class ClaimDetailView extends Component<Props, State> {
   private handleDelete() {
     const { claim, onRemoveClaim }: Props = this.props
     if (claim) {
-      onRemoveClaim(claim.id)
+      onRemoveClaim(claim.hash)
     }
   }
 
   private requestAttestation() {
     const { claim, onRequestAttestation }: Props = this.props
     if (claim) {
-      onRequestAttestation(claim.id)
+      onRequestAttestation(claim.hash)
     }
   }
 }

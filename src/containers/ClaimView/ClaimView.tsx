@@ -20,9 +20,9 @@ type SelectOption = {
   label: string
 }
 
-type Props = RouteComponentProps<{ id: string }> & {
+type Props = RouteComponentProps<{ hash: string }> & {
   claims: Claims.Entry[]
-  removeClaim: (id: string) => void
+  removeClaim: (hash: string) => void
 }
 
 type State = {
@@ -39,7 +39,7 @@ class ClaimView extends React.Component<Props, State> {
     trim: true,
   }
   private selectAttestantModal: Modal | null
-  private claimIdToAttest: string
+  private claimHashToAttest: string
 
   constructor(props: Props) {
     super(props)
@@ -62,24 +62,24 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { id } = this.props.match.params
+    const { hash } = this.props.match.params
     const { claims } = this.props
     const { isSelectAttestantsOpen } = this.state
 
     let currentClaim
-    if (id) {
+    if (hash) {
       currentClaim = this.getCurrentClaim()
     }
     return (
       <section className="ClaimView">
-        {!!id && (
+        {!!hash && (
           <ClaimDetailView
             claim={currentClaim}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={this.onRequestAttestation}
           />
         )}
-        {!id && (
+        {!hash && (
           <ClaimListView
             claims={claims}
             onRemoveClaim={this.deleteClaim}
@@ -103,14 +103,14 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   private getCurrentClaim(): Claims.Entry | undefined {
-    const { id } = this.props.match.params
+    const { hash } = this.props.match.params
     const { claims } = this.props
-    return claims.find((claim: Claims.Entry) => claim.id === id)
+    return claims.find((claim: Claims.Entry) => claim.hash === hash)
   }
 
-  private deleteClaim(id: string) {
+  private deleteClaim(hash: string) {
     const { removeClaim } = this.props
-    removeClaim(id)
+    removeClaim(hash)
     this.props.history.push('/claim')
   }
 
@@ -150,8 +150,8 @@ class ClaimView extends React.Component<Props, State> {
     )
   }
 
-  private onRequestAttestation(id: string) {
-    this.claimIdToAttest = id
+  private onRequestAttestation(hash: string) {
+    this.claimHashToAttest = hash
     if (this.selectAttestantModal) {
       this.selectAttestantModal.show()
     }
@@ -165,7 +165,7 @@ class ClaimView extends React.Component<Props, State> {
     const { claims } = this.props
 
     const claimToAttest = claims.find(
-      (claim: Claims.Entry) => claim.id === this.claimIdToAttest
+      (claim: Claims.Entry) => claim.hash === this.claimHashToAttest
     )
 
     if (claimToAttest) {
@@ -199,8 +199,8 @@ const mapStateToProps = (state: { claims: Claims.ImmutableState }) => {
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    removeClaim: (id: string) => {
-      dispatch(Claims.Store.removeAction(id))
+    removeClaim: (hash: string) => {
+      dispatch(Claims.Store.removeAction(hash))
     },
   }
 }

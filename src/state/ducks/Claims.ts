@@ -23,7 +23,7 @@ type State = {
 type ImmutableState = Immutable.Record<State>
 
 type SerializedState = {
-  claims: Array<{ id: string; claim: string }>
+  claims: Array<{ hash: string; claim: string }>
 }
 
 class Store {
@@ -36,8 +36,8 @@ class Store {
       .get('claims')
       .toList()
       .map(claim => ({
-        id: claim.id,
         claim: JSON.stringify(claim),
+        hash: claim.hash,
       }))
       .toArray()
 
@@ -60,7 +60,7 @@ class Store {
       try {
         const claim = JSON.parse(o.claim) as IClaim
         const entry = Claim.fromObject(claim)
-        claims[o.id] = entry
+        claims[o.hash] = entry
       } catch (e) {
         ErrorService.log('JSON.parse', e)
       }
@@ -78,7 +78,7 @@ class Store {
     switch (action.type) {
       case Store.ACTIONS.SAVE_CLAIM:
         const claim = (action as SaveAction).payload
-        return state.setIn(['claims', claim.id], claim)
+        return state.setIn(['claims', claim.hash], claim)
       case Store.ACTIONS.REMOVE_CLAIM:
         return state.deleteIn(['claims', (action as RemoveAction).payload])
       default:
@@ -93,9 +93,9 @@ class Store {
     }
   }
 
-  public static removeAction(id: string): RemoveAction {
+  public static removeAction(hash: string): RemoveAction {
     return {
-      payload: id,
+      payload: hash,
       type: Store.ACTIONS.REMOVE_CLAIM,
     }
   }
