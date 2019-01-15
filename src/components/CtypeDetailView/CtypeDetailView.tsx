@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import { CType } from 'src/types/Ctype'
+import Code from '../Code/Code'
 
 type Props = {
   ctype?: CType
@@ -16,7 +17,9 @@ const CtypeDetailView = ({ ctype }: Props) => {
       <div>Key: {ctype.key}</div>
       <div>Name: {ctype.name}</div>
       <div>Author: {ctype.author}</div>
-      <div>Definition: {ctype.definition}</div>
+      <div>
+        Definition: <Code>{ctype.definition}</Code>
+      </div>
       <div>
         <Link to={`/claim/new/${ctype.key}`}>New Claim</Link>
       </div>

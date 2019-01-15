@@ -10,9 +10,13 @@ type State = {}
 class Code extends React.Component<Props, State> {
   public render() {
     const { children } = this.props
-    return (
-      <pre className="Code">{js_beautify.js(JSON.stringify(children))}</pre>
-    )
+
+    let stringified = children as string
+    if (typeof children === 'object') {
+      stringified = JSON.stringify(children)
+    }
+
+    return <pre className="Code">{js_beautify.js(stringified)}</pre>
   }
 }
 
