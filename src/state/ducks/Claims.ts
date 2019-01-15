@@ -1,14 +1,11 @@
 import Immutable from 'immutable'
+import { Claim, IClaim } from '@kiltprotocol/prototype-sdk'
+
 import ErrorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
-import { Claim } from '../../types/Claim'
 
 interface SaveAction extends KiltAction {
-  payload: {
-    id: string
-    alias: string
-    claim: Claim
-  }
+  payload: Claim
 }
 
 interface RemoveAction extends KiltAction {
@@ -17,11 +14,7 @@ interface RemoveAction extends KiltAction {
 
 type Action = SaveAction | RemoveAction
 
-type Entry = {
-  id: string
-  alias: string
-  claim: Claim
-}
+type Entry = Claim
 
 type State = {
   claims: Immutable.Map<string, Entry>
@@ -30,7 +23,7 @@ type State = {
 type ImmutableState = Immutable.Record<State>
 
 type SerializedState = {
-  claims: Array<{ id: string; alias: string; claim: string }>
+  claims: Array<{ id: string; claim: string }>
 }
 
 class Store {
@@ -42,7 +35,10 @@ class Store {
     serialized.claims = state
       .get('claims')
       .toList()
-      .map(i => ({ id: i.id, alias: i.alias, claim: JSON.stringify(i.claim) }))
+      .map(claim => ({
+        id: claim.id,
+        claim: JSON.stringify(claim),
+      }))
       .toArray()
 
     return serialized
@@ -62,8 +58,8 @@ class Store {
     Object.keys(claimsStateSerialized.claims).forEach(i => {
       const o = claimsStateSerialized.claims[i]
       try {
-        const claim = JSON.parse(o.claim) as Claim
-        const entry = { id: o.id, alias: o.alias, claim }
+        const claim = JSON.parse(o.claim) as IClaim
+        const entry = Claim.fromObject(claim)
         claims[o.id] = entry
       } catch (e) {
         ErrorService.log('JSON.parse', e)
@@ -81,12 +77,8 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.SAVE_CLAIM:
-        const { id, alias, claim } = (action as SaveAction).payload
-        return state.setIn(['claims', id], {
-          alias,
-          claim,
-          id,
-        })
+        const claim = (action as SaveAction).payload
+        return state.setIn(['claims', claim.id], claim)
       case Store.ACTIONS.REMOVE_CLAIM:
         return state.deleteIn(['claims', (action as RemoveAction).payload])
       default:
@@ -94,13 +86,9 @@ class Store {
     }
   }
 
-  public static saveAction(
-    id: string,
-    alias: string,
-    claim: Claim
-  ): SaveAction {
+  public static saveAction(claim: Claim): SaveAction {
     return {
-      payload: { id, alias, claim },
+      payload: claim,
       type: Store.ACTIONS.SAVE_CLAIM,
     }
   }

@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
+
+import Code from '../Code/Code'
 import * as Claims from '../../state/ducks/Claims'
 
 type Props = {
@@ -19,13 +21,20 @@ class ClaimDetailView extends Component<Props, State> {
 
   public render() {
     const { claim }: Props = this.props
+
+    const verified = claim ? claim.verifySignature() : false
+
     return claim ? (
       <section className="ClaimDetailView">
         <h1>{claim.alias}</h1>
         <Link to="/claim">Go back</Link>
         <hr />
         <div>Id: {claim.id}</div>
-        <div>Contents: {JSON.stringify(claim.claim.contents)}</div>
+        <div>
+          Contents: <Code>{claim.contents}</Code>
+        </div>
+        <div>Signature: {claim.signature}</div>
+        <div>Verified: {verified ? 'true' : 'false'}</div>
         <div className="actions">
           <button
             className="requestAttestation"

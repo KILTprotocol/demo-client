@@ -1,4 +1,4 @@
-import { CType } from '@kiltprotocol/prototype-sdk'
+import { CType, Claim } from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
@@ -10,14 +10,15 @@ import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import CtypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
 import * as Claims from '../../state/ducks/Claims'
-import { Claim } from '../../types/Claim'
+import * as Wallet from '../../state/ducks/Wallet'
 
 import './ClaimCreate.scss'
 
 type Props = RouteComponentProps<{
   ctypeKey: string
 }> & {
-  saveClaim: (id: string, alias: string, claim: Claim) => void
+  saveClaim: (claim: Claim) => void
+  selectedIdentity?: Wallet.Entry
 }
 
 type State = {
@@ -66,7 +67,7 @@ class ClaimCreate extends Component<Props, State> {
 
   public render() {
     const { match }: Props = this.props
-    const { ctype, claim }: State = this.state
+    const { ctype, claim, name }: State = this.state
 
     return (
       <section className="ClaimCreate">
@@ -93,7 +94,7 @@ class ClaimCreate extends Component<Props, State> {
               <button
                 type="submit"
                 onClick={this.handleSubmit}
-                disabled={!this.state.name || this.state.name.length === 0}
+                disabled={!name || name.length === 0}
               >
                 Submit
               </button>
@@ -118,12 +119,16 @@ class ClaimCreate extends Component<Props, State> {
   }
 
   private handleSubmit() {
-    const { saveClaim } = this.props
-    const { name, claim }: State = this.state
+    const { saveClaim, selectedIdentity, history } = this.props
+    const { name, claim, ctype }: State = this.state
 
-    const id: string = uuid()
-    saveClaim(id, name, { contents: claim })
-    this.props.history.push('/claim')
+    if (ctype && selectedIdentity) {
+      const newClaim = new Claim(name, ctype, claim, selectedIdentity.identity)
+      saveClaim(newClaim)
+      history.push('/claim')
+    } else {
+      ErrorService.log('fetch.GET', new Error('ctype is not available'))
+    }
   }
 
   private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -131,14 +136,16 @@ class ClaimCreate extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = () => {
-  return {}
+const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
+  return {
+    selectedIdentity: state.wallet.get('selected'),
+  }
 }
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    saveClaim: (id: string, alias: string, claim: Claim) => {
-      dispatch(Claims.Store.saveAction(id, alias, claim))
+    saveClaim: (claim: Claim) => {
+      dispatch(Claims.Store.saveAction(claim))
     },
   }
 }

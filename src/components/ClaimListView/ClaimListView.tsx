@@ -37,7 +37,7 @@ class ClaimListView extends React.Component<Props, State> {
                   <td>
                     <Link to={`/claim/${claim.id}`}>{claim.alias}</Link>
                   </td>
-                  <td>{JSON.stringify(claim.claim.contents)}</td>
+                  <td>{JSON.stringify(claim.contents)}</td>
                   <td className="actions">
                     <button
                       className="requestAttestation"
