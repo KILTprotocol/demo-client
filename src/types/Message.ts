@@ -1,5 +1,5 @@
 import * as Claims from '../state/ducks/Claims'
-import { CType, CTypeMessageBody } from './Ctype'
+import { CTypeMessageBody } from './Ctype'
 
 export type Message = {
   id?: string
@@ -19,7 +19,7 @@ export enum MessageBodyType {
 }
 
 interface MessageBodyBase {
-  content: Claims.Entry | CType['key'] | CTypeMessageBody
+  content: Claims.Entry | CTypeMessageBody
   type: MessageBodyType
 }
 

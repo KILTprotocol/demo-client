@@ -26,7 +26,7 @@ type SelectOption = {
 }
 
 class ContactList extends React.Component<Props, State> {
-  private selectAttestantModal: Modal | null
+  private selectCtypeModal: Modal | null
   private selectedCtype: CType | undefined
   private selectedContact: Contact | undefined
   private filterConfig: Config = {
@@ -42,8 +42,8 @@ class ContactList extends React.Component<Props, State> {
       contacts: [],
       ctypes: [],
     }
-    this.onCancelRequestAttestation = this.onCancelRequestAttestation.bind(this)
-    this.onFinishRequestAttestation = this.onFinishRequestAttestation.bind(this)
+    this.onCancelRequestClaim = this.onCancelRequestClaim.bind(this)
+    this.onFinishRequestClaim = this.onFinishRequestClaim.bind(this)
     this.onRequestClaimForVerification = this.onRequestClaimForVerification.bind(
       this
     )
@@ -92,12 +92,12 @@ class ContactList extends React.Component<Props, State> {
 
         <Modal
           ref={el => {
-            this.selectAttestantModal = el
+            this.selectCtypeModal = el
           }}
           type="confirm"
           header="Select CTYPE"
-          onCancel={this.onCancelRequestAttestation}
-          onConfirm={this.onFinishRequestAttestation}
+          onCancel={this.onCancelRequestClaim}
+          onConfirm={this.onFinishRequestClaim}
         >
           {this.getSelectCtypes()}
         </Modal>
@@ -112,13 +112,11 @@ class ContactList extends React.Component<Props, State> {
       label: ctype.name,
       value: ctype.key,
     }))
-
-    console.log('options', options)
     return (
       <Select
         className="react-select-container"
         classNamePrefix="react-select"
-        isClearable={false}
+        isClearable={true}
         isSearchable={true}
         isDisabled={false}
         isMulti={false}
@@ -133,7 +131,6 @@ class ContactList extends React.Component<Props, State> {
   }
 
   private onSelectCtype(selectedOption: SelectOption) {
-    console.log('selectedOptions', selectedOption)
     const { ctypes } = this.state
 
     this.selectedCtype = ctypes.find(
@@ -141,23 +138,20 @@ class ContactList extends React.Component<Props, State> {
     )
   }
 
-  private onCancelRequestAttestation() {
+  private onCancelRequestClaim() {
     this.selectedCtype = undefined
   }
 
-  private onFinishRequestAttestation() {
-    console.log('selected contact', this.selectedContact)
-    console.log('selected CTYPE', this.selectedCtype)
-
+  private onFinishRequestClaim() {
     if (this.selectedContact && this.selectedCtype) {
       const cTypeMessageBody = {
+        author: this.selectedCtype.author,
         key: this.selectedCtype.key,
         name: this.selectedCtype.name,
-        author: this.selectedCtype.author
       }
       const request: RequestClaimForCtype = {
-        type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE,
         content: cTypeMessageBody,
+        type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE,
       }
 
       MessageRepository.send(this.selectedContact, request)
@@ -168,8 +162,8 @@ class ContactList extends React.Component<Props, State> {
     contact?: Contact
   ): (() => void) => () => {
     this.selectedContact = contact
-    if (this.selectAttestantModal) {
-      this.selectAttestantModal.show()
+    if (this.selectCtypeModal) {
+      this.selectCtypeModal.show()
     }
   }
 }
