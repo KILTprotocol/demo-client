@@ -56,12 +56,11 @@ class ContactList extends React.Component<Props, State> {
     })
     CtypeRepository.findAll().then((ctypes: CType[]) => {
       this.setState({ ctypes })
-      console.log('ctypes', ctypes)
     })
   }
 
   public render() {
-    const contacts = this.state.contacts
+    const { contacts } = this.state
     return (
       <section className="ContactList">
         <h1>Contacts</h1>
@@ -78,12 +77,14 @@ class ContactList extends React.Component<Props, State> {
               <tr key={contact.key}>
                 <td className="contactName">{contact.name}</td>
                 <td>{contact.key}</td>
-                <td className="actions">
-                  <button
-                    className="requestClaimForVerification"
-                    title="Request claim for verification"
-                    onClick={this.onRequestClaimForVerification(contact)}
-                  />
+                <td>
+                  <div className="actions">
+                    <button
+                      className="requestClaimBtn"
+                      title="Request claim for verification"
+                      onClick={this.onRequestClaimForVerification(contact)}
+                    />
+                  </div>
                 </td>
               </tr>
             ))}

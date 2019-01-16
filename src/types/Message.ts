@@ -1,5 +1,4 @@
 import * as Claims from '../state/ducks/Claims'
-import { CTypeMessageBody } from './Ctype'
 
 export type Message = {
   id?: string
@@ -42,3 +41,9 @@ export type MessageBody =
   | RequestAttestationForClaim
   | ApproveAttestationForClaim
   | RequestClaimForCtype
+
+export type CTypeMessageBody = {
+  key: string
+  name: string
+  author: string
+}

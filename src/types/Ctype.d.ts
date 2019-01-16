@@ -6,9 +6,3 @@ export type CType = {
   author: string
   definition: string
 }
-
-export type CTypeMessageBody = {
-  key: string
-  name: string
-  author: string
-}
