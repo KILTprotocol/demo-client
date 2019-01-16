@@ -19,6 +19,7 @@
         background: transparentize($color-primary, 0.8) !important;
       }
 
+      &--is-focused,
       &:hover {
         background: $color-primary !important;
         color: $color-font-inverted !important;

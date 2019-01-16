@@ -1,4 +1,6 @@
 import * as Claims from '../state/ducks/Claims'
+import { Attestation } from './Claim' // TODO: Attestation from SDK
+import { CType } from './Ctype'
 
 export type Message = {
   id?: string
@@ -18,7 +20,7 @@ export enum MessageBodyType {
 }
 
 interface MessageBodyBase {
-  content: Claims.Entry | CTypeMessageBody
+  content: Claims.Entry | CType['key'] | Attestation | CTypeMessageBody
   type: MessageBodyType
 }
 
@@ -28,7 +30,7 @@ export interface RequestAttestationForClaim extends MessageBodyBase {
 }
 
 export interface ApproveAttestationForClaim extends MessageBodyBase {
-  content: Claims.Entry
+  content: Attestation
   type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM
 }
 

@@ -1,3 +1,5 @@
+$darken: 5;
+
 @mixin button-base {
   @include baseFont;
 
@@ -22,11 +24,22 @@
 @mixin button {
   @include button-base;
   @include border-radius($base-border-radius);
+  @include transition($base-transition);
 
   min-width: 150px;
   padding: 0 2*$base-padding;
   border: $base-border;
   font-size: $base-font-size;
+
+  &:not([disabled]){
+
+    &:hover,
+    &:active {
+      background: $color-grey;
+      color: $color-font;
+      border-color: $color-grey;
+    }
+  }
 }
 
 @mixin button-primary {
@@ -43,6 +56,11 @@
   border-color: $color-primary;
   color: $color-primary;
   background: $color-white;
+
+  //&:hover,
+  //&:active {
+  //  background: darken($color-white, $darken);
+  //}
 }
 
 // ICON BUTTONS

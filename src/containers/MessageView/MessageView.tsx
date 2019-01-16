@@ -8,18 +8,25 @@ import Modal from '../../components/Modal/Modal'
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
 import MessageRepository from '../../services/MessageRepository'
+import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
+import { Attestation } from '../../types/Claim'
 import { Contact } from '../../types/Contact'
 import {
   ApproveAttestationForClaim,
   Message,
   MessageBodyType,
+  RequestAttestationForClaim,
 } from '../../types/Message'
 
 import './MessageView.scss'
 
 interface Props {
   selectedIdentity?: Wallet.Entry
+  addAttestationToClaim: (
+    claimId: Claims.Entry['id'],
+    attestation: Attestation
+  ) => void
 }
 
 interface State {
@@ -41,6 +48,7 @@ class MessageView extends React.Component<Props, State> {
     this.onOpenMessage = this.onOpenMessage.bind(this)
     this.onCloseMessage = this.onCloseMessage.bind(this)
     this.attestCurrentClaim = this.attestCurrentClaim.bind(this)
+    this.importAttestation = this.importAttestation.bind(this)
   }
 
   public render() {
@@ -67,6 +75,7 @@ class MessageView extends React.Component<Props, State> {
             <MessageDetailView
               message={currentMessage}
               onDelete={this.onDeleteMessage}
+              onCancel={this.onCloseMessage}
             >
               {this.getMessageActions()}
             </MessageDetailView>
@@ -109,6 +118,10 @@ class MessageView extends React.Component<Props, State> {
     switch (messageBodyType) {
       case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return <button onClick={this.attestCurrentClaim}>Attest Claim</button>
+      case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
+        return (
+          <button onClick={this.importAttestation}>Import Attestation</button>
+        )
       default:
         return ''
     }
@@ -131,6 +144,9 @@ class MessageView extends React.Component<Props, State> {
     this.setState({
       currentMessage: undefined,
     })
+    if (this.messageModal) {
+      this.messageModal.hide()
+    }
   }
 
   private getMessages() {
@@ -154,22 +170,36 @@ class MessageView extends React.Component<Props, State> {
 
   private attestCurrentClaim() {
     const { currentMessage } = this.state
+    const { selectedIdentity } = this.props
 
-    if (currentMessage) {
+    if (currentMessage && selectedIdentity) {
       ContactRepository.findAll().then(
         (contacts: Contact[]) => {
           const receiver: Contact | undefined = contacts.find(
             (contact: Contact) => contact.key === currentMessage.senderKey
           )
-          const messageBody: ApproveAttestationForClaim = currentMessage.body as ApproveAttestationForClaim
-          if (receiver && messageBody) {
-            MessageRepository.send(receiver, {
-              content: messageBody.content,
+          const claimMessageBody = currentMessage.body as RequestAttestationForClaim
+          if (receiver && claimMessageBody) {
+            console.log('selectedIdentity', selectedIdentity)
+
+            // TODO: replace with sdk's 'new Attestation()'
+            const attestationMessageBody: ApproveAttestationForClaim = {
+              content: {
+                claimHash: claimMessageBody.content.id,
+                signature:
+                  claimMessageBody.content.id +
+                  selectedIdentity.identity.signPublicKeyAsHex,
+                owner: selectedIdentity.identity.signPublicKeyAsHex,
+                revoked: false,
+              },
               type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
-            }).then(() => {
-              this.onCloseMessage()
-              this.getMessages()
-            })
+            }
+            MessageRepository.send(receiver, attestationMessageBody).then(
+              () => {
+                this.onCloseMessage()
+                this.getMessages()
+              }
+            )
           } else {
             ErrorService.log('fetch.GET', {
               message: `Could not resolve contact ${
@@ -189,6 +219,16 @@ class MessageView extends React.Component<Props, State> {
       )
     }
   }
+
+  private importAttestation() {
+    const { addAttestationToClaim } = this.props
+    const { currentMessage } = this.state
+
+    if (currentMessage && currentMessage.body) {
+      const attestation = currentMessage.body.content as Attestation
+      addAttestationToClaim(attestation.claimHash, attestation)
+    }
+  }
 }
 
 const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
@@ -197,4 +237,18 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   }
 }
 
-export default connect(mapStateToProps)(MessageView)
+const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
+  return {
+    addAttestationToClaim: (
+      claimId: Claims.Entry['id'],
+      attestation: Attestation
+    ) => {
+      dispatch(Claims.Store.addAttestation(claimId, attestation))
+    },
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(MessageView)
