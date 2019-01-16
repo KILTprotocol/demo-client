@@ -1,4 +1,7 @@
 @mixin button-base {
+  @include baseFont;
+
+  display: inline-block;
   height: $base-button-height;
   line-height: $base-button-height;
   text-align: center;
@@ -6,9 +9,12 @@
   outline: none;
   vertical-align: middle;
   cursor: pointer;
+  text-decoration: none;
 
   &[disabled] {
     @include opacity(0.3);
+
+    cursor: not-allowed;
   }
 }
 
@@ -21,7 +27,6 @@
   padding: 0 2*$base-padding;
   border: $base-border;
   font-size: $base-font-size;
-  line-height: $base-font-size;
 }
 
 @mixin button-primary {

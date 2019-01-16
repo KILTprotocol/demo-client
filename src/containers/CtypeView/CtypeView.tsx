@@ -6,6 +6,8 @@ import CtypeListView from '../../components/CtypeListView/CtypeListView'
 import CtypeRepository from '../../services/CtypeRepository'
 import { CType } from '../../types/Ctype'
 
+import './CtypeView.scss'
+
 type Props = RouteComponentProps<{ ctypeKey: string }> & {}
 
 type State = {

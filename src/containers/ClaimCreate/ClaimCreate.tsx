@@ -4,13 +4,15 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 import * as common from 'schema-based-json-editor'
-import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
+import { v4 as uuid } from 'uuid'
 
+import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import CtypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
 import * as Claims from '../../state/ducks/Claims'
 import { Claim } from '../../types/Claim'
-import { v4 as uuid } from 'uuid'
+
+import './ClaimCreate.scss'
 
 type Props = RouteComponentProps<{
   ctypeKey: string
@@ -69,15 +71,18 @@ class ClaimCreate extends Component<Props, State> {
     return (
       <section className="ClaimCreate">
         <h1>New Claim</h1>
-        <div>Ctype: {match.params.ctypeKey}</div>
         {ctype && (
           <div>
-            <input
-              type="text"
-              placeholder="Alias"
-              onChange={this.handleNameChange}
-            />
-            <br />
+            <div className="Claim-base">
+              <div>
+                <label>Ctype</label>
+                <div>{match.params.ctypeKey}</div>
+              </div>
+              <div>
+                <label>Alias</label>
+                <input type="text" onChange={this.handleNameChange} />
+              </div>
+            </div>
             <SchemaEditor
               schema={ctype!.getClaimInputModel() as common.Schema}
               initialValue={claim}

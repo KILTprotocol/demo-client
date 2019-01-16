@@ -1,5 +1,9 @@
 .CtypeCreate {
 
+  & h1 {
+    @include h1('Ctype');
+  }
+
   & .Ctype-name {
     @include card;
     @include label_input_combo;

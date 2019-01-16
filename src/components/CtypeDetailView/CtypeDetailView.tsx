@@ -20,7 +20,7 @@ const CtypeDetailView = ({ ctype }: Props) => {
       <div>
         Definition: <Code>{ctype.definition}</Code>
       </div>
-      <div>
+      <div className="actions">
         <Link to={`/claim/new/${ctype.key}`}>New Claim</Link>
       </div>
     </section>

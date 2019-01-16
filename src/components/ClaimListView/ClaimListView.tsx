@@ -22,7 +22,6 @@ class ClaimListView extends React.Component<Props, State> {
     return (
       <section className="ClaimListView">
         <h1>My Claims</h1>
-        <Link to="/ctype">Create Claim from CTYPE</Link>
         {claims && !!claims.length && (
           <table>
             <thead>
@@ -41,16 +40,16 @@ class ClaimListView extends React.Component<Props, State> {
                   <td>{JSON.stringify(claim.claim.contents)}</td>
                   <td className="actions">
                     <button
-                      className="deleteClaim"
-                      onClick={this.handleDelete(claim.id)}
-                    >
-                      Delete
-                    </button>
-                    <button
                       className="requestAttestation"
                       onClick={this.requestAttestation(claim.id)}
                     >
                       Request Attestation
+                    </button>
+                    <button
+                      className="deleteClaim"
+                      onClick={this.handleDelete(claim.id)}
+                    >
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -58,6 +57,9 @@ class ClaimListView extends React.Component<Props, State> {
             </tbody>
           </table>
         )}
+        <div className="actions">
+          <Link to="/ctype">Create Claim from CTYPE</Link>
+        </div>
       </section>
     )
   }

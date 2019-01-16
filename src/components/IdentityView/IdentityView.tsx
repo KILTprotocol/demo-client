@@ -46,9 +46,15 @@ class IdentityView extends React.Component<Props, {}> {
           <td>{identity.boxPublicKeyAsHex}</td>
         </tr>
         <tr>
-          <td colSpan={2} className="actions">
-            <button onClick={this.onSelect}>Select</button>
-            <button onClick={this.onDelete}>Remove</button>
+          <td colSpan={2}>
+            <div className="actions">
+              <button onClick={this.onDelete} disabled={selected}>
+                Remove
+              </button>
+              <button onClick={this.onSelect} disabled={selected}>
+                Select
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>

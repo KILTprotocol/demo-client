@@ -26,15 +26,15 @@ const CtypeEditor = (props: Props) => {
         updateValue={props.updateCType}
       />
       <div className="actions">
+        <button className="cancel-ctype" onClick={props.cancel}>
+          Cancel
+        </button>
         <button
           className="submit-ctype"
           disabled={!props.connected || !props.isValid}
           onClick={props.submit}
         >
           Submit
-        </button>
-        <button className="cancel-ctype" onClick={props.cancel}>
-          Cancel
         </button>
       </div>
     </section>
