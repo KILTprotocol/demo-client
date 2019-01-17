@@ -61,11 +61,11 @@ class ClaimDetailView extends Component<Props, State> {
 
   private getAttestations(attestations: Attestation[]) {
     return (
-      <section>
+      <section className="attestations">
         <h3>Attestations</h3>
         {
           !!attestations && !!attestations.length ? (
-            <table className="attestations">
+            <table>
               <thead>
                 <tr>
                   <th>Attester</th>

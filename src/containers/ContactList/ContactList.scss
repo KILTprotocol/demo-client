@@ -15,8 +15,6 @@
   
     & .requestClaimBtn {
       @include button-icon-only($icon-wpforms);
-  
-      border: none;
     }
     
     & .contactName {

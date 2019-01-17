@@ -1,6 +1,7 @@
 .CtypeDetailView {
 
   & .attributes {
+    @include card;
 
     & > div {
       @include label_input_combo;

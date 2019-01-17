@@ -74,6 +74,7 @@ $base-icon-size: $base-font-size;
   color: $color-primary;
   font-size: $icon-size;
   line-height: 0;
+  border: $base-border-width solid $color-primary;
 }
 
 @mixin button-icon-only($icon, $icon-size: $base-icon-size) {

@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 
 import * as Wallet from '../../state/ducks/Wallet'
-import IdentityViewComponent from '../../components/IdentityView/IdentityView'
+import IdentityView from '../../components/IdentityView/IdentityView'
 import './WalletView.scss'
 
 type Props = RouteComponentProps<{}> & {
@@ -29,7 +29,7 @@ class WalletView extends React.Component<Props, State> {
           entry.identity.seedAsHex === this.props.selected.identity.seedAsHex
       }
       return (
-        <IdentityViewComponent
+        <IdentityView
           key={entry.identity.seedAsHex}
           identity={entry.identity}
           alias={entry.alias}
@@ -43,7 +43,7 @@ class WalletView extends React.Component<Props, State> {
     return (
       <section className="WalletView">
         <h1>Wallet / My Identities</h1>
-        <table>{identities}</table>
+        <div>{identities}</div>
         <div className="actions">
           <Link to="/wallet/add" className="add">
             Add Identity

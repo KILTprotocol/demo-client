@@ -1,6 +1,7 @@
 .ClaimDetailView {
 
   & .attributes {
+    @include card;
 
     & > div {
       @include label_input_combo;
@@ -8,7 +9,15 @@
   }
 
   & .attestations {
-    margin: 10px 20px;
+    @include card;
+
+    padding: $base-padding;
+
+    & h3 {
+      margin: {
+        top: 0;
+      }
+    }
 
     & td {
 
@@ -29,12 +38,15 @@
           color: $color-success;
         }
       }
+
+      &:nth-child(2),
+      &:nth-child(3) {
+        text-align: center;
+      }
     }
   }
 
   & .refresh {
     @include button-icon-only($icon-refresh);
-
-    border: none;
   }
 }

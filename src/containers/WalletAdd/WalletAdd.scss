@@ -44,8 +44,6 @@
 
     & button {
       @include button-icon-only($icon-refresh, 16px);
-
-      border: none;
     }
   }
 
