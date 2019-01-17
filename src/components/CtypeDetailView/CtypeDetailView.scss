@@ -1,0 +1,9 @@
+.CtypeDetailView {
+
+  & .attributes {
+
+    & > div {
+      @include label_input_combo;
+    }
+  }
+}

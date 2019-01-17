@@ -1,0 +1,40 @@
+.ClaimDetailView {
+
+  & .attributes {
+
+    & > div {
+      @include label_input_combo;
+    }
+  }
+
+  & .attestations {
+    margin: 10px 20px;
+
+    & td {
+
+      &.revoked {
+
+        &:before {
+          @include icon($icon-times);
+
+          color: $color-danger;
+        }
+      }
+
+      &.approved {
+
+        &:before {
+          @include icon($icon-check);
+
+          color: $color-success;
+        }
+      }
+    }
+  }
+
+  & .refresh {
+    @include button-icon-only($icon-refresh);
+
+    border: none;
+  }
+}

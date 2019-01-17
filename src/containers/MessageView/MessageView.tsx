@@ -227,6 +227,10 @@ class MessageView extends React.Component<Props, State> {
     if (currentMessage && currentMessage.body) {
       const attestation = currentMessage.body.content as Attestation
       addAttestationToClaim(attestation.claimHash, attestation)
+      this.onCloseMessage()
+      if (currentMessage.id) {
+        this.onDeleteMessage(currentMessage.id)
+      }
     }
   }
 }
