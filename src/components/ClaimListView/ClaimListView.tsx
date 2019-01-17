@@ -5,8 +5,8 @@ import * as Claims from '../../state/ducks/Claims'
 
 type Props = {
   claims: Claims.Entry[]
-  onRemoveClaim: (id: string) => void
-  onRequestAttestation: (id: string) => void
+  onRemoveClaim: (hash: string) => void
+  onRequestAttestation: (hash: string) => void
 }
 
 type State = {}
@@ -35,19 +35,19 @@ class ClaimListView extends React.Component<Props, State> {
               {claims.map(claim => (
                 <tr key={claim.alias}>
                   <td>
-                    <Link to={`/claim/${claim.id}`}>{claim.alias}</Link>
+                    <Link to={`/claim/${claim.hash}`}>{claim.alias}</Link>
                   </td>
-                  <td>{JSON.stringify(claim.claim.contents)}</td>
+                  <td>{JSON.stringify(claim.contents)}</td>
                   <td className="actions">
                     <button
                       className="requestAttestation"
-                      onClick={this.requestAttestation(claim.id)}
+                      onClick={this.requestAttestation(claim.hash)}
                     >
                       Request Attestation
                     </button>
                     <button
                       className="deleteClaim"
-                      onClick={this.handleDelete(claim.id)}
+                      onClick={this.handleDelete(claim.hash)}
                     >
                       Delete
                     </button>
@@ -64,14 +64,14 @@ class ClaimListView extends React.Component<Props, State> {
     )
   }
 
-  private handleDelete = (id: string): (() => void) => () => {
+  private handleDelete = (hash: string): (() => void) => () => {
     const { onRemoveClaim } = this.props
-    onRemoveClaim(id)
+    onRemoveClaim(hash)
   }
 
-  private requestAttestation = (id: string): (() => void) => () => {
+  private requestAttestation = (hash: string): (() => void) => () => {
     const { onRequestAttestation } = this.props
-    onRequestAttestation(id)
+    onRequestAttestation(hash)
   }
 }
 

@@ -40,7 +40,7 @@ const Routes: React.FunctionComponent<{}> = props => {
         path={'/claim/new/:ctypeKey'}
         component={requiresIdentity(ClaimCreate)}
       />
-      <Route path={'/claim/:id'} component={requiresIdentity(ClaimView)} />
+      <Route path={'/claim/:hash'} component={requiresIdentity(ClaimView)} />
       <Route path={'/claim'} component={requiresIdentity(ClaimView)} />
 
       <Route component={Root} />
