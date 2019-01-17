@@ -2,6 +2,9 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import * as Claims from '../../state/ducks/Claims'
+import { Attestation } from '../../types/Claim'
+
+import './ClaimListView.scss'
 
 type Props = {
   claims: Claims.Entry[]
@@ -18,7 +21,7 @@ class ClaimListView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { claims } = this.props
+    const { claims, attestations } = this.props.claims
     return (
       <section className="ClaimListView">
         <h1>My Claims</h1>
@@ -28,6 +31,7 @@ class ClaimListView extends React.Component<Props, State> {
               <tr>
                 <th>Alias</th>
                 <th>Contents</th>
+                <th>Attested?</th>
                 <th />
               </tr>
             </thead>
@@ -38,6 +42,16 @@ class ClaimListView extends React.Component<Props, State> {
                     <Link to={`/claim/${claim.hash}`}>{claim.alias}</Link>
                   </td>
                   <td>{JSON.stringify(claim.contents)}</td>
+                  <td
+                    className={
+                      'attested ' +
+                      (attestations.find(
+                        (attestation: Attestation) => !attestation.revoked
+                      )
+                        ? 'true'
+                        : 'false')
+                    }
+                  />
                   <td className="actions">
                     <button
                       className="requestAttestation"

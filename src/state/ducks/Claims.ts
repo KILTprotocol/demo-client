@@ -54,10 +54,10 @@ class Store {
     serialized.claims = state
       .get('claims')
       .toList()
-      .map(claim => ({
-        claim: JSON.stringify(claim),
+      .map(claimEntry => ({
+        claim: JSON.stringify(claimEntry.claim),
         hash: claim.hash,
-    attestations: JSON.stringify(i.attestations),
+    attestations: JSON.stringify(claimEntry.attestations),
       }))
       .toArray()
 
@@ -156,9 +156,9 @@ class Store {
   }
 
   private static ACTIONS = {
+    ADD_ATTESTATION: 'client/claims/ADD_ATTESTATION',
     REMOVE_CLAIM: 'client/claims/REMOVE_CLAIM',
     SAVE_CLAIM: 'client/claims/SAVE_CLAIM',
-    ADD_ATTESTATION: 'client/claims/ADD_ATTESTATION',
   }
 }
 

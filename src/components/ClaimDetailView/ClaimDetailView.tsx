@@ -63,32 +63,32 @@ class ClaimDetailView extends Component<Props, State> {
     return (
       <section className="attestations">
         <h3>Attestations</h3>
-        {
-          !!attestations && !!attestations.length ? (
-            <table>
-              <thead>
-                <tr>
-                  <th>Attester</th>
-                  <th>Approved</th>
-                  <th>Chain Status</th>
+        {!!attestations && !!attestations.length ? (
+          <table>
+            <thead>
+              <tr>
+                <th>Attester</th>
+                <th>Approved</th>
+                <th>Chain Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {attestations.map((attestation: Attestation) => (
+                <tr key={attestation.signature}>
+                  <td>{attestation.owner}</td>
+                  <td
+                    className={attestation.revoked ? 'revoked' : 'approved'}
+                  />
+                  <td>
+                    <button className="refresh" />
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {attestations.map((attestation: Attestation) => (
-                  <tr key={attestation.signature}>
-                    <td>{attestation.owner}</td>
-                    <td className={attestation.revoked ? 'revoked' : 'approved'} />
-                    <td>
-                      <button className="refresh" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div>No Attestations found.</div>
-          )
-        }
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div>No Attestations found.</div>
+        )}
       </section>
     )
   }

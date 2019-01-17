@@ -186,11 +186,11 @@ class MessageView extends React.Component<Props, State> {
             const attestationMessageBody: ApproveAttestationForClaim = {
               content: {
                 claimHash: claimMessageBody.content.id,
+                owner: selectedIdentity.identity.signPublicKeyAsHex,
+                revoked: false,
                 signature:
                   claimMessageBody.content.id +
                   selectedIdentity.identity.signPublicKeyAsHex,
-                owner: selectedIdentity.identity.signPublicKeyAsHex,
-                revoked: false,
               },
               type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
             }

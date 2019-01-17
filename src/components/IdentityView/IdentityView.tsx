@@ -26,19 +26,24 @@ class IdentityView extends React.Component<Props, {}> {
     return (
       <section className={classes.join(' ')}>
         <div className="attributes">
-          <div><label>Alias</label>
+          <div>
+            <label>Alias</label>
             <div>{alias}</div>
           </div>
-          <div><label>Phrase</label>
+          <div>
+            <label>Phrase</label>
             <div>{identity.phrase}</div>
           </div>
-          <div><label>Seed (as hex)</label>
+          <div>
+            <label>Seed (as hex)</label>
             <div>{identity.seedAsHex}</div>
           </div>
-          <div><label>Public Key</label>
+          <div>
+            <label>Public Key</label>
             <div>{identity.signPublicKeyAsHex}</div>
           </div>
-          <div><label>Encryption Public Key</label>
+          <div>
+            <label>Encryption Public Key</label>
             <div>{identity.boxPublicKeyAsHex}</div>
           </div>
         </div>
