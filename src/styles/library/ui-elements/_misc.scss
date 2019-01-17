@@ -50,9 +50,11 @@
 
     &,
     & + * {
-      @extend %ellipsis;
-
       width: 100%;
+    }
+
+    & + div {
+      word-break: break-all;
     }
 
     & + input {
