@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import Loading from '../../components/Loading/Loading'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
@@ -10,7 +11,6 @@ import ErrorService from '../../services/ErrorService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
-import { Attestation } from '../../types/Claim'
 import { Contact } from '../../types/Contact'
 import {
   ApproveAttestationForClaim,
@@ -24,8 +24,8 @@ import './MessageView.scss'
 interface Props {
   selectedIdentity?: Wallet.Entry
   addAttestationToClaim: (
-    claimId: Claims.Entry['id'],
-    attestation: Attestation
+    claimHash: string,
+    attestation: sdk.Attestation
   ) => void
 }
 
@@ -182,14 +182,13 @@ class MessageView extends React.Component<Props, State> {
           if (receiver && claimMessageBody) {
             console.log('selectedIdentity', selectedIdentity)
 
-            // TODO: replace with sdk's 'new Attestation()'
             const attestationMessageBody: ApproveAttestationForClaim = {
               content: {
-                claimHash: claimMessageBody.content.id,
+                claimHash: claimMessageBody.content.claim.hash,
                 owner: selectedIdentity.identity.signPublicKeyAsHex,
                 revoked: false,
                 signature:
-                  claimMessageBody.content.id +
+                  claimMessageBody.content.claim.hash +
                   selectedIdentity.identity.signPublicKeyAsHex,
               },
               type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
@@ -225,7 +224,7 @@ class MessageView extends React.Component<Props, State> {
     const { currentMessage } = this.state
 
     if (currentMessage && currentMessage.body) {
-      const attestation = currentMessage.body.content as Attestation
+      const attestation = currentMessage.body.content as sdk.Attestation
       addAttestationToClaim(attestation.claimHash, attestation)
       this.onCloseMessage()
       if (currentMessage.id) {
@@ -244,10 +243,10 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
     addAttestationToClaim: (
-      claimId: Claims.Entry['id'],
-      attestation: Attestation
+      claimHash: string,
+      attestation: sdk.Attestation
     ) => {
-      dispatch(Claims.Store.addAttestation(claimId, attestation))
+      dispatch(Claims.Store.addAttestation(claimHash, attestation))
     },
   }
 }

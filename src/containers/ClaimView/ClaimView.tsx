@@ -105,7 +105,7 @@ class ClaimView extends React.Component<Props, State> {
   private getCurrentClaim(): Claims.Entry | undefined {
     const { hash } = this.props.match.params
     const { claims } = this.props
-    return claims.find((claim: Claims.Entry) => claim.hash === hash)
+    return claims.find((claim: Claims.Entry) => claim.claim.hash === hash)
   }
 
   private deleteClaim(hash: string) {
@@ -165,7 +165,7 @@ class ClaimView extends React.Component<Props, State> {
     const { claims } = this.props
 
     const claimToAttest = claims.find(
-      (claim: Claims.Entry) => claim.hash === this.claimHashToAttest
+      (claim: Claims.Entry) => claim.claim.hash === this.claimHashToAttest
     )
 
     if (claimToAttest) {

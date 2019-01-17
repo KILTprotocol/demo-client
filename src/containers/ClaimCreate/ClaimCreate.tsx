@@ -1,4 +1,4 @@
-import { CType, Claim } from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
@@ -16,7 +16,7 @@ import './ClaimCreate.scss'
 type Props = RouteComponentProps<{
   ctypeKey: string
 }> & {
-  saveClaim: (claim: Claim) => void
+  saveClaim: (claim: sdk.Claim) => void
   selectedIdentity?: Wallet.Entry
 }
 
@@ -24,7 +24,7 @@ type State = {
   claim: any
   name: string
   isValid: boolean
-  ctype?: CType
+  ctype?: sdk.CType
 }
 
 class ClaimCreate extends Component<Props, State> {
@@ -48,7 +48,7 @@ class ClaimCreate extends Component<Props, State> {
       dbCtype => {
         try {
           const parsedDefinition = JSON.parse(dbCtype.definition)
-          const ctype = new CType(parsedDefinition)
+          const ctype = new sdk.CType(parsedDefinition)
           this.setState({ ctype })
         } catch (e) {
           ErrorService.log('JSON.parse', e)
@@ -122,7 +122,12 @@ class ClaimCreate extends Component<Props, State> {
     const { name, claim, ctype }: State = this.state
 
     if (ctype && selectedIdentity) {
-      const newClaim = new Claim(name, ctype, claim, selectedIdentity.identity)
+      const newClaim = new sdk.Claim(
+        name,
+        ctype,
+        claim,
+        selectedIdentity.identity
+      )
       saveClaim(newClaim)
       history.push('/claim')
     } else {
@@ -143,7 +148,7 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    saveClaim: (claim: Claim) => {
+    saveClaim: (claim: sdk.Claim) => {
       dispatch(Claims.Store.saveAction(claim))
     },
   }

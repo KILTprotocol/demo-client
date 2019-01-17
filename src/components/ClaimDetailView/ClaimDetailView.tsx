@@ -2,10 +2,10 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
 import * as Claims from '../../state/ducks/Claims'
-import { Attestation } from '../../types/Claim'
 import Code from '../Code/Code'
 
 import './ClaimDetailView.scss'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 
 type Props = {
   claim?: Claims.Entry
@@ -23,13 +23,13 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   public render() {
-    const { claim, attestations }: Props = this.props.claim
+    const { claim }: Props = this.props
 
     return claim ? (
       <section className="ClaimDetailView">
-        <h1>{claim.alias}</h1>
-        {this.getAttributes(claim)}
-        {this.getAttestations(attestations)}
+        <h1>{claim.claim.alias}</h1>
+        {this.getAttributes(claim.claim)}
+        {this.getAttestations(claim.attestations)}
         {this.getActions()}
       </section>
     ) : (
@@ -37,7 +37,7 @@ class ClaimDetailView extends Component<Props, State> {
     )
   }
 
-  private getAttributes(claim: Claims.Entry) {
+  private getAttributes(claim: sdk.Claim) {
     const verified = claim ? claim.verifySignature() : false
     return (
       <div className="attributes">
@@ -59,7 +59,7 @@ class ClaimDetailView extends Component<Props, State> {
     )
   }
 
-  private getAttestations(attestations: Attestation[]) {
+  private getAttestations(attestations: sdk.Attestation[]) {
     return (
       <section className="attestations">
         <h3>Attestations</h3>
@@ -73,7 +73,7 @@ class ClaimDetailView extends Component<Props, State> {
               </tr>
             </thead>
             <tbody>
-              {attestations.map((attestation: Attestation) => (
+              {attestations.map((attestation: sdk.Attestation) => (
                 <tr key={attestation.signature}>
                   <td>{attestation.owner}</td>
                   <td
@@ -115,14 +115,14 @@ class ClaimDetailView extends Component<Props, State> {
   private handleDelete() {
     const { claim, onRemoveClaim }: Props = this.props
     if (claim) {
-      onRemoveClaim(claim.hash)
+      onRemoveClaim(claim.claim.hash)
     }
   }
 
   private requestAttestation() {
     const { claim, onRequestAttestation }: Props = this.props
     if (claim) {
-      onRequestAttestation(claim.hash)
+      onRequestAttestation(claim.claim.hash)
     }
   }
 }

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import * as Claims from '../../state/ducks/Claims'
-import { Attestation } from '../../types/Claim'
 
 import './ClaimListView.scss'
 
@@ -21,7 +21,8 @@ class ClaimListView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { claims, attestations } = this.props.claims
+    const { claims } = this.props
+
     return (
       <section className="ClaimListView">
         <h1>My Claims</h1>
@@ -37,16 +38,18 @@ class ClaimListView extends React.Component<Props, State> {
             </thead>
             <tbody>
               {claims.map(claim => (
-                <tr key={claim.alias}>
+                <tr key={claim.claim.alias}>
                   <td>
-                    <Link to={`/claim/${claim.hash}`}>{claim.alias}</Link>
+                    <Link to={`/claim/${claim.claim.hash}`}>
+                      {claim.claim.alias}
+                    </Link>
                   </td>
-                  <td>{JSON.stringify(claim.contents)}</td>
+                  <td>{JSON.stringify(claim.claim.contents)}</td>
                   <td
                     className={
                       'attested ' +
-                      (attestations.find(
-                        (attestation: Attestation) => !attestation.revoked
+                      (claim.attestations.find(
+                        (attestation: sdk.Attestation) => !attestation.revoked
                       )
                         ? 'true'
                         : 'false')
@@ -55,13 +58,13 @@ class ClaimListView extends React.Component<Props, State> {
                   <td className="actions">
                     <button
                       className="requestAttestation"
-                      onClick={this.requestAttestation(claim.hash)}
+                      onClick={this.requestAttestation(claim.claim.hash)}
                     >
                       Request Attestation
                     </button>
                     <button
                       className="deleteClaim"
-                      onClick={this.handleDelete(claim.hash)}
+                      onClick={this.handleDelete(claim.claim.hash)}
                     >
                       Delete
                     </button>

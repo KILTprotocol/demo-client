@@ -1,5 +1,6 @@
 import * as Claims from '../state/ducks/Claims'
-import { Attestation } from './Claim' // TODO: Attestation from SDK
+import * as sdk from '@kiltprotocol/prototype-sdk'
+
 import { CType } from './Ctype'
 
 export type Message = {
@@ -20,7 +21,7 @@ export enum MessageBodyType {
 }
 
 interface MessageBodyBase {
-  content: Claims.Entry | CType['key'] | Attestation | CTypeMessageBody
+  content: Claims.Entry | CType['key'] | sdk.IAttestation | CTypeMessageBody
   type: MessageBodyType
 }
 
@@ -30,7 +31,7 @@ export interface RequestAttestationForClaim extends MessageBodyBase {
 }
 
 export interface ApproveAttestationForClaim extends MessageBodyBase {
-  content: Attestation
+  content: sdk.IAttestation
   type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM
 }
 

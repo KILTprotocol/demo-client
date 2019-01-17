@@ -1,4 +1,4 @@
-import { Blockchain, CType } from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
@@ -7,7 +7,7 @@ import CtypeEditor from '../../components/CtypeEditor/CtypeEditor'
 import BlockchainService from '../../services/BlockchainService'
 import ctypeRepository from '../../services/CtypeRepository'
 import * as Wallet from '../../state/ducks/Wallet'
-import * as CTypeModel from '../../types/Ctype'
+import { CType } from '../../types/Ctype'
 
 import './CtypeCreate.scss'
 
@@ -23,7 +23,7 @@ type State = {
 }
 
 class CtypeCreate extends React.Component<Props, State> {
-  private blockchain: Blockchain
+  private blockchain: sdk.Blockchain
 
   constructor(props: Props) {
     super(props)
@@ -56,18 +56,18 @@ class CtypeCreate extends React.Component<Props, State> {
       this.state.connected &&
       this.state.isValid
     ) {
-      const _author: string = this.props.selectedIdentity.alias
-      const ctype = CType.fromInputModel(this.state.ctype)
+      const authorAlias: string = this.props.selectedIdentity.alias
+      const ctype = sdk.CType.fromInputModel(this.state.ctype)
       ctype
         .store(this.blockchain, this.props.selectedIdentity.identity, () => {
           console.log('finalized ctype registration')
-          const _ctype: CTypeModel.CType = {
-            author: _author,
+          const ctypeWrapper: CType = {
+            author: authorAlias,
             definition: JSON.stringify(ctype.getModel()),
             key: ctype.getModel().hash,
             name: this.state.name,
           }
-          ctypeRepository.register(_ctype).then(() => {
+          ctypeRepository.register(ctypeWrapper).then(() => {
             // TODO go back
           })
         })
