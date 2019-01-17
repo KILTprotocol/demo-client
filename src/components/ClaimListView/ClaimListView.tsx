@@ -46,10 +46,10 @@ class ClaimListView extends React.Component<Props, State> {
                       Request Attestation
                     </button>
                     <button
-                        className="deleteClaim"
-                        onClick={this.handleDelete(claim.hash)}
+                      className="deleteClaim"
+                      onClick={this.handleDelete(claim.hash)}
                     >
-                    Delete
+                      Delete
                     </button>
                   </td>
                 </tr>
