@@ -1,25 +1,30 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import Loading from '../../components/Loading/Loading'
-
 import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
 import Modal from '../../components/Modal/Modal'
+import attestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
 import MessageRepository from '../../services/MessageRepository'
+import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
 import { Contact } from '../../types/Contact'
 import {
-  ApproveAttestationForClaim,
   Message,
   MessageBodyType,
+  RequestAttestationForClaim,
 } from '../../types/Message'
-
 import './MessageView.scss'
 
 interface Props {
   selectedIdentity?: Wallet.Entry
+  addAttestationToClaim: (
+    claimHash: string,
+    attestation: sdk.Attestation
+  ) => void
 }
 
 interface State {
@@ -41,6 +46,7 @@ class MessageView extends React.Component<Props, State> {
     this.onOpenMessage = this.onOpenMessage.bind(this)
     this.onCloseMessage = this.onCloseMessage.bind(this)
     this.attestCurrentClaim = this.attestCurrentClaim.bind(this)
+    this.importAttestation = this.importAttestation.bind(this)
   }
 
   public render() {
@@ -67,6 +73,7 @@ class MessageView extends React.Component<Props, State> {
             <MessageDetailView
               message={currentMessage}
               onDelete={this.onDeleteMessage}
+              onCancel={this.onCloseMessage}
             >
               {this.getMessageActions()}
             </MessageDetailView>
@@ -79,7 +86,7 @@ class MessageView extends React.Component<Props, State> {
 
   public componentDidMount() {
     this.setState({ fetching: true })
-    this.getMessages()
+    this.fetchMessages()
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -87,14 +94,14 @@ class MessageView extends React.Component<Props, State> {
     const { selectedIdentity: currentSelected } = this.props
     if (currentSelected !== previousSelected) {
       this.setState({ fetching: true })
-      this.getMessages()
+      this.fetchMessages()
     }
   }
 
   private onDeleteMessage(id: string) {
     const { currentMessage } = this.state
     MessageRepository.deleteByMessageId(id).then(() => {
-      this.getMessages()
+      this.fetchMessages()
       if (currentMessage) {
         this.onCloseMessage()
       }
@@ -109,6 +116,10 @@ class MessageView extends React.Component<Props, State> {
     switch (messageBodyType) {
       case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return <button onClick={this.attestCurrentClaim}>Attest Claim</button>
+      case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
+        return (
+          <button onClick={this.importAttestation}>Import Attestation</button>
+        )
       default:
         return ''
     }
@@ -131,9 +142,12 @@ class MessageView extends React.Component<Props, State> {
     this.setState({
       currentMessage: undefined,
     })
+    if (this.messageModal) {
+      this.messageModal.hide()
+    }
   }
 
-  private getMessages() {
+  private fetchMessages() {
     const { selectedIdentity } = this.props
     if (selectedIdentity) {
       MessageRepository.findByMyIdentity(selectedIdentity.identity).then(
@@ -152,41 +166,36 @@ class MessageView extends React.Component<Props, State> {
     }
   }
 
-  private attestCurrentClaim() {
+  private async attestCurrentClaim() {
     const { currentMessage } = this.state
 
     if (currentMessage) {
-      ContactRepository.findAll().then(
-        (contacts: Contact[]) => {
-          const receiver: Contact | undefined = contacts.find(
-            (contact: Contact) => contact.key === currentMessage.senderKey
-          )
-          const messageBody: ApproveAttestationForClaim = currentMessage.body as ApproveAttestationForClaim
-          if (receiver && messageBody) {
-            MessageRepository.send(receiver, {
-              content: messageBody.content,
-              type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
-            }).then(() => {
-              this.onCloseMessage()
-              this.getMessages()
-            })
-          } else {
-            ErrorService.log('fetch.GET', {
-              message: `Could not resolve contact ${
-                currentMessage.senderKey
-              } from list of all contacts`,
-              name: 'resolve contact error',
-            })
-          }
-        },
-        error => {
-          ErrorService.log(
-            'fetch.GET',
-            error,
-            'Could not retrieve all contacts from registry'
-          )
-        }
-      )
+      try {
+        const claimer: Contact = await ContactRepository.findByKey(
+          currentMessage.senderKey
+        )
+        const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
+          .content
+        await attestationService.attestClaim(claim, claimer)
+      } catch (error) {
+        ErrorService.log('attestation.create', error, 'Error attesting claim')
+      }
+      this.fetchMessages()
+    }
+    this.onCloseMessage()
+  }
+
+  private importAttestation() {
+    const { addAttestationToClaim } = this.props
+    const { currentMessage } = this.state
+
+    if (currentMessage && currentMessage.body) {
+      const attestation = currentMessage.body.content as sdk.Attestation
+      addAttestationToClaim(attestation.claimHash, attestation)
+      this.onCloseMessage()
+      if (currentMessage.id) {
+        this.onDeleteMessage(currentMessage.id)
+      }
     }
   }
 }
@@ -197,4 +206,18 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   }
 }
 
-export default connect(mapStateToProps)(MessageView)
+const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
+  return {
+    addAttestationToClaim: (
+      claimHash: string,
+      attestation: sdk.Attestation
+    ) => {
+      dispatch(Claims.Store.addAttestation(claimHash, attestation))
+    },
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(MessageView)

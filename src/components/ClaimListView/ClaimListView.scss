@@ -1,0 +1,29 @@
+.ClaimListView {
+
+  & td {
+
+    &.attested {
+      padding:{
+        left: 30px;
+      }
+
+      &.false {
+
+        &:before {
+          @include icon($icon-times);
+
+          color: $color-danger;
+        }
+      }
+
+      &.true {
+
+        &:before {
+          @include icon($icon-check);
+
+          color: $color-success;
+        }
+      }
+    }
+  }
+}

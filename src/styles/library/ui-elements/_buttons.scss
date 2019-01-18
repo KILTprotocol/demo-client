@@ -1,5 +1,8 @@
+$darken: 5;
+
 @mixin button-base {
   @include baseFont;
+  @include border-radius($base-border-radius);
 
   display: inline-block;
   height: $base-button-height;
@@ -16,12 +19,23 @@
 
     cursor: not-allowed;
   }
+
+  &:not([disabled]){
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: $color-grey;
+      color: $color-font;
+      border-color: $color-grey;
+    }
+  }
 }
 
 // NORMAL BUTTONS
 @mixin button {
   @include button-base;
-  @include border-radius($base-border-radius);
+  @include transition($base-transition);
 
   min-width: 150px;
   padding: 0 2*$base-padding;
@@ -57,15 +71,10 @@ $base-icon-size: $base-font-size;
   min-width: auto;
   padding: 0;
   background: none;
-  color: $color-grey-dark;
+  color: $color-primary;
   font-size: $icon-size;
   line-height: 0;
-
-  &:hover,
-  &:focus,
-  &:active {
-    color: $color-primary;
-  }
+  border: $base-border-width solid $color-primary;
 }
 
 @mixin button-icon-only($icon, $icon-size: $base-icon-size) {

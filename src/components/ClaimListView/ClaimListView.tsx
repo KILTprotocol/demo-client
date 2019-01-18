@@ -1,10 +1,13 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import * as Claims from '../../state/ducks/Claims'
 
+import './ClaimListView.scss'
+
 type Props = {
-  claims: Claims.Entry[]
+  claimStore: Claims.Entry[]
   onRemoveClaim: (hash: string) => void
   onRequestAttestation: (hash: string) => void
 }
@@ -18,36 +21,50 @@ class ClaimListView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { claims } = this.props
+    const { claimStore } = this.props
+
     return (
       <section className="ClaimListView">
         <h1>My Claims</h1>
-        {claims && !!claims.length && (
+        {claimStore && !!claimStore.length && (
           <table>
             <thead>
               <tr>
                 <th>Alias</th>
                 <th>Contents</th>
+                <th>Attested?</th>
                 <th />
               </tr>
             </thead>
             <tbody>
-              {claims.map(claim => (
-                <tr key={claim.alias}>
+              {claimStore.map(claimEntry => (
+                <tr key={claimEntry.claim.alias}>
                   <td>
-                    <Link to={`/claim/${claim.hash}`}>{claim.alias}</Link>
+                    <Link to={`/claim/${claimEntry.claim.hash}`}>
+                      {claimEntry.claim.alias}
+                    </Link>
                   </td>
-                  <td>{JSON.stringify(claim.contents)}</td>
+                  <td>{JSON.stringify(claimEntry.claim.contents)}</td>
+                  <td
+                    className={
+                      'attested ' +
+                      (claimEntry.attestations.find(
+                        (attestation: sdk.Attestation) => !attestation.revoked
+                      )
+                        ? 'true'
+                        : 'false')
+                    }
+                  />
                   <td className="actions">
                     <button
                       className="requestAttestation"
-                      onClick={this.requestAttestation(claim.hash)}
+                      onClick={this.requestAttestation(claimEntry.claim.hash)}
                     >
                       Request Attestation
                     </button>
                     <button
                       className="deleteClaim"
-                      onClick={this.handleDelete(claim.hash)}
+                      onClick={this.handleDelete(claimEntry.claim.hash)}
                     >
                       Delete
                     </button>

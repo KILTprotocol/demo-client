@@ -11,14 +11,10 @@
 
   & .delete {
     @include button-icon-only($icon-trash-o);
-
-    border: none;
   }
 
   & .open {
     @include button-icon-only($icon-eye);
-
-    border: none;
   }
 
   & .message {

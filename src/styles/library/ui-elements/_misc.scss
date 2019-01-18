@@ -32,21 +32,28 @@
   border: $base-border;
 }
 
+@mixin label {
+  @include baseFont-bold;
+
+  color: $color-primary;
+  text-align: left;
+}
+
 @mixin label_input_combo {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   padding: $base-padding/2 $base-padding;
 
   & > label {
     $breakpoint: 600px;
 
     @include label;
-    @include baseFont-bold;
 
-    text-align: left;
-    color: $color-primary;
+    margin: {
+      top: 8px;
+    }
 
     &,
     & + * {
@@ -54,11 +61,18 @@
     }
 
     & + div {
-      word-break: break-all;
+      word-break: break-word;
     }
 
     & + input {
       @include input;
+    }
+
+    & + div {
+
+      margin: {
+        top: 8px;
+      }
     }
 
     @include breakpointAbove($breakpoint) {

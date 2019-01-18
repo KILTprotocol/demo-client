@@ -1,6 +1,35 @@
 .IdentityView {
+  @include card;
+
+  padding: $base-padding;
+  margin: {
+    bottom: $base-padding;
+  }
+
+  & .attributes {
+
+    & > div {
+      @include label_input_combo;
+    }
+  }
 
   &.selected {
-    color: $color-primary;
+    background: $color-primary;
+
+
+    & .attributes {
+
+      & > div {
+
+        & label,
+        & div {
+          color: $color-font-inverted;
+        }
+      }
+    }
+
+    & .actions {
+      display: none;
+    }
   }
 }

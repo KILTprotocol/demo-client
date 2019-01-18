@@ -1,6 +1,7 @@
 import { combineReducers, createStore, Store } from 'redux'
 import * as Claims from './ducks/Claims'
 import * as Wallet from './ducks/Wallet'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 
 declare global {
   /* tslint:disable */
@@ -69,6 +70,11 @@ class PersistentStore {
         PersistentStore.serialize(this._store.getState())
       )
     })
+  }
+
+  public getSelectedIdentity(): sdk.Identity {
+    return (this.store.getState().wallet.get('selected') as Wallet.Entry)
+      .identity
   }
 }
 

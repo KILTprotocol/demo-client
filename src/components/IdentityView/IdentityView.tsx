@@ -24,40 +24,38 @@ class IdentityView extends React.Component<Props, {}> {
     const classes = ['IdentityView', selected ? 'selected' : '']
 
     return (
-      <tbody className={classes.join(' ')}>
-        <tr>
-          <td>Alias:</td>
-          <td>{alias}</td>
-        </tr>
-        <tr>
-          <td>Phrase:</td>
-          <td>{identity.phrase}</td>
-        </tr>
-        <tr>
-          <td>Seed (as hex):</td>
-          <td>{identity.seedAsHex}</td>
-        </tr>
-        <tr>
-          <td>Public Key:</td>
-          <td>{identity.signPublicKeyAsHex}</td>
-        </tr>
-        <tr>
-          <td>Encryption Public Key:</td>
-          <td>{identity.boxPublicKeyAsHex}</td>
-        </tr>
-        <tr>
-          <td colSpan={2}>
-            <div className="actions">
-              <button onClick={this.onDelete} disabled={selected}>
-                Remove
-              </button>
-              <button onClick={this.onSelect} disabled={selected}>
-                Select
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
+      <section className={classes.join(' ')}>
+        <div className="attributes">
+          <div>
+            <label>Alias</label>
+            <div>{alias}</div>
+          </div>
+          <div>
+            <label>Phrase</label>
+            <div>{identity.phrase}</div>
+          </div>
+          <div>
+            <label>Seed (as hex)</label>
+            <div>{identity.seedAsHex}</div>
+          </div>
+          <div>
+            <label>Public Key</label>
+            <div>{identity.signPublicKeyAsHex}</div>
+          </div>
+          <div>
+            <label>Encryption Public Key</label>
+            <div>{identity.boxPublicKeyAsHex}</div>
+          </div>
+        </div>
+        <div className="actions">
+          <button onClick={this.onDelete} disabled={selected}>
+            Remove
+          </button>
+          <button onClick={this.onSelect} disabled={selected}>
+            Select
+          </button>
+        </div>
+      </section>
     )
   }
 

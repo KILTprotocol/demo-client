@@ -2,8 +2,6 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 
-import './index.scss'
-
 import App from './App'
 import persistentStore from './state/PersistentStore'
 
