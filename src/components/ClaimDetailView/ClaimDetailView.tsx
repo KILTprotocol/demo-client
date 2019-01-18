@@ -71,7 +71,7 @@ class ClaimDetailView extends Component<Props, State> {
     )
   }
 
-  private getAttestations(attestations: sdk.Attestation[]) {
+  private getAttestations(attestations: sdk.IAttestation[]) {
     return (
       <section className="attestations">
         <h3>Attestations</h3>
@@ -85,7 +85,7 @@ class ClaimDetailView extends Component<Props, State> {
               </tr>
             </thead>
             <tbody>
-              {attestations.map((attestation: sdk.Attestation) => (
+              {attestations.map((attestation: sdk.IAttestation) => (
                 <tr key={attestation.signature}>
                   <td>{attestation.owner}</td>
                   <td

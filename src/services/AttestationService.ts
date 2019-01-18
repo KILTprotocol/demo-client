@@ -1,8 +1,13 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-
-import persistentStore from '../state/PersistentStore'
-import { Contact } from '../types/Contact'
-import { ApproveAttestationForClaim, MessageBodyType } from '../types/Message'
+import persistentStore from 'src/state/PersistentStore'
+import { Contact } from 'src/types/Contact'
+import {
+  ApproveAttestationForClaim,
+  Message,
+  MessageBodyType,
+} from 'src/types/Message'
+import BlockchainService from './BlockchainService'
+import ErrorService from './ErrorService'
 import MessageRepository from './MessageRepository'
 
 class AttestationService {
@@ -20,23 +25,53 @@ class AttestationService {
       return Promise.reject()
     }
 
+    const blockchain: sdk.Blockchain = await BlockchainService.connect()
+    const attestation: sdk.Attestation = new sdk.Attestation(
+      claim,
+      selectedIdentity
+    )
+
+    console.log('initialize')
+
     return new Promise<void>(async (resolve, reject) => {
-      const attestationMessageBody: ApproveAttestationForClaim = {
-        content: {
-          claimHash: claim.hash,
-          owner: selectedIdentity.signPublicKeyAsHex,
-          revoked: false,
-          signature: claim.hash + selectedIdentity.signPublicKeyAsHex,
-        },
-        type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
-      }
-      try {
-        await MessageRepository.send(claimer, attestationMessageBody)
-        resolve()
-      } catch (error) {
-        reject(error)
-      }
+      attestation
+        .store(blockchain, selectedIdentity, () => {
+          console.log('attestation stored on chain')
+
+          this.sendAttestationApprovedMessage(attestation, claimer, claim)
+            .then((message: any) => {
+              resolve()
+            })
+            .catch(error => {
+              // TODO error handling
+              ErrorService.log('attestation.create', error)
+              reject(error)
+            })
+        })
+        .then((hash: any) => {
+          console.log('submitted with hash ' + hash)
+        })
+        .catch(error => {
+          // TODO error handling
+          ErrorService.log('attestation.create', error)
+          reject()
+        })
     })
+  }
+
+  private async sendAttestationApprovedMessage(
+    attestation: sdk.IAttestation,
+    claimer: Contact,
+    claim: sdk.IClaim
+  ): Promise<Message> {
+    const attestationMessageBody: ApproveAttestationForClaim = {
+      content: {
+        claim,
+        attestation,
+      },
+      type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
+    }
+    return MessageRepository.send(claimer, attestationMessageBody)
   }
 }
 

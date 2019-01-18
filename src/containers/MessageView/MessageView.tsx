@@ -16,6 +16,7 @@ import {
   Message,
   MessageBodyType,
   RequestAttestationForClaim,
+  ApproveAttestationForClaim,
 } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
 import './MessageView.scss'
@@ -24,7 +25,7 @@ interface Props {
   selectedIdentity?: Wallet.Entry
   addAttestationToClaim: (
     claimHash: string,
-    attestation: sdk.Attestation
+    attestation: sdk.IAttestation
   ) => void
 }
 
@@ -230,8 +231,11 @@ class MessageView extends React.Component<Props, State> {
     const { currentMessage } = this.state
 
     if (currentMessage && currentMessage.body) {
-      const attestation = currentMessage.body.content as sdk.Attestation
-      addAttestationToClaim(attestation.claimHash, attestation)
+      const {
+        claim,
+        attestation,
+      } = (currentMessage.body as ApproveAttestationForClaim).content
+      addAttestationToClaim(claim.hash, attestation)
       this.onCloseMessage()
       if (currentMessage.id) {
         this.onDeleteMessage(currentMessage.id)
@@ -250,7 +254,7 @@ const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
     addAttestationToClaim: (
       claimHash: string,
-      attestation: sdk.Attestation
+      attestation: sdk.IAttestation
     ) => {
       dispatch(Claims.Store.addAttestation(claimHash, attestation))
     },
