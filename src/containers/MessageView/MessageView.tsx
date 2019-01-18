@@ -196,8 +196,9 @@ class MessageView extends React.Component<Props, State> {
           const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
             .content
           attestationService
-            .attestClaim(claim, claimer)
-            .then(() => {
+            .attestClaim(claim)
+            .then(async (attestation) => {
+              await this.sendClaimAttestedMessage(attestation, claimer, claim)
               this.fetchMessages()
               this.onCloseMessage()
               blockUi.remove()
@@ -224,6 +225,21 @@ class MessageView extends React.Component<Props, State> {
           })
         })
     }
+  }
+
+  private async sendClaimAttestedMessage(
+    attestation: sdk.IAttestation,
+    claimer: Contact,
+    claim: sdk.IClaim
+  ): Promise<Message> {
+    const attestationMessageBody: ApproveAttestationForClaim = {
+      content: {
+        claim,
+        attestation,
+      },
+      type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
+    }
+    return MessageRepository.send(claimer, attestationMessageBody)
   }
 
   private importAttestation() {
