@@ -4,6 +4,7 @@ export type ErrorCategory =
   | 'fetch.POST'
   | 'fetch.DELETE'
   | 'identity.create'
+  | 'attestation.create'
 
 type QualifiedError = {
   category: ErrorCategory

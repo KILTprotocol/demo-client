@@ -171,7 +171,7 @@ class ClaimView extends React.Component<Props, State> {
     if (claimToAttest) {
       this.selectedAttestants.forEach((attestant: Contact) => {
         MessageRepository.send(attestant, {
-          content: claimToAttest,
+          content: claimToAttest.claim,
           type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
         })
       })

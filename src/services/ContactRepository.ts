@@ -9,6 +9,12 @@ class ContactRepository {
     return fetch(`${ContactRepository.URL}`).then(response => response.json())
   }
 
+  public static async findByKey(key: string): Promise<Contact> {
+    return fetch(`${ContactRepository.URL}/${key}`).then(response =>
+      response.json()
+    )
+  }
+
   public static async add(contact: Contact): Promise<Response> {
     return fetch(`${ContactRepository.URL}`, {
       ...BasePostParams,

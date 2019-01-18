@@ -145,13 +145,8 @@ class ContactList extends React.Component<Props, State> {
 
   private onFinishRequestClaim() {
     if (this.selectedContact && this.selectedCtype) {
-      const cTypeMessageBody = {
-        author: this.selectedCtype.author,
-        key: this.selectedCtype.key,
-        name: this.selectedCtype.name,
-      }
       const request: RequestClaimForCtype = {
-        content: cTypeMessageBody,
+        content: this.selectedCtype,
         type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE,
       }
 

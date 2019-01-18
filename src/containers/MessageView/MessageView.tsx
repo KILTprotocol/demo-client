@@ -1,11 +1,11 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import Loading from '../../components/Loading/Loading'
-import * as sdk from '@kiltprotocol/prototype-sdk'
-
 import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
 import Modal from '../../components/Modal/Modal'
+import attestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
 import MessageRepository from '../../services/MessageRepository'
@@ -13,12 +13,10 @@ import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
 import { Contact } from '../../types/Contact'
 import {
-  ApproveAttestationForClaim,
   Message,
   MessageBodyType,
   RequestAttestationForClaim,
 } from '../../types/Message'
-
 import './MessageView.scss'
 
 interface Props {
@@ -88,7 +86,7 @@ class MessageView extends React.Component<Props, State> {
 
   public componentDidMount() {
     this.setState({ fetching: true })
-    this.getMessages()
+    this.fetchMessages()
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -96,14 +94,14 @@ class MessageView extends React.Component<Props, State> {
     const { selectedIdentity: currentSelected } = this.props
     if (currentSelected !== previousSelected) {
       this.setState({ fetching: true })
-      this.getMessages()
+      this.fetchMessages()
     }
   }
 
   private onDeleteMessage(id: string) {
     const { currentMessage } = this.state
     MessageRepository.deleteByMessageId(id).then(() => {
-      this.getMessages()
+      this.fetchMessages()
       if (currentMessage) {
         this.onCloseMessage()
       }
@@ -149,7 +147,7 @@ class MessageView extends React.Component<Props, State> {
     }
   }
 
-  private getMessages() {
+  private fetchMessages() {
     const { selectedIdentity } = this.props
     if (selectedIdentity) {
       MessageRepository.findByMyIdentity(selectedIdentity.identity).then(
@@ -168,55 +166,23 @@ class MessageView extends React.Component<Props, State> {
     }
   }
 
-  private attestCurrentClaim() {
+  private async attestCurrentClaim() {
     const { currentMessage } = this.state
-    const { selectedIdentity } = this.props
 
-    if (currentMessage && selectedIdentity) {
-      ContactRepository.findAll().then(
-        (contacts: Contact[]) => {
-          const receiver: Contact | undefined = contacts.find(
-            (contact: Contact) => contact.key === currentMessage.senderKey
-          )
-          const claimMessageBody = currentMessage.body as RequestAttestationForClaim
-          if (receiver && claimMessageBody) {
-            console.log('selectedIdentity', selectedIdentity)
-
-            const attestationMessageBody: ApproveAttestationForClaim = {
-              content: {
-                claimHash: claimMessageBody.content.claim.hash,
-                owner: selectedIdentity.identity.signPublicKeyAsHex,
-                revoked: false,
-                signature:
-                  claimMessageBody.content.claim.hash +
-                  selectedIdentity.identity.signPublicKeyAsHex,
-              },
-              type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
-            }
-            MessageRepository.send(receiver, attestationMessageBody).then(
-              () => {
-                this.onCloseMessage()
-                this.getMessages()
-              }
-            )
-          } else {
-            ErrorService.log('fetch.GET', {
-              message: `Could not resolve contact ${
-                currentMessage.senderKey
-              } from list of all contacts`,
-              name: 'resolve contact error',
-            })
-          }
-        },
-        error => {
-          ErrorService.log(
-            'fetch.GET',
-            error,
-            'Could not retrieve all contacts from registry'
-          )
-        }
-      )
+    if (currentMessage) {
+      try {
+        const claimer: Contact = await ContactRepository.findByKey(
+          currentMessage.senderKey
+        )
+        const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
+          .content
+        await attestationService.attestClaim(claim, claimer)
+      } catch (error) {
+        ErrorService.log('attestation.create', error, 'Error attesting claim')
+      }
+      this.fetchMessages()
     }
+    this.onCloseMessage()
   }
 
   private importAttestation() {
