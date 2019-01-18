@@ -5,6 +5,7 @@ import { Link, withRouter } from 'react-router-dom'
 
 import * as Wallet from '../../state/ducks/Wallet'
 import IdentityView from '../../components/IdentityView/IdentityView'
+
 import './WalletView.scss'
 
 type Props = RouteComponentProps<{}> & {

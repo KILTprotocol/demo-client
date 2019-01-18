@@ -1,7 +1,9 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import { combineReducers, createStore, Store } from 'redux'
+
 import * as Claims from './ducks/Claims'
 import * as Wallet from './ducks/Wallet'
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as UiState from './ducks/UiState'
 
 declare global {
   /* tslint:disable */
@@ -14,11 +16,13 @@ declare global {
 type State = {
   claims: Claims.ImmutableState
   wallet: Wallet.ImmutableState
+  uiState: UiState.ImmutableState
 }
 
 type SerializedState = {
   claims: Claims.SerializedState
   wallet: Wallet.SerializedState
+  uiState: UiState.SerializedState
 }
 
 class PersistentStore {
@@ -32,6 +36,7 @@ class PersistentStore {
     return {
       claims: Claims.Store.deserialize(obj.claims),
       wallet: Wallet.Store.deserialize(obj.wallet),
+      uiState: UiState.Store.deserialize(obj.uiState),
     }
   }
 
@@ -39,6 +44,7 @@ class PersistentStore {
     const obj: SerializedState = {
       claims: Claims.Store.serialize(state.claims),
       wallet: Wallet.Store.serialize(state.wallet),
+      uiState: UiState.Store.serialize(state.uiState),
     }
 
     return JSON.stringify(obj)
@@ -58,6 +64,7 @@ class PersistentStore {
       combineReducers({
         claims: Claims.Store.reducer,
         wallet: Wallet.Store.reducer,
+        uiState: UiState.Store.reducer,
       }),
       persistedState,
       window.__REDUX_DEVTOOLS_EXTENSION__ &&

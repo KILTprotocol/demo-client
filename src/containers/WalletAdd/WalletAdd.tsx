@@ -61,13 +61,13 @@ class WalletAdd extends React.Component<Props, State> {
 
           {!useMyPhrase && (
             <div className="phrase">
-              <label>
-                Seed Phrase
+              <div>
+                <label>Seed Phrase</label>
                 <button
                   onClick={this.createRandomPhrase}
                   title="Create random phrase"
                 />
-              </label>
+              </div>
               <div>{randomPhrase}</div>
             </div>
           )}

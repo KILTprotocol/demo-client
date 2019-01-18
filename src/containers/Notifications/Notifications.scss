@@ -1,0 +1,44 @@
+.Notifications {
+  $notification-width: 400px;
+
+  position: fixed;
+  z-index: $z-index-modal + 10;
+  top: $header-height;
+  right: 0;
+  max-width: $notification-width + 2 * $base-padding;
+  height: 0;
+
+  & header {
+    @include baseFont-bold;
+
+    display: block;
+    margin: {
+      bottom: $base-padding/2;
+    }
+    font-size: 12px;
+  }
+
+  & .notification {
+    @include card;
+
+    display: block;
+    width: 100%;
+    padding: $base-padding/2;
+    background: white;
+    font-size: 14px;
+
+    &.SUCCESS {
+
+      & header {
+        color: $color-success;
+      }
+    }
+
+    &.FAILURE {
+
+      & header {
+        color: $color-danger;
+      }
+    }
+  }
+}

@@ -8,12 +8,14 @@ import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal from '../../components/Modal/Modal'
 import ContactRepository from '../../services/ContactRepository'
+import FeedbackService from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
 import { MessageBodyType } from '../../types/Message'
 
 import './ClaimView.scss'
+import { BlockUi } from '../../types/UserFeedback'
 
 type SelectOption = {
   value: string
@@ -98,8 +100,41 @@ class ClaimView extends React.Component<Props, State> {
         >
           {this.getSelectAttestants()}
         </Modal>
+
+        <button onClick={this.test} />
       </section>
     )
+  }
+
+  private test() {
+    let bu1: BlockUi, bu2: BlockUi
+
+    bu1 = FeedbackService.addBlockUi({
+      headline: 'UI blocked by Process A',
+      message: 'Step 1 of 2',
+    })
+
+    setTimeout(() => {
+      bu2 = FeedbackService.addBlockUi({ headline: 'UI blocked by Process B' })
+    }, 3000)
+
+    setTimeout(() => {
+      if (bu1.updateMessage) {
+        bu1.updateMessage('Step 2 of 2')
+      }
+    }, 5000)
+
+    setTimeout(() => {
+      if (bu2.remove) {
+        bu2.remove()
+      }
+    }, 10000)
+
+    setTimeout(() => {
+      if (bu1.remove) {
+        bu1.remove()
+      }
+    }, 15000)
   }
 
   private getCurrentClaimEntry(): Claims.Entry | undefined {

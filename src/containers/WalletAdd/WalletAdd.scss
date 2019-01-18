@@ -18,14 +18,13 @@
     }
 
     & label {
-      @include baseFont-bold;
+      @include label;
 
       display: flex;
       flex-direction: row;
       justify-content: left;
       align-items: center;
       height: $base-button-height;
-      color: $color-primary;
     }
   }
 
@@ -42,8 +41,29 @@
     position: relative;
     width: 100%;
 
+    & > div {
+      display: flex;
+    }
+
     & button {
       @include button-icon-only($icon-refresh, 16px);
+
+      border: none;
+      margin-left: $base-padding/2;
+    }
+
+    & div {
+      $margin-top: 8px;
+
+      margin: {
+        top: $margin-top;
+      }
+
+      & input {
+        margin: {
+          top: -$margin-top;
+        }
+      }
     }
   }
 
@@ -98,6 +118,9 @@
 
     & .name {
       width: $name-width;
+      padding: {
+        right: $base-padding;
+      }
     }
 
     & .phrase {

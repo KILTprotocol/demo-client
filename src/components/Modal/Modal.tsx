@@ -5,6 +5,7 @@ import './Modal.scss'
 type Props = {
   type: 'alert' | 'confirm' | 'blank'
   header: string
+  showOnInit?: boolean
   preventCloseOnCancel?: boolean
   preventCloseOnConfirm?: boolean
   onCancel?: () => void
@@ -20,7 +21,7 @@ class Modal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      show: false,
+      show: !!props.showOnInit,
     }
     this.handleCancel = this.handleCancel.bind(this)
     this.handleConfirm = this.handleConfirm.bind(this)
