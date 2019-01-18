@@ -8,7 +8,7 @@ import './ClaimDetailView.scss'
 import * as sdk from '@kiltprotocol/prototype-sdk'
 
 type Props = {
-  claim?: Claims.Entry
+  claimEntry?: Claims.Entry
   onRemoveClaim: (hash: string) => void
   onRequestAttestation: (hash: string) => void
 }
@@ -23,13 +23,13 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   public render() {
-    const { claim }: Props = this.props
+    const { claimEntry }: Props = this.props
 
-    return claim ? (
+    return claimEntry ? (
       <section className="ClaimDetailView">
-        <h1>{claim.claim.alias}</h1>
-        {this.getAttributes(claim.claim)}
-        {this.getAttestations(claim.attestations)}
+        <h1>{claimEntry.claim.alias}</h1>
+        {this.getAttributes(claimEntry.claim)}
+        {this.getAttestations(claimEntry.attestations)}
         {this.getActions()}
       </section>
     ) : (
@@ -45,10 +45,22 @@ class ClaimDetailView extends Component<Props, State> {
           <label>Hash</label>
           <div>{claim.hash}</div>
         </div>
-        <div>Ctype: {claim.ctype}</div>
-        <div>Signature: {claim.signature}</div>
-        <div>Owner: {claim.owner}</div>
-        <div>Verified: {verified ? 'true' : 'false'}</div>
+        <div>
+          <label>Ctype</label>
+          <div>{claim.ctype}</div>
+        </div>
+        <div>
+          <label>Signature</label>
+          <div>{claim.signature}</div>
+        </div>
+        <div>
+          <label>Owner</label>
+          <div>{claim.owner}</div>
+        </div>
+        <div>
+          <label>Verified</label>
+          <div>{verified ? 'true' : 'false'}</div>
+        </div>
         <div>
           <label>Contents</label>
           <div>
@@ -113,16 +125,16 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   private handleDelete() {
-    const { claim, onRemoveClaim }: Props = this.props
-    if (claim) {
-      onRemoveClaim(claim.claim.hash)
+    const { claimEntry, onRemoveClaim }: Props = this.props
+    if (claimEntry) {
+      onRemoveClaim(claimEntry.claim.hash)
     }
   }
 
   private requestAttestation() {
-    const { claim, onRequestAttestation }: Props = this.props
-    if (claim) {
-      onRequestAttestation(claim.claim.hash)
+    const { claimEntry, onRequestAttestation }: Props = this.props
+    if (claimEntry) {
+      onRequestAttestation(claimEntry.claim.hash)
     }
   }
 }

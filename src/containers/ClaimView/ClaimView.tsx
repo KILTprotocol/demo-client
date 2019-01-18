@@ -21,7 +21,7 @@ type SelectOption = {
 }
 
 type Props = RouteComponentProps<{ hash: string }> & {
-  claims: Claims.Entry[]
+  claimStore: Claims.Entry[]
   removeClaim: (hash: string) => void
 }
 
@@ -63,25 +63,25 @@ class ClaimView extends React.Component<Props, State> {
 
   public render() {
     const { hash } = this.props.match.params
-    const { claims } = this.props
+    const { claimStore } = this.props
     const { isSelectAttestantsOpen } = this.state
 
-    let currentClaim
+    let currentClaimEntry
     if (hash) {
-      currentClaim = this.getCurrentClaim()
+      currentClaimEntry = this.getCurrentClaimEntry()
     }
     return (
       <section className="ClaimView">
         {!!hash && (
           <ClaimDetailView
-            claim={currentClaim}
+            claimEntry={currentClaimEntry}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={this.onRequestAttestation}
           />
         )}
         {!hash && (
           <ClaimListView
-            claims={claims}
+            claimStore={claimStore}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={this.onRequestAttestation}
           />
@@ -102,10 +102,12 @@ class ClaimView extends React.Component<Props, State> {
     )
   }
 
-  private getCurrentClaim(): Claims.Entry | undefined {
+  private getCurrentClaimEntry(): Claims.Entry | undefined {
     const { hash } = this.props.match.params
-    const { claims } = this.props
-    return claims.find((claim: Claims.Entry) => claim.claim.hash === hash)
+    const { claimStore } = this.props
+    return claimStore.find(
+      (claimEntry: Claims.Entry) => claimEntry.claim.hash === hash
+    )
   }
 
   private deleteClaim(hash: string) {
@@ -162,10 +164,11 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   private onFinishRequestAttestation() {
-    const { claims } = this.props
+    const { claimStore } = this.props
 
-    const claimToAttest = claims.find(
-      (claim: Claims.Entry) => claim.claim.hash === this.claimHashToAttest
+    const claimToAttest = claimStore.find(
+      (claimEntry: Claims.Entry) =>
+        claimEntry.claim.hash === this.claimHashToAttest
     )
 
     if (claimToAttest) {
@@ -190,7 +193,7 @@ class ClaimView extends React.Component<Props, State> {
 
 const mapStateToProps = (state: { claims: Claims.ImmutableState }) => {
   return {
-    claims: state.claims
+    claimStore: state.claims
       .get('claims')
       .toList()
       .toArray(),
