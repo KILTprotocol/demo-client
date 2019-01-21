@@ -7,8 +7,8 @@ export type BlockUi = {
   id: string
   headline?: string
   message?: string
-  remove?: () => void
-  updateMessage?: (message: string) => void
+  remove: () => void
+  updateMessage: (message: string) => void
 }
 
 export interface Notification {
@@ -16,7 +16,7 @@ export interface Notification {
   message: string
   created: number
   type: NotificationType
-  remove?: () => void
+  remove: () => void
 }
 
 export interface BlockingNotification extends Notification {

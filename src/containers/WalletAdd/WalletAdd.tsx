@@ -8,7 +8,9 @@ import { Link, withRouter } from 'react-router-dom'
 import BlockchainService from '../../services/BlockchainService'
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
+import FeedbackService from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
+import { BlockUi } from '../../types/UserFeedback'
 import './WalletAdd.scss'
 
 type Props = RouteComponentProps<{}> & {
@@ -23,6 +25,8 @@ type State = {
 }
 
 class WalletAdd extends React.Component<Props, State> {
+  private blockUi: BlockUi
+
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -33,6 +37,7 @@ class WalletAdd extends React.Component<Props, State> {
       useMyPhrase: false,
     }
     this.togglePhrase = this.togglePhrase.bind(this)
+    this.addIdentity = this.addIdentity.bind(this)
   }
 
   public render() {
@@ -121,27 +126,23 @@ class WalletAdd extends React.Component<Props, State> {
     })
   }
 
-  private addIdentity = async () => {
+  private async addIdentity() {
     const { alias, myPhrase, randomPhrase, useMyPhrase } = this.state
 
-    this.setState({
-      pendingAdd: true,
-    })
+    this.blockUi = FeedbackService.addBlockUi({ headline: 'Creating identity' })
 
     let identity: Identity
     const usePhrase = useMyPhrase ? myPhrase : randomPhrase
-
     try {
       identity = Identity.buildFromMnemonic(usePhrase)
     } catch (error) {
-      ErrorService.log(
-        'identity.create',
+      ErrorService.log({
         error,
-        `failed to create identity from phrase '${usePhrase}'`
-      )
-      this.setState({
-        pendingAdd: false,
+        message: `failed to create identity from phrase '${usePhrase}'`,
+        origin: 'WalletAdd.addIdentity()',
       })
+      this.blockUi.remove()
+      delete this.blockUi
       return
     }
 
@@ -164,11 +165,11 @@ class WalletAdd extends React.Component<Props, State> {
               })
             },
             error => {
-              ErrorService.log(
-                'fetch.POST',
+              ErrorService.log({
                 error,
-                'failed to POST new identity'
-              )
+                message: 'failed to POST new identity',
+                origin: 'WalletAdd.addIdentity()',
+              })
               this.setState({
                 pendingAdd: false,
               })
@@ -176,11 +177,11 @@ class WalletAdd extends React.Component<Props, State> {
           )
         },
         error => {
-          ErrorService.log(
-            'fetch.POST',
+          ErrorService.log({
             error,
-            'failed to transfer initial tokens to identity'
-          )
+            message: 'failed to transfer initial tokens to identity',
+            origin: 'WalletAdd.addIdentity()',
+          })
           this.setState({
             pendingAdd: false,
           })

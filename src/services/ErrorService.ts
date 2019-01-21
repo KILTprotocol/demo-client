@@ -1,33 +1,40 @@
-export type ErrorCategory =
-  | 'JSON.parse'
-  | 'fetch.GET'
-  | 'fetch.POST'
-  | 'fetch.DELETE'
-  | 'identity.create'
-  | 'attestation.create'
+import { NotificationType } from '../types/UserFeedback'
+import FeedbackService from './FeedbackService'
 
 type QualifiedError = {
-  category: ErrorCategory
   error: Error
-  message?: string
+  message: string
+  onConfirm?: () => void
+  origin: any
 }
 
 class ErrorService {
   private errors: QualifiedError[] = []
 
-  public log(category: ErrorCategory, error: Error, message?: string) {
+  public log(qualifiedError: QualifiedError, blocking = true) {
+    const { origin, error, message, onConfirm } = qualifiedError
     console.groupCollapsed(
-      '%cERROR @ ' + category,
+      '%cERROR @ ' + origin,
       'background: red; color: white; padding: 5px;'
     )
     console.error(message)
     console.error(error)
     console.groupEnd()
     this.errors.push({
-      category,
       error,
       message,
+      origin,
     })
+    return blocking
+      ? FeedbackService.addBlockingNotification({
+          message,
+          onConfirm,
+          type: NotificationType.FAILURE,
+        })
+      : FeedbackService.addNotification({
+          message,
+          type: NotificationType.FAILURE,
+        })
   }
 }
 

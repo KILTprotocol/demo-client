@@ -53,15 +53,18 @@
     }
 
     & div {
-      $margin-top: 8px;
 
-      margin: {
-        top: $margin-top;
-      }
+      &:last-child{
+        $margin-top: 8px;
 
-      & input {
         margin: {
-          top: -$margin-top;
+          top: $margin-top;
+        }
+
+        & input {
+          margin: {
+            top: -$margin-top;
+          }
         }
       }
     }
@@ -71,6 +74,7 @@
     $checkbox-size: $base-font-size;
 
     position: relative;
+    display: inline-block;
     margin: {
       top: $base-padding;
     }

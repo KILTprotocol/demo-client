@@ -50,16 +50,20 @@ class ClaimCreate extends Component<Props, State> {
           const parsedDefinition = JSON.parse(dbCtype.definition)
           const ctype = new sdk.CType(parsedDefinition)
           this.setState({ ctype })
-        } catch (e) {
-          ErrorService.log('JSON.parse', e)
+        } catch (error) {
+          ErrorService.log({
+            error,
+            message: `could not parse definition of CTYPE ${ctypeKey}`,
+            origin: 'ClaimCreate.componentDidMount()',
+          })
         }
       },
       error => {
-        ErrorService.log(
-          'fetch.GET',
+        ErrorService.log({
           error,
-          `could not retrieve ctype with key ${ctypeKey}`
-        )
+          message: `could not retrieve ctype with key ${ctypeKey}`,
+          origin: 'ClaimCreate.componentDidMount()',
+        })
       }
     )
   }
@@ -130,8 +134,6 @@ class ClaimCreate extends Component<Props, State> {
       )
       saveClaim(newClaim)
       history.push('/claim')
-    } else {
-      ErrorService.log('fetch.GET', new Error('ctype is not available'))
     }
   }
 

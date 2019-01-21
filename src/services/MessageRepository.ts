@@ -69,11 +69,11 @@ class MessageRepository {
         body: JSON.stringify(messageObj),
       }).then(response => response.json())
     } catch (error) {
-      ErrorService.log(
-        'fetch.POST',
+      ErrorService.log({
         error,
-        'error just before sending messageBody'
-      )
+        message: 'error just before sending messageBody',
+        origin: 'MessageRepository.send()',
+      })
       return Promise.reject()
     }
   }
@@ -108,12 +108,14 @@ class MessageRepository {
     }
     try {
       message.body = JSON.parse(message.message)
-    } catch (e) {
-      ErrorService.log(
-        'JSON.parse',
-        e,
-        `Could not parse message body of message ${message.id} ($m.message)`
-      )
+    } catch (error) {
+      ErrorService.log({
+        error,
+        message: `Could not parse message body of message ${
+          message.id
+        } ($m.message)`,
+        origin: 'MessageRepository.decryptMessage()',
+      })
     }
     return message
   }

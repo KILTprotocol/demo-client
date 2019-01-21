@@ -1,5 +1,5 @@
-import Immutable from 'immutable'
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import Immutable from 'immutable'
 
 import ErrorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
@@ -85,8 +85,12 @@ class Store {
           claim: sdk.Claim.fromObject(claim),
         }
         claims[o.hash] = entry
-      } catch (e) {
-        ErrorService.log('JSON.parse', e)
+      } catch (error) {
+        ErrorService.log({
+          error,
+          message: 'Could not restore Claims from local storage',
+          origin: 'Claims.Store.deserialize()',
+        })
       }
     })
 

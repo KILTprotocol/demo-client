@@ -178,7 +178,11 @@ class MessageView extends React.Component<Props, State> {
           .content
         await attestationService.attestClaim(claim, claimer)
       } catch (error) {
-        ErrorService.log('attestation.create', error, 'Error attesting claim')
+        ErrorService.log({
+          error,
+          message: 'Error attesting claim',
+          origin: 'MessageView.attestCurrentClaim()',
+        })
       }
       this.fetchMessages()
     }

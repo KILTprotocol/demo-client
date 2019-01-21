@@ -11,7 +11,7 @@ class FeedbackService {
   public static getNotificationBase({
     message,
     type,
-  }: Partial<Notification>): Notification {
+  }: Partial<Notification>): Partial<Notification> {
     const now = Date.now()
     const id = [now, type, message].join('-') as string
     return {
@@ -26,21 +26,21 @@ class FeedbackService {
     message,
     type,
   }: Partial<Notification>): Notification {
-    const notification: Notification = {
+    const notification: Partial<Notification> = {
       ...FeedbackService.getNotificationBase({ message, type }),
     }
 
     notification.remove = () => {
-      FeedbackService.removeNotification(notification.id)
+      FeedbackService.removeNotification(notification.id as Notification['id'])
     }
 
     // now put this into redux store UiState
     PersistentStore.store.dispatch(
-      UiState.Store.addNotificationAction(notification)
+      UiState.Store.addNotificationAction(notification as Notification)
     )
 
     // return completed blockingNotification
-    return notification
+    return notification as Notification
   }
 
   public static removeNotification(id: Notification['id']) {
@@ -52,12 +52,14 @@ class FeedbackService {
     type,
     onConfirm,
   }: Partial<BlockingNotification>): BlockingNotification {
-    const blockingNotification: BlockingNotification = {
+    const blockingNotification: Partial<BlockingNotification> = {
       ...FeedbackService.getNotificationBase({ message, type }),
     }
 
     blockingNotification.remove = () => {
-      FeedbackService.removeBlockingNotification(blockingNotification.id)
+      FeedbackService.removeBlockingNotification(
+        blockingNotification.id as BlockingNotification['id']
+      )
     }
 
     if (onConfirm) {
@@ -66,11 +68,13 @@ class FeedbackService {
 
     // now put this into redux store UiState
     PersistentStore.store.dispatch(
-      UiState.Store.addBlockingNotificationAction(blockingNotification)
+      UiState.Store.addBlockingNotificationAction(
+        blockingNotification as BlockingNotification
+      )
     )
 
     // return completed blockingNotification
-    return blockingNotification
+    return blockingNotification as BlockingNotification
   }
 
   public static removeBlockingNotification(id: BlockingNotification['id']) {
@@ -81,7 +85,7 @@ class FeedbackService {
 
   public static addBlockUi({ headline, message }: Partial<BlockUi>): BlockUi {
     const id = Date.now() + (message || '')
-    const blockUi: BlockUi = { id, headline, message }
+    const blockUi: Partial<BlockUi> = { id, headline, message }
 
     blockUi.remove = () => {
       FeedbackService.removeBlockUi(id)
@@ -92,10 +96,12 @@ class FeedbackService {
     }
 
     // now put this into redux store UiState
-    PersistentStore.store.dispatch(UiState.Store.addBlockUiAction(blockUi))
+    PersistentStore.store.dispatch(
+      UiState.Store.addBlockUiAction(blockUi as BlockUi)
+    )
 
     // return completed blockingNotification
-    return blockUi
+    return blockUi as BlockUi
   }
 
   public static removeBlockUi(id: BlockUi['id']) {
