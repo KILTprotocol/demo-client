@@ -13,7 +13,7 @@ type Props = {
 type State = {}
 
 class Notifications extends Component<Props, State> {
-  private displayTime = 3000 // ms
+  private displayTime = 4000 // ms
 
   constructor(props: Props) {
     super(props)
@@ -47,10 +47,18 @@ class Notifications extends Component<Props, State> {
     return (
       <div
         key={notification.id}
-        className={['notification', notification.type].join(' ')}
+        className={[
+          'notification',
+          notification.type,
+          notification.className,
+        ].join(' ')}
       >
         <header>{notification.type}</header>
-        <div className="body">{notification.message}</div>
+        <div className="body">
+          {notification.message}
+          <div className="console-log">( for details refer to console )</div>
+        </div>
+        <button onClick={notification.remove} className="close" />
       </div>
     )
   }
@@ -61,7 +69,8 @@ const mapStateToProps = (state: { uiState: UiState.ImmutableState }) => {
     notifications: state.uiState
       .get('notifications')
       .toList()
-      .toArray(),
+      .toArray()
+      .sort((a: Notification, b: Notification) => a.created - b.created),
   }
 }
 

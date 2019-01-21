@@ -9,13 +9,15 @@ import {
 
 class FeedbackService {
   public static getNotificationBase({
+    className,
     message,
     type,
   }: Partial<Notification>): Partial<Notification> {
-    const now = Date.now()
-    const id = [now, type, message].join('-') as string
+    const created = Date.now()
+    const id = [created, type, message].join('-') as string
     return {
-      created: now,
+      className,
+      created,
       id,
       message: message || '',
       type: type || NotificationType.FAILURE,
@@ -23,11 +25,12 @@ class FeedbackService {
   }
 
   public static addNotification({
+    className,
     message,
     type,
   }: Partial<Notification>): Notification {
     const notification: Partial<Notification> = {
-      ...FeedbackService.getNotificationBase({ message, type }),
+      ...FeedbackService.getNotificationBase({ className, message, type }),
     }
 
     notification.remove = () => {
@@ -48,12 +51,13 @@ class FeedbackService {
   }
 
   public static addBlockingNotification({
+    className,
     message,
-    type,
     onConfirm,
+    type,
   }: Partial<BlockingNotification>): BlockingNotification {
     const blockingNotification: Partial<BlockingNotification> = {
-      ...FeedbackService.getNotificationBase({ message, type }),
+      ...FeedbackService.getNotificationBase({ className, message, type }),
     }
 
     blockingNotification.remove = () => {
@@ -84,8 +88,9 @@ class FeedbackService {
   }
 
   public static addBlockUi({ headline, message }: Partial<BlockUi>): BlockUi {
-    const id = Date.now() + (message || '')
-    const blockUi: Partial<BlockUi> = { id, headline, message }
+    const created = Date.now()
+    const id = created + (message || '')
+    const blockUi: Partial<BlockUi> = { created, id, headline, message }
 
     blockUi.remove = () => {
       FeedbackService.removeBlockUi(id)

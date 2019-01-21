@@ -3,14 +3,15 @@ import * as React from 'react'
 import './Modal.scss'
 
 type Props = {
-  type: 'alert' | 'confirm' | 'blank'
+  catchBackdropClick?: boolean
+  className?: string
   header: string
-  showOnInit?: boolean
-  preventCloseOnCancel?: boolean
-  preventCloseOnConfirm?: boolean
   onCancel?: () => void
   onConfirm?: () => void
-  catchBackdropClick?: boolean
+  preventCloseOnCancel?: boolean
+  preventCloseOnConfirm?: boolean
+  showOnInit?: boolean
+  type: 'alert' | 'confirm' | 'blank'
 }
 
 type State = {
@@ -29,10 +30,10 @@ class Modal extends React.Component<Props, State> {
   }
 
   public render() {
-    const { type, children, header } = this.props
+    const { className, children, header, type } = this.props
     const { show } = this.state
 
-    const classes = ['Modal', type]
+    const classes = ['Modal', className, type]
 
     return (
       show && (

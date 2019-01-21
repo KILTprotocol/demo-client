@@ -2,27 +2,38 @@
   $notification-width: 400px;
 
   position: fixed;
-  z-index: $z-index-modal + 10;
+  z-index: $z-index-modal - 20;
   top: $header-height;
   right: 0;
   max-width: $notification-width + 2 * $base-padding;
-  height: 0;
+  max-height: calc(100% - #{$header-height});
+  padding: 0;
+  overflow: auto;
 
   & header {
     @include baseFont-bold;
 
-    display: block;
+    display: flex;
+    align-items: center;
     margin: {
       bottom: $base-padding/2;
     }
     font-size: 12px;
+
+    &:before {
+      margin: {
+        right: $base-padding/2;
+      }
+    }
   }
 
   & .notification {
     @include card;
+    @include console-log;
 
+    position: relative;
     display: block;
-    width: 100%;
+    margin: $base-padding $base-padding 0 0;
     padding: $base-padding/2;
     background: white;
     font-size: 14px;
@@ -31,6 +42,12 @@
 
       & header {
         color: $color-success;
+
+        &:before {
+          @include icon($icon-check-circle-o);
+
+          font-size: 16px;
+        }
       }
     }
 
@@ -38,7 +55,21 @@
 
       & header {
         color: $color-danger;
+
+        &:before {
+          @include icon($icon-warning)
+        }
       }
     }
+  }
+
+  & .close {
+    @include button-icon-only($icon-times);
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none;
+    color: $color-font;
   }
 }

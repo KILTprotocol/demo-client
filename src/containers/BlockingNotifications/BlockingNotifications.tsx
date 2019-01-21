@@ -3,7 +3,9 @@ import { connect } from 'react-redux'
 import Modal from '../../components/Modal/Modal'
 
 import * as UiState from '../../state/ducks/UiState'
-import { BlockingNotification } from '../../types/UserFeedback'
+import { BlockingNotification, Notification } from '../../types/UserFeedback'
+
+import './BlockingNotifications.scss'
 
 type Props = {
   notifications: BlockingNotification[]
@@ -31,14 +33,16 @@ class BlockingNotifications extends Component<Props, State> {
     return (
       <Modal
         key={notification.id}
-        showOnInit={true}
+        className={[notification.className, notification.type].join(' ')}
         header={notification.type}
-        type="alert"
+        onConfirm={this.onConfirm(notification)}
         preventCloseOnCancel={true}
         preventCloseOnConfirm={true}
-        onConfirm={this.onConfirm(notification)}
+        showOnInit={true}
+        type="alert"
       >
         {notification.message}
+        <div className="console-log">( for details refer to console )</div>
       </Modal>
     )
   }
@@ -57,7 +61,8 @@ const mapStateToProps = (state: { uiState: UiState.ImmutableState }) => {
     notifications: state.uiState
       .get('blockingNotifications')
       .toList()
-      .toArray(),
+      .toArray()
+      .sort((a: Notification, b: Notification) => a.created - b.created),
   }
 }
 

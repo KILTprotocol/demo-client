@@ -1,15 +1,17 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import { combineReducers, createStore, Store } from 'redux'
+import ErrorService from '../services/ErrorService'
 
 import * as Claims from './ducks/Claims'
-import * as Wallet from './ducks/Wallet'
 import * as UiState from './ducks/UiState'
+import * as Wallet from './ducks/Wallet'
 
 declare global {
   /* tslint:disable */
   interface Window {
     __REDUX_DEVTOOLS_EXTENSION__: any
   }
+
   /* tslint:enable */
 }
 
@@ -56,8 +58,15 @@ class PersistentStore {
     const localState = localStorage.getItem(PersistentStore.NAME)
     let persistedState = {} as State
     if (localState) {
-      const storedState = JSON.parse(localState)
-      persistedState = PersistentStore.deserialize(storedState)
+      try {
+        persistedState = PersistentStore.deserialize(JSON.parse(localState))
+      } catch (error) {
+        ErrorService.log({
+          error,
+          message: 'Could not restore PersistentStore from local storage',
+          origin: 'PersistentStore.constructor()',
+        })
+      }
     }
 
     this._store = createStore(

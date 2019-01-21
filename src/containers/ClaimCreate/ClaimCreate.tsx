@@ -61,7 +61,7 @@ class ClaimCreate extends Component<Props, State> {
       error => {
         ErrorService.log({
           error,
-          message: `could not retrieve ctype with key ${ctypeKey}`,
+          message: `could not retrieve CTYPE with key ${ctypeKey}`,
           origin: 'ClaimCreate.componentDidMount()',
         })
       }

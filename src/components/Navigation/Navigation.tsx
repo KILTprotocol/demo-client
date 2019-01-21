@@ -14,6 +14,7 @@ const links: NavLink[] = [
   { url: 'chain-stats', label: 'Chain stats' },
   { url: 'contacts', label: 'Contacts' },
   { url: 'messages', label: 'Messages' },
+  { url: 'testUserFeedback', label: 'Test User Feedback' },
 ]
 
 type Props = RouteComponentProps<{}> & {

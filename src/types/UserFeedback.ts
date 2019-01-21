@@ -1,9 +1,11 @@
 export enum NotificationType {
-  SUCCESS = 'Success',
-  FAILURE = 'Failure',
+  SUCCESS = 'SUCCESS',
+  FAILURE = 'FAILURE',
+  INFO = 'INFO',
 }
 
 export type BlockUi = {
+  created: number
   id: string
   headline?: string
   message?: string
@@ -13,10 +15,11 @@ export type BlockUi = {
 
 export interface Notification {
   id: string
-  message: string
+  className?: string
   created: number
-  type: NotificationType
+  message: string
   remove: () => void
+  type: NotificationType
 }
 
 export interface BlockingNotification extends Notification {

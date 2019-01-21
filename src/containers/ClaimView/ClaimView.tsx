@@ -100,42 +100,8 @@ class ClaimView extends React.Component<Props, State> {
         >
           {this.getSelectAttestants()}
         </Modal>
-
-        <button onClick={this.test} />
       </section>
     )
-  }
-
-  private test() {
-    let bu1: BlockUi
-    let bu2: BlockUi
-
-    bu1 = FeedbackService.addBlockUi({
-      headline: 'UI blocked by Process A',
-      message: 'Step 1 of 2',
-    })
-
-    setTimeout(() => {
-      bu2 = FeedbackService.addBlockUi({ headline: 'UI blocked by Process B' })
-    }, 3000)
-
-    setTimeout(() => {
-      if (bu1.updateMessage) {
-        bu1.updateMessage('Step 2 of 2')
-      }
-    }, 5000)
-
-    setTimeout(() => {
-      if (bu2.remove) {
-        bu2.remove()
-      }
-    }, 10000)
-
-    setTimeout(() => {
-      if (bu1.remove) {
-        bu1.remove()
-      }
-    }, 15000)
   }
 
   private getCurrentClaimEntry(): Claims.Entry | undefined {

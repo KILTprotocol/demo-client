@@ -55,7 +55,8 @@ const mapStateToProps = (state: { uiState: UiState.ImmutableState }) => {
     blockUis: state.uiState
       .get('blockUis')
       .toList()
-      .toArray(),
+      .toArray()
+      .sort((a: IBlockUi, b: IBlockUi) => a.created - b.created),
   }
 }
 
