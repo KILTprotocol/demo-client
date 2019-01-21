@@ -129,7 +129,7 @@ class WalletAdd extends React.Component<Props, State> {
   private async addIdentity() {
     const { alias, myPhrase, randomPhrase, useMyPhrase } = this.state
 
-    this.blockUi = FeedbackService.addBlockUi({
+    const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Creating identity',
       message: 'building Identity from phrase (1/3)',
     })
@@ -144,20 +144,18 @@ class WalletAdd extends React.Component<Props, State> {
         message: `failed to create identity from phrase '${usePhrase}'`,
         origin: 'WalletAdd.addIdentity()',
       })
-      this.enableUi()
+      blockUi.remove()
       return
     }
 
     const blockchain: Blockchain = await BlockchainService.connect()
     const alice = Identity.buildFromSeedString('Alice')
-    this.blockUi.updateMessage('transfer initial tokens (2/3)')
+    blockUi.updateMessage('transfer initial tokens (2/3)')
     blockchain
       .makeTransfer(alice, identity.signKeyringPair.address(), 1000)
       .then(
         () => {
-          this.blockUi.updateMessage(
-            'adding identity to contact repository (3/3)'
-          )
+          blockUi.updateMessage('adding identity to contact repository (3/3)')
           ContactRepository.add({
             encryptionKey: identity.boxPublicKeyAsHex,
             key: identity.signPublicKeyAsHex,
@@ -166,7 +164,7 @@ class WalletAdd extends React.Component<Props, State> {
             () => {
               this.props.saveIdentity(alias, identity)
               this.props.history.push('/wallet')
-              this.enableUi()
+              blockUi.remove()
             },
             error => {
               ErrorService.log({
@@ -175,7 +173,7 @@ class WalletAdd extends React.Component<Props, State> {
                 origin: 'WalletAdd.addIdentity()',
                 type: 'ERROR.FETCH.POST',
               })
-              this.enableUi()
+              blockUi.remove()
             }
           )
         },
@@ -185,7 +183,7 @@ class WalletAdd extends React.Component<Props, State> {
             message: 'failed to transfer initial tokens to identity',
             origin: 'WalletAdd.addIdentity()',
           })
-          this.enableUi()
+          blockUi.remove()
         }
       )
   }
@@ -200,15 +198,6 @@ class WalletAdd extends React.Component<Props, State> {
 
   private setAlias = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ alias: e.currentTarget.value })
-  }
-
-  private enableUi() {
-    this.blockUi.remove()
-    delete this.blockUi
-  }
-
-  private disableUi(message: string) {
-    this.blockUi = FeedbackService.addBlockUi({ headline: message })
   }
 }
 

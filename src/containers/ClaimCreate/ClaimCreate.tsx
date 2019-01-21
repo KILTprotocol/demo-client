@@ -8,10 +8,12 @@ import * as common from 'schema-based-json-editor'
 import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import CtypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
+import FeedbackService from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
 
 import './ClaimCreate.scss'
+import { BlockUi } from '../../types/UserFeedback'
 
 type Props = RouteComponentProps<{
   ctypeKey: string
@@ -44,18 +46,26 @@ class ClaimCreate extends Component<Props, State> {
 
   public componentDidMount() {
     const { ctypeKey } = this.props.match.params
+
+    const blockUi: BlockUi = FeedbackService.addBlockUi({
+      headline: 'Fetching CTYPE',
+    })
+
     CtypeRepository.findByKey(ctypeKey).then(
       dbCtype => {
         try {
           const parsedDefinition = JSON.parse(dbCtype.definition)
           const ctype = new sdk.CType(parsedDefinition)
           this.setState({ ctype })
+          blockUi.remove()
         } catch (error) {
           ErrorService.log({
             error,
             message: `could not parse definition of CTYPE ${ctypeKey}`,
             origin: 'ClaimCreate.componentDidMount()',
+            type: 'ERROR.JSON.PARSE',
           })
+          blockUi.remove()
         }
       },
       error => {
@@ -63,7 +73,9 @@ class ClaimCreate extends Component<Props, State> {
           error,
           message: `could not retrieve CTYPE with key ${ctypeKey}`,
           origin: 'ClaimCreate.componentDidMount()',
+          type: 'ERROR.FETCH.GET',
         })
+        blockUi.remove()
       }
     )
   }

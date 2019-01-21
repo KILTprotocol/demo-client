@@ -8,14 +8,13 @@ import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal from '../../components/Modal/Modal'
 import ContactRepository from '../../services/ContactRepository'
-import FeedbackService from '../../services/FeedbackService'
+import ErrorService from '../../services/ErrorService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
 import { MessageBodyType } from '../../types/Message'
 
 import './ClaimView.scss'
-import { BlockUi } from '../../types/UserFeedback'
 
 type SelectOption = {
   value: string
@@ -58,9 +57,18 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    ContactRepository.findAll().then((attestants: Contact[]) => {
-      this.setState({ attestants })
-    })
+    try {
+      ContactRepository.findAll().then((attestants: Contact[]) => {
+        this.setState({ attestants })
+      })
+    } catch (error) {
+      ErrorService.log({
+        error,
+        message: 'Could not retrieve attestants/contacts',
+        origin: 'ClaimView.componentDidMount()',
+        type: 'ERROR.FETCH.GET',
+      })
+    }
   }
 
   public render() {

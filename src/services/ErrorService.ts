@@ -66,7 +66,7 @@ class ErrorService {
 
     const notification: Partial<Notification> = {
       className: useConfig.consoleLog ? 'console-log' : '',
-      message: message,
+      message,
       type: NotificationType.FAILURE,
     }
 
