@@ -13,7 +13,7 @@ type Props = {
 type State = {}
 
 class Notifications extends Component<Props, State> {
-  displayTime = 3000 //ms
+  private displayTime = 3000 // ms
 
   constructor(props: Props) {
     super(props)

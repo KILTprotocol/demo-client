@@ -15,14 +15,14 @@ declare global {
 
 type State = {
   claims: Claims.ImmutableState
-  wallet: Wallet.ImmutableState
   uiState: UiState.ImmutableState
+  wallet: Wallet.ImmutableState
 }
 
 type SerializedState = {
   claims: Claims.SerializedState
-  wallet: Wallet.SerializedState
   uiState: UiState.SerializedState
+  wallet: Wallet.SerializedState
 }
 
 class PersistentStore {
@@ -35,16 +35,16 @@ class PersistentStore {
   private static deserialize(obj: SerializedState): State {
     return {
       claims: Claims.Store.deserialize(obj.claims),
-      wallet: Wallet.Store.deserialize(obj.wallet),
       uiState: UiState.Store.deserialize(obj.uiState),
+      wallet: Wallet.Store.deserialize(obj.wallet),
     }
   }
 
   private static serialize(state: State): string {
     const obj: SerializedState = {
       claims: Claims.Store.serialize(state.claims),
-      wallet: Wallet.Store.serialize(state.wallet),
       uiState: UiState.Store.serialize(state.uiState),
+      wallet: Wallet.Store.serialize(state.wallet),
     }
 
     return JSON.stringify(obj)
@@ -63,8 +63,8 @@ class PersistentStore {
     this._store = createStore(
       combineReducers({
         claims: Claims.Store.reducer,
-        wallet: Wallet.Store.reducer,
         uiState: UiState.Store.reducer,
+        wallet: Wallet.Store.reducer,
       }),
       persistedState,
       window.__REDUX_DEVTOOLS_EXTENSION__ &&

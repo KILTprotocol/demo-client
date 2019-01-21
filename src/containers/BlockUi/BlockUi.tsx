@@ -13,8 +13,6 @@ type Props = {
 type State = {}
 
 class BlockUi extends Component<Props, State> {
-  displayTime = 3000 //ms
-
   constructor(props: Props) {
     super(props)
   }

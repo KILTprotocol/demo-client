@@ -191,23 +191,23 @@ class Store {
 
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
-      notifications: Immutable.Map<Notification['id'], Notification>(),
+      blockUis: Immutable.Map<BlockUi['id'], BlockUi>(),
       blockingNotifications: Immutable.Map<
         BlockingNotification['id'],
         BlockingNotification
       >(),
-      blockUis: Immutable.Map<BlockUi['id'], BlockUi>(),
+      notifications: Immutable.Map<Notification['id'], Notification>(),
     } as State)(obj)
   }
 
   private static ACTIONS = {
-    NOTIFICATION_ADD: 'client/uiState/NOTIFICATION_ADD',
-    NOTIFICATION_REMOVE: 'client/uiState/NOTIFICATION_REMOVE',
     BLOCKING_NOTIFICATION_ADD: 'client/uiState/BLOCKING_NOTIFICATION_ADD',
     BLOCKING_NOTIFICATION_REMOVE: 'client/uiState/BLOCKING_NOTIFICATION_REMOVE',
     BLOCK_UI_ADD: 'client/uiState/BLOCK_UI_ADD',
     BLOCK_UI_REMOVE: 'client/uiState/BLOCK_UI_REMOVE',
     BLOCK_UI_UPDATE: 'client/uiState/BLOCK_UI_UPDATE',
+    NOTIFICATION_ADD: 'client/uiState/NOTIFICATION_ADD',
+    NOTIFICATION_REMOVE: 'client/uiState/NOTIFICATION_REMOVE',
   }
 }
 

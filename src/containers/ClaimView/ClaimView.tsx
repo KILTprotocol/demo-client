@@ -107,7 +107,8 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   private test() {
-    let bu1: BlockUi, bu2: BlockUi
+    let bu1: BlockUi
+    let bu2: BlockUi
 
     bu1 = FeedbackService.addBlockUi({
       headline: 'UI blocked by Process A',

@@ -87,8 +87,8 @@ class FeedbackService {
       FeedbackService.removeBlockUi(id)
     }
 
-    blockUi.updateMessage = (message: string) => {
-      FeedbackService.updateBlockUi(id, message)
+    blockUi.updateMessage = (newMessage: string) => {
+      FeedbackService.updateBlockUi(id, newMessage)
     }
 
     // now put this into redux store UiState

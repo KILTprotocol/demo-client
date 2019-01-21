@@ -36,17 +36,19 @@ class BlockingNotifications extends Component<Props, State> {
         type="alert"
         preventCloseOnCancel={true}
         preventCloseOnConfirm={true}
-        onConfirm={() => {
-          if (notification.onConfirm) {
-            notification.onConfirm(notification)
-          } else if (notification.remove) {
-            notification.remove()
-          }
-        }}
+        onConfirm={this.onConfirm(notification)}
       >
         {notification.message}
       </Modal>
     )
+  }
+
+  private onConfirm = (notification: BlockingNotification) => () => {
+    if (notification.onConfirm) {
+      notification.onConfirm(notification)
+    } else if (notification.remove) {
+      notification.remove()
+    }
   }
 }
 
