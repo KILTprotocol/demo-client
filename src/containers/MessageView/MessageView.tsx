@@ -199,6 +199,9 @@ class MessageView extends React.Component<Props, State> {
             .attestClaim(claim)
             .then(async (attestation) => {
               await this.sendClaimAttestedMessage(attestation, claimer, claim)
+              if (currentMessage.id) {
+                this.onDeleteMessage(currentMessage.id)
+              }
               this.fetchMessages()
               this.onCloseMessage()
               blockUi.remove()
@@ -234,8 +237,8 @@ class MessageView extends React.Component<Props, State> {
   ): Promise<Message> {
     const attestationMessageBody: ApproveAttestationForClaim = {
       content: {
-        claim,
         attestation,
+        claim,
       },
       type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
     }

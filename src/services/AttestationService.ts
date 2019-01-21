@@ -52,11 +52,14 @@ class AttestationService {
     // TODO implement revokeAttestation
   }
 
-  public async attestationOnChain(
+  public async verifyAttestation(
     attestation: sdk.IAttestation
-  ): Promise<Boolean> {
-    // TODO implement attestationOnChain
-    return false
+  ): Promise<boolean> {
+    const blockchain: sdk.Blockchain = await BlockchainService.connect()
+    const attestationObject: sdk.Attestation = sdk.Attestation.fromObject(
+      attestation
+    )
+    return await attestationObject.verify(blockchain)
   }
 }
 
