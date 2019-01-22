@@ -66,6 +66,7 @@ class PersistentStore {
           message: 'Could not restore PersistentStore from local storage',
           origin: 'PersistentStore.constructor()',
         })
+        // TODO: what to do on failure?
       }
     }
 

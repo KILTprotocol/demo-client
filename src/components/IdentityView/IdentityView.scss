@@ -14,19 +14,7 @@
   }
 
   &.selected {
-    background: $color-primary;
-
-
-    & .attributes {
-
-      & > div {
-
-        & label,
-        & div {
-          color: $color-font-inverted;
-        }
-      }
-    }
+    border: 3px solid $color-primary;
 
     & .actions {
       display: none;

@@ -45,25 +45,25 @@ class TestUserFeedback extends React.Component<Props, State> {
 
     setTimeout(() => {
       bu2 = FeedbackService.addBlockUi({ headline: 'UI blocked by Process B' })
-    }, 3000)
+    }, 2000)
 
     setTimeout(() => {
       if (bu1.updateMessage) {
         bu1.updateMessage('Step 2 of 2')
       }
-    }, 5000)
+    }, 4000)
 
     setTimeout(() => {
       if (bu2.remove) {
         bu2.remove()
       }
-    }, 10000)
+    }, 6000)
 
     setTimeout(() => {
       if (bu1.remove) {
         bu1.remove()
       }
-    }, 15000)
+    }, 8000)
   }
 
   private testBlockingFailure() {

@@ -103,19 +103,31 @@ class MessageRepository {
     )
     if (!decoded) {
       message.message = 'ERROR DECODING MESSAGE'
+      const errorMessage = `Could not decode message ${message.id}`
+      ErrorService.log(
+        {
+          error: { name: 'ERROR DECODING MESSAGE', message: errorMessage },
+          message: errorMessage,
+          origin: 'MessageRepository.decryptMessage()',
+        },
+        { blocking: false }
+      )
     } else {
       message.message = decoded
     }
     try {
       message.body = JSON.parse(message.message)
     } catch (error) {
-      ErrorService.log({
-        error,
-        message: `Could not parse message body of message ${
-          message.id
-        } ($m.message)`,
-        origin: 'MessageRepository.decryptMessage()',
-      })
+      ErrorService.log(
+        {
+          error,
+          message: `Could not parse message body of message ${
+            message.id
+          } ($m.message)`,
+          origin: 'MessageRepository.decryptMessage()',
+        },
+        { blocking: false }
+      )
     }
     return message
   }

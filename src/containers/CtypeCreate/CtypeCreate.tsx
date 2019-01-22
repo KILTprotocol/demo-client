@@ -94,6 +94,7 @@ class CtypeCreate extends React.Component<Props, State> {
             key: ctype.getModel().hash,
             name: this.state.name,
           }
+          // TODO: add onrejected when sdk provides error handling
           ctypeRepository.register(ctypeWrapper).then(() => {
             blockUi.remove()
             history.push('/ctype')

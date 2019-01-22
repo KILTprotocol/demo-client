@@ -3,6 +3,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import { Contact } from 'src/types/Contact'
 import persistentStore from 'src/state/PersistentStore'
 import { ApproveAttestationForClaim, MessageBodyType } from 'src/types/Message'
+import ErrorService from './ErrorService'
 import MessageRepository from './MessageRepository'
 
 class AttestationService {
@@ -20,8 +21,6 @@ class AttestationService {
     }
 
     return new Promise<void>(async (resolve, reject) => {
-      console.log('selectedIdentity', selectedIdentity)
-
       const attestationMessageBody: ApproveAttestationForClaim = {
         content: {
           claimHash: claim.hash,

@@ -17,7 +17,7 @@ import {
   MessageBodyType,
   RequestAttestationForClaim,
 } from '../../types/Message'
-import { BlockUi } from '../../types/UserFeedback'
+import { BlockUi, NotificationType } from '../../types/UserFeedback'
 import './MessageView.scss'
 
 interface Props {
@@ -96,12 +96,21 @@ class MessageView extends React.Component<Props, State> {
 
   private onDeleteMessage(id: string) {
     const { currentMessage } = this.state
-    MessageRepository.deleteByMessageId(id).then(() => {
-      this.fetchMessages()
-      if (currentMessage) {
-        this.onCloseMessage()
-      }
-    })
+    MessageRepository.deleteByMessageId(id)
+      .then(() => {
+        this.fetchMessages()
+        if (currentMessage) {
+          this.onCloseMessage()
+        }
+      })
+      .catch(error => {
+        ErrorService.log({
+          error,
+          message: `Could not delete message ${id}`,
+          origin: 'MessageView.onDeleteMessage()',
+          type: 'ERROR.FETCH.DELETE',
+        })
+      })
   }
 
   private getMessageActions() {
@@ -178,27 +187,43 @@ class MessageView extends React.Component<Props, State> {
 
     if (currentMessage) {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
-        headline: 'Fetching messages',
+        headline: 'Fetching Contacts',
       })
-      try {
-        const claimer: Contact = await ContactRepository.findByKey(
-          currentMessage.senderKey
-        )
-        const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
-          .content
-        await attestationService.attestClaim(claim, claimer)
-        blockUi.remove()
-      } catch (error) {
-        ErrorService.log({
-          error,
-          message: 'Error attesting claim',
-          origin: 'MessageView.attestCurrentClaim()',
+
+      ContactRepository.findByKey(currentMessage.senderKey)
+        .then((claimer: Contact) => {
+          const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
+            .content
+          attestationService
+            .attestClaim(claim, claimer)
+            .then(() => {
+              this.fetchMessages()
+              this.onCloseMessage()
+              FeedbackService.addNotification({
+                message: 'Attestation send',
+                type: NotificationType.SUCCESS,
+              })
+            })
+            .catch(error => {
+              ErrorService.log({
+                error,
+                message: `Could not send attestation for claim ${
+                  claim.hash
+                } to ${claimer.name}`,
+                origin: 'MessageView.attestCurrentClaim()',
+                type: 'ERROR.FETCH.POST',
+              })
+            })
         })
-        blockUi.remove()
-      }
-      this.fetchMessages()
+        .catch(error => {
+          ErrorService.log({
+            error,
+            message: 'Could not retrieve claimer',
+            origin: 'MessageView.attestCurrentClaim()',
+            type: 'ERROR.FETCH.GET',
+          })
+        })
     }
-    this.onCloseMessage()
   }
 
   private importAttestation() {

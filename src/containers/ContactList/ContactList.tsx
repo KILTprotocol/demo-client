@@ -2,14 +2,15 @@ import * as React from 'react'
 
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
+import Modal from '../../components/Modal/Modal'
 
 import ContactRepository from '../../services/ContactRepository'
+import CtypeRepository from '../../services/CtypeRepository'
+import ErrorService from '../../services/ErrorService'
+import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { CType } from '../../types/Ctype'
-import Modal from '../../components/Modal/Modal'
-import CtypeRepository from '../../services/CtypeRepository'
-import MessageRepository from '../../services/MessageRepository'
-import { RequestClaimForCtype, MessageBodyType } from '../../types/Message'
+import { MessageBodyType, RequestClaimForCtype } from '../../types/Message'
 
 import './ContactList.scss'
 
@@ -51,12 +52,30 @@ class ContactList extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    ContactRepository.findAll().then((contacts: Contact[]) => {
-      this.setState({ contacts })
-    })
-    CtypeRepository.findAll().then((ctypes: CType[]) => {
-      this.setState({ ctypes })
-    })
+    ContactRepository.findAll()
+      .then((contacts: Contact[]) => {
+        this.setState({ contacts })
+      })
+      .catch(error => {
+        ErrorService.log({
+          error,
+          message: 'Could not fetch contacts',
+          origin: 'ContactList.componentDidMount()',
+          type: 'ERROR.FETCH.GET',
+        })
+      })
+    CtypeRepository.findAll()
+      .then((ctypes: CType[]) => {
+        this.setState({ ctypes })
+      })
+      .catch(error => {
+        ErrorService.log({
+          error,
+          message: 'Could not fetch CTYPEs',
+          origin: 'ContactList.componentDidMount()',
+          type: 'ERROR.FETCH.GET',
+        })
+      })
   }
 
   public render() {
@@ -150,7 +169,16 @@ class ContactList extends React.Component<Props, State> {
         type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE,
       }
 
-      MessageRepository.send(this.selectedContact, request)
+      MessageRepository.send(this.selectedContact, request).catch(error => {
+        ErrorService.log({
+          error,
+          message: `Could not send message ${request.type} to ${
+            this.selectedContact!.name
+          }`,
+          origin: 'ContactList.onFinishRequestClaim()',
+          type: 'ERROR.FETCH.POST',
+        })
+      })
     }
   }
 
