@@ -15,7 +15,7 @@ class AttestationService {
     const selectedIdentity: sdk.Identity = persistentStore.getSelectedIdentity()
 
     if (!selectedIdentity) {
-      return Promise.reject()
+      return Promise.reject('No identity selected')
     }
 
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
@@ -23,8 +23,6 @@ class AttestationService {
       claim,
       selectedIdentity
     )
-
-    console.log('initialize')
 
     return new Promise<sdk.IAttestation>(async (resolve, reject) => {
       attestation
@@ -51,13 +49,13 @@ class AttestationService {
   }
 
   public async verifyAttestation(
-    attestation: sdk.IAttestation
+    iAttestation: sdk.IAttestation
   ): Promise<boolean> {
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    const attestationObject: sdk.Attestation = sdk.Attestation.fromObject(
-      attestation
+    const attestation: sdk.Attestation = sdk.Attestation.fromObject(
+      iAttestation
     )
-    return await attestationObject.verify(blockchain)
+    return await attestation.verify(blockchain)
   }
 }
 
