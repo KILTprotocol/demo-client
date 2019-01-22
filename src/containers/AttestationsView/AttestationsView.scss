@@ -1,0 +1,32 @@
+.AttestationsView {
+
+  & .claimerAddress, 
+  & .ctypeHash {
+    @extend %ellipsis;
+
+    max-width: 200px;
+  }
+
+  & .revoked {
+    text-align: center;
+    &:before {
+      @include icon($icon-times);
+      color: $color-danger;
+    }
+  }
+
+  & .approved {
+    text-align: center;
+    &:before {
+      @include icon($icon-check);
+      color: $color-success;
+    }
+  }
+
+  & .revoke {
+    @include button-icon-only($icon-ban);
+  }
+  & .delete {
+    @include button-icon-only($icon-trash);
+  }
+}

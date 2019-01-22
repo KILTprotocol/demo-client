@@ -11,6 +11,7 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
+import * as Attestations from '../../state/ducks/Attestations'
 import { Contact } from '../../types/Contact'
 import {
   Message,
@@ -20,6 +21,7 @@ import {
 } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
 import './MessageView.scss'
+import KiltAction from 'src/types/Action'
 
 interface Props {
   selectedIdentity?: Wallet.Entry
@@ -27,6 +29,7 @@ interface Props {
     claimHash: string,
     attestation: sdk.IAttestation
   ) => void
+  saveAttestation: (attestationEntry: Attestations.Entry) => void
 }
 
 interface State {
@@ -171,7 +174,7 @@ class MessageView extends React.Component<Props, State> {
             error,
             message: `Could not retrieve messages for identity ${
               selectedIdentity.identity.address
-            }`,
+              }`,
             origin: 'MessageView.fetchMessages()',
           })
           blockUi.remove()
@@ -185,6 +188,7 @@ class MessageView extends React.Component<Props, State> {
 
   private async attestCurrentClaim() {
     const { currentMessage } = this.state
+    const { saveAttestation } = this.props
 
     if (!currentMessage) {
       this.onCloseMessage()
@@ -204,6 +208,12 @@ class MessageView extends React.Component<Props, State> {
         attestationService
           .attestClaim(claim)
           .then(async attestation => {
+            saveAttestation({
+              claimerAlias: claimer.name,
+              claimerAddress: claim.owner,
+              ctypeHash: claim.ctype,
+              attestation: attestation,
+            } as Attestations.Entry)
             await this.sendClaimAttestedMessage(attestation, claimer, claim)
             if (currentMessage.id) {
               this.onDeleteMessage(currentMessage.id)
@@ -271,13 +281,16 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   }
 }
 
-const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
+const mapDispatchToProps = (dispatch: (action: KiltAction) => void) => {
   return {
     addAttestationToClaim: (
       claimHash: string,
       attestation: sdk.IAttestation
     ) => {
       dispatch(Claims.Store.addAttestation(claimHash, attestation))
+    },
+    saveAttestation: (attestationEntry: Attestations.Entry) => {
+      dispatch(Attestations.Store.saveAttestation(attestationEntry))
     },
   }
 }
