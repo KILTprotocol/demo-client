@@ -29,12 +29,10 @@ class AttestationService {
     return new Promise<sdk.IAttestation>(async (resolve, reject) => {
       attestation
         .store(blockchain, selectedIdentity, () => {
-          console.log('attestation stored on chain')
-
           resolve(attestation)
         })
         .then((hash: any) => {
-          console.log('submitted with hash ' + hash)
+          // ignore
         })
         .catch(error => {
           ErrorService.log({
