@@ -10,7 +10,7 @@ import ErrorService from '../../services/ErrorService'
 import FeedbackService from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { CType } from '../../types/Ctype'
-import { BlockUi } from '../../types/UserFeedback'
+import { BlockUi, NotificationType } from '../../types/UserFeedback'
 
 import './CtypeCreate.scss'
 
@@ -97,6 +97,10 @@ class CtypeCreate extends React.Component<Props, State> {
           // TODO: add onrejected when sdk provides error handling
           ctypeRepository.register(ctypeWrapper).then(() => {
             blockUi.remove()
+            FeedbackService.addNotification({
+              message: `CTYPE ${ctypeWrapper.name} successfully created.`,
+              type: NotificationType.SUCCESS,
+            })
             history.push('/ctype')
           })
         })

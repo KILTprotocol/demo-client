@@ -20,7 +20,7 @@ class FeedbackService {
       created,
       id,
       message: message || '',
-      type: type || NotificationType.FAILURE,
+      type: type || NotificationType.INFO,
     }
   }
 

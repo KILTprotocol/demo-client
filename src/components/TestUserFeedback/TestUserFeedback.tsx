@@ -40,7 +40,7 @@ class TestUserFeedback extends React.Component<Props, State> {
 
     bu1 = FeedbackService.addBlockUi({
       headline: 'UI blocked by Process A',
-      message: 'Step 1 of 2',
+      message: 'doing something (1/2)',
     })
 
     setTimeout(() => {
@@ -49,7 +49,9 @@ class TestUserFeedback extends React.Component<Props, State> {
 
     setTimeout(() => {
       if (bu1.updateMessage) {
-        bu1.updateMessage('Step 2 of 2')
+        bu1.updateMessage(
+          'Very long block ui message to \ndemonstrate the possibility to \nmanually break lines (2/2)'
+        )
       }
     }, 4000)
 

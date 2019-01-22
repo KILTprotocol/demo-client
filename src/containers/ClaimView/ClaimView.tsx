@@ -9,6 +9,7 @@ import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal from '../../components/Modal/Modal'
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
+import FeedbackService from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
@@ -16,6 +17,7 @@ import {
   MessageBodyType,
   RequestAttestationForClaim,
 } from '../../types/Message'
+import { NotificationType } from '../../types/UserFeedback'
 
 import './ClaimView.scss'
 
@@ -211,16 +213,23 @@ class ClaimView extends React.Component<Props, State> {
           content: claimToAttest.claim,
           type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
         }
-        MessageRepository.send(attestant, request).catch(error => {
-          ErrorService.log({
-            error,
-            message: `Could not send message ${request.type} to ${
-              attestant.name
-            }`,
-            origin: 'ClaimView.componentDidMount()',
-            type: 'ERROR.FETCH.GET',
+        MessageRepository.send(attestant, request)
+          .then(() => {
+            FeedbackService.addNotification({
+              message: 'Request for attestation successfully sent.',
+              type: NotificationType.SUCCESS,
+            })
           })
-        })
+          .catch(error => {
+            ErrorService.log({
+              error,
+              message: `Could not send message ${request.type} to ${
+                attestant.name
+              }`,
+              origin: 'ClaimView.componentDidMount()',
+              type: 'ERROR.FETCH.GET',
+            })
+          })
       })
     }
   }

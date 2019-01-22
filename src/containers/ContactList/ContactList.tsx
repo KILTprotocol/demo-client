@@ -7,10 +7,12 @@ import Modal from '../../components/Modal/Modal'
 import ContactRepository from '../../services/ContactRepository'
 import CtypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
+import FeedbackService from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { CType } from '../../types/Ctype'
 import { MessageBodyType, RequestClaimForCtype } from '../../types/Message'
+import { BlockUi, NotificationType } from '../../types/UserFeedback'
 
 import './ContactList.scss'
 
@@ -164,21 +166,33 @@ class ContactList extends React.Component<Props, State> {
 
   private onFinishRequestClaim() {
     if (this.selectedContact && this.selectedCtype) {
+      const blockUi: BlockUi = FeedbackService.addBlockUi({
+        headline: 'Sending Message',
+      })
       const request: RequestClaimForCtype = {
         content: this.selectedCtype,
         type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE,
       }
 
-      MessageRepository.send(this.selectedContact, request).catch(error => {
-        ErrorService.log({
-          error,
-          message: `Could not send message ${request.type} to ${
-            this.selectedContact!.name
-          }`,
-          origin: 'ContactList.onFinishRequestClaim()',
-          type: 'ERROR.FETCH.POST',
+      MessageRepository.send(this.selectedContact, request)
+        .then(() => {
+          blockUi.remove()
+          FeedbackService.addNotification({
+            message: 'Request Claims successfully sent.',
+            type: NotificationType.SUCCESS,
+          })
         })
-      })
+        .catch(error => {
+          blockUi.remove()
+          ErrorService.log({
+            error,
+            message: `Could not send message ${request.type} to ${
+              this.selectedContact!.name
+            }`,
+            origin: 'ContactList.onFinishRequestClaim()',
+            type: 'ERROR.FETCH.POST',
+          })
+        })
     }
   }
 

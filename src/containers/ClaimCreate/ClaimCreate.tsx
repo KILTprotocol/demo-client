@@ -11,14 +11,14 @@ import ErrorService from '../../services/ErrorService'
 import FeedbackService from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
+import { BlockUi, NotificationType } from '../../types/UserFeedback'
 
 import './ClaimCreate.scss'
-import { BlockUi } from '../../types/UserFeedback'
 
 type Props = RouteComponentProps<{
   ctypeKey: string
 }> & {
-  saveClaim: (claim: sdk.Claim) => void
+  saveClaim: (claim: sdk.IClaim) => void
   selectedIdentity?: Wallet.Entry
 }
 
@@ -138,13 +138,17 @@ class ClaimCreate extends Component<Props, State> {
     const { name, claim, ctype }: State = this.state
 
     if (ctype && selectedIdentity) {
-      const newClaim = new sdk.Claim(
+      const newClaim: sdk.IClaim = new sdk.Claim(
         name,
         ctype,
         claim,
         selectedIdentity.identity
       )
       saveClaim(newClaim)
+      FeedbackService.addNotification({
+        message: `Claim ${newClaim.alias} successfully created.`,
+        type: NotificationType.SUCCESS,
+      })
       history.push('/claim')
     }
   }

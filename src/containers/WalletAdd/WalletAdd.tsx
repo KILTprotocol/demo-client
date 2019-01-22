@@ -10,7 +10,7 @@ import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
 import FeedbackService from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
-import { BlockUi } from '../../types/UserFeedback'
+import { BlockUi, NotificationType } from '../../types/UserFeedback'
 import './WalletAdd.scss'
 
 type Props = RouteComponentProps<{}> & {
@@ -163,8 +163,12 @@ class WalletAdd extends React.Component<Props, State> {
           }).then(
             () => {
               this.props.saveIdentity(alias, identity)
-              this.props.history.push('/wallet')
               blockUi.remove()
+              FeedbackService.addNotification({
+                message: `Identity ${alias} successfully created.`,
+                type: NotificationType.SUCCESS,
+              })
+              this.props.history.push('/wallet')
             },
             error => {
               ErrorService.log({

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import * as UiState from '../../state/ducks/UiState'
-import { Notification } from '../../types/UserFeedback'
+import { Notification, NotificationType } from '../../types/UserFeedback'
 
 import './Notifications.scss'
 
@@ -53,7 +53,9 @@ class Notifications extends Component<Props, State> {
           notification.className,
         ].join(' ')}
       >
-        <header>{notification.type}</header>
+        {notification.type !== NotificationType.INFO && (
+          <header>{notification.type}</header>
+        )}
         <div className="body">
           {notification.message}
           <div className="console-log">( for details refer to console )</div>

@@ -199,12 +199,14 @@ class MessageView extends React.Component<Props, State> {
             .then(() => {
               this.fetchMessages()
               this.onCloseMessage()
+              blockUi.remove()
               FeedbackService.addNotification({
-                message: 'Attestation send',
+                message: 'Attestation successfully sent.',
                 type: NotificationType.SUCCESS,
               })
             })
             .catch(error => {
+              blockUi.remove()
               ErrorService.log({
                 error,
                 message: `Could not send attestation for claim ${
