@@ -8,7 +8,9 @@ import { Link, withRouter } from 'react-router-dom'
 import BlockchainService from '../../services/BlockchainService'
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
+import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
+import { BlockUi } from '../../types/UserFeedback'
 import './WalletAdd.scss'
 
 type Props = RouteComponentProps<{}> & {
@@ -33,6 +35,7 @@ class WalletAdd extends React.Component<Props, State> {
       useMyPhrase: false,
     }
     this.togglePhrase = this.togglePhrase.bind(this)
+    this.addIdentity = this.addIdentity.bind(this)
   }
 
   public render() {
@@ -61,13 +64,13 @@ class WalletAdd extends React.Component<Props, State> {
 
           {!useMyPhrase && (
             <div className="phrase">
-              <label>
-                Seed Phrase
+              <div>
+                <label>Seed Phrase</label>
                 <button
                   onClick={this.createRandomPhrase}
                   title="Create random phrase"
                 />
-              </label>
+              </div>
               <div>{randomPhrase}</div>
             </div>
           )}
@@ -121,36 +124,36 @@ class WalletAdd extends React.Component<Props, State> {
     })
   }
 
-  private addIdentity = async () => {
+  private async addIdentity() {
     const { alias, myPhrase, randomPhrase, useMyPhrase } = this.state
 
-    this.setState({
-      pendingAdd: true,
+    const blockUi: BlockUi = FeedbackService.addBlockUi({
+      headline: 'Creating identity',
+      message: 'building Identity from phrase (1/3)',
     })
 
     let identity: Identity
     const usePhrase = useMyPhrase ? myPhrase : randomPhrase
-
     try {
       identity = Identity.buildFromMnemonic(usePhrase)
     } catch (error) {
-      ErrorService.log(
-        'identity.create',
+      ErrorService.log({
         error,
-        `failed to create identity from phrase '${usePhrase}'`
-      )
-      this.setState({
-        pendingAdd: false,
+        message: `failed to create identity from phrase '${usePhrase}'`,
+        origin: 'WalletAdd.addIdentity()',
       })
+      blockUi.remove()
       return
     }
 
     const blockchain: Blockchain = await BlockchainService.connect()
     const alice = Identity.buildFromSeedString('Alice')
+    blockUi.updateMessage('transfer initial tokens (2/3)')
     blockchain
       .makeTransfer(alice, identity.signKeyringPair.address(), 1000)
       .then(
         () => {
+          blockUi.updateMessage('adding identity to contact repository (3/3)')
           ContactRepository.add({
             encryptionKey: identity.boxPublicKeyAsHex,
             key: identity.signPublicKeyAsHex,
@@ -158,32 +161,28 @@ class WalletAdd extends React.Component<Props, State> {
           }).then(
             () => {
               this.props.saveIdentity(alias, identity)
+              blockUi.remove()
+              notifySuccess(`Identity ${alias} successfully created.`)
               this.props.history.push('/wallet')
-              this.setState({
-                pendingAdd: false,
-              })
             },
             error => {
-              ErrorService.log(
-                'fetch.POST',
+              ErrorService.log({
                 error,
-                'failed to POST new identity'
-              )
-              this.setState({
-                pendingAdd: false,
+                message: 'failed to POST new identity',
+                origin: 'WalletAdd.addIdentity()',
+                type: 'ERROR.FETCH.POST',
               })
+              blockUi.remove()
             }
           )
         },
         error => {
-          ErrorService.log(
-            'fetch.POST',
+          ErrorService.log({
             error,
-            'failed to transfer initial tokens to identity'
-          )
-          this.setState({
-            pendingAdd: false,
+            message: 'failed to transfer initial tokens to identity',
+            origin: 'WalletAdd.addIdentity()',
           })
+          blockUi.remove()
         }
       )
   }

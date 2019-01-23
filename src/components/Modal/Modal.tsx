@@ -2,14 +2,22 @@ import * as React from 'react'
 
 import './Modal.scss'
 
+export enum ModalType {
+  ALERT,
+  CONFIRM,
+  BLANK,
+}
+
 type Props = {
-  type: 'alert' | 'confirm' | 'blank'
+  catchBackdropClick?: boolean
+  className?: string
   header: string
-  preventCloseOnCancel?: boolean
-  preventCloseOnConfirm?: boolean
   onCancel?: () => void
   onConfirm?: () => void
-  catchBackdropClick?: boolean
+  preventCloseOnCancel?: boolean
+  preventCloseOnConfirm?: boolean
+  showOnInit?: boolean
+  type: ModalType
 }
 
 type State = {
@@ -20,7 +28,7 @@ class Modal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      show: false,
+      show: !!props.showOnInit,
     }
     this.handleCancel = this.handleCancel.bind(this)
     this.handleConfirm = this.handleConfirm.bind(this)
@@ -28,10 +36,10 @@ class Modal extends React.Component<Props, State> {
   }
 
   public render() {
-    const { type, children, header } = this.props
+    const { className, children, header, type } = this.props
     const { show } = this.state
 
-    const classes = ['Modal', type]
+    const classes = ['Modal', className, type]
 
     return (
       show && (
@@ -40,9 +48,9 @@ class Modal extends React.Component<Props, State> {
           <div className="container">
             <header>{header}</header>
             <div className="body">{children}</div>
-            {type !== 'blank' && (
+            {type !== ModalType.BLANK && (
               <footer>
-                {type === 'confirm' && (
+                {type === ModalType.CONFIRM && (
                   <button className="cancel" onClick={this.handleCancel}>
                     Cancel
                   </button>
@@ -95,13 +103,13 @@ class Modal extends React.Component<Props, State> {
     const { type, catchBackdropClick } = this.props
     if (!catchBackdropClick) {
       switch (type) {
-        case 'alert':
+        case ModalType.ALERT:
           this.handleConfirm()
           break
-        case 'confirm':
-        case 'blank':
+        default:
+          // ModalType.BLANK
+          // ModalType.CONFIRM
           this.handleCancel()
-          break
       }
     }
   }

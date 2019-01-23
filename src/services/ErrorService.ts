@@ -1,33 +1,82 @@
-export type ErrorCategory =
-  | 'JSON.parse'
-  | 'fetch.GET'
-  | 'fetch.POST'
-  | 'fetch.DELETE'
-  | 'identity.create'
-  | 'attestation.create'
+import { Notification, NotificationType } from '../types/UserFeedback'
+import FeedbackService from './FeedbackService'
+
+export type ErrorType =
+  | 'ERROR.FETCH.DELETE'
+  | 'ERROR.FETCH.GET'
+  | 'ERROR.FETCH.POST'
+  | 'ERROR.JSON.PARSE'
+  | 'ERROR.UNCLASSIFIED'
 
 type QualifiedError = {
-  category: ErrorCategory
   error: Error
-  message?: string
+  message: string
+  onConfirm?: () => void
+  type?: ErrorType
+  origin: string
+}
+
+type ErrorConfig = {
+  blocking?: boolean
+  consoleLog?: boolean
 }
 
 class ErrorService {
-  private errors: QualifiedError[] = []
-
-  public log(category: ErrorCategory, error: Error, message?: string) {
+  private static consoleLog({ error, message, origin, type }: QualifiedError) {
     console.groupCollapsed(
-      '%cERROR @ ' + category,
+      `%c${type} @ ${origin}`,
       'background: red; color: white; padding: 5px;'
     )
     console.error(message)
     console.error(error)
     console.groupEnd()
+  }
+
+  private errors: QualifiedError[] = []
+
+  public log(
+    { error, message, onConfirm, origin, type }: QualifiedError,
+    config?: ErrorConfig
+  ) {
+    const useConfig = {
+      ...{
+        blocking: true,
+        consoleLog: true,
+      },
+      ...config,
+    }
+
+    // create console output if not suppressed
+    if (useConfig.consoleLog) {
+      ErrorService.consoleLog({
+        error,
+        message,
+        origin,
+        type: type || 'ERROR.UNCLASSIFIED',
+      })
+    }
+
+    // store for bulk logging
     this.errors.push({
-      category,
       error,
       message,
+      origin,
+      type: type || 'ERROR.UNCLASSIFIED',
     })
+
+    const notification: Partial<Notification> = {
+      className: useConfig.consoleLog ? 'console-log' : '',
+      message,
+      type: NotificationType.FAILURE,
+    }
+
+    // create user feedback
+    return useConfig.blocking
+      ? FeedbackService.addBlockingNotification({
+          ...notification,
+          onConfirm,
+        })
+      : FeedbackService.addNotification(notification)
   }
 }
 

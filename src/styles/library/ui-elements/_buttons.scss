@@ -23,7 +23,6 @@ $darken: 5;
   &:not([disabled]){
 
     &:hover,
-    &:focus,
     &:active {
       background: $color-grey;
       color: $color-font;

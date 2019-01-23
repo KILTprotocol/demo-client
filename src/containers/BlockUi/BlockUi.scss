@@ -1,0 +1,126 @@
+.BlockUi {
+  position: fixed;
+  z-index: $z-index-modal - 10;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  max-width: none;
+  padding: 0;
+
+  & .backdrop {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: $color-background-backdrop;
+  }
+
+  & .container {
+    @extend %centerHV;
+
+    @include transform(translateX(-50%) translateY(-100%));
+
+    position: absolute;
+    margin: {
+      top: -40px;
+    }
+    color: white;
+    text-align: center;
+  }
+
+  & .blockUi {
+    position: relative;
+    margin-bottom: $base-padding;
+    font-size: 14px;
+    white-space: pre-wrap;
+  }
+
+  & header {
+    @include baseFont-bold;
+
+    position: relative;
+    display: inline-block;
+    font-size: 16px;
+
+    &:after {
+      content: '';
+      position: absolute;
+      display: block;
+      left: 100%;
+      bottom: 0;
+      margin: {
+        left: $base-padding/4;
+      }
+      animation: dotdotdot 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      white-space: nowrap;
+      letter-spacing: 3px;
+    }
+  }
+
+  & .spinner {
+    @extend %centerHV;
+
+    position: fixed;
+
+    & .lds-ring {
+      display: inline-block;
+      position: relative;
+      width: 64px;
+      height: 64px;
+
+      & div {
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 51px;
+        height: 51px;
+        margin: 6px;
+        border-radius: 50%;
+        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        border: {
+          width: 6px;
+          style: solid;
+          color: #fff transparent transparent transparent;
+        }
+
+        &:nth-child(1) {
+          animation-delay: -0.45s;
+        }
+
+        &:nth-child(2) {
+          animation-delay: -0.3s;
+        }
+
+        &:nth-child(3) {
+          animation-delay: -0.15s;
+        }
+      }
+    }
+  }
+}
+
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dotdotdot {
+  0% {
+    content: ''
+  }
+  25% {
+    content: '.'
+  }
+  50% {
+    content: '..'
+  }
+  75% {
+    content: '...'
+  }
+}

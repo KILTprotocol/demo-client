@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Route, Switch } from 'react-router-dom'
 import Root from '../components/Root/Root'
+import TestUserFeedback from '../components/TestUserFeedback/TestUserFeedback'
 
 import ChainStats from '../containers/ChainStats/ChainStats'
 import ClaimCreate from '../containers/ClaimCreate/ClaimCreate'
@@ -42,6 +43,8 @@ const Routes: React.FunctionComponent<{}> = props => {
       />
       <Route path={'/claim/:hash'} component={requiresIdentity(ClaimView)} />
       <Route path={'/claim'} component={requiresIdentity(ClaimView)} />
+
+      <Route path={'/testUserFeedback'} component={TestUserFeedback} />
 
       <Route component={Root} />
     </Switch>

@@ -24,10 +24,13 @@
 }
 
 @mixin card {
-  @include box-shadow(2px 2px 5px $color-grey);
+  @include box-shadow(2px 2px 5px transparentize($color-black, 0.8));
   @include border-radius($base-border-radius);
 
-  padding: $base-padding/2 0;
+  margin:{
+    bottom: $base-padding;
+  }
+  padding: $base-padding;
   background: $color-white;
   border: $base-border;
 }
@@ -83,6 +86,24 @@
       & + * {
         width: $input-width;
       }
+    }
+  }
+}
+
+@mixin console-log {
+
+  & .console-log {
+    display: none;
+  }
+
+  &.console-log {
+
+    & .console-log {
+      display: block;
+      margin: {
+        top: 10px;
+      }
+      font-size: 10px;
     }
   }
 }

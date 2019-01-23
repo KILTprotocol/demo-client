@@ -1,6 +1,7 @@
 .IdentityView {
   @include card;
 
+  position: relative;
   padding: $base-padding;
   margin: {
     bottom: $base-padding;
@@ -14,22 +15,22 @@
   }
 
   &.selected {
-    background: $color-primary;
-
-
-    & .attributes {
-
-      & > div {
-
-        & label,
-        & div {
-          color: $color-font-inverted;
-        }
-      }
-    }
+    border: 3px solid $color-primary;
 
     & .actions {
       display: none;
+    }
+
+    &:before {
+      content: 'Active Identity';
+      position: absolute;
+      top: -17px;
+      right: $base-padding/2;
+      font-size: 24px;
+      font-weight: bold;
+      color: $color-primary;
+      background: $color-white;
+      padding: 0 $base-padding/4;
     }
   }
 }

@@ -6,8 +6,11 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import CtypeEditor from '../../components/CtypeEditor/CtypeEditor'
 import BlockchainService from '../../services/BlockchainService'
 import ctypeRepository from '../../services/CtypeRepository'
+import ErrorService from '../../services/ErrorService'
+import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { CType } from '../../types/Ctype'
+import { BlockUi } from '../../types/UserFeedback'
 
 import './CtypeCreate.scss'
 
@@ -46,8 +49,12 @@ class CtypeCreate extends React.Component<Props, State> {
   public async connect() {
     // TODO: test unmount and host change
     // TODO: test error handling
+    const blockUi: BlockUi = FeedbackService.addBlockUi({
+      headline: 'Connecting to block chain',
+    })
     this.blockchain = await BlockchainService.connect()
     this.setState({ connected: true })
+    blockUi.remove()
   }
 
   public async submit() {
@@ -56,26 +63,56 @@ class CtypeCreate extends React.Component<Props, State> {
       this.state.connected &&
       this.state.isValid
     ) {
-      const authorAlias: string = this.props.selectedIdentity.alias
-      const ctype = sdk.CType.fromInputModel(this.state.ctype)
+      const { selectedIdentity, history } = this.props
+      const authorAlias: string = selectedIdentity.alias
+      let ctype: sdk.CType
+
+      try {
+        ctype = sdk.CType.fromInputModel(this.state.ctype)
+      } catch (error) {
+        ErrorService.log({
+          error,
+          message: 'could not create CTYPE from Input Model',
+          origin: 'CtypeCreate.submit()',
+        })
+        return
+      }
+
+      const blockUi: BlockUi = FeedbackService.addBlockUi({
+        headline: 'Creating CTYPE',
+        message: 'submitting CTYPE (1/3)',
+      })
+
       ctype
-        .store(this.blockchain, this.props.selectedIdentity.identity, () => {
-          console.log('finalized ctype registration')
+        .store(this.blockchain, selectedIdentity.identity, () => {
+          blockUi.updateMessage(
+            `CTYPE stored on block chain,\nnow registering CTYPE (3/3)`
+          )
           const ctypeWrapper: CType = {
             author: authorAlias,
             definition: JSON.stringify(ctype.getModel()),
             key: ctype.getModel().hash,
             name: this.state.name,
           }
+          // TODO: add onrejected when sdk provides error handling
           ctypeRepository.register(ctypeWrapper).then(() => {
-            // TODO go back
+            blockUi.remove()
+            notifySuccess(`CTYPE ${ctypeWrapper.name} successfully created.`)
+            history.push('/ctype')
           })
         })
         .then((_hash: any) => {
-          console.log('submitted with hash ' + _hash)
+          blockUi.updateMessage(
+            `CTYPE submitted with hash ${_hash},\nnow storing on block chain (2/3)`
+          )
         })
-        .catch(() => {
-          // TODO: error handling?
+        .catch(error => {
+          ErrorService.log({
+            error,
+            message: 'could not submit CTYPE',
+            origin: 'CtypeCreate.submit()',
+          })
+          blockUi.remove()
         })
     }
   }
@@ -115,6 +152,7 @@ class CtypeCreate extends React.Component<Props, State> {
       isValid,
     })
   }
+
   private updateName = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({
       name: e.target.value,

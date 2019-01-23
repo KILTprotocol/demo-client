@@ -69,11 +69,11 @@ class MessageRepository {
         body: JSON.stringify(messageObj),
       }).then(response => response.json())
     } catch (error) {
-      ErrorService.log(
-        'fetch.POST',
+      ErrorService.log({
         error,
-        'error just before sending messageBody'
-      )
+        message: 'error just before sending messageBody',
+        origin: 'MessageRepository.send()',
+      })
       return Promise.reject()
     }
   }
@@ -103,16 +103,30 @@ class MessageRepository {
     )
     if (!decoded) {
       message.message = 'ERROR DECODING MESSAGE'
+      const errorMessage = `Could not decode message ${message.id}`
+      ErrorService.log(
+        {
+          error: { name: 'ERROR DECODING MESSAGE', message: errorMessage },
+          message: errorMessage,
+          origin: 'MessageRepository.decryptMessage()',
+        },
+        { blocking: false }
+      )
     } else {
       message.message = decoded
     }
     try {
       message.body = JSON.parse(message.message)
-    } catch (e) {
+    } catch (error) {
       ErrorService.log(
-        'JSON.parse',
-        e,
-        `Could not parse message body of message ${message.id} ($m.message)`
+        {
+          error,
+          message: `Could not parse message body of message ${
+            message.id
+          } ($m.message)`,
+          origin: 'MessageRepository.decryptMessage()',
+        },
+        { blocking: false }
       )
     }
     return message

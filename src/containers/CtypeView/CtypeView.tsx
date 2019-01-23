@@ -4,6 +4,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import CtypeDetailView from '../../components/CtypeDetailView/CtypeDetailView'
 import CtypeListView from '../../components/CtypeListView/CtypeListView'
 import CtypeRepository from '../../services/CtypeRepository'
+import ErrorService from '../../services/ErrorService'
 import { CType } from '../../types/Ctype'
 
 import './CtypeView.scss'
@@ -12,7 +13,7 @@ type Props = RouteComponentProps<{ ctypeKey: string }> & {}
 
 type State = {
   ctypes: CType[]
-  currentCtype?: CType
+  currentCtype?: CType | 'notFoundInList'
 }
 
 class CtypeView extends React.Component<Props, State> {
@@ -24,43 +25,57 @@ class CtypeView extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    void this.init()
-
-    if (this.props.match.params.ctypeKey) {
-      this.getCurrentCtype()
-    }
+    CtypeRepository.findAll()
+      .then((ctypes: CType[]) => {
+        this.setState({ ctypes })
+      })
+      .catch(error => {
+        ErrorService.log({
+          error,
+          message: `Could not fetch CTYPES`,
+          origin: 'CtypeView.componentDidMount()',
+          type: 'ERROR.FETCH.GET',
+        })
+      })
   }
 
   public componentDidUpdate() {
     const { match } = this.props
-    const { currentCtype } = this.state
+    const { ctypes, currentCtype } = this.state
 
-    if (!currentCtype && match.params.ctypeKey) {
-      this.getCurrentCtype()
+    if (ctypes && ctypes.length && !currentCtype && match.params.ctypeKey) {
+      this.getCurrentCtype(match.params.ctypeKey)
     }
   }
 
   public render() {
-    const { ctypeKey } = this.props.match.params
+    const { ctypes, currentCtype } = this.state
+    const validCurrentCtype =
+      !!currentCtype && currentCtype !== 'notFoundInList'
     return (
       <section className="CtypeView">
         <h1>CTYPES</h1>
-        {!!ctypeKey && <CtypeDetailView ctype={this.state.currentCtype} />}
-        {!ctypeKey && <CtypeListView ctypes={this.state.ctypes} />}
+        {validCurrentCtype && <CtypeDetailView ctype={currentCtype as CType} />}
+        {!validCurrentCtype && <CtypeListView ctypes={ctypes} />}
       </section>
     )
   }
 
-  private async init() {
-    const ctypes = await CtypeRepository.findAll()
-    this.setState({ ctypes })
-  }
+  private getCurrentCtype(ctypeKey: string) {
+    const { ctypes } = this.state
 
-  private getCurrentCtype() {
-    const currentCtype = this.state.ctypes.find(
-      (ctype: CType) => ctype.key === this.props.match.params.ctypeKey
-    )
-    if (currentCtype) {
+    const currentCtype = ctypes.find((ctype: CType) => ctype.key === ctypeKey)
+
+    if (!currentCtype) {
+      const message = `Could not get CTYPE with key '${ctypeKey}' from local list of CTYPEs`
+      this.setState({ currentCtype: 'notFoundInList' }, () => {
+        ErrorService.log({
+          error: { name: 'setCurrentCtypeError', message },
+          message,
+          origin: 'CtypeView.getCurrentCtype()',
+        })
+      })
+    } else {
       this.setState({ currentCtype })
     }
   }

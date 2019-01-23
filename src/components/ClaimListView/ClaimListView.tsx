@@ -38,7 +38,7 @@ class ClaimListView extends React.Component<Props, State> {
             </thead>
             <tbody>
               {claimStore.map(claimEntry => (
-                <tr key={claimEntry.claim.alias}>
+                <tr key={claimEntry.claim.hash}>
                   <td>
                     <Link to={`/claim/${claimEntry.claim.hash}`}>
                       {claimEntry.claim.alias}

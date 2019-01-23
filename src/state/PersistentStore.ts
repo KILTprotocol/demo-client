@@ -1,23 +1,29 @@
-import { combineReducers, createStore, Store } from 'redux'
-import * as Claims from './ducks/Claims'
-import * as Wallet from './ducks/Wallet'
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import { combineReducers, createStore, Store } from 'redux'
+import ErrorService from '../services/ErrorService'
+
+import * as Claims from './ducks/Claims'
+import * as UiState from './ducks/UiState'
+import * as Wallet from './ducks/Wallet'
 
 declare global {
   /* tslint:disable */
   interface Window {
     __REDUX_DEVTOOLS_EXTENSION__: any
   }
+
   /* tslint:enable */
 }
 
 type State = {
   claims: Claims.ImmutableState
+  uiState: UiState.ImmutableState
   wallet: Wallet.ImmutableState
 }
 
 type SerializedState = {
   claims: Claims.SerializedState
+  uiState: UiState.SerializedState
   wallet: Wallet.SerializedState
 }
 
@@ -31,6 +37,7 @@ class PersistentStore {
   private static deserialize(obj: SerializedState): State {
     return {
       claims: Claims.Store.deserialize(obj.claims),
+      uiState: UiState.Store.deserialize(obj.uiState),
       wallet: Wallet.Store.deserialize(obj.wallet),
     }
   }
@@ -38,6 +45,7 @@ class PersistentStore {
   private static serialize(state: State): string {
     const obj: SerializedState = {
       claims: Claims.Store.serialize(state.claims),
+      uiState: UiState.Store.serialize(state.uiState),
       wallet: Wallet.Store.serialize(state.wallet),
     }
 
@@ -50,13 +58,22 @@ class PersistentStore {
     const localState = localStorage.getItem(PersistentStore.NAME)
     let persistedState = {} as State
     if (localState) {
-      const storedState = JSON.parse(localState)
-      persistedState = PersistentStore.deserialize(storedState)
+      try {
+        persistedState = PersistentStore.deserialize(JSON.parse(localState))
+      } catch (error) {
+        ErrorService.log({
+          error,
+          message: 'Could not restore PersistentStore from local storage',
+          origin: 'PersistentStore.constructor()',
+        })
+        // TODO: what to do on failure?
+      }
     }
 
     this._store = createStore(
       combineReducers({
         claims: Claims.Store.reducer,
+        uiState: UiState.Store.reducer,
         wallet: Wallet.Store.reducer,
       }),
       persistedState,

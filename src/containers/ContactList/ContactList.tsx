@@ -2,14 +2,17 @@ import * as React from 'react'
 
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
+import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import ContactRepository from '../../services/ContactRepository'
+import CtypeRepository from '../../services/CtypeRepository'
+import ErrorService from '../../services/ErrorService'
+import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
+import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { CType } from '../../types/Ctype'
-import Modal from '../../components/Modal/Modal'
-import CtypeRepository from '../../services/CtypeRepository'
-import MessageRepository from '../../services/MessageRepository'
-import { RequestClaimForCtype, MessageBodyType } from '../../types/Message'
+import { MessageBodyType, RequestClaimForCtype } from '../../types/Message'
+import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
 
@@ -51,12 +54,30 @@ class ContactList extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    ContactRepository.findAll().then((contacts: Contact[]) => {
-      this.setState({ contacts })
-    })
-    CtypeRepository.findAll().then((ctypes: CType[]) => {
-      this.setState({ ctypes })
-    })
+    ContactRepository.findAll()
+      .then((contacts: Contact[]) => {
+        this.setState({ contacts })
+      })
+      .catch(error => {
+        ErrorService.log({
+          error,
+          message: 'Could not fetch contacts',
+          origin: 'ContactList.componentDidMount()',
+          type: 'ERROR.FETCH.GET',
+        })
+      })
+    CtypeRepository.findAll()
+      .then((ctypes: CType[]) => {
+        this.setState({ ctypes })
+      })
+      .catch(error => {
+        ErrorService.log({
+          error,
+          message: 'Could not fetch CTYPEs',
+          origin: 'ContactList.componentDidMount()',
+          type: 'ERROR.FETCH.GET',
+        })
+      })
   }
 
   public render() {
@@ -95,7 +116,7 @@ class ContactList extends React.Component<Props, State> {
           ref={el => {
             this.selectCtypeModal = el
           }}
-          type="confirm"
+          type={ModalType.CONFIRM}
           header="Select CTYPE"
           onCancel={this.onCancelRequestClaim}
           onConfirm={this.onFinishRequestClaim}
@@ -145,12 +166,30 @@ class ContactList extends React.Component<Props, State> {
 
   private onFinishRequestClaim() {
     if (this.selectedContact && this.selectedCtype) {
+      const blockUi: BlockUi = FeedbackService.addBlockUi({
+        headline: 'Sending Message',
+      })
       const request: RequestClaimForCtype = {
         content: this.selectedCtype,
         type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE,
       }
 
       MessageRepository.send(this.selectedContact, request)
+        .then(() => {
+          blockUi.remove()
+          notifySuccess('Request Claims successfully sent.')
+        })
+        .catch(error => {
+          blockUi.remove()
+          ErrorService.log({
+            error,
+            message: `Could not send message ${request.type} to ${
+              this.selectedContact!.name
+            }`,
+            origin: 'ContactList.onFinishRequestClaim()',
+            type: 'ERROR.FETCH.POST',
+          })
+        })
     }
   }
 

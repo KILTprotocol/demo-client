@@ -1,13 +1,13 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import Loading from '../../components/Loading/Loading'
 import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
-import Modal from '../../components/Modal/Modal'
+import Modal, { ModalType } from '../../components/Modal/Modal'
 import attestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
+import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
@@ -17,6 +17,7 @@ import {
   MessageBodyType,
   RequestAttestationForClaim,
 } from '../../types/Message'
+import { BlockUi } from '../../types/UserFeedback'
 import './MessageView.scss'
 
 interface Props {
@@ -29,7 +30,6 @@ interface Props {
 
 interface State {
   messages: Message[]
-  fetching: boolean
   currentMessage?: Message
 }
 
@@ -39,7 +39,6 @@ class MessageView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      fetching: false,
       messages: [],
     }
     this.onDeleteMessage = this.onDeleteMessage.bind(this)
@@ -50,23 +49,23 @@ class MessageView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { messages, currentMessage, fetching } = this.state
+    const { messages, currentMessage } = this.state
     return (
       <section className="MessageView">
         <h1>My Messages</h1>
-        {!fetching && !!messages && !!messages.length && (
+        {!!messages && !!messages.length && (
           <MessageListView
             messages={messages}
             onDelete={this.onDeleteMessage}
             onOpen={this.onOpenMessage}
           />
         )}
-        {!fetching && !!currentMessage && (
+        {!!currentMessage && (
           <Modal
             ref={el => {
               this.messageModal = el
             }}
-            type="blank"
+            type={ModalType.BLANK}
             header={`Message from ${currentMessage.sender}`}
             onCancel={this.onCloseMessage}
           >
@@ -79,13 +78,11 @@ class MessageView extends React.Component<Props, State> {
             </MessageDetailView>
           </Modal>
         )}
-        {fetching && <Loading />}
       </section>
     )
   }
 
   public componentDidMount() {
-    this.setState({ fetching: true })
     this.fetchMessages()
   }
 
@@ -93,19 +90,27 @@ class MessageView extends React.Component<Props, State> {
     const { selectedIdentity: previousSelected } = prevProps
     const { selectedIdentity: currentSelected } = this.props
     if (currentSelected !== previousSelected) {
-      this.setState({ fetching: true })
       this.fetchMessages()
     }
   }
 
   private onDeleteMessage(id: string) {
     const { currentMessage } = this.state
-    MessageRepository.deleteByMessageId(id).then(() => {
-      this.fetchMessages()
-      if (currentMessage) {
-        this.onCloseMessage()
-      }
-    })
+    MessageRepository.deleteByMessageId(id)
+      .then(() => {
+        this.fetchMessages()
+        if (currentMessage) {
+          this.onCloseMessage()
+        }
+      })
+      .catch(error => {
+        ErrorService.log({
+          error,
+          message: `Could not delete message ${id}`,
+          origin: 'MessageView.onDeleteMessage()',
+          type: 'ERROR.FETCH.DELETE',
+        })
+      })
   }
 
   private getMessageActions() {
@@ -150,17 +155,28 @@ class MessageView extends React.Component<Props, State> {
   private fetchMessages() {
     const { selectedIdentity } = this.props
     if (selectedIdentity) {
-      MessageRepository.findByMyIdentity(selectedIdentity.identity).then(
-        (messages: Message[]) => {
+      const blockUi: BlockUi = FeedbackService.addBlockUi({
+        headline: 'Fetching messages',
+      })
+      MessageRepository.findByMyIdentity(selectedIdentity.identity)
+        .then((messages: Message[]) => {
           this.setState({
-            fetching: false,
             messages,
           })
-        }
-      )
+          blockUi.remove()
+        })
+        .catch(error => {
+          ErrorService.log({
+            error,
+            message: `Could not retrieve messages for identity ${
+              selectedIdentity.identity.address
+            }`,
+            origin: 'MessageView.fetchMessages()',
+          })
+          blockUi.remove()
+        })
     } else {
       this.setState({
-        fetching: false,
         messages: [],
       })
     }
@@ -170,19 +186,43 @@ class MessageView extends React.Component<Props, State> {
     const { currentMessage } = this.state
 
     if (currentMessage) {
-      try {
-        const claimer: Contact = await ContactRepository.findByKey(
-          currentMessage.senderKey
-        )
-        const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
-          .content
-        await attestationService.attestClaim(claim, claimer)
-      } catch (error) {
-        ErrorService.log('attestation.create', error, 'Error attesting claim')
-      }
-      this.fetchMessages()
+      const blockUi: BlockUi = FeedbackService.addBlockUi({
+        headline: 'Fetching Contacts',
+      })
+
+      ContactRepository.findByKey(currentMessage.senderKey)
+        .then((claimer: Contact) => {
+          const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
+            .content
+          attestationService
+            .attestClaim(claim, claimer)
+            .then(() => {
+              this.fetchMessages()
+              this.onCloseMessage()
+              blockUi.remove()
+              notifySuccess('Attestation successfully sent.')
+            })
+            .catch(error => {
+              blockUi.remove()
+              ErrorService.log({
+                error,
+                message: `Could not send attestation for claim ${
+                  claim.hash
+                } to ${claimer.name}`,
+                origin: 'MessageView.attestCurrentClaim()',
+                type: 'ERROR.FETCH.POST',
+              })
+            })
+        })
+        .catch(error => {
+          ErrorService.log({
+            error,
+            message: 'Could not retrieve claimer',
+            origin: 'MessageView.attestCurrentClaim()',
+            type: 'ERROR.FETCH.GET',
+          })
+        })
     }
-    this.onCloseMessage()
   }
 
   private importAttestation() {

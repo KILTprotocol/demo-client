@@ -1,0 +1,75 @@
+.Notifications {
+  $notification-width: 400px;
+
+  position: fixed;
+  z-index: $z-index-modal - 20;
+  top: $header-height;
+  right: 0;
+  max-width: $notification-width + 2 * $base-padding;
+  max-height: calc(100% - #{$header-height});
+  padding: 0;
+  overflow: auto;
+
+  & header {
+    @include baseFont-bold;
+
+    display: flex;
+    align-items: center;
+    margin: {
+      bottom: $base-padding/2;
+    }
+    font-size: 12px;
+
+    &:before {
+      margin: {
+        right: $base-padding/2;
+      }
+    }
+  }
+
+  & .notification {
+    @include card;
+    @include console-log;
+
+    position: relative;
+    display: block;
+    margin: $base-padding/2 $base-padding/2 0 0;
+    padding: $base-padding/2;
+    background: white;
+    font-size: 14px;
+
+    &.SUCCESS {
+
+      & header {
+        color: $color-success;
+
+        &:before {
+          @include icon($icon-check-circle-o);
+
+          font-size: 16px;
+        }
+      }
+    }
+
+    &.FAILURE {
+
+      & header {
+        color: $color-danger;
+
+        &:before {
+          @include icon($icon-warning)
+        }
+      }
+    }
+  }
+
+  & .close {
+    @include button-icon-only($icon-times);
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none;
+    color: $color-font;
+  }
+}
