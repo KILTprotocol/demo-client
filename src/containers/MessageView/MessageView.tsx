@@ -3,11 +3,11 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
-import Modal from '../../components/Modal/Modal'
+import Modal, { ModalType } from '../../components/Modal/Modal'
 import attestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
-import FeedbackService from '../../services/FeedbackService'
+import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
@@ -17,7 +17,7 @@ import {
   MessageBodyType,
   RequestAttestationForClaim,
 } from '../../types/Message'
-import { BlockUi, NotificationType } from '../../types/UserFeedback'
+import { BlockUi } from '../../types/UserFeedback'
 import './MessageView.scss'
 
 interface Props {
@@ -65,7 +65,7 @@ class MessageView extends React.Component<Props, State> {
             ref={el => {
               this.messageModal = el
             }}
-            type="blank"
+            type={ModalType.BLANK}
             header={`Message from ${currentMessage.sender}`}
             onCancel={this.onCloseMessage}
           >
@@ -200,10 +200,7 @@ class MessageView extends React.Component<Props, State> {
               this.fetchMessages()
               this.onCloseMessage()
               blockUi.remove()
-              FeedbackService.addNotification({
-                message: 'Attestation successfully sent.',
-                type: NotificationType.SUCCESS,
-              })
+              notifySuccess('Attestation successfully sent.')
             })
             .catch(error => {
               blockUi.remove()

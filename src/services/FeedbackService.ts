@@ -120,4 +120,25 @@ class FeedbackService {
   }
 }
 
+function _notify(type: NotificationType, message: string, blocking = false) {
+  blocking
+    ? FeedbackService.addBlockingNotification({
+        message,
+        type,
+      })
+    : FeedbackService.addNotification({ message, type })
+}
+
+export function notifySuccess(message: string, blocking = false) {
+  _notify(NotificationType.SUCCESS, message, blocking)
+}
+
+export function notifyFailure(message: string, blocking = true) {
+  _notify(NotificationType.FAILURE, message, blocking)
+}
+
+export function notify(message: string, blocking = true) {
+  _notify(NotificationType.INFO, message, blocking)
+}
+
 export default FeedbackService

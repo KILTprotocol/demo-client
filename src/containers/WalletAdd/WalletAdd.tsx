@@ -8,9 +8,9 @@ import { Link, withRouter } from 'react-router-dom'
 import BlockchainService from '../../services/BlockchainService'
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
-import FeedbackService from '../../services/FeedbackService'
+import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
-import { BlockUi, NotificationType } from '../../types/UserFeedback'
+import { BlockUi } from '../../types/UserFeedback'
 import './WalletAdd.scss'
 
 type Props = RouteComponentProps<{}> & {
@@ -25,8 +25,6 @@ type State = {
 }
 
 class WalletAdd extends React.Component<Props, State> {
-  private blockUi: BlockUi
-
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -164,10 +162,7 @@ class WalletAdd extends React.Component<Props, State> {
             () => {
               this.props.saveIdentity(alias, identity)
               blockUi.remove()
-              FeedbackService.addNotification({
-                message: `Identity ${alias} successfully created.`,
-                type: NotificationType.SUCCESS,
-              })
+              notifySuccess(`Identity ${alias} successfully created.`)
               this.props.history.push('/wallet')
             },
             error => {

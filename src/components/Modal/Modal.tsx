@@ -2,6 +2,12 @@ import * as React from 'react'
 
 import './Modal.scss'
 
+export enum ModalType {
+  ALERT,
+  CONFIRM,
+  BLANK,
+}
+
 type Props = {
   catchBackdropClick?: boolean
   className?: string
@@ -11,7 +17,7 @@ type Props = {
   preventCloseOnCancel?: boolean
   preventCloseOnConfirm?: boolean
   showOnInit?: boolean
-  type: 'alert' | 'confirm' | 'blank'
+  type: ModalType
 }
 
 type State = {
@@ -42,9 +48,9 @@ class Modal extends React.Component<Props, State> {
           <div className="container">
             <header>{header}</header>
             <div className="body">{children}</div>
-            {type !== 'blank' && (
+            {type !== ModalType.BLANK && (
               <footer>
-                {type === 'confirm' && (
+                {type === ModalType.CONFIRM && (
                   <button className="cancel" onClick={this.handleCancel}>
                     Cancel
                   </button>
@@ -97,13 +103,13 @@ class Modal extends React.Component<Props, State> {
     const { type, catchBackdropClick } = this.props
     if (!catchBackdropClick) {
       switch (type) {
-        case 'alert':
+        case ModalType.ALERT:
           this.handleConfirm()
           break
-        case 'confirm':
-        case 'blank':
+        default:
+          // ModalType.BLANK
+          // ModalType.CONFIRM
           this.handleCancel()
-          break
       }
     }
   }

@@ -6,10 +6,10 @@ import { Config } from 'react-select/lib/filters'
 
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
-import Modal from '../../components/Modal/Modal'
+import Modal, { ModalType } from '../../components/Modal/Modal'
 import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
-import FeedbackService from '../../services/FeedbackService'
+import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
@@ -17,7 +17,6 @@ import {
   MessageBodyType,
   RequestAttestationForClaim,
 } from '../../types/Message'
-import { NotificationType } from '../../types/UserFeedback'
 
 import './ClaimView.scss'
 
@@ -113,7 +112,7 @@ class ClaimView extends React.Component<Props, State> {
           ref={el => {
             this.selectAttestantModal = el
           }}
-          type="confirm"
+          type={ModalType.CONFIRM}
           header="Select Attestant(s):"
           onCancel={this.onCancelRequestAttestation}
           onConfirm={this.onFinishRequestAttestation}
@@ -215,10 +214,7 @@ class ClaimView extends React.Component<Props, State> {
         }
         MessageRepository.send(attestant, request)
           .then(() => {
-            FeedbackService.addNotification({
-              message: 'Request for attestation successfully sent.',
-              type: NotificationType.SUCCESS,
-            })
+            notifySuccess('Request for attestation successfully sent.')
           })
           .catch(error => {
             ErrorService.log({

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 import IdentityView from '../../components/IdentityView/IdentityView'
-import Modal from '../../components/Modal/Modal'
+import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import * as Wallet from '../../state/ducks/Wallet'
 
@@ -67,7 +67,7 @@ class WalletView extends React.Component<Props, State> {
             }}
             header="Delete?"
             onConfirm={this.removeIdentity}
-            type="confirm"
+            type={ModalType.CONFIRM}
           >
             <div>
               Are you sure you want to delete your identity '

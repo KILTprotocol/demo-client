@@ -1,14 +1,14 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 
-import { Contact } from 'src/types/Contact'
-import persistentStore from 'src/state/PersistentStore'
-import { ApproveAttestationForClaim, MessageBodyType } from 'src/types/Message'
-import ErrorService from './ErrorService'
+import persistentStore from '../state/PersistentStore'
+import { Contact } from '../types/Contact'
+import { ApproveAttestationForClaim, MessageBodyType } from '../types/Message'
 import MessageRepository from './MessageRepository'
 
 class AttestationService {
   /**
-   * Verifies the given `claim`, stores it on chain and sends a message to the claimer.
+   * Verifies the given `claim`, stores it on chain and sends a message to the
+   * claimer.
    *
    * @param claim the claim to attest
    * @param claimer the person that wants to attest the claim

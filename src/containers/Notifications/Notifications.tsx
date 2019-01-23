@@ -13,7 +13,7 @@ type Props = {
 type State = {}
 
 class Notifications extends Component<Props, State> {
-  private displayTime = 4000 // ms
+  private static readonly DISPLAY_TIME = 4000 // ms
 
   constructor(props: Props) {
     super(props)
@@ -32,7 +32,7 @@ class Notifications extends Component<Props, State> {
 
   private getNotification(notification: Notification) {
     const now = Date.now()
-    if (now - notification.created >= this.displayTime) {
+    if (now - notification.created >= Notifications.DISPLAY_TIME) {
       if (notification.remove) {
         notification.remove()
       }
@@ -41,7 +41,7 @@ class Notifications extends Component<Props, State> {
         if (notification.remove) {
           notification.remove()
         }
-      }, this.displayTime)
+      }, Notifications.DISPLAY_TIME)
     }
 
     return (

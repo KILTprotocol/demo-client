@@ -2,17 +2,17 @@ import * as React from 'react'
 
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
-import Modal from '../../components/Modal/Modal'
+import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import ContactRepository from '../../services/ContactRepository'
 import CtypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
-import FeedbackService from '../../services/FeedbackService'
+import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { CType } from '../../types/Ctype'
 import { MessageBodyType, RequestClaimForCtype } from '../../types/Message'
-import { BlockUi, NotificationType } from '../../types/UserFeedback'
+import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
 
@@ -116,7 +116,7 @@ class ContactList extends React.Component<Props, State> {
           ref={el => {
             this.selectCtypeModal = el
           }}
-          type="confirm"
+          type={ModalType.CONFIRM}
           header="Select CTYPE"
           onCancel={this.onCancelRequestClaim}
           onConfirm={this.onFinishRequestClaim}
@@ -177,10 +177,7 @@ class ContactList extends React.Component<Props, State> {
       MessageRepository.send(this.selectedContact, request)
         .then(() => {
           blockUi.remove()
-          FeedbackService.addNotification({
-            message: 'Request Claims successfully sent.',
-            type: NotificationType.SUCCESS,
-          })
+          notifySuccess('Request Claims successfully sent.')
         })
         .catch(error => {
           blockUi.remove()

@@ -8,10 +8,10 @@ import * as common from 'schema-based-json-editor'
 import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import CtypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
-import FeedbackService from '../../services/FeedbackService'
+import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
-import { BlockUi, NotificationType } from '../../types/UserFeedback'
+import { BlockUi } from '../../types/UserFeedback'
 
 import './ClaimCreate.scss'
 
@@ -145,10 +145,7 @@ class ClaimCreate extends Component<Props, State> {
         selectedIdentity.identity
       )
       saveClaim(newClaim)
-      FeedbackService.addNotification({
-        message: `Claim ${newClaim.alias} successfully created.`,
-        type: NotificationType.SUCCESS,
-      })
+      notifySuccess(`Claim ${newClaim.alias} successfully created.`)
       history.push('/claim')
     }
   }

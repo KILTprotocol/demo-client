@@ -1,5 +1,5 @@
 import * as React from 'react'
-import FeedbackService from '../../services/FeedbackService'
+import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import { BlockUi, NotificationType } from '../../types/UserFeedback'
 
@@ -87,21 +87,18 @@ class TestUserFeedback extends React.Component<Props, State> {
   }
 
   private testFailure() {
-    FeedbackService.addNotification({ message: 'Example for Failure' })
+    FeedbackService.addNotification({
+      message: 'Example for Failure',
+      type: NotificationType.FAILURE,
+    })
   }
 
   private testSuccess() {
-    FeedbackService.addNotification({
-      message: 'Example for Success',
-      type: NotificationType.SUCCESS,
-    })
+    notifySuccess('Example for Success')
   }
 
   private testNeutral() {
-    FeedbackService.addNotification({
-      message: 'Example for Info',
-      type: NotificationType.INFO,
-    })
+    FeedbackService.addNotification({ message: 'Example for Info' })
   }
 }
 

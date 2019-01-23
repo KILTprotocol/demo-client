@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Modal from '../../components/Modal/Modal'
+import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import * as UiState from '../../state/ducks/UiState'
 import { BlockingNotification, Notification } from '../../types/UserFeedback'
@@ -39,7 +39,7 @@ class BlockingNotifications extends Component<Props, State> {
         preventCloseOnCancel={true}
         preventCloseOnConfirm={true}
         showOnInit={true}
-        type="alert"
+        type={ModalType.ALERT}
       >
         {notification.message}
         <div className="console-log">( for details refer to console )</div>
