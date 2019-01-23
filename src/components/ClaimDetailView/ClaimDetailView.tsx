@@ -51,8 +51,8 @@ class ClaimDetailView extends Component<Props, State> {
         {this.getActions()}
       </section>
     ) : (
-        <section className="ClaimDetailView">Claim not found</section>
-      )
+      <section className="ClaimDetailView">Claim not found</section>
+    )
   }
 
   private getAttributes(claim: sdk.Claim) {
@@ -122,8 +122,8 @@ class ClaimDetailView extends Component<Props, State> {
             </tbody>
           </table>
         ) : (
-            <div>No Attestations found.</div>
-          )}
+          <div>No Attestations found.</div>
+        )}
       </section>
     )
   }
@@ -185,10 +185,11 @@ class ClaimDetailView extends Component<Props, State> {
       if (!verified) {
         return
       }
-      this.setState({ 
+      this.setState({
         unverifiedAttestations: unverifiedAttestations.filter(
-          (unverifiedAttestation: string) => attestation.claimHash !== unverifiedAttestation
-        )
+          (unverifiedAttestation: string) =>
+            attestation.claimHash !== unverifiedAttestation
+        ),
       })
     })
   }
