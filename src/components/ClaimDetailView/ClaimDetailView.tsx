@@ -10,11 +10,11 @@ type Props = {
   claimEntry?: Claims.Entry
   onRemoveClaim: (hash: string) => void
   onRequestAttestation: (hash: string) => void
-  onVerifyAttestation: (attesation: sdk.IAttestation) => Promise<boolean>
+  onVerifyAttestation: (attestation: sdk.IAttestation) => Promise<boolean>
 }
 
 type State = {
-  invalidAttestations: string[]
+  unverifiedAttestations: string[]
 }
 
 class ClaimDetailView extends Component<Props, State> {
@@ -27,7 +27,7 @@ class ClaimDetailView extends Component<Props, State> {
     const { claimEntry } = this.props
     if (claimEntry) {
       this.state = {
-        invalidAttestations: claimEntry.attestations.map(
+        unverifiedAttestations: claimEntry.attestations.map(
           (attestation: sdk.IAttestation) => {
             return attestation.claimHash
           }
@@ -51,8 +51,8 @@ class ClaimDetailView extends Component<Props, State> {
         {this.getActions()}
       </section>
     ) : (
-      <section className="ClaimDetailView">Claim not found</section>
-    )
+        <section className="ClaimDetailView">Claim not found</section>
+      )
   }
 
   private getAttributes(claim: sdk.Claim) {
@@ -122,8 +122,8 @@ class ClaimDetailView extends Component<Props, State> {
             </tbody>
           </table>
         ) : (
-          <div>No Attestations found.</div>
-        )}
+            <div>No Attestations found.</div>
+          )}
       </section>
     )
   }
@@ -148,7 +148,7 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   private isApproved(attestation: sdk.IAttestation): boolean {
-    const { invalidAttestations } = this.state
+    const { unverifiedAttestations: invalidAttestations } = this.state
     return !invalidAttestations.includes(attestation.claimHash)
   }
 
@@ -180,15 +180,16 @@ class ClaimDetailView extends Component<Props, State> {
     attestation: sdk.IAttestation
   ): (() => void) => () => {
     const { onVerifyAttestation } = this.props
-    const { invalidAttestations } = this.state
+    const { unverifiedAttestations } = this.state
     onVerifyAttestation(attestation).then(verified => {
-      if (verified) {
-        invalidAttestations.splice(
-          invalidAttestations.indexOf(attestation.claimHash),
-          1
-        )
-        this.setState({ invalidAttestations })
+      if (!verified) {
+        return
       }
+      this.setState({ 
+        unverifiedAttestations: unverifiedAttestations.filter(
+          (unverifiedAttestation: string) => attestation.claimHash !== unverifiedAttestation
+        )
+      })
     })
   }
 }

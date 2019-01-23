@@ -55,7 +55,7 @@ class AttestationService {
     const attestation: sdk.Attestation = sdk.Attestation.fromObject(
       iAttestation
     )
-    return await attestation.verify(blockchain)
+    return attestation.verify(blockchain)
   }
 }
 

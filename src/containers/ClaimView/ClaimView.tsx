@@ -193,7 +193,7 @@ class ClaimView extends React.Component<Props, State> {
   private async onVerifyAttestation(
     attestation: sdk.IAttestation
   ): Promise<boolean> {
-    return await attestationService.verifyAttestation(attestation)
+    return attestationService.verifyAttestation(attestation)
   }
 
   private onRequestAttestation(hash: string) {
