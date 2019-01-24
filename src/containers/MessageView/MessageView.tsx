@@ -171,7 +171,7 @@ class MessageView extends React.Component<Props, State> {
             error,
             message: `Could not retrieve messages for identity ${
               selectedIdentity.identity.address
-            }`,
+              }`,
             origin: 'MessageView.fetchMessages()',
           })
           blockUi.remove()
@@ -186,48 +186,51 @@ class MessageView extends React.Component<Props, State> {
   private async attestCurrentClaim() {
     const { currentMessage } = this.state
 
-    if (currentMessage) {
-      const blockUi: BlockUi = FeedbackService.addBlockUi({
-        headline: 'Fetching Contacts',
-      })
-
-      ContactRepository.findByKey(currentMessage.senderKey)
-        .then((claimer: Contact) => {
-          const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
-            .content
-          attestationService
-            .attestClaim(claim)
-            .then(async (attestation) => {
-              await this.sendClaimAttestedMessage(attestation, claimer, claim)
-              if (currentMessage.id) {
-                this.onDeleteMessage(currentMessage.id)
-              }
-              this.fetchMessages()
-              this.onCloseMessage()
-              blockUi.remove()
-              notifySuccess('Attestation successfully sent.')
-            })
-            .catch(error => {
-              blockUi.remove()
-              ErrorService.log({
-                error,
-                message: `Could not send attestation for claim ${
-                  claim.hash
-                } to ${claimer.name}`,
-                origin: 'MessageView.attestCurrentClaim()',
-                type: 'ERROR.FETCH.POST',
-              })
-            })
-        })
-        .catch(error => {
-          ErrorService.log({
-            error,
-            message: 'Could not retrieve claimer',
-            origin: 'MessageView.attestCurrentClaim()',
-            type: 'ERROR.FETCH.GET',
-          })
-        })
+    if (!currentMessage) {
+      this.onCloseMessage()
+      return
     }
+
+    const blockUi: BlockUi = FeedbackService.addBlockUi({
+      headline: 'Fetching Contacts',
+    })
+
+    ContactRepository.findByKey(currentMessage.senderKey)
+      .then((claimer: Contact) => {
+        const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
+          .content
+        attestationService
+          .attestClaim(claim)
+          .then(async (attestation) => {
+            await this.sendClaimAttestedMessage(attestation, claimer, claim)
+            if (currentMessage.id) {
+              this.onDeleteMessage(currentMessage.id)
+            }
+            this.fetchMessages()
+            this.onCloseMessage()
+            blockUi.remove()
+            notifySuccess('Attestation successfully sent.')
+          })
+          .catch(error => {
+            blockUi.remove()
+            ErrorService.log({
+              error,
+              message: `Could not send attestation for claim ${
+                claim.hash
+                } to ${claimer.name}`,
+              origin: 'MessageView.attestCurrentClaim()',
+              type: 'ERROR.FETCH.POST',
+            })
+          })
+      })
+      .catch(error => {
+        ErrorService.log({
+          error,
+          message: 'Could not retrieve claimer',
+          origin: 'MessageView.attestCurrentClaim()',
+          type: 'ERROR.FETCH.GET',
+        })
+      })
   }
 
   private async sendClaimAttestedMessage(
