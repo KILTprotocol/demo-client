@@ -17,6 +17,7 @@ import {
   Message,
   MessageBodyType,
   RequestAttestationForClaim,
+  ClaimMessageBody,
   ApproveAttestationForClaim,
 } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
@@ -203,8 +204,8 @@ class MessageView extends React.Component<Props, State> {
 
     ContactRepository.findByKey(currentMessage.senderKey)
       .then((claimer: Contact) => {
-        const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
-          .content
+        const claimMessageBody: ClaimMessageBody = (currentMessage.body as RequestAttestationForClaim).content
+        const claim: sdk.IClaim = claimMessageBody.claim
         attestationService
           .attestClaim(claim)
           .then(async attestation => {

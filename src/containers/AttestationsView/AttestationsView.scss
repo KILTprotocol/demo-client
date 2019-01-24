@@ -1,10 +1,12 @@
 .AttestationsView {
 
-  & .claimerAddress, 
-  & .ctypeHash {
-    @extend %ellipsis;
+  & .alias {
+    font-weight: bold;
+  }
 
-    max-width: 200px;
+  & .ellipsis {
+    @extend %ellipsis;
+    max-width: 250px;
   }
 
   & .revoked {
@@ -25,6 +27,7 @@
 
   & .revoke {
     @include button-icon-only($icon-ban);
+    margin: 2px;
   }
   & .delete {
     @include button-icon-only($icon-trash);

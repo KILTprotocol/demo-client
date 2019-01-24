@@ -43,8 +43,8 @@ class AttestationService {
     })
   }
 
-  public async revokeAttestation(attestation: sdk.IAttestation): Promise<void> {
-    // TODO implement revokeAttestation
+  public async revoke(iAttestation: sdk.IAttestation): Promise<void> {
+    return Promise.reject('an error occurred')
   }
 
   public async verifyAttestation(

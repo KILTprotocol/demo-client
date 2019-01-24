@@ -25,7 +25,7 @@ interface MessageBodyBase {
 }
 
 export interface RequestAttestationForClaim extends MessageBodyBase {
-  content: sdk.IClaim
+  content: ClaimMessageBody
   type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
 }
 
@@ -46,3 +46,12 @@ export type MessageBody =
   | RequestAttestationForClaim
   | ApproveAttestationForClaim
   | RequestClaimForCtype
+
+
+export interface ClaimMessageBody {
+  claim: sdk.IClaim,
+  cType: {
+    hash: string,
+    name: string
+  }
+}

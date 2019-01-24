@@ -5,6 +5,8 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import * as Attestations from '../../state/ducks/Attestations'
 import persistentStore from '../../state/PersistentStore'
 import './AttestationsView.scss'
+import attestationService from '../../services/AttestationService'
+import ErrorService from 'src/services/ErrorService'
 
 type AttestationListModel = Attestations.Entry
 
@@ -18,6 +20,7 @@ class AttestationsView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {}
+    this.revokeAttestation = this.revokeAttestation.bind(this)
   }
 
   public render() {
@@ -29,8 +32,7 @@ class AttestationsView extends React.Component<Props, State> {
         <table>
           <thead>
             <tr>
-              <th>Claimer Alias</th>
-              <th>Claimer Address</th>
+              <th>Claimer</th>
               <th>CTYPE</th>
               <th>Approved</th>
               <th />
@@ -39,9 +41,14 @@ class AttestationsView extends React.Component<Props, State> {
           <tbody>
             {attestations.map((attestation: AttestationListModel) => (
               <tr>
-                <td>{attestation.claimerAlias}</td>
-                <td className="claimerAddress">{attestation.claimerAddress}</td>
-                <td className="ctypeHash">{attestation.ctypeHash}</td>
+                <td className="ellipsis">
+                  <span className="alias">{attestation.claimerAlias}</span>{' '}
+                  {attestation.claimerAddress}
+                </td>
+                <td className="ellipsis">
+                  <span className="alias">{attestation.ctypeName}</span>{' '}
+                  {attestation.ctypeHash}
+                </td>
                 <td
                   className={
                     attestation.attestation.revoked ? 'revoked' : 'approved'
@@ -49,11 +56,19 @@ class AttestationsView extends React.Component<Props, State> {
                 />
                 <td>
                   {!attestation.attestation.revoked ? (
-                    <button className="revoke" />
+                    <button
+                      title="Revoke"
+                      className="revoke"
+                      onClick={this.revokeAttestation(attestation)}
+                    />
                   ) : (
                     ''
                   )}
-                  <button className="delete" />
+                  <button
+                    title="Delete"
+                    className="delete"
+                    onClick={this.deleteAttestation(attestation)}
+                  />
                 </td>
               </tr>
             ))}
@@ -61,6 +76,30 @@ class AttestationsView extends React.Component<Props, State> {
         </table>
       </section>
     )
+  }
+
+  private revokeAttestation = (
+    attestationListModel?: AttestationListModel
+  ): (() => void) => () => {
+    if (attestationListModel) {
+      attestationService
+        .revoke(attestationListModel.attestation)
+        .then(() => {
+          console.log('revoked')
+        })
+        .catch(error => {
+          ErrorService.log('attestation.revoke', error)
+        })
+    }
+  }
+
+  private deleteAttestation = (
+    attestationListModel?: AttestationListModel
+  ): (() => void) => () => {
+    if (attestationListModel) {
+      console.log('TODO: delete attestation from store')
+      // TODO implement delete attestation from store
+    }
   }
 }
 

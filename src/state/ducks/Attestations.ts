@@ -18,6 +18,7 @@ type Entry = {
   claimerAlias: string
   claimerAddress: string
   ctypeHash: string
+  ctypeName: string
   attestation: sdk.IAttestation
 }
 
@@ -59,21 +60,32 @@ class Store {
 
     const attestationEntries: Entry[] = []
 
-    Object.keys(attestationsStateSerialized.attestations).forEach(i => {
-      const o = attestationsStateSerialized.attestations[i]
-      try {
-        const iAttestation = JSON.parse(o.attestation) as sdk.IAttestation
-        const attestationEntry: Entry = {
-          claimerAlias: o.claimerAlias,
-          claimerAddress: o.claimerAddress,
-          ctypeHash: o.ctypeHash,
-          attestation: iAttestation,
-        } as Entry
-        attestationEntries.push(attestationEntry)
-      } catch (e) {
-        ErrorService.log('JSON.parse', e)
+    console.log(
+      'attestationsStateSerialized.attestations',
+      attestationsStateSerialized.attestations
+    )
+    console.log(
+      'typeof attestationsStateSerialized.attestations',
+      typeof attestationsStateSerialized.attestations
+    )
+    attestationsStateSerialized.attestations.forEach(
+      serializedAttestatation => {
+        try {
+          const attestationAsJson = JSON.parse(serializedAttestatation)
+          console.log('attestationAsJson', attestationAsJson)
+          const iAttestation = attestationAsJson.attestation as sdk.IAttestation
+          const attestationEntry: Entry = {
+            claimerAlias: attestationAsJson.claimerAlias,
+            claimerAddress: attestationAsJson.claimerAddress,
+            ctypeHash: attestationAsJson.ctypeHash,
+            attestation: iAttestation,
+          } as Entry
+          attestationEntries.push(attestationEntry)
+        } catch (e) {
+          ErrorService.log('JSON.parse', e)
+        }
       }
-    })
+    )
 
     return Store.createState({
       attestations: Immutable.List(attestationEntries),
