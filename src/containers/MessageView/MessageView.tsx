@@ -30,7 +30,6 @@ interface Props {
     claimHash: string,
     attestation: sdk.IAttestation
   ) => void
-  saveAttestation: (attestationEntry: Attestations.Entry) => void
 }
 
 interface State {
@@ -175,7 +174,7 @@ class MessageView extends React.Component<Props, State> {
             error,
             message: `Could not retrieve messages for identity ${
               selectedIdentity.identity.address
-              }`,
+            }`,
             origin: 'MessageView.fetchMessages()',
           })
           blockUi.remove()
@@ -189,7 +188,6 @@ class MessageView extends React.Component<Props, State> {
 
   private async attestCurrentClaim() {
     const { currentMessage } = this.state
-    const { saveAttestation } = this.props
 
     if (!currentMessage) {
       this.onCloseMessage()
@@ -204,16 +202,18 @@ class MessageView extends React.Component<Props, State> {
 
     ContactRepository.findByKey(currentMessage.senderKey)
       .then((claimer: Contact) => {
-        const claimMessageBody: ClaimMessageBody = (currentMessage.body as RequestAttestationForClaim).content
+        const claimMessageBody: ClaimMessageBody = (currentMessage.body as RequestAttestationForClaim)
+          .content
         const claim: sdk.IClaim = claimMessageBody.claim
         attestationService
           .attestClaim(claim)
           .then(async attestation => {
-            saveAttestation({
-              claimerAlias: claimer.name,
+            attestationService.saveInStore({
+              attestation,
               claimerAddress: claim.owner,
-              ctypeHash: claim.ctype,
-              attestation: attestation,
+              claimerAlias: claimer.name,
+              ctypeHash: claimMessageBody.cType.hash,
+              ctypeName: claimMessageBody.cType.name,
             } as Attestations.Entry)
             await this.sendClaimAttestedMessage(attestation, claimer, claim)
             if (currentMessage.id) {
@@ -289,9 +289,6 @@ const mapDispatchToProps = (dispatch: (action: KiltAction) => void) => {
       attestation: sdk.IAttestation
     ) => {
       dispatch(Claims.Store.addAttestation(claimHash, attestation))
-    },
-    saveAttestation: (attestationEntry: Attestations.Entry) => {
-      dispatch(Attestations.Store.saveAttestation(attestationEntry))
     },
   }
 }

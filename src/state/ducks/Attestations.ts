@@ -9,12 +9,13 @@ interface SaveAction extends KiltAction {
 }
 
 interface RemoveAction extends KiltAction {
-  payload: string
+  payload: sdk.IAttestation['claimHash']
 }
 
 type Action = SaveAction | RemoveAction
 
 type Entry = {
+  created: string
   claimerAlias: string
   claimerAddress: string
   ctypeHash: string
@@ -29,7 +30,7 @@ type State = {
 type ImmutableState = Immutable.Record<State>
 
 type SerializedState = {
-  attestations: Array<string>
+  attestations: string[]
 }
 
 class Store {
@@ -59,30 +60,26 @@ class Store {
     }
 
     const attestationEntries: Entry[] = []
-
-    console.log(
-      'attestationsStateSerialized.attestations',
-      attestationsStateSerialized.attestations
-    )
-    console.log(
-      'typeof attestationsStateSerialized.attestations',
-      typeof attestationsStateSerialized.attestations
-    )
     attestationsStateSerialized.attestations.forEach(
       serializedAttestatation => {
         try {
           const attestationAsJson = JSON.parse(serializedAttestatation)
-          console.log('attestationAsJson', attestationAsJson)
           const iAttestation = attestationAsJson.attestation as sdk.IAttestation
           const attestationEntry: Entry = {
-            claimerAlias: attestationAsJson.claimerAlias,
-            claimerAddress: attestationAsJson.claimerAddress,
-            ctypeHash: attestationAsJson.ctypeHash,
             attestation: iAttestation,
+            claimerAddress: attestationAsJson.claimerAddress,
+            claimerAlias: attestationAsJson.claimerAlias,
+            created: attestationAsJson.created,
+            ctypeHash: attestationAsJson.ctypeHash,
+            ctypeName: attestationAsJson.ctypeName,
           } as Entry
           attestationEntries.push(attestationEntry)
         } catch (e) {
-          ErrorService.log('JSON.parse', e)
+          ErrorService.log({
+            error: e,
+            message: '',
+            origin: 'Attestations.deserialize()',
+          })
         }
       }
     )
@@ -102,6 +99,14 @@ class Store {
         return state.update('attestations', attestations =>
           attestations.concat(attestationEntry)
         )
+      case Store.ACTIONS.REMOVE_ATTESTATION:
+        const claimHash: string = (action as RemoveAction).payload
+        return state.set(
+          'attestations',
+          state.get('attestations').filter((entry: Entry) => {
+            return entry.attestation.claimHash !== claimHash
+          })
+        )
       default:
         return state
     }
@@ -114,6 +119,15 @@ class Store {
     }
   }
 
+  public static removeAttestation(
+    claimHash: sdk.IAttestation['claimHash']
+  ): RemoveAction {
+    return {
+      payload: claimHash,
+      type: Store.ACTIONS.REMOVE_ATTESTATION,
+    }
+  }
+
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
       attestations: Immutable.List<Entry>(),
@@ -121,6 +135,7 @@ class Store {
   }
 
   private static ACTIONS = {
+    REMOVE_ATTESTATION: 'client/attestations/REMOVE_ATTESTATION',
     SAVE_ATTESTATION: 'client/attestations/SAVE_ATTESTATION',
   }
 }

@@ -25,6 +25,7 @@
     "jest": "20.0.4",
     "js-beautify": "^1.8.8",
     "lodash": "^4.17.11",
+    "moment": "^2.24.0",
     "node-sass": "^4.11.0",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",

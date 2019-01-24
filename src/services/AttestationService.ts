@@ -1,7 +1,9 @@
+import moment from 'moment'
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import persistentStore from 'src/state/PersistentStore'
 import BlockchainService from './BlockchainService'
 import ErrorService from './ErrorService'
+import * as Attestations from '../state/ducks/Attestations'
 
 class AttestationService {
   /**
@@ -43,7 +45,9 @@ class AttestationService {
     })
   }
 
-  public async revoke(iAttestation: sdk.IAttestation): Promise<void> {
+  public async revokeAttestation(
+    iAttestation: sdk.IAttestation
+  ): Promise<void> {
     return Promise.reject('an error occurred')
   }
 
@@ -55,6 +59,20 @@ class AttestationService {
       iAttestation
     )
     return attestation.verify(blockchain)
+  }
+
+  public saveInStore(attestationEntry: Attestations.Entry): void {
+    const m: moment.Moment = moment()
+    attestationEntry.created = m.format('YYYY-MM-DD HH:mm')
+    persistentStore.store.dispatch(
+      Attestations.Store.saveAttestation(attestationEntry)
+    )
+  }
+
+  public removeFromStore(claimHash: sdk.IAttestation['claimHash']): void {
+    persistentStore.store.dispatch(
+      Attestations.Store.removeAttestation(claimHash)
+    )
   }
 }
 

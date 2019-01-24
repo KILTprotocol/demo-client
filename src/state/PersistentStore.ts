@@ -39,19 +39,19 @@ class PersistentStore {
 
   private static deserialize(obj: SerializedState): State {
     return {
+      attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
       uiState: UiState.Store.deserialize(obj.uiState),
       wallet: Wallet.Store.deserialize(obj.wallet),
-      attestations: Attestations.Store.deserialize(obj.attestations),
     }
   }
 
   private static serialize(state: State): string {
     const obj: SerializedState = {
+      attestations: Attestations.Store.serialize(state.attestations),
       claims: Claims.Store.serialize(state.claims),
       uiState: UiState.Store.serialize(state.uiState),
       wallet: Wallet.Store.serialize(state.wallet),
-      attestations: Attestations.Store.serialize(state.attestations),
     }
 
     return JSON.stringify(obj)
@@ -77,10 +77,10 @@ class PersistentStore {
 
     this._store = createStore(
       combineReducers({
+        attestations: Attestations.Store.reducer,
         claims: Claims.Store.reducer,
         uiState: UiState.Store.reducer,
         wallet: Wallet.Store.reducer,
-        attestations: Attestations.Store.reducer,
       }),
       persistedState,
       window.__REDUX_DEVTOOLS_EXTENSION__ &&

@@ -1,12 +1,10 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import * as Attestations from '../../state/ducks/Attestations'
-import persistentStore from '../../state/PersistentStore'
-import './AttestationsView.scss'
+import { notifyFailure } from 'src/services/FeedbackService'
 import attestationService from '../../services/AttestationService'
-import ErrorService from 'src/services/ErrorService'
+import * as Attestations from '../../state/ducks/Attestations'
+import './AttestationsView.scss'
 
 type AttestationListModel = Attestations.Entry
 
@@ -20,12 +18,10 @@ class AttestationsView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {}
-    this.revokeAttestation = this.revokeAttestation.bind(this)
   }
 
   public render() {
     const { attestations } = this.props
-    console.log('attestations', attestations)
     return (
       <section className="AttestationsView">
         <h1>MANAGE ATTESTATIONS</h1>
@@ -33,7 +29,9 @@ class AttestationsView extends React.Component<Props, State> {
           <thead>
             <tr>
               <th>Claimer</th>
+              <th>Claim Hash</th>
               <th>CTYPE</th>
+              <th>Created</th>
               <th>Approved</th>
               <th />
             </tr>
@@ -46,9 +44,13 @@ class AttestationsView extends React.Component<Props, State> {
                   {attestation.claimerAddress}
                 </td>
                 <td className="ellipsis">
+                  {attestation.attestation.claimHash}
+                </td>
+                <td className="ellipsis">
                   <span className="alias">{attestation.ctypeName}</span>{' '}
                   {attestation.ctypeHash}
                 </td>
+                <td>{attestation.created}</td>
                 <td
                   className={
                     attestation.attestation.revoked ? 'revoked' : 'approved'
@@ -82,14 +84,7 @@ class AttestationsView extends React.Component<Props, State> {
     attestationListModel?: AttestationListModel
   ): (() => void) => () => {
     if (attestationListModel) {
-      attestationService
-        .revoke(attestationListModel.attestation)
-        .then(() => {
-          console.log('revoked')
-        })
-        .catch(error => {
-          ErrorService.log('attestation.revoke', error)
-        })
+      notifyFailure('Not yet implemented')
     }
   }
 
@@ -97,8 +92,9 @@ class AttestationsView extends React.Component<Props, State> {
     attestationListModel?: AttestationListModel
   ): (() => void) => () => {
     if (attestationListModel) {
-      console.log('TODO: delete attestation from store')
-      // TODO implement delete attestation from store
+      attestationService.removeFromStore(
+        attestationListModel.attestation.claimHash
+      )
     }
   }
 }
@@ -106,11 +102,10 @@ class AttestationsView extends React.Component<Props, State> {
 const mapStateToProps = (state: {
   attestations: Attestations.ImmutableState
 }) => {
-  const selectedIdentity: sdk.Identity = persistentStore.getSelectedIdentity()
-  console.log('selectedIdentity', selectedIdentity.address)
   return {
     attestations: state.attestations
       .get('attestations')
+      .sortBy(entry => entry.created)
       .toList()
       .toArray(),
   }

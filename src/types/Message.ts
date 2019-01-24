@@ -47,11 +47,10 @@ export type MessageBody =
   | ApproveAttestationForClaim
   | RequestClaimForCtype
 
-
 export interface ClaimMessageBody {
-  claim: sdk.IClaim,
+  claim: sdk.IClaim
   cType: {
-    hash: string,
+    hash: string
     name: string
   }
 }

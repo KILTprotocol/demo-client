@@ -17,9 +17,9 @@ import { MessageBodyType, ClaimMessageBody } from '../../types/Message'
 import attestationService from '../../services/AttestationService'
 
 import './ClaimView.scss'
-import CtypeRepository from 'src/services/CtypeRepository';
-import { CType } from 'src/types/Ctype';
-import ErrorService from 'src/services/ErrorService';
+import CtypeRepository from 'src/services/CtypeRepository'
+import { CType } from 'src/types/Ctype'
+import ErrorService from 'src/services/ErrorService'
 
 type SelectOption = {
   value: string
@@ -217,29 +217,29 @@ class ClaimView extends React.Component<Props, State> {
     if (claimToAttest) {
       const claim: sdk.IClaim = claimToAttest.claim
       CtypeRepository.findByKey(claimToAttest.claim.ctype)
-      .then((ctypeFromRepository:CType) => {
-        const messageBody = {
-          claim: claim,
-          cType : {
-            hash: claim.ctype,
-            name: ctypeFromRepository.name
-          }
-        } as ClaimMessageBody
-        this.selectedAttestants.forEach((attestant: Contact) => {
-          MessageRepository.send(attestant, {
-            content: messageBody,
-            type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+        .then((ctypeFromRepository: CType) => {
+          const messageBody = {
+            cType: {
+              hash: claim.ctype,
+              name: ctypeFromRepository.name,
+            },
+            claim,
+          } as ClaimMessageBody
+          this.selectedAttestants.forEach((attestant: Contact) => {
+            MessageRepository.send(attestant, {
+              content: messageBody,
+              type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+            })
           })
         })
-      })
-      .catch(error => {
-        ErrorService.log({
-          error,
-          message: 'Error fetching CTYPE',
-          origin: 'MessageView.onFinishRequestAttestation()',
-          type: 'ERROR.FETCH.GET',
+        .catch(error => {
+          ErrorService.log({
+            error,
+            message: 'Error fetching CTYPE',
+            origin: 'MessageView.onFinishRequestAttestation()',
+            type: 'ERROR.FETCH.GET',
+          })
         })
-      })
     }
   }
 
