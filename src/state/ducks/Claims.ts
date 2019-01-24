@@ -143,11 +143,10 @@ class Store {
   }
 
   public static addAttestation(
-    hash: string,
-    attestation: sdk.IAttestation
+    attestation: sdk.Attestation
   ): AddAttestationAction {
     return {
-      payload: { id: hash, attestation },
+      payload: { id: attestation.claimHash, attestation },
       type: Store.ACTIONS.ADD_ATTESTATION,
     }
   }

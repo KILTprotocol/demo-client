@@ -34,12 +34,13 @@ class BlockingNotifications extends Component<Props, State> {
       <Modal
         key={notification.id}
         className={[notification.className, notification.type].join(' ')}
-        header={notification.type}
+        header={notification.header || notification.type}
         onConfirm={this.onConfirm(notification)}
+        onCancel={this.onCancel(notification)}
         preventCloseOnCancel={true}
         preventCloseOnConfirm={true}
         showOnInit={true}
-        type={ModalType.ALERT}
+        type={notification.modalType || ModalType.ALERT}
       >
         {notification.message}
         <div className="console-log">( for details refer to console )</div>
@@ -50,6 +51,14 @@ class BlockingNotifications extends Component<Props, State> {
   private onConfirm = (notification: BlockingNotification) => () => {
     if (notification.onConfirm) {
       notification.onConfirm(notification)
+    } else if (notification.remove) {
+      notification.remove()
+    }
+  }
+
+  private onCancel = (notification: BlockingNotification) => () => {
+    if (notification.onCancel) {
+      notification.onCancel(notification)
     } else if (notification.remove) {
       notification.remove()
     }

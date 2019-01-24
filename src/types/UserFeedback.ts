@@ -1,3 +1,5 @@
+import { ModalType } from '../components/Modal/Modal'
+
 export enum NotificationType {
   SUCCESS = 'SUCCESS',
   FAILURE = 'FAILURE',
@@ -23,5 +25,8 @@ export interface Notification {
 }
 
 export interface BlockingNotification extends Notification {
+  header?: string
+  modalType?: ModalType
   onConfirm?: (notification: BlockingNotification) => void
+  onCancel?: (notification: BlockingNotification) => void
 }

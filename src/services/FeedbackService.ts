@@ -52,12 +52,19 @@ class FeedbackService {
 
   public static addBlockingNotification({
     className,
+    header,
     message,
+    onCancel,
     onConfirm,
+    modalType,
     type,
   }: Partial<BlockingNotification>): BlockingNotification {
     const blockingNotification: Partial<BlockingNotification> = {
       ...FeedbackService.getNotificationBase({ className, message, type }),
+      header,
+      modalType,
+      onCancel,
+      onConfirm,
     }
 
     blockingNotification.remove = () => {

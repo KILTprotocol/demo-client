@@ -1,11 +1,30 @@
 .MessageListView {
 
+  & table {
+    table-layout: fixed;
+  }
+
+  & th {
+    width: 100%;
+
+    &:first-child {
+      width: 30%;
+    }
+
+    &:last-child {
+      width: 30%;
+    }
+  }
+
   & th,
   & td {
+    @extend %ellipsis;
+
     text-align: left;
   }
 
   & .actions {
+    min-width: 2*($base-button-height + $base-padding/2);
     padding: 0;
   }
 
@@ -19,6 +38,14 @@
 
   & .message {
     cursor: pointer;
+
+    & .type {
+      @include baseFont-bold;
+    }
+
+    & > div {
+      @extend %ellipsis;
+    }
 
     &:hover {
       text-decoration: underline;
