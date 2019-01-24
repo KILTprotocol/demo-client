@@ -1,5 +1,6 @@
 import { Identity } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+import Identicon from '@polkadot/ui-identicon'
 
 import './IdentityView.scss'
 
@@ -29,6 +30,12 @@ class IdentityView extends React.Component<Props, {}> {
           <div>
             <label>Alias</label>
             <div>{alias}</div>
+          </div>
+          <div>
+            <label>Identicon</label>
+            <div>
+              <Identicon value={identity.address} size={32} theme="substrate" />
+            </div>
           </div>
           <div>
             <label>Phrase</label>
