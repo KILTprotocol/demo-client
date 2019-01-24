@@ -16,6 +16,7 @@ import {
   Message,
   MessageBodyType,
   RequestAttestationForClaim,
+  ApproveAttestationForClaim,
 } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
 import './MessageView.scss'
@@ -24,7 +25,7 @@ interface Props {
   selectedIdentity?: Wallet.Entry
   addAttestationToClaim: (
     claimHash: string,
-    attestation: sdk.Attestation
+    attestation: sdk.IAttestation
   ) => void
 }
 
@@ -185,44 +186,65 @@ class MessageView extends React.Component<Props, State> {
   private async attestCurrentClaim() {
     const { currentMessage } = this.state
 
-    if (currentMessage) {
-      const blockUi: BlockUi = FeedbackService.addBlockUi({
-        headline: 'Fetching Contacts',
-      })
-
-      ContactRepository.findByKey(currentMessage.senderKey)
-        .then((claimer: Contact) => {
-          const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
-            .content
-          attestationService
-            .attestClaim(claim, claimer)
-            .then(() => {
-              this.fetchMessages()
-              this.onCloseMessage()
-              blockUi.remove()
-              notifySuccess('Attestation successfully sent.')
-            })
-            .catch(error => {
-              blockUi.remove()
-              ErrorService.log({
-                error,
-                message: `Could not send attestation for claim ${
-                  claim.hash
-                } to ${claimer.name}`,
-                origin: 'MessageView.attestCurrentClaim()',
-                type: 'ERROR.FETCH.POST',
-              })
-            })
-        })
-        .catch(error => {
-          ErrorService.log({
-            error,
-            message: 'Could not retrieve claimer',
-            origin: 'MessageView.attestCurrentClaim()',
-            type: 'ERROR.FETCH.GET',
-          })
-        })
+    if (!currentMessage) {
+      this.onCloseMessage()
+      return
     }
+
+    const blockUi: BlockUi = FeedbackService.addBlockUi({
+      headline: 'Create attestation',
+    })
+
+    this.onCloseMessage()
+
+    ContactRepository.findByKey(currentMessage.senderKey)
+      .then((claimer: Contact) => {
+        const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
+          .content
+        attestationService
+          .attestClaim(claim)
+          .then(async attestation => {
+            await this.sendClaimAttestedMessage(attestation, claimer, claim)
+            if (currentMessage.id) {
+              this.onDeleteMessage(currentMessage.id)
+            }
+            this.fetchMessages()
+            blockUi.remove()
+            notifySuccess('Attestation created.\nMessage sent to claimer.')
+          })
+          .catch(error => {
+            blockUi.remove()
+            ErrorService.log({
+              error,
+              message: 'Unable to create and store attestation on blockchain',
+              origin: 'MessageView.attestCurrentClaim()',
+              type: 'ERROR.BLOCKCHAIN',
+            })
+          })
+      })
+      .catch(error => {
+        ErrorService.log({
+          error,
+          message: 'Could not retrieve claimer',
+          origin: 'MessageView.attestCurrentClaim()',
+          type: 'ERROR.FETCH.GET',
+        })
+      })
+  }
+
+  private async sendClaimAttestedMessage(
+    attestation: sdk.IAttestation,
+    claimer: Contact,
+    claim: sdk.IClaim
+  ): Promise<Message> {
+    const attestationMessageBody: ApproveAttestationForClaim = {
+      content: {
+        attestation,
+        claim,
+      },
+      type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
+    }
+    return MessageRepository.send(claimer, attestationMessageBody)
   }
 
   private importAttestation() {
@@ -230,8 +252,11 @@ class MessageView extends React.Component<Props, State> {
     const { currentMessage } = this.state
 
     if (currentMessage && currentMessage.body) {
-      const attestation = currentMessage.body.content as sdk.Attestation
-      addAttestationToClaim(attestation.claimHash, attestation)
+      const {
+        claim,
+        attestation,
+      } = (currentMessage.body as ApproveAttestationForClaim).content
+      addAttestationToClaim(claim.hash, attestation)
       this.onCloseMessage()
       if (currentMessage.id) {
         this.onDeleteMessage(currentMessage.id)
@@ -250,7 +275,7 @@ const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
     addAttestationToClaim: (
       claimHash: string,
-      attestation: sdk.Attestation
+      attestation: sdk.IAttestation
     ) => {
       dispatch(Claims.Store.addAttestation(claimHash, attestation))
     },

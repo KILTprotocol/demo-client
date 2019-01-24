@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
@@ -17,6 +18,7 @@ import {
   MessageBodyType,
   RequestAttestationForClaim,
 } from '../../types/Message'
+import attestationService from '../../services/AttestationService'
 
 import './ClaimView.scss'
 
@@ -99,6 +101,7 @@ class ClaimView extends React.Component<Props, State> {
             claimEntry={currentClaimEntry as Claims.Entry}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={this.onRequestAttestation}
+            onVerifyAttestation={this.onVerifyAttestation}
           />
         )}
         {!validCurrentClaimEntry && (
@@ -185,6 +188,12 @@ class ClaimView extends React.Component<Props, State> {
         (option: SelectOption) => option.value === attestant.key
       )
     )
+  }
+
+  private async onVerifyAttestation(
+    attestation: sdk.IAttestation
+  ): Promise<boolean> {
+    return attestationService.verifyAttestation(attestation)
   }
 
   private onRequestAttestation(hash: string) {

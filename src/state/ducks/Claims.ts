@@ -15,14 +15,14 @@ interface RemoveAction extends KiltAction {
 interface AddAttestationAction extends KiltAction {
   payload: {
     id: string
-    attestation: sdk.Attestation
+    attestation: sdk.IAttestation
   }
 }
 
 interface AddAttestationAction extends KiltAction {
   payload: {
     id: string
-    attestation: sdk.Attestation
+    attestation: sdk.IAttestation
   }
 }
 
@@ -30,7 +30,7 @@ type Action = SaveAction | RemoveAction | AddAttestationAction
 
 type Entry = {
   claim: sdk.Claim
-  attestations: sdk.Attestation[]
+  attestations: sdk.IAttestation[]
 }
 
 type State = {
@@ -77,8 +77,8 @@ class Store {
       const o = claimsStateSerialized.claims[i]
       try {
         const claim = JSON.parse(o.claim) as sdk.IClaim
-        const attestations: sdk.Attestation[] = !!o.attestations
-          ? (JSON.parse(o.attestations) as sdk.Attestation[])
+        const attestations: sdk.IAttestation[] = !!o.attestations
+          ? (JSON.parse(o.attestations) as sdk.IAttestation[])
           : []
         const entry = {
           attestations,
@@ -116,7 +116,7 @@ class Store {
         const { id, attestation } = (action as AddAttestationAction).payload
         let attestations = state.getIn(['claims', id, 'attestations']) || []
         attestations = attestations.filter(
-          (_attestation: sdk.Attestation) =>
+          (_attestation: sdk.IAttestation) =>
             _attestation.signature !== attestation.signature
         )
         return state.setIn(
@@ -144,7 +144,7 @@ class Store {
 
   public static addAttestation(
     hash: string,
-    attestation: sdk.Attestation
+    attestation: sdk.IAttestation
   ): AddAttestationAction {
     return {
       payload: { id: hash, attestation },

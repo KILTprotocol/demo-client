@@ -1,25 +1,43 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
 import * as Claims from '../../state/ducks/Claims'
 import Code from '../Code/Code'
-
 import './ClaimDetailView.scss'
-import * as sdk from '@kiltprotocol/prototype-sdk'
 
 type Props = {
   claimEntry?: Claims.Entry
   onRemoveClaim: (hash: string) => void
   onRequestAttestation: (hash: string) => void
+  onVerifyAttestation: (attestation: sdk.IAttestation) => Promise<boolean>
 }
 
-type State = {}
+type State = {
+  unverifiedAttestations: string[]
+}
 
 class ClaimDetailView extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.handleDelete = this.handleDelete.bind(this)
     this.requestAttestation = this.requestAttestation.bind(this)
+    this.verifyAttestation = this.verifyAttestation.bind(this)
+
+    const { claimEntry } = this.props
+    if (claimEntry) {
+      this.state = {
+        unverifiedAttestations: claimEntry.attestations.map(
+          (attestation: sdk.IAttestation) => {
+            return attestation.claimHash
+          }
+        ),
+      }
+    }
+
+    setTimeout(() => {
+      this.verifyAttestations()
+    }, 500)
   }
 
   public render() {
@@ -71,7 +89,7 @@ class ClaimDetailView extends Component<Props, State> {
     )
   }
 
-  private getAttestations(attestations: sdk.Attestation[]) {
+  private getAttestations(attestations: sdk.IAttestation[]) {
     return (
       <section className="attestations">
         <h3>Attestations</h3>
@@ -85,14 +103,19 @@ class ClaimDetailView extends Component<Props, State> {
               </tr>
             </thead>
             <tbody>
-              {attestations.map((attestation: sdk.Attestation) => (
+              {attestations.map((attestation: sdk.IAttestation) => (
                 <tr key={attestation.signature}>
                   <td>{attestation.owner}</td>
                   <td
-                    className={attestation.revoked ? 'revoked' : 'approved'}
+                    className={
+                      this.isApproved(attestation) ? 'approved' : 'revoked'
+                    }
                   />
                   <td>
-                    <button className="refresh" />
+                    <button
+                      className="refresh"
+                      onClick={this.verifyAttestation(attestation)}
+                    />
                   </td>
                 </tr>
               ))}
@@ -124,6 +147,11 @@ class ClaimDetailView extends Component<Props, State> {
     )
   }
 
+  private isApproved(attestation: sdk.IAttestation): boolean {
+    const { unverifiedAttestations: invalidAttestations } = this.state
+    return !invalidAttestations.includes(attestation.claimHash)
+  }
+
   private handleDelete() {
     const { claimEntry, onRemoveClaim }: Props = this.props
     if (claimEntry) {
@@ -136,6 +164,34 @@ class ClaimDetailView extends Component<Props, State> {
     if (claimEntry) {
       onRequestAttestation(claimEntry.claim.hash)
     }
+  }
+
+  private verifyAttestations(): void {
+    const { claimEntry } = this.props
+
+    if (claimEntry) {
+      claimEntry.attestations.forEach(attestation => {
+        this.verifyAttestation(attestation)()
+      })
+    }
+  }
+
+  private verifyAttestation = (
+    attestation: sdk.IAttestation
+  ): (() => void) => () => {
+    const { onVerifyAttestation } = this.props
+    const { unverifiedAttestations } = this.state
+    onVerifyAttestation(attestation).then(verified => {
+      if (!verified) {
+        return
+      }
+      this.setState({
+        unverifiedAttestations: unverifiedAttestations.filter(
+          (unverifiedAttestation: string) =>
+            attestation.claimHash !== unverifiedAttestation
+        ),
+      })
+    })
   }
 }
 

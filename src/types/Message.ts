@@ -20,7 +20,7 @@ export enum MessageBodyType {
 }
 
 interface MessageBodyBase {
-  content: sdk.IClaim | sdk.IAttestation | CType
+  content: any
   type: MessageBodyType
 }
 
@@ -30,7 +30,10 @@ export interface RequestAttestationForClaim extends MessageBodyBase {
 }
 
 export interface ApproveAttestationForClaim extends MessageBodyBase {
-  content: sdk.IAttestation
+  content: {
+    claim: sdk.IClaim
+    attestation: sdk.IAttestation
+  }
   type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM
 }
 

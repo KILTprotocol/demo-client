@@ -6,6 +6,7 @@ export type ErrorType =
   | 'ERROR.FETCH.GET'
   | 'ERROR.FETCH.POST'
   | 'ERROR.JSON.PARSE'
+  | 'ERROR.BLOCKCHAIN'
   | 'ERROR.UNCLASSIFIED'
 
 type QualifiedError = {
