@@ -5,11 +5,10 @@ import ErrorService from './ErrorService'
 
 class AttestationService {
   /**
-   * Verifies the given `claim`, stores it on chain and sends a message to the
-   * claimer.
+   * Creates and stores an attestation for the given `claim` on the blockchain.
    *
    * @param claim the claim to attest
-   * @param claimer the person that wants to attest the claim
+   * @returns the stored attestation in a promise
    */
   public async attestClaim(claim: sdk.IClaim): Promise<sdk.IAttestation> {
     const selectedIdentity: sdk.Identity = persistentStore.getSelectedIdentity()
@@ -35,9 +34,9 @@ class AttestationService {
         .catch(error => {
           ErrorService.log({
             error,
+            message: 'Error storing attestation on blockchain',
             origin: 'AttestationService.attestClaim()',
-            message: 'Error storing attestaition on blockchain',  
-            type: 'ERROR.UNCLASSIFIED'
+            type: 'ERROR.BLOCKCHAIN',
           })
           reject(error)
         })

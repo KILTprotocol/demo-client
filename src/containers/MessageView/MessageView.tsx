@@ -171,7 +171,7 @@ class MessageView extends React.Component<Props, State> {
             error,
             message: `Could not retrieve messages for identity ${
               selectedIdentity.identity.address
-              }`,
+            }`,
             origin: 'MessageView.fetchMessages()',
           })
           blockUi.remove()
@@ -192,8 +192,10 @@ class MessageView extends React.Component<Props, State> {
     }
 
     const blockUi: BlockUi = FeedbackService.addBlockUi({
-      headline: 'Fetching Contacts',
+      headline: 'Create attestation',
     })
+
+    this.onCloseMessage()
 
     ContactRepository.findByKey(currentMessage.senderKey)
       .then((claimer: Contact) => {
@@ -201,25 +203,22 @@ class MessageView extends React.Component<Props, State> {
           .content
         attestationService
           .attestClaim(claim)
-          .then(async (attestation) => {
+          .then(async attestation => {
             await this.sendClaimAttestedMessage(attestation, claimer, claim)
             if (currentMessage.id) {
               this.onDeleteMessage(currentMessage.id)
             }
             this.fetchMessages()
-            this.onCloseMessage()
             blockUi.remove()
-            notifySuccess('Attestation successfully sent.')
+            notifySuccess('Attestation created.\nMessage sent to claimer.')
           })
           .catch(error => {
             blockUi.remove()
             ErrorService.log({
               error,
-              message: `Could not send attestation for claim ${
-                claim.hash
-                } to ${claimer.name}`,
+              message: 'Unable to create and store attestation on blockchain',
               origin: 'MessageView.attestCurrentClaim()',
-              type: 'ERROR.FETCH.POST',
+              type: 'ERROR.BLOCKCHAIN',
             })
           })
       })
