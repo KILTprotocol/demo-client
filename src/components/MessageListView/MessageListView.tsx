@@ -1,8 +1,13 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-import { CType } from '../../types/Ctype'
 
-import { Message, MessageBodyType } from '../../types/Message'
+import {
+  ApproveAttestationForClaim,
+  Message,
+  MessageBodyType,
+  RequestAttestationForClaim,
+  RequestClaimForCtype,
+  SubmitClaimForCtype,
+} from '../../types/Message'
 
 import './MessageListView.scss'
 
@@ -72,24 +77,34 @@ class MessageListView extends React.Component<Props, State> {
     }
 
     let additionalInfo: string = ''
-    const messageBodyType: MessageBodyType | undefined = message.body.type
+    try {
+      const messageBodyType: MessageBodyType | undefined = message.body.type
 
-    switch (messageBodyType) {
-      case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
-        additionalInfo = (message.body.content as CType).name
-        break
-      case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
-        additionalInfo = (message.body.content as sdk.IClaim).alias
-        break
-      case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
-        additionalInfo = (message.body.content as sdk.Attestation).owner
-        break
+      switch (messageBodyType) {
+        case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
+          additionalInfo = (message.body as RequestClaimForCtype).content.name
+          break
+        case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
+          additionalInfo = (message.body as RequestAttestationForClaim).content
+            .alias
+          break
+        case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
+          additionalInfo = (message.body as ApproveAttestationForClaim).content
+            .claim.owner
+          break
+        case MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE:
+          additionalInfo = (message.body as SubmitClaimForCtype).content.claim
+            .owner
+          break
+      }
+    } catch (error) {
+      additionalInfo = ''
     }
 
     return (
       <span>
         <span className="type">{message.body!.type}</span>
-        <span> "{additionalInfo}"</span>
+        {additionalInfo && <span> "{additionalInfo}"</span>}
       </span>
     )
   }

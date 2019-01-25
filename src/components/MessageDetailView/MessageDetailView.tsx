@@ -1,11 +1,15 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { ReactNode } from 'react'
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
 import ChooseClaimForCtype from '../../containers/workflows/ChooseClaimForCtype/ChooseClaimForCtype'
 import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
-import { CType } from '../../types/Ctype'
 
-import { Message, MessageBodyType } from '../../types/Message'
+import {
+  ApproveAttestationForClaim,
+  Message,
+  MessageBodyType,
+  RequestAttestationForClaim,
+  RequestClaimForCtype,
+} from '../../types/Message'
 import Code from '../Code/Code'
 
 import './MessageDetailView.scss'
@@ -63,7 +67,7 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <ChooseClaimForCtype
             senderKey={message.senderKey}
-            ctypeKey={(message.body.content as CType).key}
+            ctypeKey={(message.body as RequestClaimForCtype).content.key}
             onFinished={this.handleDelete}
           />
         )
@@ -71,14 +75,16 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <AttestClaim
             senderKey={message.senderKey}
-            claim={message.body.content as sdk.IClaim}
+            claim={(message.body as RequestAttestationForClaim).content}
             onFinished={this.handleDelete}
           />
         )
       case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
         return (
           <ImportAttestation
-            attestation={message.body.content as sdk.Attestation}
+            attestation={
+              (message.body as ApproveAttestationForClaim).content.attestation
+            }
             onFinished={this.handleDelete}
           />
         )

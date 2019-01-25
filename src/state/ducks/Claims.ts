@@ -5,7 +5,7 @@ import ErrorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 
 interface SaveAction extends KiltAction {
-  payload: sdk.Claim
+  payload: sdk.IClaim
 }
 
 interface RemoveAction extends KiltAction {
@@ -29,6 +29,7 @@ interface AddAttestationAction extends KiltAction {
 type Action = SaveAction | RemoveAction | AddAttestationAction
 
 type Entry = {
+  // TODO: use interface instead of class
   claim: sdk.Claim
   attestations: sdk.IAttestation[]
 }
@@ -128,7 +129,7 @@ class Store {
     }
   }
 
-  public static saveAction(claim: sdk.Claim): SaveAction {
+  public static saveAction(claim: sdk.IClaim): SaveAction {
     return {
       payload: claim,
       type: Store.ACTIONS.SAVE_CLAIM,
@@ -143,7 +144,7 @@ class Store {
   }
 
   public static addAttestation(
-    attestation: sdk.Attestation
+    attestation: sdk.IAttestation
   ): AddAttestationAction {
     return {
       payload: { id: attestation.claimHash, attestation },

@@ -138,7 +138,7 @@ class ClaimCreate extends Component<Props, State> {
     const { name, claim, ctype }: State = this.state
 
     if (ctype && selectedIdentity) {
-      const newClaim: sdk.IClaim = new sdk.Claim(
+      const newClaim: sdk.Claim = new sdk.Claim(
         name,
         ctype,
         claim,
@@ -163,7 +163,7 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    saveClaim: (claim: sdk.Claim) => {
+    saveClaim: (claim: sdk.IClaim) => {
       dispatch(Claims.Store.saveAction(claim))
     },
   }

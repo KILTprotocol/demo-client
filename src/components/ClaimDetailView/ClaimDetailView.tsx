@@ -55,6 +55,7 @@ class ClaimDetailView extends Component<Props, State> {
     )
   }
 
+  // TODO: use interface instead of class
   private getAttributes(claim: sdk.Claim) {
     const verified = claim ? claim.verifySignature() : false
     return (

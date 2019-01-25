@@ -31,7 +31,7 @@ type Props = {
 type State = {
   ctype?: CType
   selectedClaim?: Claims.Entry
-  selectedAttestations: sdk.Attestation[]
+  selectedAttestations: sdk.IAttestation[]
   workflowStarted: boolean
 }
 
@@ -126,8 +126,8 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
           <div className="attestations">
             <h4>Attestations</h4>
             {selectedClaim.attestations
-              .filter((attestation: sdk.Attestation) => !attestation.revoked)
-              .map((attestation: sdk.Attestation) => (
+              .filter((attestation: sdk.IAttestation) => !attestation.revoked)
+              .map((attestation: sdk.IAttestation) => (
                 <label key={attestation.signature}>
                   <input
                     type="checkbox"
@@ -158,14 +158,14 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   }
 
   private selectAttestation(
-    attestation: sdk.Attestation,
+    attestation: sdk.IAttestation,
     event: ChangeEvent<HTMLInputElement>
   ) {
     const { checked } = event.target
     const { selectedAttestations } = this.state
 
     const attestationSelected = selectedAttestations.find(
-      (selectedAttestation: sdk.Attestation) =>
+      (selectedAttestation: sdk.IAttestation) =>
         attestation.signature === selectedAttestation.signature
     )
 
@@ -176,7 +176,7 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
     } else if (attestationSelected) {
       this.setState({
         selectedAttestations: selectedAttestations.filter(
-          (selectedAttestation: sdk.Attestation) =>
+          (selectedAttestation: sdk.IAttestation) =>
             attestation.signature !== selectedAttestation.signature
         ),
       })

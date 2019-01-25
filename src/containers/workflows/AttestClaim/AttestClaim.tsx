@@ -46,7 +46,7 @@ class AttestClaim extends React.Component<Props, State> {
       .then((claimer: Contact) => {
         blockUi.updateMessage('Attesting')
         attestationService
-          .attestClaim(claim, claimer)
+          .attestClaim(claim)
           .then(() => {
             if (onFinished) {
               onFinished()

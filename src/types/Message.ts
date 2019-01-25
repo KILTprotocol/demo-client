@@ -44,7 +44,7 @@ export interface RequestClaimForCtype extends MessageBodyBase {
 }
 
 export interface SubmitClaimForCtype extends MessageBodyBase {
-  content: { claim: sdk.IClaim; attestations: sdk.Attestation[] }
+  content: { claim: sdk.IClaim; attestations: sdk.IAttestation[] }
   type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE
 }
 

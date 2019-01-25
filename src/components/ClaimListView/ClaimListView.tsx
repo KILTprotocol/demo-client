@@ -49,7 +49,7 @@ class ClaimListView extends React.Component<Props, State> {
                     className={
                       'attested ' +
                       (claimEntry.attestations.find(
-                        (attestation: sdk.Attestation) => !attestation.revoked
+                        (attestation: sdk.IAttestation) => !attestation.revoked
                       )
                         ? 'true'
                         : 'false')

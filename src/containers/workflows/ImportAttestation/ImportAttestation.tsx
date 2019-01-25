@@ -5,8 +5,8 @@ import { notifySuccess } from '../../../services/FeedbackService'
 import * as Claims from '../../../state/ducks/Claims'
 
 type Props = {
-  attestation: sdk.Attestation
-  addAttestationToClaim: (attestation: sdk.Attestation) => void
+  attestation: sdk.IAttestation
+  addAttestationToClaim: (attestation: sdk.IAttestation) => void
   onFinished?: () => void
 }
 
@@ -45,7 +45,7 @@ const mapStateToProps = () => {
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    addAttestationToClaim: (attestation: sdk.Attestation) => {
+    addAttestationToClaim: (attestation: sdk.IAttestation) => {
       dispatch(Claims.Store.addAttestation(attestation))
     },
   }
