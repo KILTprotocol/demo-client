@@ -1,6 +1,8 @@
 .BlockUi {
+  $z-index: $z-index-modal + 100;
+
   position: fixed;
-  z-index: $z-index-modal - 10;
+  z-index: $z-index;
   top: 0;
   right: 0;
   bottom: 0;

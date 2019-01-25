@@ -1,7 +1,12 @@
 .BlockingNotifications {
+  $z-index: $z-index-modal + 300;
+
+  z-index: $z-index;
 
   & .Modal {
     @include console-log;
+
+    z-index: $z-index + 10;
 
     & header {
       display: flex;

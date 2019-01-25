@@ -67,6 +67,7 @@ class AttestClaim extends React.Component<Props, State> {
           })
       })
       .catch(error => {
+        blockUi.remove()
         ErrorService.log({
           error,
           message: 'Could not retrieve claimer',

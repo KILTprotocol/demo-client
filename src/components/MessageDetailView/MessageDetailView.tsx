@@ -62,6 +62,7 @@ class MessageDetailView extends React.Component<Props, State> {
       case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
         return (
           <ChooseClaimForCtype
+            senderKey={message.senderKey}
             ctypeKey={(message.body.content as CType).key}
             onFinished={this.handleDelete}
           />

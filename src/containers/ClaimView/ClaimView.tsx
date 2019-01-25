@@ -2,29 +2,22 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
+import CtypeRepository from 'src/services/CtypeRepository'
+import ErrorService from 'src/services/ErrorService'
+import { CType } from 'src/types/Ctype'
 
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 import SelectAttesters from '../../components/SelectAttesters/SelectAttesters'
 import attestationService from '../../services/AttestationService'
-import ErrorService from '../../services/ErrorService'
-import ContactRepository from '../../services/ContactRepository'
 import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
-import {
-  MessageBodyType,
-  RequestAttestationForClaim,
-} from '../../types/Message'
-import { MessageBodyType, ClaimMessageBody } from '../../types/Message'
-import attestationService from '../../services/AttestationService'
+import { ClaimMessageBody, MessageBodyType, } from '../../types/Message'
 
 import './ClaimView.scss'
-import CtypeRepository from 'src/services/CtypeRepository'
-import { CType } from 'src/types/Ctype'
-import ErrorService from 'src/services/ErrorService'
 
 type Props = RouteComponentProps<{ hash: string }> & {
   claimEntries: Claims.Entry[]
@@ -54,11 +47,16 @@ class ClaimView extends React.Component<Props, State> {
     this.setSelectAttestersOpen = this.setSelectAttestersOpen.bind(this)
   }
 
-  public componentDidUpdate() {
-    const { claimEntries } = this.props
+  public componentDidMount() {
     const { hash } = this.props.match.params
-    const { currentClaimEntry } = this.state
-    if (claimEntries && claimEntries.length && !currentClaimEntry && hash) {
+    if (this.isDetailView()) {
+      this.getCurrentClaimEntry(hash)
+    }
+  }
+
+  public componentDidUpdate() {
+    const { hash } = this.props.match.params
+    if (this.isDetailView()) {
       this.getCurrentClaimEntry(hash)
     }
   }
@@ -92,15 +90,22 @@ class ClaimView extends React.Component<Props, State> {
             this.selectAttestersModal = el
           }}
           type={ModalType.CONFIRM}
-          header="Select Attestant(s):"
+          header="Select Attester(s):"
           onCancel={this.onCancelRequestAttestation}
           onConfirm={this.onFinishRequestAttestation}
           catchBackdropClick={isSelectAttestersOpen}
         >
-          {this.getSelectAttestants()}
+          {this.getSelectAttesters()}
         </Modal>
       </section>
     )
+  }
+
+  private isDetailView() {
+    const { claimEntries } = this.props
+    const { hash } = this.props.match.params
+    const { currentClaimEntry } = this.state
+    return claimEntries && claimEntries.length && !currentClaimEntry && hash
   }
 
   private getCurrentClaimEntry(hash: string) {
@@ -130,7 +135,7 @@ class ClaimView extends React.Component<Props, State> {
     this.props.history.push('/claim')
   }
 
-  private getSelectAttestants() {
+  private getSelectAttesters() {
     return (
       <div>
         <SelectAttesters
@@ -196,8 +201,8 @@ class ClaimView extends React.Component<Props, State> {
               type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
             })
               .then(() => {
-              notifySuccess('Request for attestation successfully sent.')
-            })
+                notifySuccess('Request for attestation successfully sent.')
+              })
               .catch(error => {
                 ErrorService.log({
                   error,

@@ -1,13 +1,15 @@
 .Notifications {
+  $z-index: $z-index-modal + 200;
+
   $notification-width: 400px;
 
   position: fixed;
-  z-index: $z-index-modal - 20;
+  z-index: $z-index;
   top: $header-height;
   right: 0;
   max-width: $notification-width + 2 * $base-padding;
   max-height: calc(100% - #{$header-height});
-  padding: 0;
+  padding: 0 0 $base-padding/2 0;
   overflow: auto;
 
   & header {

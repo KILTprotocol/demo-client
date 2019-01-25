@@ -16,6 +16,7 @@ type Props = {
   onChange?: (selectedContacts: Contact[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
+  placeholder?: string
 }
 
 type State = {}
@@ -39,7 +40,14 @@ class SelectContacts extends React.Component<Props, State> {
   }
 
   public render() {
-    const { contacts, isMulti, name, onMenuOpen, onMenuClose } = this.props
+    const {
+      contacts,
+      isMulti,
+      name,
+      onMenuOpen,
+      onMenuClose,
+      placeholder,
+    } = this.props
 
     const options: SelectOption[] = contacts.map(
       (contact: Contact): SelectOption => ({
@@ -47,6 +55,8 @@ class SelectContacts extends React.Component<Props, State> {
         value: contact.key,
       })
     )
+
+    const _placeholder = `Select contact${isMulti ? 's' : ''}…`
 
     return (
       !!contacts &&
@@ -63,6 +73,7 @@ class SelectContacts extends React.Component<Props, State> {
           onChange={this.onChange}
           onMenuOpen={onMenuOpen}
           onMenuClose={onMenuClose}
+          placeholder={placeholder || _placeholder}
           filterOption={createFilter(this.filterConfig)}
         />
       )

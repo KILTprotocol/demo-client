@@ -1,6 +1,9 @@
 .Modal {
   position: fixed;
   z-index: $z-index-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   max-width: none;
   margin: 0;
 
@@ -19,11 +22,9 @@
   }
 
   & .container {
-    @extend %centerHV;
-
     @include border-radius($base-border-radius);
 
-    position: absolute;
+    position: relative;
     z-index: $z-index-modal + 2;
     width: calc(100% - #{$base-padding*2});
     max-width: 640px;

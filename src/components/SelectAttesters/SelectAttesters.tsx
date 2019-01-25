@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Select from 'react-select'
 import ContactRepository from '../../services/ContactRepository'
 
 import { Contact } from '../../types/Contact'
@@ -50,6 +51,7 @@ class SelectAttesters extends React.Component<Props, State> {
           onChange={onChange}
           onMenuOpen={onMenuOpen}
           onMenuClose={onMenuClose}
+          placeholder={`Select attester${isMulti ? 's' : ''}…`}
         />
       )
     )

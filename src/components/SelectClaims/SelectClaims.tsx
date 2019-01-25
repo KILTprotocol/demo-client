@@ -1,12 +1,14 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+import { ReactNode } from 'react'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
 import * as Claims from '../../state/ducks/Claims'
 
 type SelectOption = {
+  label: ReactNode
   value: string
-  label: string
 }
 
 type Props = {
@@ -22,6 +24,7 @@ type State = {}
 class SelectClaims extends React.Component<Props, State> {
   public static defaultProps = {
     isMulti: false,
+    showAttested: true,
   }
 
   private filterConfig: Config = {
@@ -41,10 +44,21 @@ class SelectClaims extends React.Component<Props, State> {
     const { claims, isMulti, onMenuOpen, onMenuClose } = this.props
 
     const options: SelectOption[] = claims.map(
-      (claim: Claims.Entry): SelectOption => ({
-        label: claim.claim.alias,
-        value: claim.claim.hash,
-      })
+      (claim: Claims.Entry): SelectOption => {
+        const isApproved =
+          claim.attestations &&
+          claim.attestations.find(
+            (attestation: sdk.Attestation) => !attestation.revoked
+          )
+        return {
+          label: (
+            <span className={isApproved ? 'approved' : 'unapproved'}>
+              {claim.claim.alias}
+            </span>
+          ),
+          value: claim.claim.hash,
+        }
+      }
     )
 
     return (
@@ -54,7 +68,7 @@ class SelectClaims extends React.Component<Props, State> {
           className="react-select-container"
           classNamePrefix="react-select"
           isClearable={isMulti}
-          isSearchable={true}
+          isSearchable={false}
           isMulti={isMulti}
           closeMenuOnSelect={!isMulti}
           name="selectClaims"
@@ -62,6 +76,7 @@ class SelectClaims extends React.Component<Props, State> {
           onChange={this.onChange}
           onMenuOpen={onMenuOpen}
           onMenuClose={onMenuClose}
+          placeholder={`Select claim${isMulti ? 's' : ''}…`}
           filterOption={createFilter(this.filterConfig)}
         />
       )
