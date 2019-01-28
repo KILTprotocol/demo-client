@@ -76,6 +76,8 @@ class MessageListView extends React.Component<Props, State> {
       return message.message
     }
 
+    // TODO: move this stuff to getSubject method in Message.ts
+
     let additionalInfo: string = ''
     try {
       const messageBodyType: MessageBodyType | undefined = message.body.type
@@ -86,7 +88,8 @@ class MessageListView extends React.Component<Props, State> {
           break
         case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
           additionalInfo = (message.body as RequestAttestationForClaim).content
-            .alias
+            .claim.alias
+          // TODO: add ctype.name
           break
         case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
           additionalInfo = (message.body as ApproveAttestationForClaim).content

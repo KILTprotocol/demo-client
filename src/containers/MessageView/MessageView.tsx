@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import MessageDetailView
-  from '../../components/MessageDetailView/MessageDetailView'
+import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 import ErrorService from '../../services/ErrorService'
@@ -101,7 +100,7 @@ class MessageView extends React.Component<Props, State> {
       header: 'Are you sure?',
       message: `Do you want to delete message '${message.id}' from '${
         message.sender
-        }'?`,
+      }'?`,
       modalType: ModalType.CONFIRM,
       onConfirm: (notification: BlockingNotification) => {
         MessageRepository.deleteByMessageId(message.id as string)
@@ -157,7 +156,7 @@ class MessageView extends React.Component<Props, State> {
             error,
             message: `Could not retrieve messages for identity ${
               selectedIdentity.identity.address
-              }`,
+            }`,
             origin: 'MessageView.fetchMessages()',
           })
           blockUi.remove()

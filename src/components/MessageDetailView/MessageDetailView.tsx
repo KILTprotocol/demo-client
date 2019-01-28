@@ -5,6 +5,7 @@ import ImportAttestation from '../../containers/workflows/ImportAttestation/Impo
 
 import {
   ApproveAttestationForClaim,
+  ClaimMessageBodyContent,
   Message,
   MessageBodyType,
   RequestAttestationForClaim,
@@ -75,13 +76,21 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <AttestClaim
             senderKey={message.senderKey}
-            claim={(message.body as RequestAttestationForClaim).content}
+            claim={
+              ((message.body as RequestAttestationForClaim)
+                .content as ClaimMessageBodyContent).claim
+            }
+            ctypeName={
+              ((message.body as RequestAttestationForClaim)
+                .content as ClaimMessageBodyContent).cType.name
+            }
             onFinished={this.handleDelete}
           />
         )
       case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
         return (
           <ImportAttestation
+            claim={(message.body as ApproveAttestationForClaim).content.claim}
             attestation={
               (message.body as ApproveAttestationForClaim).content.attestation
             }

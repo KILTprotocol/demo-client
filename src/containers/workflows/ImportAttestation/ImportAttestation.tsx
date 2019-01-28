@@ -6,7 +6,11 @@ import * as Claims from '../../../state/ducks/Claims'
 
 type Props = {
   attestation: sdk.IAttestation
-  addAttestationToClaim: (attestation: sdk.IAttestation) => void
+  addAttestationToClaim: (
+    hash: sdk.IClaim['hash'],
+    attestation: sdk.IAttestation
+  ) => void
+  claim: sdk.IClaim
   onFinished?: () => void
 }
 
@@ -30,8 +34,8 @@ class ImportAttestation extends React.Component<Props, State> {
   }
 
   private importAttestation() {
-    const { addAttestationToClaim, attestation, onFinished } = this.props
-    addAttestationToClaim(attestation)
+    const { addAttestationToClaim, attestation, claim, onFinished } = this.props
+    addAttestationToClaim(claim.hash, attestation)
     notifySuccess('Attestation successfully imported')
     if (onFinished) {
       onFinished()
@@ -45,8 +49,11 @@ const mapStateToProps = () => {
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    addAttestationToClaim: (attestation: sdk.IAttestation) => {
-      dispatch(Claims.Store.addAttestation(attestation))
+    addAttestationToClaim: (
+      hash: sdk.IClaim['hash'],
+      attestation: sdk.IAttestation
+    ) => {
+      dispatch(Claims.Store.addAttestation(hash, attestation))
     },
   }
 }

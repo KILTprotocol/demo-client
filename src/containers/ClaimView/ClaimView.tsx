@@ -15,7 +15,7 @@ import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
-import { ClaimMessageBody, MessageBodyType, } from '../../types/Message'
+import { ClaimMessageBodyContent, MessageBodyType } from '../../types/Message'
 
 import './ClaimView.scss'
 
@@ -194,7 +194,7 @@ class ClaimView extends React.Component<Props, State> {
               name: ctypeFromRepository.name,
             },
             claim,
-          } as ClaimMessageBody
+          } as ClaimMessageBodyContent
           this.selectedAttesters.forEach((attester: Contact) => {
             MessageRepository.send(attester, {
               content,
@@ -206,9 +206,9 @@ class ClaimView extends React.Component<Props, State> {
               .catch(error => {
                 ErrorService.log({
                   error,
-                  message: `Could not send message ${MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM} to ${
-                    attester.name
-                    }`,
+                  message: `Could not send message ${
+                    MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
+                  } to ${attester.name}`,
                   origin: 'ClaimView.componentDidMount()',
                   type: 'ERROR.FETCH.GET',
                 })
