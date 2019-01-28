@@ -212,7 +212,7 @@ class MessageView extends React.Component<Props, State> {
               attestation,
               claimerAddress: claim.owner,
               claimerAlias: claimer.name,
-              ctypeHash: claimMessageBody.cType.hash,
+              ctypeHash: claimMessageBody.claim.ctype,
               ctypeName: claimMessageBody.cType.name,
             } as Attestations.Entry)
             await this.sendClaimAttestedMessage(attestation, claimer, claim)

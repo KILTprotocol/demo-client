@@ -215,12 +215,11 @@ class ClaimView extends React.Component<Props, State> {
     )
 
     if (claimToAttest) {
-      const claim: sdk.IClaim = claimToAttest.claim
-      CtypeRepository.findByKey(claimToAttest.claim.ctype)
+      const { claim } = claimToAttest
+      CtypeRepository.findByKey(claim.ctype)
         .then((ctypeFromRepository: CType) => {
           const messageBody = {
             cType: {
-              hash: claim.ctype,
               name: ctypeFromRepository.name,
             },
             claim,

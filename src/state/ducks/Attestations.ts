@@ -3,6 +3,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import ErrorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
+import moment from 'moment'
 
 interface SaveAction extends KiltAction {
   payload: Entry
@@ -15,7 +16,7 @@ interface RemoveAction extends KiltAction {
 type Action = SaveAction | RemoveAction
 
 type Entry = {
-  created: string
+  created: moment.Moment
   claimerAlias: string
   claimerAddress: string
   ctypeHash: string
@@ -69,7 +70,7 @@ class Store {
             attestation: iAttestation,
             claimerAddress: attestationAsJson.claimerAddress,
             claimerAlias: attestationAsJson.claimerAlias,
-            created: attestationAsJson.created,
+            created: moment(attestationAsJson.created, moment.defaultFormatUtc),
             ctypeHash: attestationAsJson.ctypeHash,
             ctypeName: attestationAsJson.ctypeName,
           } as Entry
@@ -96,9 +97,17 @@ class Store {
     switch (action.type) {
       case Store.ACTIONS.SAVE_ATTESTATION:
         const attestationEntry: Entry = (action as SaveAction).payload
-        return state.update('attestations', attestations =>
-          attestations.concat(attestationEntry)
-        )
+
+        return state.update('attestations', attestations => {
+          return attestations
+            .filter((entry: Entry) => {
+              return (
+                entry.attestation.claimHash !==
+                attestationEntry.attestation.claimHash
+              )
+            })
+            .concat(attestationEntry)
+        })
       case Store.ACTIONS.REMOVE_ATTESTATION:
         const claimHash: string = (action as RemoveAction).payload
         return state.set(

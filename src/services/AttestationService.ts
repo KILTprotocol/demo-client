@@ -63,7 +63,7 @@ class AttestationService {
 
   public saveInStore(attestationEntry: Attestations.Entry): void {
     const m: moment.Moment = moment()
-    attestationEntry.created = m.format('YYYY-MM-DD HH:mm')
+    attestationEntry.created = m // 'YYYY-MM-DD HH:mm'
     persistentStore.store.dispatch(
       Attestations.Store.saveAttestation(attestationEntry)
     )

@@ -4,6 +4,8 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { notifyFailure } from 'src/services/FeedbackService'
 import attestationService from '../../services/AttestationService'
 import * as Attestations from '../../state/ducks/Attestations'
+import moment from 'moment'
+
 import './AttestationsView.scss'
 
 type AttestationListModel = Attestations.Entry
@@ -39,24 +41,24 @@ class AttestationsView extends React.Component<Props, State> {
           <tbody>
             {attestations.map((attestation: AttestationListModel) => (
               <tr>
-                <td className="ellipsis">
+                <td className="claimerAlias">
                   <span className="alias">{attestation.claimerAlias}</span>{' '}
                   {attestation.claimerAddress}
                 </td>
-                <td className="ellipsis">
+                <td className="claimHash">
                   {attestation.attestation.claimHash}
                 </td>
-                <td className="ellipsis">
+                <td className="ctypeName">
                   <span className="alias">{attestation.ctypeName}</span>{' '}
                   {attestation.ctypeHash}
                 </td>
-                <td>{attestation.created}</td>
+                <td>{attestation.created.format('YYYY-MM-DD HH:mm')}</td>
                 <td
                   className={
                     attestation.attestation.revoked ? 'revoked' : 'approved'
                   }
                 />
-                <td>
+                <td className="actions">
                   {!attestation.attestation.revoked ? (
                     <button
                       title="Revoke"

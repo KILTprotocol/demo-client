@@ -50,7 +50,6 @@ export type MessageBody =
 export interface ClaimMessageBody {
   claim: sdk.IClaim
   cType: {
-    hash: string
     name: string
   }
 }
