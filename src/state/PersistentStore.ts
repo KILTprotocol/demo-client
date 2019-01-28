@@ -1,10 +1,11 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import { combineReducers, createStore, Store } from 'redux'
-import ErrorService from '../services/ErrorService'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 
+import ErrorService from '../services/ErrorService'
 import * as Claims from './ducks/Claims'
 import * as UiState from './ducks/UiState'
 import * as Wallet from './ducks/Wallet'
+import * as Attestations from './ducks/Attestations'
 
 declare global {
   /* tslint:disable */
@@ -19,12 +20,14 @@ type State = {
   claims: Claims.ImmutableState
   uiState: UiState.ImmutableState
   wallet: Wallet.ImmutableState
+  attestations: Attestations.ImmutableState
 }
 
 type SerializedState = {
   claims: Claims.SerializedState
   uiState: UiState.SerializedState
   wallet: Wallet.SerializedState
+  attestations: Attestations.SerializedState
 }
 
 class PersistentStore {
@@ -36,6 +39,7 @@ class PersistentStore {
 
   private static deserialize(obj: SerializedState): State {
     return {
+      attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
       uiState: UiState.Store.deserialize(obj.uiState),
       wallet: Wallet.Store.deserialize(obj.wallet),
@@ -44,6 +48,7 @@ class PersistentStore {
 
   private static serialize(state: State): string {
     const obj: SerializedState = {
+      attestations: Attestations.Store.serialize(state.attestations),
       claims: Claims.Store.serialize(state.claims),
       uiState: UiState.Store.serialize(state.uiState),
       wallet: Wallet.Store.serialize(state.wallet),
@@ -72,6 +77,7 @@ class PersistentStore {
 
     this._store = createStore(
       combineReducers({
+        attestations: Attestations.Store.reducer,
         claims: Claims.Store.reducer,
         uiState: UiState.Store.reducer,
         wallet: Wallet.Store.reducer,

@@ -11,15 +11,18 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
+import * as Attestations from '../../state/ducks/Attestations'
 import { Contact } from '../../types/Contact'
 import {
   Message,
   MessageBodyType,
   RequestAttestationForClaim,
+  ClaimMessageBody,
   ApproveAttestationForClaim,
 } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
 import './MessageView.scss'
+import KiltAction from 'src/types/Action'
 
 interface Props {
   selectedIdentity?: Wallet.Entry
@@ -199,11 +202,19 @@ class MessageView extends React.Component<Props, State> {
 
     ContactRepository.findByKey(currentMessage.senderKey)
       .then((claimer: Contact) => {
-        const claim: sdk.IClaim = (currentMessage.body as RequestAttestationForClaim)
+        const claimMessageBody: ClaimMessageBody = (currentMessage.body as RequestAttestationForClaim)
           .content
+        const claim: sdk.IClaim = claimMessageBody.claim
         attestationService
           .attestClaim(claim)
           .then(async attestation => {
+            attestationService.saveInStore({
+              attestation,
+              claimerAddress: claim.owner,
+              claimerAlias: claimer.name,
+              ctypeHash: claimMessageBody.claim.ctype,
+              ctypeName: claimMessageBody.cType.name,
+            } as Attestations.Entry)
             await this.sendClaimAttestedMessage(attestation, claimer, claim)
             if (currentMessage.id) {
               this.onDeleteMessage(currentMessage.id)
@@ -271,7 +282,7 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   }
 }
 
-const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
+const mapDispatchToProps = (dispatch: (action: KiltAction) => void) => {
   return {
     addAttestationToClaim: (
       claimHash: string,

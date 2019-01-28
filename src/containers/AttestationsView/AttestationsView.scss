@@ -1,0 +1,53 @@
+.AttestationsView {
+
+  & th,
+  & td {
+    text-align: left;
+  }
+
+  & .alias {
+    font-weight: bold;
+  }
+
+  & .claimerAlias {
+    @extend %ellipsis;
+    max-width: 180px;
+  }
+
+  & .claimHash {
+    @extend %ellipsis;
+    max-width: 180px;
+  }
+
+  & .ctypeName {
+    @extend %ellipsis;
+    max-width: 180px;
+  }
+
+  & .revoked {
+    text-align: center;
+    &:before {
+      @include icon($icon-times);
+      color: $color-danger;
+    }
+  }
+
+  & .actions {
+    padding: 0;
+  }
+
+  & .approved {
+    text-align: center;
+    &:before {
+      @include icon($icon-check);
+      color: $color-success;
+    }
+  }
+
+  & .revoke {
+    @include button-icon-only($icon-ban);
+  }
+  & .delete {
+    @include button-icon-only($icon-trash);
+  }
+}

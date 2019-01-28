@@ -9,18 +9,17 @@ import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 import ContactRepository from '../../services/ContactRepository'
-import ErrorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
-import {
-  MessageBodyType,
-  RequestAttestationForClaim,
-} from '../../types/Message'
+import { MessageBodyType, ClaimMessageBody } from '../../types/Message'
 import attestationService from '../../services/AttestationService'
 
 import './ClaimView.scss'
+import CtypeRepository from 'src/services/CtypeRepository'
+import { CType } from 'src/types/Ctype'
+import ErrorService from 'src/services/ErrorService'
 
 type SelectOption = {
   value: string
@@ -216,26 +215,30 @@ class ClaimView extends React.Component<Props, State> {
     )
 
     if (claimToAttest) {
-      this.selectedAttestants.forEach((attestant: Contact) => {
-        const request: RequestAttestationForClaim = {
-          content: claimToAttest.claim,
-          type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
-        }
-        MessageRepository.send(attestant, request)
-          .then(() => {
-            notifySuccess('Request for attestation successfully sent.')
-          })
-          .catch(error => {
-            ErrorService.log({
-              error,
-              message: `Could not send message ${request.type} to ${
-                attestant.name
-              }`,
-              origin: 'ClaimView.componentDidMount()',
-              type: 'ERROR.FETCH.GET',
+      const { claim } = claimToAttest
+      CtypeRepository.findByKey(claim.ctype)
+        .then((ctypeFromRepository: CType) => {
+          const messageBody = {
+            cType: {
+              name: ctypeFromRepository.name,
+            },
+            claim,
+          } as ClaimMessageBody
+          this.selectedAttestants.forEach((attestant: Contact) => {
+            MessageRepository.send(attestant, {
+              content: messageBody,
+              type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
             })
           })
-      })
+        })
+        .catch(error => {
+          ErrorService.log({
+            error,
+            message: 'Error fetching CTYPE',
+            origin: 'MessageView.onFinishRequestAttestation()',
+            type: 'ERROR.FETCH.GET',
+          })
+        })
     }
   }
 

@@ -13,6 +13,7 @@ import MessageList from '../containers/MessageView/MessageView'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
 import WalletView from '../containers/WalletView/WalletView'
 import requiresIdentity from './RequiresIdentity'
+import AttestationsView from 'src/containers/AttestationsView/AttestationsView'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
@@ -45,6 +46,11 @@ const Routes: React.FunctionComponent<{}> = props => {
       <Route path={'/claim'} component={requiresIdentity(ClaimView)} />
 
       <Route path={'/testUserFeedback'} component={TestUserFeedback} />
+
+      <Route
+        path={'/attestations'}
+        component={requiresIdentity(AttestationsView)}
+      />
 
       <Route component={Root} />
     </Switch>
