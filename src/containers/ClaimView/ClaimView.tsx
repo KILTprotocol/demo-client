@@ -1,30 +1,23 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import Select, { createFilter } from 'react-select'
-import { Config } from 'react-select/lib/filters'
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import CtypeRepository from 'src/services/CtypeRepository'
+import ErrorService from 'src/services/ErrorService'
+import { CType } from 'src/types/Ctype'
 
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
-import ContactRepository from '../../services/ContactRepository'
+import SelectAttesters from '../../components/SelectAttesters/SelectAttesters'
+import attestationService from '../../services/AttestationService'
 import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
-import { MessageBodyType, ClaimMessageBody } from '../../types/Message'
-import attestationService from '../../services/AttestationService'
+import { ClaimMessageBodyContent, MessageBodyType } from '../../types/Message'
 
 import './ClaimView.scss'
-import CtypeRepository from 'src/services/CtypeRepository'
-import { CType } from 'src/types/Ctype'
-import ErrorService from 'src/services/ErrorService'
-
-type SelectOption = {
-  value: string
-  label: string
-}
 
 type Props = RouteComponentProps<{ hash: string }> & {
   claimEntries: Claims.Entry[]
@@ -32,56 +25,38 @@ type Props = RouteComponentProps<{ hash: string }> & {
 }
 
 type State = {
-  attestants: Contact[]
-  isSelectAttestantsOpen: boolean
+  isSelectAttestersOpen: boolean
   currentClaimEntry?: Claims.Entry | 'notFoundInList'
 }
 
 class ClaimView extends React.Component<Props, State> {
-  public selectedAttestants: Contact[] = []
-  private filterConfig: Config = {
-    ignoreAccents: true,
-    ignoreCase: true,
-    matchFrom: 'any',
-    trim: true,
-  }
-  private selectAttestantModal: Modal | null
+  public selectedAttesters: Contact[] = []
+  private selectAttestersModal: Modal | null
   private claimHashToAttest: string
 
   constructor(props: Props) {
     super(props)
     this.state = {
-      attestants: [],
-      isSelectAttestantsOpen: false,
+      isSelectAttestersOpen: false,
     }
     this.deleteClaim = this.deleteClaim.bind(this)
     this.onRequestAttestation = this.onRequestAttestation.bind(this)
     this.onCancelRequestAttestation = this.onCancelRequestAttestation.bind(this)
     this.onFinishRequestAttestation = this.onFinishRequestAttestation.bind(this)
-    this.onSelectAttestants = this.onSelectAttestants.bind(this)
-    this.setSelectAttestantsOpen = this.setSelectAttestantsOpen.bind(this)
+    this.onSelectAttesters = this.onSelectAttesters.bind(this)
+    this.setSelectAttestersOpen = this.setSelectAttestersOpen.bind(this)
   }
 
   public componentDidMount() {
-    ContactRepository.findAll()
-      .then((attestants: Contact[]) => {
-        this.setState({ attestants })
-      })
-      .catch(error => {
-        ErrorService.log({
-          error,
-          message: 'Could not fetch contacts (attestants)',
-          origin: 'ClaimView.componentDidMount()',
-          type: 'ERROR.FETCH.GET',
-        })
-      })
+    const { hash } = this.props.match.params
+    if (this.isDetailView()) {
+      this.getCurrentClaimEntry(hash)
+    }
   }
 
   public componentDidUpdate() {
-    const { claimEntries } = this.props
     const { hash } = this.props.match.params
-    const { currentClaimEntry } = this.state
-    if (claimEntries && claimEntries.length && !currentClaimEntry && hash) {
+    if (this.isDetailView()) {
       this.getCurrentClaimEntry(hash)
     }
   }
@@ -89,7 +64,7 @@ class ClaimView extends React.Component<Props, State> {
   public render() {
     const { hash } = this.props.match.params
     const { claimEntries } = this.props
-    const { currentClaimEntry, isSelectAttestantsOpen } = this.state
+    const { currentClaimEntry, isSelectAttestersOpen } = this.state
 
     const validCurrentClaimEntry =
       hash && currentClaimEntry && currentClaimEntry !== 'notFoundInList'
@@ -112,18 +87,25 @@ class ClaimView extends React.Component<Props, State> {
         )}
         <Modal
           ref={el => {
-            this.selectAttestantModal = el
+            this.selectAttestersModal = el
           }}
           type={ModalType.CONFIRM}
-          header="Select Attestant(s):"
+          header="Select Attester(s):"
           onCancel={this.onCancelRequestAttestation}
           onConfirm={this.onFinishRequestAttestation}
-          catchBackdropClick={isSelectAttestantsOpen}
+          catchBackdropClick={isSelectAttestersOpen}
         >
-          {this.getSelectAttestants()}
+          {this.getSelectAttesters()}
         </Modal>
       </section>
     )
+  }
+
+  private isDetailView() {
+    const { claimEntries } = this.props
+    const { hash } = this.props.match.params
+    const { currentClaimEntry } = this.state
+    return claimEntries && claimEntries.length && !currentClaimEntry && hash
   }
 
   private getCurrentClaimEntry(hash: string) {
@@ -153,57 +135,46 @@ class ClaimView extends React.Component<Props, State> {
     this.props.history.push('/claim')
   }
 
-  private getSelectAttestants() {
-    const { attestants } = this.state
-
-    const options: SelectOption[] = attestants.map((attestant: Contact) => ({
-      label: attestant.name,
-      value: attestant.key,
-    }))
-
+  private getSelectAttesters() {
     return (
-      <Select
-        className="react-select-container"
-        classNamePrefix="react-select"
-        isClearable={true}
-        isSearchable={true}
-        isMulti={true}
-        closeMenuOnSelect={false}
-        name="selectAttestants"
-        options={options}
-        onChange={this.onSelectAttestants}
-        onMenuOpen={this.setSelectAttestantsOpen(true)}
-        onMenuClose={this.setSelectAttestantsOpen(false, 500)}
-        filterOption={createFilter(this.filterConfig)}
-      />
+      <div>
+        <SelectAttesters
+          onChange={this.onSelectAttesters}
+          onMenuOpen={this.setSelectAttestersOpen(true)}
+          onMenuClose={this.setSelectAttestersOpen(false, 500)}
+        />
+      </div>
     )
   }
 
-  private onSelectAttestants(selectedOptions: any) {
-    const { attestants } = this.state
+  private onSelectAttesters(selectedAttesters: Contact[]) {
+    this.selectedAttesters = selectedAttesters
+  }
 
-    this.selectedAttestants = attestants.filter((attestant: Contact) =>
-      selectedOptions.find(
-        (option: SelectOption) => option.value === attestant.key
-      )
-    )
+  private setSelectAttestersOpen = (
+    isSelectAttestersOpen: boolean,
+    delay = 0
+  ) => () => {
+    setTimeout(() => {
+      this.setState({ isSelectAttestersOpen })
+    }, delay)
   }
 
   private async onVerifyAttestation(
-    attestation: sdk.IAttestation
+    attestation: sdk.Attestation
   ): Promise<boolean> {
     return attestationService.verifyAttestation(attestation)
   }
 
   private onRequestAttestation(hash: string) {
     this.claimHashToAttest = hash
-    if (this.selectAttestantModal) {
-      this.selectAttestantModal.show()
+    if (this.selectAttestersModal) {
+      this.selectAttestersModal.show()
     }
   }
 
   private onCancelRequestAttestation() {
-    this.selectedAttestants = []
+    this.selectedAttesters = []
   }
 
   private onFinishRequestAttestation() {
@@ -218,17 +189,30 @@ class ClaimView extends React.Component<Props, State> {
       const { claim } = claimToAttest
       CtypeRepository.findByKey(claim.ctype)
         .then((ctypeFromRepository: CType) => {
-          const messageBody = {
+          const content = {
             cType: {
               name: ctypeFromRepository.name,
             },
             claim,
-          } as ClaimMessageBody
-          this.selectedAttestants.forEach((attestant: Contact) => {
-            MessageRepository.send(attestant, {
-              content: messageBody,
+          } as ClaimMessageBodyContent
+          this.selectedAttesters.forEach((attester: Contact) => {
+            MessageRepository.send(attester, {
+              content,
               type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
             })
+              .then(() => {
+                notifySuccess('Request for attestation successfully sent.')
+              })
+              .catch(error => {
+                ErrorService.log({
+                  error,
+                  message: `Could not send message ${
+                    MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
+                  } to ${attester.name}`,
+                  origin: 'ClaimView.componentDidMount()',
+                  type: 'ERROR.FETCH.GET',
+                })
+              })
           })
         })
         .catch(error => {
@@ -240,15 +224,6 @@ class ClaimView extends React.Component<Props, State> {
           })
         })
     }
-  }
-
-  private setSelectAttestantsOpen = (
-    isSelectAttestantsOpen: boolean,
-    delay = 0
-  ) => () => {
-    setTimeout(() => {
-      this.setState({ isSelectAttestantsOpen })
-    }, delay)
   }
 }
 

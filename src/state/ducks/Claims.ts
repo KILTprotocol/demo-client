@@ -5,7 +5,7 @@ import ErrorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 
 interface SaveAction extends KiltAction {
-  payload: sdk.Claim
+  payload: sdk.IClaim
 }
 
 interface RemoveAction extends KiltAction {
@@ -14,14 +14,7 @@ interface RemoveAction extends KiltAction {
 
 interface AddAttestationAction extends KiltAction {
   payload: {
-    id: string
-    attestation: sdk.IAttestation
-  }
-}
-
-interface AddAttestationAction extends KiltAction {
-  payload: {
-    id: string
+    hash: sdk.IClaim['hash']
     attestation: sdk.IAttestation
   }
 }
@@ -29,6 +22,7 @@ interface AddAttestationAction extends KiltAction {
 type Action = SaveAction | RemoveAction | AddAttestationAction
 
 type Entry = {
+  // TODO: use interface instead of class
   claim: sdk.Claim
   attestations: sdk.IAttestation[]
 }
@@ -52,11 +46,13 @@ class Store {
     serialized.claims = state
       .get('claims')
       .toList()
-      .map(claimEntry => ({
-        attestations: JSON.stringify(claimEntry.attestations),
-        claim: JSON.stringify(claimEntry.claim),
-        hash: claimEntry.claim.hash,
-      }))
+      .map(claimEntry => {
+        return {
+          attestations: JSON.stringify(claimEntry.attestations),
+          claim: JSON.stringify(claimEntry.claim),
+          hash: claimEntry.claim.hash,
+        }
+      })
       .toArray()
 
     return serialized
@@ -113,14 +109,14 @@ class Store {
       case Store.ACTIONS.REMOVE_CLAIM:
         return state.deleteIn(['claims', (action as RemoveAction).payload])
       case Store.ACTIONS.ADD_ATTESTATION:
-        const { id, attestation } = (action as AddAttestationAction).payload
-        let attestations = state.getIn(['claims', id, 'attestations']) || []
+        const { hash, attestation } = (action as AddAttestationAction).payload
+        let attestations = state.getIn(['claims', hash, 'attestations']) || []
         attestations = attestations.filter(
           (_attestation: sdk.IAttestation) =>
             _attestation.signature !== attestation.signature
         )
         return state.setIn(
-          ['claims', id, 'attestations'],
+          ['claims', hash, 'attestations'],
           [...attestations, attestation]
         )
       default:
@@ -128,7 +124,7 @@ class Store {
     }
   }
 
-  public static saveAction(claim: sdk.Claim): SaveAction {
+  public static saveAction(claim: sdk.IClaim): SaveAction {
     return {
       payload: claim,
       type: Store.ACTIONS.SAVE_CLAIM,
@@ -143,11 +139,11 @@ class Store {
   }
 
   public static addAttestation(
-    hash: string,
+    hash: sdk.IClaim['hash'],
     attestation: sdk.IAttestation
   ): AddAttestationAction {
     return {
-      payload: { id: hash, attestation },
+      payload: { hash, attestation },
       type: Store.ACTIONS.ADD_ATTESTATION,
     }
   }

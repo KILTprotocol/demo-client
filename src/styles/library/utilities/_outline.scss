@@ -1,0 +1,12 @@
+@mixin outline($color) {
+  @include text-shadow(
+      -1px -1px 0px $color,
+      -1px 0px 0px $color,
+      -1px 1px 0px $color,
+      0px -1px 0px $color,
+      0px 1px 0px $color,
+      1px -1px 0px $color,
+      1px 0px 0px $color,
+      1px 1px 0px $color
+  )
+}

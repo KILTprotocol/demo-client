@@ -17,6 +17,7 @@ export enum MessageBodyType {
   REQUEST_ATTESTATION_FOR_CLAIM = 'request-attestation-for-claim',
   APPROVE_ATTESTATION_FOR_CLAIM = 'approve-attestation-for-claim',
   REQUEST_CLAIM_FOR_CTYPE = 'request-claim-for-ctype',
+  SUBMIT_CLAIM_FOR_CTYPE = 'submit-claim-for-ctype',
 }
 
 interface MessageBodyBase {
@@ -25,7 +26,7 @@ interface MessageBodyBase {
 }
 
 export interface RequestAttestationForClaim extends MessageBodyBase {
-  content: ClaimMessageBody
+  content: ClaimMessageBodyContent
   type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
 }
 
@@ -42,12 +43,18 @@ export interface RequestClaimForCtype extends MessageBodyBase {
   type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE
 }
 
+export interface SubmitClaimForCtype extends MessageBodyBase {
+  content: { claim: sdk.IClaim; attestations: sdk.IAttestation[] }
+  type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE
+}
+
 export type MessageBody =
   | RequestAttestationForClaim
   | ApproveAttestationForClaim
   | RequestClaimForCtype
+  | SubmitClaimForCtype
 
-export interface ClaimMessageBody {
+export interface ClaimMessageBodyContent {
   claim: sdk.IClaim
   cType: {
     name: string

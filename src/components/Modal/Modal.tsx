@@ -3,9 +3,9 @@ import * as React from 'react'
 import './Modal.scss'
 
 export enum ModalType {
-  ALERT,
-  CONFIRM,
-  BLANK,
+  ALERT = 'alert',
+  CONFIRM = 'confirm',
+  BLANK = 'blank',
 }
 
 type Props = {

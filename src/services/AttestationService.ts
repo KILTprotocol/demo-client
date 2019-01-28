@@ -12,7 +12,7 @@ class AttestationService {
    * @param claim the claim to attest
    * @returns the stored attestation in a promise
    */
-  public async attestClaim(claim: sdk.IClaim): Promise<sdk.IAttestation> {
+  public async attestClaim(claim: sdk.IClaim): Promise<sdk.Attestation> {
     const selectedIdentity: sdk.Identity = persistentStore.getSelectedIdentity()
 
     if (!selectedIdentity) {
@@ -25,7 +25,7 @@ class AttestationService {
       selectedIdentity
     )
 
-    return new Promise<sdk.IAttestation>(async (resolve, reject) => {
+    return new Promise<sdk.Attestation>(async (resolve, reject) => {
       attestation
         .store(blockchain, selectedIdentity, () => {
           resolve(attestation)
@@ -52,7 +52,7 @@ class AttestationService {
   }
 
   public async verifyAttestation(
-    iAttestation: sdk.IAttestation
+    iAttestation: sdk.Attestation
   ): Promise<boolean> {
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
     const attestation: sdk.Attestation = sdk.Attestation.fromObject(

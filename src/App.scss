@@ -1,12 +1,11 @@
 @import '../node_modules/select2-component/dist/select2.min.css';
 @import "styles/select2-overrides";
-
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,600&subset=latin');
 
 @font-face {
   font-family: '#{$icomoon-font-family}';
-  src:  url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?qxwohx');
-  src:  url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?qxwohx#iefix') format('embedded-opentype'),
+  src: url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?qxwohx');
+  src: url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?qxwohx#iefix') format('embedded-opentype'),
   url('#{$icomoon-font-path}/#{$icomoon-font-family}.ttf?qxwohx') format('truetype'),
   url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff?qxwohx') format('woff'),
   url('#{$icomoon-font-path}/#{$icomoon-font-family}.svg?qxwohx##{$icomoon-font-family}') format('svg');
@@ -15,7 +14,9 @@
 }
 
 // base elements
-* {
+*,
+*:before,
+*:after {
   box-sizing: border-box;
 }
 
@@ -28,7 +29,8 @@ body {
     right: 0;
     bottom: 0;
     left: 0;
-  };
+  }
+;
   background: $color-white;
   color: $color-font;
 }
@@ -93,7 +95,7 @@ input {
 
     section > & {
 
-      &:last-child{
+      &:last-child {
         @include button-primary;
       }
     }

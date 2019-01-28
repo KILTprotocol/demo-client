@@ -9,9 +9,21 @@ type Props = {
   onRequestAttestation: (hash: string) => void
 }
 
-type State = {}
+type State = {
+  notificationMessage: string
+}
 
 class TestUserFeedback extends React.Component<Props, State> {
+  private notificationTimeout: any
+
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      notificationMessage: '',
+    }
+    this.testNeutral = this.testNeutral.bind(this)
+  }
+
   public render() {
     return (
       <section className="TestUserFeedBack">
@@ -98,7 +110,16 @@ class TestUserFeedback extends React.Component<Props, State> {
   }
 
   private testNeutral() {
-    FeedbackService.addNotification({ message: 'Example for Info' })
+    const { notificationMessage } = this.state
+    const _notificationMessage = notificationMessage + 'Example for Info '
+    FeedbackService.addNotification({ message: _notificationMessage })
+
+    this.setState({ notificationMessage: _notificationMessage })
+
+    clearTimeout(this.notificationTimeout)
+    this.notificationTimeout = setTimeout(() => {
+      this.setState({ notificationMessage: '' })
+    }, 3000)
   }
 }
 

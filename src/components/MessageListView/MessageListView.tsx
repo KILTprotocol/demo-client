@@ -1,12 +1,19 @@
 import * as React from 'react'
 
-import { Message } from '../../types/Message'
+import {
+  ApproveAttestationForClaim,
+  Message,
+  MessageBodyType,
+  RequestAttestationForClaim,
+  RequestClaimForCtype,
+  SubmitClaimForCtype,
+} from '../../types/Message'
 
 import './MessageListView.scss'
 
 type Props = {
   messages: Message[]
-  onDelete: (id: string) => void
+  onDelete: (message: Message) => void
   onOpen: (message: Message) => void
 }
 
@@ -38,13 +45,13 @@ class MessageListView extends React.Component<Props, State> {
                   <td>{message.sender}</td>
                   <td className="message">
                     <div onClick={this.openMessage(message)}>
-                      {message.body ? message.body.type : message.message}
+                      {this.getMessageInfo(message)}
                     </div>
                   </td>
                   <td className="actions">
                     <button
                       className="delete"
-                      onClick={this.handleDelete(message.id)}
+                      onClick={this.handleDelete(message)}
                     />
                     <button
                       className="open"
@@ -60,11 +67,54 @@ class MessageListView extends React.Component<Props, State> {
     )
   }
 
-  private handleDelete = (id?: string): (() => void) => () => {
-    if (id) {
-      const { onDelete } = this.props
-      onDelete(id)
+  private getMessageInfo(message: Message) {
+    if (!message || !message.body || !message.body.content) {
+      return undefined
     }
+
+    if (!message.body || !message.body.type) {
+      return message.message
+    }
+
+    // TODO: move this stuff to getSubject method in Message.ts
+
+    let additionalInfo: string = ''
+    try {
+      const messageBodyType: MessageBodyType | undefined = message.body.type
+
+      switch (messageBodyType) {
+        case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
+          additionalInfo = (message.body as RequestClaimForCtype).content.name
+          break
+        case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
+          additionalInfo = (message.body as RequestAttestationForClaim).content
+            .claim.alias
+          // TODO: add ctype.name
+          break
+        case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
+          additionalInfo = (message.body as ApproveAttestationForClaim).content
+            .claim.owner
+          break
+        case MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE:
+          additionalInfo = (message.body as SubmitClaimForCtype).content.claim
+            .owner
+          break
+      }
+    } catch (error) {
+      additionalInfo = ''
+    }
+
+    return (
+      <span>
+        <span className="type">{message.body!.type}</span>
+        {additionalInfo && <span> "{additionalInfo}"</span>}
+      </span>
+    )
+  }
+
+  private handleDelete = (message: Message): (() => void) => () => {
+    const { onDelete } = this.props
+    onDelete(message)
   }
 
   private openMessage = (message: Message): (() => void) => () => {
