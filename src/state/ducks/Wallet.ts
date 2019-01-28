@@ -1,43 +1,43 @@
-import { Identity } from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import Immutable from 'immutable'
 import KiltAction from '../../types/Action'
+import { MyIdentity } from '../../types/Contact'
 
 interface SaveAction extends KiltAction {
-  payload: {
-    alias: string
-    identity: Identity
-  }
+  payload: MyIdentity
 }
 
 interface RemoveAction extends KiltAction {
-  payload: string
+  payload: MyIdentity['identity']['address']
 }
 
 interface SelectAction extends KiltAction {
-  payload: string
+  payload: MyIdentity['identity']['address']
 }
 
 type Action = SaveAction | RemoveAction | SelectAction
 
-type Entry = {
-  alias: string
-  identity: Identity
-}
+type Entry = MyIdentity
 
 type State = {
-  identities: Immutable.Map<string, Entry>
-  selected: Entry | null
+  identities: Immutable.Map<MyIdentity['identity']['address'], MyIdentity>
+  selectedIdentity: Entry | null
 }
 
 type ImmutableState = Immutable.Record<State>
 
+type SerializedIdentity = {
+  name: MyIdentity['metaData']['name']
+  phrase: MyIdentity['phrase']
+}
+
 type SerializedState = {
-  identities: Array<{ alias: string; phrase: string }>
-  selectedIdentityAsSeedAsHex?: string
+  identities: SerializedIdentity[]
+  selectedAddress?: MyIdentity['identity']['address']
 }
 
 class Store {
-  public static serialize(state: ImmutableState) {
+  public static serialize(state: ImmutableState): SerializedState {
     const wallet: SerializedState = {
       identities: [],
     }
@@ -45,41 +45,53 @@ class Store {
     wallet.identities = state
       .get('identities')
       .toList()
-      .map(i => ({
-        alias: i.alias,
-        phrase: i.identity.phrase ? i.identity.phrase : '',
+      .map((myIdentity: MyIdentity) => ({
+        name: myIdentity.metaData.name,
+        phrase: myIdentity.phrase,
       }))
       .toArray()
 
-    const selected = state.get('selected')
-    if (selected) {
-      wallet.selectedIdentityAsSeedAsHex = selected.identity.seedAsHex
+    const selectedIdentity: MyIdentity | null = state.get('selectedIdentity')
+    if (selectedIdentity) {
+      wallet.selectedAddress = selectedIdentity.identity.address
     }
 
     return wallet
   }
 
   public static deserialize(serializedState: SerializedState): ImmutableState {
-    const identities = {}
-    let selected: Entry | null = null
+    const serializedIdentities: SerializedIdentity[] =
+      serializedState.identities && Array.isArray(serializedState.identities)
+        ? serializedState.identities
+        : []
+    const identities: { [key: string]: MyIdentity } = {}
 
-    Object.keys(serializedState.identities).forEach(i => {
-      const o = serializedState.identities[i]
-      const identity = Identity.buildFromMnemonic(o.phrase)
-      const entry = { alias: o.alias, identity }
-      identities[identity.seedAsHex] = entry
+    serializedIdentities.forEach((serializedIdentity: SerializedIdentity) => {
+      const { name, phrase } = serializedIdentity
 
-      if (
-        serializedState.selectedIdentityAsSeedAsHex &&
-        serializedState.selectedIdentityAsSeedAsHex === identity.seedAsHex
-      ) {
-        selected = entry
+      // TODO: use real wallet later instead of stored phrase
+
+      const identity = sdk.Identity.buildFromMnemonic(phrase)
+      const myIdentity: MyIdentity = {
+        identity,
+        metaData: {
+          name,
+        },
+        phrase,
       }
+
+      identities[identity.address] = myIdentity
     })
+
+    const { selectedAddress } = serializedState
+    let selectedIdentity = null
+    if (selectedAddress) {
+      selectedIdentity = identities[selectedAddress]
+    }
 
     return Store.createState({
       identities: Immutable.Map(identities),
-      selected,
+      selectedIdentity,
     })
   }
 
@@ -89,51 +101,55 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.SAVE_IDENTITY:
-        const { alias, identity } = (action as SaveAction).payload
-        return state.setIn(['identities', identity.seedAsHex], {
-          alias,
-          identity,
-        })
+        const myIdentity = (action as SaveAction).payload
+        return state.setIn(
+          ['identities', myIdentity.identity.address],
+          myIdentity
+        )
       case Store.ACTIONS.REMOVE_IDENTITY:
-        const seedAsHex1 = (action as RemoveAction).payload
-        return state.deleteIn(['identities', seedAsHex1])
+        const removeAddress = (action as RemoveAction).payload
+        return state.deleteIn(['identities', removeAddress])
       case Store.ACTIONS.SELECT_IDENTITY:
-        const seedAsHex2 = (action as SelectAction).payload
-        const selectedIdentity = state.getIn(['identities', seedAsHex2])
-        return state.set('selected', selectedIdentity)
+        const selectAddress = (action as SelectAction).payload
+        const selectedIdentity = state.getIn(['identities', selectAddress])
+        return state.set('selectedIdentity', selectedIdentity)
       default:
         return state
     }
   }
 
-  public static saveIdentityAction(
-    alias: string,
-    identity: Identity
-  ): SaveAction {
+  public static saveIdentityAction(myIdentity: MyIdentity): SaveAction {
     return {
-      payload: { alias, identity },
+      payload: myIdentity,
       type: Store.ACTIONS.SAVE_IDENTITY,
     }
   }
 
-  public static removeIdentityAction(seedAsHex: string): RemoveAction {
+  public static removeIdentityAction(
+    address: MyIdentity['identity']['address']
+  ): RemoveAction {
     return {
-      payload: seedAsHex,
+      payload: address,
       type: Store.ACTIONS.REMOVE_IDENTITY,
     }
   }
 
-  public static selectIdentityAction(seedAsHex: string): SelectAction {
+  public static selectIdentityAction(
+    address: MyIdentity['identity']['address']
+  ): SelectAction {
     return {
-      payload: seedAsHex,
+      payload: address,
       type: Store.ACTIONS.SELECT_IDENTITY,
     }
   }
 
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
-      identities: Immutable.Map<string, Entry>(),
-      selected: null,
+      identities: Immutable.Map<
+        MyIdentity['identity']['address'],
+        MyIdentity
+      >(),
+      selectedIdentity: null,
     } as State)(obj)
   }
 

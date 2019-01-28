@@ -10,11 +10,12 @@ import ContactRepository from '../../services/ContactRepository'
 import ErrorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
+import { Contact, MyIdentity } from '../../types/Contact'
 import { BlockUi } from '../../types/UserFeedback'
 import './WalletAdd.scss'
 
 type Props = RouteComponentProps<{}> & {
-  saveIdentity: (alias: string, identity: Identity) => void
+  saveIdentity: (myIdentity: MyIdentity) => void
 }
 type State = {
   alias: string
@@ -133,13 +134,13 @@ class WalletAdd extends React.Component<Props, State> {
     })
 
     let identity: Identity
-    const usePhrase = useMyPhrase ? myPhrase : randomPhrase
+    const phrase = useMyPhrase ? myPhrase : randomPhrase
     try {
-      identity = Identity.buildFromMnemonic(usePhrase)
+      identity = Identity.buildFromMnemonic(phrase)
     } catch (error) {
       ErrorService.log({
         error,
-        message: `failed to create identity from phrase '${usePhrase}'`,
+        message: `failed to create identity from phrase '${phrase}'`,
         origin: 'WalletAdd.addIdentity()',
       })
       blockUi.remove()
@@ -149,42 +150,47 @@ class WalletAdd extends React.Component<Props, State> {
     const blockchain: Blockchain = await BlockchainService.connect()
     const alice = Identity.buildFromSeedString('Alice')
     blockUi.updateMessage('transfer initial tokens (2/3)')
-    blockchain
-      .makeTransfer(alice, identity.signKeyringPair.address(), 1000)
-      .then(
-        () => {
-          blockUi.updateMessage('adding identity to contact repository (3/3)')
-          ContactRepository.add({
-            encryptionKey: identity.boxPublicKeyAsHex,
-            key: identity.signPublicKeyAsHex,
+    blockchain.makeTransfer(alice, identity.address, 1000).then(
+      () => {
+        const { address, boxPublicKeyAsHex } = identity
+        const newContact: Contact = {
+          metaData: {
             name: alias,
-          }).then(
-            () => {
-              this.props.saveIdentity(alias, identity)
-              blockUi.remove()
-              notifySuccess(`Identity ${alias} successfully created.`)
-              this.props.history.push('/wallet')
-            },
-            error => {
-              ErrorService.log({
-                error,
-                message: 'failed to POST new identity',
-                origin: 'WalletAdd.addIdentity()',
-                type: 'ERROR.FETCH.POST',
-              })
-              blockUi.remove()
-            }
-          )
-        },
-        error => {
-          ErrorService.log({
-            error,
-            message: 'failed to transfer initial tokens to identity',
-            origin: 'WalletAdd.addIdentity()',
-          })
-          blockUi.remove()
+          },
+          publicIdentity: { address, boxPublicKeyAsHex },
         }
-      )
+        blockUi.updateMessage('adding identity to contact repository (3/3)')
+        ContactRepository.add(newContact).then(
+          () => {
+            this.props.saveIdentity({
+              ...newContact,
+              identity,
+              phrase,
+            })
+            blockUi.remove()
+            notifySuccess(`Identity ${alias} successfully created.`)
+            this.props.history.push('/wallet')
+          },
+          error => {
+            ErrorService.log({
+              error,
+              message: 'failed to POST new identity',
+              origin: 'WalletAdd.addIdentity()',
+              type: 'ERROR.FETCH.POST',
+            })
+            blockUi.remove()
+          }
+        )
+      },
+      error => {
+        ErrorService.log({
+          error,
+          message: 'failed to transfer initial tokens to identity',
+          origin: 'WalletAdd.addIdentity()',
+        })
+        blockUi.remove()
+      }
+    )
   }
 
   private createRandomPhrase = () => {
@@ -207,8 +213,8 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
 
 const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
   return {
-    saveIdentity: (alias: string, identity: Identity) => {
-      dispatch(Wallet.Store.saveIdentityAction(alias, identity))
+    saveIdentity: (myIdentity: MyIdentity) => {
+      dispatch(Wallet.Store.saveIdentityAction(myIdentity))
     },
   }
 }

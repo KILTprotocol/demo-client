@@ -1,7 +1,22 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
+
+/**
+ * as in prototype/services
+ */
 export interface Contact {
-  key: string
-  encryptionKey: string
-  name: string
-  __v?: number
-  _id?: string
+  metaData: {
+    name: string
+  }
+  publicIdentity: sdk.PublicIdentity
+}
+
+/**
+ * local Identity
+ */
+export interface MyIdentity {
+  identity: sdk.Identity
+  metaData: {
+    name: string
+  }
+  phrase: string
 }

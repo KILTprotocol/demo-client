@@ -4,6 +4,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import Select from 'react-select'
 
 import * as Wallet from '../../state/ducks/Wallet'
+import { MyIdentity } from '../../types/Contact'
 
 import './IdentitySelector.scss'
 
@@ -13,8 +14,8 @@ const addIdentity = {
 }
 
 type SelectIdentityOption = {
-  label: string
-  value: string
+  label: MyIdentity['metaData']['name']
+  value: MyIdentity['identity']['address']
 }
 
 type Props = RouteComponentProps<{}> & {
@@ -38,7 +39,7 @@ class IdentitySelector extends React.Component<Props, State> {
     if (selected) {
       selectedIdentity = identities.find(
         (identity: SelectIdentityOption) =>
-          identity.value === selected.identity.seedAsHex
+          identity.value === selected.identity.address
       )
     }
 
@@ -74,18 +75,18 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
       .get('identities')
       .toList()
       .toArray()
-      .map(identity => ({
-        label: identity.alias,
-        value: identity.identity.seedAsHex,
+      .map((myIdentity: MyIdentity) => ({
+        label: myIdentity.metaData.name,
+        value: myIdentity.identity.address,
       })),
-    selected: state.wallet.get('selected'),
+    selected: state.wallet.get('selectedIdentity'),
   }
 }
 
 const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
   return {
-    selectIdentity: (seedAsHex: string) => {
-      dispatch(Wallet.Store.selectIdentityAction(seedAsHex))
+    selectIdentity: (address: string) => {
+      dispatch(Wallet.Store.selectIdentityAction(address))
     },
   }
 }

@@ -5,26 +5,33 @@ import { BasePostParams } from './BaseRepository'
 // (for other tests)
 
 class ContactRepository {
-  public static async findAll(): Promise<Contact[]> {
-    return fetch(`${ContactRepository.URL}`).then(response => response.json())
+  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/contacts`
+
+  private contacts: Contact[] = []
+
+  public async findAll(): Promise<Contact[]> {
+    return fetch(`${ContactRepository.URL}`)
+      .then(response => response.json())
+      .then((contacts: Contact[]) => {
+        this.contacts = contacts
+        return contacts
+      })
   }
 
-  public static async findByKey(key: string): Promise<Contact> {
-    return fetch(`${ContactRepository.URL}/${key}`).then(response =>
-      response.json()
+  public findByAddress(address: string): Contact | undefined {
+    return this.contacts.find(
+      (contact: Contact) => contact.publicIdentity.address === address
     )
   }
 
-  public static async add(contact: Contact): Promise<Response> {
+  public async add(contact: Contact): Promise<Response> {
     return fetch(`${ContactRepository.URL}`, {
       ...BasePostParams,
       body: JSON.stringify(contact),
     })
   }
-
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/contacts`
 }
 
-export default ContactRepository
+export default new ContactRepository()

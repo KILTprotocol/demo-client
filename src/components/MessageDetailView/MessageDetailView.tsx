@@ -111,8 +111,8 @@ class MessageDetailView extends React.Component<Props, State> {
 
   private handleCancel() {
     const { message, onCancel } = this.props
-    if (message && message.id && onCancel) {
-      onCancel(message.id)
+    if (message && message.messageId && onCancel) {
+      onCancel(message.messageId)
     }
   }
 }

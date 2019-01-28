@@ -64,7 +64,7 @@ class CtypeCreate extends React.Component<Props, State> {
       this.state.isValid
     ) {
       const { selectedIdentity, history } = this.props
-      const authorAlias: string = selectedIdentity.alias
+      const authorAlias: string = selectedIdentity.metaData.name
       let ctype: sdk.CType
 
       try {
@@ -162,7 +162,7 @@ class CtypeCreate extends React.Component<Props, State> {
 
 const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
-    selectedIdentity: state.wallet.get('selected'),
+    selectedIdentity: state.wallet.get('selectedIdentity'),
   }
 }
 

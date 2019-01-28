@@ -95,9 +95,9 @@ class ContactList extends React.Component<Props, State> {
           </thead>
           <tbody>
             {contacts.map((contact: Contact) => (
-              <tr key={contact.key}>
-                <td className="contactName">{contact.name}</td>
-                <td>{contact.key}</td>
+              <tr key={contact.publicIdentity.address}>
+                <td className="contactName">{contact.metaData.name}</td>
+                <td>{contact.publicIdentity.address}</td>
                 <td>
                   <div className="actions">
                     <button
@@ -184,7 +184,7 @@ class ContactList extends React.Component<Props, State> {
           ErrorService.log({
             error,
             message: `Could not send message ${request.type} to ${
-              this.selectedContact!.name
+              this.selectedContact!.metaData.name
             }`,
             origin: 'ContactList.onFinishRequestClaim()',
             type: 'ERROR.FETCH.POST',

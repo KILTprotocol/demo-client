@@ -8,7 +8,12 @@ import ErrorService from '../../services/ErrorService'
 import FeedbackService from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
-import { Message } from '../../types/Message'
+import {
+  ApproveAttestationForClaim,
+  Message,
+  MessageBodyType,
+  RequestAttestationForClaim,
+} from '../../types/Message'
 import {
   BlockingNotification,
   BlockUi,
@@ -39,6 +44,18 @@ class MessageView extends React.Component<Props, State> {
     this.onCloseMessage = this.onCloseMessage.bind(this)
   }
 
+  public componentDidMount() {
+    this.fetchMessages()
+  }
+
+  public componentDidUpdate(prevProps: Props) {
+    const { selectedIdentity: previousSelected } = prevProps
+    const { selectedIdentity: currentSelected } = this.props
+    if (currentSelected !== previousSelected) {
+      this.fetchMessages()
+    }
+  }
+
   public render() {
     const { messages, currentMessage } = this.state
     return (
@@ -58,7 +75,7 @@ class MessageView extends React.Component<Props, State> {
             }}
             showOnInit={true}
             type={ModalType.BLANK}
-            header={`Message from ${currentMessage.sender}`}
+            header={`Message from ${currentMessage.senderAddress}`}
             onCancel={this.onCloseMessage}
           >
             <MessageDetailView
@@ -72,22 +89,45 @@ class MessageView extends React.Component<Props, State> {
     )
   }
 
-  public componentDidMount() {
-    this.fetchMessages()
-  }
+  private fetchMessages() {
+    const { selectedIdentity } = this.props
 
-  public componentDidUpdate(prevProps: Props) {
-    const { selectedIdentity: previousSelected } = prevProps
-    const { selectedIdentity: currentSelected } = this.props
-    if (currentSelected !== previousSelected) {
-      this.fetchMessages()
+    if (selectedIdentity) {
+      console.log('fetching')
+
+      const blockUi: BlockUi = FeedbackService.addBlockUi({
+        headline: 'Fetching messages',
+      })
+      MessageRepository.findByMyIdentity(selectedIdentity.identity)
+        .then((messages: Message[]) => {
+          console.log('messages', messages)
+
+          this.setState({
+            messages,
+          })
+          blockUi.remove()
+        })
+        .catch(error => {
+          ErrorService.log({
+            error,
+            message: `Could not retrieve messages for identity ${
+              selectedIdentity.identity.address
+            }`,
+            origin: 'MessageView.fetchMessages()',
+          })
+          blockUi.remove()
+        })
+    } else {
+      this.setState({
+        messages: [],
+      })
     }
   }
 
   private onDeleteMessage(message: Message) {
     const { currentMessage } = this.state
 
-    if (!message.id) {
+    if (!message.messageId) {
       return
     }
 
@@ -98,8 +138,8 @@ class MessageView extends React.Component<Props, State> {
 
     FeedbackService.addBlockingNotification({
       header: 'Are you sure?',
-      message: `Do you want to delete message '${message.id}' from '${
-        message.sender
+      message: `Do you want to delete message '${message.messageId}' from '${
+        message.senderAddress
       }'?`,
       modalType: ModalType.CONFIRM,
       onConfirm: (notification: BlockingNotification) => {
@@ -137,41 +177,11 @@ class MessageView extends React.Component<Props, State> {
   private onCloseMessage() {
     this.setState({ currentMessage: undefined })
   }
-
-  private fetchMessages() {
-    const { selectedIdentity } = this.props
-    if (selectedIdentity) {
-      const blockUi: BlockUi = FeedbackService.addBlockUi({
-        headline: 'Fetching messages',
-      })
-      MessageRepository.findByMyIdentity(selectedIdentity.identity)
-        .then((messages: Message[]) => {
-          this.setState({
-            messages,
-          })
-          blockUi.remove()
-        })
-        .catch(error => {
-          ErrorService.log({
-            error,
-            message: `Could not retrieve messages for identity ${
-              selectedIdentity.identity.address
-            }`,
-            origin: 'MessageView.fetchMessages()',
-          })
-          blockUi.remove()
-        })
-    } else {
-      this.setState({
-        messages: [],
-      })
-    }
-  }
 }
 
 const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
-    selectedIdentity: state.wallet.get('selected'),
+    selectedIdentity: state.wallet.get('selectedIdentity'),
   }
 }
 

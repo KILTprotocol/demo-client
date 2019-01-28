@@ -1,17 +1,16 @@
-import { Identity } from '@kiltprotocol/prototype-sdk'
-import * as React from 'react'
 import Identicon from '@polkadot/ui-identicon'
+import * as React from 'react'
+import { MyIdentity } from '../../types/Contact'
 
 import './IdentityView.scss'
 
 type Props = {
   // input
-  identity: Identity
-  alias: string
+  myIdentity: MyIdentity
   selected: boolean
   // output
-  onDelete: (seedAsHex: string) => void
-  onSelect: (seedAsHex: string) => void
+  onDelete: (address: MyIdentity['identity']['address']) => void
+  onSelect: (seedAsHex: MyIdentity['identity']['address']) => void
 }
 
 class IdentityView extends React.Component<Props, {}> {
@@ -20,7 +19,7 @@ class IdentityView extends React.Component<Props, {}> {
   }
 
   public render() {
-    const { identity, alias, selected } = this.props
+    const { myIdentity, selected } = this.props
 
     const classes = ['IdentityView', selected ? 'selected' : '']
 
@@ -29,29 +28,33 @@ class IdentityView extends React.Component<Props, {}> {
         <div className="attributes">
           <div>
             <label>Alias</label>
-            <div>{alias}</div>
+            <div>{myIdentity.metaData.name}</div>
           </div>
           <div>
             <label>Identicon</label>
             <div>
-              <Identicon value={identity.address} size={32} theme="substrate" />
+              <Identicon
+                value={myIdentity.identity.address}
+                size={32}
+                theme="substrate"
+              />
             </div>
           </div>
           <div>
             <label>Phrase</label>
-            <div>{identity.phrase}</div>
+            <div>{myIdentity.phrase}</div>
           </div>
           <div>
             <label>Seed (as hex)</label>
-            <div>{identity.seedAsHex}</div>
+            <div>{myIdentity.identity.seedAsHex}</div>
           </div>
           <div>
             <label>Public Key</label>
-            <div>{identity.signPublicKeyAsHex}</div>
+            <div>{myIdentity.identity.signPublicKeyAsHex}</div>
           </div>
           <div>
             <label>Encryption Public Key</label>
-            <div>{identity.boxPublicKeyAsHex}</div>
+            <div>{myIdentity.identity.boxPublicKeyAsHex}</div>
           </div>
         </div>
         <div className="actions">
@@ -67,11 +70,11 @@ class IdentityView extends React.Component<Props, {}> {
   }
 
   private onDelete = () => {
-    this.props.onDelete(this.props.identity.seedAsHex)
+    this.props.onDelete(this.props.myIdentity.identity.address)
   }
 
   private onSelect = () => {
-    this.props.onSelect(this.props.identity.seedAsHex)
+    this.props.onSelect(this.props.myIdentity.identity.address)
   }
 }
 

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import ContactRepository from '../../services/ContactRepository'
 
 import {
   ApproveAttestationForClaim,
@@ -41,8 +42,8 @@ class MessageListView extends React.Component<Props, State> {
             </thead>
             <tbody>
               {messages.map((message: Message) => (
-                <tr key={message.id}>
-                  <td>{message.sender}</td>
+                <tr key={message.messageId}>
+                  <td>{message.senderAddress}</td>
                   <td className="message">
                     <div onClick={this.openMessage(message)}>
                       {this.getMessageInfo(message)}

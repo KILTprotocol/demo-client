@@ -13,7 +13,7 @@ type Props = RouteComponentProps<{}> & {
   selectIdentity: (seedAsHex: string) => void
   removeIdentity: (seedAsHex: string) => void
   identities: Wallet.Entry[]
-  selected?: Wallet.Entry
+  selectedIdentity?: Wallet.Entry
 }
 
 type State = {
@@ -33,17 +33,17 @@ class WalletView extends React.Component<Props, State> {
   public render() {
     const { identityToDelete } = this.state
 
-    const identities = this.props.identities.map((entry: Wallet.Entry) => {
+    const identities = this.props.identities.map((myIdentity: Wallet.Entry) => {
       let selected = false
-      if (this.props.selected) {
+      if (this.props.selectedIdentity) {
         selected =
-          entry.identity.seedAsHex === this.props.selected.identity.seedAsHex
+          myIdentity.identity.address ===
+          this.props.selectedIdentity.identity.address
       }
       return (
         <IdentityView
-          key={entry.identity.seedAsHex}
-          identity={entry.identity}
-          alias={entry.alias}
+          key={myIdentity.identity.address}
+          myIdentity={myIdentity}
           selected={selected}
           onDelete={this.requestRemoveIdentity}
           onSelect={this.selectIdentity}
@@ -71,7 +71,7 @@ class WalletView extends React.Component<Props, State> {
           >
             <div>
               Are you sure you want to delete your identity '
-              {identityToDelete.alias}'?
+              {identityToDelete.metaData.name}'?
             </div>
           </Modal>
         )}
@@ -114,7 +114,7 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
       .get('identities')
       .toList()
       .toArray(),
-    selected: state.wallet.get('selected'),
+    selectedIdentity: state.wallet.get('selectedIdentity'),
   }
 }
 

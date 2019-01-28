@@ -1,16 +1,15 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import { Contact } from './Contact'
 
 import { CType } from './Ctype'
 
-export type Message = {
-  id?: string
-  sender: string
-  senderKey: string
-  senderEncryptionKey: string
-  receiverKey: string
+export interface Message {
+  body?: MessageBody
+  messageId?: string
   message: string
   nonce: string
-  body?: MessageBody
+  receiverAddress: Contact['publicIdentity']['address']
+  senderAddress: Contact['publicIdentity']['address']
 }
 
 export enum MessageBodyType {
