@@ -37,8 +37,8 @@ class ClaimDetailView extends Component<Props, State> {
     const { claimEntry } = this.props
     if (claimEntry) {
       this.state = {
-          canResolveAttesters: false,
-          pendingAttestations: [],
+        canResolveAttesters: false,
+        pendingAttestations: [],
         unverifiedAttestations: claimEntry.attestations.map(
           (attestation: sdk.IAttestation) => {
             return attestation.claimHash
@@ -146,19 +146,21 @@ class ClaimDetailView extends Component<Props, State> {
                     <td className="attesterName">
                       {attester ? attester.metaData.name : attestation.owner}
                     </td>
-                      {this.isPending(attestation) && (
-                          <td className="status">
-                              <Spinner size={20} color="#5d5d5d" strength={2} />
-                          </td>
-                      )}
-                      {!this.isPending(attestation) && (
-                          <td
-                              className={
-                                  'status ' +
-                                  (this.isApproved(attestation) ? 'approved' : 'revoked')
-                              }
-                          />
-                      )}
+                    {this.isPending(attestation) && (
+                      <td className="status">
+                        <Spinner size={20} color="#ef5a28" strength={3} />
+                      </td>
+                    )}
+                    {!this.isPending(attestation) && (
+                      <td
+                        className={
+                          'status ' +
+                          (this.isApproved(attestation)
+                            ? 'approved'
+                            : 'revoked')
+                        }
+                      />
+                    )}
                   </tr>
                 )
               })}

@@ -46,7 +46,7 @@ class MessageDetailView extends React.Component<Props, State> {
             )}
           </div>
         )}
-        <div className="workflow">{this.buildWorkflow(message)}</div>
+        <div className="workflow">{this.getWorkflow(message)}</div>
         <footer>
           {children}
           <button className="cancel" onClick={this.handleCancel}>
@@ -60,70 +60,7 @@ class MessageDetailView extends React.Component<Props, State> {
     )
   }
 
-  private getWorkflow(): ReactNode | undefined {
-    const { message } = this.props
-
-    if (!message || !message.body || !message.body.content) {
-      return undefined
-    }
-
-    const messageBodyType: MessageBodyType | undefined =
-      message && message.body && message.body.type
-
-    switch (messageBodyType) {
-      case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
-        return (
-          <ChooseClaimForCtype
-            senderAddress={message.senderAddress}
-            ctypeKey={(message.body as RequestClaimForCtype).content.key}
-            onFinished={this.handleDelete}
-          />
-        )
-      case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
-        return (
-          <AttestClaim
-            senderAddress={message.senderAddress}
-            claim={
-              ((message.body as RequestAttestationForClaim)
-                .content as ClaimMessageBodyContent).claim
-            }
-            ctypeName={
-              ((message.body as RequestAttestationForClaim)
-                .content as ClaimMessageBodyContent).cType.name
-            }
-            onFinished={this.handleDelete}
-          />
-        )
-      case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
-        return (
-          <ImportAttestation
-            claim={(message.body as ApproveAttestationForClaim).content.claim}
-            attestation={
-              (message.body as ApproveAttestationForClaim).content.attestation
-            }
-            onFinished={this.handleDelete}
-          />
-        )
-      default:
-        return undefined
-    }
-  }
-
-  private handleDelete() {
-    const { message, onDelete } = this.props
-    if (message && onDelete) {
-      onDelete(message)
-    }
-  }
-
-  private handleCancel() {
-    const { message, onCancel } = this.props
-    if (message && message.messageId && onCancel) {
-      onCancel(message.messageId)
-    }
-  }
-
-  private buildWorkflow(message: Message): ReactNode | undefined {
+  private getWorkflow(message: Message): ReactNode | undefined {
     if (!message || !message.body || !message.body.content) {
       return undefined
     }
@@ -136,7 +73,7 @@ class MessageDetailView extends React.Component<Props, State> {
       case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
         return (
           <ChooseClaimForCtype
-            senderKey={message.senderKey}
+            senderAddress={message.senderAddress}
             ctypeKey={(message.body as RequestClaimForCtype).content.key}
             onFinished={this.handleDelete}
           />
@@ -144,7 +81,7 @@ class MessageDetailView extends React.Component<Props, State> {
       case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return (
           <AttestClaim
-            senderKey={message.senderKey}
+            senderAddress={message.senderAddress}
             claim={
               ((message.body as RequestAttestationForClaim)
                 .content as ClaimMessageBodyContent).claim
@@ -177,6 +114,20 @@ class MessageDetailView extends React.Component<Props, State> {
         )
       default:
         return undefined
+    }
+  }
+
+  private handleDelete() {
+    const { message, onDelete } = this.props
+    if (message && onDelete) {
+      onDelete(message)
+    }
+  }
+
+  private handleCancel() {
+    const { message, onCancel } = this.props
+    if (message && message.messageId && onCancel) {
+      onCancel(message.messageId)
     }
   }
 
