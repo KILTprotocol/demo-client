@@ -113,7 +113,7 @@ class MessageListView extends React.Component<Props, State> {
           break
         case MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE:
           additionalInfo = (message.body as SubmitClaimForCtype).content.claim
-            .owner
+            .alias
           break
       }
     } catch (error) {

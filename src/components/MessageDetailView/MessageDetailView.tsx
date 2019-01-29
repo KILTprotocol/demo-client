@@ -1,17 +1,8 @@
-import React, { ReactNode } from 'react'
-import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
-import ChooseClaimForCtype from '../../containers/workflows/ChooseClaimForCtype/ChooseClaimForCtype'
-import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
+import React from 'react'
 
-import {
-  ApproveAttestationForClaim,
-  ClaimMessageBodyContent,
-  Message,
-  MessageBodyType,
-  RequestAttestationForClaim,
-  RequestClaimForCtype,
-} from '../../types/Message'
+import { Message } from '../../types/Message'
 import Code from '../Code/Code'
+import MessageWorkflowBuilder from './MessageWorkflowBuilder'
 
 import './MessageDetailView.scss'
 
@@ -35,11 +26,19 @@ class MessageDetailView extends React.Component<Props, State> {
     return (
       <section className="MessageDetailView">
         <h4>Subject: {message.body ? message.body.type : message.message}</h4>
-        <div>
-          Contents:{' '}
-          {message.body ? <Code>{message.body.content}</Code> : message.message}
+        {MessageWorkflowBuilder.shouldDisplayContentAsCode(message) && (
+          <div>
+            Contents:{' '}
+            {message.body ? (
+              <Code>{message.body.content}</Code>
+            ) : (
+              message.message
+            )}
+          </div>
+        )}
+        <div className="workflow">
+          {MessageWorkflowBuilder.fromMessage(message, this.handleDelete)}
         </div>
-        <div className="workflow">{this.getWorkflow()}</div>
         <footer>
           {children}
           <button className="cancel" onClick={this.handleCancel}>

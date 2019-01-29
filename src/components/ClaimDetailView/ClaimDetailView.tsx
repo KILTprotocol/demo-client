@@ -12,8 +12,8 @@ import './ClaimDetailView.scss'
 
 type Props = {
   claimEntry?: Claims.Entry
-  onRemoveClaim: (hash: string) => void
-  onRequestAttestation: (hash: string) => void
+  onRemoveClaim?: (hash: string) => void
+  onRequestAttestation?: (hash: string) => void
   onVerifyAttestation: (attestation: sdk.IAttestation) => Promise<boolean>
 }
 
@@ -161,20 +161,25 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   private getActions() {
+    const { onRemoveClaim, onRequestAttestation }: Props = this.props
     return (
       <div className="actions">
         <Link className="cancel" to="/claim">
           Cancel
         </Link>
-        <button
-          className="requestAttestation"
-          onClick={this.requestAttestation}
-        >
-          Request Attestation
-        </button>
-        <button className="deleteClaim" onClick={this.handleDelete}>
-          Delete
-        </button>
+        {onRequestAttestation && (
+          <button
+            className="requestAttestation"
+            onClick={this.requestAttestation}
+          >
+            Request Attestation
+          </button>
+        )}
+        {onRemoveClaim && (
+          <button className="deleteClaim" onClick={this.handleDelete}>
+            Delete
+          </button>
+        )}
       </div>
     )
   }
@@ -186,14 +191,14 @@ class ClaimDetailView extends Component<Props, State> {
 
   private handleDelete() {
     const { claimEntry, onRemoveClaim }: Props = this.props
-    if (claimEntry) {
+    if (claimEntry && onRemoveClaim) {
       onRemoveClaim(claimEntry.claim.hash)
     }
   }
 
   private requestAttestation() {
     const { claimEntry, onRequestAttestation }: Props = this.props
-    if (claimEntry) {
+    if (claimEntry && onRequestAttestation) {
       onRequestAttestation(claimEntry.claim.hash)
     }
   }
