@@ -1,9 +1,17 @@
 .IdentitySelector {
+  @include react-select;
 
   & .react-select {
 
     &-container {
       width: 200px;
+    }
+
+    &__value {
+
+      &-container {
+        overflow: visible;
+      }
     }
 
     &__option {

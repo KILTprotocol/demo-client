@@ -67,7 +67,7 @@ class MessageDetailView extends React.Component<Props, State> {
       case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
         return (
           <ChooseClaimForCtype
-            senderKey={message.senderKey}
+            senderAddress={message.senderAddress}
             ctypeKey={(message.body as RequestClaimForCtype).content.key}
             onFinished={this.handleDelete}
           />
@@ -75,7 +75,7 @@ class MessageDetailView extends React.Component<Props, State> {
       case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return (
           <AttestClaim
-            senderKey={message.senderKey}
+            senderAddress={message.senderAddress}
             claim={
               ((message.body as RequestAttestationForClaim)
                 .content as ClaimMessageBodyContent).claim
@@ -111,8 +111,8 @@ class MessageDetailView extends React.Component<Props, State> {
 
   private handleCancel() {
     const { message, onCancel } = this.props
-    if (message && message.id && onCancel) {
-      onCancel(message.id)
+    if (message && message.messageId && onCancel) {
+      onCancel(message.messageId)
     }
   }
 }

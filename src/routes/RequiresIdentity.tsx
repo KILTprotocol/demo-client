@@ -18,7 +18,7 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
       .get('identities')
       .toList()
       .toArray(),
-    selectedIdentity: state.wallet.get('selected'),
+    selectedIdentity: state.wallet.get('selectedIdentity'),
   }
 }
 

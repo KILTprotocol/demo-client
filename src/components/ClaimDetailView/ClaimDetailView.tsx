@@ -1,9 +1,13 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
+import ContactRepository from '../../services/ContactRepository'
 
 import * as Claims from '../../state/ducks/Claims'
+import { Contact } from '../../types/Contact'
+import { Message } from '../../types/Message'
 import Code from '../Code/Code'
+import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 import './ClaimDetailView.scss'
 
 type Props = {
@@ -14,6 +18,7 @@ type Props = {
 }
 
 type State = {
+  canResolveAttesters: boolean
   unverifiedAttestations: string[]
 }
 
@@ -27,6 +32,7 @@ class ClaimDetailView extends Component<Props, State> {
     const { claimEntry } = this.props
     if (claimEntry) {
       this.state = {
+        canResolveAttesters: false,
         unverifiedAttestations: claimEntry.attestations.map(
           (attestation: sdk.IAttestation) => {
             return attestation.claimHash
@@ -38,6 +44,14 @@ class ClaimDetailView extends Component<Props, State> {
     setTimeout(() => {
       this.verifyAttestations()
     }, 500)
+  }
+
+  public componentDidMount() {
+    ContactRepository.findAll().then(() => {
+      this.setState({
+        canResolveAttesters: true,
+      })
+    })
   }
 
   public render() {
@@ -98,28 +112,39 @@ class ClaimDetailView extends Component<Props, State> {
           <table>
             <thead>
               <tr>
-                <th>Attester</th>
-                <th>Approved</th>
-                <th>Chain Status</th>
+                <th className="identicon" />
+                <th className="attesterName">Attester</th>
+                <th className="status">Approved</th>
+                <th className="refresh" />
               </tr>
             </thead>
             <tbody>
-              {attestations.map((attestation: sdk.IAttestation) => (
-                <tr key={attestation.signature}>
-                  <td>{attestation.owner}</td>
-                  <td
-                    className={
-                      this.isApproved(attestation) ? 'approved' : 'revoked'
-                    }
-                  />
-                  <td>
-                    <button
-                      className="refresh"
-                      onClick={this.verifyAttestation(attestation)}
+              {attestations.map((attestation: sdk.IAttestation) => {
+                const attester = this.getAttester(attestation.owner)
+                return (
+                  <tr key={attestation.signature}>
+                    <td className="identicon">
+                      {attester ? (
+                        <KiltIdenticon contact={attester} size={24} />
+                      ) : (
+                        ''
+                      )}
+                    </td>
+                    <td className="attesterName">
+                      {attester ? attester.metaData.name : attestation.owner}
+                    </td>
+                    <td
+                      className={
+                        'status ' +
+                        (this.isApproved(attestation) ? 'approved' : 'revoked')
+                      }
                     />
-                  </td>
-                </tr>
-              ))}
+                    <td className="refresh">
+                      <button onClick={this.verifyAttestation(attestation)} />
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         ) : (
@@ -127,6 +152,12 @@ class ClaimDetailView extends Component<Props, State> {
         )}
       </section>
     )
+  }
+
+  private getAttester(
+    attesterAddress: Contact['publicIdentity']['address']
+  ): Contact | undefined {
+    return ContactRepository.findByAddress(attesterAddress)
   }
 
   private getActions() {

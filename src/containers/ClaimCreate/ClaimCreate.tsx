@@ -157,7 +157,7 @@ class ClaimCreate extends Component<Props, State> {
 
 const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
-    selectedIdentity: state.wallet.get('selected'),
+    selectedIdentity: state.wallet.get('selectedIdentity'),
   }
 }
 

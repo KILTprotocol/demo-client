@@ -1,9 +1,12 @@
 import * as React from 'react'
+import { ReactNode } from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import Select from 'react-select'
+import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 
 import * as Wallet from '../../state/ducks/Wallet'
+import { MyIdentity } from '../../types/Contact'
 
 import './IdentitySelector.scss'
 
@@ -13,14 +16,14 @@ const addIdentity = {
 }
 
 type SelectIdentityOption = {
-  label: string
-  value: string
+  label: ReactNode
+  value: MyIdentity['identity']['address']
 }
 
 type Props = RouteComponentProps<{}> & {
   selectIdentity: (seedAsHex: string) => void
-  identities: SelectIdentityOption[]
-  selected?: Wallet.Entry
+  myIdentities: MyIdentity[]
+  selectedIdentity?: Wallet.Entry
 }
 
 type State = {
@@ -30,15 +33,22 @@ type State = {
 
 class IdentitySelector extends React.Component<Props, State> {
   public render() {
-    const { identities, selected } = this.props
+    const { myIdentities, selectedIdentity } = this.props
 
-    identities.push(addIdentity)
+    const identityOptions: SelectIdentityOption[] = myIdentities.map(
+      (myIdentity: MyIdentity) => ({
+        label: <KiltIdenticon myIdentity={myIdentity} size={20} />,
+        value: myIdentity.identity.address,
+      })
+    )
 
-    let selectedIdentity
-    if (selected) {
-      selectedIdentity = identities.find(
-        (identity: SelectIdentityOption) =>
-          identity.value === selected.identity.seedAsHex
+    identityOptions.push(addIdentity)
+
+    let selectedOption
+    if (selectedIdentity) {
+      selectedOption = identityOptions.find(
+        (identityOption: SelectIdentityOption) =>
+          identityOption.value === selectedIdentity.identity.address
       )
     }
 
@@ -51,8 +61,8 @@ class IdentitySelector extends React.Component<Props, State> {
           isSearchable={false}
           isMulti={false}
           name="selectIdentity"
-          options={identities}
-          value={selectedIdentity}
+          options={identityOptions}
+          value={selectedOption}
           onChange={this.selectIdentity}
         />
       </section>
@@ -70,22 +80,18 @@ class IdentitySelector extends React.Component<Props, State> {
 
 const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
-    identities: state.wallet
+    myIdentities: state.wallet
       .get('identities')
       .toList()
-      .toArray()
-      .map(identity => ({
-        label: identity.alias,
-        value: identity.identity.seedAsHex,
-      })),
-    selected: state.wallet.get('selected'),
+      .toArray(),
+    selectedIdentity: state.wallet.get('selectedIdentity'),
   }
 }
 
 const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
   return {
-    selectIdentity: (seedAsHex: string) => {
-      dispatch(Wallet.Store.selectIdentityAction(seedAsHex))
+    selectIdentity: (address: string) => {
+      dispatch(Wallet.Store.selectIdentityAction(address))
     },
   }
 }

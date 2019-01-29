@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 
 import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
@@ -8,7 +9,7 @@ import ErrorService from '../../services/ErrorService'
 import FeedbackService from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
-import { Message } from '../../types/Message'
+import { Message, MessageOutput } from '../../types/Message'
 import {
   BlockingNotification,
   BlockUi,
@@ -22,8 +23,8 @@ interface Props {
 }
 
 interface State {
-  messages: Message[]
-  currentMessage?: Message
+  messages: MessageOutput[]
+  currentMessage?: MessageOutput
 }
 
 class MessageView extends React.Component<Props, State> {
@@ -37,6 +38,18 @@ class MessageView extends React.Component<Props, State> {
     this.onDeleteMessage = this.onDeleteMessage.bind(this)
     this.onOpenMessage = this.onOpenMessage.bind(this)
     this.onCloseMessage = this.onCloseMessage.bind(this)
+  }
+
+  public componentDidMount() {
+    this.fetchMessages()
+  }
+
+  public componentDidUpdate(prevProps: Props) {
+    const { selectedIdentity: previousSelected } = prevProps
+    const { selectedIdentity: currentSelected } = this.props
+    if (currentSelected !== previousSelected) {
+      this.fetchMessages()
+    }
   }
 
   public render() {
@@ -58,7 +71,16 @@ class MessageView extends React.Component<Props, State> {
             }}
             showOnInit={true}
             type={ModalType.BLANK}
-            header={`Message from ${currentMessage.sender}`}
+            header={
+              currentMessage.sender ? (
+                <div className="header-KiltIdenticon">
+                  Message from{' '}
+                  <KiltIdenticon contact={currentMessage.sender} size={24} />
+                </div>
+              ) : (
+                `Message from ${currentMessage.senderAddress}`
+              )
+            }
             onCancel={this.onCloseMessage}
           >
             <MessageDetailView
@@ -72,74 +94,9 @@ class MessageView extends React.Component<Props, State> {
     )
   }
 
-  public componentDidMount() {
-    this.fetchMessages()
-  }
-
-  public componentDidUpdate(prevProps: Props) {
-    const { selectedIdentity: previousSelected } = prevProps
-    const { selectedIdentity: currentSelected } = this.props
-    if (currentSelected !== previousSelected) {
-      this.fetchMessages()
-    }
-  }
-
-  private onDeleteMessage(message: Message) {
-    const { currentMessage } = this.state
-
-    if (!message.id) {
-      return
-    }
-
-    if (currentMessage) {
-      this.onCloseMessage()
-      this.fetchMessages()
-    }
-
-    FeedbackService.addBlockingNotification({
-      header: 'Are you sure?',
-      message: `Do you want to delete message '${message.id}' from '${
-        message.sender
-      }'?`,
-      modalType: ModalType.CONFIRM,
-      onConfirm: (notification: BlockingNotification) => {
-        MessageRepository.deleteByMessageId(message.id as string)
-          .then(() => {
-            this.fetchMessages()
-            notification.remove()
-          })
-          .catch(error => {
-            ErrorService.log({
-              error,
-              message: `Could not delete message ${message.id}`,
-              origin: 'MessageView.onDeleteMessage()',
-              type: 'ERROR.FETCH.DELETE',
-            })
-          })
-      },
-      type: NotificationType.INFO,
-    })
-  }
-
-  private onOpenMessage(message: Message) {
-    this.setState(
-      {
-        currentMessage: message,
-      },
-      () => {
-        if (this.messageModal) {
-          this.messageModal.show()
-        }
-      }
-    )
-  }
-
-  private onCloseMessage() {
-    this.setState({ currentMessage: undefined })
-  }
-
   private fetchMessages() {
     const { selectedIdentity } = this.props
+
     if (selectedIdentity) {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Fetching messages',
@@ -167,11 +124,65 @@ class MessageView extends React.Component<Props, State> {
       })
     }
   }
+
+  private onDeleteMessage(message: Message) {
+    const { currentMessage } = this.state
+
+    if (!message.messageId) {
+      return
+    }
+
+    if (currentMessage) {
+      this.onCloseMessage()
+      this.fetchMessages()
+    }
+
+    FeedbackService.addBlockingNotification({
+      header: 'Are you sure?',
+      message: `Do you want to delete message '${message.messageId}' from '${
+        message.senderAddress
+      }'?`,
+      modalType: ModalType.CONFIRM,
+      onConfirm: (notification: BlockingNotification) => {
+        MessageRepository.deleteByMessageId(message.messageId as string)
+          .then(() => {
+            this.fetchMessages()
+            notification.remove()
+          })
+          .catch(error => {
+            ErrorService.log({
+              error,
+              message: `Could not delete message ${message.messageId}`,
+              origin: 'MessageView.onDeleteMessage()',
+              type: 'ERROR.FETCH.DELETE',
+            })
+          })
+      },
+      type: NotificationType.INFO,
+    })
+  }
+
+  private onOpenMessage(message: Message) {
+    this.setState(
+      {
+        currentMessage: message,
+      },
+      () => {
+        if (this.messageModal) {
+          this.messageModal.show()
+        }
+      }
+    )
+  }
+
+  private onCloseMessage() {
+    this.setState({ currentMessage: undefined })
+  }
 }
 
 const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
-    selectedIdentity: state.wallet.get('selected'),
+    selectedIdentity: state.wallet.get('selectedIdentity'),
   }
 }
 

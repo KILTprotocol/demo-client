@@ -1,0 +1,17 @@
+.KiltIdenticon {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+
+  & .ui--IdentityIcon {
+    cursor: default;
+  }
+
+  & .name {
+    @extend %ellipsis;
+
+    padding:{
+      left: $base-padding/4;
+    }
+  }
+}

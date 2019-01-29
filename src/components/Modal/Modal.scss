@@ -21,7 +21,7 @@
     background: $color-background-backdrop;
   }
 
-  & .container {
+  & > .container {
     @include border-radius($base-border-radius);
 
     position: relative;
@@ -40,6 +40,19 @@
       bottom: $base-border;
     }
     font-size: 20px;
+
+    & .header-KiltIdenticon {
+      display: flex;
+      flex-direction: row;
+      justify-content: left;
+      align-items: center;
+
+      & .KiltIdenticon {
+        margin: {
+          left: $base-padding;
+        }
+      }
+    }
   }
 
   & .body {

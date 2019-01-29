@@ -1,12 +1,14 @@
+import { ReactNode } from 'react'
 import * as React from 'react'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
 import { Contact } from '../../types/Contact'
+import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 
 type SelectOption = {
+  label: ReactNode
   value: string
-  label: string
 }
 
 type Props = {
@@ -51,8 +53,8 @@ class SelectContacts extends React.Component<Props, State> {
 
     const options: SelectOption[] = contacts.map(
       (contact: Contact): SelectOption => ({
-        label: contact.name,
-        value: contact.key,
+        label: <KiltIdenticon contact={contact} size={24} />,
+        value: contact.publicIdentity.address,
       })
     )
 
@@ -90,7 +92,8 @@ class SelectContacts extends React.Component<Props, State> {
     ).map((selectedOption: SelectOption) => selectedOption.value)
 
     const selectedContacts: Contact[] = contacts.filter(
-      (contact: Contact) => _selectedOptions.indexOf(contact.key) !== -1
+      (contact: Contact) =>
+        _selectedOptions.indexOf(contact.publicIdentity.address) !== -1
     )
     const { onChange } = this.props
     if (onChange) {
