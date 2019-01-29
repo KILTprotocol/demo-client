@@ -5,6 +5,7 @@ import * as UiState from '../../state/ducks/UiState'
 import { BlockUi as IBlockUi } from '../../types/UserFeedback'
 
 import './BlockUi.scss'
+import Spinner from '../../components/Spinner/Spinner'
 
 type Props = {
   blockUis: IBlockUi[]
@@ -27,12 +28,7 @@ class BlockUi extends Component<Props, State> {
           {blockUis.map((blockUi: IBlockUi) => this.getBlockUi(blockUi))}
         </div>
         <div className="spinner">
-          <div className="lds-ring">
-            <div />
-            <div />
-            <div />
-            <div />
-          </div>
+          <Spinner size={64} strength={8} color="#fff" />
         </div>
       </section>
     ) : (

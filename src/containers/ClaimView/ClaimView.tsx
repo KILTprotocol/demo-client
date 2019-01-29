@@ -72,6 +72,7 @@ class ClaimView extends React.Component<Props, State> {
       <section className="ClaimView">
         {validCurrentClaimEntry && (
           <ClaimDetailView
+            cancelable={true}
             claimEntry={currentClaimEntry as Claims.Entry}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={this.onRequestAttestation}

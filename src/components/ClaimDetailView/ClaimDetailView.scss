@@ -13,10 +13,18 @@
 
     padding: $base-padding;
 
-    & h3 {
+    & .header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin: {
-        top: 0;
+        bottom: $base-padding;
       }
+    }
+
+    & h3 {
+      margin: 0;
     }
 
     & table {
@@ -32,12 +40,11 @@
     }
 
     & .attesterName {
-      @include baseFont-bold;
-
       width: 60%;
     }
 
     & .status {
+      height: 30px;
       width: 20%;
       text-align: center;
 
@@ -59,13 +66,9 @@
         }
       }
     }
+  }
 
-    & .refresh {
-      width: 50px;
-
-      & button {
-        @include button-icon-only($icon-refresh);
-      }
-    }
+  & .refresh {
+    @include button-icon-only($icon-refresh);
   }
 }

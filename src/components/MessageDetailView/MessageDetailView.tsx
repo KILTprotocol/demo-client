@@ -1,18 +1,19 @@
 import React, { ReactNode } from 'react'
-import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
-import ChooseClaimForCtype from '../../containers/workflows/ChooseClaimForCtype/ChooseClaimForCtype'
-import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
 
 import {
-  ApproveAttestationForClaim,
-  ClaimMessageBodyContent,
   Message,
   MessageBodyType,
-  RequestAttestationForClaim,
   RequestClaimForCtype,
+  RequestAttestationForClaim,
+  ClaimMessageBodyContent,
+  ApproveAttestationForClaim,
+  SubmitClaimForCtype,
 } from '../../types/Message'
 import Code from '../Code/Code'
-
+import ChooseClaimForCtype from '../../containers/workflows/ChooseClaimForCtype/ChooseClaimForCtype'
+import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
+import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
+import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
 import './MessageDetailView.scss'
 
 type Props = {
@@ -35,11 +36,17 @@ class MessageDetailView extends React.Component<Props, State> {
     return (
       <section className="MessageDetailView">
         <h4>Subject: {message.body ? message.body.type : message.message}</h4>
-        <div>
-          Contents:{' '}
-          {message.body ? <Code>{message.body.content}</Code> : message.message}
-        </div>
-        <div className="workflow">{this.getWorkflow()}</div>
+        {this.shouldDisplayContentAsCode(message) && (
+          <div>
+            Contents:{' '}
+            {message.body ? (
+              <Code>{message.body.content}</Code>
+            ) : (
+              message.message
+            )}
+          </div>
+        )}
+        <div className="workflow">{this.getWorkflow(message)}</div>
         <footer>
           {children}
           <button className="cancel" onClick={this.handleCancel}>
@@ -53,15 +60,14 @@ class MessageDetailView extends React.Component<Props, State> {
     )
   }
 
-  private getWorkflow(): ReactNode | undefined {
-    const { message } = this.props
-
+  private getWorkflow(message: Message): ReactNode | undefined {
     if (!message || !message.body || !message.body.content) {
       return undefined
     }
 
-    const messageBodyType: MessageBodyType | undefined =
-      message && message.body && message.body.type
+    const messageBodyType:
+      | MessageBodyType
+      | undefined = this.getMessageBodyType(message)
 
     switch (messageBodyType) {
       case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
@@ -97,6 +103,15 @@ class MessageDetailView extends React.Component<Props, State> {
             onFinished={this.handleDelete}
           />
         )
+      case MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE:
+        return (
+          <VerifyClaim
+            claim={(message.body as SubmitClaimForCtype).content.claim}
+            attestations={
+              (message.body as SubmitClaimForCtype).content.attestations
+            }
+          />
+        )
       default:
         return undefined
     }
@@ -114,6 +129,21 @@ class MessageDetailView extends React.Component<Props, State> {
     if (message && message.messageId && onCancel) {
       onCancel(message.messageId)
     }
+  }
+
+  private getMessageBodyType(message: Message): MessageBodyType | undefined {
+    return message && message.body && message.body.type
+  }
+
+  private shouldDisplayContentAsCode(message: Message): boolean {
+    const messageBodyType:
+      | MessageBodyType
+      | undefined = this.getMessageBodyType(message)
+
+    return (
+      messageBodyType !== undefined &&
+      messageBodyType !== MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE
+    )
   }
 }
 
