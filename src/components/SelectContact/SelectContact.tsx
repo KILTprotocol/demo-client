@@ -51,8 +51,8 @@ class SelectContacts extends React.Component<Props, State> {
 
     const options: SelectOption[] = contacts.map(
       (contact: Contact): SelectOption => ({
-        label: contact.name,
-        value: contact.key,
+        label: contact.metaData.name,
+        value: contact.publicIdentity.address,
       })
     )
 
@@ -90,7 +90,8 @@ class SelectContacts extends React.Component<Props, State> {
     ).map((selectedOption: SelectOption) => selectedOption.value)
 
     const selectedContacts: Contact[] = contacts.filter(
-      (contact: Contact) => _selectedOptions.indexOf(contact.key) !== -1
+      (contact: Contact) =>
+        _selectedOptions.indexOf(contact.publicIdentity.address) !== -1
     )
     const { onChange } = this.props
     if (onChange) {

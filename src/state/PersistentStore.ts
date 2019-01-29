@@ -96,8 +96,9 @@ class PersistentStore {
   }
 
   public getSelectedIdentity(): sdk.Identity {
-    return (this.store.getState().wallet.get('selected') as Wallet.Entry)
-      .identity
+    return (this.store
+      .getState()
+      .wallet.get('selectedIdentity') as Wallet.Entry).identity
   }
 }
 

@@ -25,7 +25,7 @@ type Props = {
   claimEntries: Claims.Entry[]
   ctypeKey: CType['key']
   onFinished?: () => void
-  senderKey: string
+  senderAddress: Contact['publicIdentity']['address']
 }
 
 type State = {
@@ -184,7 +184,7 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   }
 
   private sendClaim() {
-    const { onFinished, senderKey } = this.props
+    const { onFinished, senderAddress } = this.props
     const { selectedAttestations, selectedClaim } = this.state
 
     if (
@@ -207,8 +207,11 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
       type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE,
     }
 
-    ContactRepository.findByKey(senderKey)
-      .then((receiver: Contact) => {
+    ContactRepository.findAll().then(() => {
+      const receiver: Contact | undefined = ContactRepository.findByAddress(
+        senderAddress
+      )
+      if (receiver) {
         blockUi.updateMessage('Sending claim & attestations (2/2)')
         MessageRepository.send(receiver, request)
           .then(() => {
@@ -227,16 +230,15 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
               type: 'ERROR.FETCH.POST',
             })
           })
-      })
-      .catch(error => {
+      } else {
         blockUi.remove()
         ErrorService.log({
-          error,
+          error: new Error(),
           message: 'Could not retrieve receiver',
           origin: 'ChooseClaimForCtype.sendClaim()',
-          type: 'ERROR.FETCH.GET',
         })
-      })
+      }
+    })
   }
 }
 

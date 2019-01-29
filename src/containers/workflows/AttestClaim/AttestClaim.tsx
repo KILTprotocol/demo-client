@@ -17,7 +17,7 @@ import {
 import { BlockUi } from '../../../types/UserFeedback'
 
 type Props = {
-  senderKey: sdk.Identity['signPublicKeyAsHex']
+  senderAddress: Contact['publicIdentity']['address']
   claim: sdk.IClaim
   onFinished?: () => void
   ctypeName: string
@@ -44,15 +44,18 @@ class AttestClaim extends React.Component<Props, State> {
   }
 
   private attestClaim() {
-    const { ctypeName, claim, onFinished, senderKey } = this.props
+    const { ctypeName, claim, onFinished, senderAddress } = this.props
 
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Attesting',
       message: 'fetching contacts',
     })
 
-    ContactRepository.findByKey(senderKey)
-      .then((claimer: Contact) => {
+    ContactRepository.findAll().then(() => {
+      const claimer: Contact | undefined = ContactRepository.findByAddress(
+        senderAddress
+      )
+      if (claimer) {
         blockUi.updateMessage('Attesting')
         attestationService
           .attestClaim(claim)
@@ -60,7 +63,7 @@ class AttestClaim extends React.Component<Props, State> {
             attestationService.saveInStore({
               attestation,
               claimerAddress: claim.owner,
-              claimerAlias: claimer.name,
+              claimerAlias: claimer.metaData.name,
               ctypeHash: claim.ctype,
               ctypeName,
             } as Attestations.Entry)
@@ -91,22 +94,21 @@ class AttestClaim extends React.Component<Props, State> {
             ErrorService.log({
               error,
               message: `Could not send attestation for claim ${claim.hash} to ${
-                claimer.name
+                claimer.metaData.name
               }`,
               origin: 'AttestClaim.attestClaim()',
               type: 'ERROR.FETCH.POST',
             })
           })
-      })
-      .catch(error => {
+      } else {
         blockUi.remove()
         ErrorService.log({
-          error,
+          error: new Error(),
           message: 'Could not retrieve claimer',
           origin: 'MessageView.attestCurrentClaim()',
-          type: 'ERROR.FETCH.GET',
         })
-      })
+      }
+    })
   }
 
   private sendClaimAttestedMessage(

@@ -208,7 +208,7 @@ class ClaimView extends React.Component<Props, State> {
                   error,
                   message: `Could not send message ${
                     MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
-                  } to ${attester.name}`,
+                  } to ${attester.metaData.name}`,
                   origin: 'ClaimView.componentDidMount()',
                   type: 'ERROR.FETCH.GET',
                 })

@@ -93,15 +93,11 @@ class MessageView extends React.Component<Props, State> {
     const { selectedIdentity } = this.props
 
     if (selectedIdentity) {
-      console.log('fetching')
-
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Fetching messages',
       })
       MessageRepository.findByMyIdentity(selectedIdentity.identity)
         .then((messages: Message[]) => {
-          console.log('messages', messages)
-
           this.setState({
             messages,
           })
@@ -143,7 +139,7 @@ class MessageView extends React.Component<Props, State> {
       }'?`,
       modalType: ModalType.CONFIRM,
       onConfirm: (notification: BlockingNotification) => {
-        MessageRepository.deleteByMessageId(message.id as string)
+        MessageRepository.deleteByMessageId(message.messageId as string)
           .then(() => {
             this.fetchMessages()
             notification.remove()
@@ -151,7 +147,7 @@ class MessageView extends React.Component<Props, State> {
           .catch(error => {
             ErrorService.log({
               error,
-              message: `Could not delete message ${message.id}`,
+              message: `Could not delete message ${message.messageId}`,
               origin: 'MessageView.onDeleteMessage()',
               type: 'ERROR.FETCH.DELETE',
             })
