@@ -15,8 +15,8 @@ import './ClaimDetailView.scss'
 type Props = {
   cancelable?: boolean
   claimEntry?: Claims.Entry
-  onRemoveClaim?: (hash: string) => void
-  onRequestAttestation?: (hash: string) => void
+  onRemoveClaim?: (hash: sdk.IClaim['hash']) => void
+  onRequestAttestation?: (hash: sdk.IClaim['hash']) => void
   onVerifyAttestation: (attestation: sdk.IAttestation) => Promise<boolean>
 }
 
