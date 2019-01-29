@@ -13,6 +13,7 @@ import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 import './ClaimDetailView.scss'
 
 type Props = {
+  cancelable?: boolean
   claimEntry?: Claims.Entry
   onRemoveClaim?: (hash: string) => void
   onRequestAttestation?: (hash: string) => void
@@ -151,7 +152,7 @@ class ClaimDetailView extends Component<Props, State> {
                     </td>
                       {this.isPending(attestation) && (
                           <td className="status">
-                              <Spinner size={16} color="#5d5d5d" strength={2} />
+                              <Spinner size={20} color="#5d5d5d" strength={2} />
                           </td>
                       )}
                       {!this.isPending(attestation) && (
@@ -181,12 +182,18 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   private getActions() {
-    const { onRemoveClaim, onRequestAttestation }: Props = this.props
+    const {
+      onRemoveClaim,
+      onRequestAttestation,
+      cancelable,
+    }: Props = this.props
     return (
       <div className="actions">
-        <Link className="cancel" to="/claim">
-          Cancel
-        </Link>
+        {cancelable && (
+          <Link className="cancel" to="/claim">
+            Cancel
+          </Link>
+        )}
         {onRequestAttestation && (
           <button
             className="requestAttestation"

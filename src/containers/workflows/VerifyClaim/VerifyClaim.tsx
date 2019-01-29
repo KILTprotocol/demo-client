@@ -14,8 +14,6 @@ class VerifyClaim extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.onVerifyAttestation = this.onVerifyAttestation.bind(this)
-    this.onRemoveClaim = this.onRemoveClaim.bind(this)
-    this.onRequestAttestation = this.onRequestAttestation.bind(this)
   }
 
   public render() {
@@ -27,10 +25,6 @@ class VerifyClaim extends React.Component<Props, State> {
     return (
       <ClaimDetailView
         claimEntry={claimEntry}
-        // @ts-ignore
-        onRemoveClaim={this.onRemoveClaim}
-        // @ts-ignore
-        onRequestAttestation={this.onRequestAttestation}
         onVerifyAttestation={this.onVerifyAttestation}
       />
     )
@@ -40,14 +34,6 @@ class VerifyClaim extends React.Component<Props, State> {
     attestation: sdk.Attestation
   ): Promise<boolean> {
     return attestationService.verifyAttestation(attestation)
-  }
-
-  private onRemoveClaim(hash: string) {
-    // ignore
-  }
-
-  private onRequestAttestation(hash: string) {
-    // ignore
   }
 }
 
