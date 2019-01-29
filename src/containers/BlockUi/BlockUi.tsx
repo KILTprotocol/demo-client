@@ -5,7 +5,7 @@ import * as UiState from '../../state/ducks/UiState'
 import { BlockUi as IBlockUi } from '../../types/UserFeedback'
 
 import './BlockUi.scss'
-import Spinner from 'src/components/Spinner/Spinner'
+import Spinner from '../../components/Spinner/Spinner'
 
 type Props = {
   blockUis: IBlockUi[]

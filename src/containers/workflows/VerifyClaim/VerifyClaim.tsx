@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
-import ClaimDetailView from 'src/components/ClaimDetailView/ClaimDetailView'
+import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
 import attestationService from '../../../services/AttestationService'
 
 type Props = {
