@@ -37,7 +37,7 @@ class IdentitySelector extends React.Component<Props, State> {
 
     const identityOptions: SelectIdentityOption[] = myIdentities.map(
       (myIdentity: MyIdentity) => ({
-        label: this.getOptionLabel(myIdentity),
+        label: <KiltIdenticon myIdentity={myIdentity} size={20} />,
         value: myIdentity.identity.address,
       })
     )
@@ -66,15 +66,6 @@ class IdentitySelector extends React.Component<Props, State> {
           onChange={this.selectIdentity}
         />
       </section>
-    )
-  }
-
-  private getOptionLabel(myIdentity: MyIdentity) {
-    return (
-      <span className="option">
-        <KiltIdenticon myIdentity={myIdentity} size={20} />
-        <span className="name">{myIdentity.metaData.name}</span>
-      </span>
     )
   }
 

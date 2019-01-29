@@ -25,6 +25,10 @@
 
     & .identicon {
       width: 40px;
+
+      & .name {
+        display: none;
+      }
     }
 
     & .attesterName {

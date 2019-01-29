@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 
 import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
@@ -8,12 +9,7 @@ import ErrorService from '../../services/ErrorService'
 import FeedbackService from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
-import {
-  ApproveAttestationForClaim,
-  Message,
-  MessageBodyType,
-  RequestAttestationForClaim,
-} from '../../types/Message'
+import { Message, MessageOutput } from '../../types/Message'
 import {
   BlockingNotification,
   BlockUi,
@@ -27,8 +23,8 @@ interface Props {
 }
 
 interface State {
-  messages: Message[]
-  currentMessage?: Message
+  messages: MessageOutput[]
+  currentMessage?: MessageOutput
 }
 
 class MessageView extends React.Component<Props, State> {
@@ -75,7 +71,16 @@ class MessageView extends React.Component<Props, State> {
             }}
             showOnInit={true}
             type={ModalType.BLANK}
-            header={`Message from ${currentMessage.senderAddress}`}
+            header={
+              currentMessage.sender ? (
+                <div className="header-KiltIdenticon">
+                  Message from{' '}
+                  <KiltIdenticon contact={currentMessage.sender} size={24} />
+                </div>
+              ) : (
+                `Message from ${currentMessage.senderAddress}`
+              )
+            }
             onCancel={this.onCloseMessage}
           >
             <MessageDetailView

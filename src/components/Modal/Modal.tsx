@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import * as React from 'react'
 
 import './Modal.scss'
@@ -11,7 +12,7 @@ export enum ModalType {
 type Props = {
   catchBackdropClick?: boolean
   className?: string
-  header: string
+  header: string | ReactNode
   onCancel?: () => void
   onConfirm?: () => void
   preventCloseOnCancel?: boolean

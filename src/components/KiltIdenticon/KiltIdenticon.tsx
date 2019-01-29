@@ -6,19 +6,26 @@ import './KiltIdenticon.scss'
 
 type Props = {
   contact?: Contact
+  iconOnly?: boolean
   myIdentity?: MyIdentity
+  fallback?: string
   size?: number
 }
 
 const DEFAULT_SIZE = 32
 
 const KiltIdenticon = (props: Props) => {
-  const { contact, myIdentity, size } = props
+  const { contact, fallback, myIdentity, size, iconOnly } = props
   const address = myIdentity
     ? myIdentity.identity.address
     : contact
     ? contact.publicIdentity.address
     : undefined
+  const name = myIdentity
+    ? myIdentity.metaData.name
+    : contact
+    ? contact.metaData.name
+    : fallback
 
   return (
     <div className="KiltIdenticon">
@@ -27,6 +34,7 @@ const KiltIdenticon = (props: Props) => {
         size={size ? size : DEFAULT_SIZE}
         theme="substrate"
       />
+      <span className="name">{name}</span>
     </div>
   )
 }

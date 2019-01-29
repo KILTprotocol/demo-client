@@ -1,4 +1,5 @@
 .IdentitySelector {
+  @include react-select;
 
   & .react-select {
 
@@ -20,24 +21,5 @@
         border-top: $base-border;
       }
     }
-  }
-
-  & .option {
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    margin:{
-      right: $base-padding/4;
-    }
-
-    & .KiltIdenticon {
-      margin: {
-        right: $base-padding/2;
-      }
-    }
-  }
-
-  & .name {
-    @extend %ellipsis;
   }
 }

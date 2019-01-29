@@ -23,6 +23,10 @@
 
   & .identicon{
     width: 40px;
+
+    & .name {
+      display: none;
+    }
   }
 
   & .name {
