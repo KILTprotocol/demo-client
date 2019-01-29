@@ -13,6 +13,21 @@
 
     padding: $base-padding;
 
+    & .header {
+      width: 100%
+    }
+
+    & .headline {
+      width: 50%;
+      display: inline-block !important;
+    }
+
+    & .headerActions {
+      width: 50%;
+      text-align: right;
+      display: inline-block !important;
+    }
+
     & h3 {
       margin: {
         top: 0;

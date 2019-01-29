@@ -1,8 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
-
 import ClaimDetailView from 'src/components/ClaimDetailView/ClaimDetailView'
-import * as Claims from '../../../state/ducks/Claims'
 import attestationService from '../../../services/AttestationService'
 
 type Props = {
@@ -10,9 +8,7 @@ type Props = {
   attestations: sdk.IAttestation[]
 }
 
-type State = {
-  claimEntry: Claims.Entry
-}
+type State = {}
 
 class VerifyClaim extends React.Component<Props, State> {
   constructor(props: Props) {

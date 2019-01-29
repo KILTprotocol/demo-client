@@ -27,6 +27,8 @@
     position: relative;
     z-index: $z-index-modal + 2;
     width: calc(100% - #{$base-padding*2});
+    max-height: calc(100% - #{$base-padding*2});
+    overflow: auto;
     max-width: 640px;
     background: $color-white;
     border: $base-border;

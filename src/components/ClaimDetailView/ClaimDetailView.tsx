@@ -1,13 +1,15 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import ContactRepository from '../../services/ContactRepository'
 
+import Spinner from '../../components/Spinner/Spinner'
+import ContactRepository from '../../services/ContactRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
 import { Message } from '../../types/Message'
 import Code from '../Code/Code'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
+
 import './ClaimDetailView.scss'
 
 type Props = {
@@ -20,6 +22,7 @@ type Props = {
 type State = {
   canResolveAttesters: boolean
   unverifiedAttestations: string[]
+  pendingAttestations: string[]
 }
 
 class ClaimDetailView extends Component<Props, State> {
@@ -28,11 +31,13 @@ class ClaimDetailView extends Component<Props, State> {
     this.handleDelete = this.handleDelete.bind(this)
     this.requestAttestation = this.requestAttestation.bind(this)
     this.verifyAttestation = this.verifyAttestation.bind(this)
+    this.verifyAttestations = this.verifyAttestations.bind(this)
 
     const { claimEntry } = this.props
     if (claimEntry) {
       this.state = {
-        canResolveAttesters: false,
+          canResolveAttesters: false,
+          pendingAttestations: [],
         unverifiedAttestations: claimEntry.attestations.map(
           (attestation: sdk.IAttestation) => {
             return attestation.claimHash
@@ -105,9 +110,21 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   private getAttestations(attestations: sdk.IAttestation[]) {
+    const { pendingAttestations } = this.state
     return (
       <section className="attestations">
-        <h3>Attestations</h3>
+        <div className="header">
+          <div className="headline">
+            <h3>Attestations</h3>
+          </div>
+          <div className="headerActions">
+            <button
+              className="refresh"
+              onClick={this.verifyAttestations}
+              disabled={pendingAttestations.length > 0}
+            />
+          </div>
+        </div>
         {!!attestations && !!attestations.length ? (
           <table>
             <thead>
@@ -115,7 +132,6 @@ class ClaimDetailView extends Component<Props, State> {
                 <th className="identicon" />
                 <th className="attesterName">Attester</th>
                 <th className="status">Approved</th>
-                <th className="refresh" />
               </tr>
             </thead>
             <tbody>
@@ -133,15 +149,19 @@ class ClaimDetailView extends Component<Props, State> {
                     <td className="attesterName">
                       {attester ? attester.metaData.name : attestation.owner}
                     </td>
-                    <td
-                      className={
-                        'status ' +
-                        (this.isApproved(attestation) ? 'approved' : 'revoked')
-                      }
-                    />
-                    <td className="refresh">
-                      <button onClick={this.verifyAttestation(attestation)} />
-                    </td>
+                      {this.isPending(attestation) && (
+                          <td className="status">
+                              <Spinner size={16} color="#5d5d5d" strength={2} />
+                          </td>
+                      )}
+                      {!this.isPending(attestation) && (
+                          <td
+                              className={
+                                  'status ' +
+                                  (this.isApproved(attestation) ? 'approved' : 'revoked')
+                              }
+                          />
+                      )}
                   </tr>
                 )
               })}
@@ -189,6 +209,11 @@ class ClaimDetailView extends Component<Props, State> {
     return !invalidAttestations.includes(attestation.claimHash)
   }
 
+  private isPending(attestation: sdk.IAttestation): boolean {
+    const { pendingAttestations } = this.state
+    return pendingAttestations.includes(attestation.claimHash)
+  }
+
   private handleDelete() {
     const { claimEntry, onRemoveClaim }: Props = this.props
     if (claimEntry && onRemoveClaim) {
@@ -217,12 +242,20 @@ class ClaimDetailView extends Component<Props, State> {
     attestation: sdk.IAttestation
   ): (() => void) => () => {
     const { onVerifyAttestation } = this.props
-    const { unverifiedAttestations } = this.state
+    const { unverifiedAttestations, pendingAttestations } = this.state
+    pendingAttestations.push(attestation.claimHash)
+    this.setState({
+      pendingAttestations,
+    })
     onVerifyAttestation(attestation).then(verified => {
       if (!verified) {
         return
       }
       this.setState({
+        pendingAttestations: pendingAttestations.filter(
+          (pendingAttestation: string) =>
+            attestation.claimHash !== pendingAttestation
+        ),
         unverifiedAttestations: unverifiedAttestations.filter(
           (unverifiedAttestation: string) =>
             attestation.claimHash !== unverifiedAttestation
