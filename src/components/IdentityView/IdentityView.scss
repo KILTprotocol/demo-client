@@ -45,5 +45,9 @@
     top: $base-padding/2;
     left: $base-padding/2;
     padding: 0 !important;
+
+    & .name {
+      display: none;
+    }
   }
 }

@@ -50,7 +50,7 @@
     @include button-icon-only($icon-eye);
   }
 
-  & .message {
+  & .subject {
     cursor: pointer;
 
     & .type {
