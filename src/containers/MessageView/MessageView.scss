@@ -22,10 +22,10 @@
       padding: {
         top: 0;
       }
-    }
 
-    & button {
-      @include button-secondary;
+      & button {
+        @include button-secondary;
+      }
     }
   }
 }

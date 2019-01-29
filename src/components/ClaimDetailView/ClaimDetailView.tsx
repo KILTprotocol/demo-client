@@ -115,16 +115,12 @@ class ClaimDetailView extends Component<Props, State> {
     return (
       <section className="attestations">
         <div className="header">
-          <div className="headline">
-            <h3>Attestations</h3>
-          </div>
-          <div className="headerActions">
-            <button
-              className="refresh"
-              onClick={this.verifyAttestations}
-              disabled={pendingAttestations.length > 0}
-            />
-          </div>
+          <h3>Attestations</h3>
+          <button
+            className="refresh"
+            onClick={this.verifyAttestations}
+            disabled={pendingAttestations.length > 0}
+          />
         </div>
         {!!attestations && !!attestations.length ? (
           <table>

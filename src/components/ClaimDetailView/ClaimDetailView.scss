@@ -14,24 +14,17 @@
     padding: $base-padding;
 
     & .header {
-      width: 100%
-    }
-
-    & .headline {
-      width: 50%;
-      display: inline-block !important;
-    }
-
-    & .headerActions {
-      width: 50%;
-      text-align: right;
-      display: inline-block !important;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: {
+        bottom: $base-padding;
+      }
     }
 
     & h3 {
-      margin: {
-        top: 0;
-      }
+      margin: 0;
     }
 
     & table {
@@ -53,6 +46,7 @@
     }
 
     & .status {
+      height: 30px;
       width: 20%;
       text-align: center;
 
@@ -74,13 +68,9 @@
         }
       }
     }
+  }
 
-    & .refresh {
-      width: 50px;
-
-      & button {
-        @include button-icon-only($icon-refresh);
-      }
-    }
+  & .refresh {
+    @include button-icon-only($icon-refresh);
   }
 }
