@@ -3,7 +3,7 @@ import { EncryptedAsymmetricString } from '@kiltprotocol/prototype-sdk/build/cry
 import PersistentStore from '../state/PersistentStore'
 
 import { Contact, MyIdentity } from '../types/Contact'
-import { Message, MessageBody } from '../types/Message'
+import { Message, MessageBody, MessageOutput } from '../types/Message'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import ContactRepository from './ContactRepository'
 import ErrorService from './ErrorService'
@@ -27,7 +27,7 @@ class MessageRepository {
 
   public static async findByMyIdentity(
     myIdentity: Identity
-  ): Promise<Message[]> {
+  ): Promise<MessageOutput[]> {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
       .then(async (messages: Message[]) => {
@@ -38,14 +38,10 @@ class MessageRepository {
         for (const message of messages) {
           MessageRepository.decryptMessage(message, myIdentity)
         }
-        return messages
+        return messages.map((message: Message) =>
+          MessageRepository.createMessageOutput(message)
+        )
       })
-  }
-
-  public static async findByMyIdentities(
-    myIdentities: Identity[]
-  ): Promise<Message[]> {
-    return Promise.reject('implement')
   }
 
   public static async send(
@@ -88,6 +84,13 @@ class MessageRepository {
   private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
     process.env.REACT_APP_SERVICE_PORT
   }/messaging`
+
+  private static createMessageOutput(message: Message): MessageOutput {
+    return {
+      ...message,
+      sender: ContactRepository.findByAddress(message.senderAddress),
+    }
+  }
 
   private static decryptMessage(
     message: Message,

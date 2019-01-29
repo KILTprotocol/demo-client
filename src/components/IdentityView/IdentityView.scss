@@ -1,10 +1,14 @@
 .IdentityView {
+  $margin-left: $base-padding;
+
   @include card;
 
   position: relative;
+  width: calc(100% - #{$margin-left});
   padding: $base-padding;
   margin: {
-    bottom: $base-padding;
+    bottom: 2*$base-padding;
+    left: $margin-left;
   }
 
   & .attributes {
@@ -32,5 +36,14 @@
       background: $color-white;
       padding: 0 $base-padding/4;
     }
+  }
+
+  & .KiltIdenticon {
+    @extend %centerHV;
+
+    position: absolute;
+    top: $base-padding/2;
+    left: $base-padding/2;
+    padding: 0 !important;
   }
 }

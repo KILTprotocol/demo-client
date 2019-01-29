@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
+import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import ContactRepository from '../../services/ContactRepository'
@@ -88,17 +89,21 @@ class ContactList extends React.Component<Props, State> {
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Key</th>
-              <th />
+              <th className="identicon" />
+              <th className="name">Name</th>
+              <th className="address">Address</th>
+              <th className="actionTd" />
             </tr>
           </thead>
           <tbody>
             {contacts.map((contact: Contact) => (
               <tr key={contact.publicIdentity.address}>
-                <td className="contactName">{contact.metaData.name}</td>
-                <td>{contact.publicIdentity.address}</td>
-                <td>
+                <td className="identicon">
+                  <KiltIdenticon contact={contact} size={24} />
+                </td>
+                <td className="name">{contact.metaData.name}</td>
+                <td className="address">{contact.publicIdentity.address}</td>
+                <td className="actionTd">
                   <div className="actions">
                     <button
                       className="requestClaimBtn"

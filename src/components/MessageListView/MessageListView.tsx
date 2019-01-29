@@ -1,19 +1,20 @@
 import * as React from 'react'
-import ContactRepository from '../../services/ContactRepository'
 
 import {
   ApproveAttestationForClaim,
   Message,
   MessageBodyType,
+  MessageOutput,
   RequestAttestationForClaim,
   RequestClaimForCtype,
   SubmitClaimForCtype,
 } from '../../types/Message'
+import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 
 import './MessageListView.scss'
 
 type Props = {
-  messages: Message[]
+  messages: MessageOutput[]
   onDelete: (message: Message) => void
   onOpen: (message: Message) => void
 }
@@ -35,29 +36,43 @@ class MessageListView extends React.Component<Props, State> {
           <table>
             <thead>
               <tr>
-                <th>Sender</th>
-                <th>Type</th>
-                <th />
+                <th className="identicon" />
+                <th className="sender">Sender</th>
+                <th className="subject">Subject</th>
+                <th className="actionTd" />
               </tr>
             </thead>
             <tbody>
-              {messages.map((message: Message) => (
+              {messages.map((message: MessageOutput) => (
                 <tr key={message.messageId}>
-                  <td>{message.senderAddress}</td>
-                  <td className="message">
+                  <td className="identicon">
+                    {message.sender ? (
+                      <KiltIdenticon contact={message.sender} size={24} />
+                    ) : (
+                      ''
+                    )}
+                  </td>
+                  <td className="sender">
+                    {message.sender
+                      ? message.sender.metaData.name
+                      : message.senderAddress}
+                  </td>
+                  <td className="subject">
                     <div onClick={this.openMessage(message)}>
                       {this.getMessageInfo(message)}
                     </div>
                   </td>
-                  <td className="actions">
-                    <button
-                      className="delete"
-                      onClick={this.handleDelete(message)}
-                    />
-                    <button
-                      className="open"
-                      onClick={this.openMessage(message)}
-                    />
+                  <td className="actionTd">
+                    <div className="actions">
+                      <button
+                        className="delete"
+                        onClick={this.handleDelete(message)}
+                      />
+                      <button
+                        className="open"
+                        onClick={this.openMessage(message)}
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}

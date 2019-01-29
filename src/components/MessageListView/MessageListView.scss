@@ -4,18 +4,6 @@
     table-layout: fixed;
   }
 
-  & th {
-    width: 100%;
-
-    &:first-child {
-      width: 30%;
-    }
-
-    &:last-child {
-      width: 30%;
-    }
-  }
-
   & th,
   & td {
     @extend %ellipsis;
@@ -23,9 +11,31 @@
     text-align: left;
   }
 
-  & .actions {
-    min-width: 2*($base-button-height + $base-padding/2);
+  & .actionTd {
+    width: 2*($base-button-height + $base-padding/2);
     padding: 0;
+
+    & .actions {
+      padding: 0;
+    }
+  }
+
+  & .identicon {
+    width: 40px;
+  }
+
+  & .sender {
+    @include baseFont-bold;
+
+    width: 20%;
+  }
+
+  & .subject {
+    width: 60%;
+
+    & > div {
+      @extend %ellipsis;
+    }
   }
 
   & .delete {

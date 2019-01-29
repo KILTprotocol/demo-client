@@ -1,24 +1,45 @@
 .ContactList {
 
-    & h1 {
-      @include h1('Contact');
-    }
-
-    & th,
-    & td {
-      text-align: left;
-    }
-  
-    & .actions {
-      padding: 0;
-    }
-  
-    & .requestClaimBtn {
-      @include button-icon-only($icon-wpforms);
-    }
-    
-    & .contactName {
-        font-weight:bold
-    }
+  & h1 {
+    @include h1('Contact');
   }
+
+  & table {
+    table-layout: fixed;
+  }
+
+  & th,
+  & td {
+    text-align: left;
+  }
+
+  & .actions {
+    padding: 0;
+  }
+
+  & .requestClaimBtn {
+    @include button-icon-only($icon-wpforms);
+  }
+
+  & .identicon{
+    width: 40px;
+  }
+
+  & .name {
+    @extend %ellipsis;
+
+    width: 40%;
+    font-weight: bold
+  }
+
+  & .address {
+    @extend %ellipsis;
+
+    width: 60%;
+  }
+
+  & .actionTd {
+    width: 50px;
+  }
+}
   

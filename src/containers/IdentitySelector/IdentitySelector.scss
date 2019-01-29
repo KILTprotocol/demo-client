@@ -6,6 +6,13 @@
       width: 200px;
     }
 
+    &__value {
+
+      &-container {
+        overflow: visible;
+      }
+    }
+
     &__option {
       white-space: nowrap;
 
@@ -13,5 +20,24 @@
         border-top: $base-border;
       }
     }
+  }
+
+  & .option {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin:{
+      right: $base-padding/4;
+    }
+
+    & .KiltIdenticon {
+      margin: {
+        right: $base-padding/2;
+      }
+    }
+  }
+
+  & .name {
+    @extend %ellipsis;
   }
 }

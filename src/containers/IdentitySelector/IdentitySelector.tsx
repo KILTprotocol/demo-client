@@ -1,7 +1,9 @@
 import * as React from 'react'
+import { ReactNode } from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import Select from 'react-select'
+import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 
 import * as Wallet from '../../state/ducks/Wallet'
 import { MyIdentity } from '../../types/Contact'
@@ -14,14 +16,14 @@ const addIdentity = {
 }
 
 type SelectIdentityOption = {
-  label: MyIdentity['metaData']['name']
+  label: ReactNode
   value: MyIdentity['identity']['address']
 }
 
 type Props = RouteComponentProps<{}> & {
   selectIdentity: (seedAsHex: string) => void
-  identities: SelectIdentityOption[]
-  selected?: Wallet.Entry
+  myIdentities: MyIdentity[]
+  selectedIdentity?: Wallet.Entry
 }
 
 type State = {
@@ -31,15 +33,22 @@ type State = {
 
 class IdentitySelector extends React.Component<Props, State> {
   public render() {
-    const { identities, selected } = this.props
+    const { myIdentities, selectedIdentity } = this.props
 
-    identities.push(addIdentity)
+    const identityOptions: SelectIdentityOption[] = myIdentities.map(
+      (myIdentity: MyIdentity) => ({
+        label: this.getOptionLabel(myIdentity),
+        value: myIdentity.identity.address,
+      })
+    )
 
-    let selectedIdentity
-    if (selected) {
-      selectedIdentity = identities.find(
-        (identity: SelectIdentityOption) =>
-          identity.value === selected.identity.address
+    identityOptions.push(addIdentity)
+
+    let selectedOption
+    if (selectedIdentity) {
+      selectedOption = identityOptions.find(
+        (identityOption: SelectIdentityOption) =>
+          identityOption.value === selectedIdentity.identity.address
       )
     }
 
@@ -52,11 +61,20 @@ class IdentitySelector extends React.Component<Props, State> {
           isSearchable={false}
           isMulti={false}
           name="selectIdentity"
-          options={identities}
-          value={selectedIdentity}
+          options={identityOptions}
+          value={selectedOption}
           onChange={this.selectIdentity}
         />
       </section>
+    )
+  }
+
+  private getOptionLabel(myIdentity: MyIdentity) {
+    return (
+      <span className="option">
+        <KiltIdenticon myIdentity={myIdentity} size={20} />
+        <span className="name">{myIdentity.metaData.name}</span>
+      </span>
     )
   }
 
@@ -71,15 +89,11 @@ class IdentitySelector extends React.Component<Props, State> {
 
 const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
   return {
-    identities: state.wallet
+    myIdentities: state.wallet
       .get('identities')
       .toList()
-      .toArray()
-      .map((myIdentity: MyIdentity) => ({
-        label: myIdentity.metaData.name,
-        value: myIdentity.identity.address,
-      })),
-    selected: state.wallet.get('selectedIdentity'),
+      .toArray(),
+    selectedIdentity: state.wallet.get('selectedIdentity'),
   }
 }
 

@@ -3,6 +3,7 @@ import * as React from 'react'
 import { MyIdentity } from '../../types/Contact'
 
 import './IdentityView.scss'
+import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 
 type Props = {
   // input
@@ -31,16 +32,6 @@ class IdentityView extends React.Component<Props, {}> {
             <div>{myIdentity.metaData.name}</div>
           </div>
           <div>
-            <label>Identicon</label>
-            <div>
-              <Identicon
-                value={myIdentity.identity.address}
-                size={32}
-                theme="substrate"
-              />
-            </div>
-          </div>
-          <div>
             <label>Phrase</label>
             <div>{myIdentity.phrase}</div>
           </div>
@@ -56,6 +47,7 @@ class IdentityView extends React.Component<Props, {}> {
             <label>Encryption Public Key</label>
             <div>{myIdentity.identity.boxPublicKeyAsHex}</div>
           </div>
+          <KiltIdenticon myIdentity={myIdentity} size={50} />
         </div>
         <div className="actions">
           <button onClick={this.onDelete} disabled={selected}>

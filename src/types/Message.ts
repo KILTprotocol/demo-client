@@ -12,6 +12,10 @@ export interface Message {
   senderAddress: Contact['publicIdentity']['address']
 }
 
+export interface MessageOutput extends Message {
+  sender?: Contact
+}
+
 export enum MessageBodyType {
   REQUEST_ATTESTATION_FOR_CLAIM = 'request-attestation-for-claim',
   APPROVE_ATTESTATION_FOR_CLAIM = 'approve-attestation-for-claim',

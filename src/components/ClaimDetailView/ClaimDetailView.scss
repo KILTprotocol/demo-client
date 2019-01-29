@@ -19,7 +19,23 @@
       }
     }
 
-    & td {
+    & table {
+      table-layout: fixed;
+    }
+
+    & .identicon {
+      width: 40px;
+    }
+
+    & .attesterName {
+      @include baseFont-bold;
+
+      width: 60%;
+    }
+
+    & .status {
+      width: 20%;
+      text-align: center;
 
       &.revoked {
 
@@ -38,15 +54,14 @@
           color: $color-success;
         }
       }
+    }
 
-      &:nth-child(2),
-      &:nth-child(3) {
-        text-align: center;
+    & .refresh {
+      width: 50px;
+
+      & button {
+        @include button-icon-only($icon-refresh);
       }
     }
-  }
-
-  & .refresh {
-    @include button-icon-only($icon-refresh);
   }
 }
