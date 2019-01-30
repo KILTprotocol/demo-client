@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-import attestationService from '../../../services/AttestationService'
+
+import AttestationService from '../../../services/AttestationService'
 import ContactRepository from '../../../services/ContactRepository'
 import ErrorService from '../../../services/ErrorService'
 import FeedbackService, {
@@ -57,10 +58,9 @@ class AttestClaim extends React.Component<Props, State> {
       )
       if (claimer) {
         blockUi.updateMessage('Attesting')
-        attestationService
-          .attestClaim(claim)
+        AttestationService.attestClaim(claim)
           .then((attestation: sdk.IAttestation) => {
-            attestationService.saveInStore({
+            AttestationService.saveInStore({
               attestation,
               claimerAddress: claim.owner,
               claimerAlias: claimer.metaData.name,

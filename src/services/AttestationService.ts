@@ -1,9 +1,10 @@
-import moment from 'moment'
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import moment from 'moment'
 import persistentStore from 'src/state/PersistentStore'
+import * as Attestations from '../state/ducks/Attestations'
 import BlockchainService from './BlockchainService'
 import ErrorService from './ErrorService'
-import * as Attestations from '../state/ducks/Attestations'
+import { notifySuccess } from './FeedbackService'
 
 class AttestationService {
   /**
@@ -13,13 +14,15 @@ class AttestationService {
    * @returns the stored attestation in a promise
    */
   public async attestClaim(claim: sdk.IClaim): Promise<sdk.Attestation> {
-    const selectedIdentity: sdk.Identity = persistentStore.getSelectedIdentity()
+    const {
+      selectedIdentity,
+      blockchain,
+    } = await this.getBlockchainAndIdentity()
 
     if (!selectedIdentity) {
       return Promise.reject('No identity selected')
     }
 
-    const blockchain: sdk.Blockchain = await BlockchainService.connect()
     const attestation: sdk.Attestation = new sdk.Attestation(
       claim,
       selectedIdentity
@@ -47,8 +50,36 @@ class AttestationService {
 
   public async revokeAttestation(
     iAttestation: sdk.IAttestation
-  ): Promise<void> {
-    return Promise.reject('an error occurred')
+  ): Promise<sdk.Attestation> {
+    const attestation = sdk.Attestation.fromObject(iAttestation)
+    const {
+      selectedIdentity,
+      blockchain,
+    } = await this.getBlockchainAndIdentity()
+
+    if (!selectedIdentity) {
+      return Promise.reject('No identity selected')
+    }
+
+    return new Promise<sdk.Attestation>(async (resolve, reject) => {
+      attestation
+        .revoke(blockchain, selectedIdentity, () => {
+          notifySuccess('Attestation successfully revoked')
+          resolve()
+        })
+        .then(() => {
+          notifySuccess('Revocation successfully build')
+        })
+        .catch(error => {
+          ErrorService.log({
+            error,
+            message: 'Could not revoke Attestation',
+            origin: 'AttestationService.attestClaim()',
+            type: 'ERROR.BLOCKCHAIN',
+          })
+          reject(error)
+        })
+    })
   }
 
   public async verifyAttestation(
@@ -73,6 +104,18 @@ class AttestationService {
     persistentStore.store.dispatch(
       Attestations.Store.removeAttestation(claimHash)
     )
+  }
+
+  private async getBlockchainAndIdentity(): Promise<{
+    blockchain: sdk.Blockchain
+    selectedIdentity: sdk.Identity
+  }> {
+    const selectedIdentity: sdk.Identity = persistentStore.getSelectedIdentity()
+    const blockchain: sdk.Blockchain = await BlockchainService.connect()
+    return {
+      blockchain,
+      selectedIdentity,
+    }
   }
 }
 
