@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 
 import { CType } from 'src/types/Ctype'
 
+import './CtypeListView.scss'
+
 type Props = {
   ctypes?: CType[]
 }
@@ -14,19 +16,19 @@ const CtypeListView = (props: Props) => {
         <table>
           <thead>
             <tr>
-              <th>Author</th>
-              <th>CTYPE name</th>
-              <th />
+              <th className="author">Author</th>
+              <th className="name">CTYPE name</th>
+              <th className="actionsTd" />
             </tr>
           </thead>
           <tbody>
             {props.ctypes.map(ctype => (
               <tr key={ctype.key}>
-                <td>{ctype.author}</td>
-                <td>
+                <td className="author">{ctype.author}</td>
+                <td className="name" title={ctype.key}>
                   <Link to={`/ctype/${ctype.key}`}>{ctype.name}</Link>
                 </td>
-                <td>
+                <td className="actionsTd">
                   <div className="actions">
                     <Link to={`/claim/new/${ctype.key}`}>Create Claim</Link>
                   </div>

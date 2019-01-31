@@ -1,0 +1,18 @@
+.CtypeListView {
+
+  & table {
+    @include table;
+  }
+
+  & .author {
+    width: 60%;
+  }
+
+  & .name {
+    width: 100%;
+  }
+
+  & .actionsTd {
+    width: 200px;
+  }
+}

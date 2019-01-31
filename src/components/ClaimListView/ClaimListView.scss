@@ -1,29 +1,22 @@
 .ClaimListView {
 
-  & td {
+  & table {
+    @include table;
+  }
 
-    &.attested {
-      padding:{
-        left: 30px;
-      }
+  & .alias {
+    width: 30%;
+  }
 
-      &.false {
+  & .content {
+    width: 100%;
+  }
 
-        &:before {
-          @include icon($icon-times);
+  & .actionsTd {
+    width: 270px;
+  }
 
-          color: $color-danger;
-        }
-      }
-
-      &.true {
-
-        &:before {
-          @include icon($icon-check);
-
-          color: $color-success;
-        }
-      }
-    }
+  & .deleteClaim {
+    @include button-icon-only($icon-trash);
   }
 }
