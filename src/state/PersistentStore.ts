@@ -1,7 +1,7 @@
 import { combineReducers, createStore, Store } from 'redux'
 import * as sdk from '@kiltprotocol/prototype-sdk'
 
-import ErrorService from '../services/ErrorService'
+import errorService from '../services/ErrorService'
 import * as Claims from './ducks/Claims'
 import * as UiState from './ducks/UiState'
 import * as Wallet from './ducks/Wallet'
@@ -66,9 +66,9 @@ class PersistentStore {
       try {
         persistedState = PersistentStore.deserialize(JSON.parse(localState))
       } catch (error) {
-        ErrorService.log({
+        errorService.log({
           error,
-          message: 'Could not restore PersistentStore from local storage',
+          message: 'Could not restore persistentStore from local storage',
           origin: 'PersistentStore.constructor()',
         })
         // TODO: what to do on failure?

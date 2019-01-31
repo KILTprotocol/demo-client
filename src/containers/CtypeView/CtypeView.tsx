@@ -4,7 +4,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import CtypeDetailView from '../../components/CtypeDetailView/CtypeDetailView'
 import CtypeListView from '../../components/CtypeListView/CtypeListView'
 import CtypeRepository from '../../services/CtypeRepository'
-import ErrorService from '../../services/ErrorService'
+import errorService from '../../services/ErrorService'
 import { CType } from '../../types/Ctype'
 
 import './CtypeView.scss'
@@ -30,7 +30,7 @@ class CtypeView extends React.Component<Props, State> {
         this.setState({ ctypes })
       })
       .catch(error => {
-        ErrorService.log({
+        errorService.log({
           error,
           message: `Could not fetch CTYPES`,
           origin: 'CtypeView.componentDidMount()',
@@ -69,7 +69,7 @@ class CtypeView extends React.Component<Props, State> {
     if (!currentCtype) {
       const message = `Could not get CTYPE with key '${ctypeKey}' from local list of CTYPEs`
       this.setState({ currentCtype: 'notFoundInList' }, () => {
-        ErrorService.log({
+        errorService.log({
           error: { name: 'setCurrentCtypeError', message },
           message,
           origin: 'CtypeView.getCurrentCtype()',

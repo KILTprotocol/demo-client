@@ -7,7 +7,7 @@ import * as common from 'schema-based-json-editor'
 
 import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import CtypeRepository from '../../services/CtypeRepository'
-import ErrorService from '../../services/ErrorService'
+import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
@@ -59,7 +59,7 @@ class ClaimCreate extends Component<Props, State> {
           this.setState({ ctype })
           blockUi.remove()
         } catch (error) {
-          ErrorService.log({
+          errorService.log({
             error,
             message: `could not parse definition of CTYPE ${ctypeKey}`,
             origin: 'ClaimCreate.componentDidMount()',
@@ -69,7 +69,7 @@ class ClaimCreate extends Component<Props, State> {
         }
       },
       error => {
-        ErrorService.log({
+        errorService.log({
           error,
           message: `could not retrieve CTYPE with key ${ctypeKey}`,
           origin: 'ClaimCreate.componentDidMount()',

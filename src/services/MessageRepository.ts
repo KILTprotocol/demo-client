@@ -1,12 +1,12 @@
 import { Identity } from '@kiltprotocol/prototype-sdk'
 import { EncryptedAsymmetricString } from '@kiltprotocol/prototype-sdk/build/crypto/Crypto'
-import PersistentStore from '../state/PersistentStore'
 
+import persistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
 import { Message, MessageBody, MessageOutput } from '../types/Message'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
-import ContactRepository from './ContactRepository'
-import ErrorService from './ErrorService'
+import contactRepository from './ContactRepository'
+import errorService from './ErrorService'
 
 // TODO: add tests, create interface for this class to be implemented as mock
 // (for other tests)
@@ -31,7 +31,7 @@ class MessageRepository {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
       .then(async (messages: Message[]) => {
-        await ContactRepository.findAll()
+        await contactRepository.findAll()
         return messages
       })
       .then((messages: Message[]) => {
@@ -49,7 +49,7 @@ class MessageRepository {
     messageBody: MessageBody
   ): Promise<Message> {
     try {
-      const sender: MyIdentity = PersistentStore.store.getState().wallet
+      const sender: MyIdentity = persistentStore.store.getState().wallet
         .selectedIdentity
       const encryptedMessage: EncryptedAsymmetricString = sender.identity.encryptAsymmetricAsStr(
         JSON.stringify(messageBody),
@@ -66,7 +66,7 @@ class MessageRepository {
         body: JSON.stringify(messageObj),
       }).then(response => response.json())
     } catch (error) {
-      ErrorService.log({
+      errorService.log({
         error,
         message: 'error just before sending messageBody',
         origin: 'MessageRepository.send()',
@@ -88,7 +88,7 @@ class MessageRepository {
   private static createMessageOutput(message: Message): MessageOutput {
     return {
       ...message,
-      sender: ContactRepository.findByAddress(message.senderAddress),
+      sender: contactRepository.findByAddress(message.senderAddress),
     }
   }
 
@@ -100,7 +100,7 @@ class MessageRepository {
       box: message.message,
       nonce: message.nonce,
     }
-    const sender: Contact | undefined = ContactRepository.findByAddress(
+    const sender: Contact | undefined = contactRepository.findByAddress(
       message.senderAddress
     )
 
@@ -112,7 +112,7 @@ class MessageRepository {
       if (!decoded) {
         message.message = 'ERROR DECODING MESSAGE'
         const errorMessage = `Could not decode message ${message.messageId}`
-        ErrorService.log(
+        errorService.log(
           {
             error: { name: 'ERROR DECODING MESSAGE', message: errorMessage },
             message: errorMessage,
@@ -126,7 +126,7 @@ class MessageRepository {
       try {
         message.body = JSON.parse(message.message)
       } catch (error) {
-        ErrorService.log(
+        errorService.log(
           {
             error,
             message: `Could not parse message body of message ${
@@ -138,7 +138,7 @@ class MessageRepository {
         )
       }
     } else {
-      ErrorService.log({
+      errorService.log({
         error: new Error(),
         message: 'Could not retrieve claimer from local contact list',
         origin: 'MessageRepository.decryptMessage()',

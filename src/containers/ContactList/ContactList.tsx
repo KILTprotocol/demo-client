@@ -5,9 +5,9 @@ import { Config } from 'react-select/lib/filters'
 import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
-import ContactRepository from '../../services/ContactRepository'
+import contactRepository from '../../services/ContactRepository'
 import CtypeRepository from '../../services/CtypeRepository'
-import ErrorService from '../../services/ErrorService'
+import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
@@ -55,12 +55,13 @@ class ContactList extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    ContactRepository.findAll()
+    contactRepository
+      .findAll()
       .then((contacts: Contact[]) => {
         this.setState({ contacts })
       })
       .catch(error => {
-        ErrorService.log({
+        errorService.log({
           error,
           message: 'Could not fetch contacts',
           origin: 'ContactList.componentDidMount()',
@@ -72,7 +73,7 @@ class ContactList extends React.Component<Props, State> {
         this.setState({ ctypes })
       })
       .catch(error => {
-        ErrorService.log({
+        errorService.log({
           error,
           message: 'Could not fetch CTYPEs',
           origin: 'ContactList.componentDidMount()',
@@ -186,7 +187,7 @@ class ContactList extends React.Component<Props, State> {
         })
         .catch(error => {
           blockUi.remove()
-          ErrorService.log({
+          errorService.log({
             error,
             message: `Could not send message ${request.type} to ${
               this.selectedContact!.metaData.name

@@ -2,26 +2,30 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import CtypeRepository from 'src/services/CtypeRepository'
-import ErrorService from 'src/services/ErrorService'
-import { CType } from 'src/types/Ctype'
 
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 import SelectAttesters from '../../components/SelectAttesters/SelectAttesters'
 import attestationService from '../../services/AttestationService'
+import CtypeRepository from '../../services/CtypeRepository'
+import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
+import { CType } from '../../types/Ctype'
 import { ClaimMessageBodyContent, MessageBodyType } from '../../types/Message'
 
 import './ClaimView.scss'
 
 type Props = RouteComponentProps<{ hash: string }> & {
   claimEntries: Claims.Entry[]
-  removeClaim: (hash: string) => void
+  removeClaim: (hash: sdk.IClaim['hash']) => void
+  updateAttestation: (
+    hash: sdk.IClaim['hash'],
+    attestation: sdk.Attestation
+  ) => void
 }
 
 type State = {
@@ -45,6 +49,7 @@ class ClaimView extends React.Component<Props, State> {
     this.onFinishRequestAttestation = this.onFinishRequestAttestation.bind(this)
     this.onSelectAttesters = this.onSelectAttesters.bind(this)
     this.setSelectAttestersOpen = this.setSelectAttestersOpen.bind(this)
+    this.onVerifyAttestation = this.onVerifyAttestation.bind(this)
   }
 
   public componentDidMount() {
@@ -119,7 +124,7 @@ class ClaimView extends React.Component<Props, State> {
     if (!currentClaimEntry) {
       const message = `Could not get claim with hash '${hash}' from local list of claims`
       this.setState({ currentClaimEntry: 'notFoundInList' }, () => {
-        ErrorService.log({
+        errorService.log({
           error: { name: 'Error while setting current claim', message },
           message,
           origin: 'ClaimView.getCurrentClaimEntry()',
@@ -164,7 +169,23 @@ class ClaimView extends React.Component<Props, State> {
   private async onVerifyAttestation(
     attestation: sdk.Attestation
   ): Promise<boolean> {
-    return attestationService.verifyAttestation(attestation)
+    const { updateAttestation } = this.props
+    const { currentClaimEntry } = this.state
+    return attestationService
+      .verifyAttestation(attestation)
+      .then((verified: boolean) => {
+        if (
+          currentClaimEntry &&
+          currentClaimEntry !== 'notFoundInList' &&
+          attestation.revoked === verified
+        ) {
+          updateAttestation(
+            currentClaimEntry.claim.hash,
+            Object.assign(attestation, { revoked: !verified })
+          )
+        }
+        return verified
+      })
   }
 
   private onRequestAttestation(hash: string) {
@@ -205,7 +226,7 @@ class ClaimView extends React.Component<Props, State> {
                 notifySuccess('Request for attestation successfully sent.')
               })
               .catch(error => {
-                ErrorService.log({
+                errorService.log({
                   error,
                   message: `Could not send message ${
                     MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
@@ -217,7 +238,7 @@ class ClaimView extends React.Component<Props, State> {
           })
         })
         .catch(error => {
-          ErrorService.log({
+          errorService.log({
             error,
             message: 'Error fetching CTYPE',
             origin: 'MessageView.onFinishRequestAttestation()',
@@ -239,8 +260,14 @@ const mapStateToProps = (state: { claims: Claims.ImmutableState }) => {
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    removeClaim: (hash: string) => {
+    removeClaim: (hash: sdk.IClaim['hash']) => {
       dispatch(Claims.Store.removeAction(hash))
+    },
+    updateAttestation: (
+      hash: sdk.IClaim['hash'],
+      attestation: sdk.Attestation
+    ) => {
+      dispatch(Claims.Store.updateAttestation(hash, attestation))
     },
   }
 }

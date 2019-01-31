@@ -1,7 +1,6 @@
 import * as React from 'react'
-import Select from 'react-select'
-import ContactRepository from '../../services/ContactRepository'
 
+import contactRepository from '../../services/ContactRepository'
 import { Contact } from '../../types/Contact'
 import { CType } from '../../types/Ctype'
 import SelectContacts from '../SelectContact/SelectContact'
@@ -32,7 +31,7 @@ class SelectAttesters extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    ContactRepository.findAll().then((attesters: Contact[]) => {
+    contactRepository.findAll().then((attesters: Contact[]) => {
       // TODO: filter by ctype when info available
       this.setState({ attesters })
     })

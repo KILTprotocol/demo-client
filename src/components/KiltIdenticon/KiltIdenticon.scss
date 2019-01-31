@@ -3,6 +3,13 @@
   justify-content: left;
   align-items: center;
 
+  & .container {
+
+    &:before {
+      display: none;
+    }
+  }
+
   & .ui--IdentityIcon {
     cursor: default;
   }

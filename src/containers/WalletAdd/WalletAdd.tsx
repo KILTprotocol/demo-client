@@ -6,8 +6,8 @@ import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 
 import BlockchainService from '../../services/BlockchainService'
-import ContactRepository from '../../services/ContactRepository'
-import ErrorService from '../../services/ErrorService'
+import contactRepository from '../../services/ContactRepository'
+import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { Contact, MyIdentity } from '../../types/Contact'
@@ -138,7 +138,7 @@ class WalletAdd extends React.Component<Props, State> {
     try {
       identity = Identity.buildFromMnemonic(phrase)
     } catch (error) {
-      ErrorService.log({
+      errorService.log({
         error,
         message: `failed to create identity from phrase '${phrase}'`,
         origin: 'WalletAdd.addIdentity()',
@@ -160,7 +160,7 @@ class WalletAdd extends React.Component<Props, State> {
           publicIdentity: { address, boxPublicKeyAsHex },
         }
         blockUi.updateMessage('adding identity to contact repository (3/3)')
-        ContactRepository.add(newContact).then(
+        contactRepository.add(newContact).then(
           () => {
             this.props.saveIdentity({
               ...newContact,
@@ -172,7 +172,7 @@ class WalletAdd extends React.Component<Props, State> {
             this.props.history.push('/wallet')
           },
           error => {
-            ErrorService.log({
+            errorService.log({
               error,
               message: 'failed to POST new identity',
               origin: 'WalletAdd.addIdentity()',
@@ -183,7 +183,7 @@ class WalletAdd extends React.Component<Props, State> {
         )
       },
       error => {
-        ErrorService.log({
+        errorService.log({
           error,
           message: 'failed to transfer initial tokens to identity',
           origin: 'WalletAdd.addIdentity()',

@@ -5,7 +5,7 @@ import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
-import ErrorService from '../../services/ErrorService'
+import errorService from '../../services/ErrorService'
 import FeedbackService from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
@@ -109,7 +109,7 @@ class MessageView extends React.Component<Props, State> {
           blockUi.remove()
         })
         .catch(error => {
-          ErrorService.log({
+          errorService.log({
             error,
             message: `Could not retrieve messages for identity ${
               selectedIdentity.identity.address
@@ -150,7 +150,7 @@ class MessageView extends React.Component<Props, State> {
             notification.remove()
           })
           .catch(error => {
-            ErrorService.log({
+            errorService.log({
               error,
               message: `Could not delete message ${message.messageId}`,
               origin: 'MessageView.onDeleteMessage()',

@@ -1,5 +1,5 @@
 import * as UiState from '../state/ducks/UiState'
-import PersistentStore from '../state/PersistentStore'
+import persistentStore from '../state/PersistentStore'
 import {
   BlockingNotification,
   BlockUi,
@@ -38,7 +38,7 @@ class FeedbackService {
     }
 
     // now put this into redux store UiState
-    PersistentStore.store.dispatch(
+    persistentStore.store.dispatch(
       UiState.Store.addNotificationAction(notification as Notification)
     )
 
@@ -47,7 +47,7 @@ class FeedbackService {
   }
 
   public static removeNotification(id: Notification['id']) {
-    PersistentStore.store.dispatch(UiState.Store.removeNotificationAction(id))
+    persistentStore.store.dispatch(UiState.Store.removeNotificationAction(id))
   }
 
   public static addBlockingNotification({
@@ -78,7 +78,7 @@ class FeedbackService {
     }
 
     // now put this into redux store UiState
-    PersistentStore.store.dispatch(
+    persistentStore.store.dispatch(
       UiState.Store.addBlockingNotificationAction(
         blockingNotification as BlockingNotification
       )
@@ -89,7 +89,7 @@ class FeedbackService {
   }
 
   public static removeBlockingNotification(id: BlockingNotification['id']) {
-    PersistentStore.store.dispatch(
+    persistentStore.store.dispatch(
       UiState.Store.removeBlockingNotificationAction(id)
     )
   }
@@ -108,7 +108,7 @@ class FeedbackService {
     }
 
     // now put this into redux store UiState
-    PersistentStore.store.dispatch(
+    persistentStore.store.dispatch(
       UiState.Store.addBlockUiAction(blockUi as BlockUi)
     )
 
@@ -117,11 +117,11 @@ class FeedbackService {
   }
 
   public static removeBlockUi(id: BlockUi['id']) {
-    PersistentStore.store.dispatch(UiState.Store.removeBlockUiAction(id))
+    persistentStore.store.dispatch(UiState.Store.removeBlockUiAction(id))
   }
 
   public static updateBlockUi(id: BlockUi['id'], message: BlockUi['message']) {
-    PersistentStore.store.dispatch(
+    persistentStore.store.dispatch(
       UiState.Store.updateBlockUiAction(id, message)
     )
   }
