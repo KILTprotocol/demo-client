@@ -21,7 +21,11 @@ import './ClaimView.scss'
 
 type Props = RouteComponentProps<{ hash: string }> & {
   claimEntries: Claims.Entry[]
-  removeClaim: (hash: string) => void
+  removeClaim: (hash: sdk.IClaim['hash']) => void
+  updateAttestation: (
+    hash: sdk.IClaim['hash'],
+    attestation: sdk.Attestation
+  ) => void
 }
 
 type State = {
@@ -45,6 +49,7 @@ class ClaimView extends React.Component<Props, State> {
     this.onFinishRequestAttestation = this.onFinishRequestAttestation.bind(this)
     this.onSelectAttesters = this.onSelectAttesters.bind(this)
     this.setSelectAttestersOpen = this.setSelectAttestersOpen.bind(this)
+    this.onVerifyAttestation = this.onVerifyAttestation.bind(this)
   }
 
   public componentDidMount() {
@@ -164,7 +169,23 @@ class ClaimView extends React.Component<Props, State> {
   private async onVerifyAttestation(
     attestation: sdk.Attestation
   ): Promise<boolean> {
-    return attestationService.verifyAttestation(attestation)
+    const { updateAttestation } = this.props
+    const { currentClaimEntry } = this.state
+    return attestationService
+      .verifyAttestation(attestation)
+      .then((verified: boolean) => {
+        if (
+          currentClaimEntry &&
+          currentClaimEntry !== 'notFoundInList' &&
+          attestation.revoked === verified
+        ) {
+          updateAttestation(
+            currentClaimEntry.claim.hash,
+            Object.assign(attestation, { revoked: !verified })
+          )
+        }
+        return verified
+      })
   }
 
   private onRequestAttestation(hash: string) {
@@ -239,8 +260,14 @@ const mapStateToProps = (state: { claims: Claims.ImmutableState }) => {
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    removeClaim: (hash: string) => {
+    removeClaim: (hash: sdk.IClaim['hash']) => {
       dispatch(Claims.Store.removeAction(hash))
+    },
+    updateAttestation: (
+      hash: sdk.IClaim['hash'],
+      attestation: sdk.Attestation
+    ) => {
+      dispatch(Claims.Store.updateAttestation(hash, attestation))
     },
   }
 }

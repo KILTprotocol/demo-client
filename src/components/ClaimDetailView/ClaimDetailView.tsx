@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom'
 import Spinner from '../../components/Spinner/Spinner'
 import ContactRepository from '../../services/ContactRepository'
 import * as Claims from '../../state/ducks/Claims'
+import PersistentStore from '../../state/PersistentStore'
 import { Contact } from '../../types/Contact'
-import { Message } from '../../types/Message'
 import Code from '../Code/Code'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 
@@ -238,13 +238,14 @@ class ClaimDetailView extends Component<Props, State> {
 
     if (claimEntry) {
       claimEntry.attestations.forEach(attestation => {
-        this.verifyAttestation(attestation)()
+        this.verifyAttestation(attestation, claimEntry.claim)()
       })
     }
   }
 
   private verifyAttestation = (
-    attestation: sdk.IAttestation
+    attestation: sdk.IAttestation,
+    claim: sdk.IClaim
   ): (() => void) => () => {
     const { onVerifyAttestation } = this.props
     const { unverifiedAttestations, pendingAttestations } = this.state
@@ -253,18 +254,22 @@ class ClaimDetailView extends Component<Props, State> {
       pendingAttestations,
     })
     onVerifyAttestation(attestation).then(verified => {
-      if (!verified) {
-        return
-      }
-      this.setState({
+      const newState: any = {
         pendingAttestations: pendingAttestations.filter(
           (pendingAttestation: string) =>
             attestation.claimHash !== pendingAttestation
         ),
-        unverifiedAttestations: unverifiedAttestations.filter(
+      }
+
+      if (verified) {
+        newState.unverifiedAttestations = unverifiedAttestations.filter(
           (unverifiedAttestation: string) =>
             attestation.claimHash !== unverifiedAttestation
-        ),
+        )
+      }
+
+      this.setState({
+        ...newState,
       })
     })
   }

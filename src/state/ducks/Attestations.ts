@@ -1,15 +1,19 @@
-import Immutable from 'immutable'
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import Immutable from 'immutable'
+import moment from 'moment'
 
 import ErrorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
-import moment from 'moment'
 
 interface SaveAction extends KiltAction {
   payload: Entry
 }
 
 interface RemoveAction extends KiltAction {
+  payload: sdk.IAttestation['claimHash']
+}
+
+interface RevokeAction extends KiltAction {
   payload: sdk.IAttestation['claimHash']
 }
 
@@ -95,9 +99,8 @@ class Store {
     action: Action
   ): ImmutableState {
     switch (action.type) {
-      case Store.ACTIONS.SAVE_ATTESTATION:
+      case Store.ACTIONS.SAVE_ATTESTATION: {
         const attestationEntry: Entry = (action as SaveAction).payload
-
         return state.update('attestations', attestations => {
           return attestations
             .filter((entry: Entry) => {
@@ -108,14 +111,40 @@ class Store {
             })
             .concat(attestationEntry)
         })
-      case Store.ACTIONS.REMOVE_ATTESTATION:
-        const claimHash: string = (action as RemoveAction).payload
+      }
+      case Store.ACTIONS.REMOVE_ATTESTATION: {
+        const claimHash: sdk.IAttestation['claimHash'] = (action as RemoveAction)
+          .payload
         return state.set(
           'attestations',
           state.get('attestations').filter((entry: Entry) => {
             return entry.attestation.claimHash !== claimHash
           })
         )
+      }
+      case Store.ACTIONS.REVOKE_ATTESTATION: {
+        console.log(
+          'Store.ACTIONS.REVOKE_ATTESTATION',
+          Store.ACTIONS.REVOKE_ATTESTATION
+        )
+        const claimHash: sdk.IAttestation['claimHash'] = (action as RemoveAction)
+          .payload
+        let attestations = state.get('attestations') || []
+        attestations = attestations.map((entry: Entry) => {
+          console.log(
+            'entry.attestation.claimHash, claimHash',
+            entry.attestation.claimHash,
+            claimHash
+          )
+          return entry.attestation.claimHash === claimHash
+            ? { ...entry, attestation: { ...entry.attestation, revoked: true } }
+            : entry
+        })
+
+        console.log('attestations', attestations)
+
+        return state.set('attestations', attestations)
+      }
       default:
         return state
     }
@@ -137,6 +166,16 @@ class Store {
     }
   }
 
+  public static revokeAttestation(
+    claimHash: sdk.IAttestation['claimHash']
+  ): RevokeAction {
+    console.log('revokeAttestation')
+    return {
+      payload: claimHash,
+      type: Store.ACTIONS.REVOKE_ATTESTATION,
+    }
+  }
+
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
       attestations: Immutable.List<Entry>(),
@@ -145,6 +184,7 @@ class Store {
 
   private static ACTIONS = {
     REMOVE_ATTESTATION: 'client/attestations/REMOVE_ATTESTATION',
+    REVOKE_ATTESTATION: 'client/attestations/REVOKE_ATTESTATION',
     SAVE_ATTESTATION: 'client/attestations/SAVE_ATTESTATION',
   }
 }

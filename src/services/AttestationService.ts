@@ -2,6 +2,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import moment from 'moment'
 import persistentStore from 'src/state/PersistentStore'
 import * as Attestations from '../state/ducks/Attestations'
+import PersistentStore from '../state/PersistentStore'
 import BlockchainService from './BlockchainService'
 import ErrorService from './ErrorService'
 import { notifySuccess } from './FeedbackService'
@@ -65,6 +66,9 @@ class AttestationService {
       attestation
         .revoke(blockchain, selectedIdentity, () => {
           notifySuccess('Attestation successfully revoked')
+          PersistentStore.store.dispatch(
+            Attestations.Store.revokeAttestation(attestation.claimHash)
+          )
           resolve()
         })
         .then(() => {
