@@ -12,6 +12,7 @@ type SelectOption = {
 }
 
 type Props = {
+  closeMenuOnSelect?: boolean
   contacts: Contact[]
   isMulti?: boolean
   name: string
@@ -25,6 +26,7 @@ type State = {}
 
 class SelectContacts extends React.Component<Props, State> {
   public static defaultProps = {
+    closeMenuOnSelect: true,
     isMulti: false,
   }
 
@@ -43,6 +45,7 @@ class SelectContacts extends React.Component<Props, State> {
 
   public render() {
     const {
+      closeMenuOnSelect,
       contacts,
       isMulti,
       name,
@@ -66,10 +69,10 @@ class SelectContacts extends React.Component<Props, State> {
         <Select
           className="react-select-container"
           classNamePrefix="react-select"
-          isClearable={isMulti}
+          isClearable={isMulti && contacts.length > 1}
           isSearchable={true}
-          isMulti={isMulti}
-          closeMenuOnSelect={!isMulti}
+          isMulti={isMulti && contacts.length > 1}
+          closeMenuOnSelect={closeMenuOnSelect}
           name={name}
           options={options}
           onChange={this.onChange}

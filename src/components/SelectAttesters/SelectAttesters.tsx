@@ -6,6 +6,7 @@ import { CType } from '../../types/Ctype'
 import SelectContacts from '../SelectContact/SelectContact'
 
 type Props = {
+  closeMenuOnSelect?: boolean
   isMulti?: boolean
   ctypes?: CType[]
   onChange?: (selectedAttesters: Contact[]) => void
@@ -19,6 +20,7 @@ type State = {
 
 class SelectAttesters extends React.Component<Props, State> {
   public static defaultProps = {
+    closeMenuOnSelect: true,
     isMulti: true,
   }
 
@@ -38,7 +40,13 @@ class SelectAttesters extends React.Component<Props, State> {
   }
 
   public render() {
-    const { isMulti, onChange, onMenuOpen, onMenuClose } = this.props
+    const {
+      closeMenuOnSelect,
+      isMulti,
+      onChange,
+      onMenuOpen,
+      onMenuClose,
+    } = this.props
     const { attesters } = this.state
     return (
       !!attesters &&
@@ -50,6 +58,7 @@ class SelectAttesters extends React.Component<Props, State> {
           onChange={onChange}
           onMenuOpen={onMenuOpen}
           onMenuClose={onMenuClose}
+          closeMenuOnSelect={closeMenuOnSelect}
           placeholder={`Select attester${isMulti ? 's' : ''}…`}
         />
       )
