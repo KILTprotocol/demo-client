@@ -1,7 +1,7 @@
 .MessageListView {
 
   & table {
-    table-layout: fixed;
+    @include table;
   }
 
   & th,
@@ -11,26 +11,11 @@
     text-align: left;
   }
 
-  & .actionTd {
-    width: 2*($base-button-height + $base-padding/2);
-    padding: 0;
-
-    & .actions {
-      padding: 0;
-    }
-  }
-
-  & .identicon {
-    width: 40px;
-
-    & .name {
-      display: none;
-    }
+  & .actionsTd {
+    width: 2*$base-button-height + $base-padding;
   }
 
   & .sender {
-    @include baseFont-bold;
-
     width: 20%;
   }
 

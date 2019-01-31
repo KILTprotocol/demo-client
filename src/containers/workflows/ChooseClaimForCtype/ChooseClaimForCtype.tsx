@@ -117,43 +117,50 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
 
   private getAttestionsSelect() {
     const { selectedAttestations, selectedClaim } = this.state
-    return (
-      !!selectedClaim &&
-      // TODO: disable modals confirm button unless at least one attestation is
-      // selected TODO: request attestation for selected claim
-      (selectedClaim.attestations && selectedClaim.attestations.length ? (
-        <React.Fragment>
-          <div className="attestations">
-            <h4>Attestations</h4>
-            {selectedClaim.attestations
-              .filter((attestation: sdk.IAttestation) => !attestation.revoked)
-              .map((attestation: sdk.IAttestation) => (
-                <label key={attestation.signature}>
-                  <input
-                    type="checkbox"
-                    onChange={this.selectAttestation.bind(this, attestation)}
-                  />
-                  <span>{attestation.owner}</span>
-                </label>
-              ))}
-          </div>
-          <div className="actions">
-            <button
-              disabled={!selectedAttestations || !selectedAttestations.length}
-              onClick={this.sendClaim}
-            >
-              Send Claim & Attestations
-            </button>
-          </div>
-        </React.Fragment>
-      ) : (
-        <div className="no-attestations">
-          <span>No attestations found.</span>
-          <Link to={`/claim/${selectedClaim.claim.hash}`}>
-            Request attestation
-          </Link>
+
+    if (!selectedClaim) {
+      return ''
+    }
+
+    const approvedAttestations =
+      selectedClaim &&
+      selectedClaim.attestations &&
+      selectedClaim.attestations.length &&
+      selectedClaim.attestations.filter(
+        (attestation: sdk.IAttestation) => !attestation.revoked
+      )
+    // TODO: should we check the attestations against chain here?
+
+    return approvedAttestations && approvedAttestations.length ? (
+      <React.Fragment>
+        <div className="attestations">
+          <h4>Attestations</h4>
+          {approvedAttestations.map((attestation: sdk.IAttestation) => (
+            <label key={attestation.signature}>
+              <input
+                type="checkbox"
+                onChange={this.selectAttestation.bind(this, attestation)}
+              />
+              <span>{attestation.owner}</span>
+            </label>
+          ))}
         </div>
-      ))
+        <div className="actions">
+          <button
+            disabled={!selectedAttestations || !selectedAttestations.length}
+            onClick={this.sendClaim}
+          >
+            Send Claim & Attestations
+          </button>
+        </div>
+      </React.Fragment>
+    ) : (
+      <div className="no-attestations">
+        <span>No attestations found.</span>
+        <Link to={`/claim/${selectedClaim.claim.hash}`}>
+          Request attestation
+        </Link>
+      </div>
     )
   }
 

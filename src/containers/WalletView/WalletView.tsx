@@ -6,12 +6,13 @@ import IdentityView from '../../components/IdentityView/IdentityView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import * as Wallet from '../../state/ducks/Wallet'
+import { MyIdentity } from '../../types/Contact'
 
 import './WalletView.scss'
 
 type Props = RouteComponentProps<{}> & {
-  selectIdentity: (seedAsHex: string) => void
-  removeIdentity: (seedAsHex: string) => void
+  selectIdentity: (address: MyIdentity['identity']['address']) => void
+  removeIdentity: (address: MyIdentity['identity']['address']) => void
   identities: Wallet.Entry[]
   selectedIdentity?: Wallet.Entry
 }
@@ -80,16 +81,17 @@ class WalletView extends React.Component<Props, State> {
   }
 
   private removeIdentity = () => {
+    const { removeIdentity } = this.props
     const { identityToDelete } = this.state
     if (identityToDelete) {
-      this.props.removeIdentity(identityToDelete.identity.seedAsHex)
+      removeIdentity(identityToDelete.identity.address)
     }
   }
 
-  private requestRemoveIdentity(seedAsHex: string) {
+  private requestRemoveIdentity(address: MyIdentity['identity']['address']) {
     const { identities } = this.props
     const identityToDelete = identities.find(
-      (identity: Wallet.Entry) => identity.identity.seedAsHex === seedAsHex
+      (identity: Wallet.Entry) => identity.identity.address === address
     )
 
     if (identityToDelete) {
@@ -103,8 +105,8 @@ class WalletView extends React.Component<Props, State> {
     }
   }
 
-  private selectIdentity = (seedAsHex: string) => {
-    this.props.selectIdentity(seedAsHex)
+  private selectIdentity = (address: MyIdentity['identity']['address']) => {
+    this.props.selectIdentity(address)
   }
 }
 
@@ -120,11 +122,11 @@ const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
 
 const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
   return {
-    removeIdentity: (seedAsHex: string) => {
-      dispatch(Wallet.Store.removeIdentityAction(seedAsHex))
+    removeIdentity: (address: MyIdentity['identity']['address']) => {
+      dispatch(Wallet.Store.removeIdentityAction(address))
     },
-    selectIdentity: (seedAsHex: string) => {
-      dispatch(Wallet.Store.selectIdentityAction(seedAsHex))
+    selectIdentity: (address: MyIdentity['identity']['address']) => {
+      dispatch(Wallet.Store.selectIdentityAction(address))
     },
   }
 }

@@ -28,15 +28,7 @@
     }
 
     & table {
-      table-layout: fixed;
-    }
-
-    & .identicon {
-      width: 40px;
-
-      & .name {
-        display: none;
-      }
+      @include table;
     }
 
     & .attesterName {

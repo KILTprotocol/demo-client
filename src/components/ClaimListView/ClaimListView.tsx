@@ -1,6 +1,6 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import * as Claims from '../../state/ducks/Claims'
 
@@ -30,44 +30,46 @@ class ClaimListView extends React.Component<Props, State> {
           <table>
             <thead>
               <tr>
-                <th>Alias</th>
-                <th>Contents</th>
-                <th>Attested?</th>
-                <th />
+                <th className="alias">Alias</th>
+                <th className="content">Content</th>
+                <th className="status">Attested?</th>
+                <th className="actionsTd" />
               </tr>
             </thead>
             <tbody>
               {claimStore.map(claimEntry => (
                 <tr key={claimEntry.claim.hash}>
-                  <td>
+                  <td className="alias">
                     <Link to={`/claim/${claimEntry.claim.hash}`}>
                       {claimEntry.claim.alias}
                     </Link>
                   </td>
-                  <td>{JSON.stringify(claimEntry.claim.contents)}</td>
+                  <td className="content">
+                    {JSON.stringify(claimEntry.claim.contents)}
+                  </td>
                   <td
                     className={
-                      'attested ' +
+                      'status ' +
                       (claimEntry.attestations.find(
                         (attestation: sdk.IAttestation) => !attestation.revoked
                       )
-                        ? 'true'
-                        : 'false')
+                        ? 'attested'
+                        : 'revoked')
                     }
                   />
-                  <td className="actions">
-                    <button
-                      className="requestAttestation"
-                      onClick={this.requestAttestation(claimEntry.claim.hash)}
-                    >
-                      Request Attestation
-                    </button>
-                    <button
-                      className="deleteClaim"
-                      onClick={this.handleDelete(claimEntry.claim.hash)}
-                    >
-                      Delete
-                    </button>
+                  <td className="actionsTd">
+                    <div className="actions">
+                      <button
+                        className="requestAttestation"
+                        onClick={this.requestAttestation(claimEntry.claim.hash)}
+                      >
+                        Get Attestation
+                      </button>
+                      <button
+                        className="deleteClaim"
+                        onClick={this.handleDelete(claimEntry.claim.hash)}
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}

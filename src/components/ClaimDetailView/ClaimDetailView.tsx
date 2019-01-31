@@ -125,9 +125,8 @@ class ClaimDetailView extends Component<Props, State> {
           <table>
             <thead>
               <tr>
-                <th className="identicon" />
                 <th className="attesterName">Attester</th>
-                <th className="status">Approved</th>
+                <th className="status">Attested</th>
               </tr>
             </thead>
             <tbody>
@@ -135,15 +134,12 @@ class ClaimDetailView extends Component<Props, State> {
                 const attester = this.getAttester(attestation.owner)
                 return (
                   <tr key={attestation.signature}>
-                    <td className="identicon">
+                    <td className="attesterName">
                       {attester ? (
                         <KiltIdenticon contact={attester} size={24} />
                       ) : (
-                        ''
+                        attestation.owner
                       )}
-                    </td>
-                    <td className="attesterName">
-                      {attester ? attester.metaData.name : attestation.owner}
                     </td>
                     {this.isPending(attestation) && (
                       <td className="status">
@@ -155,7 +151,7 @@ class ClaimDetailView extends Component<Props, State> {
                         className={
                           'status ' +
                           (this.isApproved(attestation)
-                            ? 'approved'
+                            ? 'attested'
                             : 'revoked')
                         }
                       />

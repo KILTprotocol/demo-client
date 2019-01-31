@@ -36,7 +36,6 @@ class MessageListView extends React.Component<Props, State> {
           <table>
             <thead>
               <tr>
-                <th className="identicon" />
                 <th className="sender">Sender</th>
                 <th className="subject">Subject</th>
                 <th className="actionTd" />
@@ -45,24 +44,19 @@ class MessageListView extends React.Component<Props, State> {
             <tbody>
               {messages.map((message: MessageOutput) => (
                 <tr key={message.messageId}>
-                  <td className="identicon">
+                  <td className="sender">
                     {message.sender ? (
                       <KiltIdenticon contact={message.sender} size={24} />
                     ) : (
-                      ''
+                      message.senderAddress
                     )}
-                  </td>
-                  <td className="sender">
-                    {message.sender
-                      ? message.sender.metaData.name
-                      : message.senderAddress}
                   </td>
                   <td className="subject">
                     <div onClick={this.openMessage(message)}>
                       {this.getMessageInfo(message)}
                     </div>
                   </td>
-                  <td className="actionTd">
+                  <td className="actionsTd">
                     <div className="actions">
                       <button
                         className="delete"

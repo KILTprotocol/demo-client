@@ -90,7 +90,6 @@ class ContactList extends React.Component<Props, State> {
         <table>
           <thead>
             <tr>
-              <th className="identicon" />
               <th className="name">Name</th>
               <th className="address">Address</th>
               <th className="actionTd" />
@@ -99,11 +98,12 @@ class ContactList extends React.Component<Props, State> {
           <tbody>
             {contacts.map((contact: Contact) => (
               <tr key={contact.publicIdentity.address}>
-                <td className="identicon">
+                <td className="name">
                   <KiltIdenticon contact={contact} size={24} />
                 </td>
-                <td className="name">{contact.metaData.name}</td>
-                <td className="address">{contact.publicIdentity.address}</td>
+                <td className="address" title={contact.publicIdentity.address}>
+                  {contact.publicIdentity.address}
+                </td>
                 <td className="actionTd">
                   <div className="actions">
                     <button

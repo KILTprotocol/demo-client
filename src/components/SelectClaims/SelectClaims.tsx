@@ -12,6 +12,7 @@ type SelectOption = {
 }
 
 type Props = {
+  closeMenuOnSelect?: boolean
   claims: Claims.Entry[]
   isMulti?: boolean
   onChange?: (selectedClaims: Claims.Entry[]) => void
@@ -23,6 +24,7 @@ type State = {}
 
 class SelectClaims extends React.Component<Props, State> {
   public static defaultProps = {
+    closeMenuOnSelect: true,
     isMulti: false,
     showAttested: true,
   }
@@ -41,7 +43,13 @@ class SelectClaims extends React.Component<Props, State> {
   }
 
   public render() {
-    const { claims, isMulti, onMenuOpen, onMenuClose } = this.props
+    const {
+      closeMenuOnSelect,
+      claims,
+      isMulti,
+      onMenuOpen,
+      onMenuClose,
+    } = this.props
 
     const options: SelectOption[] = claims.map(
       (claim: Claims.Entry): SelectOption => {
@@ -52,7 +60,7 @@ class SelectClaims extends React.Component<Props, State> {
           )
         return {
           label: (
-            <span className={isApproved ? 'approved' : 'unapproved'}>
+            <span className={isApproved ? 'attested' : 'revoked'}>
               {claim.claim.alias}
             </span>
           ),
@@ -67,10 +75,10 @@ class SelectClaims extends React.Component<Props, State> {
         <Select
           className="react-select-container"
           classNamePrefix="react-select"
-          isClearable={isMulti}
+          isClearable={isMulti && claims.length > 1}
           isSearchable={false}
-          isMulti={isMulti}
-          closeMenuOnSelect={!isMulti}
+          isMulti={isMulti && claims.length > 1}
+          closeMenuOnSelect={closeMenuOnSelect}
           name="selectClaims"
           options={options}
           onChange={this.onChange}

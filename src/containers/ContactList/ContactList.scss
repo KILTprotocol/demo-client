@@ -5,7 +5,7 @@
   }
 
   & table {
-    table-layout: fixed;
+    @include table;
   }
 
   & th,
@@ -21,25 +21,14 @@
     @include button-icon-only($icon-wpforms);
   }
 
-  & .identicon{
-    width: 40px;
-
-    & .name {
-      display: none;
-    }
-  }
-
   & .name {
-    @extend %ellipsis;
-
-    width: 40%;
-    font-weight: bold
+    width: 50%;
   }
 
   & .address {
     @extend %ellipsis;
 
-    width: 60%;
+    width: 100%;
   }
 
   & .actionTd {
