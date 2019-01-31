@@ -1,14 +1,14 @@
 .Modal {
-  position: fixed;
   z-index: $z-index-modal;
   display: flex;
-  align-items: center;
-  justify-content: center;
   max-width: none;
   margin: 0;
+  padding: $base-padding;
+  overflow: auto;
 
   &,
   & .backdrop {
+    position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
@@ -16,7 +16,6 @@
   }
 
   & .backdrop {
-    position: absolute;
     z-index: $z-index-modal + 1;
     background: $color-background-backdrop;
   }
@@ -26,10 +25,9 @@
 
     position: relative;
     z-index: $z-index-modal + 2;
-    width: calc(100% - #{$base-padding*2});
-    max-height: calc(100% - #{$base-padding*2});
-    overflow: auto;
+    width: 100%;
     max-width: 640px;
+    margin: auto;
     background: $color-white;
     border: $base-border;
   }

@@ -151,7 +151,7 @@ class ClaimDetailView extends Component<Props, State> {
                         className={
                           'status ' +
                           (this.isApproved(attestation)
-                            ? 'approved'
+                            ? 'attested'
                             : 'revoked')
                         }
                       />

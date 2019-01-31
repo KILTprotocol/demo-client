@@ -29,7 +29,7 @@
       }
     }
 
-    &.approved {
+    &.attested {
 
       &:before {
         @include icon($icon-check);

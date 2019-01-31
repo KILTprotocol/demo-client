@@ -81,7 +81,7 @@ class AttestationsView extends React.Component<Props, State> {
                 <td
                   className={
                     'status ' +
-                    (attestation.attestation.revoked ? 'revoked' : 'approved')
+                    (attestation.attestation.revoked ? 'revoked' : 'attested')
                   }
                 />
                 <td className="actionsTd">

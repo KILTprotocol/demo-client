@@ -117,17 +117,21 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
 
   private getAttestionsSelect() {
     const { selectedAttestations, selectedClaim } = this.state
+
+    if (!selectedClaim) {
+      return ''
+    }
+
+    const approvedAttestations = selectedClaim && selectedClaim.attestations && selectedClaim.attestations.length && selectedClaim.attestations.filter((attestation: sdk.IAttestation) => !attestation.revoked)
+    // TODO: should we check the attestations against chain here?
+
+    console.log('approvedAttestations',approvedAttestations)
     return (
-      !!selectedClaim &&
-      // TODO: disable modals confirm button unless at least one attestation is
-      // selected TODO: request attestation for selected claim
-      (selectedClaim.attestations && selectedClaim.attestations.length ? (
+      approvedAttestations && approvedAttestations.length ? (
         <React.Fragment>
           <div className="attestations">
             <h4>Attestations</h4>
-            {selectedClaim.attestations
-              .filter((attestation: sdk.IAttestation) => !attestation.revoked)
-              .map((attestation: sdk.IAttestation) => (
+            {approvedAttestations.map((attestation: sdk.IAttestation) => (
                 <label key={attestation.signature}>
                   <input
                     type="checkbox"
@@ -153,7 +157,7 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
             Request attestation
           </Link>
         </div>
-      ))
+      )
     )
   }
 

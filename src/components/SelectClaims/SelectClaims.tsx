@@ -52,7 +52,7 @@ class SelectClaims extends React.Component<Props, State> {
           )
         return {
           label: (
-            <span className={isApproved ? 'approved' : 'unapproved'}>
+            <span className={isApproved ? 'attested' : 'revoked'}>
               {claim.claim.alias}
             </span>
           ),

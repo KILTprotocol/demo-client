@@ -14,8 +14,8 @@
 
   & .react-select-container {
 
-    & .approved,
-    & .unapproved {
+    & .attested,
+    & .revoked {
       $icon-width: 20px;
 
       position: relative;
@@ -34,7 +34,7 @@
       }
     }
 
-    & .approved {
+    & .attested {
 
       &:before {
         @include icon($icon-check);
@@ -43,7 +43,7 @@
       }
     }
 
-    & .unapproved {
+    & .revoked {
 
       &:before {
         @include icon($icon-times);
