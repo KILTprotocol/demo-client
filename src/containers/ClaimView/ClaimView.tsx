@@ -1,8 +1,8 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
 
+import { RouteComponentProps, withRouter } from 'react-router'
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
@@ -251,10 +251,7 @@ class ClaimView extends React.Component<Props, State> {
 
 const mapStateToProps = (state: { claims: Claims.ImmutableState }) => {
   return {
-    claimEntries: state.claims
-      .get('claims')
-      .toList()
-      .toArray(),
+    claimEntries: Claims.getClaims(state),
   }
 }
 

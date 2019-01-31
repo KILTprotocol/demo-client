@@ -16,7 +16,7 @@ declare global {
   /* tslint:enable */
 }
 
-type State = {
+export type State = {
   claims: Claims.ImmutableState
   uiState: UiState.ImmutableState
   wallet: Wallet.ImmutableState
@@ -93,12 +93,6 @@ class PersistentStore {
         PersistentStore.serialize(this._store.getState())
       )
     })
-  }
-
-  public getSelectedIdentity(): sdk.Identity {
-    return (this.store
-      .getState()
-      .wallet.get('selectedIdentity') as Wallet.Entry).identity
   }
 }
 

@@ -1,7 +1,10 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import { createSelector } from 'reselect'
+
 import Immutable from 'immutable'
 import moment from 'moment'
-
+import { MyIdentity } from '../../types/Contact'
+import * as Wallet from './Wallet'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 
@@ -178,4 +181,24 @@ class Store {
   }
 }
 
-export { Store, ImmutableState, SerializedState, Entry, Action }
+const _getAllAttestations = (state: any): Entry[] => {
+  return state.attestations.get('attestations').toList()
+}
+
+const getAttestations = createSelector(
+  [Wallet.getSelectedIdentity, _getAllAttestations],
+  (selectedIdentity: MyIdentity, entries: Entry[]) => {
+    return entries.filter((entry: Entry) => {
+      return entry.attestation.owner === selectedIdentity.identity.address
+    })
+  }
+)
+
+export {
+  Store,
+  ImmutableState,
+  SerializedState,
+  Entry,
+  Action,
+  getAttestations,
+}

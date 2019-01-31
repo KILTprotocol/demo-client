@@ -1,7 +1,10 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import Immutable from 'immutable'
+import { createSelector } from 'reselect'
+
 import KiltAction from '../../types/Action'
 import { MyIdentity } from '../../types/Contact'
+import * as PersistentStore from '../PersistentStore'
 
 interface SaveAction extends KiltAction {
   payload: MyIdentity
@@ -160,4 +163,19 @@ class Store {
   }
 }
 
-export { Store, ImmutableState, SerializedState, Entry, Action }
+const _getSelectedIdentity = (state: PersistentStore.State) =>
+  state.wallet.get('selectedIdentity')
+
+const getSelectedIdentity = createSelector(
+  [_getSelectedIdentity],
+  (selectedIdentity: MyIdentity) => selectedIdentity
+)
+
+export {
+  Store,
+  ImmutableState,
+  SerializedState,
+  Entry,
+  Action,
+  getSelectedIdentity,
+}

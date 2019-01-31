@@ -1,8 +1,12 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import Immutable from 'immutable'
+import { createSelector } from 'reselect'
 
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
+import { MyIdentity } from '../../types/Contact'
+import PersistentStore from '../PersistentStore'
+import * as Wallet from './Wallet'
 
 interface SaveAction extends KiltAction {
   payload: sdk.IClaim
@@ -197,4 +201,20 @@ class Store {
   }
 }
 
-export { Store, ImmutableState, SerializedState, Entry, Action }
+const _getAllClaims = (state: any): Entry[] => {
+  return state.claims
+    .get('claims')
+    .toList()
+    .toArray()
+}
+
+const getClaims = createSelector(
+  [Wallet.getSelectedIdentity, _getAllClaims],
+  (selectedIdentity: MyIdentity, entries: Entry[]) => {
+    return entries.filter((entry: Entry) => {
+      return entry.claim.owner === selectedIdentity.identity.address
+    })
+  }
+)
+
+export { Store, ImmutableState, SerializedState, Entry, Action, getClaims }

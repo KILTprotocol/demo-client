@@ -133,11 +133,7 @@ const mapStateToProps = (state: {
   attestations: Attestations.ImmutableState
 }) => {
   return {
-    attestations: state.attestations
-      .get('attestations')
-      .sortBy(entry => entry.created)
-      .toList()
-      .toArray(),
+    attestations: Attestations.getAttestations(state),
   }
 }
 
