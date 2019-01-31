@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import CtypeEditor from '../../components/CtypeEditor/CtypeEditor'
 import BlockchainService from '../../services/BlockchainService'
 import ctypeRepository from '../../services/CtypeRepository'
-import ErrorService from '../../services/ErrorService'
+import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { CType } from '../../types/Ctype'
@@ -70,7 +70,7 @@ class CtypeCreate extends React.Component<Props, State> {
       try {
         ctype = sdk.CType.fromInputModel(this.state.ctype)
       } catch (error) {
-        ErrorService.log({
+        errorService.log({
           error,
           message: 'could not create CTYPE from Input Model',
           origin: 'CtypeCreate.submit()',
@@ -107,7 +107,7 @@ class CtypeCreate extends React.Component<Props, State> {
           )
         })
         .catch(error => {
-          ErrorService.log({
+          errorService.log({
             error,
             message: 'could not submit CTYPE',
             origin: 'CtypeCreate.submit()',

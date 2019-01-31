@@ -1,10 +1,10 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import moment from 'moment'
-import persistentStore from 'src/state/PersistentStore'
+
 import * as Attestations from '../state/ducks/Attestations'
-import PersistentStore from '../state/PersistentStore'
+import persistentStore from '../state/PersistentStore'
 import BlockchainService from './BlockchainService'
-import ErrorService from './ErrorService'
+import errorService from './ErrorService'
 import { notifySuccess } from './FeedbackService'
 
 class AttestationService {
@@ -38,7 +38,7 @@ class AttestationService {
           // ignore
         })
         .catch(error => {
-          ErrorService.log({
+          errorService.log({
             error,
             message: 'Error storing attestation on blockchain',
             origin: 'AttestationService.attestClaim()',
@@ -66,16 +66,13 @@ class AttestationService {
       attestation
         .revoke(blockchain, selectedIdentity, () => {
           notifySuccess('Attestation successfully revoked')
-          PersistentStore.store.dispatch(
+          persistentStore.store.dispatch(
             Attestations.Store.revokeAttestation(attestation.claimHash)
           )
           resolve()
         })
-        .then(() => {
-          notifySuccess('Revocation successfully build')
-        })
         .catch(error => {
-          ErrorService.log({
+          errorService.log({
             error,
             message: 'Could not revoke Attestation',
             origin: 'AttestationService.attestClaim()',

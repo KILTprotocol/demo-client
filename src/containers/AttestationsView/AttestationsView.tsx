@@ -1,10 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import AttestationService from '../../services/AttestationService'
 import attestationService from '../../services/AttestationService'
-import ErrorService from '../../services/ErrorService'
-import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 
 import './AttestationsView.scss'
@@ -87,7 +84,7 @@ class AttestationsView extends React.Component<Props, State> {
     attestationListModel?: AttestationListModel
   ): (() => void) => () => {
     if (attestationListModel) {
-      AttestationService.revokeAttestation(attestationListModel.attestation)
+      attestationService.revokeAttestation(attestationListModel.attestation)
     }
   }
 

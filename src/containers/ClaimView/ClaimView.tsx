@@ -2,19 +2,19 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import CtypeRepository from 'src/services/CtypeRepository'
-import ErrorService from 'src/services/ErrorService'
-import { CType } from 'src/types/Ctype'
 
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 import SelectAttesters from '../../components/SelectAttesters/SelectAttesters'
 import attestationService from '../../services/AttestationService'
+import CtypeRepository from '../../services/CtypeRepository'
+import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { Contact } from '../../types/Contact'
+import { CType } from '../../types/Ctype'
 import { ClaimMessageBodyContent, MessageBodyType } from '../../types/Message'
 
 import './ClaimView.scss'
@@ -124,7 +124,7 @@ class ClaimView extends React.Component<Props, State> {
     if (!currentClaimEntry) {
       const message = `Could not get claim with hash '${hash}' from local list of claims`
       this.setState({ currentClaimEntry: 'notFoundInList' }, () => {
-        ErrorService.log({
+        errorService.log({
           error: { name: 'Error while setting current claim', message },
           message,
           origin: 'ClaimView.getCurrentClaimEntry()',
@@ -226,7 +226,7 @@ class ClaimView extends React.Component<Props, State> {
                 notifySuccess('Request for attestation successfully sent.')
               })
               .catch(error => {
-                ErrorService.log({
+                errorService.log({
                   error,
                   message: `Could not send message ${
                     MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
@@ -238,7 +238,7 @@ class ClaimView extends React.Component<Props, State> {
           })
         })
         .catch(error => {
-          ErrorService.log({
+          errorService.log({
             error,
             message: 'Error fetching CTYPE',
             origin: 'MessageView.onFinishRequestAttestation()',

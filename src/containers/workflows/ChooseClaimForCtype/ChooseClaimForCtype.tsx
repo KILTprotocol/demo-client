@@ -6,9 +6,9 @@ import { Link } from 'react-router-dom'
 
 import Modal from '../../../components/Modal/Modal'
 import SelectClaims from '../../../components/SelectClaims/SelectClaims'
-import ContactRepository from '../../../services/ContactRepository'
+import contactRepository from '../../../services/ContactRepository'
 import CtypeRepository from '../../../services/CtypeRepository'
-import ErrorService from '../../../services/ErrorService'
+import errorService from '../../../services/ErrorService'
 import FeedbackService, {
   notifySuccess,
 } from '../../../services/FeedbackService'
@@ -207,8 +207,8 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
       type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE,
     }
 
-    ContactRepository.findAll().then(() => {
-      const receiver: Contact | undefined = ContactRepository.findByAddress(
+    contactRepository.findAll().then(() => {
+      const receiver: Contact | undefined = contactRepository.findByAddress(
         senderAddress
       )
       if (receiver) {
@@ -223,7 +223,7 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
           })
           .catch(error => {
             blockUi.remove()
-            ErrorService.log({
+            errorService.log({
               error,
               message: 'Could not send claim and attestations',
               origin: 'ChooseClaimForCtype.sendClaim()',
@@ -232,7 +232,7 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
           })
       } else {
         blockUi.remove()
-        ErrorService.log({
+        errorService.log({
           error: new Error(),
           message: 'Could not retrieve receiver',
           origin: 'ChooseClaimForCtype.sendClaim()',

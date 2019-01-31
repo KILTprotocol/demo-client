@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import Immutable from 'immutable'
 
-import ErrorService from '../../services/ErrorService'
+import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 
 interface SaveAction extends KiltAction {
@@ -89,7 +89,7 @@ class Store {
         }
         claims[o.hash] = entry
       } catch (error) {
-        ErrorService.log({
+        errorService.log({
           error,
           message: 'Could not restore Claims from local storage',
           origin: 'Claims.Store.deserialize()',

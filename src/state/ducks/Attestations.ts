@@ -2,7 +2,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import Immutable from 'immutable'
 import moment from 'moment'
 
-import ErrorService from '../../services/ErrorService'
+import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 
 interface SaveAction extends KiltAction {
@@ -80,7 +80,7 @@ class Store {
           } as Entry
           attestationEntries.push(attestationEntry)
         } catch (e) {
-          ErrorService.log({
+          errorService.log({
             error: e,
             message: '',
             origin: 'Attestations.deserialize()',
@@ -123,25 +123,15 @@ class Store {
         )
       }
       case Store.ACTIONS.REVOKE_ATTESTATION: {
-        console.log(
-          'Store.ACTIONS.REVOKE_ATTESTATION',
-          Store.ACTIONS.REVOKE_ATTESTATION
-        )
         const claimHash: sdk.IAttestation['claimHash'] = (action as RemoveAction)
           .payload
+
         let attestations = state.get('attestations') || []
         attestations = attestations.map((entry: Entry) => {
-          console.log(
-            'entry.attestation.claimHash, claimHash',
-            entry.attestation.claimHash,
-            claimHash
-          )
           return entry.attestation.claimHash === claimHash
             ? { ...entry, attestation: { ...entry.attestation, revoked: true } }
             : entry
         })
-
-        console.log('attestations', attestations)
 
         return state.set('attestations', attestations)
       }
@@ -169,7 +159,6 @@ class Store {
   public static revokeAttestation(
     claimHash: sdk.IAttestation['claimHash']
   ): RevokeAction {
-    console.log('revokeAttestation')
     return {
       payload: claimHash,
       type: Store.ACTIONS.REVOKE_ATTESTATION,

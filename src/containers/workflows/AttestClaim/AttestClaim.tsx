@@ -1,9 +1,9 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
-import AttestationService from '../../../services/AttestationService'
-import ContactRepository from '../../../services/ContactRepository'
-import ErrorService from '../../../services/ErrorService'
+import attestationService from '../../../services/AttestationService'
+import contactRepository from '../../../services/ContactRepository'
+import errorService from '../../../services/ErrorService'
 import FeedbackService, {
   notifySuccess,
 } from '../../../services/FeedbackService'
@@ -52,15 +52,16 @@ class AttestClaim extends React.Component<Props, State> {
       message: 'fetching contacts',
     })
 
-    ContactRepository.findAll().then(() => {
-      const claimer: Contact | undefined = ContactRepository.findByAddress(
+    contactRepository.findAll().then(() => {
+      const claimer: Contact | undefined = contactRepository.findByAddress(
         senderAddress
       )
       if (claimer) {
         blockUi.updateMessage('Attesting')
-        AttestationService.attestClaim(claim)
+        attestationService
+          .attestClaim(claim)
           .then((attestation: sdk.IAttestation) => {
-            AttestationService.saveInStore({
+            attestationService.saveInStore({
               attestation,
               claimerAddress: claim.owner,
               claimerAlias: claimer.metaData.name,
@@ -78,7 +79,7 @@ class AttestClaim extends React.Component<Props, State> {
               })
               .catch(error => {
                 blockUi.remove()
-                ErrorService.log({
+                errorService.log({
                   error,
                   message: 'Could not send attestation message',
                   origin: 'AttestClaim.sendClaimAttestedMessage()',
@@ -91,7 +92,7 @@ class AttestClaim extends React.Component<Props, State> {
           })
           .catch(error => {
             blockUi.remove()
-            ErrorService.log({
+            errorService.log({
               error,
               message: `Could not send attestation for claim ${claim.hash} to ${
                 claimer.metaData.name
@@ -102,7 +103,7 @@ class AttestClaim extends React.Component<Props, State> {
           })
       } else {
         blockUi.remove()
-        ErrorService.log({
+        errorService.log({
           error: new Error(),
           message: 'Could not retrieve claimer',
           origin: 'MessageView.attestCurrentClaim()',

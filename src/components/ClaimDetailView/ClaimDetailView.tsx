@@ -3,9 +3,8 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
 import Spinner from '../../components/Spinner/Spinner'
-import ContactRepository from '../../services/ContactRepository'
+import contactRepository from '../../services/ContactRepository'
 import * as Claims from '../../state/ducks/Claims'
-import PersistentStore from '../../state/PersistentStore'
 import { Contact } from '../../types/Contact'
 import Code from '../Code/Code'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
@@ -53,7 +52,7 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   public componentDidMount() {
-    ContactRepository.findAll().then(() => {
+    contactRepository.findAll().then(() => {
       this.setState({
         canResolveAttesters: true,
       })
@@ -176,7 +175,7 @@ class ClaimDetailView extends Component<Props, State> {
   private getAttester(
     attesterAddress: Contact['publicIdentity']['address']
   ): Contact | undefined {
-    return ContactRepository.findByAddress(attesterAddress)
+    return contactRepository.findByAddress(attesterAddress)
   }
 
   private getActions() {
