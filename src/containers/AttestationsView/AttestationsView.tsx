@@ -6,11 +6,11 @@ import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 import attestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import * as Attestations from '../../state/ducks/Attestations'
+import { BlockUi } from '../../types/UserFeedback'
+import FeedbackService from '../../services/FeedbackService'
 import { State as ReduxState } from '../../state/PersistentStore'
 
 import './AttestationsView.scss'
-import { BlockUi } from 'src/types/UserFeedback'
-import FeedbackService from 'src/services/FeedbackService'
 
 type AttestationListModel = Attestations.Entry
 
