@@ -49,7 +49,6 @@ class AttestClaim extends React.Component<Props, State> {
 
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Attesting',
-      message: 'fetching contacts',
     })
 
     contactRepository.findAll().then(() => {
@@ -57,7 +56,6 @@ class AttestClaim extends React.Component<Props, State> {
         senderAddress
       )
       if (claimer) {
-        blockUi.updateMessage('Attesting')
         attestationService
           .attestClaim(claim)
           .then((attestation: sdk.IAttestation) => {
