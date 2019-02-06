@@ -32,7 +32,7 @@ type Props = {
 type State = {
   ctype?: CType
   selectedClaim?: Claims.Entry
-  selectedAttestations: sdk.IAttestation[]
+  selectedAttestedClaims: sdk.IAttestedClaim[]
   workflowStarted: boolean
 }
 
@@ -42,7 +42,7 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      selectedAttestations: [],
+      selectedAttestedClaims: [],
       workflowStarted: false,
     }
 
@@ -117,32 +117,36 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   }
 
   private getAttestionsSelect() {
-    const { selectedAttestations, selectedClaim } = this.state
+    const {
+      selectedAttestedClaims: selectedAttestations,
+      selectedClaim,
+    } = this.state
 
     if (!selectedClaim) {
       return ''
     }
 
-    const approvedAttestations =
+    const approvedAttestatedClaims =
       selectedClaim &&
       selectedClaim.attestations &&
       selectedClaim.attestations.length &&
       selectedClaim.attestations.filter(
-        (attestation: sdk.IAttestation) => !attestation.revoked
+        (attestedClaim: sdk.IAttestedClaim) =>
+          !attestedClaim.attestation.revoked
       )
     // TODO: should we check the attestations against chain here?
 
-    return approvedAttestations && approvedAttestations.length ? (
+    return approvedAttestatedClaims && approvedAttestatedClaims.length ? (
       <React.Fragment>
         <div className="attestations">
           <h4>Attestations</h4>
-          {approvedAttestations.map((attestation: sdk.IAttestation) => (
-            <label key={attestation.signature}>
+          {approvedAttestatedClaims.map((attestedClaim: sdk.IAttestedClaim) => (
+            <label key={attestedClaim.attestation.signature}>
               <input
                 type="checkbox"
-                onChange={this.selectAttestation.bind(this, attestation)}
+                onChange={this.selectAttestation.bind(this, attestedClaim)}
               />
-              <span>{attestation.owner}</span>
+              <span>{attestedClaim.attestation.owner}</span>
             </label>
           ))}
         </div>
@@ -158,34 +162,34 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
     ) : (
       <div className="no-attestations">
         <span>No attestations found.</span>
-        <Link to={`/claim/${selectedClaim.claim.hash}`}>
-          Request attestation
-        </Link>
+        <Link to={`/claim/${selectedClaim.id}`}>Request attestation</Link>
       </div>
     )
   }
 
   private selectAttestation(
-    attestation: sdk.IAttestation,
+    attestedClaim: sdk.IAttestedClaim,
     event: ChangeEvent<HTMLInputElement>
   ) {
     const { checked } = event.target
-    const { selectedAttestations } = this.state
+    const { selectedAttestedClaims: selectedAttestedClaims } = this.state
 
-    const attestationSelected = selectedAttestations.find(
-      (selectedAttestation: sdk.IAttestation) =>
-        attestation.signature === selectedAttestation.signature
+    const attestationSelected = selectedAttestedClaims.find(
+      (selectedAttestedClaim: sdk.IAttestedClaim) =>
+        attestedClaim.attestation.signature ===
+        selectedAttestedClaim.attestation.signature
     )
 
     if (checked && !attestationSelected) {
       this.setState({
-        selectedAttestations: [...selectedAttestations, attestation],
+        selectedAttestedClaims: [...selectedAttestedClaims, attestedClaim],
       })
     } else if (attestationSelected) {
       this.setState({
-        selectedAttestations: selectedAttestations.filter(
-          (selectedAttestation: sdk.IAttestation) =>
-            attestation.signature !== selectedAttestation.signature
+        selectedAttestedClaims: selectedAttestedClaims.filter(
+          (selectedAttestedClaim: sdk.IAttestedClaim) =>
+            attestedClaim.attestation.signature !==
+            selectedAttestedClaim.attestation.signature
         ),
       })
     }
@@ -193,7 +197,10 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
 
   private sendClaim() {
     const { onFinished, senderAddress } = this.props
-    const { selectedAttestations, selectedClaim } = this.state
+    const {
+      selectedAttestedClaims: selectedAttestations,
+      selectedClaim,
+    } = this.state
 
     if (
       !selectedClaim ||
@@ -208,10 +215,7 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
     })
 
     const request: SubmitClaimForCtype = {
-      content: {
-        attestations: selectedAttestations,
-        claim: selectedClaim.claim,
-      },
+      content: selectedAttestations,
       type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE,
     }
 

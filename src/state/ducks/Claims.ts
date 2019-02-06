@@ -8,34 +8,47 @@ import { MyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 
+function hash(claim: sdk.IClaim): string {
+  return sdk.Crypto.hashStr(JSON.stringify(claim))
+}
+
 interface SaveAction extends KiltAction {
-  payload: sdk.IClaim
+  payload: {
+    claimId: Entry['id']
+    claim: sdk.IClaim
+    meta: {
+      alias: string
+    }
+  }
 }
 
 interface RemoveAction extends KiltAction {
-  payload: string
+  payload: Entry['id']
 }
 
 interface AddAttestationAction extends KiltAction {
   payload: {
-    hash: sdk.IClaim['hash']
-    attestation: sdk.IAttestation
+    claimId: Entry['id']
+    attestation: sdk.IAttestedClaim
   }
 }
 
 interface UpdateAttestationAction extends KiltAction {
   payload: {
-    hash: sdk.IClaim['hash']
-    attestation: sdk.IAttestation
+    claimId: Entry['id']
+    attestation: sdk.IAttestedClaim
   }
 }
 
 type Action = SaveAction | RemoveAction | AddAttestationAction
 
 type Entry = {
-  // TODO: use interface instead of class
-  claim: sdk.Claim
-  attestations: sdk.IAttestation[]
+  id: string
+  claim: sdk.IClaim
+  attestations: sdk.IAttestedClaim[]
+  meta: {
+    alias: string
+  }
 }
 
 type State = {
@@ -45,7 +58,7 @@ type State = {
 type ImmutableState = Immutable.Record<State>
 
 type SerializedState = {
-  claims: Array<{ hash: string; claim: string }>
+  claims: Array<{ id: string; claim: string; meta: object }>
 }
 
 class Store {
@@ -61,7 +74,8 @@ class Store {
         return {
           attestations: JSON.stringify(claimEntry.attestations),
           claim: JSON.stringify(claimEntry.claim),
-          hash: claimEntry.claim.hash,
+          id: claimEntry.id,
+          meta: claimEntry.meta,
         }
       })
       .toArray()
@@ -84,14 +98,16 @@ class Store {
       const o = claimsStateSerialized.claims[i]
       try {
         const claim = JSON.parse(o.claim) as sdk.IClaim
-        const attestations: sdk.IAttestation[] = !!o.attestations
-          ? (JSON.parse(o.attestations) as sdk.IAttestation[])
+        const attestations: sdk.IAttestedClaim[] = !!o.attestations
+          ? (JSON.parse(o.attestations) as sdk.IAttestedClaim[])
           : []
         const entry = {
           attestations,
-          claim: sdk.Claim.fromObject(claim),
-        }
-        claims[o.hash] = entry
+          claim,
+          id: o.id,
+          meta: o.meta,
+        } as Entry
+        claims[o.id] = entry
       } catch (error) {
         errorService.log({
           error,
@@ -112,77 +128,94 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.SAVE_CLAIM: {
-        const claim = (action as SaveAction).payload
+        const { claimId, claim, meta } = (action as SaveAction).payload
 
-        return state.setIn(['claims', claim.hash], {
+        return state.setIn(['claims', claimId], {
           attestations: [],
           claim,
-        })
+          id: claimId,
+          meta,
+        } as Entry)
       }
       case Store.ACTIONS.REMOVE_CLAIM: {
         return state.deleteIn(['claims', (action as RemoveAction).payload])
       }
       case Store.ACTIONS.ADD_ATTESTATION: {
-        const { hash, attestation } = (action as AddAttestationAction).payload
+        const {
+          claimId,
+          attestation,
+        } = (action as AddAttestationAction).payload
 
-        let attestations = state.getIn(['claims', hash, 'attestations']) || []
+        let attestations =
+          state.getIn(['claims', claimId, 'attestations']) || []
         attestations = attestations.filter(
-          (_attestation: sdk.IAttestation) =>
-            _attestation.signature !== attestation.signature
+          (_attestation: sdk.IAttestedClaim) =>
+            _attestation.attestation.signature !==
+            attestation.attestation.signature
         )
 
         return state.setIn(
-          ['claims', hash, 'attestations'],
+          ['claims', claimId, 'attestations'],
           [...attestations, attestation]
         )
       }
       case Store.ACTIONS.UPDATE_ATTESTATION: {
-        const { hash, attestation } = (action as AddAttestationAction).payload
+        const {
+          claimId,
+          attestation,
+        } = (action as UpdateAttestationAction).payload
 
-        let attestations = state.getIn(['claims', hash, 'attestations']) || []
-        attestations = attestations.map((_attestation: sdk.IAttestation) => {
-          return _attestation.signature === attestation.signature
+        let attestations =
+          state.getIn(['claims', claimId, 'attestations']) || []
+        attestations = attestations.map((_attestation: sdk.IAttestedClaim) => {
+          return _attestation.attestation.signature ===
+            attestation.attestation.signature
             ? attestation
             : _attestation
         })
 
-        return state.setIn(['claims', hash, 'attestations'], [...attestations])
+        return state.setIn(
+          ['claims', claimId, 'attestations'],
+          [...attestations]
+        )
       }
       default:
         return state
     }
   }
 
-  public static saveAction(claim: sdk.IClaim): SaveAction {
+  public static saveAction(claim: sdk.IClaim, meta: Entry['meta']): SaveAction {
     return {
-      payload: claim,
+      payload: {
+        claim,
+        claimId: hash(claim),
+        meta,
+      },
       type: Store.ACTIONS.SAVE_CLAIM,
     }
   }
 
-  public static removeAction(hash: string): RemoveAction {
+  public static removeAction(claimId: Entry['id']): RemoveAction {
     return {
-      payload: hash,
+      payload: claimId,
       type: Store.ACTIONS.REMOVE_CLAIM,
     }
   }
 
   public static addAttestation(
-    hash: sdk.IClaim['hash'],
-    attestation: sdk.IAttestation
+    attestation: sdk.IAttestedClaim
   ): AddAttestationAction {
     return {
-      payload: { hash, attestation },
+      payload: { claimId: hash(attestation.request.claim), attestation },
       type: Store.ACTIONS.ADD_ATTESTATION,
     }
   }
 
   public static updateAttestation(
-    hash: sdk.IClaim['hash'],
-    attestation: sdk.IAttestation
+    attestation: sdk.IAttestedClaim
   ): UpdateAttestationAction {
     return {
-      payload: { hash, attestation },
+      payload: { claimId: hash(attestation.request.claim), attestation },
       type: Store.ACTIONS.UPDATE_ATTESTATION,
     }
   }
@@ -217,4 +250,4 @@ const getClaims = createSelector(
   }
 )
 
-export { Store, ImmutableState, SerializedState, Entry, Action, getClaims }
+export { Store, ImmutableState, SerializedState, Entry, Action, getClaims, hash }

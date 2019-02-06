@@ -56,15 +56,16 @@ class SelectClaims extends React.Component<Props, State> {
         const isApproved =
           claim.attestations &&
           claim.attestations.find(
-            (attestation: sdk.IAttestation) => !attestation.revoked
+            (attestedClaim: sdk.IAttestedClaim) =>
+              !attestedClaim.attestation.revoked
           )
         return {
           label: (
             <span className={isApproved ? 'attested' : 'revoked'}>
-              {claim.claim.alias}
+              {claim.meta.alias}
             </span>
           ),
-          value: claim.claim.hash,
+          value: claim.id,
         }
       }
     )
@@ -101,7 +102,7 @@ class SelectClaims extends React.Component<Props, State> {
     ).map((selectedOption: SelectOption) => selectedOption.value)
 
     const selectedClaims: Claims.Entry[] = claims.filter(
-      (claim: Claims.Entry) => _selectedOptions.indexOf(claim.claim.hash) !== -1
+      (claim: Claims.Entry) => _selectedOptions.indexOf(claim.id) !== -1
     )
     const { onChange } = this.props
     if (onChange) {

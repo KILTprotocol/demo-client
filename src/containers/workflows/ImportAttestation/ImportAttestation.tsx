@@ -1,16 +1,13 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
+
 import { notifySuccess } from '../../../services/FeedbackService'
 import * as Claims from '../../../state/ducks/Claims'
 
 type Props = {
-  attestation: sdk.IAttestation
-  addAttestationToClaim: (
-    hash: sdk.IClaim['hash'],
-    attestation: sdk.IAttestation
-  ) => void
-  claim: sdk.IClaim
+  addAttestationToClaim: (attestation: sdk.IAttestedClaim) => void
+  attestedClaim: sdk.IAttestedClaim
   onFinished?: () => void
 }
 
@@ -34,9 +31,9 @@ class ImportAttestation extends React.Component<Props, State> {
   }
 
   private importAttestation() {
-    const { addAttestationToClaim, attestation, claim, onFinished } = this.props
-    addAttestationToClaim(claim.hash, attestation)
-    notifySuccess('Attestation successfully imported')
+    const { addAttestationToClaim, attestedClaim, onFinished } = this.props
+    addAttestationToClaim(attestedClaim)
+    notifySuccess('Attested claim successfully imported.')
     if (onFinished) {
       onFinished()
     }
@@ -49,11 +46,8 @@ const mapStateToProps = () => {
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    addAttestationToClaim: (
-      hash: sdk.IClaim['hash'],
-      attestation: sdk.IAttestation
-    ) => {
-      dispatch(Claims.Store.addAttestation(hash, attestation))
+    addAttestationToClaim: (attestation: sdk.IAttestedClaim) => {
+      dispatch(Claims.Store.addAttestation(attestation))
     },
   }
 }

@@ -8,7 +8,7 @@ import './ClaimListView.scss'
 
 type Props = {
   claimStore: Claims.Entry[]
-  onRemoveClaim: (hash: string) => void
+  onRemoveClaim: (claimId: Claims.Entry['id']) => void
   onRequestAttestation: (hash: string) => void
 }
 
@@ -22,7 +22,6 @@ class ClaimListView extends React.Component<Props, State> {
 
   public render() {
     const { claimStore } = this.props
-
     return (
       <section className="ClaimListView">
         <h1>My Claims</h1>
@@ -38,10 +37,10 @@ class ClaimListView extends React.Component<Props, State> {
             </thead>
             <tbody>
               {claimStore.map(claimEntry => (
-                <tr key={claimEntry.claim.hash}>
+                <tr key={claimEntry.id}>
                   <td className="alias">
-                    <Link to={`/claim/${claimEntry.claim.hash}`}>
-                      {claimEntry.claim.alias}
+                    <Link to={`/claim/${claimEntry.id}`}>
+                      {claimEntry.meta.alias}
                     </Link>
                   </td>
                   <td className="content">
@@ -51,7 +50,8 @@ class ClaimListView extends React.Component<Props, State> {
                     className={
                       'status ' +
                       (claimEntry.attestations.find(
-                        (attestation: sdk.IAttestation) => !attestation.revoked
+                        (attestedClaim: sdk.IAttestedClaim) =>
+                          !attestedClaim.attestation.revoked
                       )
                         ? 'attested'
                         : 'revoked')
@@ -61,13 +61,13 @@ class ClaimListView extends React.Component<Props, State> {
                     <div className="actions">
                       <button
                         className="requestAttestation"
-                        onClick={this.requestAttestation(claimEntry.claim.hash)}
+                        onClick={this.requestAttestation(claimEntry.id)}
                       >
                         Get Attestation
                       </button>
                       <button
                         className="deleteClaim"
-                        onClick={this.handleDelete(claimEntry.claim.hash)}
+                        onClick={this.handleDelete(claimEntry.id)}
                       />
                     </div>
                   </td>
