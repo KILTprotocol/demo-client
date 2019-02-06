@@ -5,7 +5,7 @@ import { createSelector } from 'reselect'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 import { MyIdentity } from '../../types/Contact'
-import PersistentStore from '../PersistentStore'
+import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 
 interface SaveAction extends KiltAction {
@@ -201,7 +201,7 @@ class Store {
   }
 }
 
-const _getAllClaims = (state: any): Entry[] => {
+const _getAllClaims = (state: ReduxState): Entry[] => {
   return state.claims
     .get('claims')
     .toList()

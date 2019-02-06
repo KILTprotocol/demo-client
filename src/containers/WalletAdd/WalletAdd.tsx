@@ -206,7 +206,7 @@ class WalletAdd extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
+const mapStateToProps = () => {
   // TODO: empty block causes tslint warning, check how to handle this
   return {}
 }

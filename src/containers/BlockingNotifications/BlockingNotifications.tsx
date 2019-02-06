@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import * as UiState from '../../state/ducks/UiState'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { BlockingNotification, Notification } from '../../types/UserFeedback'
 
 import './BlockingNotifications.scss'
@@ -65,14 +66,8 @@ class BlockingNotifications extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { uiState: UiState.ImmutableState }) => {
-  return {
-    notifications: state.uiState
-      .get('blockingNotifications')
-      .toList()
-      .toArray()
-      .sort((a: Notification, b: Notification) => a.created - b.created),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  notifications: UiState.getBlockingNotifications(state),
+})
 
 export default connect(mapStateToProps)(BlockingNotifications)

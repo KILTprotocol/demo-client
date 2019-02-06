@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import * as UiState from '../../state/ducks/UiState'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { Notification, NotificationType } from '../../types/UserFeedback'
 
 import './Notifications.scss'
@@ -66,14 +67,8 @@ class Notifications extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { uiState: UiState.ImmutableState }) => {
-  return {
-    notifications: state.uiState
-      .get('notifications')
-      .toList()
-      .toArray()
-      .sort((a: Notification, b: Notification) => a.created - b.created),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  notifications: UiState.getNotifications(state),
+})
 
 export default connect(mapStateToProps)(Notifications)

@@ -6,6 +6,7 @@ import Select from 'react-select'
 import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 
 import * as Wallet from '../../state/ducks/Wallet'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 
 import './IdentitySelector.scss'
@@ -78,15 +79,10 @@ class IdentitySelector extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
-  return {
-    myIdentities: state.wallet
-      .get('identities')
-      .toList()
-      .toArray(),
-    selectedIdentity: state.wallet.get('selectedIdentity'),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  myIdentities: Wallet.getAllIdentities(state),
+  selectedIdentity: Wallet.getSelectedIdentity(state),
+})
 
 const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
   return {

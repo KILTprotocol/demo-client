@@ -6,21 +6,17 @@ import Loading from '../components/Loading/Loading'
 import NoIdentities from '../components/NoIdentities/NoIdentities'
 import NoSelectedIdentity from '../components/NoSelectedIdentity/NoSelectedIdentity'
 import * as Wallet from '../state/ducks/Wallet'
+import { State as ReduxState } from '../state/PersistentStore'
 
 type Props = {
   identities?: Wallet.Entry[]
   selectedIdentity?: Wallet.Entry
 }
 
-const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
-  return {
-    identities: state.wallet
-      .get('identities')
-      .toList()
-      .toArray(),
-    selectedIdentity: state.wallet.get('selectedIdentity'),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  identities: Wallet.getAllIdentities(state),
+  selectedIdentity: Wallet.getSelectedIdentity(state),
+})
 
 const requiresIdentity = (WrappedComponent: ComponentType) => {
   return connect(mapStateToProps)((props: Props) => {

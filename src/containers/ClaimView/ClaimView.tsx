@@ -13,6 +13,8 @@ import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
+import { State as ReduxState } from '../../state/PersistentStore'
+
 import { Contact } from '../../types/Contact'
 import { CType } from '../../types/Ctype'
 import { ClaimMessageBodyContent, MessageBodyType } from '../../types/Message'
@@ -249,11 +251,9 @@ class ClaimView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { claims: Claims.ImmutableState }) => {
-  return {
-    claimEntries: Claims.getClaims(state),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  claimEntries: Claims.getClaims(state),
+})
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {

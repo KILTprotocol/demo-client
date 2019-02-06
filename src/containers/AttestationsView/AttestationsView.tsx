@@ -6,6 +6,7 @@ import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 import attestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import * as Attestations from '../../state/ducks/Attestations'
+import { State as ReduxState } from '../../state/PersistentStore'
 
 import './AttestationsView.scss'
 
@@ -129,12 +130,8 @@ class AttestationsView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {
-  attestations: Attestations.ImmutableState
-}) => {
-  return {
-    attestations: Attestations.getAttestations(state),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  attestations: Attestations.getAttestations(state),
+})
 
 export default connect(mapStateToProps)(withRouter(AttestationsView))

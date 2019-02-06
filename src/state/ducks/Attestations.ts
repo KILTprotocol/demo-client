@@ -7,6 +7,7 @@ import { MyIdentity } from '../../types/Contact'
 import * as Wallet from './Wallet'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
+import { State as ReduxState } from '../PersistentStore'
 
 interface SaveAction extends KiltAction {
   payload: Entry
@@ -181,8 +182,11 @@ class Store {
   }
 }
 
-const _getAllAttestations = (state: any): Entry[] => {
-  return state.attestations.get('attestations').toList()
+const _getAllAttestations = (state: ReduxState): Entry[] => {
+  return state.attestations
+    .get('attestations')
+    .toList()
+    .toArray()
 }
 
 const getAttestations = createSelector(
