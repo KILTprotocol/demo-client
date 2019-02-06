@@ -11,10 +11,12 @@ class AttestationService {
   /**
    * Creates and stores an attestation for the given `claim` on the blockchain.
    *
-   * @param claim the claim to attest
-   * @returns the stored attestation in a promise
+   * @param requestForAttestation the request for attestation
+   * @returns the attestated claim (including the on-chain stored attestation) in a promise
    */
-  public async attestClaim(claim: sdk.IClaim): Promise<sdk.Attestation> {
+  public async attestClaim(
+    requestForAttestation: sdk.IRequestForAttestation
+  ): Promise<sdk.AttestedClaim> {
     const {
       selectedIdentity,
       blockchain,
@@ -25,14 +27,22 @@ class AttestationService {
     }
 
     const attestation: sdk.Attestation = new sdk.Attestation(
-      claim,
+      requestForAttestation,
       selectedIdentity
     )
 
-    return new Promise<sdk.Attestation>(async (resolve, reject) => {
+    const attestedClaim: sdk.AttestedClaim = new sdk.AttestedClaim(
+      requestForAttestation,
+      attestation
+    )
+    if (!attestedClaim.verifyData()) {
+      return Promise.reject(new Error('verification failed'))
+    }
+
+    return new Promise<sdk.AttestedClaim>(async (resolve, reject) => {
       attestation
         .store(blockchain, selectedIdentity, () => {
-          resolve(attestation)
+          resolve(attestedClaim)
         })
         .then((hash: any) => {
           // ignore
@@ -83,14 +93,11 @@ class AttestationService {
     })
   }
 
-  public async verifyAttestation(
-    iAttestation: sdk.Attestation
+  public async verifyAttestatedClaim(
+    attestedClaim: sdk.IAttestedClaim
   ): Promise<boolean> {
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    const attestation: sdk.Attestation = sdk.Attestation.fromObject(
-      iAttestation
-    )
-    return attestation.verify(blockchain)
+    return sdk.AttestedClaim.fromObject(attestedClaim).verify(blockchain)
   }
 
   public saveInStore(attestationEntry: Attestations.Entry): void {

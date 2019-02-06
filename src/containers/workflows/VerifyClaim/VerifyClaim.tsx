@@ -1,11 +1,11 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
-import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
+
+import AttestedClaimsListView from 'src/components/AttestedClaimsListView/AttestedClaimsListView'
 import attestationService from '../../../services/AttestationService'
 
 type Props = {
-  claim: sdk.IClaim
-  attestations: sdk.IAttestation[]
+  attestedClaims: sdk.IAttestedClaim[]
 }
 
 type State = {}
@@ -17,23 +17,19 @@ class VerifyClaim extends React.Component<Props, State> {
   }
 
   public render() {
-    const { claim, attestations } = this.props
-    const claimEntry = {
-      attestations,
-      claim: sdk.Claim.fromObject(claim),
-    }
+    const { attestedClaims } = this.props
     return (
-      <ClaimDetailView
-        claimEntry={claimEntry}
+      <AttestedClaimsListView
+        attestedClaims={attestedClaims}
         onVerifyAttestation={this.onVerifyAttestation}
       />
     )
   }
 
   private async onVerifyAttestation(
-    attestation: sdk.Attestation
+    attestation: sdk.IAttestedClaim
   ): Promise<boolean> {
-    return attestationService.verifyAttestation(attestation)
+    return attestationService.verifyAttestatedClaim(attestation)
   }
 }
 

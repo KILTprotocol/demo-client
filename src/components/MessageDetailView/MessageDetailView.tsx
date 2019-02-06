@@ -5,7 +5,6 @@ import {
   MessageBodyType,
   RequestClaimForCtype,
   RequestAttestationForClaim,
-  ClaimMessageBodyContent,
   ApproveAttestationForClaim,
   SubmitClaimForCtype,
 } from '../../types/Message'
@@ -82,13 +81,8 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <AttestClaim
             senderAddress={message.senderAddress}
-            claim={
-              ((message.body as RequestAttestationForClaim)
-                .content as ClaimMessageBodyContent).claim
-            }
-            ctypeName={
-              ((message.body as RequestAttestationForClaim)
-                .content as ClaimMessageBodyContent).cType.name
+            requestForAttestation={
+              (message.body as RequestAttestationForClaim).content
             }
             onFinished={this.handleDelete}
           />
@@ -96,20 +90,14 @@ class MessageDetailView extends React.Component<Props, State> {
       case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
         return (
           <ImportAttestation
-            claim={(message.body as ApproveAttestationForClaim).content.claim}
-            attestation={
-              (message.body as ApproveAttestationForClaim).content.attestation
-            }
+            attestedClaim={(message.body as ApproveAttestationForClaim).content}
             onFinished={this.handleDelete}
           />
         )
       case MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE:
         return (
           <VerifyClaim
-            claim={(message.body as SubmitClaimForCtype).content.claim}
-            attestations={
-              (message.body as SubmitClaimForCtype).content.attestations
-            }
+            attestedClaims={(message.body as SubmitClaimForCtype).content}
           />
         )
       default:
