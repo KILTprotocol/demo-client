@@ -71,7 +71,7 @@ class AttestationWorkflow {
         })
       )
         .then(() => {
-          notifySuccess('Attestation reqest sent.')
+          notifySuccess('Attestation request sent.')
           resolve()
         })
         .catch(error => {

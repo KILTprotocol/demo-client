@@ -16,7 +16,7 @@ import MessageRepository from '../../../services/MessageRepository'
 import * as Claims from '../../../state/ducks/Claims'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact } from '../../../types/Contact'
-import { CType } from '../../../types/Ctype'
+import { CType, CTypeImpl } from '../../../types/Ctype'
 import { MessageBodyType, SubmitClaimForCtype } from '../../../types/Message'
 import { BlockUi } from '../../../types/UserFeedback'
 
@@ -30,9 +30,10 @@ type Props = {
 }
 
 type State = {
-  ctype?: CType
+  ctype?: CTypeImpl
   selectedClaim?: Claims.Entry
   selectedAttestedClaims: sdk.IAttestedClaim[]
+  selectedClaimProperties: string[]
   workflowStarted: boolean
 }
 
@@ -43,6 +44,7 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
     super(props)
     this.state = {
       selectedAttestedClaims: [],
+      selectedClaimProperties: [],
       workflowStarted: false,
     }
 
@@ -55,12 +57,20 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
     const { ctypeKey } = this.props
 
     CtypeRepository.findByKey(ctypeKey).then((ctype: CType) => {
-      this.setState({ ctype })
+      this.setState({ ctype: CTypeImpl.fromObject(ctype) })
     })
   }
 
   public render() {
-    const { workflowStarted } = this.state
+    const {
+      workflowStarted,
+      selectedAttestedClaims,
+      selectedClaimProperties: selectedProperties,
+    } = this.state
+    const canFinalize: boolean =
+      !selectedAttestedClaims ||
+      !selectedAttestedClaims.length ||
+      selectedProperties.length === 0
     return (
       <section className="ChooseClaimForCtype">
         {!workflowStarted && (
@@ -72,6 +82,14 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
         )}
         {workflowStarted && this.getClaimSelect()}
         {workflowStarted && this.getAttestionsSelect()}
+        {workflowStarted && this.getClaimPropertySelect()}
+        {workflowStarted && (
+          <div className="actions">
+            <button disabled={canFinalize} onClick={this.sendClaim}>
+              Send Claim & Attestations
+            </button>
+          </div>
+        )}
       </section>
     )
   }
@@ -150,14 +168,6 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
             </label>
           ))}
         </div>
-        <div className="actions">
-          <button
-            disabled={!selectedAttestations || !selectedAttestations.length}
-            onClick={this.sendClaim}
-          >
-            Send Claim & Attestations
-          </button>
-        </div>
       </React.Fragment>
     ) : (
       <div className="no-attestations">
@@ -165,6 +175,37 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
         <Link to={`/claim/${selectedClaim.id}`}>Request attestation</Link>
       </div>
     )
+  }
+
+  private getClaimPropertySelect() {
+    const { selectedClaim } = this.state
+    const propertyNames: string[] = selectedClaim
+      ? Object.keys(selectedClaim.claim.contents)
+      : []
+    return propertyNames.length > 0 && selectedClaim ? (
+      <div className="properties">
+        <h4>Select properties to include in Claim</h4>
+        {propertyNames.map((propertyName: string) => {
+          const propertyTitle = this.getCtypePropertyTitle(propertyName)
+          return (
+            <label key={propertyName}>
+              <input
+                type="checkbox"
+                onChange={this.selectClaimProperty.bind(this, propertyName)}
+              />
+              <span>{propertyTitle}</span>
+            </label>
+          )
+        })}
+      </div>
+    ) : (
+      ''
+    )
+  }
+
+  private getCtypePropertyTitle(propertyName: string): string {
+    const { ctype } = this.state
+    return ctype ? ctype.getPropertyTitle(propertyName) : propertyName
   }
 
   private selectAttestation(
@@ -195,6 +236,41 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
     }
   }
 
+  private selectClaimProperty(
+    propertyName: string,
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    const { checked } = event.target
+    let { selectedClaimProperties: selectedProperties } = this.state
+
+    if (checked) {
+      selectedProperties.push(propertyName)
+    } else {
+      selectedProperties = selectedProperties.filter(
+        (_propertyName: string) => {
+          return _propertyName !== propertyName
+        }
+      )
+    }
+    this.setState({
+      selectedClaimProperties: selectedProperties,
+    })
+  }
+
+  private getExcludedProperties(): string[] {
+    const {
+      selectedClaim,
+      selectedClaimProperties: selectedProperties,
+    } = this.state
+    return selectedClaim
+      ? Object.keys(selectedClaim.claim.contents).filter(
+          (propertyName: string) => {
+            return !selectedProperties.includes(propertyName)
+          }
+        )
+      : []
+  }
+
   private sendClaim() {
     const { onFinished, senderAddress } = this.props
     const {
@@ -215,9 +291,17 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
     })
 
     const request: SubmitClaimForCtype = {
-      content: selectedAttestations,
+      content: selectedAttestations.map(
+        (selectedAttestedClaim: sdk.IAttestedClaim) => {
+          return sdk.AttestedClaim.fromObject(
+            selectedAttestedClaim
+          ).createPresentation(this.getExcludedProperties())
+        }
+      ),
       type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE,
     }
+
+    console.log('request', JSON.stringify(request))
 
     contactRepository.findAll().then(() => {
       const receiver: Contact | undefined = contactRepository.findByAddress(
