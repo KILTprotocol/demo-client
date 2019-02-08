@@ -124,7 +124,9 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
 
   private selectClaim(claims: Claims.Entry[]) {
     this.setState({
+      selectedAttestedClaims: [],
       selectedClaim: claims[0],
+      selectedClaimProperties: [],
     })
   }
 
@@ -178,7 +180,7 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   }
 
   private getClaimPropertySelect() {
-    const { selectedClaim } = this.state
+    const { selectedClaim, selectedClaimProperties } = this.state
     const propertyNames: string[] = selectedClaim
       ? Object.keys(selectedClaim.claim.contents)
       : []
@@ -190,6 +192,7 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
           return (
             <label key={propertyName}>
               <input
+                checked={selectedClaimProperties.includes(propertyName)}
                 type="checkbox"
                 onChange={this.selectClaimProperty.bind(this, propertyName)}
               />

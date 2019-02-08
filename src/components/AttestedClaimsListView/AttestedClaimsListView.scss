@@ -1,4 +1,12 @@
 .AttestedClaimsListView {
+  
+  & .attributes {
+    @include card;
+
+    & > div {
+      @include label_input_combo;
+    }
+  }
 
   & .attestations {
     @include card;
