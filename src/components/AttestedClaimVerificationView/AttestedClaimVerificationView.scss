@@ -32,7 +32,7 @@
     width: 20%;
     text-align: left;
 
-    &.revoked {
+    &.unverified {
 
       &:before {
         @include icon($icon-times);
@@ -41,7 +41,7 @@
       }
     }
 
-    &.approved {
+    &.verified {
 
       &:before {
         @include icon($icon-check);
