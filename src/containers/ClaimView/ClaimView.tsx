@@ -8,26 +8,19 @@ import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 import SelectAttesters from '../../components/SelectAttesters/SelectAttesters'
 import attestationService from '../../services/AttestationService'
-import CtypeRepository from '../../services/CtypeRepository'
+import attestationWorkflow from '../../services/AttestationWorkflow'
 import errorService from '../../services/ErrorService'
-import { notifySuccess } from '../../services/FeedbackService'
-import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
 
 import { Contact } from '../../types/Contact'
-import { CType } from '../../types/Ctype'
-import { ClaimMessageBodyContent, MessageBodyType } from '../../types/Message'
 
 import './ClaimView.scss'
 
-type Props = RouteComponentProps<{ hash: string }> & {
+type Props = RouteComponentProps<{ claimId: Claims.Entry['id'] }> & {
   claimEntries: Claims.Entry[]
-  removeClaim: (hash: sdk.IClaim['hash']) => void
-  updateAttestation: (
-    hash: sdk.IClaim['hash'],
-    attestation: sdk.Attestation
-  ) => void
+  removeClaim: (claimId: Claims.Entry['id']) => void
+  updateAttestation: (attestation: sdk.IAttestedClaim) => void
 }
 
 type State = {
@@ -38,7 +31,7 @@ type State = {
 class ClaimView extends React.Component<Props, State> {
   public selectedAttesters: Contact[] = []
   private selectAttestersModal: Modal | null
-  private claimHashToAttest: string
+  private claimIdToAttest: Claims.Entry['id']
 
   constructor(props: Props) {
     super(props)
@@ -46,35 +39,38 @@ class ClaimView extends React.Component<Props, State> {
       isSelectAttestersOpen: false,
     }
     this.deleteClaim = this.deleteClaim.bind(this)
-    this.onRequestAttestation = this.onRequestAttestation.bind(this)
-    this.onCancelRequestAttestation = this.onCancelRequestAttestation.bind(this)
-    this.onFinishRequestAttestation = this.onFinishRequestAttestation.bind(this)
+    this.showAttesterSelectionModal = this.showAttesterSelectionModal.bind(this)
+    this.hideAttersterSelectionModal = this.hideAttersterSelectionModal.bind(
+      this
+    )
+    this.requestAttestationForClaim = this.requestAttestationForClaim.bind(this)
     this.onSelectAttesters = this.onSelectAttesters.bind(this)
     this.setSelectAttestersOpen = this.setSelectAttestersOpen.bind(this)
     this.onVerifyAttestation = this.onVerifyAttestation.bind(this)
   }
 
   public componentDidMount() {
-    const { hash } = this.props.match.params
+    const { claimId } = this.props.match.params
     if (this.isDetailView()) {
-      this.getCurrentClaimEntry(hash)
+      this.getCurrentClaimEntry(claimId)
     }
   }
 
   public componentDidUpdate() {
-    const { hash } = this.props.match.params
+    const { claimId } = this.props.match.params
     if (this.isDetailView()) {
-      this.getCurrentClaimEntry(hash)
+      this.getCurrentClaimEntry(claimId)
     }
   }
 
   public render() {
-    const { hash } = this.props.match.params
+    const { claimId } = this.props.match.params
     const { claimEntries } = this.props
     const { currentClaimEntry, isSelectAttestersOpen } = this.state
 
     const validCurrentClaimEntry =
-      hash && currentClaimEntry && currentClaimEntry !== 'notFoundInList'
+      claimId && currentClaimEntry && currentClaimEntry !== 'notFoundInList'
+
     return (
       <section className="ClaimView">
         {validCurrentClaimEntry && (
@@ -82,7 +78,7 @@ class ClaimView extends React.Component<Props, State> {
             cancelable={true}
             claimEntry={currentClaimEntry as Claims.Entry}
             onRemoveClaim={this.deleteClaim}
-            onRequestAttestation={this.onRequestAttestation}
+            onRequestAttestation={this.showAttesterSelectionModal}
             onVerifyAttestation={this.onVerifyAttestation}
           />
         )}
@@ -90,7 +86,7 @@ class ClaimView extends React.Component<Props, State> {
           <ClaimListView
             claimStore={claimEntries}
             onRemoveClaim={this.deleteClaim}
-            onRequestAttestation={this.onRequestAttestation}
+            onRequestAttestation={this.showAttesterSelectionModal}
           />
         )}
         <Modal
@@ -99,8 +95,8 @@ class ClaimView extends React.Component<Props, State> {
           }}
           type={ModalType.CONFIRM}
           header="Select Attester(s):"
-          onCancel={this.onCancelRequestAttestation}
-          onConfirm={this.onFinishRequestAttestation}
+          onCancel={this.hideAttersterSelectionModal}
+          onConfirm={this.requestAttestationForClaim}
           catchBackdropClick={isSelectAttestersOpen}
         >
           {this.getSelectAttesters()}
@@ -111,16 +107,16 @@ class ClaimView extends React.Component<Props, State> {
 
   private isDetailView() {
     const { claimEntries } = this.props
-    const { hash } = this.props.match.params
+    const { claimId } = this.props.match.params
     const { currentClaimEntry } = this.state
-    return claimEntries && claimEntries.length && !currentClaimEntry && hash
+    return claimEntries && claimEntries.length && !currentClaimEntry && claimId
   }
 
   private getCurrentClaimEntry(hash: string) {
     const { claimEntries } = this.props
 
     const currentClaimEntry = claimEntries.find(
-      (claimEntry: Claims.Entry) => claimEntry.claim.hash === hash
+      (claimEntry: Claims.Entry) => claimEntry.id === hash
     )
 
     if (!currentClaimEntry) {
@@ -137,9 +133,9 @@ class ClaimView extends React.Component<Props, State> {
     }
   }
 
-  private deleteClaim(hash: string) {
+  private deleteClaim(claimId: Claims.Entry['id']) {
     const { removeClaim } = this.props
-    removeClaim(hash)
+    removeClaim(claimId)
     this.props.history.push('/claim')
   }
 
@@ -169,84 +165,45 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   private async onVerifyAttestation(
-    attestation: sdk.Attestation
+    attestedClaim: sdk.IAttestedClaim
   ): Promise<boolean> {
     const { updateAttestation } = this.props
     const { currentClaimEntry } = this.state
     return attestationService
-      .verifyAttestation(attestation)
+      .verifyAttestatedClaim(attestedClaim)
       .then((verified: boolean) => {
-        if (
-          currentClaimEntry &&
-          currentClaimEntry !== 'notFoundInList' &&
-          attestation.revoked === verified
-        ) {
+        if (currentClaimEntry && currentClaimEntry !== 'notFoundInList') {
           updateAttestation(
-            currentClaimEntry.claim.hash,
-            Object.assign(attestation, { revoked: !verified })
+            Object.assign(attestedClaim, { revoked: !verified })
           )
         }
         return verified
       })
   }
 
-  private onRequestAttestation(hash: string) {
-    this.claimHashToAttest = hash
+  private showAttesterSelectionModal(claimId: Claims.Entry['id']) {
+    this.claimIdToAttest = claimId
     if (this.selectAttestersModal) {
       this.selectAttestersModal.show()
     }
   }
 
-  private onCancelRequestAttestation() {
+  private hideAttersterSelectionModal() {
     this.selectedAttesters = []
   }
 
-  private onFinishRequestAttestation() {
+  private requestAttestationForClaim() {
     const { claimEntries } = this.props
 
     const claimToAttest = claimEntries.find(
-      (claimEntry: Claims.Entry) =>
-        claimEntry.claim.hash === this.claimHashToAttest
+      (claimEntry: Claims.Entry) => claimEntry.id === this.claimIdToAttest
     )
-
     if (claimToAttest) {
       const { claim } = claimToAttest
-      CtypeRepository.findByKey(claim.ctype)
-        .then((ctypeFromRepository: CType) => {
-          const content = {
-            cType: {
-              name: ctypeFromRepository.name,
-            },
-            claim,
-          } as ClaimMessageBodyContent
-          this.selectedAttesters.forEach((attester: Contact) => {
-            MessageRepository.send(attester, {
-              content,
-              type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
-            })
-              .then(() => {
-                notifySuccess('Request for attestation successfully sent.')
-              })
-              .catch(error => {
-                errorService.log({
-                  error,
-                  message: `Could not send message ${
-                    MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
-                  } to ${attester.metaData.name}`,
-                  origin: 'ClaimView.componentDidMount()',
-                  type: 'ERROR.FETCH.GET',
-                })
-              })
-          })
-        })
-        .catch(error => {
-          errorService.log({
-            error,
-            message: 'Error fetching CTYPE',
-            origin: 'MessageView.onFinishRequestAttestation()',
-            type: 'ERROR.FETCH.GET',
-          })
-        })
+      attestationWorkflow.requestAttestationForClaim(
+        claim,
+        this.selectedAttesters
+      )
     }
   }
 }
@@ -257,14 +214,11 @@ const mapStateToProps = (state: ReduxState) => ({
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    removeClaim: (hash: sdk.IClaim['hash']) => {
-      dispatch(Claims.Store.removeAction(hash))
+    removeClaim: (claimId: Claims.Entry['id']) => {
+      dispatch(Claims.Store.removeAction(claimId))
     },
-    updateAttestation: (
-      hash: sdk.IClaim['hash'],
-      attestation: sdk.Attestation
-    ) => {
-      dispatch(Claims.Store.updateAttestation(hash, attestation))
+    updateAttestation: (attestation: sdk.IAttestedClaim) => {
+      dispatch(Claims.Store.updateAttestation(attestation))
     },
   }
 }

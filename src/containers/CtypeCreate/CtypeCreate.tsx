@@ -10,7 +10,7 @@ import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { CType } from '../../types/Ctype'
+import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './CtypeCreate.scss'
@@ -89,7 +89,7 @@ class CtypeCreate extends React.Component<Props, State> {
           blockUi.updateMessage(
             `CTYPE stored on block chain,\nnow registering CTYPE (3/3)`
           )
-          const ctypeWrapper: CType = {
+          const ctypeWrapper: ICType = {
             author: authorAlias,
             definition: JSON.stringify(ctype.getModel()),
             key: ctype.getModel().hash,

@@ -1,16 +1,11 @@
 import * as React from 'react'
-
 import {
-  ApproveAttestationForClaim,
   Message,
   MessageBodyType,
   MessageOutput,
-  RequestAttestationForClaim,
   RequestClaimForCtype,
-  SubmitClaimForCtype,
 } from '../../types/Message'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
-
 import './MessageListView.scss'
 
 type Props = {
@@ -46,7 +41,7 @@ class MessageListView extends React.Component<Props, State> {
                 <tr key={message.messageId}>
                   <td className="sender">
                     {message.sender ? (
-                      <KiltIdenticon contact={message.sender} size={24} />
+                      <KiltIdenticon contact={message.sender} />
                     ) : (
                       message.senderAddress
                     )}
@@ -97,17 +92,10 @@ class MessageListView extends React.Component<Props, State> {
           additionalInfo = (message.body as RequestClaimForCtype).content.name
           break
         case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
-          additionalInfo = (message.body as RequestAttestationForClaim).content
-            .claim.alias
-          // TODO: add ctype.name
           break
         case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
-          additionalInfo = (message.body as ApproveAttestationForClaim).content
-            .claim.owner
           break
         case MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE:
-          additionalInfo = (message.body as SubmitClaimForCtype).content.claim
-            .alias
           break
       }
     } catch (error) {

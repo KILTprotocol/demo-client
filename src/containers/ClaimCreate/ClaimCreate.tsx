@@ -19,7 +19,7 @@ import './ClaimCreate.scss'
 type Props = RouteComponentProps<{
   ctypeKey: string
 }> & {
-  saveClaim: (claim: sdk.IClaim) => void
+  saveClaim: (claim: sdk.IClaim, meta: { alias: string }) => void
   selectedIdentity?: Wallet.Entry
 }
 
@@ -140,13 +140,12 @@ class ClaimCreate extends Component<Props, State> {
 
     if (ctype && selectedIdentity) {
       const newClaim: sdk.Claim = new sdk.Claim(
-        name,
         ctype,
         claim,
         selectedIdentity.identity
       )
-      saveClaim(newClaim)
-      notifySuccess(`Claim ${newClaim.alias} successfully created.`)
+      saveClaim(newClaim, { alias: name })
+      notifySuccess(`Claim ${name} successfully created.`)
       history.push('/claim')
     }
   }
@@ -162,8 +161,8 @@ const mapStateToProps = (state: ReduxState) => ({
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
-    saveClaim: (claim: sdk.IClaim) => {
-      dispatch(Claims.Store.saveAction(claim))
+    saveClaim: (claim: sdk.IClaim, meta: { alias: string }) => {
+      dispatch(Claims.Store.saveAction(claim, meta))
     },
   }
 }
