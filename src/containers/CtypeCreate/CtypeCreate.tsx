@@ -9,6 +9,7 @@ import ctypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { CType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 
@@ -160,10 +161,8 @@ class CtypeCreate extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
-  return {
-    selectedIdentity: state.wallet.get('selectedIdentity'),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  selectedIdentity: Wallet.getSelectedIdentity(state),
+})
 
 export default connect(mapStateToProps)(withRouter(CtypeCreate))

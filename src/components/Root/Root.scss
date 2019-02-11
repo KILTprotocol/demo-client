@@ -62,11 +62,15 @@
         }
       }
 
+      &[class=" "] {
+        display: none;
+      }
+
       $icons: (wallet: 'Wallet', ctype: 'Ctype', claim: 'Claim', chain-stats: 'Settings', contacts: 'Contact', messages: 'Message');
 
       @each $class, $icon in $icons {
 
-        @if($icon != ''){
+        @if ($icon != '') {
 
           &.#{$class} {
 

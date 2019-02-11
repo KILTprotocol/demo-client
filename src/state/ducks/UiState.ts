@@ -1,10 +1,13 @@
 import Immutable from 'immutable'
+import { createSelector } from 'reselect'
+
 import KiltAction from '../../types/Action'
 import {
   BlockingNotification,
   BlockUi,
   Notification,
 } from '../../types/UserFeedback'
+import { State as ReduxState } from '../PersistentStore'
 
 /**
  * Notifications
@@ -211,4 +214,48 @@ class Store {
   }
 }
 
-export { Store, ImmutableState, SerializedState, Action }
+const _getNotifications = (state: ReduxState): Notification[] =>
+  state.uiState
+    .get('notifications')
+    .toList()
+    .toArray()
+    .sort((a: Notification, b: Notification) => a.created - b.created)
+
+const getNotifications = createSelector(
+  [_getNotifications],
+  (notifications: Notification[]) => notifications
+)
+
+const _getBlockUis = (state: ReduxState): BlockUi[] =>
+  state.uiState
+    .get('blockUis')
+    .toList()
+    .toArray()
+    .sort((a: BlockUi, b: BlockUi) => a.created - b.created)
+
+const getBlockUis = createSelector(
+  [_getBlockUis],
+  (blockUis: BlockUi[]) => blockUis
+)
+
+const _getBlockingNotifications = (state: ReduxState): BlockingNotification[] =>
+  state.uiState
+    .get('blockingNotifications')
+    .toList()
+    .toArray()
+    .sort((a: Notification, b: Notification) => a.created - b.created)
+
+const getBlockingNotifications = createSelector(
+  [_getBlockingNotifications],
+  (blockingNotifications: BlockingNotification[]) => blockingNotifications
+)
+
+export {
+  Store,
+  ImmutableState,
+  SerializedState,
+  Action,
+  getNotifications,
+  getBlockUis,
+  getBlockingNotifications,
+}

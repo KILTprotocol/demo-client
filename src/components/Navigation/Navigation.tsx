@@ -11,10 +11,10 @@ const links: NavLink[] = [
   { url: 'wallet', label: 'Wallet' },
   { url: 'ctype', label: 'CTYPEs' },
   { url: 'claim', label: 'Claims' },
-  { url: 'attestations', label: 'Manage Attestations' },
-  { url: 'chain-stats', label: 'Chain stats' },
+  { url: 'attestations', label: 'Attestations' },
   { url: 'contacts', label: 'Contacts' },
   { url: 'messages', label: 'Messages' },
+  { url: 'chain-stats', label: 'Chain stats' },
   { url: 'testUserFeedback', label: 'Test User Feedback' },
 ]
 

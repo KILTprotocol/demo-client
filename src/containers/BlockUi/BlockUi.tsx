@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import * as UiState from '../../state/ducks/UiState'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { BlockUi as IBlockUi } from '../../types/UserFeedback'
 
 import './BlockUi.scss'
@@ -46,14 +47,8 @@ class BlockUi extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { uiState: UiState.ImmutableState }) => {
-  return {
-    blockUis: state.uiState
-      .get('blockUis')
-      .toList()
-      .toArray()
-      .sort((a: IBlockUi, b: IBlockUi) => a.created - b.created),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  blockUis: UiState.getBlockUis(state),
+})
 
 export default connect(mapStateToProps)(BlockUi)

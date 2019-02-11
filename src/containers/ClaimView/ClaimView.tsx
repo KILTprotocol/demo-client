@@ -1,8 +1,8 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
 
+import { RouteComponentProps, withRouter } from 'react-router'
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
@@ -13,6 +13,8 @@ import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
+import { State as ReduxState } from '../../state/PersistentStore'
+
 import { Contact } from '../../types/Contact'
 import { CType } from '../../types/Ctype'
 import { ClaimMessageBodyContent, MessageBodyType } from '../../types/Message'
@@ -249,14 +251,9 @@ class ClaimView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { claims: Claims.ImmutableState }) => {
-  return {
-    claimEntries: state.claims
-      .get('claims')
-      .toList()
-      .toArray(),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  claimEntries: Claims.getClaims(state),
+})
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {

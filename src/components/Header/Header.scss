@@ -170,6 +170,11 @@
           }
         }
       }
+
+      & .testUserFeedback,
+      & .chain-stats {
+        display: none;
+      }
     }
   }
 }

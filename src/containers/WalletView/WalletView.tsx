@@ -6,6 +6,7 @@ import IdentityView from '../../components/IdentityView/IdentityView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import * as Wallet from '../../state/ducks/Wallet'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 
 import './WalletView.scss'
@@ -110,15 +111,10 @@ class WalletView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
-  return {
-    identities: state.wallet
-      .get('identities')
-      .toList()
-      .toArray(),
-    selectedIdentity: state.wallet.get('selectedIdentity'),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  identities: Wallet.getAllIdentities(state),
+  selectedIdentity: Wallet.getSelectedIdentity(state),
+})
 
 const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
   return {

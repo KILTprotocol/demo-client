@@ -1,11 +1,12 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import moment from 'moment'
 
-import * as Attestations from '../state/ducks/Attestations'
 import persistentStore from '../state/PersistentStore'
 import BlockchainService from './BlockchainService'
+import * as Attestations from '../state/ducks/Attestations'
 import errorService from './ErrorService'
 import { notifySuccess } from './FeedbackService'
+import * as Wallet from '../state/ducks/Wallet'
 
 class AttestationService {
   /**
@@ -111,7 +112,9 @@ class AttestationService {
     blockchain: sdk.Blockchain
     selectedIdentity: sdk.Identity
   }> {
-    const selectedIdentity: sdk.Identity = persistentStore.getSelectedIdentity()
+    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
+      persistentStore.store.getState()
+    ).identity
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
     return {
       blockchain,

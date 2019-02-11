@@ -11,6 +11,7 @@ import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './ClaimCreate.scss'
@@ -155,11 +156,9 @@ class ClaimCreate extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
-  return {
-    selectedIdentity: state.wallet.get('selectedIdentity'),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  selectedIdentity: Wallet.getSelectedIdentity(state),
+})
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {

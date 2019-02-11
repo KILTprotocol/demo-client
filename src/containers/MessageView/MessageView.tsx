@@ -9,6 +9,7 @@ import errorService from '../../services/ErrorService'
 import FeedbackService from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { Message, MessageOutput } from '../../types/Message'
 import {
   BlockingNotification,
@@ -180,10 +181,8 @@ class MessageView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: { wallet: Wallet.ImmutableState }) => {
-  return {
-    selectedIdentity: state.wallet.get('selectedIdentity'),
-  }
-}
+const mapStateToProps = (state: ReduxState) => ({
+  selectedIdentity: Wallet.getSelectedIdentity(state),
+})
 
 export default connect(mapStateToProps)(MessageView)
