@@ -5,15 +5,15 @@ import CtypeDetailView from '../../components/CtypeDetailView/CtypeDetailView'
 import CtypeListView from '../../components/CtypeListView/CtypeListView'
 import CtypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
-import { CType } from '../../types/Ctype'
+import { ICType } from '../../types/Ctype'
 
 import './CtypeView.scss'
 
 type Props = RouteComponentProps<{ ctypeKey: string }> & {}
 
 type State = {
-  ctypes: CType[]
-  currentCtype?: CType | 'notFoundInList'
+  ctypes: ICType[]
+  currentCtype?: ICType | 'notFoundInList'
 }
 
 class CtypeView extends React.Component<Props, State> {
@@ -26,7 +26,7 @@ class CtypeView extends React.Component<Props, State> {
 
   public componentDidMount() {
     CtypeRepository.findAll()
-      .then((ctypes: CType[]) => {
+      .then((ctypes: ICType[]) => {
         this.setState({ ctypes })
       })
       .catch(error => {
@@ -55,7 +55,9 @@ class CtypeView extends React.Component<Props, State> {
     return (
       <section className="CtypeView">
         <h1>CTYPES</h1>
-        {validCurrentCtype && <CtypeDetailView ctype={currentCtype as CType} />}
+        {validCurrentCtype && (
+          <CtypeDetailView ctype={currentCtype as ICType} />
+        )}
         {!validCurrentCtype && <CtypeListView ctypes={ctypes} />}
       </section>
     )
@@ -64,7 +66,7 @@ class CtypeView extends React.Component<Props, State> {
   private getCurrentCtype(ctypeKey: string) {
     const { ctypes } = this.state
 
-    const currentCtype = ctypes.find((ctype: CType) => ctype.key === ctypeKey)
+    const currentCtype = ctypes.find((ctype: ICType) => ctype.key === ctypeKey)
 
     if (!currentCtype) {
       const message = `Could not get CTYPE with key '${ctypeKey}' from local list of CTYPEs`

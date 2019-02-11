@@ -75,8 +75,7 @@ class MessageView extends React.Component<Props, State> {
             header={
               currentMessage.sender ? (
                 <div className="header-KiltIdenticon">
-                  Message from{' '}
-                  <KiltIdenticon contact={currentMessage.sender} size={24} />
+                  Message from <KiltIdenticon contact={currentMessage.sender} />
                 </div>
               ) : (
                 `Message from ${currentMessage.senderAddress}`

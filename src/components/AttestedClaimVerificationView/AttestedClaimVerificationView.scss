@@ -1,0 +1,57 @@
+.AttestedClaimVerificationView {
+  
+  @include card;
+  padding: $base-padding;
+
+  & header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: {
+      bottom: $base-padding;
+    }
+  }
+
+  & h3 {
+    margin: 0;
+  }
+
+  & .attributes {
+    & > div {
+      @include label_input_combo;
+    }
+  }
+
+  & .attesterName {
+    width: 60%;
+  }
+
+  & .status {
+    height: 30px;
+    width: 20%;
+    text-align: left;
+
+    &.revoked {
+
+      &:before {
+        @include icon($icon-times);
+
+        color: $color-danger;
+      }
+    }
+
+    &.approved {
+
+      &:before {
+        @include icon($icon-check);
+
+        color: $color-success;
+      }
+    }
+  }
+
+  & .refresh {
+    @include button-icon-only($icon-refresh);
+  }
+}

@@ -2,13 +2,13 @@ import * as React from 'react'
 
 import contactRepository from '../../services/ContactRepository'
 import { Contact } from '../../types/Contact'
-import { CType } from '../../types/Ctype'
+import { ICType } from '../../types/Ctype'
 import SelectContacts from '../SelectContact/SelectContact'
 
 type Props = {
   closeMenuOnSelect?: boolean
   isMulti?: boolean
-  ctypes?: CType[]
+  ctypes?: ICType[]
   onChange?: (selectedAttesters: Contact[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void

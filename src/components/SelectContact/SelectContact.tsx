@@ -56,7 +56,7 @@ class SelectContacts extends React.Component<Props, State> {
 
     const options: SelectOption[] = contacts.map(
       (contact: Contact): SelectOption => ({
-        label: <KiltIdenticon contact={contact} size={24} />,
+        label: <KiltIdenticon contact={contact} />,
         value: contact.publicIdentity.address,
       })
     )

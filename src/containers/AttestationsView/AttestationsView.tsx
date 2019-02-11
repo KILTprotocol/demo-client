@@ -58,7 +58,6 @@ class AttestationsView extends React.Component<Props, State> {
                       contact={ContactRepository.findByAddress(
                         attestation.claimerAddress
                       )}
-                      size={24}
                     />
                   ) : (
                     attestation.claimerAlias

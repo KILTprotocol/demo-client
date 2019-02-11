@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import { Contact } from './Contact'
 
-import { CType } from './Ctype'
+import { ICType } from './Ctype'
 
 export interface Message {
   body?: MessageBody
@@ -17,6 +17,8 @@ export interface MessageOutput extends Message {
 }
 
 export enum MessageBodyType {
+  REQUEST_LEGITIMATIONS_FOR_CLAIM_ATTESTATION = 'request-legitimation-for-claim-attestation',
+  SUBMIT_LEGITIMATIONS_FOR_CLAIM_ATTESTATION = 'submit-legitimation-for-claim-attestation',
   REQUEST_ATTESTATION_FOR_CLAIM = 'request-attestation-for-claim',
   APPROVE_ATTESTATION_FOR_CLAIM = 'approve-attestation-for-claim',
   REQUEST_CLAIM_FOR_CTYPE = 'request-claim-for-ctype',
@@ -28,38 +30,45 @@ interface MessageBodyBase {
   type: MessageBodyType
 }
 
+export interface RequestLegitimationsForClaimAttestation
+  extends MessageBodyBase {
+  content: sdk.IClaim
+  type: MessageBodyType.REQUEST_LEGITIMATIONS_FOR_CLAIM_ATTESTATION
+}
+
+export interface SubmitLegitimationsForClaimAttestation
+  extends MessageBodyBase {
+  content: {
+    claim: sdk.IClaim
+    legitimations: sdk.IAttestedClaim[]
+  }
+  type: MessageBodyType.SUBMIT_LEGITIMATIONS_FOR_CLAIM_ATTESTATION
+}
+
 export interface RequestAttestationForClaim extends MessageBodyBase {
-  content: ClaimMessageBodyContent
+  content: sdk.IRequestForAttestation
   type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
 }
 
 export interface ApproveAttestationForClaim extends MessageBodyBase {
-  content: {
-    claim: sdk.IClaim
-    attestation: sdk.IAttestation
-  }
+  content: sdk.IAttestedClaim
   type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM
 }
 
 export interface RequestClaimForCtype extends MessageBodyBase {
-  content: CType
+  content: ICType
   type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE
 }
 
 export interface SubmitClaimForCtype extends MessageBodyBase {
-  content: { claim: sdk.IClaim; attestations: sdk.IAttestation[] }
+  content: sdk.IAttestedClaim[]
   type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE
 }
 
 export type MessageBody =
+  | RequestLegitimationsForClaimAttestation
+  | SubmitLegitimationsForClaimAttestation
   | RequestAttestationForClaim
   | ApproveAttestationForClaim
   | RequestClaimForCtype
   | SubmitClaimForCtype
-
-export interface ClaimMessageBodyContent {
-  claim: sdk.IClaim
-  cType: {
-    name: string
-  }
-}

@@ -16,7 +16,7 @@ import MessageRepository from '../../../services/MessageRepository'
 import * as Claims from '../../../state/ducks/Claims'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact } from '../../../types/Contact'
-import { CType } from '../../../types/Ctype'
+import { ICType, CType } from '../../../types/Ctype'
 import { MessageBodyType, SubmitClaimForCtype } from '../../../types/Message'
 import { BlockUi } from '../../../types/UserFeedback'
 
@@ -24,7 +24,7 @@ import './ChooseClaimForCtype.scss'
 
 type Props = {
   claimEntries: Claims.Entry[]
-  ctypeKey: CType['key']
+  ctypeKey: ICType['key']
   onFinished?: () => void
   senderAddress: Contact['publicIdentity']['address']
 }
@@ -32,7 +32,8 @@ type Props = {
 type State = {
   ctype?: CType
   selectedClaim?: Claims.Entry
-  selectedAttestations: sdk.IAttestation[]
+  selectedAttestedClaims: sdk.IAttestedClaim[]
+  selectedClaimProperties: string[]
   workflowStarted: boolean
 }
 
@@ -42,7 +43,8 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      selectedAttestations: [],
+      selectedAttestedClaims: [],
+      selectedClaimProperties: [],
       workflowStarted: false,
     }
 
@@ -54,13 +56,21 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   public componentDidMount() {
     const { ctypeKey } = this.props
 
-    CtypeRepository.findByKey(ctypeKey).then((ctype: CType) => {
-      this.setState({ ctype })
+    CtypeRepository.findByKey(ctypeKey).then((ctype: ICType) => {
+      this.setState({ ctype: CType.fromObject(ctype) })
     })
   }
 
   public render() {
-    const { workflowStarted } = this.state
+    const {
+      workflowStarted,
+      selectedAttestedClaims,
+      selectedClaimProperties: selectedProperties,
+    } = this.state
+    const canFinalize: boolean =
+      !selectedAttestedClaims ||
+      !selectedAttestedClaims.length ||
+      selectedProperties.length === 0
     return (
       <section className="ChooseClaimForCtype">
         {!workflowStarted && (
@@ -72,6 +82,14 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
         )}
         {workflowStarted && this.getClaimSelect()}
         {workflowStarted && this.getAttestionsSelect()}
+        {workflowStarted && this.getClaimPropertySelect()}
+        {workflowStarted && (
+          <div className="actions">
+            <button disabled={canFinalize} onClick={this.sendClaim}>
+              Send Claim & Attestations
+            </button>
+          </div>
+        )}
       </section>
     )
   }
@@ -106,7 +124,9 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
 
   private selectClaim(claims: Claims.Entry[]) {
     this.setState({
+      selectedAttestedClaims: [],
       selectedClaim: claims[0],
+      selectedClaimProperties: [],
     })
   }
 
@@ -117,83 +137,149 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   }
 
   private getAttestionsSelect() {
-    const { selectedAttestations, selectedClaim } = this.state
+    const {
+      selectedAttestedClaims: selectedAttestations,
+      selectedClaim,
+    } = this.state
 
     if (!selectedClaim) {
       return ''
     }
 
-    const approvedAttestations =
+    const approvedAttestatedClaims =
       selectedClaim &&
       selectedClaim.attestations &&
       selectedClaim.attestations.length &&
       selectedClaim.attestations.filter(
-        (attestation: sdk.IAttestation) => !attestation.revoked
+        (attestedClaim: sdk.IAttestedClaim) =>
+          !attestedClaim.attestation.revoked
       )
     // TODO: should we check the attestations against chain here?
 
-    return approvedAttestations && approvedAttestations.length ? (
+    return approvedAttestatedClaims && approvedAttestatedClaims.length ? (
       <React.Fragment>
         <div className="attestations">
           <h4>Attestations</h4>
-          {approvedAttestations.map((attestation: sdk.IAttestation) => (
-            <label key={attestation.signature}>
+          {approvedAttestatedClaims.map((attestedClaim: sdk.IAttestedClaim) => (
+            <label key={attestedClaim.attestation.signature}>
               <input
                 type="checkbox"
-                onChange={this.selectAttestation.bind(this, attestation)}
+                onChange={this.selectAttestation.bind(this, attestedClaim)}
               />
-              <span>{attestation.owner}</span>
+              <span>{attestedClaim.attestation.owner}</span>
             </label>
           ))}
-        </div>
-        <div className="actions">
-          <button
-            disabled={!selectedAttestations || !selectedAttestations.length}
-            onClick={this.sendClaim}
-          >
-            Send Claim & Attestations
-          </button>
         </div>
       </React.Fragment>
     ) : (
       <div className="no-attestations">
         <span>No attestations found.</span>
-        <Link to={`/claim/${selectedClaim.claim.hash}`}>
-          Request attestation
-        </Link>
+        <Link to={`/claim/${selectedClaim.id}`}>Request attestation</Link>
       </div>
     )
   }
 
+  private getClaimPropertySelect() {
+    const { selectedClaim, selectedClaimProperties } = this.state
+    const propertyNames: string[] = selectedClaim
+      ? Object.keys(selectedClaim.claim.contents)
+      : []
+    return propertyNames.length > 0 && selectedClaim ? (
+      <div className="properties">
+        <h4>Select properties to include in Claim</h4>
+        {propertyNames.map((propertyName: string) => {
+          const propertyTitle = this.getCtypePropertyTitle(propertyName)
+          return (
+            <label key={propertyName}>
+              <input
+                checked={selectedClaimProperties.includes(propertyName)}
+                type="checkbox"
+                onChange={this.selectClaimProperty.bind(this, propertyName)}
+              />
+              <span>{propertyTitle}</span>
+            </label>
+          )
+        })}
+      </div>
+    ) : (
+      ''
+    )
+  }
+
+  private getCtypePropertyTitle(propertyName: string): string {
+    const { ctype } = this.state
+    return ctype ? ctype.getPropertyTitle(propertyName) : propertyName
+  }
+
   private selectAttestation(
-    attestation: sdk.IAttestation,
+    attestedClaim: sdk.IAttestedClaim,
     event: ChangeEvent<HTMLInputElement>
   ) {
     const { checked } = event.target
-    const { selectedAttestations } = this.state
+    const { selectedAttestedClaims: selectedAttestedClaims } = this.state
 
-    const attestationSelected = selectedAttestations.find(
-      (selectedAttestation: sdk.IAttestation) =>
-        attestation.signature === selectedAttestation.signature
+    const attestationSelected = selectedAttestedClaims.find(
+      (selectedAttestedClaim: sdk.IAttestedClaim) =>
+        attestedClaim.attestation.signature ===
+        selectedAttestedClaim.attestation.signature
     )
 
     if (checked && !attestationSelected) {
       this.setState({
-        selectedAttestations: [...selectedAttestations, attestation],
+        selectedAttestedClaims: [...selectedAttestedClaims, attestedClaim],
       })
     } else if (attestationSelected) {
       this.setState({
-        selectedAttestations: selectedAttestations.filter(
-          (selectedAttestation: sdk.IAttestation) =>
-            attestation.signature !== selectedAttestation.signature
+        selectedAttestedClaims: selectedAttestedClaims.filter(
+          (selectedAttestedClaim: sdk.IAttestedClaim) =>
+            attestedClaim.attestation.signature !==
+            selectedAttestedClaim.attestation.signature
         ),
       })
     }
   }
 
+  private selectClaimProperty(
+    propertyName: string,
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    const { checked } = event.target
+    let { selectedClaimProperties: selectedProperties } = this.state
+
+    if (checked) {
+      selectedProperties.push(propertyName)
+    } else {
+      selectedProperties = selectedProperties.filter(
+        (_propertyName: string) => {
+          return _propertyName !== propertyName
+        }
+      )
+    }
+    this.setState({
+      selectedClaimProperties: selectedProperties,
+    })
+  }
+
+  private getExcludedProperties(): string[] {
+    const {
+      selectedClaim,
+      selectedClaimProperties: selectedProperties,
+    } = this.state
+    return selectedClaim
+      ? Object.keys(selectedClaim.claim.contents).filter(
+          (propertyName: string) => {
+            return !selectedProperties.includes(propertyName)
+          }
+        )
+      : []
+  }
+
   private sendClaim() {
     const { onFinished, senderAddress } = this.props
-    const { selectedAttestations, selectedClaim } = this.state
+    const {
+      selectedAttestedClaims: selectedAttestations,
+      selectedClaim,
+    } = this.state
 
     if (
       !selectedClaim ||
@@ -208,10 +294,13 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
     })
 
     const request: SubmitClaimForCtype = {
-      content: {
-        attestations: selectedAttestations,
-        claim: selectedClaim.claim,
-      },
+      content: selectedAttestations.map(
+        (selectedAttestedClaim: sdk.IAttestedClaim) => {
+          return sdk.AttestedClaim.fromObject(
+            selectedAttestedClaim
+          ).createPresentation(this.getExcludedProperties())
+        }
+      ),
       type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE,
     }
 

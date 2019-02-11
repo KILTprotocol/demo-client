@@ -11,6 +11,16 @@
       }
     }
   }
+  
+  & .actions {
+    margin: {
+      top: $base-padding;
+    }
+
+    & button {
+      @include button-primary;
+    }
+  }  
 
   & .react-select-container {
 
@@ -89,6 +99,10 @@
       left: $base-padding/2 + $base-border-width;
     }
 
+    & h4 {
+      margin-bottom: 10px
+    }
+
     & label {
       @extend %ellipsis;
 
@@ -96,19 +110,35 @@
 
       display: block;
       width: 100%;
-      margin:{
+      margin: {
         bottom: $base-padding/2;
       }
     }
+  }
 
-    & + .actions {
+  & .properties {
+    margin: {
+      top: 0;
+      bottom: $base-padding/2;
+      right: $base-padding/2 + $base-border-width;
+      left: $base-padding/2 + $base-border-width;
+    }
+
+    & h4 {
+      margin-bottom: 10px
+    }
+
+    & label {
+      @extend %ellipsis;
+
+      @include checkbox;
+
+      display: block;
+      width: 100%;
       margin: {
-        top: $base-padding;
-      }
-
-      & button {
-        @include button-primary;
+        bottom: $base-padding/2;
       }
     }
   }
+
 }
