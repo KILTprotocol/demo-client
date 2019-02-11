@@ -41,7 +41,7 @@ class MessageListView extends React.Component<Props, State> {
                 <tr key={message.messageId}>
                   <td className="sender">
                     {message.sender ? (
-                      <KiltIdenticon contact={message.sender} size={24} />
+                      <KiltIdenticon contact={message.sender} />
                     ) : (
                       message.senderAddress
                     )}

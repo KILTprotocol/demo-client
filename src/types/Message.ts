@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import { Contact } from './Contact'
 
-import { CType } from './Ctype'
+import { ICType } from './Ctype'
 
 export interface Message {
   body?: MessageBody
@@ -56,7 +56,7 @@ export interface ApproveAttestationForClaim extends MessageBodyBase {
 }
 
 export interface RequestClaimForCtype extends MessageBodyBase {
-  content: CType
+  content: ICType
   type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE
 }
 

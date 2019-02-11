@@ -7,7 +7,7 @@ import contactRepository from '../../../services/ContactRepository'
 import ctypeRepository from '../../../services/CtypeRepository'
 import { Contact } from '../../../types/Contact'
 import Spinner from '../../../components/Spinner/Spinner'
-import { CType, CTypeImpl } from '../../../types/Ctype'
+import { ICType, CType } from '../../../types/Ctype'
 
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
@@ -19,7 +19,7 @@ type State = {
 }
 
 class VerifyClaim extends React.Component<Props, State> {
-  private ctypeMap: Map<string, CTypeImpl>
+  private ctypeMap: Map<string, CType>
 
   constructor(props: Props) {
     super(props)
@@ -42,9 +42,9 @@ class VerifyClaim extends React.Component<Props, State> {
       attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => {
         return ctypeRepository.findByKey(attestedClaim.request.claim.ctype)
       })
-    ).then((ctypes: CType[]) => {
-      ctypes.forEach((cType: CType) => {
-        this.ctypeMap[cType.key] = CTypeImpl.fromObject(cType)
+    ).then((ctypes: ICType[]) => {
+      ctypes.forEach((cType: ICType) => {
+        this.ctypeMap[cType.key] = CType.fromObject(cType)
       })
       this.setState({
         ctypesResolved: true,

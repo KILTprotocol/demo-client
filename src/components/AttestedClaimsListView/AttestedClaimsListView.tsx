@@ -90,7 +90,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                   <tr key={attestedClaim.attestation.signature}>
                     <td className="attesterName">
                       {attester ? (
-                        <KiltIdenticon contact={attester} size={24} />
+                        <KiltIdenticon contact={attester} />
                       ) : (
                         attestedClaim.attestation.owner
                       )}

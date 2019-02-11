@@ -81,7 +81,7 @@ class AttestationWorkflow {
               MessageBodyType.REQUEST_LEGITIMATIONS_FOR_CLAIM_ATTESTATION
             }`,
             origin: 'AttestationsWorkflow.requestAttestationForClaim()',
-            type: 'ERROR.FETCH.GET',
+            type: 'ERROR.FETCH.POST',
           })
           reject(error)
         })
@@ -92,6 +92,7 @@ class AttestationWorkflow {
    * Verifies the given request for attestation, creates an attestation on chain and sends it to the claimer.
    *
    * @param requestForAttestation the request for attestation to be verified and attested
+   * @param claimer the contact who wants his claim to be attested
    */
   public approveAndSubmitAttestationForClaim(
     requestForAttestation: sdk.IRequestForAttestation,
@@ -125,6 +126,7 @@ class AttestationWorkflow {
                 message: 'Could send attested claim to claimer',
                 origin:
                   'AttestationWorkflow.approveAndSubmitAttestationForClaim()',
+                type: 'ERROR.FETCH.POST',
               })
               reject(error)
             })

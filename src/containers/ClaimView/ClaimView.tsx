@@ -71,9 +71,6 @@ class ClaimView extends React.Component<Props, State> {
     const validCurrentClaimEntry =
       claimId && currentClaimEntry && currentClaimEntry !== 'notFoundInList'
 
-    console.log('claimId', claimId)
-    console.log('claimEntries', claimEntries)
-    console.log('validCurrentClaimEntry', validCurrentClaimEntry)
     return (
       <section className="ClaimView">
         {validCurrentClaimEntry && (

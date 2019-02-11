@@ -16,7 +16,7 @@ import MessageRepository from '../../../services/MessageRepository'
 import * as Claims from '../../../state/ducks/Claims'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact } from '../../../types/Contact'
-import { CType, CTypeImpl } from '../../../types/Ctype'
+import { ICType, CType } from '../../../types/Ctype'
 import { MessageBodyType, SubmitClaimForCtype } from '../../../types/Message'
 import { BlockUi } from '../../../types/UserFeedback'
 
@@ -24,13 +24,13 @@ import './ChooseClaimForCtype.scss'
 
 type Props = {
   claimEntries: Claims.Entry[]
-  ctypeKey: CType['key']
+  ctypeKey: ICType['key']
   onFinished?: () => void
   senderAddress: Contact['publicIdentity']['address']
 }
 
 type State = {
-  ctype?: CTypeImpl
+  ctype?: CType
   selectedClaim?: Claims.Entry
   selectedAttestedClaims: sdk.IAttestedClaim[]
   selectedClaimProperties: string[]
@@ -56,8 +56,8 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   public componentDidMount() {
     const { ctypeKey } = this.props
 
-    CtypeRepository.findByKey(ctypeKey).then((ctype: CType) => {
-      this.setState({ ctype: CTypeImpl.fromObject(ctype) })
+    CtypeRepository.findByKey(ctypeKey).then((ctype: ICType) => {
+      this.setState({ ctype: CType.fromObject(ctype) })
     })
   }
 
@@ -303,8 +303,6 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
       ),
       type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE,
     }
-
-    console.log('request', JSON.stringify(request))
 
     contactRepository.findAll().then(() => {
       const receiver: Contact | undefined = contactRepository.findByAddress(

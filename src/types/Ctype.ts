@@ -1,4 +1,4 @@
-export interface CType {
+export interface ICType {
   _id?: string
   __v?: number
   key: string
@@ -7,9 +7,9 @@ export interface CType {
   definition: string
 }
 
-export class CTypeImpl implements CType {
-  public static fromObject(obj: CType): CTypeImpl {
-    const newCtype = Object.create(CTypeImpl.prototype)
+export class CType implements ICType {
+  public static fromObject(obj: ICType): CType {
+    const newCtype = Object.create(CType.prototype)
     return Object.assign(newCtype, obj)
   }
 

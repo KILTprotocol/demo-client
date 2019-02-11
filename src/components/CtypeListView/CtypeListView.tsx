@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-import { CType } from 'src/types/Ctype'
+import { ICType } from 'src/types/Ctype'
 
 import './CtypeListView.scss'
 
 type Props = {
-  ctypes?: CType[]
+  ctypes?: ICType[]
 }
 
 const CtypeListView = (props: Props) => {

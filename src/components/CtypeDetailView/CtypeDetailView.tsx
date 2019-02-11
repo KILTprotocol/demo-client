@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-import { CType } from '../../types/Ctype'
+import { ICType } from '../../types/Ctype'
 import Code from '../Code/Code'
 
 import './CtypeDetailView.scss'
 
 type Props = {
-  ctype?: CType
+  ctype?: ICType
 }
 
 const CtypeDetailView = ({ ctype }: Props) => {

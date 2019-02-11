@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 
-import { CTypeImpl } from '../../types/Ctype'
+import { CType } from '../../types/Ctype'
 import { Contact } from '../../types/Contact'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 import Spinner from '../Spinner/Spinner'
@@ -11,7 +11,7 @@ import './AttestedClaimVerificationView.scss'
 type Props = {
   attester?: Contact
   attestedClaim: sdk.IAttestedClaim
-  ctype?: CTypeImpl
+  ctype?: CType
   onVerifyAttestatedClaim: (
     attestatedClaim: sdk.IAttestedClaim
   ) => Promise<boolean>
@@ -41,21 +41,23 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     const { attestedClaim }: Props = this.props
     const { verificationPending } = this.state
 
-    return attestedClaim ? (
+    return (
       <section className="AttestedClaimVerificationView">
-        <div className="header">
-          <h3>Attested Claim</h3>
-          <button
-            className="refresh"
-            onClick={this.verifyAttestatedClaim}
-            disabled={verificationPending}
-          />
-        </div>
-        {this.buildClaimPropertiesView(attestedClaim)}
-      </section>
-    ) : (
-      <section className="AttestedClaimVerificationView">
-        Claim not found
+        {attestedClaim ? (
+          <React.Fragment>
+            <header>
+              <h3>Attested Claim</h3>
+              <button
+                className="refresh"
+                onClick={this.verifyAttestatedClaim}
+                disabled={verificationPending}
+              />
+            </header>
+            {this.buildClaimPropertiesView(attestedClaim)}
+          </React.Fragment>
+        ) : (
+          <div>Claim not found</div>
+        )}
       </section>
     )
   }
@@ -67,7 +69,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     const { attester } = this.props
     const { verificationPending, verificationApproved } = this.state
     const attesterView = attester ? (
-      <KiltIdenticon contact={attester} size={24} />
+      <KiltIdenticon contact={attester} />
     ) : (
       attestedClaim.attestation.owner
     )

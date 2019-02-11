@@ -3,7 +3,7 @@
   @include card;
   padding: $base-padding;
 
-  & .header {
+  & header {
     width: 100%;
     display: flex;
     justify-content: space-between;

@@ -11,7 +11,7 @@ import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
-import { CType } from '../../types/Ctype'
+import { ICType } from '../../types/Ctype'
 import { MessageBodyType, RequestClaimForCtype } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
 
@@ -21,7 +21,7 @@ interface Props {}
 
 interface State {
   contacts: Contact[]
-  ctypes: CType[]
+  ctypes: ICType[]
 }
 
 type SelectOption = {
@@ -31,7 +31,7 @@ type SelectOption = {
 
 class ContactList extends React.Component<Props, State> {
   private selectCtypeModal: Modal | null
-  private selectedCtype: CType | undefined
+  private selectedCtype: ICType | undefined
   private selectedContact: Contact | undefined
   private filterConfig: Config = {
     ignoreAccents: true,
@@ -69,7 +69,7 @@ class ContactList extends React.Component<Props, State> {
         })
       })
     CtypeRepository.findAll()
-      .then((ctypes: CType[]) => {
+      .then((ctypes: ICType[]) => {
         this.setState({ ctypes })
       })
       .catch(error => {
@@ -99,7 +99,7 @@ class ContactList extends React.Component<Props, State> {
             {contacts.map((contact: Contact) => (
               <tr key={contact.publicIdentity.address}>
                 <td className="name">
-                  <KiltIdenticon contact={contact} size={24} />
+                  <KiltIdenticon contact={contact} />
                 </td>
                 <td className="address" title={contact.publicIdentity.address}>
                   {contact.publicIdentity.address}
@@ -136,7 +136,7 @@ class ContactList extends React.Component<Props, State> {
   private getSelectCtypes() {
     const { ctypes } = this.state
 
-    const options: SelectOption[] = ctypes.map((ctype: CType) => ({
+    const options: SelectOption[] = ctypes.map((ctype: ICType) => ({
       label: ctype.name,
       value: ctype.key,
     }))
@@ -162,7 +162,7 @@ class ContactList extends React.Component<Props, State> {
     const { ctypes } = this.state
 
     this.selectedCtype = ctypes.find(
-      (ctype: CType) => selectedOption.value === ctype.key
+      (ctype: ICType) => selectedOption.value === ctype.key
     )
   }
 
