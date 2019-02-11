@@ -250,4 +250,12 @@ const getClaims = createSelector(
   }
 )
 
-export { Store, ImmutableState, SerializedState, Entry, Action, getClaims, hash }
+export {
+  Store,
+  ImmutableState,
+  SerializedState,
+  Entry,
+  Action,
+  getClaims,
+  hash,
+}

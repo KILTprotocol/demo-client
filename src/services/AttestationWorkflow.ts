@@ -2,6 +2,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import attestationService from '../services/AttestationService'
 import * as Attestations from '../state/ducks/Attestations'
+import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import { Contact } from '../types/Contact'
 import {
@@ -53,7 +54,9 @@ class AttestationWorkflow {
     claim: sdk.IClaim,
     attesters: Contact[]
   ): Promise<void> {
-    const identity: sdk.Identity = persistentStore.getSelectedIdentity()
+    const identity: sdk.Identity = Wallet.getSelectedIdentity(
+      persistentStore.store.getState()
+    ).identity
     const requestForAttestation: sdk.IRequestForAttestation = new sdk.RequestForAttestation(
       claim,
       [],
