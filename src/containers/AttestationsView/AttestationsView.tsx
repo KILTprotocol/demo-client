@@ -7,6 +7,8 @@ import attestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
+import { BlockUi } from '../../types/UserFeedback'
+import FeedbackService from '../../services/FeedbackService'
 
 import './AttestationsView.scss'
 
@@ -114,7 +116,17 @@ class AttestationsView extends React.Component<Props, State> {
     attestationListModel?: AttestationListModel
   ): (() => void) => () => {
     if (attestationListModel) {
-      attestationService.revokeAttestation(attestationListModel.attestation)
+      const blockUi: BlockUi = FeedbackService.addBlockUi({
+        headline: 'Revoking attestation',
+      })
+      attestationService
+        .revokeAttestation(attestationListModel.attestation)
+        .then(() => {
+          blockUi.remove()
+        })
+        .catch(error => {
+          blockUi.remove()
+        })
     }
   }
 

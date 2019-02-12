@@ -62,7 +62,7 @@ class AttestationService {
 
   public async revokeAttestation(
     iAttestation: sdk.IAttestation
-  ): Promise<sdk.Attestation> {
+  ): Promise<void> {
     const attestation = sdk.Attestation.fromObject(iAttestation)
     const {
       selectedIdentity,
@@ -73,7 +73,7 @@ class AttestationService {
       return Promise.reject('No identity selected')
     }
 
-    return new Promise<sdk.Attestation>(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       attestation
         .revoke(blockchain, selectedIdentity, () => {
           notifySuccess('Attestation successfully revoked')
