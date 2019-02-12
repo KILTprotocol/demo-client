@@ -19,7 +19,7 @@ type Props = {
 
 type State = {
   verificationPending: boolean
-  verificationApproved: boolean
+  verificationSucceeded: boolean
 }
 
 class AttestedClaimVerificationView extends React.Component<Props, State> {
@@ -29,8 +29,8 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     super(props)
     this.verifyAttestatedClaim = this.verifyAttestatedClaim.bind(this)
     this.state = {
-      verificationApproved: false,
       verificationPending: true,
+      verificationSucceeded: false,
     }
     setTimeout(() => {
       this.verifyAttestatedClaim()
@@ -67,7 +67,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
       attestedClaim.request.claimHashTree
     )
     const { attester } = this.props
-    const { verificationPending, verificationApproved } = this.state
+    const { verificationPending, verificationSucceeded } = this.state
     const attesterView = attester ? (
       <KiltIdenticon contact={attester} />
     ) : (
@@ -77,7 +77,9 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
       <Spinner size={20} color="#ef5a28" strength={3} />
     ) : (
       <div
-        className={'status ' + (verificationApproved ? 'attested' : 'revoked')}
+        className={
+          'status ' + (verificationSucceeded ? 'verified' : 'unverified')
+        }
       />
     )
 
@@ -118,13 +120,13 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     const { attestedClaim } = this.props
     const { onVerifyAttestatedClaim } = this.props
     this.setState({
-      verificationApproved: false,
       verificationPending: true,
+      verificationSucceeded: false,
     })
     onVerifyAttestatedClaim(attestedClaim).then(verified => {
       this.setState({
-        verificationApproved: verified,
         verificationPending: false,
+        verificationSucceeded: verified,
       })
     })
   }
