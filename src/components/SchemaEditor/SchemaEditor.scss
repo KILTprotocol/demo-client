@@ -39,6 +39,18 @@
       &--row {
         @include label_input_combo;
       }
+
+      &--error-row {
+        @include label_input_combo;
+      }
+
+      &--description {
+        color: $color-primary;
+        font-size: 12px;
+        text-align: right;
+        width: 100%;
+        margin: 4px 0 0 0;
+      }
     }
 
     &:empty {
