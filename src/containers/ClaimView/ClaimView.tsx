@@ -32,6 +32,7 @@ class ClaimView extends React.Component<Props, State> {
   public selectedAttesters: Contact[] = []
   private selectAttestersModal: Modal | null
   private claimIdToAttest: Claims.Entry['id']
+  private claimIdToLegitimate: Claims.Entry['id']
 
   constructor(props: Props) {
     super(props)
@@ -39,12 +40,13 @@ class ClaimView extends React.Component<Props, State> {
       isSelectAttestersOpen: false,
     }
     this.deleteClaim = this.deleteClaim.bind(this)
-    this.showAttesterSelectionModal = this.showAttesterSelectionModal.bind(this)
-    this.hideAttersterSelectionModal = this.hideAttersterSelectionModal.bind(
-      this
-    )
-    this.requestAttestationForClaim = this.requestAttestationForClaim.bind(this)
+    this.onRequestLegitimation = this.onRequestLegitimation.bind(this)
+    this.onRequestAttestation = this.onRequestAttestation.bind(this)
+
     this.onSelectAttesters = this.onSelectAttesters.bind(this)
+    this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
+    this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
+
     this.setSelectAttestersOpen = this.setSelectAttestersOpen.bind(this)
     this.onVerifyAttestation = this.onVerifyAttestation.bind(this)
   }
@@ -78,7 +80,8 @@ class ClaimView extends React.Component<Props, State> {
             cancelable={true}
             claimEntry={currentClaimEntry as Claims.Entry}
             onRemoveClaim={this.deleteClaim}
-            onRequestAttestation={this.showAttesterSelectionModal}
+            onRequestAttestation={this.onRequestAttestation}
+            onRequestLegitimation={this.onRequestLegitimation}
             onVerifyAttestation={this.onVerifyAttestation}
           />
         )}
@@ -86,7 +89,8 @@ class ClaimView extends React.Component<Props, State> {
           <ClaimListView
             claimStore={claimEntries}
             onRemoveClaim={this.deleteClaim}
-            onRequestAttestation={this.showAttesterSelectionModal}
+            onRequestAttestation={this.onRequestAttestation}
+            onRequestLegitimation={this.onRequestLegitimation}
           />
         )}
         <Modal
@@ -95,11 +99,17 @@ class ClaimView extends React.Component<Props, State> {
           }}
           type={ModalType.CONFIRM}
           header="Select Attester(s):"
-          onCancel={this.hideAttersterSelectionModal}
-          onConfirm={this.requestAttestationForClaim}
+          onCancel={this.cancelSelectAttesters}
+          onConfirm={this.finishSelectAttesters}
           catchBackdropClick={isSelectAttestersOpen}
         >
-          {this.getSelectAttesters()}
+          <div>
+            <SelectAttesters
+              onChange={this.onSelectAttesters}
+              onMenuOpen={this.setSelectAttestersOpen(true)}
+              onMenuClose={this.setSelectAttestersOpen(false, 500)}
+            />
+          </div>
         </Modal>
       </section>
     )
@@ -139,18 +149,6 @@ class ClaimView extends React.Component<Props, State> {
     this.props.history.push('/claim')
   }
 
-  private getSelectAttesters() {
-    return (
-      <div>
-        <SelectAttesters
-          onChange={this.onSelectAttesters}
-          onMenuOpen={this.setSelectAttestersOpen(true)}
-          onMenuClose={this.setSelectAttestersOpen(false, 500)}
-        />
-      </div>
-    )
-  }
-
   private onSelectAttesters(selectedAttesters: Contact[]) {
     this.selectedAttesters = selectedAttesters
   }
@@ -181,29 +179,89 @@ class ClaimView extends React.Component<Props, State> {
       })
   }
 
-  private showAttesterSelectionModal(claimId: Claims.Entry['id']) {
+  private onRequestLegitimation(claimId: Claims.Entry['id']) {
+    this.claimIdToLegitimate = claimId
+    delete this.claimIdToAttest
+    if (this.selectAttestersModal) {
+      this.selectAttestersModal.show()
+    }
+  }
+
+  private onRequestAttestation(claimId: Claims.Entry['id']) {
+    delete this.claimIdToLegitimate
     this.claimIdToAttest = claimId
     if (this.selectAttestersModal) {
       this.selectAttestersModal.show()
     }
   }
 
-  private hideAttersterSelectionModal() {
+  private cancelSelectAttesters() {
     this.selectedAttesters = []
+    delete this.claimIdToLegitimate
+    delete this.claimIdToAttest
   }
 
-  private requestAttestationForClaim() {
+  private finishSelectAttesters() {
+    const claim = this.resolveClaim(
+      this.claimIdToLegitimate || this.claimIdToAttest
+    )
+
+    if (claim) {
+      if (this.claimIdToLegitimate) {
+        attestationWorkflow.requestLegitimations(claim, this.selectedAttesters)
+      } else if (this.claimIdToAttest) {
+        attestationWorkflow.requestAttestationForClaim(
+          claim,
+          this.selectedAttesters
+        )
+      }
+    }
+  }
+
+  private resolveClaim(claimId: Claims.Entry['id']): sdk.Claim | undefined {
     const { claimEntries } = this.props
 
     const claimToAttest = claimEntries.find(
-      (claimEntry: Claims.Entry) => claimEntry.id === this.claimIdToAttest
+      (claimEntry: Claims.Entry) => claimEntry.id === claimId
     )
     if (claimToAttest) {
       const { claim } = claimToAttest
-      attestationWorkflow.requestAttestationForClaim(
-        claim,
-        this.selectedAttesters
+      return claim
+    } else {
+      return undefined
+    }
+  }
+}
+
+export function getClaimActions(
+  action: 'delete' | 'requestAttestation' | 'requestLegitimation',
+  callback: () => void
+) {
+  switch (action) {
+    case 'requestAttestation': {
+      return (
+        <button
+          className="requestAttestation"
+          onClick={callback}
+          title="Request attestation of this claim from attester"
+        >
+          Get Attestation
+        </button>
       )
+    }
+    case 'requestLegitimation': {
+      return (
+        <button
+          className="requestLegitimation"
+          onClick={callback}
+          title="Request legimation for attestation of this claim from attester"
+        >
+          Get Legitimation
+        </button>
+      )
+    }
+    case 'delete': {
+      return <button className="deleteClaim" onClick={callback} />
     }
   }
 }

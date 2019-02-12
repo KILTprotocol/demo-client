@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+import { getClaimActions } from '../../containers/ClaimView/ClaimView'
 
 import * as Claims from '../../state/ducks/Claims'
 
@@ -9,17 +10,13 @@ import './ClaimListView.scss'
 type Props = {
   claimStore: Claims.Entry[]
   onRemoveClaim: (claimId: Claims.Entry['id']) => void
-  onRequestAttestation: (hash: string) => void
+  onRequestAttestation: (claimId: Claims.Entry['id']) => void
+  onRequestLegitimation: (claimId: Claims.Entry['id']) => void
 }
 
 type State = {}
 
 class ClaimListView extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.handleDelete = this.handleDelete.bind(this)
-  }
-
   public render() {
     const { claimStore } = this.props
     return (
@@ -59,16 +56,18 @@ class ClaimListView extends React.Component<Props, State> {
                   />
                   <td className="actionsTd">
                     <div className="actions">
-                      <button
-                        className="requestAttestation"
-                        onClick={this.requestAttestation(claimEntry.id)}
-                      >
-                        Get Attestation
-                      </button>
-                      <button
-                        className="deleteClaim"
-                        onClick={this.handleDelete(claimEntry.id)}
-                      />
+                      {getClaimActions(
+                        'requestLegitimation',
+                        this.requestLegitimation.bind(this, claimEntry.id)
+                      )}
+                      {getClaimActions(
+                        'requestAttestation',
+                        this.requestAttestation.bind(this, claimEntry.id)
+                      )}
+                      {getClaimActions(
+                        'delete',
+                        this.handleDelete.bind(this, claimEntry.id)
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -83,14 +82,19 @@ class ClaimListView extends React.Component<Props, State> {
     )
   }
 
-  private handleDelete = (hash: string): (() => void) => () => {
+  private handleDelete(claimId: Claims.Entry['id']) {
     const { onRemoveClaim } = this.props
-    onRemoveClaim(hash)
+    onRemoveClaim(claimId)
   }
 
-  private requestAttestation = (hash: string): (() => void) => () => {
+  private requestAttestation(claimId: Claims.Entry['id']) {
     const { onRequestAttestation } = this.props
-    onRequestAttestation(hash)
+    onRequestAttestation(claimId)
+  }
+
+  private requestLegitimation(claimId: Claims.Entry['id']) {
+    const { onRequestLegitimation } = this.props
+    onRequestLegitimation(claimId)
   }
 }
 

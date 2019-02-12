@@ -2,6 +2,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import AttestedClaimsListView from '../../components/AttestedClaimsListView/AttestedClaimsListView'
+import { getClaimActions } from '../../containers/ClaimView/ClaimView'
 import * as Claims from '../../state/ducks/Claims'
 import Code from '../Code/Code'
 
@@ -12,6 +13,7 @@ type Props = {
   claimEntry?: Claims.Entry
   onRemoveClaim?: (claimId: Claims.Entry['id']) => void
   onRequestAttestation?: (claimId: Claims.Entry['id']) => void
+  onRequestLegitimation?: (claimId: Claims.Entry['id']) => void
   onVerifyAttestation: (attestation: sdk.IAttestedClaim) => Promise<boolean>
 }
 
@@ -24,6 +26,7 @@ class ClaimDetailView extends Component<Props, State> {
     super(props)
     this.handleDelete = this.handleDelete.bind(this)
     this.requestAttestation = this.requestAttestation.bind(this)
+    this.requestLegitimation = this.requestLegitimation.bind(this)
   }
 
   public render() {
@@ -69,6 +72,7 @@ class ClaimDetailView extends Component<Props, State> {
     const {
       onRemoveClaim,
       onRequestAttestation,
+      onRequestLegitimation,
       cancelable,
     }: Props = this.props
     return (
@@ -78,19 +82,11 @@ class ClaimDetailView extends Component<Props, State> {
             Cancel
           </Link>
         )}
-        {onRequestAttestation && (
-          <button
-            className="requestAttestation"
-            onClick={this.requestAttestation}
-          >
-            Request Attestation
-          </button>
-        )}
-        {onRemoveClaim && (
-          <button className="deleteClaim" onClick={this.handleDelete}>
-            Delete
-          </button>
-        )}
+        {onRemoveClaim && getClaimActions('delete', this.handleDelete)}
+        {onRequestLegitimation &&
+          getClaimActions('requestLegitimation', this.requestLegitimation)}
+        {onRequestAttestation &&
+          getClaimActions('requestAttestation', this.requestAttestation)}
       </div>
     )
   }
@@ -106,6 +102,13 @@ class ClaimDetailView extends Component<Props, State> {
     const { claimEntry, onRequestAttestation }: Props = this.props
     if (claimEntry && onRequestAttestation) {
       onRequestAttestation(claimEntry.id)
+    }
+  }
+
+  private requestLegitimation() {
+    const { claimEntry, onRequestLegitimation }: Props = this.props
+    if (claimEntry && onRequestLegitimation) {
+      onRequestLegitimation(claimEntry.id)
     }
   }
 }
