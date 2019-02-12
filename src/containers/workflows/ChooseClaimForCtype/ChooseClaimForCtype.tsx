@@ -293,12 +293,14 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
       headline: 'Resolving receiver (1/2)',
     })
 
+    const excludedProperties = this.getExcludedProperties()
     const request: SubmitClaimForCtype = {
       content: selectedAttestations.map(
         (selectedAttestedClaim: sdk.IAttestedClaim) => {
-          return sdk.AttestedClaim.fromObject(
-            selectedAttestedClaim
-          ).createPresentation(this.getExcludedProperties())
+          const attestedClaim = sdk.AttestedClaim.fromObject(
+            this.deepCopy(selectedAttestedClaim)
+          ).createPresentation(excludedProperties)
+          return attestedClaim
         }
       ),
       type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE,
@@ -336,6 +338,11 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
         })
       }
     })
+  }
+
+  // TODO better externalize for reusability
+  private deepCopy(attestedClaim: sdk.IAttestedClaim): sdk.IAttestedClaim {
+    return JSON.parse(JSON.stringify(attestedClaim)) as sdk.IAttestedClaim
   }
 }
 
