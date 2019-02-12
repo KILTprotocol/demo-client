@@ -1,22 +1,24 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
+
 import { ICType } from '../types/Ctype'
 import { BasePostParams } from './BaseRepository'
 
 // TODO: add tests, create interface for this class to be implemented as mock
 // (for other tests)
 
-class CtypeRepository {
-  public static async findByKey(key: string): Promise<ICType> {
-    return fetch(`${CtypeRepository.URL}/${key}`).then(response =>
+class CTypeRepository {
+  public static async findByHash(hash: sdk.ICType['hash']): Promise<ICType> {
+    return fetch(`${CTypeRepository.URL}/${hash}`).then(response =>
       response.json()
     )
   }
 
   public static async findAll(): Promise<ICType[]> {
-    return fetch(`${CtypeRepository.URL}`).then(response => response.json())
+    return fetch(`${CTypeRepository.URL}`).then(response => response.json())
   }
 
   public static async register(cType: ICType): Promise<Response> {
-    return fetch(CtypeRepository.URL, {
+    return fetch(CTypeRepository.URL, {
       ...BasePostParams,
       body: JSON.stringify(cType),
     })
@@ -31,4 +33,4 @@ class CtypeRepository {
   }/ctype`
 }
 
-export default CtypeRepository
+export default CTypeRepository

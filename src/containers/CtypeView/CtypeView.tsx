@@ -1,8 +1,9 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 
-import CtypeDetailView from '../../components/CtypeDetailView/CtypeDetailView'
-import CtypeListView from '../../components/CtypeListView/CtypeListView'
+import CTypeDetailView from '../../components/CtypeDetailView/CtypeDetailView'
+import CTypeListView from '../../components/CtypeListView/CtypeListView'
 import SelectAttestersModal from '../../components/Modal/SelectAttestersModal'
 import attestationWorkflow from '../../services/AttestationWorkflow'
 import CtypeRepository from '../../services/CtypeRepository'
@@ -12,28 +13,32 @@ import { ICType } from '../../types/Ctype'
 
 import './CtypeView.scss'
 
-type Props = RouteComponentProps<{ ctypeKey: string }> & {}
+type Props = RouteComponentProps<{ ctypeHash: string }> & {}
 
 type State = {
-  ctypes: ICType[]
-  currentCtype?: ICType | 'notFoundInList'
+  cTypes: ICType[]
+  currentCType?: ICType | 'notFoundInList'
 }
 
 class CtypeView extends React.Component<Props, State> {
   private selectAttestersModal: SelectAttestersModal | null
-  private ctypeToLegitimate: ICType
+  private cTypeToLegitimate: ICType
 
   constructor(props: Props) {
     super(props)
     this.state = {
-      ctypes: [],
+      cTypes: [],
     }
+    this.onRequestLegitimation = this.onRequestLegitimation.bind(this)
+
+    this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
+    this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
   }
 
   public componentDidMount() {
     CtypeRepository.findAll()
-      .then((ctypes: ICType[]) => {
-        this.setState({ ctypes })
+      .then((cTypes: ICType[]) => {
+        this.setState({ cTypes })
       })
       .catch(error => {
         errorService.log({
@@ -47,26 +52,26 @@ class CtypeView extends React.Component<Props, State> {
 
   public componentDidUpdate() {
     const { match } = this.props
-    const { ctypes, currentCtype } = this.state
+    const { cTypes, currentCType } = this.state
 
-    if (ctypes && ctypes.length && !currentCtype && match.params.ctypeKey) {
-      this.getCurrentCtype(match.params.ctypeKey)
+    if (cTypes && cTypes.length && !currentCType && match.params.ctypeHash) {
+      this.getCurrentCType(match.params.ctypeHash)
     }
   }
 
   public render() {
-    const { ctypes, currentCtype } = this.state
-    const validCurrentCtype =
-      !!currentCtype && currentCtype !== 'notFoundInList'
+    const { cTypes, currentCType } = this.state
+    const validCurrentCType =
+      !!currentCType && currentCType !== 'notFoundInList'
     return (
       <section className="CtypeView">
         <h1>CTYPES</h1>
-        {validCurrentCtype && (
-          <CtypeDetailView ctype={currentCtype as ICType} />
+        {validCurrentCType && (
+          <CTypeDetailView cType={currentCType as ICType} />
         )}
-        {!validCurrentCtype && (
-          <CtypeListView
-            ctypes={ctypes}
+        {!validCurrentCType && (
+          <CTypeListView
+            cTypes={cTypes}
             onRequestLegitimation={this.onRequestLegitimation}
           />
         )}
@@ -81,40 +86,46 @@ class CtypeView extends React.Component<Props, State> {
     )
   }
 
-  private getCurrentCtype(ctypeKey: string) {
-    const { ctypes } = this.state
+  private getCurrentCType(cTypeHash: sdk.ICType['hash']) {
+    const { cTypes } = this.state
 
-    const currentCtype = ctypes.find((ctype: ICType) => ctype.key === ctypeKey)
+    const currentCType = cTypes.find(
+      (cType: ICType) => cType.cType.hash === cTypeHash
+    )
 
-    if (!currentCtype) {
-      const message = `Could not get CTYPE with key '${ctypeKey}' from local list of CTYPEs`
-      this.setState({ currentCtype: 'notFoundInList' }, () => {
+    if (!currentCType) {
+      const message = `Could not get CTYPE with hash '${cTypeHash}' from local list of CTYPEs`
+      this.setState({ currentCType: 'notFoundInList' }, () => {
         errorService.log({
-          error: { name: 'setCurrentCtypeError', message },
+          error: { name: 'setCurrentCTypeError', message },
           message,
-          origin: 'CtypeView.getCurrentCtype()',
+          origin: 'CtypeView.getCurrentCType()',
         })
       })
     } else {
-      this.setState({ currentCtype })
+      this.setState({ currentCType })
     }
   }
 
-  private onRequestLegitimation(ctype: ICType) {
-    if (ctype && this.selectAttestersModal) {
+  private onRequestLegitimation(cType: ICType) {
+    if (cType && this.selectAttestersModal) {
+      this.cTypeToLegitimate = cType
       this.selectAttestersModal.show()
     }
   }
 
   private cancelSelectAttesters() {
-    delete this.ctypeToLegitimate
+    delete this.cTypeToLegitimate
     if (this.selectAttestersModal) {
       this.selectAttestersModal.hide()
     }
   }
 
   private finishSelectAttesters(selectedAttesters: Contact[]) {
-    attestationWorkflow.requestLegitimations({ctype: this.ctypeToLegitimate.key}, selectedAttesters)
+    attestationWorkflow.requestLegitimations(
+      { ctype: this.cTypeToLegitimate.cType.hash },
+      selectedAttesters
+    )
   }
 }
 

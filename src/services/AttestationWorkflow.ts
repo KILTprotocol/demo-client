@@ -13,7 +13,7 @@ import {
   RequestLegitimations,
 } from '../types/Message'
 import errorService from './ErrorService'
-import { notifySuccess } from './FeedbackService'
+import { notifyFailure, notifySuccess } from './FeedbackService'
 import MessageRepository from './MessageRepository'
 
 class AttestationWorkflow {
@@ -36,10 +36,12 @@ class AttestationWorkflow {
   }
 
   /**
-   * Sends back the legitimation along with the originally given (partial) claim to the claimer.
+   * Sends back the legitimation along with the originally given (partial)
+   * claim to the claimer.
    *
    * @param claim the (partial) claim to attest
-   * @param legitimations the list of legitimations to be included in the attestation
+   * @param legitimations the list of legitimations to be included in the
+   *   attestation
    * @param claimer the claimer who requested the legitimation
    */
   public submitLegitimations(
@@ -55,7 +57,8 @@ class AttestationWorkflow {
    *
    * @param claim - the claim to attest
    * @param attesters - the attesters to send the request to
-   * @param [legitimations] - the legitimations the claimer requested beforehand from attester
+   * @param [legitimations] - the legitimations the claimer requested
+   *   beforehand from attester
    */
   public requestAttestationForClaim(
     claim: sdk.IClaim,
@@ -79,9 +82,11 @@ class AttestationWorkflow {
   }
 
   /**
-   * Verifies the given request for attestation, creates an attestation on chain and sends it to the claimer.
+   * Verifies the given request for attestation, creates an attestation on
+   * chain and sends it to the claimer.
    *
-   * @param requestForAttestation the request for attestation to be verified and attested
+   * @param requestForAttestation the request for attestation to be verified
+   *   and attested
    * @param claimer the contact who wants his claim to be attested
    */
   public approveAndSubmitAttestationForClaim(
@@ -153,12 +158,15 @@ class AttestationWorkflow {
   ): Promise<void> {
     const failedReceivers: Contact[] = []
 
+    if (!attesters || !attesters.length) {
+      notifyFailure('No attesters selected')
+      return Promise.reject()
+    }
+
     return new Promise((resolve, reject) => {
       Promise.all(
         attesters.map((attester: Contact) => {
-          return MessageRepository.send(attester, messageBody).catch(() => {
-            failedReceivers.push(attester)
-          })
+          return MessageRepository.send(attester, messageBody)
         })
       )
         .then(() => {

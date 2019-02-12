@@ -1,13 +1,13 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
+import AttestedClaimVerificationView from 'src/components/AttestedClaimVerificationView/AttestedClaimVerificationView'
+import Spinner from '../../../components/Spinner/Spinner'
 
 import attestationService from '../../../services/AttestationService'
-import AttestedClaimVerificationView from 'src/components/AttestedClaimVerificationView/AttestedClaimVerificationView'
 import contactRepository from '../../../services/ContactRepository'
-import ctypeRepository from '../../../services/CtypeRepository'
+import cTypeRepository from '../../../services/CtypeRepository'
 import { Contact } from '../../../types/Contact'
-import Spinner from '../../../components/Spinner/Spinner'
-import { ICType, CType } from '../../../types/Ctype'
+import { CType, ICType } from '../../../types/Ctype'
 
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
@@ -40,11 +40,13 @@ class VerifyClaim extends React.Component<Props, State> {
     })
     Promise.all(
       attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => {
-        return ctypeRepository.findByKey(attestedClaim.request.claim.ctype)
+        return cTypeRepository.findByHash(attestedClaim.request.claim.ctype)
       })
     ).then((ctypes: ICType[]) => {
       ctypes.forEach((cType: ICType) => {
-        this.ctypeMap[cType.key] = CType.fromObject(cType)
+        if (cType.cType.hash) {
+          this.ctypeMap[cType.cType.hash] = CType.fromObject(cType)
+        }
       })
       this.setState({
         ctypesResolved: true,

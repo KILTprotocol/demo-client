@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 
-import CtypeEditor from '../../components/CtypeEditor/CtypeEditor'
+import CTypeEditor from '../../components/CtypeEditor/CtypeEditor'
 import BlockchainService from '../../services/BlockchainService'
 import ctypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
@@ -21,22 +21,20 @@ type Props = RouteComponentProps<{}> & {
 
 type State = {
   connected: boolean
-  ctype: any
+  cType: any
   isValid: boolean
-  name: string
 }
 
-class CtypeCreate extends React.Component<Props, State> {
+class CTypeCreate extends React.Component<Props, State> {
   private blockchain: sdk.Blockchain
 
   constructor(props: Props) {
     super(props)
 
     this.state = {
+      cType: { title: '' },
       connected: false,
-      ctype: { title: 'My New CType' },
       isValid: false,
-      name: '',
     }
 
     this.submit = this.submit.bind(this)
@@ -66,15 +64,15 @@ class CtypeCreate extends React.Component<Props, State> {
     ) {
       const { selectedIdentity, history } = this.props
       const authorAlias: string = selectedIdentity.metaData.name
-      let ctype: sdk.CType
+      let cType: sdk.CType
 
       try {
-        ctype = sdk.CType.fromInputModel(this.state.ctype)
+        cType = sdk.CType.fromInputModel(this.state.cType)
       } catch (error) {
         errorService.log({
           error,
           message: 'could not create CTYPE from Input Model',
-          origin: 'CtypeCreate.submit()',
+          origin: 'CTypeCreate.submit()',
         })
         return
       }
@@ -84,34 +82,36 @@ class CtypeCreate extends React.Component<Props, State> {
         message: 'submitting CTYPE (1/3)',
       })
 
-      ctype
+      cType
         .store(this.blockchain, selectedIdentity.identity, () => {
           blockUi.updateMessage(
             `CTYPE stored on block chain,\nnow registering CTYPE (3/3)`
           )
           const ctypeWrapper: ICType = {
-            author: authorAlias,
-            definition: JSON.stringify(ctype.getModel()),
-            key: ctype.getModel().hash,
-            name: this.state.name,
+            cType,
+            metaData: {
+              author: authorAlias,
+            },
           }
           // TODO: add onrejected when sdk provides error handling
           ctypeRepository.register(ctypeWrapper).then(() => {
             blockUi.remove()
-            notifySuccess(`CTYPE ${ctypeWrapper.name} successfully created.`)
-            history.push('/ctype')
+            notifySuccess(
+              `CTYPE ${cType.metadata.title.default} successfully created.`
+            )
+            history.push('/cType')
           })
         })
         .then((_hash: any) => {
           blockUi.updateMessage(
-            `CTYPE submitted with hash ${_hash},\nnow storing on block chain (2/3)`
+            `CTYPE created,\nnow storing on block chain (2/3)`
           )
         })
         .catch(error => {
           errorService.log({
             error,
-            message: 'could not submit CTYPE',
-            origin: 'CtypeCreate.submit()',
+            message: 'Could not submit CTYPE',
+            origin: 'CTypeCreate.submit()',
           })
           blockUi.remove()
         })
@@ -120,18 +120,10 @@ class CtypeCreate extends React.Component<Props, State> {
 
   public render() {
     return (
-      <section className="CtypeCreate">
+      <section className="CTypeCreate">
         <h1 className="App-title">Create CTYPE</h1>
-        <div className="Ctype-name">
-          <label>Name</label>
-          <input
-            type="text"
-            onChange={this.updateName}
-            value={this.state.name}
-          />
-        </div>
-        <CtypeEditor
-          ctype={this.state.ctype}
+        <CTypeEditor
+          cType={this.state.cType}
           updateCType={this.updateCType}
           submit={this.submit}
           cancel={this.cancel}
@@ -144,19 +136,13 @@ class CtypeCreate extends React.Component<Props, State> {
 
   private cancel() {
     // TODO: goto CTYPE list or previous screen?
-    this.props.history.push('/ctype')
+    this.props.history.push('/cType')
   }
 
-  private updateCType = (ctype: string, isValid: boolean) => {
+  private updateCType = (cType: string, isValid: boolean) => {
     this.setState({
-      ctype,
+      cType,
       isValid,
-    })
-  }
-
-  private updateName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      name: e.target.value,
     })
   }
 }
@@ -165,4 +151,4 @@ const mapStateToProps = (state: ReduxState) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-export default connect(mapStateToProps)(withRouter(CtypeCreate))
+export default connect(mapStateToProps)(withRouter(CTypeCreate))

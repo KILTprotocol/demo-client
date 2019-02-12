@@ -5,11 +5,11 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
-import Modal, { ModalType } from '../../components/Modal/Modal'
-import SelectAttesters from '../../components/SelectAttesters/SelectAttesters'
+import SelectAttestersModal from '../../components/Modal/SelectAttestersModal'
 import attestationService from '../../services/AttestationService'
 import attestationWorkflow from '../../services/AttestationWorkflow'
 import errorService from '../../services/ErrorService'
+import { notifyFailure } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
 
@@ -30,7 +30,7 @@ type State = {
 
 class ClaimView extends React.Component<Props, State> {
   public selectedAttesters: Contact[] = []
-  private selectAttestersModal: Modal | null
+  private selectAttestersModal: SelectAttestersModal | null
   private claimIdToAttest: Claims.Entry['id']
   private claimIdToLegitimate: Claims.Entry['id']
 
@@ -43,11 +43,9 @@ class ClaimView extends React.Component<Props, State> {
     this.onRequestLegitimation = this.onRequestLegitimation.bind(this)
     this.onRequestAttestation = this.onRequestAttestation.bind(this)
 
-    this.onSelectAttesters = this.onSelectAttesters.bind(this)
     this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
     this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
 
-    this.setSelectAttestersOpen = this.setSelectAttestersOpen.bind(this)
     this.onVerifyAttestation = this.onVerifyAttestation.bind(this)
   }
 
@@ -93,24 +91,13 @@ class ClaimView extends React.Component<Props, State> {
             onRequestLegitimation={this.onRequestLegitimation}
           />
         )}
-        <Modal
+        <SelectAttestersModal
           ref={el => {
             this.selectAttestersModal = el
           }}
-          type={ModalType.CONFIRM}
-          header="Select Attester(s):"
           onCancel={this.cancelSelectAttesters}
           onConfirm={this.finishSelectAttesters}
-          catchBackdropClick={isSelectAttestersOpen}
-        >
-          <div>
-            <SelectAttesters
-              onChange={this.onSelectAttesters}
-              onMenuOpen={this.setSelectAttestersOpen(true)}
-              onMenuClose={this.setSelectAttestersOpen(false, 500)}
-            />
-          </div>
-        </Modal>
+        />
       </section>
     )
   }
@@ -149,19 +136,6 @@ class ClaimView extends React.Component<Props, State> {
     this.props.history.push('/claim')
   }
 
-  private onSelectAttesters(selectedAttesters: Contact[]) {
-    this.selectedAttesters = selectedAttesters
-  }
-
-  private setSelectAttestersOpen = (
-    isSelectAttestersOpen: boolean,
-    delay = 0
-  ) => () => {
-    setTimeout(() => {
-      this.setState({ isSelectAttestersOpen })
-    }, delay)
-  }
-
   private async onVerifyAttestation(
     attestedClaim: sdk.IAttestedClaim
   ): Promise<boolean> {
@@ -180,17 +154,17 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   private onRequestLegitimation(claimId: Claims.Entry['id']) {
-    this.claimIdToLegitimate = claimId
-    delete this.claimIdToAttest
     if (this.selectAttestersModal) {
+      this.claimIdToLegitimate = claimId
+      delete this.claimIdToAttest
       this.selectAttestersModal.show()
     }
   }
 
   private onRequestAttestation(claimId: Claims.Entry['id']) {
-    delete this.claimIdToLegitimate
-    this.claimIdToAttest = claimId
     if (this.selectAttestersModal) {
+      delete this.claimIdToLegitimate
+      this.claimIdToAttest = claimId
       this.selectAttestersModal.show()
     }
   }
@@ -201,20 +175,22 @@ class ClaimView extends React.Component<Props, State> {
     delete this.claimIdToAttest
   }
 
-  private finishSelectAttesters() {
+  private finishSelectAttesters(selectedAttesters: Contact[]) {
     const claim = this.resolveClaim(
       this.claimIdToLegitimate || this.claimIdToAttest
     )
 
     if (claim) {
       if (this.claimIdToLegitimate) {
-        attestationWorkflow.requestLegitimations(claim, this.selectedAttesters)
+        attestationWorkflow.requestLegitimations(claim, selectedAttesters)
       } else if (this.claimIdToAttest) {
         attestationWorkflow.requestAttestationForClaim(
           claim,
           this.selectedAttesters
         )
       }
+    } else {
+      notifyFailure(`Could not resolve Claim`)
     }
   }
 

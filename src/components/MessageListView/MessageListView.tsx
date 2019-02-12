@@ -89,7 +89,8 @@ class MessageListView extends React.Component<Props, State> {
 
       switch (messageBodyType) {
         case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
-          additionalInfo = (message.body as RequestClaimForCtype).content.name
+          additionalInfo = (message.body as RequestClaimForCtype).content.cType
+            .metadata.title.default
           break
         case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
           break

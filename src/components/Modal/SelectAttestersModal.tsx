@@ -22,6 +22,7 @@ class SelectAttestersModal extends React.Component<Props, State> {
     this.state = {
       isSelectAttestersOpen: false,
     }
+    this.onSelectAttesters = this.onSelectAttesters.bind(this)
   }
 
   public render() {
@@ -35,7 +36,7 @@ class SelectAttestersModal extends React.Component<Props, State> {
         type={ModalType.CONFIRM}
         header="Select Attester(s):"
         onCancel={onCancel}
-        onConfirm={onConfirm.bind(this.selectedAttesters)}
+        onConfirm={onConfirm.bind(this, this.selectedAttesters)}
         catchBackdropClick={isSelectAttestersOpen}
       >
         <div>

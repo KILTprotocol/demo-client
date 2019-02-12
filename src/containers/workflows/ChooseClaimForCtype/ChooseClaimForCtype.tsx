@@ -24,13 +24,13 @@ import './ChooseClaimForCtype.scss'
 
 type Props = {
   claimEntries: Claims.Entry[]
-  ctypeKey: ICType['key']
+  cTypeHash: sdk.ICType['hash']
   onFinished?: () => void
   senderAddress: Contact['publicIdentity']['address']
 }
 
 type State = {
-  ctype?: CType
+  cType?: CType
   selectedClaim?: Claims.Entry
   selectedAttestedClaims: sdk.IAttestedClaim[]
   selectedClaimProperties: string[]
@@ -54,10 +54,10 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    const { ctypeKey } = this.props
+    const { cTypeHash } = this.props
 
-    CtypeRepository.findByKey(ctypeKey).then((ctype: ICType) => {
-      this.setState({ ctype: CType.fromObject(ctype) })
+    CtypeRepository.findByHash(cTypeHash).then((cType: ICType) => {
+      this.setState({ cType: CType.fromObject(cType) })
     })
   }
 
@@ -96,14 +96,14 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
 
   private getClaimSelect() {
     const { claimEntries } = this.props
-    const { ctype } = this.state
+    const { cType } = this.state
 
-    if (!ctype) {
+    if (!cType) {
       return ''
     }
 
     const claims: Claims.Entry[] = claimEntries.filter(
-      (claimEntry: Claims.Entry) => claimEntry.claim.ctype === ctype.key
+      (claimEntry: Claims.Entry) => claimEntry.claim.ctype === cType.cType.hash
     )
     return !!claims && !!claims.length ? (
       <div className="select-claim">
@@ -116,8 +116,10 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
       </div>
     ) : (
       <div className="no-claim">
-        <span>No claim for CTYPE '{ctype.name}' found.</span>
-        <Link to={`/claim/new/${ctype.key}`}>Create Claim</Link>
+        <span>
+          No claim for CTYPE '{cType.cType.metadata.title.default}' found.
+        </span>
+        <Link to={`/claim/new/${cType.cType.hash}`}>Create Claim</Link>
       </div>
     )
   }
@@ -207,8 +209,8 @@ class ChooseClaimForCtype extends React.Component<Props, State> {
   }
 
   private getCtypePropertyTitle(propertyName: string): string {
-    const { ctype } = this.state
-    return ctype ? ctype.getPropertyTitle(propertyName) : propertyName
+    const { cType } = this.state
+    return cType ? cType.getPropertyTitle(propertyName) : propertyName
   }
 
   private selectAttestation(

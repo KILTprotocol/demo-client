@@ -9,7 +9,7 @@ import {
   SubmitClaimForCtype,
 } from '../../types/Message'
 import Code from '../Code/Code'
-import ChooseClaimForCtype from '../../containers/workflows/ChooseClaimForCtype/ChooseClaimForCtype'
+import ChooseClaimForCType from '../../containers/workflows/ChooseClaimForCtype/ChooseClaimForCtype'
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
 import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
 import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
@@ -71,9 +71,11 @@ class MessageDetailView extends React.Component<Props, State> {
     switch (messageBodyType) {
       case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
         return (
-          <ChooseClaimForCtype
+          <ChooseClaimForCType
             senderAddress={message.senderAddress}
-            ctypeKey={(message.body as RequestClaimForCtype).content.key}
+            cTypeHash={
+              (message.body as RequestClaimForCtype).content.cType.hash
+            }
             onFinished={this.handleDelete}
           />
         )
