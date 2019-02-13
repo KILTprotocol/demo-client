@@ -2,7 +2,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { RouteComponentProps, withRouter } from 'react-router'
+import { Redirect, RouteComponentProps, withRouter } from 'react-router'
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
 import SelectAttestersModal from '../../components/Modal/SelectAttestersModal'
@@ -25,11 +25,9 @@ type Props = RouteComponentProps<{ claimId: Claims.Entry['id'] }> & {
 
 type State = {
   isSelectAttestersOpen: boolean
-  currentClaimEntry?: Claims.Entry | 'notFoundInList'
 }
 
 class ClaimView extends React.Component<Props, State> {
-  public selectedAttesters: Contact[] = []
   private selectAttestersModal: SelectAttestersModal | null
   private claimIdToAttest: Claims.Entry['id']
   private claimIdToLegitimate: Claims.Entry['id']
@@ -56,24 +54,22 @@ class ClaimView extends React.Component<Props, State> {
     }
   }
 
-  public componentDidUpdate() {
-    const { claimId } = this.props.match.params
-    if (this.isDetailView()) {
-      this.getCurrentClaimEntry(claimId)
-    }
-  }
-
   public render() {
-    const { claimId } = this.props.match.params
     const { claimEntries } = this.props
-    const { currentClaimEntry, isSelectAttestersOpen } = this.state
+    const { claimId } = this.props.match.params
 
-    const validCurrentClaimEntry =
-      claimId && currentClaimEntry && currentClaimEntry !== 'notFoundInList'
+    const isDetailView = this.isDetailView()
 
-    return (
+    let currentClaimEntry
+    if (isDetailView) {
+      currentClaimEntry = this.getCurrentClaimEntry(claimId)
+    }
+
+    return isDetailView && !currentClaimEntry ? (
+      <Redirect to="/claim" />
+    ) : (
       <section className="ClaimView">
-        {validCurrentClaimEntry && (
+        {isDetailView && currentClaimEntry && (
           <ClaimDetailView
             cancelable={true}
             claimEntry={currentClaimEntry as Claims.Entry}
@@ -83,7 +79,7 @@ class ClaimView extends React.Component<Props, State> {
             onVerifyAttestation={this.onVerifyAttestation}
           />
         )}
-        {!validCurrentClaimEntry && (
+        {!isDetailView && (
           <ClaimListView
             claimStore={claimEntries}
             onRemoveClaim={this.deleteClaim}
@@ -91,6 +87,7 @@ class ClaimView extends React.Component<Props, State> {
             onRequestLegitimation={this.onRequestLegitimation}
           />
         )}
+        {}
         <SelectAttestersModal
           ref={el => {
             this.selectAttestersModal = el
@@ -105,8 +102,7 @@ class ClaimView extends React.Component<Props, State> {
   private isDetailView() {
     const { claimEntries } = this.props
     const { claimId } = this.props.match.params
-    const { currentClaimEntry } = this.state
-    return claimEntries && claimEntries.length && !currentClaimEntry && claimId
+    return !!(claimEntries && claimEntries.length && claimId)
   }
 
   private getCurrentClaimEntry(hash: string) {
@@ -118,15 +114,14 @@ class ClaimView extends React.Component<Props, State> {
 
     if (!currentClaimEntry) {
       const message = `Could not get claim with hash '${hash}' from local list of claims`
-      this.setState({ currentClaimEntry: 'notFoundInList' }, () => {
-        errorService.log({
-          error: { name: 'Error while setting current claim', message },
-          message,
-          origin: 'ClaimView.getCurrentClaimEntry()',
-        })
+      errorService.log({
+        error: { name: 'Error while setting current claim', message },
+        message,
+        origin: 'ClaimView.getCurrentClaimEntry()',
       })
+      return undefined
     } else {
-      this.setState({ currentClaimEntry })
+      return currentClaimEntry
     }
   }
 
@@ -140,11 +135,11 @@ class ClaimView extends React.Component<Props, State> {
     attestedClaim: sdk.IAttestedClaim
   ): Promise<boolean> {
     const { updateAttestation } = this.props
-    const { currentClaimEntry } = this.state
+    const { claimId } = this.props.match.params
     return attestationService
       .verifyAttestatedClaim(attestedClaim)
       .then((verified: boolean) => {
-        if (currentClaimEntry && currentClaimEntry !== 'notFoundInList') {
+        if (this.isDetailView() && this.getCurrentClaimEntry(claimId)) {
           updateAttestation(
             Object.assign(attestedClaim, { revoked: !verified })
           )
@@ -170,7 +165,6 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   private cancelSelectAttesters() {
-    this.selectedAttesters = []
     delete this.claimIdToLegitimate
     delete this.claimIdToAttest
   }
@@ -186,7 +180,7 @@ class ClaimView extends React.Component<Props, State> {
       } else if (this.claimIdToAttest) {
         attestationWorkflow.requestAttestationForClaim(
           claim,
-          this.selectedAttesters
+          selectedAttesters
         )
       }
     } else {

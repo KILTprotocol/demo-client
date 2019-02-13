@@ -79,7 +79,7 @@ class ClaimCreate extends Component<Props, State> {
       <section className="ClaimCreate">
         <h1>New Claim</h1>
         {cType && (
-          <div>
+          <React.Fragment>
             <div className="Claim-base">
               <div>
                 <label>CTYPE</label>
@@ -97,15 +97,15 @@ class ClaimCreate extends Component<Props, State> {
             />
 
             <div className="actions">
+              <Link to="/claim">Cancel</Link>
               <button
-                type="submit"
                 onClick={this.handleSubmit}
                 disabled={!name || name.length === 0}
               >
-                Submit
+                Create
               </button>
             </div>
-          </div>
+          </React.Fragment>
         )}
         {!cType && (
           <p>
