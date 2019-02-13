@@ -1,0 +1,8 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+    - echo Build / Lint / Test
+    - docker build --build-arg KILT_NPM_AUTH_TOKEN=$KILT_NPM_AUTH_TOKEN -t prototype-client .
+    - echo Completed successfully!
