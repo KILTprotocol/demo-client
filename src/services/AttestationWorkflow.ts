@@ -9,6 +9,7 @@ import {
   ApproveAttestationForClaim,
   MessageBody,
   MessageBodyType,
+  PartialClaim,
   RequestAttestationForClaim,
   RequestLegitimations,
 } from '../types/Message'
@@ -24,7 +25,7 @@ class AttestationWorkflow {
    * @param attesters the attesters to send the legitimation request to
    */
   public requestLegitimations(
-    claim: Partial<sdk.Claim>,
+    claim: PartialClaim,
     attesters: Contact[]
   ): Promise<void> {
     const messageBody = {
@@ -45,7 +46,7 @@ class AttestationWorkflow {
    * @param claimer the claimer who requested the legitimation
    */
   public submitLegitimations(
-    claim: Partial<sdk.Claim>,
+    claim: PartialClaim,
     legitimations: sdk.AttestedClaim[],
     claimer: Contact
   ): Promise<void> {
@@ -102,7 +103,7 @@ class AttestationWorkflow {
             attestation: attestedClaim.attestation,
             claimerAddress: attestedClaim.request.claim.owner,
             claimerAlias: claimer.metaData.name,
-            ctypeHash: attestedClaim.request.claim.ctype,
+            ctypeHash: attestedClaim.request.claim.cType,
             ctypeName: '<tbd>',
           } as Attestations.Entry)
 

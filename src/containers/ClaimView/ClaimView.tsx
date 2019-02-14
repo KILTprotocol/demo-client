@@ -178,10 +178,7 @@ class ClaimView extends React.Component<Props, State> {
       if (this.claimIdToLegitimate) {
         attestationWorkflow.requestLegitimations(claim, selectedAttesters)
       } else if (this.claimIdToAttest) {
-        attestationWorkflow.requestAttestationForClaim(
-          claim,
-          selectedAttesters
-        )
+        attestationWorkflow.requestAttestationForClaim(claim, selectedAttesters)
       }
     } else {
       notifyFailure(`Could not resolve Claim`)
@@ -224,7 +221,7 @@ export function getClaimActions(
         <button
           className="requestLegitimation"
           onClick={callback}
-          title="Request legimation for attestation of this claim from attester"
+          title="Request legitimation for attestation of this claim from attester"
         >
           Get Legitimation
         </button>

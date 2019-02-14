@@ -21,8 +21,8 @@ export enum MessageBodyType {
   SUBMIT_LEGITIMATIONS = 'submit-legitimations',
   REQUEST_ATTESTATION_FOR_CLAIM = 'request-attestation-for-claim',
   APPROVE_ATTESTATION_FOR_CLAIM = 'approve-attestation-for-claim',
-  REQUEST_CLAIM_FOR_CTYPE = 'request-claim-for-ctype',
-  SUBMIT_CLAIM_FOR_CTYPE = 'submit-claim-for-ctype',
+  REQUEST_CLAIMS_FOR_CTYPE = 'request-claims-for-ctype',
+  SUBMIT_CLAIMS_FOR_CTYPE = 'submit-claims-for-ctype',
 }
 
 interface MessageBodyBase {
@@ -31,13 +31,13 @@ interface MessageBodyBase {
 }
 
 export interface RequestLegitimations extends MessageBodyBase {
-  content: Partial<sdk.Claim>
+  content: PartialClaim
   type: MessageBodyType.REQUEST_LEGITIMATIONS
 }
 
 export interface SubmitLegitimations extends MessageBodyBase {
   content: {
-    claim: Partial<sdk.Claim>
+    claim: PartialClaim
     legitimations: sdk.IAttestedClaim[]
   }
   type: MessageBodyType.SUBMIT_LEGITIMATIONS
@@ -53,14 +53,18 @@ export interface ApproveAttestationForClaim extends MessageBodyBase {
   type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM
 }
 
-export interface RequestClaimForCtype extends MessageBodyBase {
+export interface RequestClaimsForCtype extends MessageBodyBase {
   content: ICType
-  type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE
+  type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE
 }
 
-export interface SubmitClaimForCtype extends MessageBodyBase {
+export interface SubmitClaimsForCtype extends MessageBodyBase {
   content: sdk.IAttestedClaim[]
-  type: MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE
+  type: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
+}
+
+export interface PartialClaim extends Partial<sdk.Claim> {
+  cType: sdk.Claim['cType']
 }
 
 export type MessageBody =
@@ -68,5 +72,5 @@ export type MessageBody =
   | SubmitLegitimations
   | RequestAttestationForClaim
   | ApproveAttestationForClaim
-  | RequestClaimForCtype
-  | SubmitClaimForCtype
+  | RequestClaimsForCtype
+  | SubmitClaimsForCtype

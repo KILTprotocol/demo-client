@@ -13,7 +13,7 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
-import { MessageBodyType, RequestClaimForCtype } from '../../types/Message'
+import { MessageBodyType, RequestClaimsForCtype } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
@@ -176,9 +176,9 @@ class ContactList extends React.Component<Props, State> {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Sending Message',
       })
-      const request: RequestClaimForCtype = {
+      const request: RequestClaimsForCtype = {
         content: this.selectedCtype,
-        type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE,
+        type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
       }
 
       MessageRepository.send(this.selectedContact, request)

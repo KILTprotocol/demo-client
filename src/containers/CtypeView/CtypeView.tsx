@@ -122,10 +122,12 @@ class CtypeView extends React.Component<Props, State> {
   }
 
   private finishSelectAttesters(selectedAttesters: Contact[]) {
-    attestationWorkflow.requestLegitimations(
-      { ctype: this.cTypeToLegitimate.cType.hash },
-      selectedAttesters
-    )
+    if (this.cTypeToLegitimate.cType.hash) {
+      attestationWorkflow.requestLegitimations(
+        { cType: this.cTypeToLegitimate.cType.hash },
+        selectedAttesters
+      )
+    }
   }
 }
 

@@ -15,6 +15,7 @@ type Props = {
   closeMenuOnSelect?: boolean
   claims: Claims.Entry[]
   isMulti?: boolean
+  placeholder?: string
   onChange?: (selectedClaims: Claims.Entry[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
@@ -49,6 +50,7 @@ class SelectClaims extends React.Component<Props, State> {
       isMulti,
       onMenuOpen,
       onMenuClose,
+      placeholder,
     } = this.props
 
     const options: SelectOption[] = claims.map(
@@ -85,7 +87,7 @@ class SelectClaims extends React.Component<Props, State> {
           onChange={this.onChange}
           onMenuOpen={onMenuOpen}
           onMenuClose={onMenuClose}
-          placeholder={`Select claim${isMulti ? 's' : ''}…`}
+          placeholder={placeholder || `Select claim${isMulti ? 's' : ''}…`}
           filterOption={createFilter(this.filterConfig)}
         />
       )

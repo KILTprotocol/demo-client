@@ -52,7 +52,7 @@ class ClaimDetailView extends Component<Props, State> {
       <div className="attributes">
         <div>
           <label>Ctype</label>
-          <div>{claim.ctype}</div>
+          <div>{claim.cType}</div>
         </div>
         <div>
           <label>Owner</label>

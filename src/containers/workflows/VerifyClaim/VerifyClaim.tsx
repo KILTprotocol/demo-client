@@ -11,22 +11,23 @@ import { CType, ICType } from '../../../types/Ctype'
 
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
+  context?: 'legitimation'
 }
 
 type State = {
   attestersResolved: boolean
-  ctypesResolved: boolean
+  cTypesResolved: boolean
 }
 
 class VerifyClaim extends React.Component<Props, State> {
-  private ctypeMap: Map<string, CType>
+  private cTypeMap: Map<string, CType>
 
   constructor(props: Props) {
     super(props)
-    this.ctypeMap = new Map()
+    this.cTypeMap = new Map()
     this.state = {
       attestersResolved: false,
-      ctypesResolved: false,
+      cTypesResolved: false,
     }
     this.onVerifyAttestation = this.onVerifyAttestation.bind(this)
   }
@@ -40,32 +41,33 @@ class VerifyClaim extends React.Component<Props, State> {
     })
     Promise.all(
       attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => {
-        return cTypeRepository.findByHash(attestedClaim.request.claim.ctype)
+        return cTypeRepository.findByHash(attestedClaim.request.claim.cType)
       })
     ).then((ctypes: ICType[]) => {
       ctypes.forEach((cType: ICType) => {
         if (cType.cType.hash) {
-          this.ctypeMap[cType.cType.hash] = CType.fromObject(cType)
+          this.cTypeMap[cType.cType.hash] = CType.fromObject(cType)
         }
       })
       this.setState({
-        ctypesResolved: true,
+        cTypesResolved: true,
       })
     })
   }
 
   public render() {
-    const { attestedClaims } = this.props
-    const { attestersResolved, ctypesResolved } = this.state
+    const { attestedClaims, context } = this.props
+    const { attestersResolved, cTypesResolved } = this.state
 
-    return attestersResolved && ctypesResolved ? (
+    return attestersResolved && cTypesResolved ? (
       <React.Fragment>
         {attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => {
           return (
             <AttestedClaimVerificationView
               key={attestedClaim.attestation.claimHash}
               attestedClaim={attestedClaim}
-              ctype={this.ctypeMap[attestedClaim.request.claim.ctype]}
+              context={context}
+              ctype={this.cTypeMap[attestedClaim.request.claim.cType]}
               attester={this.getAttester(attestedClaim.attestation.owner)}
               onVerifyAttestatedClaim={this.onVerifyAttestation}
             />

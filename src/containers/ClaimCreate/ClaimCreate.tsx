@@ -82,7 +82,7 @@ class ClaimCreate extends Component<Props, State> {
           <React.Fragment>
             <div className="Claim-base">
               <div>
-                <label>CTYPE</label>
+                <label>CType</label>
                 <div>{cType.metadata.title.default}</div>
               </div>
               <div>
