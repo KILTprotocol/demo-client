@@ -3,12 +3,13 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 
 import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
+import ShortHash from '../../components/ShortHash/ShortHash'
 import attestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
+import FeedbackService, { safeDelete } from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { BlockUi } from '../../types/UserFeedback'
-import FeedbackService from '../../services/FeedbackService'
 
 import './AttestationsView.scss'
 
@@ -134,8 +135,16 @@ class AttestationsView extends React.Component<Props, State> {
     attestationListModel?: AttestationListModel
   ): (() => void) => () => {
     if (attestationListModel) {
-      attestationService.removeFromStore(
-        attestationListModel.attestation.claimHash
+      safeDelete(
+        <span>
+          the attestation with the claim hash '
+          <ShortHash>{attestationListModel.attestation.claimHash}</ShortHash>'
+        </span>,
+        () => {
+          attestationService.removeFromStore(
+            attestationListModel.attestation.claimHash
+          )
+        }
       )
     }
   }

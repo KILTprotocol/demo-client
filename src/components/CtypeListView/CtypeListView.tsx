@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 
 import { ICType } from '../../types/Ctype'
 
 import './CtypeListView.scss'
+import SelectAction from '../SelectAction/SelectAction'
 
-type Props = {
+type Props = RouteComponentProps<{}> & {
   cTypes?: ICType[]
   onRequestLegitimation: (ctype: ICType) => void
 }
@@ -41,16 +42,21 @@ class CtypeListView extends React.Component<Props, State> {
                   </td>
                   <td className="actionsTd">
                     <div className="actions">
-                      <Link to={`/claim/new/${cType.cType.hash}`}>
-                        Create Claim
-                      </Link>
-                      <button
-                        className="requestLegitimation"
-                        onClick={this.requestLegitimation.bind(this, cType)}
-                        title="Request legimation for attestation of this claim from attester"
-                      >
-                        Get Legitimation
-                      </button>
+                      <SelectAction
+                        actions={[
+                          {
+                            callback: this.createClaim.bind(this, cType),
+                            label: 'Create Claim',
+                          },
+                          {
+                            callback: this.requestLegitimation.bind(
+                              this,
+                              cType
+                            ),
+                            label: 'Get Legitimation',
+                          },
+                        ]}
+                      />
                     </div>
                   </td>
                 </tr>
@@ -65,10 +71,14 @@ class CtypeListView extends React.Component<Props, State> {
     )
   }
 
+  private createClaim(cType: ICType) {
+    this.props.history.push(`/claim/new/${cType.cType.hash}`)
+  }
+
   private requestLegitimation(ctype: ICType) {
     const { onRequestLegitimation } = this.props
     onRequestLegitimation(ctype)
   }
 }
 
-export default CtypeListView
+export default withRouter(CtypeListView)

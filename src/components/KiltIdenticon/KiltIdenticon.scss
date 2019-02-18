@@ -2,6 +2,7 @@
   display: flex;
   justify-content: left;
   align-items: center;
+  vertical-align: bottom;
 
   & .container {
 
@@ -18,6 +19,7 @@
     @extend %ellipsis;
 
     padding:{
+      right: $base-padding/4;
       left: $base-padding/4;
     }
   }

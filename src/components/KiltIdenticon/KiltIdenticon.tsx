@@ -15,7 +15,7 @@ type Props = {
 const DEFAULT_SIZE = 24
 
 const KiltIdenticon = (props: Props) => {
-  const { contact, fallback, myIdentity, size, iconOnly } = props
+  const { contact, fallback, myIdentity, size } = props
   const address = myIdentity
     ? myIdentity.identity.address
     : contact

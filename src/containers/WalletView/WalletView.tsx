@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 import IdentityView from '../../components/IdentityView/IdentityView'
 import Modal, { ModalType } from '../../components/Modal/Modal'
+import { safeDelete } from '../../services/FeedbackService'
 
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
@@ -18,23 +19,16 @@ type Props = RouteComponentProps<{}> & {
   selectedIdentity?: Wallet.Entry
 }
 
-type State = {
-  identityToDelete?: Wallet.Entry
-}
+type State = {}
 
 class WalletView extends React.Component<Props, State> {
-  private deleteModal: Modal | null
-
   constructor(props: Props) {
     super(props)
-    this.state = {}
 
-    this.requestRemoveIdentity = this.requestRemoveIdentity.bind(this)
+    this.removeIdentity = this.removeIdentity.bind(this)
   }
 
   public render() {
-    const { identityToDelete } = this.state
-
     const identities = this.props.identities.map((myIdentity: Wallet.Entry) => {
       let selected = false
       if (this.props.selectedIdentity) {
@@ -47,7 +41,7 @@ class WalletView extends React.Component<Props, State> {
           key={myIdentity.identity.address}
           myIdentity={myIdentity}
           selected={selected}
-          onDelete={this.requestRemoveIdentity}
+          onDelete={this.removeIdentity}
           onSelect={this.selectIdentity}
         />
       )
@@ -62,47 +56,20 @@ class WalletView extends React.Component<Props, State> {
             Add Identity
           </Link>
         </div>
-        {!!identityToDelete && (
-          <Modal
-            ref={el => {
-              this.deleteModal = el
-            }}
-            header="Delete?"
-            onConfirm={this.removeIdentity}
-            type={ModalType.CONFIRM}
-          >
-            <div>
-              Are you sure you want to delete your identity '
-              {identityToDelete.metaData.name}'?
-            </div>
-          </Modal>
-        )}
       </section>
     )
   }
 
-  private removeIdentity = () => {
-    const { removeIdentity } = this.props
-    const { identityToDelete } = this.state
-    if (identityToDelete) {
-      removeIdentity(identityToDelete.identity.address)
-    }
-  }
-
-  private requestRemoveIdentity(address: MyIdentity['identity']['address']) {
-    const { identities } = this.props
+  private removeIdentity(address: MyIdentity['identity']['address']) {
+    const { identities, removeIdentity } = this.props
     const identityToDelete = identities.find(
       (identity: Wallet.Entry) => identity.identity.address === address
     )
 
     if (identityToDelete) {
-      this.setState({ identityToDelete }, () => {
-        if (this.deleteModal) {
-          this.deleteModal.show()
-        }
+      safeDelete(`your identity '${identityToDelete.metaData.name}''`, () => {
+        removeIdentity(identityToDelete.identity.address)
       })
-    } else {
-      this.setState({ identityToDelete: undefined })
     }
   }
 

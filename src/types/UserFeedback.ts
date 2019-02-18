@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import { ModalType } from '../components/Modal/Modal'
 
 export enum NotificationType {
@@ -19,7 +20,7 @@ export interface Notification {
   id: string
   className?: string
   created: number
-  message: string
+  message: string | ReactNode
   remove: () => void
   type: NotificationType
 }

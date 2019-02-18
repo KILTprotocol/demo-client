@@ -8,6 +8,7 @@ import {
 } from '../../types/Message'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 import './MessageListView.scss'
+import MessageSubject from '../MessageSubject/MessageSubject'
 
 type Props = {
   messages: MessageOutput[]
@@ -49,7 +50,7 @@ class MessageListView extends React.Component<Props, State> {
                   </td>
                   <td className="subject">
                     <div onClick={this.openMessage(message)}>
-                      {this.getMessageInfo(message)}
+                      <MessageSubject message={message} />
                     </div>
                   </td>
                   <td className="actionsTd">
@@ -70,42 +71,6 @@ class MessageListView extends React.Component<Props, State> {
           </table>
         )}
       </section>
-    )
-  }
-
-  private getMessageInfo(message: Message) {
-    if (!message || !message.body || !message.body.content) {
-      return undefined
-    }
-
-    if (!message.body || !message.body.type) {
-      return message.message
-    }
-
-    // TODO: move this stuff to getSubject method in Message.ts
-
-    let additionalInfo: string = ''
-    try {
-      const messageBodyType: MessageBodyType | undefined = message.body.type
-
-      switch (messageBodyType) {
-        case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
-          additionalInfo = (message.body as RequestClaimsForCtype).content.cType
-            .metadata.title.default
-          break
-        case MessageBodyType.REQUEST_LEGITIMATIONS:
-          additionalInfo = (message.body as RequestLegitimations).content.cType
-          break
-      }
-    } catch (error) {
-      additionalInfo = ''
-    }
-
-    return (
-      <span>
-        <span className="type">{message.body!.type}</span>
-        {additionalInfo && <span> "{additionalInfo}"</span>}
-      </span>
     )
   }
 

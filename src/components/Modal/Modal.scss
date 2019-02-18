@@ -57,9 +57,14 @@
 
   & .body {
     padding: $base-padding/2 $base-padding;
+    line-height: 1.6;
 
     & footer {
       margin: $base-padding (-$base-padding) (-$base-padding/2);
+    }
+
+    & .KiltIdenticon {
+      display: inline-flex;
     }
   }
 

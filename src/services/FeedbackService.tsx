@@ -1,3 +1,5 @@
+import React, { ReactNode } from 'react'
+import { ModalType } from '../components/Modal/Modal'
 import * as UiState from '../state/ducks/UiState'
 import persistentStore from '../state/PersistentStore'
 import {
@@ -146,6 +148,25 @@ export function notifyFailure(message: string, blocking = true) {
 
 export function notify(message: string, blocking = false) {
   _notify(NotificationType.INFO, message, blocking)
+}
+
+export function safeDelete(
+  message: ReactNode,
+  onConfirm: (notification: BlockingNotification) => void,
+  removeNotificationInstantly = true
+) {
+  FeedbackService.addBlockingNotification({
+    header: 'Are you sure?',
+    message: <div>Do you want to delete {message}?</div>,
+    modalType: ModalType.CONFIRM,
+    onConfirm: (notification: BlockingNotification) => {
+      onConfirm(notification)
+      if (removeNotificationInstantly) {
+        notification.remove()
+      }
+    },
+    type: NotificationType.INFO,
+  })
 }
 
 export default FeedbackService
