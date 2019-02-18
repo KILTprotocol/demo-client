@@ -7,38 +7,47 @@ import persistentStore from '../state/PersistentStore'
 import { Contact } from '../types/Contact'
 import {
   ApproveAttestationForClaim,
+  MessageBody,
   MessageBodyType,
+  PartialClaim,
   RequestAttestationForClaim,
-  RequestLegitimationsForClaimAttestation,
+  RequestLegitimations,
 } from '../types/Message'
 import errorService from './ErrorService'
-import { notifySuccess } from './FeedbackService'
+import { notifyFailure, notifySuccess } from './FeedbackService'
 import MessageRepository from './MessageRepository'
 
 class AttestationWorkflow {
   /**
-   * Sends a legitimations request for attestating a claim to attesters.
+   * Sends a legitimation request for attesting claims to attesters
    *
-   * @param claim the claim to be attested
-   * @param attesters the attesters to send the legitimations request to
+   * @param claim the partial claim we request legitimation for
+   * @param attesters the attesters to send the legitimation request to
    */
-  public requestLegitimationsForClaimAttestation(
-    claim: sdk.IClaim,
+  public requestLegitimations(
+    claim: PartialClaim,
     attesters: Contact[]
-  ): Promise<RequestLegitimationsForClaimAttestation> {
-    throw new Error('not implemented')
+  ): Promise<void> {
+    const messageBody = {
+      content: claim,
+      type: MessageBodyType.REQUEST_LEGITIMATIONS,
+    } as RequestLegitimations
+
+    return this.bulkSend(attesters, messageBody)
   }
 
   /**
-   * Sends back the legitimations along with the claim to the claimer.
+   * Sends back the legitimation along with the originally given (partial)
+   * claim to the claimer.
    *
-   * @param claim the claim to attest
-   * @param legitimations the list of legitimations to be included in the attestation
-   * @param claimer the claimer who requested the legitimations
+   * @param claim the (partial) claim to attest
+   * @param legitimations the list of legitimations to be included in the
+   *   attestation
+   * @param claimer the claimer who requested the legitimation
    */
-  public submitLegitimationsForClaimAttestation(
-    claim: sdk.IClaim,
-    legitimations: sdk.IAttestedClaim[],
+  public submitLegitimations(
+    claim: PartialClaim,
+    legitimations: sdk.AttestedClaim[],
     claimer: Contact
   ): Promise<void> {
     throw new Error('not implemented')
@@ -47,54 +56,38 @@ class AttestationWorkflow {
   /**
    * Creates the request for claim attestation and sends it to the attester.
    *
-   * @param claim the claim to attest
-   * @param attesters the attesters to send the request to
+   * @param claim - the claim to attest
+   * @param attesters - the attesters to send the request to
+   * @param [legitimations] - the legitimations the claimer requested
+   *   beforehand from attester
    */
   public requestAttestationForClaim(
     claim: sdk.IClaim,
-    attesters: Contact[]
+    attesters: Contact[],
+    legitimations: sdk.AttestedClaim[] = []
   ): Promise<void> {
     const identity: sdk.Identity = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
     ).identity
     const requestForAttestation: sdk.IRequestForAttestation = new sdk.RequestForAttestation(
       claim,
-      [],
+      legitimations,
       identity
     )
+    const messageBody = {
+      content: requestForAttestation,
+      type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+    } as RequestAttestationForClaim
 
-    return new Promise((resolve, reject) => {
-      Promise.all(
-        attesters.map((attester: Contact) => {
-          const messageBody = {
-            content: requestForAttestation,
-            type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
-          } as RequestAttestationForClaim
-          return MessageRepository.send(attester, messageBody)
-        })
-      )
-        .then(() => {
-          notifySuccess('Attestation request sent.')
-          resolve()
-        })
-        .catch(error => {
-          errorService.log({
-            error,
-            message: `Could not send message ${
-              MessageBodyType.REQUEST_LEGITIMATIONS_FOR_CLAIM_ATTESTATION
-            }`,
-            origin: 'AttestationsWorkflow.requestAttestationForClaim()',
-            type: 'ERROR.FETCH.POST',
-          })
-          reject(error)
-        })
-    })
+    return this.bulkSend(attesters, messageBody)
   }
 
   /**
-   * Verifies the given request for attestation, creates an attestation on chain and sends it to the claimer.
+   * Verifies the given request for attestation, creates an attestation on
+   * chain and sends it to the claimer.
    *
-   * @param requestForAttestation the request for attestation to be verified and attested
+   * @param requestForAttestation the request for attestation to be verified
+   *   and attested
    * @param claimer the contact who wants his claim to be attested
    */
   public approveAndSubmitAttestationForClaim(
@@ -110,7 +103,7 @@ class AttestationWorkflow {
             attestation: attestedClaim.attestation,
             claimerAddress: attestedClaim.request.claim.owner,
             claimerAlias: claimer.metaData.name,
-            ctypeHash: attestedClaim.request.claim.ctype,
+            ctypeHash: attestedClaim.request.claim.cType,
             ctypeName: '<tbd>',
           } as Attestations.Entry)
 
@@ -152,6 +145,53 @@ class AttestationWorkflow {
    */
   public importAttestedClaim(attestedClaim: sdk.IAttestedClaim): Promise<void> {
     throw new Error('not implemented')
+  }
+
+  /**
+   * sends a bulk of requests to several attesters
+   *
+   * @param attesters
+   * @param messageBody
+   */
+  private bulkSend(
+    attesters: Contact[],
+    messageBody: MessageBody
+  ): Promise<void> {
+    const failedReceivers: Contact[] = []
+
+    if (!attesters || !attesters.length) {
+      notifyFailure('No attesters selected')
+      return Promise.reject()
+    }
+
+    return new Promise((resolve, reject) => {
+      Promise.all(
+        attesters.map((attester: Contact) => {
+          return MessageRepository.send(attester, messageBody)
+        })
+      )
+        .then(() => {
+          notifySuccess(
+            `'${messageBody.type}' message${
+              attesters.length > 1 ? 's' : ''
+            } successfully sent.`
+          )
+          resolve()
+        })
+        .catch(error => {
+          errorService.log({
+            error,
+            message: `Failed to send '${messageBody.type}' message${
+              failedReceivers.length > 1 ? 's' : ''
+            } to '${failedReceivers
+              .map((receiver: Contact) => receiver.metaData.name)
+              .join(',')}'`,
+            origin: 'AttestationsWorkflow.bulkSend()',
+            type: 'ERROR.FETCH.POST',
+          })
+          reject(failedReceivers)
+        })
+    })
   }
 }
 

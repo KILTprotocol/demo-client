@@ -144,7 +144,7 @@ export function notifyFailure(message: string, blocking = true) {
   _notify(NotificationType.FAILURE, message, blocking)
 }
 
-export function notify(message: string, blocking = true) {
+export function notify(message: string, blocking = false) {
   _notify(NotificationType.INFO, message, blocking)
 }
 

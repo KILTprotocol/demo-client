@@ -58,14 +58,8 @@ class AttestClaim extends React.Component<Props, State> {
               onFinished()
             }
           })
-          .catch(error => {
+          .catch((rejectedReceivers: Contact[]) => {
             blockUi.remove()
-            notifyFailure(
-              `An error occurred during claim attestation: ${error.message}`
-            )
-            if (onFinished) {
-              onFinished()
-            }
           })
       } else {
         blockUi.remove()

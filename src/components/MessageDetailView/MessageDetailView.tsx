@@ -3,13 +3,15 @@ import React, { ReactNode } from 'react'
 import {
   Message,
   MessageBodyType,
-  RequestClaimForCtype,
+  RequestClaimsForCtype,
   RequestAttestationForClaim,
   ApproveAttestationForClaim,
-  SubmitClaimForCtype,
+  SubmitClaimsForCtype,
+  RequestLegitimations,
+  SubmitLegitimations,
 } from '../../types/Message'
 import Code from '../Code/Code'
-import ChooseClaimForCtype from '../../containers/workflows/ChooseClaimForCtype/ChooseClaimForCtype'
+import ChooseClaimsForCType from '../../containers/workflows/ChooseClaimsForCtype/ChooseClaimsForCtype'
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
 import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
 import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
@@ -69,12 +71,24 @@ class MessageDetailView extends React.Component<Props, State> {
       | undefined = this.getMessageBodyType(message)
 
     switch (messageBodyType) {
-      case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
+      case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
         return (
-          <ChooseClaimForCtype
+          <ChooseClaimsForCType
             senderAddress={message.senderAddress}
-            ctypeKey={(message.body as RequestClaimForCtype).content.key}
+            cTypeHash={
+              (message.body as RequestClaimsForCtype).content.cType.hash
+            }
             onFinished={this.handleDelete}
+          />
+        )
+      case MessageBodyType.REQUEST_LEGITIMATIONS:
+        return (
+          <ChooseClaimsForCType
+            senderAddress={message.senderAddress}
+            sentClaim={(message.body as RequestLegitimations).content}
+            cTypeHash={(message.body as RequestLegitimations).content.cType}
+            onFinished={this.handleDelete}
+            context="legitimation"
           />
         )
       case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
@@ -94,10 +108,19 @@ class MessageDetailView extends React.Component<Props, State> {
             onFinished={this.handleDelete}
           />
         )
-      case MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE:
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
         return (
           <VerifyClaim
-            attestedClaims={(message.body as SubmitClaimForCtype).content}
+            attestedClaims={(message.body as SubmitClaimsForCtype).content}
+          />
+        )
+      case MessageBodyType.SUBMIT_LEGITIMATIONS:
+        return (
+          <VerifyClaim
+            attestedClaims={
+              (message.body as SubmitLegitimations).content.legitimations
+            }
+            context="legitimation"
           />
         )
       default:
@@ -130,7 +153,7 @@ class MessageDetailView extends React.Component<Props, State> {
 
     return (
       messageBodyType !== undefined &&
-      messageBodyType !== MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE
+      messageBodyType !== MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
     )
   }
 }

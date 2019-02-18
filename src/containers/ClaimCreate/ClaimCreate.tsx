@@ -12,12 +12,13 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
+import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './ClaimCreate.scss'
 
 type Props = RouteComponentProps<{
-  ctypeKey: string
+  cTypeHash: sdk.ICType['hash']
 }> & {
   saveClaim: (claim: sdk.IClaim, meta: { alias: string }) => void
   selectedIdentity?: Wallet.Entry
@@ -27,7 +28,7 @@ type State = {
   claim: any
   name: string
   isValid: boolean
-  ctype?: sdk.CType
+  cType?: sdk.CType
 }
 
 class ClaimCreate extends Component<Props, State> {
@@ -46,33 +47,22 @@ class ClaimCreate extends Component<Props, State> {
   }
 
   public componentDidMount() {
-    const { ctypeKey } = this.props.match.params
+    const { cTypeHash } = this.props.match.params
 
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Fetching CTYPE',
     })
 
-    CtypeRepository.findByKey(ctypeKey).then(
-      dbCtype => {
-        try {
-          const parsedDefinition = JSON.parse(dbCtype.definition)
-          const ctype = new sdk.CType(parsedDefinition)
-          this.setState({ ctype })
-          blockUi.remove()
-        } catch (error) {
-          errorService.log({
-            error,
-            message: `could not parse definition of CTYPE ${ctypeKey}`,
-            origin: 'ClaimCreate.componentDidMount()',
-            type: 'ERROR.JSON.PARSE',
-          })
-          blockUi.remove()
-        }
+    CtypeRepository.findByHash(cTypeHash).then(
+      (dbCtype: ICType) => {
+        const cType = new sdk.CType(dbCtype.cType)
+        this.setState({ cType })
+        blockUi.remove()
       },
       error => {
         errorService.log({
           error,
-          message: `could not retrieve CTYPE with key ${ctypeKey}`,
+          message: `could not retrieve CTYPE with key ${cTypeHash}`,
           origin: 'ClaimCreate.componentDidMount()',
           type: 'ERROR.FETCH.GET',
         })
@@ -83,41 +73,41 @@ class ClaimCreate extends Component<Props, State> {
 
   public render() {
     const { match }: Props = this.props
-    const { ctype, claim, name }: State = this.state
+    const { cType, claim, name }: State = this.state
 
     return (
       <section className="ClaimCreate">
         <h1>New Claim</h1>
-        {ctype && (
-          <div>
+        {cType && (
+          <React.Fragment>
             <div className="Claim-base">
               <div>
-                <label>Ctype</label>
-                <div>{match.params.ctypeKey}</div>
+                <label>CType</label>
+                <div>{cType.metadata.title.default}</div>
               </div>
               <div>
-                <label>Alias</label>
+                <label>Claim alias</label>
                 <input type="text" onChange={this.handleNameChange} />
               </div>
             </div>
             <SchemaEditor
-              schema={ctype!.getClaimInputModel() as common.Schema}
+              schema={cType!.getClaimInputModel() as common.Schema}
               initialValue={claim}
               updateValue={this.updateClaim}
             />
 
             <div className="actions">
+              <Link to="/claim">Cancel</Link>
               <button
-                type="submit"
                 onClick={this.handleSubmit}
                 disabled={!name || name.length === 0}
               >
-                Submit
+                Create
               </button>
             </div>
-          </div>
+          </React.Fragment>
         )}
-        {!ctype && (
+        {!cType && (
           <p>
             <span>No CTYPEs found. Please </span>
             <Link to="/ctype/new">create a new CTYPE</Link>.
@@ -136,11 +126,11 @@ class ClaimCreate extends Component<Props, State> {
 
   private handleSubmit() {
     const { saveClaim, selectedIdentity, history } = this.props
-    const { name, claim, ctype }: State = this.state
+    const { name, claim, cType }: State = this.state
 
-    if (ctype && selectedIdentity) {
+    if (cType && selectedIdentity) {
       const newClaim: sdk.Claim = new sdk.Claim(
-        ctype,
+        cType,
         claim,
         selectedIdentity.identity
       )

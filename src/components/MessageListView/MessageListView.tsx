@@ -3,7 +3,8 @@ import {
   Message,
   MessageBodyType,
   MessageOutput,
-  RequestClaimForCtype,
+  RequestClaimsForCtype,
+  RequestLegitimations,
 } from '../../types/Message'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 import './MessageListView.scss'
@@ -88,14 +89,12 @@ class MessageListView extends React.Component<Props, State> {
       const messageBodyType: MessageBodyType | undefined = message.body.type
 
       switch (messageBodyType) {
-        case MessageBodyType.REQUEST_CLAIM_FOR_CTYPE:
-          additionalInfo = (message.body as RequestClaimForCtype).content.name
+        case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
+          additionalInfo = (message.body as RequestClaimsForCtype).content.cType
+            .metadata.title.default
           break
-        case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
-          break
-        case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
-          break
-        case MessageBodyType.SUBMIT_CLAIM_FOR_CTYPE:
+        case MessageBodyType.REQUEST_LEGITIMATIONS:
+          additionalInfo = (message.body as RequestLegitimations).content.cType
           break
       }
     } catch (error) {

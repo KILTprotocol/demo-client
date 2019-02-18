@@ -11,6 +11,7 @@ import './AttestedClaimVerificationView.scss'
 type Props = {
   attester?: Contact
   attestedClaim: sdk.IAttestedClaim
+  context?: 'legitimation'
   ctype?: CType
   onVerifyAttestatedClaim: (
     attestatedClaim: sdk.IAttestedClaim
@@ -38,7 +39,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { attestedClaim }: Props = this.props
+    const { attestedClaim, context }: Props = this.props
     const { verificationPending } = this.state
 
     return (
@@ -46,7 +47,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
         {attestedClaim ? (
           <React.Fragment>
             <header>
-              <h3>Attested Claim</h3>
+              <h3>{context || 'Attested claim'}</h3>
               <button
                 className="refresh"
                 onClick={this.verifyAttestatedClaim}
@@ -104,7 +105,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
           </div>
           <div>
             <label>Valid</label>
-            <div>{attestationStatusView}</div>
+            <div className="attestationStatusView">{attestationStatusView}</div>
           </div>
         </div>
       )

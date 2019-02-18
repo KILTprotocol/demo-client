@@ -9,7 +9,7 @@ import './CtypeEditor.scss'
 type Props = {
   // input
   connected: boolean
-  ctype: string
+  cType: string
   isValid: boolean
   // output
   cancel: () => void
@@ -17,22 +17,24 @@ type Props = {
   updateCType: (ctype: any, isValid: boolean) => void
 }
 
-const CtypeEditor = (props: Props) => {
+const CTypeEditor = (props: Props) => {
+  const { cancel, connected, isValid, submit, cType, updateCType } = props
+
   return (
-    <section className="CtypeEditor">
+    <section className="CTypeEditor">
       <SchemaEditor
         schema={CTypeInputModel as common.Schema}
-        initialValue={props.ctype}
-        updateValue={props.updateCType}
+        initialValue={cType}
+        updateValue={updateCType}
       />
       <div className="actions">
-        <button className="cancel-ctype" onClick={props.cancel}>
+        <button className="cancel-cType" onClick={cancel}>
           Cancel
         </button>
         <button
-          className="submit-ctype"
-          disabled={!props.connected || !props.isValid}
-          onClick={props.submit}
+          className="submit-cType"
+          disabled={!connected || !isValid}
+          onClick={submit}
         >
           Submit
         </button>
@@ -41,4 +43,4 @@ const CtypeEditor = (props: Props) => {
   )
 }
 
-export default CtypeEditor
+export default CTypeEditor

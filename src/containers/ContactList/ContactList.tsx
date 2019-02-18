@@ -1,3 +1,4 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
 import Select, { createFilter } from 'react-select'
@@ -12,7 +13,7 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
-import { MessageBodyType, RequestClaimForCtype } from '../../types/Message'
+import { MessageBodyType, RequestClaimsForCtype } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
@@ -21,11 +22,11 @@ interface Props {}
 
 interface State {
   contacts: Contact[]
-  ctypes: ICType[]
+  cTypes: ICType[]
 }
 
 type SelectOption = {
-  value: string
+  value: sdk.ICType['hash']
   label: string
 }
 
@@ -43,8 +44,8 @@ class ContactList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
+      cTypes: [],
       contacts: [],
-      ctypes: [],
     }
     this.onCancelRequestClaim = this.onCancelRequestClaim.bind(this)
     this.onFinishRequestClaim = this.onFinishRequestClaim.bind(this)
@@ -69,8 +70,8 @@ class ContactList extends React.Component<Props, State> {
         })
       })
     CtypeRepository.findAll()
-      .then((ctypes: ICType[]) => {
-        this.setState({ ctypes })
+      .then((cTypes: ICType[]) => {
+        this.setState({ cTypes })
       })
       .catch(error => {
         errorService.log({
@@ -134,11 +135,11 @@ class ContactList extends React.Component<Props, State> {
   }
 
   private getSelectCtypes() {
-    const { ctypes } = this.state
+    const { cTypes } = this.state
 
-    const options: SelectOption[] = ctypes.map((ctype: ICType) => ({
-      label: ctype.name,
-      value: ctype.key,
+    const options: SelectOption[] = cTypes.map((cType: ICType) => ({
+      label: cType.cType.metadata.title.default,
+      value: cType.cType.hash,
     }))
     return (
       <Select
@@ -159,10 +160,10 @@ class ContactList extends React.Component<Props, State> {
   }
 
   private onSelectCtype(selectedOption: SelectOption) {
-    const { ctypes } = this.state
+    const { cTypes } = this.state
 
-    this.selectedCtype = ctypes.find(
-      (ctype: ICType) => selectedOption.value === ctype.key
+    this.selectedCtype = cTypes.find(
+      (cType: ICType) => selectedOption.value === cType.cType.hash
     )
   }
 
@@ -175,9 +176,9 @@ class ContactList extends React.Component<Props, State> {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Sending Message',
       })
-      const request: RequestClaimForCtype = {
+      const request: RequestClaimsForCtype = {
         content: this.selectedCtype,
-        type: MessageBodyType.REQUEST_CLAIM_FOR_CTYPE,
+        type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
       }
 
       MessageRepository.send(this.selectedContact, request)

@@ -2,14 +2,14 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { RouteComponentProps, withRouter } from 'react-router'
+import { Redirect, RouteComponentProps, withRouter } from 'react-router'
 import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
 import ClaimListView from '../../components/ClaimListView/ClaimListView'
-import Modal, { ModalType } from '../../components/Modal/Modal'
-import SelectAttesters from '../../components/SelectAttesters/SelectAttesters'
+import SelectAttestersModal from '../../components/Modal/SelectAttestersModal'
 import attestationService from '../../services/AttestationService'
 import attestationWorkflow from '../../services/AttestationWorkflow'
 import errorService from '../../services/ErrorService'
+import { notifyFailure } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
 
@@ -25,13 +25,12 @@ type Props = RouteComponentProps<{ claimId: Claims.Entry['id'] }> & {
 
 type State = {
   isSelectAttestersOpen: boolean
-  currentClaimEntry?: Claims.Entry | 'notFoundInList'
 }
 
 class ClaimView extends React.Component<Props, State> {
-  public selectedAttesters: Contact[] = []
-  private selectAttestersModal: Modal | null
+  private selectAttestersModal: SelectAttestersModal | null
   private claimIdToAttest: Claims.Entry['id']
+  private claimIdToLegitimate: Claims.Entry['id']
 
   constructor(props: Props) {
     super(props)
@@ -39,14 +38,13 @@ class ClaimView extends React.Component<Props, State> {
       isSelectAttestersOpen: false,
     }
     this.deleteClaim = this.deleteClaim.bind(this)
-    this.showAttesterSelectionModal = this.showAttesterSelectionModal.bind(this)
-    this.hideAttersterSelectionModal = this.hideAttersterSelectionModal.bind(
-      this
-    )
-    this.requestAttestationForClaim = this.requestAttestationForClaim.bind(this)
-    this.onSelectAttesters = this.onSelectAttesters.bind(this)
-    this.setSelectAttestersOpen = this.setSelectAttestersOpen.bind(this)
-    this.onVerifyAttestation = this.onVerifyAttestation.bind(this)
+    this.requestLegitimation = this.requestLegitimation.bind(this)
+    this.requestAttestation = this.requestAttestation.bind(this)
+
+    this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
+    this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
+
+    this.verifyAttestation = this.verifyAttestation.bind(this)
   }
 
   public componentDidMount() {
@@ -56,51 +54,47 @@ class ClaimView extends React.Component<Props, State> {
     }
   }
 
-  public componentDidUpdate() {
-    const { claimId } = this.props.match.params
-    if (this.isDetailView()) {
-      this.getCurrentClaimEntry(claimId)
-    }
-  }
-
   public render() {
-    const { claimId } = this.props.match.params
     const { claimEntries } = this.props
-    const { currentClaimEntry, isSelectAttestersOpen } = this.state
+    const { claimId } = this.props.match.params
 
-    const validCurrentClaimEntry =
-      claimId && currentClaimEntry && currentClaimEntry !== 'notFoundInList'
+    const isDetailView = this.isDetailView()
 
-    return (
+    let currentClaimEntry
+    if (isDetailView) {
+      currentClaimEntry = this.getCurrentClaimEntry(claimId)
+    }
+
+    return isDetailView && !currentClaimEntry ? (
+      <Redirect to="/claim" />
+    ) : (
       <section className="ClaimView">
-        {validCurrentClaimEntry && (
+        {isDetailView && currentClaimEntry && (
           <ClaimDetailView
             cancelable={true}
             claimEntry={currentClaimEntry as Claims.Entry}
             onRemoveClaim={this.deleteClaim}
-            onRequestAttestation={this.showAttesterSelectionModal}
-            onVerifyAttestation={this.onVerifyAttestation}
+            onRequestAttestation={this.requestAttestation}
+            onRequestLegitimation={this.requestLegitimation}
+            onVerifyAttestation={this.verifyAttestation}
           />
         )}
-        {!validCurrentClaimEntry && (
+        {!isDetailView && (
           <ClaimListView
             claimStore={claimEntries}
             onRemoveClaim={this.deleteClaim}
-            onRequestAttestation={this.showAttesterSelectionModal}
+            onRequestAttestation={this.requestAttestation}
+            onRequestLegitimation={this.requestLegitimation}
           />
         )}
-        <Modal
+        {}
+        <SelectAttestersModal
           ref={el => {
             this.selectAttestersModal = el
           }}
-          type={ModalType.CONFIRM}
-          header="Select Attester(s):"
-          onCancel={this.hideAttersterSelectionModal}
-          onConfirm={this.requestAttestationForClaim}
-          catchBackdropClick={isSelectAttestersOpen}
-        >
-          {this.getSelectAttesters()}
-        </Modal>
+          onCancel={this.cancelSelectAttesters}
+          onConfirm={this.finishSelectAttesters}
+        />
       </section>
     )
   }
@@ -108,28 +102,26 @@ class ClaimView extends React.Component<Props, State> {
   private isDetailView() {
     const { claimEntries } = this.props
     const { claimId } = this.props.match.params
-    const { currentClaimEntry } = this.state
-    return claimEntries && claimEntries.length && !currentClaimEntry && claimId
+    return !!(claimEntries && claimEntries.length && claimId)
   }
 
-  private getCurrentClaimEntry(hash: string) {
+  private getCurrentClaimEntry(id: Claims.Entry['id']) {
     const { claimEntries } = this.props
 
     const currentClaimEntry = claimEntries.find(
-      (claimEntry: Claims.Entry) => claimEntry.id === hash
+      (claimEntry: Claims.Entry) => claimEntry.id === id
     )
 
     if (!currentClaimEntry) {
-      const message = `Could not get claim with hash '${hash}' from local list of claims`
-      this.setState({ currentClaimEntry: 'notFoundInList' }, () => {
-        errorService.log({
-          error: { name: 'Error while setting current claim', message },
-          message,
-          origin: 'ClaimView.getCurrentClaimEntry()',
-        })
+      const message = `Could not get claim with id '${id}' from local list of claims`
+      errorService.log({
+        error: { name: 'Error while setting current claim', message },
+        message,
+        origin: 'ClaimView.getCurrentClaimEntry()',
       })
+      return undefined
     } else {
-      this.setState({ currentClaimEntry })
+      return currentClaimEntry
     }
   }
 
@@ -139,40 +131,15 @@ class ClaimView extends React.Component<Props, State> {
     this.props.history.push('/claim')
   }
 
-  private getSelectAttesters() {
-    return (
-      <div>
-        <SelectAttesters
-          onChange={this.onSelectAttesters}
-          onMenuOpen={this.setSelectAttestersOpen(true)}
-          onMenuClose={this.setSelectAttestersOpen(false, 500)}
-        />
-      </div>
-    )
-  }
-
-  private onSelectAttesters(selectedAttesters: Contact[]) {
-    this.selectedAttesters = selectedAttesters
-  }
-
-  private setSelectAttestersOpen = (
-    isSelectAttestersOpen: boolean,
-    delay = 0
-  ) => () => {
-    setTimeout(() => {
-      this.setState({ isSelectAttestersOpen })
-    }, delay)
-  }
-
-  private async onVerifyAttestation(
+  private async verifyAttestation(
     attestedClaim: sdk.IAttestedClaim
   ): Promise<boolean> {
     const { updateAttestation } = this.props
-    const { currentClaimEntry } = this.state
+    const { claimId } = this.props.match.params
     return attestationService
       .verifyAttestatedClaim(attestedClaim)
       .then((verified: boolean) => {
-        if (currentClaimEntry && currentClaimEntry !== 'notFoundInList') {
+        if (this.isDetailView() && this.getCurrentClaimEntry(claimId)) {
           updateAttestation(
             Object.assign(attestedClaim, { revoked: !verified })
           )
@@ -181,29 +148,87 @@ class ClaimView extends React.Component<Props, State> {
       })
   }
 
-  private showAttesterSelectionModal(claimId: Claims.Entry['id']) {
-    this.claimIdToAttest = claimId
+  private requestLegitimation(claimId: Claims.Entry['id']) {
     if (this.selectAttestersModal) {
+      this.claimIdToLegitimate = claimId
+      delete this.claimIdToAttest
       this.selectAttestersModal.show()
     }
   }
 
-  private hideAttersterSelectionModal() {
-    this.selectedAttesters = []
+  private requestAttestation(claimId: Claims.Entry['id']) {
+    if (this.selectAttestersModal) {
+      delete this.claimIdToLegitimate
+      this.claimIdToAttest = claimId
+      this.selectAttestersModal.show()
+    }
   }
 
-  private requestAttestationForClaim() {
+  private cancelSelectAttesters() {
+    delete this.claimIdToLegitimate
+    delete this.claimIdToAttest
+  }
+
+  private finishSelectAttesters(selectedAttesters: Contact[]) {
+    const claim = this.resolveClaim(
+      this.claimIdToLegitimate || this.claimIdToAttest
+    )
+
+    if (claim) {
+      if (this.claimIdToLegitimate) {
+        attestationWorkflow.requestLegitimations(claim, selectedAttesters)
+      } else if (this.claimIdToAttest) {
+        attestationWorkflow.requestAttestationForClaim(claim, selectedAttesters)
+      }
+    } else {
+      notifyFailure(`Could not resolve Claim`)
+    }
+  }
+
+  private resolveClaim(claimId: Claims.Entry['id']): sdk.Claim | undefined {
     const { claimEntries } = this.props
 
     const claimToAttest = claimEntries.find(
-      (claimEntry: Claims.Entry) => claimEntry.id === this.claimIdToAttest
+      (claimEntry: Claims.Entry) => claimEntry.id === claimId
     )
     if (claimToAttest) {
       const { claim } = claimToAttest
-      attestationWorkflow.requestAttestationForClaim(
-        claim,
-        this.selectedAttesters
+      return claim
+    } else {
+      return undefined
+    }
+  }
+}
+
+export function getClaimActions(
+  action: 'delete' | 'requestAttestation' | 'requestLegitimation',
+  callback: () => void
+) {
+  switch (action) {
+    case 'requestAttestation': {
+      return (
+        <button
+          className="requestAttestation"
+          onClick={callback}
+          title="Request attestation of this claim from attester"
+        >
+          Get Attestation
+        </button>
       )
+    }
+    case 'requestLegitimation': {
+      return (
+        <button
+          className="requestLegitimation"
+          onClick={callback}
+          title="Request legitimation for attestation of this claim from attester"
+        >
+          Get Legitimation
+        </button>
+      )
+    }
+    case 'delete': {
+      return <button className="deleteClaim" onClick={callback} />
     }
   }
 }

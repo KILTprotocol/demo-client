@@ -64,6 +64,21 @@ class ErrorService {
       origin,
       type: type || 'ERROR.UNCLASSIFIED',
     })
+  }
+
+  public logWithNotification(
+    { error, message, onConfirm, origin, type }: QualifiedError,
+    config?: ErrorConfig
+  ) {
+    this.log({ error, message, onConfirm, origin, type }, config)
+
+    const useConfig = {
+      ...{
+        blocking: true,
+        consoleLog: true,
+      },
+      ...config,
+    }
 
     const notification: Partial<Notification> = {
       className: useConfig.consoleLog ? 'console-log' : '',

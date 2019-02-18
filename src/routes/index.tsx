@@ -7,7 +7,7 @@ import ChainStats from '../containers/ChainStats/ChainStats'
 import ClaimCreate from '../containers/ClaimCreate/ClaimCreate'
 import ClaimView from '../containers/ClaimView/ClaimView'
 import ContactList from '../containers/ContactList/ContactList'
-import CtypeCreate from '../containers/CtypeCreate/CtypeCreate'
+import CTypeCreate from '../containers/CtypeCreate/CtypeCreate'
 import CtypeView from '../containers/CtypeView/CtypeView'
 import MessageList from '../containers/MessageView/MessageView'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
@@ -31,15 +31,15 @@ const Routes: React.FunctionComponent<{}> = props => {
       <Route path={'/wallet/add'} component={WalletAdd} />
       <Route path={'/wallet'} component={WalletView} />
 
-      <Route path={'/ctype/new'} component={requiresIdentity(CtypeCreate)} />
+      <Route path={'/ctype/new'} component={requiresIdentity(CTypeCreate)} />
       <Route
-        path={'/ctype/:ctypeKey'}
+        path={'/ctype/:cTypeHash'}
         component={requiresIdentity(CtypeView)}
       />
       <Route path={'/ctype'} component={requiresIdentity(CtypeView)} />
 
       <Route
-        path={'/claim/new/:ctypeKey'}
+        path={'/claim/new/:cTypeHash'}
         component={requiresIdentity(ClaimCreate)}
       />
       <Route path={'/claim/:claimId'} component={requiresIdentity(ClaimView)} />

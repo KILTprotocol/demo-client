@@ -54,4 +54,12 @@
   & .refresh {
     @include button-icon-only($icon-refresh);
   }
+
+  & .attestationStatusView {
+    position: relative;
+
+    & > * {
+      position: absolute;
+    }
+  }
 }

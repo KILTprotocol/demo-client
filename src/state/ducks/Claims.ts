@@ -245,7 +245,11 @@ const getClaims = createSelector(
   [Wallet.getSelectedIdentity, _getAllClaims],
   (selectedIdentity: MyIdentity, entries: Entry[]) => {
     return entries.filter((entry: Entry) => {
-      return entry.claim.owner === selectedIdentity.identity.address
+      return (
+        entry &&
+        entry.claim &&
+        entry.claim.owner === selectedIdentity.identity.address
+      )
     })
   }
 )

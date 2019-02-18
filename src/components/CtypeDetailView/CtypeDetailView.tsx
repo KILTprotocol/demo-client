@@ -7,41 +7,33 @@ import Code from '../Code/Code'
 import './CtypeDetailView.scss'
 
 type Props = {
-  ctype?: ICType
+  cType?: ICType
 }
 
-const CtypeDetailView = ({ ctype }: Props) => {
+const CtypeDetailView = ({ cType }: Props) => {
   return (
     <section className="CtypeDetailView">
-      {ctype ? (
+      {cType ? (
         <React.Fragment>
           <div className="attributes">
             <div>
-              <label>Id</label>
-              <div>{ctype._id}</div>
-            </div>
-            <div>
-              <label>Key</label>
-              <div>{ctype.key}</div>
-            </div>
-            <div>
-              <label>Name</label>
-              <div>{ctype.name}</div>
+              <label>Title</label>
+              <div>{cType.cType.metadata.title.default}</div>
             </div>
             <div>
               <label>Author</label>
-              <div>{ctype.author}</div>
+              <div>{cType.metaData.author}</div>
             </div>
             <div>
               <label>Definition</label>
               <div>
-                <Code>{ctype.definition}</Code>
+                <Code>{JSON.stringify(cType.cType)}</Code>
               </div>
             </div>
           </div>
           <div className="actions">
-            <Link to="/ctype">Cancel</Link>
-            <Link to={`/claim/new/${ctype.key}`}>New Claim</Link>
+            <Link to="/cType">Cancel</Link>
+            <Link to={`/claim/new/${cType.cType.hash}`}>New Claim</Link>
           </div>
         </React.Fragment>
       ) : (
