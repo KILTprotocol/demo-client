@@ -38,13 +38,13 @@ class ClaimView extends React.Component<Props, State> {
       isSelectAttestersOpen: false,
     }
     this.deleteClaim = this.deleteClaim.bind(this)
-    this.onRequestLegitimation = this.onRequestLegitimation.bind(this)
-    this.onRequestAttestation = this.onRequestAttestation.bind(this)
+    this.requestLegitimation = this.requestLegitimation.bind(this)
+    this.requestAttestation = this.requestAttestation.bind(this)
 
     this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
     this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
 
-    this.onVerifyAttestation = this.onVerifyAttestation.bind(this)
+    this.verifyAttestation = this.verifyAttestation.bind(this)
   }
 
   public componentDidMount() {
@@ -74,17 +74,17 @@ class ClaimView extends React.Component<Props, State> {
             cancelable={true}
             claimEntry={currentClaimEntry as Claims.Entry}
             onRemoveClaim={this.deleteClaim}
-            onRequestAttestation={this.onRequestAttestation}
-            onRequestLegitimation={this.onRequestLegitimation}
-            onVerifyAttestation={this.onVerifyAttestation}
+            onRequestAttestation={this.requestAttestation}
+            onRequestLegitimation={this.requestLegitimation}
+            onVerifyAttestation={this.verifyAttestation}
           />
         )}
         {!isDetailView && (
           <ClaimListView
             claimStore={claimEntries}
             onRemoveClaim={this.deleteClaim}
-            onRequestAttestation={this.onRequestAttestation}
-            onRequestLegitimation={this.onRequestLegitimation}
+            onRequestAttestation={this.requestAttestation}
+            onRequestLegitimation={this.requestLegitimation}
           />
         )}
         {}
@@ -105,15 +105,15 @@ class ClaimView extends React.Component<Props, State> {
     return !!(claimEntries && claimEntries.length && claimId)
   }
 
-  private getCurrentClaimEntry(hash: string) {
+  private getCurrentClaimEntry(id: Claims.Entry['id']) {
     const { claimEntries } = this.props
 
     const currentClaimEntry = claimEntries.find(
-      (claimEntry: Claims.Entry) => claimEntry.id === hash
+      (claimEntry: Claims.Entry) => claimEntry.id === id
     )
 
     if (!currentClaimEntry) {
-      const message = `Could not get claim with hash '${hash}' from local list of claims`
+      const message = `Could not get claim with id '${id}' from local list of claims`
       errorService.log({
         error: { name: 'Error while setting current claim', message },
         message,
@@ -131,7 +131,7 @@ class ClaimView extends React.Component<Props, State> {
     this.props.history.push('/claim')
   }
 
-  private async onVerifyAttestation(
+  private async verifyAttestation(
     attestedClaim: sdk.IAttestedClaim
   ): Promise<boolean> {
     const { updateAttestation } = this.props
@@ -148,7 +148,7 @@ class ClaimView extends React.Component<Props, State> {
       })
   }
 
-  private onRequestLegitimation(claimId: Claims.Entry['id']) {
+  private requestLegitimation(claimId: Claims.Entry['id']) {
     if (this.selectAttestersModal) {
       this.claimIdToLegitimate = claimId
       delete this.claimIdToAttest
@@ -156,7 +156,7 @@ class ClaimView extends React.Component<Props, State> {
     }
   }
 
-  private onRequestAttestation(claimId: Claims.Entry['id']) {
+  private requestAttestation(claimId: Claims.Entry['id']) {
     if (this.selectAttestersModal) {
       delete this.claimIdToLegitimate
       this.claimIdToAttest = claimId

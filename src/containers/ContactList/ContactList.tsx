@@ -27,7 +27,7 @@ interface State {
 
 type SelectOption = {
   value: sdk.ICType['hash']
-  label: sdk.ICType['metadata']['title']['default']
+  label: string
 }
 
 class ContactList extends React.Component<Props, State> {

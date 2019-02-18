@@ -63,7 +63,7 @@ export interface SubmitClaimsForCtype extends MessageBodyBase {
   type: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
 }
 
-export interface PartialClaim extends Partial<sdk.Claim> {
+export interface PartialClaim extends Partial<sdk.IClaim> {
   cType: sdk.Claim['cType']
 }
 

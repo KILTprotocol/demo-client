@@ -29,7 +29,7 @@ class CtypeView extends React.Component<Props, State> {
     this.state = {
       cTypes: [],
     }
-    this.onRequestLegitimation = this.onRequestLegitimation.bind(this)
+    this.requestLegitimation = this.requestLegitimation.bind(this)
 
     this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
     this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
@@ -72,7 +72,7 @@ class CtypeView extends React.Component<Props, State> {
         {!validCurrentCType && (
           <CTypeListView
             cTypes={cTypes}
-            onRequestLegitimation={this.onRequestLegitimation}
+            onRequestLegitimation={this.requestLegitimation}
           />
         )}
         <SelectAttestersModal
@@ -107,7 +107,7 @@ class CtypeView extends React.Component<Props, State> {
     }
   }
 
-  private onRequestLegitimation(cType: ICType) {
+  private requestLegitimation(cType: ICType) {
     if (cType && this.selectAttestersModal) {
       this.cTypeToLegitimate = cType
       this.selectAttestersModal.show()
