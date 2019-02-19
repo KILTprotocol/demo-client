@@ -2,7 +2,6 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import AttestedClaimsListView from '../../components/AttestedClaimsListView/AttestedClaimsListView'
-import { getClaimActions } from '../../containers/ClaimView/ClaimView'
 import * as Claims from '../../state/ducks/Claims'
 import Code from '../Code/Code'
 
@@ -69,12 +68,7 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   private getActions() {
-    const {
-      onRemoveClaim,
-      onRequestAttestation,
-      onRequestLegitimation,
-      cancelable,
-    }: Props = this.props
+    const { cancelable }: Props = this.props
     return (
       <div className="actions">
         {cancelable && (
@@ -82,11 +76,21 @@ class ClaimDetailView extends Component<Props, State> {
             Cancel
           </Link>
         )}
-        {onRemoveClaim && getClaimActions('delete', this.handleDelete)}
-        {onRequestLegitimation &&
-          getClaimActions('requestLegitimation', this.requestLegitimation)}
-        {onRequestAttestation &&
-          getClaimActions('requestAttestation', this.requestAttestation)}
+        <button className="deleteClaim" onClick={this.handleDelete} />
+        <button
+          className="requestLegitimation"
+          onClick={this.requestLegitimation}
+          title="Request legitimation for attestation of this claim from attester"
+        >
+          Get Legitimation
+        </button>
+        <button
+          className="requestAttestation"
+          onClick={this.requestAttestation}
+          title="Request attestation of this claim from attester"
+        >
+          Get Attestation
+        </button>
       </div>
     )
   }

@@ -15,6 +15,8 @@ import ChooseClaimsForCType from '../../containers/workflows/ChooseClaimsForCtyp
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
 import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
 import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
+import MessageSubject from '../MessageSubject/MessageSubject'
+
 import './MessageDetailView.scss'
 
 type Props = {
@@ -36,7 +38,9 @@ class MessageDetailView extends React.Component<Props, State> {
     const { message, children } = this.props
     return (
       <section className="MessageDetailView">
-        <h4>Subject: {message.body ? message.body.type : message.message}</h4>
+        <h4>
+          Subject: <MessageSubject message={message} />
+        </h4>
         {this.shouldDisplayContentAsCode(message) && (
           <div>
             Contents:{' '}

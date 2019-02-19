@@ -9,7 +9,7 @@ import SelectAttestersModal from '../../components/Modal/SelectAttestersModal'
 import attestationService from '../../services/AttestationService'
 import attestationWorkflow from '../../services/AttestationWorkflow'
 import errorService from '../../services/ErrorService'
-import { notifyFailure } from '../../services/FeedbackService'
+import { notifyFailure, safeDelete } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
 
@@ -126,9 +126,16 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   private deleteClaim(claimId: Claims.Entry['id']) {
-    const { removeClaim } = this.props
-    removeClaim(claimId)
-    this.props.history.push('/claim')
+    const { removeClaim, claimEntries } = this.props
+
+    const claim = claimEntries.find(
+      (claimEntry: Claims.Entry) => claimEntry.id === claimId
+    )
+
+    safeDelete(`claim '${claim ? claim.meta.alias : claimId}'`, () => {
+      removeClaim(claimId)
+      this.props.history.push('/claim')
+    })
   }
 
   private async verifyAttestation(
@@ -196,39 +203,6 @@ class ClaimView extends React.Component<Props, State> {
       return claim
     } else {
       return undefined
-    }
-  }
-}
-
-export function getClaimActions(
-  action: 'delete' | 'requestAttestation' | 'requestLegitimation',
-  callback: () => void
-) {
-  switch (action) {
-    case 'requestAttestation': {
-      return (
-        <button
-          className="requestAttestation"
-          onClick={callback}
-          title="Request attestation of this claim from attester"
-        >
-          Get Attestation
-        </button>
-      )
-    }
-    case 'requestLegitimation': {
-      return (
-        <button
-          className="requestLegitimation"
-          onClick={callback}
-          title="Request legitimation for attestation of this claim from attester"
-        >
-          Get Legitimation
-        </button>
-      )
-    }
-    case 'delete': {
-      return <button className="deleteClaim" onClick={callback} />
     }
   }
 }

@@ -4,9 +4,10 @@ import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 
 import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
+import MessageSubject from '../../components/MessageSubject/MessageSubject'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 import errorService from '../../services/ErrorService'
-import FeedbackService from '../../services/FeedbackService'
+import FeedbackService, { safeDelete } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
@@ -125,7 +126,7 @@ class MessageView extends React.Component<Props, State> {
     }
   }
 
-  private onDeleteMessage(message: Message) {
+  private onDeleteMessage(message: MessageOutput) {
     const { currentMessage } = this.state
 
     if (!message.messageId) {
@@ -137,13 +138,12 @@ class MessageView extends React.Component<Props, State> {
       this.fetchMessages()
     }
 
-    FeedbackService.addBlockingNotification({
-      header: 'Are you sure?',
-      message: `Do you want to delete message '${message.messageId}' from '${
-        message.senderAddress
-      }'?`,
-      modalType: ModalType.CONFIRM,
-      onConfirm: (notification: BlockingNotification) => {
+    safeDelete(
+      <span>
+        the message '<MessageSubject message={message} />' from{' '}
+        <KiltIdenticon contact={message.sender} />
+      </span>,
+      (notification: BlockingNotification) => {
         MessageRepository.deleteByMessageId(message.messageId as string)
           .then(() => {
             this.fetchMessages()
@@ -158,8 +158,8 @@ class MessageView extends React.Component<Props, State> {
             })
           })
       },
-      type: NotificationType.INFO,
-    })
+      false
+    )
   }
 
   private onOpenMessage(message: Message) {

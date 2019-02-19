@@ -1,9 +1,9 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { getClaimActions } from '../../containers/ClaimView/ClaimView'
 
 import * as Claims from '../../state/ducks/Claims'
+import SelectAction from '../SelectAction/SelectAction'
 
 import './ClaimListView.scss'
 
@@ -56,18 +56,31 @@ class ClaimListView extends React.Component<Props, State> {
                   />
                   <td className="actionsTd">
                     <div className="actions">
-                      {getClaimActions(
-                        'requestLegitimation',
-                        this.requestLegitimation.bind(this, claimEntry.id)
-                      )}
-                      {getClaimActions(
-                        'requestAttestation',
-                        this.requestAttestation.bind(this, claimEntry.id)
-                      )}
-                      {getClaimActions(
-                        'delete',
-                        this.handleDelete.bind(this, claimEntry.id)
-                      )}
+                      <SelectAction
+                        actions={[
+                          {
+                            callback: this.requestLegitimation.bind(
+                              this,
+                              claimEntry.id
+                            ),
+                            label: 'Get Legitimation',
+                          },
+                          {
+                            callback: this.requestAttestation.bind(
+                              this,
+                              claimEntry.id
+                            ),
+                            label: 'Get Attestation',
+                          },
+                          {
+                            callback: this.handleDelete.bind(
+                              this,
+                              claimEntry.id
+                            ),
+                            label: 'Delete',
+                          },
+                        ]}
+                      />
                     </div>
                   </td>
                 </tr>
