@@ -13,7 +13,7 @@ import { ICType } from '../../types/Ctype'
 
 import './CtypeView.scss'
 
-type Props = RouteComponentProps<{ ctypeHash: string }> & {}
+type Props = RouteComponentProps<{ cTypeHash: string }> & {}
 
 type State = {
   cTypes: ICType[]
@@ -54,8 +54,8 @@ class CtypeView extends React.Component<Props, State> {
     const { match } = this.props
     const { cTypes, currentCType } = this.state
 
-    if (cTypes && cTypes.length && !currentCType && match.params.ctypeHash) {
-      this.getCurrentCType(match.params.ctypeHash)
+    if (cTypes && cTypes.length && !currentCType && match.params.cTypeHash) {
+      this.getCurrentCType(match.params.cTypeHash)
     }
   }
 

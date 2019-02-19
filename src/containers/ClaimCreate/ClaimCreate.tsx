@@ -26,21 +26,19 @@ type Props = RouteComponentProps<{
 
 type State = {
   claim: any
-  name: string
-  isValid: boolean
   cType?: sdk.CType
+  isValid: boolean
+  name: string
 }
 
 class ClaimCreate extends Component<Props, State> {
-  public state = {
-    claim: {},
-    ctype: undefined,
-    isValid: false,
-    name: '',
-  }
-
   constructor(props: Props) {
     super(props)
+    this.state = {
+      claim: {},
+      isValid: false,
+      name: '',
+    }
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleNameChange = this.handleNameChange.bind(this)
     this.updateClaim = this.updateClaim.bind(this)
@@ -55,7 +53,7 @@ class ClaimCreate extends Component<Props, State> {
 
     CtypeRepository.findByHash(cTypeHash).then(
       (dbCtype: ICType) => {
-        const cType = new sdk.CType(dbCtype.cType)
+        const cType = sdk.CType.fromObject(dbCtype.cType)
         this.setState({ cType })
         blockUi.remove()
       },
@@ -72,7 +70,6 @@ class ClaimCreate extends Component<Props, State> {
   }
 
   public render() {
-    const { match }: Props = this.props
     const { cType, claim, name }: State = this.state
 
     return (
@@ -91,7 +88,7 @@ class ClaimCreate extends Component<Props, State> {
               </div>
             </div>
             <SchemaEditor
-              schema={cType!.getClaimInputModel() as common.Schema}
+              schema={cType.getClaimInputModel() as common.Schema}
               initialValue={claim}
               updateValue={this.updateClaim}
             />
@@ -134,6 +131,9 @@ class ClaimCreate extends Component<Props, State> {
         claim,
         selectedIdentity.identity
       )
+
+      console.log('newClaim', newClaim)
+
       saveClaim(newClaim, { alias: name })
       notifySuccess(`Claim ${name} successfully created.`)
       history.push('/claim')

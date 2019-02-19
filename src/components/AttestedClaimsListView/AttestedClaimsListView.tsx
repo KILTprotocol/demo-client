@@ -1,22 +1,31 @@
-import React from 'react'
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import React from 'react'
 
-import { Contact } from '../../types/Contact'
+import attestationService from '../../services/AttestationService'
 import contactRepository from '../../services/ContactRepository'
+import { Contact } from '../../types/Contact'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 import Spinner from '../Spinner/Spinner'
 
 import './AttestedClaimsListView.scss'
 
+const enum STATUS {
+  PENDING = 'pending',
+  UNVERIFIED = 'unverified',
+  ATTESTED = 'attested',
+}
+
+type AttestationStatus = {
+  [signature: string]: STATUS
+}
+
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
-  onVerifyAttestation: (attestation: sdk.IAttestedClaim) => Promise<boolean>
 }
 
 type State = {
   canResolveAttesters: boolean
-  unverifiedAttestations: string[]
-  pendingAttestations: string[]
+  attestationStatus: AttestationStatus
 }
 
 class AttestedClaimsListView extends React.Component<Props, State> {
@@ -25,15 +34,9 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     this.verifyAttestation = this.verifyAttestation.bind(this)
     this.verifyAttestations = this.verifyAttestations.bind(this)
 
-    const { attestedClaims } = this.props
     this.state = {
+      attestationStatus: {},
       canResolveAttesters: false,
-      pendingAttestations: [],
-      unverifiedAttestations: attestedClaims.map(
-        (attestedClaim: sdk.IAttestedClaim) => {
-          return attestedClaim.attestation.claimHash
-        }
-      ),
     }
     setTimeout(() => {
       this.verifyAttestations()
@@ -62,16 +65,12 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   private getAttestations(attestations: sdk.IAttestedClaim[]) {
-    const { pendingAttestations } = this.state
+    const { attestationStatus } = this.state
     return (
       <section className="attestations">
         <div className="header">
           <h3>Attestations</h3>
-          <button
-            className="refresh"
-            onClick={this.verifyAttestations}
-            disabled={pendingAttestations.length > 0}
-          />
+          <button className="refresh" onClick={this.verifyAttestations} />
         </div>
         {!!attestations && !!attestations.length ? (
           <table>
@@ -86,6 +85,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                 const attester = this.getAttester(
                   attestedClaim.attestation.owner
                 )
+                const { signature } = attestedClaim.attestation
                 return (
                   <tr key={attestedClaim.attestation.signature}>
                     <td className="attesterName">
@@ -95,21 +95,11 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                         attestedClaim.attestation.owner
                       )}
                     </td>
-                    {this.isPending(attestedClaim.attestation) && (
-                      <td className="status">
+                    <td className={`status ${attestationStatus[signature]}`}>
+                      {attestationStatus[signature] === STATUS.PENDING && (
                         <Spinner size={20} color="#ef5a28" strength={3} />
-                      </td>
-                    )}
-                    {!this.isPending(attestedClaim.attestation) && (
-                      <td
-                        className={
-                          'status ' +
-                          (this.isApproved(attestedClaim.attestation)
-                            ? 'attested'
-                            : 'revoked')
-                        }
-                      />
-                    )}
+                      )}
+                    </td>
                   </tr>
                 )
               })}
@@ -122,16 +112,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     )
   }
 
-  private isApproved(attestation: sdk.IAttestation): boolean {
-    const { unverifiedAttestations: invalidAttestations } = this.state
-    return !invalidAttestations.includes(attestation.claimHash)
-  }
-
-  private isPending(attestation: sdk.IAttestation): boolean {
-    const { pendingAttestations } = this.state
-    return pendingAttestations.includes(attestation.claimHash)
-  }
-
   private getAttester(
     attesterAddress: Contact['publicIdentity']['address']
   ): Contact | undefined {
@@ -141,38 +121,38 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   private verifyAttestations(): void {
     const { attestedClaims } = this.props
     attestedClaims.forEach(attestedClaim => {
-      this.verifyAttestation(attestedClaim)()
+      this.verifyAttestation(attestedClaim)
     })
   }
 
-  private verifyAttestation = (
-    attestedClaim: sdk.IAttestedClaim
-  ): (() => void) => () => {
-    const { onVerifyAttestation } = this.props
-    const { unverifiedAttestations, pendingAttestations } = this.state
-    pendingAttestations.push(attestedClaim.attestation.claimHash)
+  private verifyAttestation(attestedClaim: sdk.IAttestedClaim) {
+    const { attestationStatus } = this.state
+    const { signature } = attestedClaim.attestation
+
+    // if we are currently already fetching - cancel
+    if (attestationStatus[signature] === STATUS.PENDING) {
+      return
+    }
+
+    attestationStatus[signature] = STATUS.PENDING
+
     this.setState({
-      pendingAttestations,
+      attestationStatus,
     })
-    onVerifyAttestation(attestedClaim).then(verified => {
-      const newState: any = {
-        pendingAttestations: pendingAttestations.filter(
-          (pendingAttestation: string) =>
-            attestedClaim.attestation.claimHash !== pendingAttestation
-        ),
-      }
 
-      if (verified) {
-        newState.unverifiedAttestations = unverifiedAttestations.filter(
-          (unverifiedAttestation: string) =>
-            attestedClaim.attestation.claimHash !== unverifiedAttestation
-        )
-      }
+    attestationService
+      .verifyAttestatedClaim(attestedClaim)
+      .then((verified: boolean) => {
+        if (verified) {
+          attestationStatus[signature] = STATUS.ATTESTED
+        } else {
+          attestationStatus[signature] = STATUS.UNVERIFIED
+        }
 
-      this.setState({
-        ...newState,
+        this.setState({
+          attestationStatus,
+        })
       })
-    })
   }
 }
 

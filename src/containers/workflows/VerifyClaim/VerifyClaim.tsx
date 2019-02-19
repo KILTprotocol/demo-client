@@ -43,8 +43,8 @@ class VerifyClaim extends React.Component<Props, State> {
       attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => {
         return cTypeRepository.findByHash(attestedClaim.request.claim.cType)
       })
-    ).then((ctypes: ICType[]) => {
-      ctypes.forEach((cType: ICType) => {
+    ).then((cTypes: ICType[]) => {
+      cTypes.forEach((cType: ICType) => {
         if (cType.cType.hash) {
           this.cTypeMap[cType.cType.hash] = CType.fromObject(cType)
         }
@@ -67,7 +67,7 @@ class VerifyClaim extends React.Component<Props, State> {
               key={attestedClaim.attestation.claimHash}
               attestedClaim={attestedClaim}
               context={context}
-              ctype={this.cTypeMap[attestedClaim.request.claim.cType]}
+              cType={this.cTypeMap[attestedClaim.request.claim.cType]}
               attester={this.getAttester(attestedClaim.attestation.owner)}
               onVerifyAttestatedClaim={this.onVerifyAttestation}
             />

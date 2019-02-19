@@ -46,7 +46,7 @@ class AttestationsView extends React.Component<Props, State> {
             <tr>
               <th className="claimerAlias">Claimer</th>
               <th className="claimHash">Claim Hash</th>
-              <th className="ctypeName">CTYPE</th>
+              <th className="cTypeName">CTYPE</th>
               <th className="created">Created</th>
               <th className="status">Approved</th>
               <th className="actionsTd" />
@@ -72,8 +72,8 @@ class AttestationsView extends React.Component<Props, State> {
                 >
                   {attestation.attestation.claimHash}
                 </td>
-                <td className="ctypeName" title={attestation.ctypeHash}>
-                  {attestation.ctypeName}
+                <td className="cTypeName" title={attestation.cTypeHash}>
+                  {attestation.cTypeName}
                 </td>
                 <td
                   className="created"

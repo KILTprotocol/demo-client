@@ -14,7 +14,7 @@ type Props = {
   // output
   cancel: () => void
   submit: () => void
-  updateCType: (ctype: any, isValid: boolean) => void
+  updateCType: (cType: any, isValid: boolean) => void
 }
 
 const CTypeEditor = (props: Props) => {

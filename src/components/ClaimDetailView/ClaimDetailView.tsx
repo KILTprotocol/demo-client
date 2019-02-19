@@ -13,7 +13,6 @@ type Props = {
   onRemoveClaim?: (claimId: Claims.Entry['id']) => void
   onRequestAttestation?: (claimId: Claims.Entry['id']) => void
   onRequestLegitimation?: (claimId: Claims.Entry['id']) => void
-  onVerifyAttestation: (attestation: sdk.IAttestedClaim) => Promise<boolean>
 }
 
 type State = {
@@ -29,16 +28,13 @@ class ClaimDetailView extends Component<Props, State> {
   }
 
   public render() {
-    const { claimEntry, onVerifyAttestation }: Props = this.props
+    const { claimEntry }: Props = this.props
 
     return claimEntry ? (
       <section className="ClaimDetailView">
         <h1>{claimEntry.meta.alias}</h1>
         {this.getAttributes(claimEntry.claim)}
-        <AttestedClaimsListView
-          attestedClaims={claimEntry.attestations}
-          onVerifyAttestation={onVerifyAttestation}
-        />
+        <AttestedClaimsListView attestedClaims={claimEntry.attestations} />
         {this.getActions()}
       </section>
     ) : (

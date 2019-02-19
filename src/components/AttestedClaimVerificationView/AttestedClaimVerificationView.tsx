@@ -12,7 +12,7 @@ type Props = {
   attester?: Contact
   attestedClaim: sdk.IAttestedClaim
   context?: 'legitimation'
-  ctype?: CType
+  cType?: CType
   onVerifyAttestatedClaim: (
     attestatedClaim: sdk.IAttestedClaim
   ) => Promise<boolean>
@@ -113,8 +113,8 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
   }
 
   private getCtypePropertyTitle(propertyName: string): string {
-    const { ctype } = this.props
-    return ctype ? ctype.getPropertyTitle(propertyName) : propertyName
+    const { cType } = this.props
+    return cType ? cType.getPropertyTitle(propertyName) : propertyName
   }
 
   private verifyAttestatedClaim() {

@@ -5,7 +5,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 
 import CTypeEditor from '../../components/CtypeEditor/CtypeEditor'
 import BlockchainService from '../../services/BlockchainService'
-import ctypeRepository from '../../services/CtypeRepository'
+import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
@@ -87,14 +87,14 @@ class CTypeCreate extends React.Component<Props, State> {
           blockUi.updateMessage(
             `CTYPE stored on blockchain,\nnow registering CTYPE (3/3)`
           )
-          const ctypeWrapper: ICType = {
+          const cTypeWrapper: ICType = {
             cType,
             metaData: {
               author: authorAlias,
             },
           }
           // TODO: add onrejected when sdk provides error handling
-          ctypeRepository.register(ctypeWrapper).then(() => {
+          CTypeRepository.register(cTypeWrapper).then(() => {
             blockUi.remove()
             notifySuccess(
               `CTYPE ${cType.metadata.title.default} successfully created.`

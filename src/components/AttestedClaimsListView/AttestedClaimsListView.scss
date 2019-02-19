@@ -40,7 +40,7 @@
       width: 20%;
       text-align: center;
 
-      &.revoked {
+      &.unverified {
 
         &:before {
           @include icon($icon-times);

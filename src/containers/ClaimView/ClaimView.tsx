@@ -20,7 +20,6 @@ import './ClaimView.scss'
 type Props = RouteComponentProps<{ claimId: Claims.Entry['id'] }> & {
   claimEntries: Claims.Entry[]
   removeClaim: (claimId: Claims.Entry['id']) => void
-  updateAttestation: (attestation: sdk.IAttestedClaim) => void
 }
 
 type State = {
@@ -43,8 +42,6 @@ class ClaimView extends React.Component<Props, State> {
 
     this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
     this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
-
-    this.verifyAttestation = this.verifyAttestation.bind(this)
   }
 
   public componentDidMount() {
@@ -76,7 +73,6 @@ class ClaimView extends React.Component<Props, State> {
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={this.requestAttestation}
             onRequestLegitimation={this.requestLegitimation}
-            onVerifyAttestation={this.verifyAttestation}
           />
         )}
         {!isDetailView && (
@@ -136,23 +132,6 @@ class ClaimView extends React.Component<Props, State> {
       removeClaim(claimId)
       this.props.history.push('/claim')
     })
-  }
-
-  private async verifyAttestation(
-    attestedClaim: sdk.IAttestedClaim
-  ): Promise<boolean> {
-    const { updateAttestation } = this.props
-    const { claimId } = this.props.match.params
-    return attestationService
-      .verifyAttestatedClaim(attestedClaim)
-      .then((verified: boolean) => {
-        if (this.isDetailView() && this.getCurrentClaimEntry(claimId)) {
-          updateAttestation(
-            Object.assign(attestedClaim, { revoked: !verified })
-          )
-        }
-        return verified
-      })
   }
 
   private requestLegitimation(claimId: Claims.Entry['id']) {
@@ -215,9 +194,6 @@ const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   return {
     removeClaim: (claimId: Claims.Entry['id']) => {
       dispatch(Claims.Store.removeAction(claimId))
-    },
-    updateAttestation: (attestation: sdk.IAttestedClaim) => {
-      dispatch(Claims.Store.updateAttestation(attestation))
     },
   }
 }

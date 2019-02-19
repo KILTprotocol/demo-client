@@ -67,7 +67,7 @@ const LABELS: AllLabels = {
       claimHeadline: 'Claim',
       includePropertiesHeadline: 'Select property(s) to include in Claim',
       noAttestationFound: 'No attestation found.',
-      noClaimsFound: `No claim for CTYPE '#{ctype}' found.`,
+      noClaimsFound: `No claim for CTYPE '#{cType}' found.`,
       selectClaim: 'Select claim ...',
       selectClaimHeadline: 'Select claim(s)',
     },
@@ -93,7 +93,7 @@ const LABELS: AllLabels = {
       includePropertiesHeadline:
         'Select property(s) to include in Legitimation',
       noAttestationFound: 'No attestation found.',
-      noClaimsFound: `No legitimation for CTYPE '#{ctype}' found.`,
+      noClaimsFound: `No legitimation for CTYPE '#{cType}' found.`,
       selectClaim: 'Select legitimation ...',
       selectClaimHeadline: 'Select legitimation(s)',
     },
@@ -154,6 +154,8 @@ class ChooseClaimsForCType extends React.Component<Props, State> {
       return ''
     }
 
+    console.log('cType', cType)
+
     const claims: Claims.Entry[] = claimEntries.filter(
       (claimEntry: Claims.Entry) => claimEntry.claim.cType === cType.cType.hash
     )
@@ -193,7 +195,7 @@ class ChooseClaimsForCType extends React.Component<Props, State> {
           <div className="no-claim">
             <span>
               {this.labels.text.noClaimsFound.replace(
-                '#{ctype}',
+                '#{cType}',
                 cType.cType.metadata.title.default
               )}
             </span>
