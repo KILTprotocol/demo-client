@@ -1,14 +1,9 @@
 import * as React from 'react'
-import {
-  Message,
-  MessageBodyType,
-  MessageOutput,
-  RequestClaimsForCtype,
-  RequestLegitimations,
-} from '../../types/Message'
+import { Message, MessageOutput, } from '../../types/Message'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
-import './MessageListView.scss'
 import MessageSubject from '../MessageSubject/MessageSubject'
+
+import './MessageListView.scss'
 
 type Props = {
   messages: MessageOutput[]

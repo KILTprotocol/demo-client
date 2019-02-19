@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-const defaultLength = 10
+const DEFAULT_LENGTH: number = 10
 
 type Props = {
   length?: number
@@ -12,7 +12,7 @@ class ShortHash extends React.Component<Props, State> {
   public render() {
     const { children, length } = this.props
 
-    const _length: number = length || defaultLength
+    const _length: number = length || DEFAULT_LENGTH
 
     return (
       <span className="short-hash" title={children as string}>

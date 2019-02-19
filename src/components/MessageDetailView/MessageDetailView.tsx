@@ -15,8 +15,9 @@ import ChooseClaimsForCType from '../../containers/workflows/ChooseClaimsForCtyp
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
 import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
 import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
-import './MessageDetailView.scss'
 import MessageSubject from '../MessageSubject/MessageSubject'
+
+import './MessageDetailView.scss'
 
 type Props = {
   message: Message
