@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Message, MessageOutput, } from '../../types/Message'
+import { Message, MessageOutput } from '../../types/Message'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 import MessageSubject from '../MessageSubject/MessageSubject'
 
