@@ -1,0 +1,67 @@
+.ChooseClaimForCType {
+  @include card;
+
+  & h4 {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+  }
+
+  & label {
+    @include checkbox;
+  }
+
+  & .properties,
+  & .attestations {
+    display: flex;
+    flex-direction: column;
+    margin: {
+      left: 1.5*$base-padding;
+    }
+
+    & h4 {
+      margin:{
+        top: $base-padding;
+      }
+
+      & label {
+        margin: 0;
+      }
+    }
+
+    & label {
+      margin: {
+        top: $base-padding/2;
+      }
+
+      &.selected-all {
+        @include opacity(0.3)
+      }
+    }
+  }
+
+  & .attestations {
+
+    & label {
+
+      & .approved {
+        color: $color-success;
+      }
+
+      & .unapproved {
+        color: $color-danger;
+        text-decoration: line-through;
+      }
+    }
+  }
+
+    & .actions {
+    margin: {
+      top: $base-padding;
+    }
+
+    & button {
+      @include button-primary;
+    }
+  }
+}

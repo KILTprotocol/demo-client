@@ -1,0 +1,14 @@
+.ClaimDetailView {
+
+  & .attributes {
+    @include card;
+
+    & > div {
+      @include label_input_combo;
+    }
+  }
+
+  & .deleteClaim {
+    @include button-icon-only($icon-trash)
+  }
+}

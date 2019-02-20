@@ -1,0 +1,134 @@
+.WalletAdd {
+  $name-width: 30%;
+
+  & h1 {
+    @include h1('Identity');
+  }
+
+  & .inputs {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    & > div {
+      margin: {
+        bottom: $base-padding;
+      }
+    }
+
+    & label {
+      @include label;
+
+      display: flex;
+      flex-direction: row;
+      justify-content: left;
+      align-items: center;
+      height: $base-button-height;
+    }
+  }
+
+  & input[type=text] {
+    display: block;
+    width: 100%;
+  }
+
+  & .name {
+    width: 100%;
+  }
+
+  & .phrase {
+    position: relative;
+    width: 100%;
+
+    & > div {
+      display: flex;
+    }
+
+    & button {
+      @include button-icon-only($icon-refresh, 16px);
+
+      border: none;
+      margin-left: $base-padding/2;
+    }
+
+    & div {
+
+      &:last-child{
+        $margin-top: 8px;
+
+        margin: {
+          top: $margin-top;
+        }
+
+        & input {
+          margin: {
+            top: -$margin-top;
+          }
+        }
+      }
+    }
+  }
+
+  & .toggle-phrase {
+    $checkbox-size: $base-font-size;
+
+    position: relative;
+    display: inline-block;
+    margin: {
+      top: $base-padding;
+    }
+    padding: {
+      left: $checkbox-size + $base-padding;
+    }
+    color: $color-primary;
+    cursor: pointer;
+
+    &:before,
+    &:after {
+      @extend %centerHV;
+
+      position: absolute;
+      left: $checkbox-size/2;
+    }
+
+    &:before {
+      $size: $checkbox-size;
+
+      @include border-radius($base-border-radius);
+
+      content: '';
+      width: $size;
+      height: $size;
+      border: $base-border;
+      background: $color-white;
+    }
+
+    &.checked {
+
+      &:after {
+        @include icon($icon-check);
+
+        font-size: $checkbox-size * 0.8;
+      }
+    }
+  }
+
+  & .actions {
+    width: 100%;
+  }
+
+  @include breakpoint('desktop') {
+
+    & .name {
+      width: $name-width;
+      padding: {
+        right: $base-padding;
+      }
+    }
+
+    & .phrase {
+      width: 100% - $name-width;
+    }
+  }
+}

@@ -1,0 +1,10 @@
+.MessageSubject {
+
+  & .type {
+    @include baseFont-bold;
+  }
+
+  & > div {
+    @extend %ellipsis;
+  }
+}

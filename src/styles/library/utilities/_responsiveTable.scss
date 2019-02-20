@@ -1,0 +1,44 @@
+@mixin responsiveColumn($columnWidths) {
+
+    & th,
+    & tbody td {
+
+        &:not([colspan]) {
+
+            @for $columnWidthIndex from 1 through length($columnWidths) {
+
+                $columnWidth: nth($columnWidths, $columnWidthIndex);
+
+                &:nth-child(#{$columnWidthIndex}) {
+                    @if $columnWidth == false {
+                        display: none;
+                    } @else if (type-of($columnWidth) == string) {
+                        width: 100% * str-length($columnWidth);
+                    } @else {
+                        width: $columnWidth;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// @param {map} $columnWidth / map width columnWidths per breakpoint as defined in _mixins.scss
+// e.g.
+// (xs: (15px, 100%, 200%, '*', '**' 0px, false))
+// - px-values and % are used as width
+// -- % defines dynamic column with relative widths to each other (100% will get half the width of a 200% column)
+// --- convenience: same logic applies to '*', '**' etc. / with '*...' converted to 100% multiplied with number of '*' in string
+// ---- actually would work with any string character
+// - false hides column via display: none
+@mixin responsiveTable($columnWidths) {
+    table-layout: fixed;
+    width: 100%;
+
+    @each $breakpoint, $breakPointColumnWidths in $columnWidths {
+
+        @include breakpoint($breakpoint) {
+            @include responsiveColumn ($breakPointColumnWidths);
+        }
+    }
+}

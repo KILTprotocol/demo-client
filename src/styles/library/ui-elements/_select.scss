@@ -1,0 +1,40 @@
+@mixin react-select {
+
+  & input[type=text] {
+    height: 20px;
+  }
+
+  & .react-select {
+
+    &__control {
+      @include box-shadow(none !important);
+      border: $base-border !important;
+    }
+
+    &__option {
+      background: $color-white !important;
+      color: $color-font !important;
+
+      &--is-selected {
+        background: transparentize($color-primary, 0.8) !important;
+      }
+
+      &--is-focused,
+      &:hover {
+        background: $color-primary !important;
+        color: $color-font-inverted !important;
+      }
+    }
+
+    &__multi-value{
+
+      &__remove {
+
+        &:hover {
+          background-color: $color-primary !important;
+          color: $color-font-inverted !important;
+        }
+      }
+    }
+  }
+}

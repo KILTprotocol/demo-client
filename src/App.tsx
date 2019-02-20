@@ -1,17 +1,23 @@
 import * as React from 'react'
-import { BrowserRouter as Router } from "react-router-dom"
+import { BrowserRouter as Router } from 'react-router-dom'
 
-import './App.css'
-import HeaderComponent from './components/HeaderComponent'
-import Routes from './components/Routes'
+import './App.scss'
+import Header from './components/Header/Header'
+import BlockingNotifications from './containers/BlockingNotifications/BlockingNotifications'
+import BlockUi from './containers/BlockUi/BlockUi'
+import Notifications from './containers/Notifications/Notifications'
+import Routes from './routes'
 
 class App extends React.Component {
   public render() {
     return (
       <Router>
         <div className="App">
-          <HeaderComponent />
+          <Header />
           <Routes />
+          <BlockUi />
+          <BlockingNotifications />
+          <Notifications />
         </div>
       </Router>
     )

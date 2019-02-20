@@ -1,0 +1,32 @@
+// BASE COLORS
+$color-black: #000;
+$color-white: #fff;
+$color-grey: #DFE3E9;
+$color-grey-dark: #5C5D5D;
+$color-grey-light: #f2efee;
+$color-grey-icon: $color-grey-dark;
+$color-light-blue: #c8e3ee;
+$color-green: #5ab9aa;
+$color-purple: #4f405c;
+
+// BACKGROUNDS
+$color-background: #f2efee;
+$color-background-backdrop: transparentize($color-black, 0.5);
+
+// PRIMARY
+$color-primary: #ef5a28;
+$color-secondary: #8c145a;
+
+// DANGER
+$color-danger: #be1e23;
+
+// SUCCESS
+$color-success: #3AB93C;
+
+// FONT-COLORS
+$color-font: $color-grey-dark;
+$color-font-inverted: $color-white;
+
+// HIGHLIGHTS
+$highlight-active: transparentize($color-primary, 0.3);
+$highlight-related: transparentize($color-primary, 0.8);

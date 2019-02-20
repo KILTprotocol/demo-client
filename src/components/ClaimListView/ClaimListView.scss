@@ -1,0 +1,22 @@
+.ClaimListView {
+
+  & table {
+    @include table;
+  }
+
+  & .alias {
+    width: 30%;
+  }
+
+  & .content {
+    width: 100%;
+  }
+
+  & .actionsTd {
+    width: 270px;
+  }
+
+  & .deleteClaim {
+    @include button-icon-only($icon-trash);
+  }
+}

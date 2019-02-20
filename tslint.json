@@ -3,14 +3,24 @@
   "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
   "linterOptions": {
     "exclude": [
+      "**/*.json",
       "config/**/*.js",
-      "node_modules/**/*.ts",
-      "coverage/lcov-report/*.js"
+      "node_modules/**/*.*",
+      "coverage/lcov-report/*.js",
+      "semantic/**/*.js"
     ]
   },
+  "rulesDirectory": ["tslint-plugin-prettier"],
   "rules": {
-    "semicolon": [true, "never"],
+    "interface-name": false,
     "interface-over-type-literal": false,
-    "no-console": false
+    "no-console": false,
+    "no-empty-interface": false,
+    "no-parameter-reassignment": true,
+    "ordered-imports": false,
+    "prettier": [true, ".prettierrc"],
+    "quotemark": [true, "single", "jsx-double"],
+    "semicolon": [true, "never"],
+    "variable-name": false
   }
 }

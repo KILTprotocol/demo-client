@@ -1,0 +1,41 @@
+@mixin table {
+  width: 100%;
+  table-layout: fixed;
+
+  & th {
+    @include baseFont-bold;
+
+    color: $color-primary;
+  }
+
+  & .actionsTd {
+
+    &,
+    & .actions {
+      padding: 0;
+    }
+  }
+
+  & .status {
+    text-align: center;
+    width: 100px;
+
+    &.revoked {
+
+      &:before {
+        @include icon($icon-times);
+
+        color: $color-danger;
+      }
+    }
+
+    &.attested {
+
+      &:before {
+        @include icon($icon-check);
+
+        color: $color-success;
+      }
+    }
+  }
+}

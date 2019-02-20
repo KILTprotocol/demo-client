@@ -1,0 +1,9 @@
+.MessageDetailView {
+
+  & footer {
+
+    & .delete {
+      @include button-primary;
+    }
+  }
+}

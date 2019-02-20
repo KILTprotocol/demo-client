@@ -1,0 +1,136 @@
+@mixin ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+// normal ellipsis
+%ellipsis {
+    @include ellipsis;
+}
+
+// center ellipsis
+%center-ellipsis {
+    $height: 1.4em;
+    $ellipsisWidth: 1em;
+
+    position: relative;
+    display: inline-block;
+    height: $height;
+    max-width: 100%;
+    overflow: hidden !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    vertical-align: text-top;
+
+    &:before {
+        content: attr(data-text);
+        visibility: hidden;
+    }
+
+    & .full,
+    & .half,
+    & .start,
+    & .end {
+        position: absolute;
+        display: block;
+        line-height: $height;
+    }
+
+    & .half,
+    & .full {
+        right: 0;
+        left: 0;
+    }
+
+    & .full {
+        @extend %forceWordWrap;
+
+        bottom: 0;
+        min-height: $height;
+        white-space: normal;
+
+        &:before {
+            content: '';
+            position: absolute;
+            z-index: 0;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: $height - 0.1em;
+            background-color: $color-background;
+        }
+
+        & div {
+            position: relative;
+            z-index: 1;
+            color: transparent;
+
+            &::first-line {
+                color: $color-grey-dark;
+            }
+        }
+    }
+
+    & .half {
+        top: 0;
+        line-height: $height;
+
+        &:after {
+            @include translateX(-50%);
+
+            content: '...';
+            position: absolute;
+            top: 0;
+            left: 50%;
+        }
+
+        & .start,
+        & .end {
+            @extend %forceWordWrap;
+
+            width: 50%;
+            line-height: $height;
+        }
+
+        & .start {
+            left: 0;
+            padding-right: $ellipsisWidth/2;
+        }
+
+        & .end {
+            right: 0;
+            padding-left: $ellipsisWidth/2;
+
+            & b {
+                float: right;
+                font: inherit;
+                white-space: pre;
+            }
+        }
+    }
+}
+
+@mixin customCenterEllipsis($styles) {
+
+    & .full {
+
+        @each $style, $value in $styles {
+
+            @if ($style == background) {
+
+                &:before {
+                    background-color: $value;
+                }
+            } @else if ($style == color) {
+
+                & div {
+
+                    &::first-line {
+                        color: $value !important;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+.MessageView {
+
+  & h1 {
+    @include h1('Message');
+  }
+
+  & .workflow {
+    width: calc(100% + #{2 * $base-padding});
+    margin: {
+      top: $base-padding;
+      left: -$base-padding;
+    }
+    padding: $base-padding $base-padding 0;
+    border: {
+      top: $base-border;
+    }
+
+    & .actions {
+      margin: {
+        bottom: -$base-padding/2;
+      }
+      padding: {
+        top: 0;
+      }
+
+      & button {
+        @include button-secondary;
+      }
+    }
+  }
+}

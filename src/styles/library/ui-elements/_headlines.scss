@@ -1,0 +1,17 @@
+@mixin h1 ($icon) {
+
+  &:before {
+    content: '';
+    width: $h1-icon-size;
+    height: $h1-icon-size;
+    margin:{
+      right: $base-padding;
+    }
+    background: {
+      image: url('~src/assets/#{$icon}.svg');
+      size: contain;
+      position: center;
+      repeat: no-repeat;
+    }
+  }
+}

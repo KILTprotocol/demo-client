@@ -1,0 +1,45 @@
+.AttestationsView {
+
+  & table {
+    @include table;
+  }
+
+  & th,
+  & td {
+    text-align: left;
+  }
+
+  & .claimerAlias {
+    @extend %ellipsis;
+
+    width: 120px;
+  }
+
+  & .claimHash {
+    @extend %ellipsis;
+
+    width: 20%;
+  }
+
+  & .ctypeName {
+    @extend %ellipsis;
+
+    width: 20%;
+  }
+
+  & .created {
+    width: 80px;
+  }
+
+  & .actionsTd {
+    width: 2*$base-button-height + $base-padding;
+  }
+
+  & .revoke {
+    @include button-icon-only($icon-ban);
+  }
+
+  & .delete {
+    @include button-icon-only($icon-trash);
+  }
+}

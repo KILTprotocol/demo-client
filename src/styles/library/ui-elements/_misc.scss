@@ -1,0 +1,109 @@
+@mixin baseFont {
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-weight: 400;
+}
+
+@mixin baseFont-bold {
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-weight: 600;
+}
+
+@mixin icon($icon) {
+  content: $icon;
+  font-family: '#{$icomoon-font-family}' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@mixin card {
+  @include box-shadow(2px 2px 5px transparentize($color-black, 0.8));
+  @include border-radius($base-border-radius);
+
+  margin:{
+    bottom: $base-padding;
+  }
+  padding: $base-padding;
+  background: $color-white;
+  border: $base-border;
+}
+
+@mixin label {
+  @include baseFont-bold;
+
+  color: $color-primary;
+  text-align: left;
+}
+
+@mixin label_input_combo {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding: $base-padding/2 $base-padding;
+
+  & > label {
+    $breakpoint: 600px;
+
+    @include label;
+
+    margin: {
+      top: 8px;
+    }
+
+    &,
+    & + * {
+      width: 100%;
+    }
+
+    & + div {
+      word-break: break-word;
+    }
+
+    & + input {
+      @include input;
+    }
+
+    & + div {
+
+      margin: {
+        top: 8px;
+      }
+    }
+
+    @include breakpointAbove($breakpoint) {
+      $input-width: 70%;
+
+      width: 100% - $input-width;
+
+      & + * {
+        width: $input-width;
+      }
+    }
+  }
+}
+
+@mixin console-log {
+
+  & .console-log {
+    display: none;
+  }
+
+  &.console-log {
+
+    & .console-log {
+      display: block;
+      margin: {
+        top: 10px;
+      }
+      font-size: 10px;
+    }
+  }
+}

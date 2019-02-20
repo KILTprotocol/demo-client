@@ -1,0 +1,71 @@
+@mixin fadeInOut($duration: 1s, $fadeDuration: $base-transition-time) {
+    $animationCounter: $animationCounter + 1 !global;
+    $wholeDuration: $duration + 2*$fadeDuration;
+    $endFadeIn: $fadeDuration / $wholeDuration * 100%;
+    $startFadeOut: 100% - $endFadeIn;
+
+    @include keyframes(fadeInOut#{$animationCounter}) {
+        0%, 100% {
+            @include opacity(0);
+        }
+        #{$endFadeIn}, #{$startFadeOut} {
+            @include opacity(1);
+        }
+    }
+    @include animation(fadeInOut#{$animationCounter} $wholeDuration);
+}
+
+@mixin animate($duration: $base-transition-time, $delay: 0s) {
+    $animationCounter: $animationCounter + 1 !global;
+    $wholeDuration: $delay + $duration;
+    $endDelay: $delay / $wholeDuration * 100%;
+    $startAnimation: 100% - $endDelay;
+
+    @include keyframes(animate#{$animationCounter}) {
+        #{0%}, #{$startAnimation} {
+            top: 6px;
+        }
+
+        #{100%} {
+            @content;
+        }
+    }
+
+    @include animation(animate#{$animationCounter} $wholeDuration);
+}
+
+@mixin delay($delay: $base-transition-time) {
+    $animationCounter: $animationCounter + 1 !global;
+
+    @include keyframes(delay#{$animationCounter}) {
+        100% {
+            @content;
+        }
+    }
+
+    @include animation(delay#{$animationCounter} $delay forwards);
+}
+
+@mixin rotation($duration) {
+
+    @include keyframes(rotating-#{$duration}) {
+        from {
+            @include transform(rotate(0deg));
+        }
+        to {
+            @include transform(rotate(360deg));
+        }
+    }
+
+    @include animation(rotating-#{$duration} $duration linear infinite);
+}
+
+@mixin myEndlessAnimation($duration) {
+    $animationCounter: $animationCounter + 1 !global;
+
+    @include keyframes(myEndlessAnimation#{$animationCounter}) {
+        @content;
+    }
+
+    @include animation(myEndlessAnimation#{$animationCounter} $duration linear infinite);
+}

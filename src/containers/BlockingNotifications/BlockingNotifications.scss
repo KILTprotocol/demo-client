@@ -1,0 +1,46 @@
+.BlockingNotifications {
+  $z-index: $z-index-modal + 300;
+
+  z-index: $z-index;
+
+  & .Modal {
+    @include console-log;
+
+    z-index: $z-index + 10;
+
+    & header {
+      display: flex;
+      align-items: center;
+
+      &:before {
+        margin: {
+          right: $base-padding;
+        }
+      }
+    }
+
+    &.SUCCESS {
+
+      & header {
+        color: $color-success;
+
+        &:before {
+          @include icon($icon-check-circle-o);
+
+          font-size: #{14/16}em;
+        }
+      }
+    }
+
+    &.FAILURE {
+
+      & header {
+        color: $color-danger;
+
+        &:before {
+          @include icon($icon-warning)
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+// library will be added to every component scss via webpack's sass-resources-loader
+// !!! Do not add styles which will be actually rendered in CSS, because it will be added to every SCSS file. !!!
+// use only variables, functions, extends, mixins
+
+// base
+@import "../../node_modules/compass-mixins/lib/_compass";
+@import "library/variables";
+@import "library/functions";
+// advanced
+@import "library/utilities";
+@import "library/ui-elements";

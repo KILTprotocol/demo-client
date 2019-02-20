@@ -1,0 +1,46 @@
+.MessageListView {
+
+  & table {
+    @include table;
+  }
+
+  & th,
+  & td {
+    @extend %ellipsis;
+
+    text-align: left;
+  }
+
+  & .actionsTd {
+    width: 2*$base-button-height + $base-padding;
+  }
+
+  & .sender {
+    width: 20%;
+  }
+
+  & .subject {
+    width: 60%;
+
+    & > div {
+      @extend %ellipsis;
+    }
+  }
+
+  & .delete {
+    @include button-icon-only($icon-trash-o);
+  }
+
+  & .open {
+    @include button-icon-only($icon-eye);
+  }
+
+  & .subject {
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+      color: $color-primary;
+    }
+  }
+}

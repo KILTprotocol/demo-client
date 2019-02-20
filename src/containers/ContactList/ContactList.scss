@@ -1,0 +1,38 @@
+.ContactList {
+
+  & h1 {
+    @include h1('Contact');
+  }
+
+  & table {
+    @include table;
+  }
+
+  & th,
+  & td {
+    text-align: left;
+  }
+
+  & .actions {
+    padding: 0;
+  }
+
+  & .requestClaimBtn {
+    @include button-icon-only($icon-wpforms);
+  }
+
+  & .name {
+    width: 50%;
+  }
+
+  & .address {
+    @extend %ellipsis;
+
+    width: 100%;
+  }
+
+  & .actionTd {
+    width: 50px;
+  }
+}
+  
