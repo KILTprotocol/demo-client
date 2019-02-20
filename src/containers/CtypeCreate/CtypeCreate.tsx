@@ -79,13 +79,13 @@ class CTypeCreate extends React.Component<Props, State> {
 
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Creating CTYPE',
-        message: 'submitting CTYPE (1/3)',
+        message: 'creating CTYPE (1/3)',
       })
 
       cType
         .store(this.blockchain, selectedIdentity.identity, () => {
           blockUi.updateMessage(
-            `CTYPE stored on block chain,\nnow registering CTYPE (3/3)`
+            `CTYPE stored on blockchain,\nnow registering CTYPE (3/3)`
           )
           const ctypeWrapper: ICType = {
             cType,
@@ -102,9 +102,9 @@ class CTypeCreate extends React.Component<Props, State> {
             history.push('/cType')
           })
         })
-        .then((_hash: any) => {
+        .then(() => {
           blockUi.updateMessage(
-            `CTYPE created,\nnow storing on block chain (2/3)`
+            `CTYPE created. Now submitting to blockchain (2/3)`
           )
         })
         .catch(error => {
