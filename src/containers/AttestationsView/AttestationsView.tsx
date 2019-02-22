@@ -5,7 +5,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 import ShortHash from '../../components/ShortHash/ShortHash'
 import attestationService from '../../services/AttestationService'
-import ContactRepository from '../../services/ContactRepository'
+import contactRepository from '../../services/ContactRepository'
 import FeedbackService, { safeDelete } from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
@@ -30,7 +30,7 @@ class AttestationsView extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    ContactRepository.findAll().then(() => {
+    contactRepository.findAll().then(() => {
       this.setState({ contactsLoaded: true })
     })
   }
@@ -58,7 +58,7 @@ class AttestationsView extends React.Component<Props, State> {
                 <td className="claimerAlias">
                   {contactsLoaded ? (
                     <KiltIdenticon
-                      contact={ContactRepository.findByAddress(
+                      contact={contactRepository.findByAddress(
                         attestation.claimerAddress
                       )}
                     />

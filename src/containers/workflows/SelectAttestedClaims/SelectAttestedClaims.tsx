@@ -2,13 +2,15 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { groupBy } from 'lodash'
 
-import ChooseClaimForCtype, {
-  State as ChooseClaimForCtypeState,
-} from '../../../components/ChooseClaimForCType/ChooseClaimForCType'
-import '../../../components/ChooseClaimForCType/ChooseClaimForCType.scss'
+import SelectAttestedClaim, {
+  State as SelectAttestedClaimState,
+} from '../../../components/SelectAttestedClaim/SelectAttestedClaim'
+import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'
+import ShortHash from '../../../components/ShortHash/ShortHash'
 import contactRepository from '../../../services/ContactRepository'
-import CtypeRepository from '../../../services/CtypeRepository'
+import CTypeRepository from '../../../services/CtypeRepository'
 import errorService from '../../../services/ErrorService'
 import FeedbackService, {
   notifySuccess,
@@ -26,7 +28,9 @@ import {
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
 
-export type ChooseClaimsForCTypeLabels = {
+import './SelectAttestedClaims.scss'
+
+export type SelectAttestedClaimsLabels = {
   buttons: {
     [key: string]: string
   }
@@ -42,8 +46,8 @@ export type ChooseClaimsForCTypeLabels = {
 }
 
 type AllLabels = {
-  default: ChooseClaimsForCTypeLabels
-  legitimation: ChooseClaimsForCTypeLabels
+  default: SelectAttestedClaimsLabels
+  legitimation: SelectAttestedClaimsLabels
 }
 
 const LABELS: AllLabels = {
@@ -67,7 +71,8 @@ const LABELS: AllLabels = {
       claimHeadline: 'Claim',
       includePropertiesHeadline: 'Select property(s) to include in Claim',
       noAttestationFound: 'No attestation found.',
-      noClaimsFound: `No claim for CTYPE '#{cType}' found.`,
+      noClaimsForCTypeFound: `No claims for CTYPE '#{ctype}' found.`,
+      noClaimsFound: `No claims found.`,
       selectClaim: 'Select claim ...',
       selectClaimHeadline: 'Select claim(s)',
     },
@@ -93,17 +98,22 @@ const LABELS: AllLabels = {
       includePropertiesHeadline:
         'Select property(s) to include in Legitimation',
       noAttestationFound: 'No attestation found.',
-      noClaimsFound: `No legitimation for CTYPE '#{cType}' found.`,
+      noClaimsForCTypeFound: `No legitimations for CTYPE '#{ctype}' found.`,
+      noClaimsFound: `No legitimations found.`,
       selectClaim: 'Select legitimation ...',
       selectClaimHeadline: 'Select legitimation(s)',
     },
   },
 }
 
+type GroupedClaimEntries = {
+  [cTypeHash: string]: Claims.Entry[]
+}
+
 type Props = {
   sentClaim?: IPartialClaim
   claimEntries: Claims.Entry[]
-  cTypeHash: sdk.ICType['hash']
+  cTypeHash?: sdk.ICType['hash']
   onFinished?: () => void
   senderAddress: Contact['publicIdentity']['address']
   context?: 'default' | 'legitimation'
@@ -114,21 +124,25 @@ type State = {
   claimSelectionData: {
     [key: string]: {
       claimEntry: Claims.Entry
-      state: ChooseClaimForCtypeState
+      state: SelectAttestedClaimState
     }
   }
+  relevantClaimEntries: GroupedClaimEntries
   workflowStarted: boolean
 }
 
-class ChooseClaimsForCType extends React.Component<Props, State> {
-  private labels: ChooseClaimsForCTypeLabels
+class SelectAttestedClaims extends React.Component<Props, State> {
+  private labels: SelectAttestedClaimsLabels
 
   constructor(props: Props) {
     super(props)
     this.state = {
       claimSelectionData: {},
+      relevantClaimEntries: this.getRelevantClaimEntries(),
       workflowStarted: false,
     }
+
+    this.labels = LABELS[props.context || 'default']
 
     this.changeSelection = this.changeSelection.bind(this)
     this.sendClaim = this.sendClaim.bind(this)
@@ -136,33 +150,29 @@ class ChooseClaimsForCType extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    const { context, cTypeHash } = this.props
+    const { cTypeHash } = this.props
 
-    this.labels = LABELS[context || 'default']
-
-    CtypeRepository.findByHash(cTypeHash).then((cType: ICType) => {
-      this.setState({ cType: CType.fromObject(cType) })
-    })
+    if (cTypeHash) {
+      CTypeRepository.findByHash(cTypeHash).then((cType: ICType) => {
+        this.setState({ cType: CType.fromObject(cType) })
+      })
+    }
   }
 
   public render() {
-    const { claimEntries } = this.props
-    const { claimSelectionData, cType, workflowStarted } = this.state
+    const { cTypeHash } = this.props
+    const {
+      claimSelectionData,
+      relevantClaimEntries,
+      workflowStarted,
+    } = this.state
     const selectedClaimEntryIds = Object.keys(claimSelectionData)
 
-    if (!cType) {
-      return ''
-    }
-
-    console.log('cType', cType)
-
-    const claims: Claims.Entry[] = claimEntries.filter(
-      (claimEntry: Claims.Entry) => claimEntry.claim.cType === cType.cType.hash
-    )
+    const relevantCTypes = Object.keys(relevantClaimEntries)
 
     return (
-      <section className="ChooseClaimsForCType">
-        {!!claims && !!claims.length ? (
+      <section className="SelectAttestedClaims">
+        {!!relevantCTypes && !!relevantCTypes.length ? (
           <React.Fragment>
             {!workflowStarted && (
               <div className="actions">
@@ -176,8 +186,9 @@ class ChooseClaimsForCType extends React.Component<Props, State> {
               <React.Fragment>
                 <h4>{this.labels.text.selectClaimHeadline}</h4>
 
-                {claims.map((claimEntry: Claims.Entry) =>
-                  this.getChooseClaim(claimEntry)
+                {relevantCTypes.map(
+                  (_cTypeHash: Claims.Entry['claim']['cType']) =>
+                    this.getCTypeContainer(_cTypeHash)
                 )}
 
                 <div className="actions">
@@ -191,52 +202,92 @@ class ChooseClaimsForCType extends React.Component<Props, State> {
               </React.Fragment>
             )}
           </React.Fragment>
+        ) : cTypeHash ? (
+          this.getNoClaimsForCtypeFound()
         ) : (
-          <div className="no-claim">
-            <span>
-              {this.labels.text.noClaimsFound.replace(
-                '#{cType}',
-                cType.cType.metadata.title.default
-              )}
-            </span>
-            <Link to={`/claim/new/${cType.cType.hash}`}>
-              {this.labels.buttons.createClaim}
-            </Link>
-          </div>
+          this.getNoClaimsFound()
         )}
       </section>
     )
   }
 
-  private getChooseClaim(claimEntry: Claims.Entry) {
-    const { cType } = this.state
+  private getNoClaimsFound() {
+    return (
+      <div className="no-claim">
+        <span>{this.labels.text.noClaimsFound}</span>
+        <Link to={`/ctype`}>{this.labels.buttons.createClaim}</Link>
+      </div>
+    )
+  }
 
-    if (!cType) {
-      return ''
-    }
+  private getNoClaimsForCtypeFound() {
+    const { cTypeHash } = this.props
+    const { cType } = this.state
+    return (
+      <div className="no-claim">
+        <span>
+          {this.labels.text.noClaimsFound.replace(
+            '#{ctype}',
+            cType ? cType.cType.metadata.title.default : cTypeHash || ''
+          )}
+        </span>
+        <Link to={`/claim/new/${cTypeHash}`}>
+          {this.labels.buttons.createClaim}
+        </Link>
+      </div>
+    )
+  }
+
+  private getCTypeContainer(cTypeHash: Claims.Entry['claim']['cType']) {
+    const { relevantClaimEntries } = this.state
+    return (
+      <div className="cType-container" key={cTypeHash}>
+        <h4>
+          CType <ShortHash>{cTypeHash}</ShortHash>
+        </h4>
+        {relevantClaimEntries[cTypeHash].map((claimEntry: Claims.Entry) =>
+          this.getSelectAttestedClaim(claimEntry)
+        )}
+      </div>
+    )
+  }
+
+  private getSelectAttestedClaim(claimEntry: Claims.Entry) {
+    const { cTypeHash } = this.props
 
     return (
-      <ChooseClaimForCtype
+      <SelectAttestedClaim
         key={claimEntry.id}
         labels={this.labels}
         onChangeSelections={this.changeSelection}
         claimEntry={claimEntry}
-        cType={cType}
+        cTypeHash={cTypeHash}
       />
+    )
+  }
+
+  private getRelevantClaimEntries(): GroupedClaimEntries {
+    const { claimEntries, cTypeHash } = this.props
+
+    const relevantClaimEntries = cTypeHash
+      ? claimEntries.filter(
+          (claimEntry: Claims.Entry) => claimEntry.claim.cType === cTypeHash
+        )
+      : claimEntries
+
+    return groupBy(
+      relevantClaimEntries,
+      (claimEntry: Claims.Entry) => claimEntry.claim.cType
     )
   }
 
   private changeSelection(
     claimEntry: Claims.Entry,
-    state: ChooseClaimForCtypeState
+    state: SelectAttestedClaimState
   ) {
     const { claimSelectionData } = this.state
 
-    if (
-      state.isSelected &&
-      state.selectedAttestedClaims.length &&
-      state.selectedClaimProperties.length
-    ) {
+    if (state.isSelected && state.selectedAttestedClaims.length) {
       claimSelectionData[claimEntry.id] = { claimEntry, state }
     } else {
       delete claimSelectionData[claimEntry.id]
@@ -335,7 +386,7 @@ class ChooseClaimsForCType extends React.Component<Props, State> {
             errorService.log({
               error,
               message: this.labels.message.sent.failure,
-              origin: 'ChooseClaimForCType.sendClaim()',
+              origin: 'SelectAttestedClaim.sendClaim()',
               type: 'ERROR.FETCH.POST',
             })
           })
@@ -344,7 +395,7 @@ class ChooseClaimsForCType extends React.Component<Props, State> {
         errorService.log({
           error: new Error(),
           message: 'Could not retrieve receiver',
-          origin: 'ChooseClaimForCType.sendClaim()',
+          origin: 'SelectAttestedClaim.sendClaim()',
         })
       }
     })
@@ -355,4 +406,4 @@ const mapStateToProps = (state: ReduxState) => ({
   claimEntries: Claims.getClaims(state),
 })
 
-export default connect(mapStateToProps)(ChooseClaimsForCType)
+export default connect(mapStateToProps)(SelectAttestedClaims)

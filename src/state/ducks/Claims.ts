@@ -1,3 +1,4 @@
+import { IClaim } from '@kiltprotocol/prototype-sdk'
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
@@ -5,10 +6,11 @@ import { createSelector } from 'reselect'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 import { MyIdentity } from '../../types/Contact'
+import { PartialClaim } from '../../types/Message'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 
-function hash(claim: sdk.IClaim): string {
+function hash(claim: PartialClaim): string {
   return sdk.Crypto.hashStr(JSON.stringify(claim))
 }
 
@@ -254,6 +256,17 @@ const getClaims = createSelector(
   }
 )
 
+const _getClaimHash = (state: ReduxState, claim: PartialClaim): string => {
+  return hash(claim)
+}
+
+const getClaim = createSelector(
+  [_getClaimHash, getClaims],
+  (claimHash: string, entries: Entry[]) => {
+    return entries.find((entry: Entry) => entry.id === claimHash)
+  }
+)
+
 export {
   Store,
   ImmutableState,
@@ -261,5 +274,6 @@ export {
   Entry,
   Action,
   getClaims,
+  getClaim,
   hash,
 }

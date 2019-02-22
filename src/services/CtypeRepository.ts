@@ -8,8 +8,6 @@ import { BasePostParams } from './BaseRepository'
 
 class CTypeRepository {
   public static async findByHash(hash: sdk.ICType['hash']): Promise<ICType> {
-    console.log('hash', hash)
-
     return fetch(`${CTypeRepository.URL}/${hash}`).then(response =>
       response.json()
     )

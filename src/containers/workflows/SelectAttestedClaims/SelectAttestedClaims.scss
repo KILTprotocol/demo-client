@@ -1,0 +1,12 @@
+.SelectAttestedClaims {
+
+  & .cType-container {
+    @include card;
+
+    & > h4 {
+      margin: {
+        top: 0;
+      }
+    }
+  }
+}

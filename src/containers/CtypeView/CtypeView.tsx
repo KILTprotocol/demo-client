@@ -6,7 +6,7 @@ import CTypeDetailView from '../../components/CtypeDetailView/CtypeDetailView'
 import CTypeListView from '../../components/CtypeListView/CtypeListView'
 import SelectAttestersModal from '../../components/Modal/SelectAttestersModal'
 import attestationWorkflow from '../../services/AttestationWorkflow'
-import CtypeRepository from '../../services/CtypeRepository'
+import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { Contact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
@@ -36,7 +36,7 @@ class CtypeView extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    CtypeRepository.findAll()
+    CTypeRepository.findAll()
       .then((cTypes: ICType[]) => {
         this.setState({ cTypes })
       })

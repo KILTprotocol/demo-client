@@ -85,30 +85,28 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     )
 
     return (
-      propertyNames.length > 0 && (
-        <div className="attributes">
-          {propertyNames.map((propertyName: string) => {
-            const propertyTitle = this.getCtypePropertyTitle(propertyName)
-            return (
-              <div key={propertyName}>
-                <label>{propertyTitle}</label>
-                <div>
-                  {attestedClaim.request.claim.contents[propertyName] ||
-                    AttestedClaimVerificationView.BLOCK_CHAR.repeat(12)}
-                </div>
+      <div className="attributes">
+        {propertyNames.map((propertyName: string) => {
+          const propertyTitle = this.getCtypePropertyTitle(propertyName)
+          return (
+            <div key={propertyName}>
+              <label>{propertyTitle}</label>
+              <div>
+                {attestedClaim.request.claim.contents[propertyName] ||
+                  AttestedClaimVerificationView.BLOCK_CHAR.repeat(12)}
               </div>
-            )
-          })}
-          <div>
-            <label>Attester</label>
-            <div>{attesterView}</div>
-          </div>
-          <div>
-            <label>Valid</label>
-            <div className="attestationStatusView">{attestationStatusView}</div>
-          </div>
+            </div>
+          )
+        })}
+        <div>
+          <label>Attester</label>
+          <div>{attesterView}</div>
         </div>
-      )
+        <div>
+          <label>Valid</label>
+          <div className="attestationStatusView">{attestationStatusView}</div>
+        </div>
+      </div>
     )
   }
 

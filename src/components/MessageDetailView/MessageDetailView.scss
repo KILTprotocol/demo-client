@@ -1,5 +1,15 @@
 .MessageDetailView {
 
+  & h4 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .toggle-code {
+    @include button-icon-only($icon-code)
+  }
+
   & footer {
 
     & .delete {
