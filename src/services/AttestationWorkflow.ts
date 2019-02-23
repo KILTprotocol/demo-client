@@ -5,17 +5,18 @@ import * as Attestations from '../state/ducks/Attestations'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import { Contact } from '../types/Contact'
-import {
-  ApproveAttestationForClaim,
-  MessageBody,
-  MessageBodyType,
-  PartialClaim,
-  RequestAttestationForClaim,
-  RequestLegitimations,
-} from '../types/Message'
 import errorService from './ErrorService'
 import { notifyFailure, notifySuccess } from './FeedbackService'
 import MessageRepository from './MessageRepository'
+import {
+  IPartialClaim,
+  IRequestAttestationForClaim,
+  IRequestLegitimations,
+  ISubmitAttestationForClaim,
+  MessageBody,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
+import { Error } from 'tslint/lib/error'
 
 class AttestationWorkflow {
   /**
@@ -25,13 +26,13 @@ class AttestationWorkflow {
    * @param attesters the attesters to send the legitimation request to
    */
   public requestLegitimations(
-    claim: PartialClaim,
+    claim: IPartialClaim,
     attesters: Contact[]
   ): Promise<void> {
     const messageBody = {
       content: claim,
       type: MessageBodyType.REQUEST_LEGITIMATIONS,
-    } as RequestLegitimations
+    } as IRequestLegitimations
 
     return this.bulkSend(attesters, messageBody)
   }
@@ -46,7 +47,7 @@ class AttestationWorkflow {
    * @param claimer the claimer who requested the legitimation
    */
   public submitLegitimations(
-    claim: PartialClaim,
+    claim: IPartialClaim,
     legitimations: sdk.AttestedClaim[],
     claimer: Contact
   ): Promise<void> {
@@ -77,7 +78,7 @@ class AttestationWorkflow {
     const messageBody = {
       content: requestForAttestation,
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
-    } as RequestAttestationForClaim
+    } as IRequestAttestationForClaim
 
     return this.bulkSend(attesters, messageBody)
   }
@@ -108,9 +109,9 @@ class AttestationWorkflow {
           } as Attestations.Entry)
 
           // build 'claim attested' message and send to claimer
-          const attestationMessageBody: ApproveAttestationForClaim = {
+          const attestationMessageBody: ISubmitAttestationForClaim = {
             content: attestedClaim,
-            type: MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM,
+            type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
           }
           MessageRepository.send(claimer, attestationMessageBody)
             .then(message => {

@@ -1,15 +1,5 @@
 import React, { ReactNode } from 'react'
 
-import {
-  Message,
-  MessageBodyType,
-  RequestClaimsForCtype,
-  RequestAttestationForClaim,
-  ApproveAttestationForClaim,
-  SubmitClaimsForCtype,
-  RequestLegitimations,
-  SubmitLegitimations,
-} from '../../types/Message'
 import Code from '../Code/Code'
 import ChooseClaimsForCType from '../../containers/workflows/ChooseClaimsForCtype/ChooseClaimsForCtype'
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
@@ -18,10 +8,20 @@ import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
 import MessageSubject from '../MessageSubject/MessageSubject'
 
 import './MessageDetailView.scss'
+import {
+  IMessage,
+  IRequestAttestationForClaim,
+  IRequestClaimsForCtype,
+  IRequestLegitimations,
+  ISubmitAttestationForClaim,
+  ISubmitClaimsForCtype,
+  ISubmitLegitimations,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
 
 type Props = {
-  message: Message
-  onDelete: (message: Message) => void
+  message: IMessage
+  onDelete: (message: IMessage) => void
   onCancel: (id: string) => void
 }
 
@@ -44,11 +44,7 @@ class MessageDetailView extends React.Component<Props, State> {
         {this.shouldDisplayContentAsCode(message) && (
           <div>
             Contents:{' '}
-            {message.body ? (
-              <Code>{message.body.content}</Code>
-            ) : (
-              message.message
-            )}
+            {message.body ? <Code>{message.body.content}</Code> : message.body}
           </div>
         )}
         <div className="workflow">{this.getWorkflow(message)}</div>
@@ -65,7 +61,7 @@ class MessageDetailView extends React.Component<Props, State> {
     )
   }
 
-  private getWorkflow(message: Message): ReactNode | undefined {
+  private getWorkflow(message: IMessage): ReactNode | undefined {
     if (!message || !message.body || !message.body.content) {
       return undefined
     }
@@ -79,9 +75,7 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <ChooseClaimsForCType
             senderAddress={message.senderAddress}
-            cTypeHash={
-              (message.body as RequestClaimsForCtype).content.cType.hash
-            }
+            cTypeHash={(message.body as IRequestClaimsForCtype).content}
             onFinished={this.handleDelete}
           />
         )
@@ -89,8 +83,8 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <ChooseClaimsForCType
             senderAddress={message.senderAddress}
-            sentClaim={(message.body as RequestLegitimations).content}
-            cTypeHash={(message.body as RequestLegitimations).content.cType}
+            sentClaim={(message.body as IRequestLegitimations).content}
+            cTypeHash={(message.body as IRequestLegitimations).content.cType}
             onFinished={this.handleDelete}
             context="legitimation"
           />
@@ -100,29 +94,29 @@ class MessageDetailView extends React.Component<Props, State> {
           <AttestClaim
             senderAddress={message.senderAddress}
             requestForAttestation={
-              (message.body as RequestAttestationForClaim).content
+              (message.body as IRequestAttestationForClaim).content
             }
             onFinished={this.handleDelete}
           />
         )
-      case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
+      case MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
         return (
           <ImportAttestation
-            attestedClaim={(message.body as ApproveAttestationForClaim).content}
+            attestedClaim={(message.body as ISubmitAttestationForClaim).content}
             onFinished={this.handleDelete}
           />
         )
       case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
         return (
           <VerifyClaim
-            attestedClaims={(message.body as SubmitClaimsForCtype).content}
+            attestedClaims={(message.body as ISubmitClaimsForCtype).content}
           />
         )
       case MessageBodyType.SUBMIT_LEGITIMATIONS:
         return (
           <VerifyClaim
             attestedClaims={
-              (message.body as SubmitLegitimations).content.legitimations
+              (message.body as ISubmitLegitimations).content.legitimations
             }
             context="legitimation"
           />
@@ -146,11 +140,11 @@ class MessageDetailView extends React.Component<Props, State> {
     }
   }
 
-  private getMessageBodyType(message: Message): MessageBodyType | undefined {
+  private getMessageBodyType(message: IMessage): MessageBodyType | undefined {
     return message && message.body && message.body.type
   }
 
-  private shouldDisplayContentAsCode(message: Message): boolean {
+  private shouldDisplayContentAsCode(message: IMessage): boolean {
     const messageBodyType:
       | MessageBodyType
       | undefined = this.getMessageBodyType(message)

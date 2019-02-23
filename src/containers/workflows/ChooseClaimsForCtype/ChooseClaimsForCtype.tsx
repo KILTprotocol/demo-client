@@ -18,13 +18,13 @@ import * as Claims from '../../../state/ducks/Claims'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact } from '../../../types/Contact'
 import { CType, ICType } from '../../../types/Ctype'
-import {
-  MessageBodyType,
-  PartialClaim,
-  SubmitClaimsForCtype,
-  SubmitLegitimations,
-} from '../../../types/Message'
 import { BlockUi } from '../../../types/UserFeedback'
+import {
+  IPartialClaim,
+  ISubmitClaimsForCtype,
+  ISubmitLegitimations,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
 
 export type ChooseClaimsForCTypeLabels = {
   buttons: {
@@ -101,7 +101,7 @@ const LABELS: AllLabels = {
 }
 
 type Props = {
-  sentClaim?: PartialClaim
+  sentClaim?: IPartialClaim
   claimEntries: Claims.Entry[]
   cTypeHash: sdk.ICType['hash']
   onFinished?: () => void
@@ -297,7 +297,7 @@ class ChooseClaimsForCType extends React.Component<Props, State> {
       }
     )
 
-    let request: SubmitLegitimations | SubmitClaimsForCtype
+    let request: ISubmitLegitimations | ISubmitClaimsForCtype
 
     if (context === 'legitimation') {
       request = {
@@ -306,12 +306,12 @@ class ChooseClaimsForCType extends React.Component<Props, State> {
           legitimations: attestedClaims,
         },
         type: MessageBodyType.SUBMIT_LEGITIMATIONS,
-      } as SubmitLegitimations
+      } as ISubmitLegitimations
     } else {
       request = {
         content: attestedClaims,
         type: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
-      } as SubmitClaimsForCtype
+      } as ISubmitClaimsForCtype
     }
 
     contactRepository.findAll().then(() => {

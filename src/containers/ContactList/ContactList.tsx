@@ -13,10 +13,13 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
-import { MessageBodyType, RequestClaimsForCtype } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
+import {
+  IRequestClaimsForCtype,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
 
 interface Props {}
 
@@ -176,8 +179,8 @@ class ContactList extends React.Component<Props, State> {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Sending Message',
       })
-      const request: RequestClaimsForCtype = {
-        content: this.selectedCtype,
+      const request: IRequestClaimsForCtype = {
+        content: this.selectedCtype.cType.hash,
         type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
       }
 
