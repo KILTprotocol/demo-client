@@ -50,26 +50,37 @@ class MessageRepository {
   ): Promise<MessageOutput[]> {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
-      .then(async (messages: IMessage[]) => {
+      .then(async (encryptedMessages: IEncryptedMessage[]) => {
         await contactRepository.findAll()
-        return messages
+        return encryptedMessages
       })
       .then((encryptedMessages: IEncryptedMessage[]) => {
         const result: MessageOutput[] = []
-        for (const enctyptedMessage of encryptedMessages) {
+        for (const encryptedMessage of encryptedMessages) {
           const sender: Contact | undefined = contactRepository.findByAddress(
-            enctyptedMessage.senderAddress
+            encryptedMessage.senderAddress
           )
           if (sender) {
-            const m: IMessage = Message.createFromEncryptedMessage(
-              enctyptedMessage,
-              sender.publicIdentity,
-              myIdentity
-            )
-            result.push({
-              ...m,
-              sender,
-            })
+            try {
+              const m: IMessage = Message.createFromEncryptedMessage(
+                encryptedMessage,
+                sender.publicIdentity,
+                myIdentity
+              )
+              Message.ensureOwnerIsSender(m)
+              result.push({
+                ...m,
+                sender,
+              })
+            } catch (error) {
+              errorService.log({
+                error,
+                message:
+                  'error on receiving messsage: ' +
+                  JSON.stringify(encryptedMessage),
+                origin: 'MessageRepository.findByMyIdentity()',
+              })
+            }
           }
         }
         return result
