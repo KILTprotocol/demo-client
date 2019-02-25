@@ -1,13 +1,4 @@
-import {
-  IMessage,
-  IRequestAttestationForClaim,
-  IRequestClaimsForCtype,
-  IRequestLegitimations,
-  ISubmitAttestationForClaim,
-  ISubmitClaimsForCtype,
-  ISubmitLegitimations,
-  MessageBodyType,
-} from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { ReactNode } from 'react'
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
 import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
@@ -21,8 +12,8 @@ import MessageSubject from '../MessageSubject/MessageSubject'
 import './MessageDetailView.scss'
 
 type Props = {
-  message: IMessage
-  onDelete: (message: IMessage) => void
+  message: sdk.IMessage
+  onDelete: (message: sdk.IMessage) => void
   onCancel: (id: string) => void
 }
 
@@ -68,82 +59,84 @@ class MessageDetailView extends React.Component<Props, State> {
     )
   }
 
-  private getCode(message: Message) {
+  private getCode(message: sdk.IMessage) {
     const { showCode } = this.state
     return (
       showCode && (
         <div className="code">
           <div>Source:</div>
-          {message.body ? (
-            <Code>{message.body!.content}</Code>
-          ) : (
-            message.message
-          )}
+          <Code>{message.body.content}</Code>
         </div>
       )
     )
   }
 
-  private getWorkflow(message: IMessage): ReactNode | undefined {
+  private getWorkflow(message: sdk.IMessage): ReactNode | undefined {
     if (!message || !message.body || !message.body.content) {
       return undefined
     }
 
     const messageBodyType:
-      | MessageBodyType
+      | sdk.MessageBodyType
       | undefined = this.getMessageBodyType(message)
 
     switch (messageBodyType) {
-      case MessageBodyType.REQUEST_LEGITIMATIONS:
+      case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
         return (
           <SelectAttestedClaims
             senderAddress={message.senderAddress}
-            sentClaim={(message.body as IRequestLegitimations).content}
-            cTypeHash={(message.body as IRequestLegitimations).content.cType}
+            sentClaim={(message.body as sdk.IRequestLegitimations).content}
+            cTypeHash={
+              (message.body as sdk.IRequestLegitimations).content.cType
+            }
             onFinished={this.handleDelete}
             context="legitimation"
           />
         )
-      case MessageBodyType.SUBMIT_LEGITIMATIONS:
+      case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
         return (
           <RequestAttestation
-            initialClaim={(message.body as ISubmitLegitimations).content.claim}
+            initialClaim={
+              (message.body as sdk.ISubmitLegitimations).content.claim
+            }
             legitimations={
-              (message.body as ISubmitLegitimations).content.legitimations
+              (message.body as sdk.ISubmitLegitimations).content.legitimations
             }
             attesterAddress={message.senderAddress}
             onFinished={this.handleDelete}
           />
         )
-      case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
+      case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return (
           <AttestClaim
             senderAddress={message.senderAddress}
             requestForAttestation={
-              (message.body as IRequestAttestationForClaim).content
+              (message.body as sdk.IRequestAttestationForClaim).content
             }
             onFinished={this.handleDelete}
           />
         )
-      case MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
+      case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
         return (
           <ImportAttestation
-            attestedClaim={(message.body as ISubmitAttestationForClaim).content}
+            attestedClaim={
+              (message.body as sdk.ISubmitAttestationForClaim).content
+            }
             onFinished={this.handleDelete}
           />
         )
-      case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
         return (
           <SelectAttestedClaims
             senderAddress={message.senderAddress}
-            cTypeHash={(message.body as IRequestClaimsForCtype).content}
+            cTypeHash={(message.body as sdk.IRequestClaimsForCtype).content}
             onFinished={this.handleDelete}
           />
         )
-      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
         return (
           <VerifyClaim
-            attestedClaims={(message.body as ISubmitClaimsForCtype).content}
+            attestedClaims={(message.body as sdk.ISubmitClaimsForCtype).content}
           />
         )
       default:
@@ -172,18 +165,20 @@ class MessageDetailView extends React.Component<Props, State> {
     })
   }
 
-  private getMessageBodyType(message: IMessage): MessageBodyType | undefined {
+  private getMessageBodyType(
+    message: sdk.IMessage
+  ): sdk.MessageBodyType | undefined {
     return message && message.body && message.body.type
   }
 
-  private canDisplayContentAsCode(message: IMessage): boolean {
+  private canDisplayContentAsCode(message: sdk.IMessage): boolean {
     const messageBodyType:
-      | MessageBodyType
+      | sdk.MessageBodyType
       | undefined = this.getMessageBodyType(message)
 
     return (
       messageBodyType !== undefined &&
-      messageBodyType !== MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
+      messageBodyType !== sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
     )
   }
 }
