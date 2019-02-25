@@ -96,6 +96,8 @@ class Store {
 
     Object.keys(claimsStateSerialized.claims).forEach(i => {
       const o = claimsStateSerialized.claims[i]
+
+      console.log('o', o)
       try {
         const claim = JSON.parse(o.claim) as sdk.IClaim
         const attestations: sdk.IAttestedClaim[] = !!o.attestations

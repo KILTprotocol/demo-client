@@ -85,7 +85,7 @@ class RequestAttestation extends React.Component<Props, State> {
   }
 
   private handleSubmit() {
-    const { attesterAddress, onFinished } = this.props
+    const { attesterAddress, legitimations, onFinished } = this.props
     const { savedClaimEntry } = this.state
 
     let attester: Contact | undefined
@@ -95,7 +95,13 @@ class RequestAttestation extends React.Component<Props, State> {
         attester = ContactRepository.findByAddress(attesterAddress)
         if (attester) {
           attestationWorkflow
-            .requestAttestationForClaim(savedClaimEntry.claim, [attester])
+            .requestAttestationForClaim(
+              savedClaimEntry.claim,
+              [attester],
+              legitimations.map((legitimation: sdk.IAttestedClaim) =>
+                sdk.AttestedClaim.fromObject(legitimation)
+              )
+            )
             .then(() => {
               onFinished()
             })
