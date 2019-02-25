@@ -1,14 +1,15 @@
 import * as React from 'react'
-import { Message, MessageOutput } from '../../types/Message'
 import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 import MessageSubject from '../MessageSubject/MessageSubject'
 
 import './MessageListView.scss'
+import { MessageOutput } from '../../services/MessageRepository'
+import { IMessage } from '@kiltprotocol/prototype-sdk'
 
 type Props = {
   messages: MessageOutput[]
-  onDelete: (message: Message) => void
-  onOpen: (message: Message) => void
+  onDelete: (message: IMessage) => void
+  onOpen: (message: IMessage) => void
 }
 
 type State = {}
@@ -69,12 +70,12 @@ class MessageListView extends React.Component<Props, State> {
     )
   }
 
-  private handleDelete = (message: Message): (() => void) => () => {
+  private handleDelete = (message: IMessage): (() => void) => () => {
     const { onDelete } = this.props
     onDelete(message)
   }
 
-  private openMessage = (message: Message): (() => void) => () => {
+  private openMessage = (message: IMessage): (() => void) => () => {
     const { onOpen } = this.props
     onOpen(message)
   }

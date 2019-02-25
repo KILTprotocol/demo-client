@@ -1,16 +1,15 @@
 import * as React from 'react'
-import {
-  Message,
-  MessageBodyType,
-  MessageOutput,
-  RequestClaimsForCtype,
-  RequestLegitimations,
-} from '../../types/Message'
 
 import './MessageSubject.scss'
+import {
+  IMessage,
+  IRequestClaimsForCtype,
+  IRequestLegitimations,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
 
 type Props = {
-  message: Message
+  message: IMessage
 }
 
 const MessageSubject = (props: Props) => {
@@ -20,7 +19,7 @@ const MessageSubject = (props: Props) => {
   }
 
   if (!message.body || !message.body.type) {
-    return <span className="MessageSubject">{message.message}</span>
+    return <span className="MessageSubject">{message.body}</span>
   }
 
   let additionalInfo: string = ''
@@ -29,11 +28,10 @@ const MessageSubject = (props: Props) => {
 
     switch (messageBodyType) {
       case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
-        additionalInfo = (message.body as RequestClaimsForCtype).content.cType
-          .metadata.title.default
+        additionalInfo = (message.body as IRequestClaimsForCtype).content!
         break
       case MessageBodyType.REQUEST_LEGITIMATIONS:
-        additionalInfo = (message.body as RequestLegitimations).content.cType
+        additionalInfo = (message.body as IRequestLegitimations).content.cType
         break
     }
   } catch (error) {
