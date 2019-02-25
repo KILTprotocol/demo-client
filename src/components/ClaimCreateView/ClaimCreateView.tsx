@@ -12,7 +12,6 @@ import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
-import { PartialClaim } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './ClaimCreateView.scss'
@@ -20,13 +19,13 @@ import './ClaimCreateView.scss'
 type Props = {
   onCancel?: () => void
   onCreate: (claim: sdk.Claim) => void
-  partialClaim: PartialClaim
+  partialClaim: sdk.IPartialClaim
   saveClaim: (claim: sdk.IClaim, meta: { alias: string }) => void
   selectedIdentity?: Wallet.Entry
 }
 
 type State = {
-  partialClaim: PartialClaim
+  partialClaim: sdk.IPartialClaim
   name: string
   isValid: boolean
   cType?: sdk.CType

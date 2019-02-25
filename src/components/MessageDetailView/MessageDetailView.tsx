@@ -25,7 +25,7 @@ class MessageDetailView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      showCode: false,
+      showCode: true,
     }
     this.handleDelete = this.handleDelete.bind(this)
     this.handleCancel = this.handleCancel.bind(this)

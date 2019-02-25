@@ -6,17 +6,15 @@ import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import ContactRepository from '../../../services/ContactRepository'
 import ErrorService from '../../../services/ErrorService'
-import { notifyFailure, notifySuccess } from '../../../services/FeedbackService'
 import * as Claims from '../../../state/ducks/Claims'
 import PersistentStore from '../../../state/PersistentStore'
 import { Contact } from '../../../types/Contact'
-import { PartialClaim } from '../../../types/Message'
 import VerifyClaim from '../VerifyClaim/VerifyClaim'
 
 import './RequestAttestation.scss'
 
 type Props = {
-  initialClaim: PartialClaim
+  initialClaim: sdk.IPartialClaim
   legitimations: sdk.IAttestedClaim[]
   attesterAddress: sdk.PublicIdentity['address']
   onFinished: () => void
@@ -77,7 +75,7 @@ class RequestAttestation extends React.Component<Props, State> {
     )
   }
 
-  private handleCreateClaim(currentClaim: PartialClaim) {
+  private handleCreateClaim(currentClaim: sdk.IPartialClaim) {
     this.setState({
       savedClaimEntry: Claims.getClaim(
         PersistentStore.store.getState(),
