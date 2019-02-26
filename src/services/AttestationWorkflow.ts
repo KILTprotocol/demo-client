@@ -102,10 +102,9 @@ class AttestationWorkflow {
           // store attestation locally
           attestationService.saveInStore({
             attestation: attestedClaim.attestation,
+            cTypeHash: attestedClaim.request.claim.cType,
             claimerAddress: attestedClaim.request.claim.owner,
             claimerAlias: claimer.metaData.name,
-            ctypeHash: attestedClaim.request.claim.cType,
-            ctypeName: '<tbd>',
           } as Attestations.Entry)
 
           // build 'claim attested' message and send to claimer

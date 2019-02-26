@@ -27,8 +27,7 @@ type Entry = {
   created: moment.Moment
   claimerAlias: string
   claimerAddress: string
-  ctypeHash: string
-  ctypeName: string
+  cTypeHash: string
   attestation: sdk.IAttestation
 }
 
@@ -76,11 +75,10 @@ class Store {
           const iAttestation = attestationAsJson.attestation as sdk.IAttestation
           const attestationEntry: Entry = {
             attestation: iAttestation,
+            cTypeHash: attestationAsJson.cTypeHash,
             claimerAddress: attestationAsJson.claimerAddress,
             claimerAlias: attestationAsJson.claimerAlias,
             created: moment(attestationAsJson.created, moment.defaultFormatUtc),
-            ctypeHash: attestationAsJson.ctypeHash,
-            ctypeName: attestationAsJson.ctypeName,
           } as Entry
           attestationEntries.push(attestationEntry)
         } catch (e) {

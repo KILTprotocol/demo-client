@@ -8,7 +8,7 @@ import SelectAction from '../SelectAction/SelectAction'
 
 type Props = RouteComponentProps<{}> & {
   cTypes?: ICType[]
-  onRequestLegitimation: (ctype: ICType) => void
+  onRequestLegitimation: (cType: ICType) => void
 }
 
 type State = {}
@@ -75,9 +75,9 @@ class CtypeListView extends React.Component<Props, State> {
     this.props.history.push(`/claim/new/${cType.cType.hash}`)
   }
 
-  private requestLegitimation(ctype: ICType) {
+  private requestLegitimation(cType: ICType) {
     const { onRequestLegitimation } = this.props
-    onRequestLegitimation(ctype)
+    onRequestLegitimation(cType)
   }
 }
 

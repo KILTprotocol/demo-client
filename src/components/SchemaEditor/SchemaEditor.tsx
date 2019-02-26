@@ -6,7 +6,7 @@ import './SchemaEditor.scss'
 
 type Props = {
   schema: common.Schema
-  initialValue: string
+  initialValue: common.ValueType
   updateValue: (value: common.ValueType, _isValid: boolean) => void
 }
 

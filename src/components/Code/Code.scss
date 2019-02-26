@@ -1,7 +1,15 @@
-.Code {
-  margin: 0;
-  padding: 20px;
-  background: black;
-  color: white;
+.react-json-view {
+  padding: $base-padding/2;
+  line-height: 1.2;
+  font-size: 16px;
   overflow: auto;
 }
+
+.Code {
+   max-height: 400px;
+   margin: 0;
+   padding: 20px;
+   background: black;
+   color: white;
+   overflow: auto;
+ }

@@ -1,0 +1,7 @@
+.RequestAttestation {
+
+  & .ClaimCreate,
+  & .ClaimDetailView {
+    @include card;
+  }
+}

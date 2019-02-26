@@ -5,7 +5,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 import ShortHash from '../../components/ShortHash/ShortHash'
 import attestationService from '../../services/AttestationService'
-import ContactRepository from '../../services/ContactRepository'
+import contactRepository from '../../services/ContactRepository'
 import FeedbackService, { safeDelete } from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
@@ -30,7 +30,7 @@ class AttestationsView extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    ContactRepository.findAll().then(() => {
+    contactRepository.findAll().then(() => {
       this.setState({ contactsLoaded: true })
     })
   }
@@ -46,7 +46,7 @@ class AttestationsView extends React.Component<Props, State> {
             <tr>
               <th className="claimerAlias">Claimer</th>
               <th className="claimHash">Claim Hash</th>
-              <th className="ctypeName">CTYPE</th>
+              <th className="cType">CTYPE</th>
               <th className="created">Created</th>
               <th className="status">Approved</th>
               <th className="actionsTd" />
@@ -58,7 +58,7 @@ class AttestationsView extends React.Component<Props, State> {
                 <td className="claimerAlias">
                   {contactsLoaded ? (
                     <KiltIdenticon
-                      contact={ContactRepository.findByAddress(
+                      contact={contactRepository.findByAddress(
                         attestation.claimerAddress
                       )}
                     />
@@ -72,8 +72,8 @@ class AttestationsView extends React.Component<Props, State> {
                 >
                   {attestation.attestation.claimHash}
                 </td>
-                <td className="ctypeName" title={attestation.ctypeHash}>
-                  {attestation.ctypeName}
+                <td className="cType" title={attestation.cTypeHash}>
+                  <ShortHash>{attestation.cTypeHash}</ShortHash>
                 </td>
                 <td
                   className="created"

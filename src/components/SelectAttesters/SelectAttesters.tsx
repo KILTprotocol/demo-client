@@ -8,7 +8,7 @@ import SelectContacts from '../SelectContact/SelectContact'
 type Props = {
   closeMenuOnSelect?: boolean
   isMulti?: boolean
-  ctypes?: ICType[]
+  cTypes?: ICType[] // if we need to filter attesters by cType(s)
   onChange?: (selectedAttesters: Contact[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
@@ -34,7 +34,7 @@ class SelectAttesters extends React.Component<Props, State> {
 
   public componentDidMount() {
     contactRepository.findAll().then((attesters: Contact[]) => {
-      // TODO: filter by ctype when info available
+      // TODO: filter by cType when info available
       this.setState({ attesters })
     })
   }
