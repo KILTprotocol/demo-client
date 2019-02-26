@@ -14,7 +14,7 @@ import { State as ReduxState } from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 
-import './ClaimCreateView.scss'
+import './MyClaimCreateView.scss'
 
 type Props = {
   onCancel?: () => void
@@ -31,7 +31,7 @@ type State = {
   cType?: sdk.CType
 }
 
-class ClaimCreateView extends Component<Props, State> {
+class MyClaimCreateView extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
@@ -79,7 +79,7 @@ class ClaimCreateView extends Component<Props, State> {
     const { contents } = partialClaim
 
     return (
-      <section className="ClaimCreate">
+      <section className="MyClaimCreateView">
         <h1>New Claim</h1>
         {cType && (
           <React.Fragment>
@@ -173,4 +173,4 @@ const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ClaimCreateView)
+)(MyClaimCreateView)

@@ -1,0 +1,6 @@
+.MyClaimDetailView {
+
+  & .deleteClaim {
+    @include button-icon-only($icon-trash)
+  }
+}
