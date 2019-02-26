@@ -86,9 +86,6 @@ class MessageDetailView extends React.Component<Props, State> {
           <SelectAttestedClaims
             senderAddress={message.senderAddress}
             sentClaim={(message.body as sdk.IRequestLegitimations).content}
-            cTypeHash={
-              (message.body as sdk.IRequestLegitimations).content.cType
-            }
             onFinished={this.handleDelete}
             context="legitimation"
           />
