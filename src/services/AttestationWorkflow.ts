@@ -103,7 +103,6 @@ class AttestationWorkflow {
           attestationService.saveInStore({
             attestation: attestedClaim.attestation,
             cTypeHash: attestedClaim.request.claim.cType,
-            cTypeName: '<tbd>',
             claimerAddress: attestedClaim.request.claim.owner,
             claimerAlias: claimer.metaData.name,
           } as Attestations.Entry)

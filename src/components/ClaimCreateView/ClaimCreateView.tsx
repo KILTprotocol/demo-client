@@ -31,7 +31,7 @@ type State = {
   cType?: sdk.CType
 }
 
-class ClaimCreate extends Component<Props, State> {
+class ClaimCreateView extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
@@ -173,4 +173,4 @@ const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ClaimCreate)
+)(ClaimCreateView)

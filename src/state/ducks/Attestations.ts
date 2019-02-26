@@ -28,7 +28,6 @@ type Entry = {
   claimerAlias: string
   claimerAddress: string
   cTypeHash: string
-  cTypeName: string
   attestation: sdk.IAttestation
 }
 
@@ -77,7 +76,6 @@ class Store {
           const attestationEntry: Entry = {
             attestation: iAttestation,
             cTypeHash: attestationAsJson.cTypeHash,
-            cTypeName: attestationAsJson.cTypeName,
             claimerAddress: attestationAsJson.claimerAddress,
             claimerAlias: attestationAsJson.claimerAlias,
             created: moment(attestationAsJson.created, moment.defaultFormatUtc),
