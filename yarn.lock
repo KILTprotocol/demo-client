@@ -225,9 +225,10 @@
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.2.tgz#63985d3d8b02530e0869962f4da09142ee8e200e"
 
-"@kiltprotocol/prototype-sdk@^0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@kiltprotocol/prototype-sdk/-/prototype-sdk-0.1.7.tgz#77a2c40f311d14e468a82a155239d30c4b440853"
+"@kiltprotocol/prototype-sdk@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@kiltprotocol/prototype-sdk/-/prototype-sdk-0.2.0.tgz#c5066d09eb595bff4db9d119fb8c02bd54a70bc2"
+  integrity sha512-jDSAFmNYMTAG88dM+2McDgMPvqwJ21cFESKff7NLmt9ekY4imhzhjXBzyVrArGBbE8ur9Xd7ddX1LTMAh408Qg==
   dependencies:
     "@polkadot/api" "^0.43.14"
     ajv "^6.6.1"
