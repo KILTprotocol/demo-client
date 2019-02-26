@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import Select from 'react-select'
-import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
+import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
@@ -38,7 +38,7 @@ class IdentitySelector extends React.Component<Props, State> {
 
     const identityOptions: SelectIdentityOption[] = myIdentities.map(
       (myIdentity: MyIdentity) => ({
-        label: <KiltIdenticon myIdentity={myIdentity} size={20} />,
+        label: <ContactPresentation myIdentity={myIdentity} size={20} />,
         value: myIdentity.identity.address,
       })
     )

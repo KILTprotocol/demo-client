@@ -1,10 +1,8 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import AttestedClaimsListView from '../../components/AttestedClaimsListView/AttestedClaimsListView'
 import * as Claims from '../../state/ducks/Claims'
 import ClaimDetailView from '../ClaimDetailView/ClaimDetailView'
-import Code from '../Code/Code'
 
 import './MyClaimDetailView.scss'
 

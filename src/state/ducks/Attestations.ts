@@ -1,13 +1,13 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-import { createSelector } from 'reselect'
 
 import Immutable from 'immutable'
 import moment from 'moment'
-import { MyIdentity } from '../../types/Contact'
-import * as Wallet from './Wallet'
+import { createSelector } from 'reselect'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
+import { MyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
+import * as Wallet from './Wallet'
 
 interface SaveAction extends KiltAction {
   payload: Entry

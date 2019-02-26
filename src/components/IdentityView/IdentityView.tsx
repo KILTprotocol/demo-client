@@ -1,9 +1,8 @@
-import Identicon from '@polkadot/ui-identicon'
 import * as React from 'react'
 import { MyIdentity } from '../../types/Contact'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 import './IdentityView.scss'
-import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
 
 type Props = {
   // input
@@ -47,7 +46,7 @@ class IdentityView extends React.Component<Props, {}> {
             <label>Encryption Public Key</label>
             <div>{myIdentity.identity.boxPublicKeyAsHex}</div>
           </div>
-          <KiltIdenticon myIdentity={myIdentity} size={50} />
+          <ContactPresentation myIdentity={myIdentity} size={50} />
         </div>
         <div className="actions">
           <button onClick={this.onDelete} disabled={selected}>

@@ -11,6 +11,7 @@ import { State as ReduxState } from '../../state/PersistentStore'
 import { CType, ICType } from '../../types/Ctype'
 
 import './SelectAttestedClaim.scss'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 type Props = {
   claimEntry: Claims.Entry
@@ -207,7 +208,9 @@ class SelectAttestedClaim extends React.Component<Props, State> {
                   attestedClaim.attestation.revoked ? 'unapproved' : 'approved'
                 }
               >
-                {attestedClaim.attestation.owner}
+                <ContactPresentation
+                  address={attestedClaim.attestation.owner}
+                />
               </span>
             </label>
           ))}

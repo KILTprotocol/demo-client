@@ -1,16 +1,16 @@
 import {
   Identity,
   IEncryptedMessage,
+  IMessage,
   MessageBody,
 } from '@kiltprotocol/prototype-sdk'
-import { IMessage } from '@kiltprotocol/prototype-sdk'
+import Message from '@kiltprotocol/prototype-sdk/build/messaging/Message'
 
 import persistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import contactRepository from './ContactRepository'
 import errorService from './ErrorService'
-import Message from '@kiltprotocol/prototype-sdk/build/messaging/Message'
 
 export interface MessageOutput extends IMessage {
   sender?: Contact
@@ -31,17 +31,15 @@ class MessageRepository {
     )
       .then(response => response.json())
       .then(message => {
-        const sender: Contact | undefined = contactRepository.findByAddress(
-          message.senderAddress
-        )
-        if (sender) {
-          return Message.createFromEncryptedMessage(
-            message,
-            sender.publicIdentity,
-            myIdentity
+        return contactRepository
+          .findByAddress(message.senderAddress)
+          .then((sender: Contact) =>
+            Message.createFromEncryptedMessage(
+              message,
+              sender.publicIdentity,
+              myIdentity
+            )
           )
-        }
-        return undefined
       })
   }
 
@@ -50,40 +48,50 @@ class MessageRepository {
   ): Promise<MessageOutput[]> {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
-      .then(async (encryptedMessages: IEncryptedMessage[]) => {
-        await contactRepository.findAll()
-        return encryptedMessages
-      })
       .then((encryptedMessages: IEncryptedMessage[]) => {
-        const result: MessageOutput[] = []
-        for (const encryptedMessage of encryptedMessages) {
-          const sender: Contact | undefined = contactRepository.findByAddress(
-            encryptedMessage.senderAddress
-          )
-          if (sender) {
-            try {
-              const m: IMessage = Message.createFromEncryptedMessage(
-                encryptedMessage,
-                sender.publicIdentity,
-                myIdentity
-              )
-              Message.ensureOwnerIsSender(m)
-              result.push({
-                ...m,
-                sender,
+        return Promise.all(
+          encryptedMessages.map((encryptedMessage: IEncryptedMessage) => {
+            return contactRepository
+              .findByAddress(encryptedMessage.senderAddress)
+              .then((sender: Contact) => {
+                try {
+                  const m: IMessage = Message.createFromEncryptedMessage(
+                    encryptedMessage,
+                    sender.publicIdentity,
+                    myIdentity
+                  )
+                  Message.ensureOwnerIsSender(m)
+                  return {
+                    ...m,
+                    sender,
+                  }
+                } catch (error) {
+                  errorService.log({
+                    error,
+                    message:
+                      'error on decrypting message: ' +
+                      JSON.stringify(encryptedMessage),
+                    origin: 'MessageRepository.findByMyIdentity()',
+                  })
+                  return undefined
+                }
               })
-            } catch (error) {
-              errorService.log({
-                error,
-                message:
-                  'error on receiving messsage: ' +
-                  JSON.stringify(encryptedMessage),
-                origin: 'MessageRepository.findByMyIdentity()',
+              .catch(error => {
+                errorService.log({
+                  error,
+                  message:
+                    'could not resolve sender of message:' +
+                    JSON.stringify(encryptedMessage),
+                  origin: 'MessageRepository.findByMyIdentity()',
+                })
+                return undefined
               })
-            }
-          }
-        }
-        return result
+          })
+        ).then((messageOutputList: Array<MessageOutput | undefined>) => {
+          return messageOutputList.filter(
+            messageOutput => messageOutput
+          ) as MessageOutput[]
+        })
       })
   }
 

@@ -2,14 +2,13 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 
 import { CType } from '../../types/Ctype'
-import { Contact } from '../../types/Contact'
-import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import Spinner from '../Spinner/Spinner'
 
 import './AttestedClaimVerificationView.scss'
 
 type Props = {
-  attester?: Contact
+  attesterAddress: sdk.PublicIdentity['address']
   attestedClaim: sdk.IAttestedClaim
   context?: 'legitimation'
   cType?: CType
@@ -67,13 +66,8 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     const propertyNames: string[] = Object.keys(
       attestedClaim.request.claimHashTree
     )
-    const { attester } = this.props
+    const { attesterAddress } = this.props
     const { verificationPending, verificationSucceeded } = this.state
-    const attesterView = attester ? (
-      <KiltIdenticon contact={attester} />
-    ) : (
-      attestedClaim.attestation.owner
-    )
     const attestationStatusView = verificationPending ? (
       <Spinner size={20} color="#ef5a28" strength={3} />
     ) : (
@@ -100,7 +94,9 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
         })}
         <div>
           <label>Attester</label>
-          <div>{attesterView}</div>
+          <div>
+            <ContactPresentation address={attesterAddress} />
+          </div>
         </div>
         <div>
           <label>Valid</label>

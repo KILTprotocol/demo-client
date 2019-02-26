@@ -182,6 +182,16 @@ const getAllIdentities = createSelector(
   (entries: Entry[]) => entries
 )
 
+const _getIdentity = (
+  state: ReduxState,
+  address: sdk.PublicIdentity['address']
+) => state.wallet.get('identities').get(address)
+
+const getIdentity = createSelector(
+  [_getIdentity],
+  (entry: Entry) => entry
+)
+
 export {
   Store,
   ImmutableState,
@@ -190,4 +200,5 @@ export {
   Action,
   getSelectedIdentity,
   getAllIdentities,
+  getIdentity,
 }

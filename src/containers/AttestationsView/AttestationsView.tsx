@@ -2,10 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 
-import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
+import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import ShortHash from '../../components/ShortHash/ShortHash'
 import attestationService from '../../services/AttestationService'
-import contactRepository from '../../services/ContactRepository'
 import FeedbackService, { safeDelete } from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
@@ -19,25 +18,11 @@ type Props = RouteComponentProps<{}> & {
   attestations: AttestationListModel[]
 }
 
-type State = {
-  contactsLoaded?: boolean
-}
+type State = {}
 
 class AttestationsView extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {}
-  }
-
-  public componentDidMount() {
-    contactRepository.findAll().then(() => {
-      this.setState({ contactsLoaded: true })
-    })
-  }
-
   public render() {
     const { attestations } = this.props
-    const { contactsLoaded } = this.state
     return (
       <section className="AttestationsView">
         <h1>MANAGE ATTESTATIONS</h1>
@@ -56,15 +41,7 @@ class AttestationsView extends React.Component<Props, State> {
             {attestations.map((attestation: AttestationListModel) => (
               <tr key={attestation.attestation.signature}>
                 <td className="claimerAlias">
-                  {contactsLoaded ? (
-                    <KiltIdenticon
-                      contact={contactRepository.findByAddress(
-                        attestation.claimerAddress
-                      )}
-                    />
-                  ) : (
-                    attestation.claimerAlias
-                  )}
+                  <ContactPresentation address={attestation.claimerAddress} />
                 </td>
                 <td
                   className="claimHash"

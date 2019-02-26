@@ -2,6 +2,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 
 import Code from '../Code/Code'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 import './ClaimDetailView.scss'
 
@@ -24,7 +25,9 @@ class ClaimDetailView extends Component<Props, State> {
         {claim.owner && (
           <div>
             <label>Owner</label>
-            <div>{claim.owner}</div>
+            <div>
+              <ContactPresentation address={claim.owner} />
+            </div>
           </div>
         )}
         {claim.contents && (

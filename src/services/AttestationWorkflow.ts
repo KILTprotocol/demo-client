@@ -1,13 +1,4 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-
-import attestationService from '../services/AttestationService'
-import * as Attestations from '../state/ducks/Attestations'
-import * as Wallet from '../state/ducks/Wallet'
-import persistentStore from '../state/PersistentStore'
-import { Contact } from '../types/Contact'
-import errorService from './ErrorService'
-import { notifyFailure, notifySuccess } from './FeedbackService'
-import MessageRepository from './MessageRepository'
 import {
   IPartialClaim,
   IRequestAttestationForClaim,
@@ -17,6 +8,15 @@ import {
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
 import { Error } from 'tslint/lib/error'
+
+import attestationService from '../services/AttestationService'
+import * as Attestations from '../state/ducks/Attestations'
+import * as Wallet from '../state/ducks/Wallet'
+import persistentStore from '../state/PersistentStore'
+import { Contact } from '../types/Contact'
+import errorService from './ErrorService'
+import { notifyFailure, notifySuccess } from './FeedbackService'
+import MessageRepository from './MessageRepository'
 
 class AttestationWorkflow {
   /**

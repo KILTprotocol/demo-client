@@ -1,12 +1,12 @@
-import * as React from 'react'
-
-import './MessageSubject.scss'
 import {
   IMessage,
   IRequestClaimsForCtype,
   IRequestLegitimations,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
+import * as React from 'react'
+
+import './MessageSubject.scss'
 
 type Props = {
   message: IMessage

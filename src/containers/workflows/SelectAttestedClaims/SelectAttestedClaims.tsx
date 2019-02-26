@@ -1,8 +1,14 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import {
+  IPartialClaim,
+  ISubmitClaimsForCtype,
+  ISubmitLegitimations,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
+import { groupBy } from 'lodash'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { groupBy } from 'lodash'
 
 import SelectAttestedClaim, {
   State as SelectAttestedClaimState,
@@ -21,12 +27,6 @@ import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact } from '../../../types/Contact'
 import { CType, ICType } from '../../../types/Ctype'
 import { BlockUi } from '../../../types/UserFeedback'
-import {
-  IPartialClaim,
-  ISubmitClaimsForCtype,
-  ISubmitLegitimations,
-  MessageBodyType,
-} from '@kiltprotocol/prototype-sdk'
 
 import './SelectAttestedClaims.scss'
 
@@ -367,11 +367,9 @@ class SelectAttestedClaims extends React.Component<Props, State> {
       } as ISubmitClaimsForCtype
     }
 
-    contactRepository.findAll().then(() => {
-      const receiver: Contact | undefined = contactRepository.findByAddress(
-        senderAddress
-      )
-      if (receiver) {
+    contactRepository
+      .findByAddress(senderAddress)
+      .then((receiver: Contact) => {
         blockUi.updateMessage(this.labels.message.sending as string)
         MessageRepository.send(receiver, request)
           .then(() => {
@@ -390,15 +388,15 @@ class SelectAttestedClaims extends React.Component<Props, State> {
               type: 'ERROR.FETCH.POST',
             })
           })
-      } else {
+      })
+      .catch(error => {
         blockUi.remove()
         errorService.log({
           error: new Error(),
           message: 'Could not retrieve receiver',
           origin: 'SelectAttestedClaim.sendClaim()',
         })
-      }
-    })
+      })
   }
 }
 

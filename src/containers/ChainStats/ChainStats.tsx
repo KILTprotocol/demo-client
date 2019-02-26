@@ -1,9 +1,9 @@
+import { Blockchain } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 import If from '../../common/If'
 import BlockchainService from '../../services/BlockchainService'
-import { Blockchain } from '@kiltprotocol/prototype-sdk'
 
 type Props = RouteComponentProps<{
   host: string

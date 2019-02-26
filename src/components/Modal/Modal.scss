@@ -41,13 +41,13 @@
     }
     font-size: 20px;
 
-    & .header-KiltIdenticon {
+    & .header-ContactPresentation {
       display: flex;
       flex-direction: row;
       justify-content: left;
       align-items: center;
 
-      & .KiltIdenticon {
+      & .ContactPresentation {
         margin: {
           left: $base-padding;
         }
@@ -63,7 +63,7 @@
       margin: $base-padding (-$base-padding) (-$base-padding/2);
     }
 
-    & .KiltIdenticon {
+    & .ContactPresentation {
       display: inline-flex;
     }
   }

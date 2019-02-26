@@ -1,9 +1,13 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import {
+  IRequestClaimsForCtype,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
-import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
+import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import contactRepository from '../../services/ContactRepository'
@@ -16,10 +20,6 @@ import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
-import {
-  IRequestClaimsForCtype,
-  MessageBodyType,
-} from '@kiltprotocol/prototype-sdk'
 
 interface Props {}
 
@@ -103,7 +103,9 @@ class ContactList extends React.Component<Props, State> {
             {contacts.map((contact: Contact) => (
               <tr key={contact.publicIdentity.address}>
                 <td className="name">
-                  <KiltIdenticon contact={contact} />
+                  <ContactPresentation
+                    address={contact.publicIdentity.address}
+                  />
                 </td>
                 <td className="address" title={contact.publicIdentity.address}>
                   {contact.publicIdentity.address}

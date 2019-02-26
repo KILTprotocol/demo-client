@@ -1,11 +1,10 @@
 import { combineReducers, createStore, Store } from 'redux'
-import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import errorService from '../services/ErrorService'
+import * as Attestations from './ducks/Attestations'
 import * as Claims from './ducks/Claims'
 import * as UiState from './ducks/UiState'
 import * as Wallet from './ducks/Wallet'
-import * as Attestations from './ducks/Attestations'
 
 declare global {
   /* tslint:disable */

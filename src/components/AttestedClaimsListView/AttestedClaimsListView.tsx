@@ -3,8 +3,7 @@ import React from 'react'
 
 import attestationService from '../../services/AttestationService'
 import contactRepository from '../../services/ContactRepository'
-import { Contact } from '../../types/Contact'
-import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import Spinner from '../Spinner/Spinner'
 
 import './AttestedClaimsListView.scss'
@@ -76,24 +75,19 @@ class AttestedClaimsListView extends React.Component<Props, State> {
           <table>
             <thead>
               <tr>
-                <th className="attesterName">Attester</th>
+                <th className="attester">Attester</th>
                 <th className="status">Attested</th>
               </tr>
             </thead>
             <tbody>
               {attestations.map((attestedClaim: sdk.IAttestedClaim) => {
-                const attester = this.getAttester(
-                  attestedClaim.attestation.owner
-                )
                 const { signature } = attestedClaim.attestation
                 return (
                   <tr key={attestedClaim.attestation.signature}>
-                    <td className="attesterName">
-                      {attester ? (
-                        <KiltIdenticon contact={attester} />
-                      ) : (
-                        attestedClaim.attestation.owner
-                      )}
+                    <td className="attester">
+                      <ContactPresentation
+                        address={attestedClaim.attestation.owner}
+                      />
                     </td>
                     <td className={`status ${attestationStatus[signature]}`}>
                       {attestationStatus[signature] === STATUS.PENDING && (
@@ -110,12 +104,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
         )}
       </section>
     )
-  }
-
-  private getAttester(
-    attesterAddress: Contact['publicIdentity']['address']
-  ): Contact | undefined {
-    return contactRepository.findByAddress(attesterAddress)
   }
 
   private verifyAttestations(): void {
