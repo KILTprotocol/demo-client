@@ -64,8 +64,8 @@ class MessageDetailView extends React.Component<Props, State> {
     return (
       showCode && (
         <div className="code">
-          <div>Source:</div>
-          <Code>{message.body.content}</Code>
+          <div>Message source:</div>
+          <Code>{message}</Code>
         </div>
       )
     )
