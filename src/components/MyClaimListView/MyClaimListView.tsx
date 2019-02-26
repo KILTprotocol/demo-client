@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import * as Claims from '../../state/ducks/Claims'
 import SelectAction from '../SelectAction/SelectAction'
 
-import './ClaimListView.scss'
+import './MyClaimListView.scss'
 
 type Props = {
   claimStore: Claims.Entry[]
@@ -16,11 +16,11 @@ type Props = {
 
 type State = {}
 
-class ClaimListView extends React.Component<Props, State> {
+class MyClaimListView extends React.Component<Props, State> {
   public render() {
     const { claimStore } = this.props
     return (
-      <section className="ClaimListView">
+      <section className="MyClaimListView">
         <h1>My Claims</h1>
         {claimStore && !!claimStore.length && (
           <table>
@@ -111,4 +111,4 @@ class ClaimListView extends React.Component<Props, State> {
   }
 }
 
-export default ClaimListView
+export default MyClaimListView

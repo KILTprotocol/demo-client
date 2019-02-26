@@ -3,8 +3,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { Redirect, RouteComponentProps, withRouter } from 'react-router'
-import ClaimDetailView from '../../components/ClaimDetailView/ClaimDetailView'
-import ClaimListView from '../../components/ClaimListView/ClaimListView'
+import MyClaimDetailView from '../../components/MyClaimDetailView/MyClaimDetailView'
+import MyClaimListView from '../../components/MyClaimListView/MyClaimListView'
 import SelectAttestersModal from '../../components/Modal/SelectAttestersModal'
 import attestationService from '../../services/AttestationService'
 import attestationWorkflow from '../../services/AttestationWorkflow'
@@ -67,7 +67,7 @@ class ClaimView extends React.Component<Props, State> {
     ) : (
       <section className="ClaimView">
         {isDetailView && currentClaimEntry && (
-          <ClaimDetailView
+          <MyClaimDetailView
             cancelable={true}
             claimEntry={currentClaimEntry as Claims.Entry}
             onRemoveClaim={this.deleteClaim}
@@ -76,7 +76,7 @@ class ClaimView extends React.Component<Props, State> {
           />
         )}
         {!isDetailView && (
-          <ClaimListView
+          <MyClaimListView
             claimStore={claimEntries}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={this.requestAttestation}
