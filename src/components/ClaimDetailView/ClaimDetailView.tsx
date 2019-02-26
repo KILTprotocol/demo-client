@@ -5,6 +5,7 @@ import Code from '../Code/Code'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 import './ClaimDetailView.scss'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
   claim: sdk.IClaim
@@ -20,7 +21,9 @@ class ClaimDetailView extends Component<Props, State> {
       <section className="ClaimDetailView">
         <div>
           <label>Ctype</label>
-          <div>{claim.cType}</div>
+          <div>
+            <CTypePresentation cTypeHash={claim.cType} />
+          </div>
         </div>
         {claim.owner && (
           <div>

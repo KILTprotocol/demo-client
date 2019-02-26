@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import * as Claims from '../../state/ducks/Claims'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import SelectAction from '../SelectAction/SelectAction'
 
 import './MyClaimListView.scss'
@@ -27,6 +28,7 @@ class MyClaimListView extends React.Component<Props, State> {
             <thead>
               <tr>
                 <th className="alias">Alias</th>
+                <th className="cType">CType</th>
                 <th className="content">Content</th>
                 <th className="status">Attested?</th>
                 <th className="actionsTd" />
@@ -39,6 +41,9 @@ class MyClaimListView extends React.Component<Props, State> {
                     <Link to={`/claim/${claimEntry.id}`}>
                       {claimEntry.meta.alias}
                     </Link>
+                  </td>
+                  <td className="cType">
+                    <CTypePresentation cTypeHash={claimEntry.claim.cType} />
                   </td>
                   <td className="content">
                     {JSON.stringify(claimEntry.claim.contents)}

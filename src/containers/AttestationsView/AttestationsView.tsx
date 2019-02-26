@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
+import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
 import ShortHash from '../../components/ShortHash/ShortHash'
 import attestationService from '../../services/AttestationService'
 import FeedbackService, { safeDelete } from '../../services/FeedbackService'
@@ -50,7 +51,7 @@ class AttestationsView extends React.Component<Props, State> {
                   {attestation.attestation.claimHash}
                 </td>
                 <td className="cType" title={attestation.cTypeHash}>
-                  <ShortHash>{attestation.cTypeHash}</ShortHash>
+                  <CTypePresentation cTypeHash={attestation.cTypeHash} />
                 </td>
                 <td
                   className="created"

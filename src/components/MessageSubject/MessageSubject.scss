@@ -7,4 +7,9 @@
   & > div {
     @extend %ellipsis;
   }
+
+  & .CTypePresentation {
+    display: inline-flex;
+    margin-left: $base-padding/2;
+  }
 }

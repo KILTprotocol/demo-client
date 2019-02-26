@@ -3,11 +3,13 @@ import {
   IRequestClaimsForCtype,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
+import { ReactNode } from 'react'
 import * as React from 'react'
 
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
+import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import contactRepository from '../../services/ContactRepository'
@@ -29,8 +31,8 @@ interface State {
 }
 
 type SelectOption = {
+  label: ReactNode
   value: sdk.ICType['hash']
-  label: string
 }
 
 class ContactList extends React.Component<Props, State> {
@@ -143,7 +145,7 @@ class ContactList extends React.Component<Props, State> {
     const { cTypes } = this.state
 
     const options: SelectOption[] = cTypes.map((cType: ICType) => ({
-      label: cType.cType.metadata.title.default,
+      label: <CTypePresentation cType={cType} />,
       value: cType.cType.hash,
     }))
     return (

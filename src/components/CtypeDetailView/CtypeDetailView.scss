@@ -1,10 +1,29 @@
 .CtypeDetailView {
+  margin-left: $base-padding;
+  width: calc(100% - #{$base-padding});
 
   & .attributes {
     @include card;
 
+    position: relative;
+
     & > div {
       @include label_input_combo;
+    }
+
+    & .CTypePresentation {
+      @extend %centerHV;
+
+      position: absolute;
+      top: $base-padding/2;
+      left: $base-padding/2;
+      padding: 0 !important;
+      border-radius: 50%;
+      border: 5px solid #fff;
+
+      & .name {
+        display: none;
+      }
     }
   }
 }

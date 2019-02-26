@@ -6,6 +6,7 @@ import Code from '../Code/Code'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 import './CtypeDetailView.scss'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
   cType?: ICType
@@ -33,6 +34,7 @@ const CtypeDetailView = ({ cType }: Props) => {
                 <Code>{cType.cType}</Code>
               </div>
             </div>
+            <CTypePresentation cType={cType} size={50} />
           </div>
           <div className="actions">
             <Link to="/cType">Cancel</Link>
