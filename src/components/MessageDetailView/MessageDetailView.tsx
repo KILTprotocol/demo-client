@@ -1,37 +1,35 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { ReactNode } from 'react'
-
-import {
-  Message,
-  MessageBodyType,
-  RequestClaimsForCtype,
-  RequestAttestationForClaim,
-  ApproveAttestationForClaim,
-  SubmitClaimsForCtype,
-  RequestLegitimations,
-  SubmitLegitimations,
-} from '../../types/Message'
-import Code from '../Code/Code'
-import ChooseClaimsForCType from '../../containers/workflows/ChooseClaimsForCtype/ChooseClaimsForCtype'
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
 import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
+import RequestAttestation from '../../containers/workflows/RequestAttestation/RequestAttestation'
+import SelectAttestedClaims from '../../containers/workflows/SelectAttestedClaims/SelectAttestedClaims'
 import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
+
+import Code from '../Code/Code'
 import MessageSubject from '../MessageSubject/MessageSubject'
 
 import './MessageDetailView.scss'
 
 type Props = {
-  message: Message
-  onDelete: (message: Message) => void
+  message: sdk.IMessage
+  onDelete: (message: sdk.IMessage) => void
   onCancel: (id: string) => void
 }
 
-type State = {}
+type State = {
+  showCode: boolean
+}
 
 class MessageDetailView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
+    this.state = {
+      showCode: true,
+    }
     this.handleDelete = this.handleDelete.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
+    this.toggleShowCode = this.toggleShowCode.bind(this)
   }
 
   public render() {
@@ -39,18 +37,14 @@ class MessageDetailView extends React.Component<Props, State> {
     return (
       <section className="MessageDetailView">
         <h4>
-          Subject: <MessageSubject message={message} />
+          <span>
+            Subject: <MessageSubject message={message} />
+          </span>
+          {this.canDisplayContentAsCode(message) && (
+            <button className="toggle-code" onClick={this.toggleShowCode} />
+          )}
         </h4>
-        {this.shouldDisplayContentAsCode(message) && (
-          <div>
-            Contents:{' '}
-            {message.body ? (
-              <Code>{message.body.content}</Code>
-            ) : (
-              message.message
-            )}
-          </div>
-        )}
+        {this.canDisplayContentAsCode(message) && this.getCode(message)}
         <div className="workflow">{this.getWorkflow(message)}</div>
         <footer>
           {children}
@@ -65,66 +59,84 @@ class MessageDetailView extends React.Component<Props, State> {
     )
   }
 
-  private getWorkflow(message: Message): ReactNode | undefined {
+  private getCode(message: sdk.IMessage) {
+    const { showCode } = this.state
+    return (
+      showCode && (
+        <div className="code">
+          <div>Source:</div>
+          <Code>{message.body.content}</Code>
+        </div>
+      )
+    )
+  }
+
+  private getWorkflow(message: sdk.IMessage): ReactNode | undefined {
     if (!message || !message.body || !message.body.content) {
       return undefined
     }
 
     const messageBodyType:
-      | MessageBodyType
+      | sdk.MessageBodyType
       | undefined = this.getMessageBodyType(message)
 
     switch (messageBodyType) {
-      case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
+      case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
         return (
-          <ChooseClaimsForCType
+          <SelectAttestedClaims
             senderAddress={message.senderAddress}
+            sentClaim={(message.body as sdk.IRequestLegitimations).content}
             cTypeHash={
-              (message.body as RequestClaimsForCtype).content.cType.hash
+              (message.body as sdk.IRequestLegitimations).content.cType
             }
-            onFinished={this.handleDelete}
-          />
-        )
-      case MessageBodyType.REQUEST_LEGITIMATIONS:
-        return (
-          <ChooseClaimsForCType
-            senderAddress={message.senderAddress}
-            sentClaim={(message.body as RequestLegitimations).content}
-            cTypeHash={(message.body as RequestLegitimations).content.cType}
             onFinished={this.handleDelete}
             context="legitimation"
           />
         )
-      case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
+      case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
+        return (
+          <RequestAttestation
+            initialClaim={
+              (message.body as sdk.ISubmitLegitimations).content.claim
+            }
+            legitimations={
+              (message.body as sdk.ISubmitLegitimations).content.legitimations
+            }
+            attesterAddress={message.senderAddress}
+            onFinished={this.handleDelete}
+          />
+        )
+      case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return (
           <AttestClaim
             senderAddress={message.senderAddress}
             requestForAttestation={
-              (message.body as RequestAttestationForClaim).content
+              (message.body as sdk.IRequestAttestationForClaim).content
             }
             onFinished={this.handleDelete}
           />
         )
-      case MessageBodyType.APPROVE_ATTESTATION_FOR_CLAIM:
+      case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
         return (
           <ImportAttestation
-            attestedClaim={(message.body as ApproveAttestationForClaim).content}
+            attestedClaim={
+              (message.body as sdk.ISubmitAttestationForClaim).content
+            }
             onFinished={this.handleDelete}
           />
         )
-      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
         return (
-          <VerifyClaim
-            attestedClaims={(message.body as SubmitClaimsForCtype).content}
+          <SelectAttestedClaims
+            senderAddress={message.senderAddress}
+            cTypeHash={(message.body as sdk.IRequestClaimsForCtype).content}
+            onFinished={this.handleDelete}
           />
         )
-      case MessageBodyType.SUBMIT_LEGITIMATIONS:
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
         return (
           <VerifyClaim
-            attestedClaims={
-              (message.body as SubmitLegitimations).content.legitimations
-            }
-            context="legitimation"
+            attestedClaims={(message.body as sdk.ISubmitClaimsForCtype).content}
           />
         )
       default:
@@ -146,18 +158,27 @@ class MessageDetailView extends React.Component<Props, State> {
     }
   }
 
-  private getMessageBodyType(message: Message): MessageBodyType | undefined {
+  private toggleShowCode() {
+    const { showCode } = this.state
+    this.setState({
+      showCode: !showCode,
+    })
+  }
+
+  private getMessageBodyType(
+    message: sdk.IMessage
+  ): sdk.MessageBodyType | undefined {
     return message && message.body && message.body.type
   }
 
-  private shouldDisplayContentAsCode(message: Message): boolean {
+  private canDisplayContentAsCode(message: sdk.IMessage): boolean {
     const messageBodyType:
-      | MessageBodyType
+      | sdk.MessageBodyType
       | undefined = this.getMessageBodyType(message)
 
     return (
       messageBodyType !== undefined &&
-      messageBodyType !== MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
+      messageBodyType !== sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
     )
   }
 }

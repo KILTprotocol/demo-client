@@ -33,6 +33,12 @@
   padding: $base-padding;
   background: $color-white;
   border: $base-border;
+
+  &:last-child {
+    margin: {
+      bottom: 0
+    }
+  }
 }
 
 @mixin label {

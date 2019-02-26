@@ -12,7 +12,7 @@ type Props = {
   attester?: Contact
   attestedClaim: sdk.IAttestedClaim
   context?: 'legitimation'
-  ctype?: CType
+  cType?: CType
   onVerifyAttestatedClaim: (
     attestatedClaim: sdk.IAttestedClaim
   ) => Promise<boolean>
@@ -85,36 +85,34 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     )
 
     return (
-      propertyNames.length > 0 && (
-        <div className="attributes">
-          {propertyNames.map((propertyName: string) => {
-            const propertyTitle = this.getCtypePropertyTitle(propertyName)
-            return (
-              <div key={propertyName}>
-                <label>{propertyTitle}</label>
-                <div>
-                  {attestedClaim.request.claim.contents[propertyName] ||
-                    AttestedClaimVerificationView.BLOCK_CHAR.repeat(12)}
-                </div>
+      <div className="attributes">
+        {propertyNames.map((propertyName: string) => {
+          const propertyTitle = this.getCtypePropertyTitle(propertyName)
+          return (
+            <div key={propertyName}>
+              <label>{propertyTitle}</label>
+              <div>
+                {attestedClaim.request.claim.contents[propertyName] ||
+                  AttestedClaimVerificationView.BLOCK_CHAR.repeat(12)}
               </div>
-            )
-          })}
-          <div>
-            <label>Attester</label>
-            <div>{attesterView}</div>
-          </div>
-          <div>
-            <label>Valid</label>
-            <div className="attestationStatusView">{attestationStatusView}</div>
-          </div>
+            </div>
+          )
+        })}
+        <div>
+          <label>Attester</label>
+          <div>{attesterView}</div>
         </div>
-      )
+        <div>
+          <label>Valid</label>
+          <div className="attestationStatusView">{attestationStatusView}</div>
+        </div>
+      </div>
     )
   }
 
   private getCtypePropertyTitle(propertyName: string): string {
-    const { ctype } = this.props
-    return ctype ? ctype.getPropertyTitle(propertyName) : propertyName
+    const { cType } = this.props
+    return cType ? cType.getPropertyTitle(propertyName) : propertyName
   }
 
   private verifyAttestatedClaim() {

@@ -8,10 +8,11 @@ import MessageSubject from '../../components/MessageSubject/MessageSubject'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 import errorService from '../../services/ErrorService'
 import FeedbackService, { safeDelete } from '../../services/FeedbackService'
-import MessageRepository from '../../services/MessageRepository'
+import MessageRepository, {
+  MessageOutput,
+} from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { Message, MessageOutput } from '../../types/Message'
 import {
   BlockingNotification,
   BlockUi,
@@ -19,6 +20,7 @@ import {
 } from '../../types/UserFeedback'
 
 import './MessageView.scss'
+import { IMessage } from '@kiltprotocol/prototype-sdk'
 
 interface Props {
   selectedIdentity?: Wallet.Entry
@@ -103,7 +105,7 @@ class MessageView extends React.Component<Props, State> {
         headline: 'Fetching messages',
       })
       MessageRepository.findByMyIdentity(selectedIdentity.identity)
-        .then((messages: Message[]) => {
+        .then((messages: IMessage[]) => {
           this.setState({
             messages,
           })
@@ -162,7 +164,7 @@ class MessageView extends React.Component<Props, State> {
     )
   }
 
-  private onOpenMessage(message: Message) {
+  private onOpenMessage(message: IMessage) {
     this.setState(
       {
         currentMessage: message,

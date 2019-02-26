@@ -1,10 +1,10 @@
 {
   "name": "kilt-prototype-client",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "@kiltprotocol/prototype-sdk": "^0.1.2",
+    "@kiltprotocol/prototype-sdk": "^0.2.0",
     "@polkadot/ui-identicon": "^0.25.8",
     "@types/react-select": "^2.0.11",
     "@types/reselect": "^2.2.0",
@@ -37,6 +37,7 @@
     "react": "^16.6.3",
     "react-dev-utils": "^5.0.2",
     "react-dom": "^16.6.3",
+    "react-json-view": "^1.19.1",
     "react-redux": "^5.1.1",
     "react-router-dom": "^4.3.1",
     "react-schema-based-json-editor": "^7.20.2",

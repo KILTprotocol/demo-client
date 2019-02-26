@@ -5,7 +5,7 @@ import Spinner from '../../../components/Spinner/Spinner'
 
 import attestationService from '../../../services/AttestationService'
 import contactRepository from '../../../services/ContactRepository'
-import cTypeRepository from '../../../services/CtypeRepository'
+import CTypeRepository from '../../../services/CtypeRepository'
 import { Contact } from '../../../types/Contact'
 import { CType, ICType } from '../../../types/Ctype'
 
@@ -41,10 +41,10 @@ class VerifyClaim extends React.Component<Props, State> {
     })
     Promise.all(
       attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => {
-        return cTypeRepository.findByHash(attestedClaim.request.claim.cType)
+        return CTypeRepository.findByHash(attestedClaim.request.claim.cType)
       })
-    ).then((ctypes: ICType[]) => {
-      ctypes.forEach((cType: ICType) => {
+    ).then((cTypes: ICType[]) => {
+      cTypes.forEach((cType: ICType) => {
         if (cType.cType.hash) {
           this.cTypeMap[cType.cType.hash] = CType.fromObject(cType)
         }
@@ -64,10 +64,10 @@ class VerifyClaim extends React.Component<Props, State> {
         {attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => {
           return (
             <AttestedClaimVerificationView
-              key={attestedClaim.attestation.claimHash}
+              key={attestedClaim.attestation.signature}
               attestedClaim={attestedClaim}
               context={context}
-              ctype={this.cTypeMap[attestedClaim.request.claim.cType]}
+              cType={this.cTypeMap[attestedClaim.request.claim.cType]}
               attester={this.getAttester(attestedClaim.attestation.owner)}
               onVerifyAttestatedClaim={this.onVerifyAttestation}
             />

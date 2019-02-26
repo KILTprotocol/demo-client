@@ -27,7 +27,7 @@ const CtypeDetailView = ({ cType }: Props) => {
             <div>
               <label>Definition</label>
               <div>
-                <Code>{JSON.stringify(cType.cType)}</Code>
+                <Code>{cType.cType}</Code>
               </div>
             </div>
           </div>

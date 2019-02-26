@@ -5,7 +5,6 @@ import attestationWorkflow from '../../../services/AttestationWorkflow'
 import contactRepository from '../../../services/ContactRepository'
 import errorService from '../../../services/ErrorService'
 import FeedbackService, {
-  notifyFailure,
   notifySuccess,
 } from '../../../services/FeedbackService'
 import { Contact } from '../../../types/Contact'

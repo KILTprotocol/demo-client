@@ -4,29 +4,31 @@ import { ChangeEvent } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { ChooseClaimsForCTypeLabels } from '../../containers/workflows/ChooseClaimsForCtype/ChooseClaimsForCtype'
+import { SelectAttestedClaimsLabels } from '../../containers/workflows/SelectAttestedClaims/SelectAttestedClaims'
+import CTypeRepository from '../../services/CtypeRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { CType } from '../../types/Ctype'
+import { CType, ICType } from '../../types/Ctype'
 
-import './ChooseClaimForCType.scss'
+import './SelectAttestedClaim.scss'
 
 type Props = {
   claimEntry: Claims.Entry
-  cType: CType
-  labels: ChooseClaimsForCTypeLabels
+  cTypeHash?: sdk.ICType['hash']
+  labels: SelectAttestedClaimsLabels
   onChangeSelections: (claimEntry: Claims.Entry, state: State) => void
 }
 
 export type State = {
   allAttestedClaimsSelected?: boolean
   allClaimPropertiesSelected?: boolean
+  cType?: CType
   isSelected: boolean
   selectedAttestedClaims: sdk.IAttestedClaim[]
   selectedClaimProperties: string[]
 }
 
-class ChooseClaimForCType extends React.Component<Props, State> {
+class SelectAttestedClaim extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -39,10 +41,19 @@ class ChooseClaimForCType extends React.Component<Props, State> {
     this.selectAllProperties = this.selectAllProperties.bind(this)
   }
 
+  public componentDidMount() {
+    const { cTypeHash } = this.props
+    if (cTypeHash) {
+      CTypeRepository.findByHash(cTypeHash).then((cType: ICType) => {
+        this.setState({ cType: CType.fromObject(cType) })
+      })
+    }
+  }
+
   public render() {
     const { isSelected } = this.state
     return (
-      <section className="ChooseClaimForCType">
+      <section className="SelectAttestedClaim">
         {this.getClaimSelect()}
         {isSelected && this.getClaimPropertySelect()}
         {isSelected && this.getAttestionsSelect()}
@@ -133,7 +144,7 @@ class ChooseClaimForCType extends React.Component<Props, State> {
   }
 
   private getCtypePropertyTitle(propertyName: string): string {
-    const { cType } = this.props
+    const { cType } = this.state
     return cType ? cType.getPropertyTitle(propertyName) : propertyName
   }
 
@@ -277,4 +288,4 @@ const mapStateToProps = (state: ReduxState) => ({
   claimEntries: Claims.getClaims(state),
 })
 
-export default connect(mapStateToProps)(ChooseClaimForCType)
+export default connect(mapStateToProps)(SelectAttestedClaim)

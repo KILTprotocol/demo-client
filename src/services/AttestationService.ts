@@ -1,19 +1,21 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import moment from 'moment'
 
+import * as Attestations from '../state/ducks/Attestations'
+import * as Claims from '../state/ducks/Claims'
+import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import BlockchainService from './BlockchainService'
-import * as Attestations from '../state/ducks/Attestations'
 import errorService from './ErrorService'
 import { notifySuccess } from './FeedbackService'
-import * as Wallet from '../state/ducks/Wallet'
 
 class AttestationService {
   /**
    * Creates and stores an attestation for the given `claim` on the blockchain.
    *
    * @param requestForAttestation the request for attestation
-   * @returns the attestated claim (including the on-chain stored attestation) in a promise
+   * @returns the attestated claim (including the on-chain stored attestation)
+   *   in a promise
    */
   public async attestClaim(
     requestForAttestation: sdk.IRequestForAttestation
@@ -98,7 +100,15 @@ class AttestationService {
     attestedClaim: sdk.IAttestedClaim
   ): Promise<boolean> {
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    return sdk.AttestedClaim.fromObject(attestedClaim).verify(blockchain)
+    return sdk.AttestedClaim.fromObject(attestedClaim)
+      .verify(blockchain)
+      .then((verified: boolean) => {
+        attestedClaim.attestation.revoked = !verified
+        persistentStore.store.dispatch(
+          Claims.Store.updateAttestation(attestedClaim)
+        )
+        return verified
+      })
   }
 
   public saveInStore(attestationEntry: Attestations.Entry): void {

@@ -8,7 +8,7 @@ import { MyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 
-function hash(claim: sdk.IClaim): string {
+function hash(claim: sdk.IPartialClaim): string {
   return sdk.Crypto.hashStr(JSON.stringify(claim))
 }
 
@@ -254,6 +254,17 @@ const getClaims = createSelector(
   }
 )
 
+const _getClaimHash = (state: ReduxState, claim: sdk.IPartialClaim): string => {
+  return hash(claim)
+}
+
+const getClaim = createSelector(
+  [_getClaimHash, getClaims],
+  (claimHash: string, entries: Entry[]) => {
+    return entries.find((entry: Entry) => entry.id === claimHash)
+  }
+)
+
 export {
   Store,
   ImmutableState,
@@ -261,5 +272,6 @@ export {
   Entry,
   Action,
   getClaims,
+  getClaim,
   hash,
 }

@@ -7,16 +7,19 @@ import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import contactRepository from '../../services/ContactRepository'
-import CtypeRepository from '../../services/CtypeRepository'
+import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
-import { MessageBodyType, RequestClaimsForCtype } from '../../types/Message'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
+import {
+  IRequestClaimsForCtype,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
 
 interface Props {}
 
@@ -69,7 +72,7 @@ class ContactList extends React.Component<Props, State> {
           type: 'ERROR.FETCH.GET',
         })
       })
-    CtypeRepository.findAll()
+    CTypeRepository.findAll()
       .then((cTypes: ICType[]) => {
         this.setState({ cTypes })
       })
@@ -176,8 +179,8 @@ class ContactList extends React.Component<Props, State> {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Sending Message',
       })
-      const request: RequestClaimsForCtype = {
-        content: this.selectedCtype,
+      const request: IRequestClaimsForCtype = {
+        content: this.selectedCtype.cType.hash,
         type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
       }
 
