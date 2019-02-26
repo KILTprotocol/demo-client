@@ -1,8 +1,8 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
-import ClaimCreateView from '../../../components/ClaimCreateView/ClaimCreateView'
-import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
+import MyClaimCreateView from '../../../components/MyClaimCreateView/MyClaimCreateView'
+import MyClaimDetailView from '../../../components/MyClaimDetailView/MyClaimDetailView'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import ContactRepository from '../../../services/ContactRepository'
 import ErrorService from '../../../services/ErrorService'
@@ -50,12 +50,12 @@ class RequestAttestation extends React.Component<Props, State> {
     return (
       <section className="RequestAttestation">
         {savedClaimEntry ? (
-          <ClaimDetailView
+          <MyClaimDetailView
             claimEntry={savedClaimEntry}
             hideAttestedClaims={true}
           />
         ) : (
-          <ClaimCreateView
+          <MyClaimCreateView
             partialClaim={initialClaim}
             onCreate={this.handleCreateClaim}
           />

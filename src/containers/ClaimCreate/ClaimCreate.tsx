@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 
-import ClaimCreateView from '../../components/ClaimCreateView/ClaimCreateView'
+import MyClaimCreateView from '../../components/MyClaimCreateView/MyClaimCreateView'
 
 type Props = RouteComponentProps<{
   cTypeHash: sdk.ICType['hash']
@@ -23,7 +23,7 @@ class ClaimCreate extends Component<Props, State> {
 
     return (
       cTypeHash && (
-        <ClaimCreateView
+        <MyClaimCreateView
           partialClaim={{ cType: cTypeHash }}
           onCreate={this.claimCreated}
           onCancel={this.handleCancel}

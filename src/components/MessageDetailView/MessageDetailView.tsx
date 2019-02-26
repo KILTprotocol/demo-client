@@ -64,8 +64,8 @@ class MessageDetailView extends React.Component<Props, State> {
     return (
       showCode && (
         <div className="code">
-          <div>Source:</div>
-          <Code>{message.body.content}</Code>
+          <div>Message source:</div>
+          <Code>{message}</Code>
         </div>
       )
     )
@@ -86,9 +86,6 @@ class MessageDetailView extends React.Component<Props, State> {
           <SelectAttestedClaims
             senderAddress={message.senderAddress}
             sentClaim={(message.body as sdk.IRequestLegitimations).content}
-            cTypeHash={
-              (message.body as sdk.IRequestLegitimations).content.cType
-            }
             onFinished={this.handleDelete}
             context="legitimation"
           />
