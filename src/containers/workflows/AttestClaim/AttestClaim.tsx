@@ -1,7 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
-import MyClaimDetailView from '../../../components/MyClaimDetailView/MyClaimDetailView'
 
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import contactRepository from '../../../services/ContactRepository'
@@ -52,11 +51,9 @@ class AttestClaim extends React.Component<Props, State> {
       headline: 'Attesting claim',
     })
 
-    contactRepository.findAll().then(() => {
-      const claimer: Contact | undefined = contactRepository.findByAddress(
-        senderAddress
-      )
-      if (claimer) {
+    contactRepository
+      .findByAddress(senderAddress)
+      .then((claimer: Contact) => {
         attestationWorkflow
           .approveAndSubmitAttestationForClaim(requestForAttestation, claimer)
           .then(() => {
@@ -69,15 +66,15 @@ class AttestClaim extends React.Component<Props, State> {
           .catch((rejectedReceivers: Contact[]) => {
             blockUi.remove()
           })
-      } else {
+      })
+      .catch(error => {
         blockUi.remove()
         errorService.log({
-          error: new Error(),
+          error,
           message: 'Could not retrieve claimer',
           origin: 'AttestClaim.attestClaim()',
         })
-      }
-    })
+      })
   }
 }
 

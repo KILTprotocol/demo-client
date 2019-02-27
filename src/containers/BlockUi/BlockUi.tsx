@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import Spinner from '../../components/Spinner/Spinner'
 import * as UiState from '../../state/ducks/UiState'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { BlockUi as IBlockUi } from '../../types/UserFeedback'
 
 import './BlockUi.scss'
-import Spinner from '../../components/Spinner/Spinner'
 
 type Props = {
   blockUis: IBlockUi[]

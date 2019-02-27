@@ -1,10 +1,10 @@
 {
   "name": "kilt-prototype-client",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "@kiltprotocol/prototype-sdk": "^0.3.0",
+    "@kiltprotocol/prototype-sdk": "^0.3.1",
     "@polkadot/ui-identicon": "^0.25.8",
     "@types/react-select": "^2.0.11",
     "@types/reselect": "^2.2.0",

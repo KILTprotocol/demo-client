@@ -38,13 +38,15 @@
     }
   }
 
-  & .KiltIdenticon {
+  & .ContactPresentation {
     @extend %centerHV;
 
     position: absolute;
     top: $base-padding/2;
     left: $base-padding/2;
     padding: 0 !important;
+    border-radius: 50%;
+    border: 5px solid #fff;
 
     & .name {
       display: none;

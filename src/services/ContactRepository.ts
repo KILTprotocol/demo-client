@@ -9,20 +9,13 @@ class ContactRepository {
     process.env.REACT_APP_SERVICE_PORT
   }/contacts`
 
-  private contacts: Contact[] = []
-
   public async findAll(): Promise<Contact[]> {
-    return fetch(`${ContactRepository.URL}`)
-      .then(response => response.json())
-      .then((contacts: Contact[]) => {
-        this.contacts = contacts
-        return contacts
-      })
+    return fetch(`${ContactRepository.URL}`).then(response => response.json())
   }
 
-  public findByAddress(address: string): Contact | undefined {
-    return this.contacts.find(
-      (contact: Contact) => contact.publicIdentity.address === address
+  public findByAddress(address: string): Promise<Contact> {
+    return fetch(`${ContactRepository.URL}/${address}`).then(response =>
+      response.json()
     )
   }
 

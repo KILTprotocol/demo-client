@@ -6,7 +6,6 @@ import Spinner from '../../../components/Spinner/Spinner'
 import attestationService from '../../../services/AttestationService'
 import contactRepository from '../../../services/ContactRepository'
 import CTypeRepository from '../../../services/CtypeRepository'
-import { Contact } from '../../../types/Contact'
 import { CType, ICType } from '../../../types/Ctype'
 
 type Props = {
@@ -68,7 +67,7 @@ class VerifyClaim extends React.Component<Props, State> {
               attestedClaim={attestedClaim}
               context={context}
               cType={this.cTypeMap[attestedClaim.request.claim.cType]}
-              attester={this.getAttester(attestedClaim.attestation.owner)}
+              attesterAddress={attestedClaim.attestation.owner}
               onVerifyAttestatedClaim={this.onVerifyAttestation}
             />
           )
@@ -77,12 +76,6 @@ class VerifyClaim extends React.Component<Props, State> {
     ) : (
       <Spinner size={20} color="#ef5a28" strength={3} />
     )
-  }
-
-  private getAttester(
-    attesterAddress: Contact['publicIdentity']['address']
-  ): Contact | undefined {
-    return contactRepository.findByAddress(attesterAddress)
   }
 
   private async onVerifyAttestation(

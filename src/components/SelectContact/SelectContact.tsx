@@ -1,10 +1,10 @@
-import { ReactNode } from 'react'
 import * as React from 'react'
+import { ReactNode } from 'react'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
 import { Contact } from '../../types/Contact'
-import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 type SelectOption = {
   label: ReactNode
@@ -56,7 +56,7 @@ class SelectContacts extends React.Component<Props, State> {
 
     const options: SelectOption[] = contacts.map(
       (contact: Contact): SelectOption => ({
-        label: <KiltIdenticon contact={contact} />,
+        label: <ContactPresentation contact={contact} />,
         value: contact.publicIdentity.address,
       })
     )

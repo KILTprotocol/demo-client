@@ -88,12 +88,9 @@ class RequestAttestation extends React.Component<Props, State> {
     const { attesterAddress, legitimations, onFinished } = this.props
     const { savedClaimEntry } = this.state
 
-    let attester: Contact | undefined
-
     if (savedClaimEntry) {
-      ContactRepository.findAll().then(() => {
-        attester = ContactRepository.findByAddress(attesterAddress)
-        if (attester) {
+      ContactRepository.findByAddress(attesterAddress)
+        .then((attester: Contact) => {
           attestationWorkflow
             .requestAttestationForClaim(
               savedClaimEntry.claim,
@@ -105,14 +102,14 @@ class RequestAttestation extends React.Component<Props, State> {
             .then(() => {
               onFinished()
             })
-        } else {
+        })
+        .catch(error => {
           ErrorService.log({
-            error: new Error(),
+            error,
             message: `Could not resolve attester with address '${attesterAddress}'`,
             origin: 'RequestAttestation.handleSubmit()',
           })
-        }
-      })
+        })
     }
   }
 }

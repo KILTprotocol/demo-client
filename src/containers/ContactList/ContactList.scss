@@ -6,33 +6,33 @@
 
   & table {
     @include table;
-  }
 
-  & th,
-  & td {
-    text-align: left;
-  }
+    & th,
+    & td {
+      text-align: left;
+    }
 
-  & .actions {
-    padding: 0;
-  }
+    & .actions {
+      padding: 0;
+    }
 
-  & .requestClaimBtn {
-    @include button-icon-only($icon-wpforms);
-  }
+    & .requestClaimBtn {
+      @include button-icon-only($icon-wpforms);
+    }
 
-  & .name {
-    width: 50%;
-  }
+    & .name {
+      width: 50%;
+    }
 
-  & .address {
-    @extend %ellipsis;
+    & .address {
+      @extend %ellipsis;
 
-    width: 100%;
-  }
+      width: 100%;
+    }
 
-  & .actionTd {
-    width: 50px;
+    & .actionTd {
+      width: 50px;
+    }
   }
 }
   

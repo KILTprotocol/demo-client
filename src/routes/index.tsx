@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { Route, Switch } from 'react-router-dom'
+
 import Root from '../components/Root/Root'
 import TestUserFeedback from '../components/TestUserFeedback/TestUserFeedback'
-
+import AttestationsView from '../containers/AttestationsView/AttestationsView'
 import ChainStats from '../containers/ChainStats/ChainStats'
 import ClaimCreate from '../containers/ClaimCreate/ClaimCreate'
 import ClaimView from '../containers/ClaimView/ClaimView'
@@ -13,7 +14,6 @@ import MessageList from '../containers/MessageView/MessageView'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
 import WalletView from '../containers/WalletView/WalletView'
 import requiresIdentity from './RequiresIdentity'
-import AttestationsView from 'src/containers/AttestationsView/AttestationsView'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
