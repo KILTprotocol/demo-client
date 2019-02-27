@@ -16,4 +16,40 @@
       @include button-primary;
     }
   }
+
+  & .code-tabs {
+    display: flex;
+    justify-content: left;
+    align-items: flex-end;
+    font-size: 12px;
+
+    & > * {
+      @include border-radius($base-border-radius $base-border-radius 0 0);
+      border:{
+        width: 1px 1px 0 1px;
+        style: solid;
+        color: $color-grey-light;
+      }
+      padding: $base-padding/4 $base-padding/2;
+    }
+  }
+
+  & .code {
+
+    @each $message in encrypted, decrypted {
+
+      &.#{$message} {
+
+        & .#{$message} {
+          border:{
+            width: 1px;
+            style: solid solid dotted solid;
+            color: $color-black $color-black $color-grey-dark $color-black;
+          }
+          background: $color-black;
+          color: $color-white;
+        }
+      }
+    }
+  }
 }
