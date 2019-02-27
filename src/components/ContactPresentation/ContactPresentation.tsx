@@ -35,18 +35,10 @@ class ContactPresentation extends React.Component<Props, State> {
     this.setIdentityOrContact()
   }
 
-  public componentDidUpdate() {
-    this.setIdentityOrContact()
-  }
-
-  public shouldComponentUpdate(nextProps: Props, nextState: State) {
-    return (
-      this.props.address !== nextProps.address ||
-      this.props.myIdentity !== nextProps.myIdentity ||
-      this.props.contact !== nextProps.contact ||
-      this.state.myIdentity !== nextState.myIdentity ||
-      this.state.contact !== nextState.contact
-    )
+  public componentDidUpdate(nextProps: Props) {
+    if (nextProps !== this.props) {
+      this.setIdentityOrContact()
+    }
   }
 
   public render() {

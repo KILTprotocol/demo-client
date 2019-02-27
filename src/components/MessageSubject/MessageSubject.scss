@@ -9,7 +9,8 @@
   }
 
   & .CTypePresentation {
-    display: inline-flex;
+    display: inline-block;
     margin-left: $base-padding/2;
+    vertical-align: 2px;
   }
 }

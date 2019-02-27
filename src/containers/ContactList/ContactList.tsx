@@ -145,7 +145,7 @@ class ContactList extends React.Component<Props, State> {
     const { cTypes } = this.state
 
     const options: SelectOption[] = cTypes.map((cType: ICType) => ({
-      label: <CTypePresentation cType={cType} />,
+      label: <CTypePresentation cType={cType} linked={false} />,
       value: cType.cType.hash,
     }))
     return (

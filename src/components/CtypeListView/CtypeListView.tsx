@@ -36,9 +36,7 @@ class CtypeListView extends React.Component<Props, State> {
                     className="name"
                     title={cType.cType.metadata.title.default}
                   >
-                    <Link to={`/ctype/${cType.cType.hash}`}>
-                      <CTypePresentation cType={cType} />
-                    </Link>
+                    <CTypePresentation cType={cType} />
                   </td>
                   <td className="author">
                     <ContactPresentation address={cType.metaData.author} />

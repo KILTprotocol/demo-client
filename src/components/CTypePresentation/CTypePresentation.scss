@@ -1,33 +1,10 @@
 .CTypePresentation {
-  display: flex;
-  justify-content: left;
-  align-items: center;
-  vertical-align: bottom;
+  @include presentation;
 
-  & .container {
+  & > a {
 
-    &:before {
-      display: none;
-    }
-  }
-
-  & .ui--IdentityIcon {
-    cursor: default;
-  }
-
-  & .name {
-    @extend %ellipsis;
-
-    padding:{
-      right: $base-padding/4;
-      left: $base-padding/4;
-    }
-
-    & small {
-      @include baseFont;
-
-      font-size: 0.6em;
-      margin-left: 0.4em;
+    & .ui--IdentityIcon {
+      cursor: pointer;
     }
   }
 }

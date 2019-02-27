@@ -1,5 +1,6 @@
 import {
   IMessage,
+  IRequestAttestationForClaim,
   IRequestClaimsForCtype,
   IRequestLegitimations,
   MessageBodyType,
@@ -30,25 +31,39 @@ const MessageSubject = (props: Props) => {
     const messageBodyType: MessageBodyType | undefined = message.body.type
 
     switch (messageBodyType) {
+      case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={
+                (message.body as IRequestAttestationForClaim).content.claim
+                  .cType
+              }
+            />
+            )
+          </span>
+        )
+        break
       case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
         additionalInfo = (
           <span>
-            {' '}
-            for cType{' '}
+            <span> (cType: </span>
             <CTypePresentation
               cTypeHash={(message.body as IRequestClaimsForCtype).content}
             />
+            )
           </span>
         )
         break
       case MessageBodyType.REQUEST_LEGITIMATIONS:
         additionalInfo = (
           <span>
-            {' '}
-            for cType{' '}
+            <span> (cType: </span>
             <CTypePresentation
               cTypeHash={(message.body as IRequestLegitimations).content.cType}
             />
+            )
           </span>
         )
         break
