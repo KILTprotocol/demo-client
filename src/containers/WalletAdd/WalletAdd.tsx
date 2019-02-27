@@ -150,8 +150,8 @@ class WalletAdd extends React.Component<Props, State> {
     const blockchain: Blockchain = await BlockchainService.connect()
     const alice = Identity.buildFromSeedString('Alice')
     blockUi.updateMessage('transfer initial tokens (2/3)')
-    blockchain.makeTransfer(alice, identity.address, 1000).then(
-      () => {
+    blockchain
+      .makeTransfer(alice, identity.address, 1000, () => {
         const { address, boxPublicKeyAsHex } = identity
         const newContact: Contact = {
           metaData: {
@@ -181,16 +181,15 @@ class WalletAdd extends React.Component<Props, State> {
             blockUi.remove()
           }
         )
-      },
-      error => {
+      })
+      .catch(error => {
         errorService.log({
           error,
           message: 'failed to transfer initial tokens to identity',
           origin: 'WalletAdd.addIdentity()',
         })
         blockUi.remove()
-      }
-    )
+      })
   }
 
   private createRandomPhrase = () => {
