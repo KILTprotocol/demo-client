@@ -1,10 +1,10 @@
+import { IMessage } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-import KiltIdenticon from '../KiltIdenticon/KiltIdenticon'
+import { MessageOutput } from '../../services/MessageRepository'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import MessageSubject from '../MessageSubject/MessageSubject'
 
 import './MessageListView.scss'
-import { MessageOutput } from '../../services/MessageRepository'
-import { IMessage } from '@kiltprotocol/prototype-sdk'
 
 type Props = {
   messages: MessageOutput[]
@@ -38,11 +38,7 @@ class MessageListView extends React.Component<Props, State> {
               {messages.map((message: MessageOutput) => (
                 <tr key={message.messageId}>
                   <td className="sender">
-                    {message.sender ? (
-                      <KiltIdenticon contact={message.sender} />
-                    ) : (
-                      message.senderAddress
-                    )}
+                    <ContactPresentation address={message.senderAddress} />
                   </td>
                   <td className="subject">
                     <div onClick={this.openMessage(message)}>

@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 import IdentityView from '../../components/IdentityView/IdentityView'
-import Modal, { ModalType } from '../../components/Modal/Modal'
 import { safeDelete } from '../../services/FeedbackService'
 
 import * as Wallet from '../../state/ducks/Wallet'

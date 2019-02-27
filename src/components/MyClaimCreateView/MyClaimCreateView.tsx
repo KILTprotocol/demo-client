@@ -15,6 +15,7 @@ import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './MyClaimCreateView.scss'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
   onCancel?: () => void
@@ -86,7 +87,9 @@ class MyClaimCreateView extends Component<Props, State> {
             <div className="Claim-base">
               <div>
                 <label>CType</label>
-                <div>{cType.metadata.title.default}</div>
+                <div>
+                  <CTypePresentation cTypeHash={cType.hash} />
+                </div>
               </div>
               <div>
                 <label>Claim alias</label>

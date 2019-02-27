@@ -4,7 +4,7 @@ import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import * as UiState from '../../state/ducks/UiState'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { BlockingNotification, Notification } from '../../types/UserFeedback'
+import { BlockingNotification } from '../../types/UserFeedback'
 
 import './BlockingNotifications.scss'
 

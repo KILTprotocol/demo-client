@@ -1,12 +1,16 @@
-import * as React from 'react'
-
-import './MessageSubject.scss'
 import {
   IMessage,
+  IRequestAttestationForClaim,
   IRequestClaimsForCtype,
   IRequestLegitimations,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
+import { ReactNode } from 'react'
+import * as React from 'react'
+
+import './MessageSubject.scss'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
   message: IMessage
@@ -22,16 +26,46 @@ const MessageSubject = (props: Props) => {
     return <span className="MessageSubject">{message.body}</span>
   }
 
-  let additionalInfo: string = ''
+  let additionalInfo: string | ReactNode = ''
   try {
     const messageBodyType: MessageBodyType | undefined = message.body.type
 
     switch (messageBodyType) {
+      case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={
+                (message.body as IRequestAttestationForClaim).content.claim
+                  .cType
+              }
+            />
+            )
+          </span>
+        )
+        break
       case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
-        additionalInfo = (message.body as IRequestClaimsForCtype).content!
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={(message.body as IRequestClaimsForCtype).content}
+            />
+            )
+          </span>
+        )
         break
       case MessageBodyType.REQUEST_LEGITIMATIONS:
-        additionalInfo = (message.body as IRequestLegitimations).content.cType
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={(message.body as IRequestLegitimations).content.cType}
+            />
+            )
+          </span>
+        )
         break
     }
   } catch (error) {
@@ -41,7 +75,7 @@ const MessageSubject = (props: Props) => {
   return (
     <span className="MessageSubject">
       <span className="type">{message.body!.type}</span>
-      {additionalInfo && <span> "{additionalInfo}"</span>}
+      {additionalInfo}
     </span>
   )
 }

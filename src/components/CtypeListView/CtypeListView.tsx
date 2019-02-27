@@ -2,9 +2,11 @@ import * as React from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 
 import { ICType } from '../../types/Ctype'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
+import SelectAction from '../SelectAction/SelectAction'
 
 import './CtypeListView.scss'
-import SelectAction from '../SelectAction/SelectAction'
 
 type Props = RouteComponentProps<{}> & {
   cTypes?: ICType[]
@@ -22,23 +24,22 @@ class CtypeListView extends React.Component<Props, State> {
           <table>
             <thead>
               <tr>
+                <th className="name">CTYPE</th>
                 <th className="author">Author</th>
-                <th className="name">CTYPE title</th>
                 <th className="actionsTd" />
               </tr>
             </thead>
             <tbody>
               {cTypes.map(cType => (
                 <tr key={cType.cType.hash}>
-                  {/* TODO: resolve to Contact */}
-                  <td className="author">{cType.metaData.author}</td>
                   <td
                     className="name"
                     title={cType.cType.metadata.title.default}
                   >
-                    <Link to={`/ctype/${cType.cType.hash}`}>
-                      {cType.cType.metadata.title.default}
-                    </Link>
+                    <CTypePresentation cType={cType} />
+                  </td>
+                  <td className="author">
+                    <ContactPresentation address={cType.metaData.author} />
                   </td>
                   <td className="actionsTd">
                     <div className="actions">

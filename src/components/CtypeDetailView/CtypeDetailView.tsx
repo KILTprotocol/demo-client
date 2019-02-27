@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 
 import { ICType } from '../../types/Ctype'
 import Code from '../Code/Code'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 import './CtypeDetailView.scss'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
   cType?: ICType
@@ -22,7 +24,9 @@ const CtypeDetailView = ({ cType }: Props) => {
             </div>
             <div>
               <label>Author</label>
-              <div>{cType.metaData.author}</div>
+              <div>
+                <ContactPresentation address={cType.metaData.author} />
+              </div>
             </div>
             <div>
               <label>Definition</label>
@@ -30,6 +34,7 @@ const CtypeDetailView = ({ cType }: Props) => {
                 <Code>{cType.cType}</Code>
               </div>
             </div>
+            <CTypePresentation cType={cType} size={50} />
           </div>
           <div className="actions">
             <Link to="/cType">Cancel</Link>

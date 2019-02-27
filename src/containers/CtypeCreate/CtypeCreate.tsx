@@ -63,7 +63,6 @@ class CTypeCreate extends React.Component<Props, State> {
       this.state.isValid
     ) {
       const { selectedIdentity, history } = this.props
-      const authorAlias: string = selectedIdentity.metaData.name
       let cType: sdk.CType
 
       try {
@@ -90,7 +89,7 @@ class CTypeCreate extends React.Component<Props, State> {
           const cTypeWrapper: ICType = {
             cType,
             metaData: {
-              author: authorAlias,
+              author: selectedIdentity.identity.address,
             },
           }
           // TODO: add onrejected when sdk provides error handling

@@ -1,9 +1,15 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import {
+  IRequestClaimsForCtype,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
+import { ReactNode } from 'react'
 import * as React from 'react'
 
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
-import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
+import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
+import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import contactRepository from '../../services/ContactRepository'
@@ -16,10 +22,6 @@ import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
-import {
-  IRequestClaimsForCtype,
-  MessageBodyType,
-} from '@kiltprotocol/prototype-sdk'
 
 interface Props {}
 
@@ -29,8 +31,8 @@ interface State {
 }
 
 type SelectOption = {
+  label: ReactNode
   value: sdk.ICType['hash']
-  label: string
 }
 
 class ContactList extends React.Component<Props, State> {
@@ -103,7 +105,9 @@ class ContactList extends React.Component<Props, State> {
             {contacts.map((contact: Contact) => (
               <tr key={contact.publicIdentity.address}>
                 <td className="name">
-                  <KiltIdenticon contact={contact} />
+                  <ContactPresentation
+                    address={contact.publicIdentity.address}
+                  />
                 </td>
                 <td className="address" title={contact.publicIdentity.address}>
                   {contact.publicIdentity.address}
@@ -141,7 +145,7 @@ class ContactList extends React.Component<Props, State> {
     const { cTypes } = this.state
 
     const options: SelectOption[] = cTypes.map((cType: ICType) => ({
-      label: cType.cType.metadata.title.default,
+      label: <CTypePresentation cType={cType} linked={false} />,
       value: cType.cType.hash,
     }))
     return (

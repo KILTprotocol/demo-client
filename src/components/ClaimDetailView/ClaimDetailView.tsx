@@ -2,8 +2,10 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { Component } from 'react'
 
 import Code from '../Code/Code'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 import './ClaimDetailView.scss'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
   claim: sdk.IClaim
@@ -19,12 +21,16 @@ class ClaimDetailView extends Component<Props, State> {
       <section className="ClaimDetailView">
         <div>
           <label>Ctype</label>
-          <div>{claim.cType}</div>
+          <div>
+            <CTypePresentation cTypeHash={claim.cType} />
+          </div>
         </div>
         {claim.owner && (
           <div>
             <label>Owner</label>
-            <div>{claim.owner}</div>
+            <div>
+              <ContactPresentation address={claim.owner} />
+            </div>
           </div>
         )}
         {claim.contents && (

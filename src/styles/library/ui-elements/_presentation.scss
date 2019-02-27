@@ -1,0 +1,36 @@
+@mixin presentation {
+  white-space: nowrap;
+
+  & .container {
+
+    &:before {
+      display: none;
+    }
+  }
+
+  & .ui--IdentityIcon {
+    cursor: default;
+  }
+
+  & .ui--IdentityIcon,
+  & .name {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  & .name {
+    @extend %ellipsis;
+
+    padding:{
+      right: $base-padding/4;
+      left: $base-padding/4;
+    }
+
+    & small {
+      @include baseFont;
+
+      font-size: 0.6em;
+      margin-left: 0.4em;
+    }
+  }
+}

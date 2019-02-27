@@ -33,10 +33,4 @@
       }
     }
   }
-
-  & .KiltIdenticon {
-    @include border-radius(50%);
-    
-    border: $base-padding/4 solid $color-white;
-  }
 }

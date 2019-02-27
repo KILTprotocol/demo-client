@@ -1,6 +1,7 @@
+import { IMessage } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import KiltIdenticon from '../../components/KiltIdenticon/KiltIdenticon'
+import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 
 import MessageDetailView from '../../components/MessageDetailView/MessageDetailView'
 import MessageListView from '../../components/MessageListView/MessageListView'
@@ -13,14 +14,9 @@ import MessageRepository, {
 } from '../../services/MessageRepository'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import {
-  BlockingNotification,
-  BlockUi,
-  NotificationType,
-} from '../../types/UserFeedback'
+import { BlockingNotification, BlockUi } from '../../types/UserFeedback'
 
 import './MessageView.scss'
-import { IMessage } from '@kiltprotocol/prototype-sdk'
 
 interface Props {
   selectedIdentity?: Wallet.Entry
@@ -76,13 +72,10 @@ class MessageView extends React.Component<Props, State> {
             showOnInit={true}
             type={ModalType.BLANK}
             header={
-              currentMessage.sender ? (
-                <div className="header-KiltIdenticon">
-                  Message from <KiltIdenticon contact={currentMessage.sender} />
-                </div>
-              ) : (
-                `Message from ${currentMessage.senderAddress}`
-              )
+              <div className="header-ContactPresentation">
+                Message from{' '}
+                <ContactPresentation address={currentMessage.senderAddress} />
+              </div>
             }
             onCancel={this.onCloseMessage}
           >
@@ -143,7 +136,7 @@ class MessageView extends React.Component<Props, State> {
     safeDelete(
       <span>
         the message '<MessageSubject message={message} />' from{' '}
-        <KiltIdenticon contact={message.sender} />
+        <ContactPresentation address={message.senderAddress} />
       </span>,
       (notification: BlockingNotification) => {
         MessageRepository.deleteByMessageId(message.messageId as string)

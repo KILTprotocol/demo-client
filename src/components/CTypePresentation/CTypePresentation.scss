@@ -1,0 +1,10 @@
+.CTypePresentation {
+  @include presentation;
+
+  & > a {
+
+    & .ui--IdentityIcon {
+      cursor: pointer;
+    }
+  }
+}
