@@ -56,7 +56,7 @@ class SelectContacts extends React.Component<Props, State> {
 
     const options: SelectOption[] = contacts.map(
       (contact: Contact): SelectOption => ({
-        label: <ContactPresentation contact={contact} />,
+        label: <ContactPresentation address={contact.publicIdentity.address} />,
         value: contact.publicIdentity.address,
       })
     )
@@ -70,7 +70,7 @@ class SelectContacts extends React.Component<Props, State> {
           className="react-select-container"
           classNamePrefix="react-select"
           isClearable={isMulti && contacts.length > 1}
-          isSearchable={true}
+          isSearchable={false}
           isMulti={isMulti && contacts.length > 1}
           closeMenuOnSelect={closeMenuOnSelect}
           name={name}

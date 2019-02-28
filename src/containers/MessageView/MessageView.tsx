@@ -98,7 +98,7 @@ class MessageView extends React.Component<Props, State> {
         headline: 'Fetching messages',
       })
       MessageRepository.findByMyIdentity(selectedIdentity.identity)
-        .then((messages: IMessage[]) => {
+        .then((messages: MessageOutput[]) => {
           this.setState({
             messages,
           })
@@ -157,7 +157,7 @@ class MessageView extends React.Component<Props, State> {
     )
   }
 
-  private onOpenMessage(message: IMessage) {
+  private onOpenMessage(message: MessageOutput) {
     this.setState(
       {
         currentMessage: message,

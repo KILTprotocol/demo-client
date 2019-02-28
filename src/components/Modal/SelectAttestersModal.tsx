@@ -11,23 +11,24 @@ type Props = {
 
 type State = {
   isSelectAttestersOpen: boolean
+  selectedAttesters: Contact[]
 }
 
 class SelectAttestersModal extends React.Component<Props, State> {
-  private selectedAttesters: Contact[] = []
   private modal: Modal | null
 
   constructor(props: Props) {
     super(props)
     this.state = {
       isSelectAttestersOpen: false,
+      selectedAttesters: [],
     }
     this.onSelectAttesters = this.onSelectAttesters.bind(this)
   }
 
   public render() {
-    const { isSelectAttestersOpen } = this.state
     const { onCancel, onConfirm } = this.props
+    const { isSelectAttestersOpen, selectedAttesters } = this.state
     return (
       <Modal
         ref={el => {
@@ -36,7 +37,7 @@ class SelectAttestersModal extends React.Component<Props, State> {
         type={ModalType.CONFIRM}
         header="Select Attester(s):"
         onCancel={onCancel}
-        onConfirm={onConfirm.bind(this, this.selectedAttesters)}
+        onConfirm={onConfirm.bind(this, selectedAttesters)}
         catchBackdropClick={isSelectAttestersOpen}
       >
         <div>
@@ -63,7 +64,7 @@ class SelectAttestersModal extends React.Component<Props, State> {
   }
 
   private onSelectAttesters(selectedAttesters: Contact[]) {
-    this.selectedAttesters = selectedAttesters
+    this.setState({ selectedAttesters })
   }
 
   private setSelectAttestersOpen = (

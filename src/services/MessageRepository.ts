@@ -13,6 +13,7 @@ import contactRepository from './ContactRepository'
 import errorService from './ErrorService'
 
 export interface MessageOutput extends IMessage {
+  encryptedMessage: IEncryptedMessage
   sender?: Contact
 }
 
@@ -63,6 +64,7 @@ class MessageRepository {
                   Message.ensureOwnerIsSender(m)
                   return {
                     ...m,
+                    encryptedMessage,
                     sender,
                   }
                 } catch (error) {

@@ -3,6 +3,7 @@ import {
   IRequestAttestationForClaim,
   IRequestClaimsForCtype,
   IRequestLegitimations,
+  ISubmitLegitimations,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
 import { ReactNode } from 'react'
@@ -62,6 +63,19 @@ const MessageSubject = (props: Props) => {
             <span> (cType: </span>
             <CTypePresentation
               cTypeHash={(message.body as IRequestLegitimations).content.cType}
+            />
+            )
+          </span>
+        )
+        break
+      case MessageBodyType.SUBMIT_LEGITIMATIONS:
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={
+                (message.body as ISubmitLegitimations).content.claim.cType
+              }
             />
             )
           </span>
