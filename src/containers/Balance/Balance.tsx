@@ -1,6 +1,7 @@
+import Immutable from 'immutable'
 import React, { ChangeEvent, ReactNode } from 'react'
 import { connect } from 'react-redux'
-import Immutable from 'immutable'
+import SelectContactsModal from '../../components/Modal/SelectContactsModal'
 import Spinner from '../../components/Spinner/Spinner'
 
 import * as Balances from '../../state/ducks/Balances'
@@ -18,43 +19,55 @@ type Props = {
 }
 
 type State = {
-  transferTokens?: number
+  transferTokens: string
 }
 
 class Balance extends React.Component<Props, State> {
+  private selectContactsModal: SelectContactsModal | null
+
   constructor(props: Props) {
     super(props)
-    this.state = {}
+    this.state = {
+      transferTokens: '',
+    }
 
     this.setTransferTokens = this.setTransferTokens.bind(this)
     this.transferTokens = this.transferTokens.bind(this)
+    this.showContactsModal = this.showContactsModal.bind(this)
+    this.hideContactsModal = this.hideContactsModal.bind(this)
+    this.cancelSelectContacts = this.cancelSelectContacts.bind(this)
+    this.finishSelectContacts = this.finishSelectContacts.bind(this)
   }
 
   public render() {
-    const { balances, myIdentity } = this.props
-    const _myIdentity =
-      myIdentity || Wallet.getSelectedIdentity(PersistentStore.store.getState())
-
-    const balance = balances.get(_myIdentity.identity.address)
+    const myBalance = this.getMyBalance()
 
     return (
       <section className="Balance">
         <h2>Manage Balance</h2>
         <div className="display">
           <label>Balance</label>
-          {balance == null && (
+          {myBalance == null && (
             <Spinner size={20} color="#ef5a28" strength={3} />
           )}
-          {balance != null && <div className="kilt-token">{balance}</div>}
+          {myBalance != null && <div className="kilt-token">{myBalance}</div>}
         </div>
-        {balance != null && (
+        {myBalance != null && (
           <div className="transfer-tokens">
             <label>Transfer</label>
-            <div>{this.getTokenTransferElement(balance)}</div>
+            <div>{this.getTokenTransferElement(myBalance)}</div>
           </div>
         )}
       </section>
     )
+  }
+
+  private getMyBalance(): number | undefined {
+    const { balances, myIdentity } = this.props
+    const _myIdentity =
+      myIdentity || Wallet.getSelectedIdentity(PersistentStore.store.getState())
+
+    return balances.get(_myIdentity.identity.address)
   }
 
   private getTokenTransferElement(balance: number | undefined): ReactNode {
@@ -64,29 +77,87 @@ class Balance extends React.Component<Props, State> {
     if (balance <= 0) {
       return <span>No sufficient funds to enable transfer.</span>
     }
+
+    const { transferTokens } = this.state
+
     return (
-      <React.Fragment>
+      <>
         <input
-          type="number"
-          min={0}
-          max={balance}
+          type="text"
           onChange={this.setTransferTokens}
+          value={transferTokens}
         />
-        <button onClick={this.transferTokens}>Transfer</button>
-      </React.Fragment>
+        <button
+          disabled={!transferTokens || !isFinite(Number(transferTokens))}
+          onClick={this.showContactsModal}
+        >
+          Transfer
+        </button>
+        <SelectContactsModal
+          ref={el => {
+            this.selectContactsModal = el
+          }}
+          header={
+            <span>
+              Select receiver for{' '}
+              <span className="kilt-token">{transferTokens}</span>
+            </span>
+          }
+          placeholder="Select receiver…"
+          isMulti={false}
+          onCancel={this.cancelSelectContacts}
+          onConfirm={this.finishSelectContacts}
+        />
+      </>
     )
   }
 
-  private setTransferTokens(e: ChangeEvent<HTMLInputElement>) {
-    const { value: amount } = e.target
-    console.log('setTransferTokens', amount)
-    this.setState({ transferTokens: Number(amount) })
+  private showContactsModal() {
+    if (this.selectContactsModal) {
+      this.selectContactsModal.show()
+    }
+  }
+
+  private hideContactsModal() {
+    if (this.selectContactsModal) {
+      this.selectContactsModal.hide()
+    }
+  }
+
+  private cancelSelectContacts() {
+    this.hideContactsModal()
+    this.setState({ transferTokens: '' })
+  }
+
+  private finishSelectContacts() {
+    this.hideContactsModal()
+    this.transferTokens()
+  }
+
+  private setTransferTokens(event: ChangeEvent<HTMLInputElement>) {
+    const { value: amount } = event.target
+    const myBalance = this.getMyBalance()
+
+    if (!myBalance) {
+      return
+    }
+
+    const amountNumber = Number(amount)
+
+    if (
+      amount === '' ||
+      (isFinite(amountNumber) &&
+        amountNumber > 0 &&
+        myBalance - amountNumber >= 0)
+    ) {
+      this.setState({ transferTokens: '' + amount })
+    }
   }
 
   private transferTokens() {
     const { transferTokens } = this.state
-    console.log('transferTokens', transferTokens)
-    this.setState({ transferTokens: 0 })
+    console.log('transfering', transferTokens, ' Tokens')
+    this.setState({ transferTokens: '' })
   }
 }
 

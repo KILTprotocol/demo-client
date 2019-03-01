@@ -4,7 +4,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 
 import CTypeDetailView from '../../components/CtypeDetailView/CtypeDetailView'
 import CTypeListView from '../../components/CtypeListView/CtypeListView'
-import SelectAttestersModal from '../../components/Modal/SelectAttestersModal'
+import SelectContactsModal from '../../components/Modal/SelectContactsModal'
 import attestationWorkflow from '../../services/AttestationWorkflow'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
@@ -21,7 +21,7 @@ type State = {
 }
 
 class CtypeView extends React.Component<Props, State> {
-  private selectAttestersModal: SelectAttestersModal | null
+  private selectAttestersModal: SelectContactsModal | null
   private cTypeToLegitimate: ICType
 
   constructor(props: Props) {
@@ -75,10 +75,11 @@ class CtypeView extends React.Component<Props, State> {
             onRequestLegitimation={this.requestLegitimation}
           />
         )}
-        <SelectAttestersModal
+        <SelectContactsModal
           ref={el => {
             this.selectAttestersModal = el
           }}
+          placeholder="Select attester#{multi}…"
           onCancel={this.cancelSelectAttesters}
           onConfirm={this.finishSelectAttesters}
         />
