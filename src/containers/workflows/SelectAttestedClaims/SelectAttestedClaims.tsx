@@ -9,6 +9,7 @@ import { groupBy } from 'lodash'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import CTypePresentation from '../../../components/CTypePresentation/CTypePresentation'
 
 import SelectAttestedClaim, {
   State as SelectAttestedClaimState,
@@ -243,7 +244,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     return (
       <div className="cType-container" key={cTypeHash}>
         <h4>
-          CType <ShortHash>{cTypeHash}</ShortHash>
+          CType <CTypePresentation cTypeHash={cTypeHash} />
         </h4>
         {relevantClaimEntries[cTypeHash].map((claimEntry: Claims.Entry) =>
           this.getSelectAttestedClaim(claimEntry)

@@ -27,8 +27,9 @@
   @include box-shadow(2px 2px 5px transparentize($color-black, 0.8));
   @include border-radius($base-border-radius);
 
+  position: relative;
   margin:{
-    bottom: $base-padding;
+    bottom: 2*$base-padding;
   }
   padding: $base-padding;
   background: $color-white;
@@ -37,6 +38,37 @@
   &:last-child {
     margin: {
       bottom: 0
+    }
+  }
+}
+
+@mixin labeledCard {
+  @include card;
+
+  padding:{
+    top: 1.5*$base-padding;
+  }
+
+  margin:{
+    top: 3*$base-padding;
+  }
+
+  & > h1,
+  & > h2,
+  & > h3,
+  & > h4,
+  & > h5,
+  & > h6 {
+
+    &:first-child {
+      @include border-radius($base-border-radius);
+
+      position: absolute;
+      top: -1.2em;
+      left: $base-padding/2;
+      padding: 0.2em 1em;
+      border: $base-border;
+      background: $color-white;
     }
   }
 }
@@ -111,5 +143,43 @@
       }
       font-size: 10px;
     }
+  }
+}
+
+@mixin kilt-token {
+  display: inline-block;
+
+  &:after {
+    $font-size: 0.8em;
+    $size: 1.6;
+
+    @include border-radius(50%);
+
+    content: 'K';
+    display: inline-block;
+    width: #{$size}em;
+    height: #{$size}em;
+    margin:{
+      left: 0.5em;
+    }
+    border: 1px solid $color-primary;
+    font-weight: bold;
+    font-size: $font-size;
+    line-height: $size;
+    text-align: center;
+    vertical-align: bottom;
+    color: $color-primary;
+  }
+}
+
+@mixin colored-kilt-token {
+  @include kilt-token;
+
+  &.decreased {
+    color: $color-danger;
+  }
+
+  &.increased {
+    color: $color-success;
   }
 }

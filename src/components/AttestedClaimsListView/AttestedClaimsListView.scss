@@ -9,7 +9,7 @@
   }
 
   & .attestations {
-    @include card;
+    @include labeledCard;
 
     padding: $base-padding;
 
@@ -61,6 +61,10 @@
   }
 
   & .refresh {
-    @include button-icon-only($icon-refresh);
+    text-align: right;
+
+    & button {
+      @include button-icon-only($icon-refresh);
+    }
   }
 }

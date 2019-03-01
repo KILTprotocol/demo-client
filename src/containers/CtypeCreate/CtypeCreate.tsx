@@ -42,7 +42,13 @@ class CTypeCreate extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    this.connect()
+    // TODO: without this setTimeout ew run into an infinite loop
+    // this is somehow connected to the balance redux solution in app.tsx
+    // the mapStateToProps methods retrigger each other as it seems
+    // see also messageView.tsx
+    setTimeout(() => {
+      this.connect()
+    })
   }
 
   public async connect() {

@@ -129,7 +129,11 @@ class FeedbackService {
   }
 }
 
-function _notify(type: NotificationType, message: string, blocking = false) {
+function _notify(
+  type: NotificationType,
+  message: string | ReactNode,
+  blocking = false
+) {
   blocking
     ? FeedbackService.addBlockingNotification({
         message,
@@ -138,15 +142,15 @@ function _notify(type: NotificationType, message: string, blocking = false) {
     : FeedbackService.addNotification({ message, type })
 }
 
-export function notifySuccess(message: string, blocking = false) {
+export function notifySuccess(message: string | ReactNode, blocking = false) {
   _notify(NotificationType.SUCCESS, message, blocking)
 }
 
-export function notifyFailure(message: string, blocking = true) {
+export function notifyFailure(message: string | ReactNode, blocking = true) {
   _notify(NotificationType.FAILURE, message, blocking)
 }
 
-export function notify(message: string, blocking = false) {
+export function notify(message: string | ReactNode, blocking = false) {
   _notify(NotificationType.INFO, message, blocking)
 }
 

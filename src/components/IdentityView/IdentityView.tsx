@@ -1,4 +1,5 @@
 import * as React from 'react'
+
 import { MyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
@@ -9,8 +10,8 @@ type Props = {
   myIdentity: MyIdentity
   selected: boolean
   // output
-  onDelete: (address: MyIdentity['identity']['address']) => void
-  onSelect: (seedAsHex: MyIdentity['identity']['address']) => void
+  onDelete?: (address: MyIdentity['identity']['address']) => void
+  onSelect?: (seedAsHex: MyIdentity['identity']['address']) => void
 }
 
 class IdentityView extends React.Component<Props, {}> {
@@ -19,12 +20,14 @@ class IdentityView extends React.Component<Props, {}> {
   }
 
   public render() {
-    const { myIdentity, selected } = this.props
+    const { myIdentity, onDelete, onSelect, selected } = this.props
 
     const classes = ['IdentityView', selected ? 'selected' : '']
 
     return (
       <section className={classes.join(' ')}>
+        {selected && <h2>Active identity</h2>}
+        <ContactPresentation myIdentity={myIdentity} size={50} />
         <div className="attributes">
           <div>
             <label>Alias</label>
@@ -46,26 +49,29 @@ class IdentityView extends React.Component<Props, {}> {
             <label>Encryption Public Key</label>
             <div>{myIdentity.identity.boxPublicKeyAsHex}</div>
           </div>
-          <ContactPresentation myIdentity={myIdentity} size={50} />
         </div>
-        <div className="actions">
-          <button onClick={this.onDelete} disabled={selected}>
-            Remove
-          </button>
-          <button onClick={this.onSelect} disabled={selected}>
-            Select
-          </button>
-        </div>
+        {!selected && (
+          <div className="actions">
+            {onDelete && (
+              <button
+                onClick={onDelete.bind(this, myIdentity.identity.address)}
+                disabled={selected}
+              >
+                Remove
+              </button>
+            )}
+            {onSelect && (
+              <button
+                onClick={onSelect.bind(this, myIdentity.identity.address)}
+                disabled={selected}
+              >
+                Select
+              </button>
+            )}
+          </div>
+        )}
       </section>
     )
-  }
-
-  private onDelete = () => {
-    this.props.onDelete(this.props.myIdentity.identity.address)
-  }
-
-  private onSelect = () => {
-    this.props.onSelect(this.props.myIdentity.identity.address)
   }
 }
 

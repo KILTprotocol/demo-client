@@ -61,7 +61,7 @@ class ContactPresentation extends React.Component<Props, State> {
           theme="substrate"
         />
         {!iconOnly && (
-          <span className="name">
+          <span className="label">
             {name}
             {myIdentity && <small>(me)</small>}
           </span>

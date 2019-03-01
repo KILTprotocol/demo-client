@@ -1,0 +1,28 @@
+.Balance {
+
+  & .display,
+  & .transfer-tokens {
+    @include label_input_combo;
+  }
+
+  & .transfer-tokens {
+    align-items: center;
+
+    & > div {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+  }
+
+  & input {
+    @include input;
+
+    width: 150px;
+  }
+
+  & button {
+    @include button-primary;
+    margin-left: $base-padding/2;
+  }
+}

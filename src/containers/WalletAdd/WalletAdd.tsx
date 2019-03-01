@@ -205,11 +205,6 @@ class WalletAdd extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = () => {
-  // TODO: empty block causes tslint warning, check how to handle this
-  return {}
-}
-
 const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
   return {
     saveIdentity: (myIdentity: MyIdentity) => {
@@ -220,7 +215,7 @@ const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
 
 export default withRouter(
   connect(
-    mapStateToProps,
+    null,
     mapDispatchToProps
   )(WalletAdd)
 )
