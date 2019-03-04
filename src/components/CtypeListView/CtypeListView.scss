@@ -2,17 +2,20 @@
 
   & table {
     @include table;
+    @include responsiveTable(
+        (
+          phone: ('*', false, false, 120px),
+          tablet: (false, '*', '*', 170px),
+          desktop: (false, '*', '*', 270px),
+        )
+    );
   }
 
-  & .author {
-    width: 100%;
-  }
+  @include breakpoint(phone-tablet-only){
 
-  & .name {
-    width: 100%;
-  }
-
-  & .actionsTd {
-    width: 200px;
+    & th,
+    & td {
+      padding-bottom: $base-padding;
+    }
   }
 }

@@ -22,3 +22,7 @@
 
     @return $x1;
 }
+
+@function getActionTdWidth($countButtons){
+    @return $countButtons * ($base-button-height + $base-padding/2);
+}

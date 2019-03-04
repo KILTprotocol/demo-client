@@ -24,7 +24,6 @@ class TestUserFeedback extends React.Component<Props, State> {
     return (
       <section className="TestUserFeedBack">
         <h2>Test User Feedback</h2>
-        <hr />
 
         <h4>Block UI</h4>
         <button onClick={this.testBlockUi}>Test</button>

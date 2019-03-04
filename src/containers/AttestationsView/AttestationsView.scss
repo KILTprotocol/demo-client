@@ -2,37 +2,21 @@
 
   & table {
     @include table;
-  }
-
-  & th,
-  & td {
-    text-align: left;
+    @include responsiveTable(
+        (
+          phone: ('*', false, '*', false, 50px, getActionTdWidth(2)),
+          tablet: ('*', false, '*', 130px, 100px, getActionTdWidth(2)),
+          desktop: (40%, '*', 100px, 130px, 100px, getActionTdWidth(2)),
+        )
+    );
   }
 
   & .claimerAlias {
     @extend %ellipsis;
-
-    width: 120px;
   }
 
   & .claimHash {
-    @extend %ellipsis;
-
-    width: 20%;
-  }
-
-  & .cType {
-    @extend %ellipsis;
-
-    width: 20%;
-  }
-
-  & .created {
-    width: 80px;
-  }
-
-  & .actionsTd {
-    width: 2*$base-button-height + $base-padding;
+    word-break: break-word;
   }
 
   & .revoke {

@@ -6,6 +6,7 @@ import ContactPresentation from '../../components/ContactPresentation/ContactPre
 import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
 import ShortHash from '../../components/ShortHash/ShortHash'
 import attestationService from '../../services/AttestationService'
+import BaseUtilities from '../../services/BaseUtilities'
 import FeedbackService, { safeDelete } from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
@@ -53,11 +54,8 @@ class AttestationsView extends React.Component<Props, State> {
                 <td className="cType" title={attestation.cTypeHash}>
                   <CTypePresentation cTypeHash={attestation.cTypeHash} />
                 </td>
-                <td
-                  className="created"
-                  title={attestation.created.format('YYYY-MM-DD HH:mm')}
-                >
-                  {attestation.created.format('YY-MM-DD')}
+                <td className="created">
+                  {BaseUtilities.getDateTime(attestation.created)}
                 </td>
                 <td
                   className={

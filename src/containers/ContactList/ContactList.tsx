@@ -112,7 +112,7 @@ class ContactList extends React.Component<Props, State> {
                 <td className="address" title={contact.publicIdentity.address}>
                   {contact.publicIdentity.address}
                 </td>
-                <td className="actionTd">
+                <td className="actionsTd">
                   <div className="actions">
                     <button
                       className="requestClaimBtn"

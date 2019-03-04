@@ -6,32 +6,20 @@
 
   & table {
     @include table;
+    @include responsiveTable(
+        (
+          phone: ('*', false, getActionTdWidth(1)),
+          tablet: ('*', '**', getActionTdWidth(1)),
+          desktop: ('*', '**', getActionTdWidth(1)),
+        )
+    );
 
-    & th,
-    & td {
-      text-align: left;
-    }
-
-    & .actions {
-      padding: 0;
+    & .address {
+      word-break: break-word;
     }
 
     & .requestClaimBtn {
       @include button-icon-only($icon-wpforms);
-    }
-
-    & .name {
-      width: 50%;
-    }
-
-    & .address {
-      @extend %ellipsis;
-
-      width: 100%;
-    }
-
-    & .actionTd {
-      width: 50px;
     }
   }
 }

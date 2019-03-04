@@ -1,7 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import Immutable from 'immutable'
-import moment from 'moment'
 import { createSelector } from 'reselect'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
@@ -24,7 +23,7 @@ interface RevokeAction extends KiltAction {
 type Action = SaveAction | RemoveAction
 
 type Entry = {
-  created: moment.Moment
+  created: number
   claimerAlias: string
   claimerAddress: string
   cTypeHash: string
@@ -78,7 +77,7 @@ class Store {
             cTypeHash: attestationAsJson.cTypeHash,
             claimerAddress: attestationAsJson.claimerAddress,
             claimerAlias: attestationAsJson.claimerAlias,
-            created: moment(attestationAsJson.created, moment.defaultFormatUtc),
+            created: attestationAsJson.created,
           } as Entry
           attestationEntries.push(attestationEntry)
         } catch (e) {
