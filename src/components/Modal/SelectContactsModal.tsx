@@ -79,7 +79,7 @@ class SelectContactsModal extends React.Component<Props, State> {
     } = this.props
     const { contacts, isSelectContactsOpen, selectedContacts } = this.state
 
-    const finalPlaceholder = String(placeholder).replace(
+    const finalPlaceholder = (placeholder as string).replace(
       '#{multi}',
       isMulti ? 's' : ''
     )
