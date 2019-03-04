@@ -53,7 +53,6 @@
 
   @include breakpoint(phone-tablet-only){
 
-    & th,
     & td {
       padding-bottom: $base-padding;
     }

@@ -14,7 +14,8 @@
     @include baseFont-bold;
 
     color: $color-primary;
-  }
+    padding-bottom: $base-padding;
+ }
 
   & .actionsTd {
 
