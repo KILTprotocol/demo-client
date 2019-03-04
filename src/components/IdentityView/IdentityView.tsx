@@ -38,6 +38,10 @@ class IdentityView extends React.Component<Props, {}> {
             <div>{myIdentity.phrase}</div>
           </div>
           <div>
+            <label>Address</label>
+            <div>{myIdentity.identity.address}</div>
+          </div>
+          <div>
             <label>Seed (as hex)</label>
             <div>{myIdentity.identity.seedAsHex}</div>
           </div>
