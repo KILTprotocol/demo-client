@@ -2,6 +2,7 @@ import { combineReducers, createStore, Store } from 'redux'
 
 import errorService from '../services/ErrorService'
 import * as Attestations from './ducks/Attestations'
+import * as Balances from './ducks/Balances'
 import * as Claims from './ducks/Claims'
 import * as UiState from './ducks/UiState'
 import * as Wallet from './ducks/Wallet'
@@ -20,6 +21,7 @@ export type State = {
   uiState: UiState.ImmutableState
   wallet: Wallet.ImmutableState
   attestations: Attestations.ImmutableState
+  balances: Balances.ImmutableState
 }
 
 type SerializedState = {
@@ -36,7 +38,7 @@ class PersistentStore {
 
   private static NAME = 'reduxState'
 
-  private static deserialize(obj: SerializedState): State {
+  private static deserialize(obj: SerializedState): Partial<State> {
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
@@ -60,7 +62,7 @@ class PersistentStore {
 
   constructor() {
     const localState = localStorage.getItem(PersistentStore.NAME)
-    let persistedState = {} as State
+    let persistedState: Partial<State> = {}
     if (localState) {
       try {
         persistedState = PersistentStore.deserialize(JSON.parse(localState))
@@ -77,6 +79,7 @@ class PersistentStore {
     this._store = createStore(
       combineReducers({
         attestations: Attestations.Store.reducer,
+        balances: Balances.Store.reducer,
         claims: Claims.Store.reducer,
         uiState: UiState.Store.reducer,
         wallet: Wallet.Store.reducer,

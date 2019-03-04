@@ -33,4 +33,15 @@
       }
     }
   }
+
+  & .IdentityView {
+
+    &.selected {
+      border: 3px solid $color-primary;
+
+      & h2 {
+        color: $color-primary;
+      }
+    }
+  }
 }

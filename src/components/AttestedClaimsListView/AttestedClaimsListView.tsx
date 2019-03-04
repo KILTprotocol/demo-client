@@ -55,7 +55,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
     return attestedClaims ? (
       <section className="AttestedClaimsListView">
-        <h1>Attested Claims</h1>
         {this.getAttestations(attestedClaims)}
       </section>
     ) : (
@@ -67,9 +66,9 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     const { attestationStatus } = this.state
     return (
       <section className="attestations">
-        <div className="header">
-          <h3>Attestations</h3>
-          <button className="refresh" onClick={this.verifyAttestations} />
+        <h2>Attestations</h2>
+        <div className="refresh">
+          <button onClick={this.verifyAttestations} />
         </div>
         {!!attestations && !!attestations.length ? (
           <table>

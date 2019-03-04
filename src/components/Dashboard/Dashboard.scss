@@ -1,0 +1,24 @@
+.Dashboard {
+
+  & h1 {
+    @include h1('Identity');
+
+    & .ContactPresentation {
+      margin: 0 $base-padding/2;
+    }
+  }
+
+  & .IdentityView {
+
+    & ~ .actions {
+      margin:{
+        top: -2*$base-padding;
+        bottom: 2*$base-padding;
+      }
+    }
+  }
+
+  & .Balance {
+    @include labeledCard;
+  }
+}

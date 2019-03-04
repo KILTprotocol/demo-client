@@ -42,11 +42,9 @@
 
         & .#{$message} {
           border:{
-            width: 1px;
-            style: solid solid dotted solid;
-            color: $color-black $color-black $color-grey-dark $color-black;
+            color: $color-grey-dark;
           }
-          background: $color-black;
+          background: $color-grey-dark;
           color: $color-white;
         }
       }

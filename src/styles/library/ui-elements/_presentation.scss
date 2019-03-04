@@ -13,12 +13,12 @@
   }
 
   & .ui--IdentityIcon,
-  & .name {
+  & .label {
     display: inline-block;
     vertical-align: middle;
   }
 
-  & .name {
+  & .label {
     @extend %ellipsis;
 
     padding:{
@@ -32,5 +32,27 @@
       font-size: 0.6em;
       margin-left: 0.4em;
     }
+  }
+}
+
+@mixin inlinePresentation {
+  display: inline-block;
+  margin-left: $base-padding/2;
+  vertical-align: 2px;
+}
+
+@mixin detailPresentation {
+  @extend %centerV;
+
+  @include border-radius(50%);
+
+  position: absolute;
+  top: 0;
+  right: $base-padding/2;
+  padding: 0 !important;
+  border: 5px solid $color-white;
+
+  & .label {
+    display: none;
   }
 }

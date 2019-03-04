@@ -1,14 +1,8 @@
 .IdentityView {
-  $margin-left: $base-padding;
-
-  @include card;
-
   position: relative;
-  width: calc(100% - #{$margin-left});
   padding: $base-padding;
   margin: {
     bottom: 2*$base-padding;
-    left: $margin-left;
   }
 
   & .attributes {
@@ -19,37 +13,18 @@
   }
 
   &.selected {
-    border: 3px solid $color-primary;
+    @include labeledCard;
 
     & .actions {
       display: none;
     }
+  }
 
-    &:before {
-      content: 'Active Identity';
-      position: absolute;
-      top: -17px;
-      right: $base-padding/2;
-      font-size: 24px;
-      font-weight: bold;
-      color: $color-primary;
-      background: $color-white;
-      padding: 0 $base-padding/4;
-    }
+  &:not(.selected){
+    @include card;
   }
 
   & .ContactPresentation {
-    @extend %centerHV;
-
-    position: absolute;
-    top: $base-padding/2;
-    left: $base-padding/2;
-    padding: 0 !important;
-    border-radius: 50%;
-    border: 5px solid #fff;
-
-    & .name {
-      display: none;
-    }
+    @include detailPresentation;
   }
 }

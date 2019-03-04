@@ -56,7 +56,9 @@ class CTypePresentation extends React.Component<Props, State> {
                 size={size || DEFAULT_SIZE}
                 theme="polkadot"
               />
-              <span className="name">{cType.cType.metadata.title.default}</span>
+              <span className="label">
+                {cType.cType.metadata.title.default}
+              </span>
             </React.Fragment>
           )}
       </div>

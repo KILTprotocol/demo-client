@@ -7,15 +7,13 @@ type NavLink = {
   label: string
 }
 const links: NavLink[] = [
-  { url: '', label: 'Home' },
-  { url: 'wallet', label: 'Wallet' },
+  { url: 'dashboard', label: 'Dashboard' },
   { url: 'ctype', label: 'CTYPEs' },
   { url: 'claim', label: 'Claims' },
   { url: 'attestations', label: 'Attestations' },
   { url: 'contacts', label: 'Contacts' },
   { url: 'messages', label: 'Messages' },
-  { url: 'chain-stats', label: 'Chain stats' },
-  { url: 'testUserFeedback', label: 'Test User Feedback' },
+  { url: 'utilities', label: 'Utilities' },
 ]
 
 type Props = RouteComponentProps<{}> & {

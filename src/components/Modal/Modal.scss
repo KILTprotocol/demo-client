@@ -48,9 +48,7 @@
       align-items: center;
 
       & .ContactPresentation {
-        margin: {
-          left: $base-padding;
-        }
+        @include inlinePresentation;
       }
     }
   }
@@ -64,7 +62,7 @@
     }
 
     & .ContactPresentation {
-      display: inline-flex;
+      @include inlinePresentation;
     }
   }
 

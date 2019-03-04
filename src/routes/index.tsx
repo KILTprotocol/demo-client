@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Redirect, Route, Switch } from 'react-router-dom'
 
-import Root from '../components/Root/Root'
-import TestUserFeedback from '../components/TestUserFeedback/TestUserFeedback'
+import Dashboard from '../components/Dashboard/Dashboard'
+import Utilities from '../components/Utilities/Utilities'
 import AttestationsView from '../containers/AttestationsView/AttestationsView'
-import ChainStats from '../containers/ChainStats/ChainStats'
 import ClaimCreate from '../containers/ClaimCreate/ClaimCreate'
 import ClaimView from '../containers/ClaimView/ClaimView'
 import ContactList from '../containers/ContactList/ContactList'
@@ -19,7 +18,8 @@ const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
   return (
     <Switch>
-      <Route path={'/chain-stats'} component={ChainStats} />
+      <Route path={'/dashboard'} component={requiresIdentity(Dashboard)} />
+
       <Route path={'/contacts'} component={requiresIdentity(ContactList)} />
 
       <Route path={'/messages'} component={requiresIdentity(MessageList)} />
@@ -45,14 +45,14 @@ const Routes: React.FunctionComponent<{}> = props => {
       <Route path={'/claim/:claimId'} component={requiresIdentity(ClaimView)} />
       <Route path={'/claim'} component={requiresIdentity(ClaimView)} />
 
-      <Route path={'/testUserFeedback'} component={TestUserFeedback} />
+      <Route path={'/utilities'} component={Utilities} />
 
       <Route
         path={'/attestations'}
         component={requiresIdentity(AttestationsView)}
       />
 
-      <Route component={Root} />
+      <Redirect to="/dashboard" />
     </Switch>
   )
 }

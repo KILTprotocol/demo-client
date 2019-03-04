@@ -1,0 +1,10 @@
+.Utilities {
+
+  & section {
+    @include card;
+  }
+
+  & button {
+    @include button-secondary;
+  }
+}
