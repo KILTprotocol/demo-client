@@ -2,10 +2,11 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import ContactPresentation from '../components/ContactPresentation/ContactPresentation'
 import * as Balances from '../state/ducks/Balances'
+import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
-import { MyIdentity } from '../types/Contact'
+import { Contact, MyIdentity } from '../types/Contact'
 import BlockchainService from './BlockchainService'
-import { notify } from './FeedbackService'
+import { notify, notifySuccess } from './FeedbackService'
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
@@ -34,6 +35,41 @@ class BalanceUtilities {
     }
   }
 
+  public static async makeTransfer(
+    myIdentity: MyIdentity,
+    receiverAddress: Contact['publicIdentity']['address'],
+    amount: number,
+    successCallback?: () => void
+  ) {
+    const blockchain = await BlockchainService.connect()
+
+    blockchain
+      .makeTransfer(myIdentity.identity, receiverAddress, amount, () => {
+        notifySuccess(
+          <div>
+            <span>Successfully transfered </span>
+            <span className="kilt-token">{amount}</span>
+            <span> to </span>
+            <ContactPresentation address={receiverAddress} />.
+          </div>
+        )
+        if (successCallback) {
+          successCallback()
+        }
+      })
+      .then(() => {
+        notify(
+          <div>
+            <span>Transfer of </span>
+            <span className="kilt-token">{amount}</span>
+            <span> to </span>
+            <ContactPresentation address={receiverAddress} />
+            <span> initiated.</span>
+          </div>
+        )
+      })
+  }
+
   private static async listener(
     account: sdk.PublicIdentity['address'],
     balance: number,
@@ -44,7 +80,7 @@ class BalanceUtilities {
       notify(
         <div>
           Balance of <ContactPresentation address={account} /> {inDeCreased} by{' '}
-          <span className={`kilt-tokens ${inDeCreased}`}>{change}</span>.
+          <span className={`kilt-token ${inDeCreased}`}>{change}</span>.
         </div>
       )
     }

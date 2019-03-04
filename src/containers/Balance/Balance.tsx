@@ -1,15 +1,23 @@
 import Immutable from 'immutable'
 import React, { ChangeEvent, ReactNode } from 'react'
 import { connect } from 'react-redux'
+import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
+import { ModalType } from '../../components/Modal/Modal'
 import SelectContactsModal from '../../components/Modal/SelectContactsModal'
 import Spinner from '../../components/Spinner/Spinner'
+import BalanceUtilities from '../../services/BalanceUtilities'
+import FeedbackService from '../../services/FeedbackService'
 
 import * as Balances from '../../state/ducks/Balances'
 import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
-import { MyIdentity } from '../../types/Contact'
+import { Contact, MyIdentity } from '../../types/Contact'
+import {
+  BlockingNotification,
+  NotificationType,
+} from '../../types/UserFeedback'
 
 import './Balance.scss'
 
@@ -19,7 +27,7 @@ type Props = {
 }
 
 type State = {
-  transferTokens: string
+  transferTokens: string // String so we can have empty input field
 }
 
 class Balance extends React.Component<Props, State> {
@@ -32,7 +40,7 @@ class Balance extends React.Component<Props, State> {
     }
 
     this.setTransferTokens = this.setTransferTokens.bind(this)
-    this.transferTokens = this.transferTokens.bind(this)
+    this.checkTransferTokens = this.checkTransferTokens.bind(this)
     this.showContactsModal = this.showContactsModal.bind(this)
     this.hideContactsModal = this.hideContactsModal.bind(this)
     this.cancelSelectContacts = this.cancelSelectContacts.bind(this)
@@ -62,12 +70,16 @@ class Balance extends React.Component<Props, State> {
     )
   }
 
-  private getMyBalance(): number | undefined {
-    const { balances, myIdentity } = this.props
-    const _myIdentity =
+  private getMyIdentity(): MyIdentity {
+    const { myIdentity } = this.props
+    return (
       myIdentity || Wallet.getSelectedIdentity(PersistentStore.store.getState())
+    )
+  }
 
-    return balances.get(_myIdentity.identity.address)
+  private getMyBalance(): number | undefined {
+    const { balances } = this.props
+    return balances.get(this.getMyIdentity().identity.address)
   }
 
   private getTokenTransferElement(balance: number | undefined): ReactNode {
@@ -129,9 +141,9 @@ class Balance extends React.Component<Props, State> {
     this.setState({ transferTokens: '' })
   }
 
-  private finishSelectContacts() {
+  private finishSelectContacts(receiver: Contact[]) {
     this.hideContactsModal()
-    this.transferTokens()
+    this.checkTransferTokens(receiver[0])
   }
 
   private setTransferTokens(event: ChangeEvent<HTMLInputElement>) {
@@ -154,10 +166,49 @@ class Balance extends React.Component<Props, State> {
     }
   }
 
-  private transferTokens() {
+  private checkTransferTokens(receiver: Contact) {
+    const myIdentity = this.getMyIdentity()
+    const selectedIdentity = Wallet.getSelectedIdentity(
+      PersistentStore.store.getState()
+    )
+
+    // the identity of this component might not be the currently selected one
+    // so we need to inform the user in this case
+    if (myIdentity.identity.address !== selectedIdentity.identity.address) {
+      FeedbackService.addBlockingNotification({
+        header: `Attention!`,
+        message: (
+          <div>
+            <span>You are trying so transfer </span>
+            <span className="kilt-token" />
+            <span> from your identity </span>
+            <ContactPresentation myIdentity={myIdentity} />
+            <span> which is not your currently active identity </span>
+            <ContactPresentation myIdentity={selectedIdentity} />
+          </div>
+        ),
+        modalType: ModalType.CONFIRM,
+        onConfirm: (notification: BlockingNotification) => {
+          this.transferTokens(receiver)
+          notification.remove()
+        },
+        type: NotificationType.INFO,
+      })
+    } else {
+      this.transferTokens(receiver)
+    }
+  }
+
+  private transferTokens(receiver: Contact) {
     const { transferTokens } = this.state
-    console.log('transfering', transferTokens, ' Tokens')
+
     this.setState({ transferTokens: '' })
+
+    BalanceUtilities.makeTransfer(
+      this.getMyIdentity(),
+      receiver.publicIdentity.address,
+      Number(transferTokens)
+    )
   }
 }
 
