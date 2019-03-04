@@ -73,8 +73,8 @@ class MessageListView extends React.Component<Props, State> {
                       <div onClick={this.openMessage(message)}>
                         <MessageSubject message={message} />
                       </div>
-                      <div title={`created: ${created}`}>c: {created}</div>
-                      <div title={`received: ${received}`}>r: {received}</div>
+                      <div title={`created`}>{created}</div>
+                      <div title={`received`}>{received}</div>
                     </td>
                     <td className="sender-subject">
                       <div>
@@ -95,8 +95,8 @@ class MessageListView extends React.Component<Props, State> {
                     <td className="created">{created}</td>
                     <td className="received">{received}</td>
                     <td className="created_received">
-                      <div title={`created: ${created}`}>c: {created}</div>
-                      <div title={`received: ${received}`}>r: {received}</div>
+                      <div title={`created`}>{created}</div>
+                      <div title={`received`}>{received}</div>
                     </td>
                     <td className="actionsTd">
                       <div className="actions">
