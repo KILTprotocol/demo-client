@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
-
 import './App.scss'
 import Header from './components/Header/Header'
 import BlockingNotifications from './containers/BlockingNotifications/BlockingNotifications'

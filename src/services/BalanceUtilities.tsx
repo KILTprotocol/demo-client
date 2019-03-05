@@ -37,6 +37,11 @@ class BalanceUtilities {
     }
   }
 
+  public static async getMyBalance(identity: Wallet.Entry): Promise<number> {
+    const blockchain: sdk.Blockchain = await BlockchainService.connect()
+    return blockchain.getBalance(identity.identity.address)
+  }
+
   public static connectMyIdentities(store: Store = PersistentStore.store) {
     Wallet.getAllIdentities(store.getState()).forEach(
       (myIdentity: MyIdentity) => {
