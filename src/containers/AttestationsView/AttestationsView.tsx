@@ -4,9 +4,9 @@ import { RouteComponentProps, withRouter } from 'react-router'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
+import DateTime from '../../components/DateTime/DateTime'
 import ShortHash from '../../components/ShortHash/ShortHash'
 import attestationService from '../../services/AttestationService'
-import BaseUtilities from '../../services/BaseUtilities'
 import FeedbackService, { safeDelete } from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
@@ -55,7 +55,7 @@ class AttestationsView extends React.Component<Props, State> {
                   <CTypePresentation cTypeHash={attestation.cTypeHash} />
                 </td>
                 <td className="created">
-                  {BaseUtilities.getDateTime(attestation.created)}
+                  <DateTime timestamp={attestation.created} />
                 </td>
                 <td
                   className={

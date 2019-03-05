@@ -1,11 +1,13 @@
 import { IMessage } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-import BaseUtilities from '../../services/BaseUtilities'
 import { MessageOutput } from '../../services/MessageRepository'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import DateTime from '../DateTime/DateTime'
 import MessageSubject from '../MessageSubject/MessageSubject'
 
 import './MessageListView.scss'
+
+type CreateReceiveErrors = { createdAt: string[]; receivedAt: string[] }
 
 type Props = {
   messages: MessageOutput[]
@@ -59,11 +61,15 @@ class MessageListView extends React.Component<Props, State> {
             </thead>
             <tbody>
               {messages.map((message: MessageOutput) => {
-                const { created, received } = this.getCombinedDateTime(
+                const createReceiveErrors = this.getCreateReceiveErrors(message)
+                const created = this.getDateTime(
                   message.createdAt,
-                  message.receivedAt
+                  createReceiveErrors.createdAt
                 )
-
+                const received = this.getDateTime(
+                  message.receivedAt,
+                  createReceiveErrors.receivedAt
+                )
                 return (
                   <tr key={message.messageId}>
                     <td className="sender-subject-created-received">
@@ -120,29 +126,27 @@ class MessageListView extends React.Component<Props, State> {
     )
   }
 
-  private getCombinedDateTime(created: number, received: number | undefined) {
+  private getCreateReceiveErrors(message: MessageOutput) {
+    const { createdAt, receivedAt } = message
     const validDifference = 1000
-    const errorMessages: { created: string[]; received: string[] } = {
-      created: [],
-      received: [],
+    const createReceiveErrors: CreateReceiveErrors = {
+      createdAt: [],
+      receivedAt: [],
     }
 
-    if (!received) {
-      errorMessages.received.push('No receive date found')
-    } else if (created > received) {
-      const message = `Created after received`
-      errorMessages.created.push(message)
-      errorMessages.received.push(message)
-    } else if (created + validDifference < received) {
-      const message = `Received more than ${validDifference}ms after creation`
-      errorMessages.created.push(message)
-      errorMessages.received.push(message)
+    if (!receivedAt) {
+      createReceiveErrors.receivedAt.push('No receive date found')
+    } else if (createdAt > receivedAt) {
+      const error = `Created after received`
+      createReceiveErrors.createdAt.push(error)
+      createReceiveErrors.receivedAt.push(error)
+    } else if (createdAt + validDifference < receivedAt) {
+      const error = `Received more than ${validDifference}ms after creation`
+      createReceiveErrors.createdAt.push(error)
+      createReceiveErrors.receivedAt.push(error)
     }
 
-    return {
-      created: this.getDateTime(created, errorMessages.created),
-      received: this.getDateTime(received, errorMessages.received),
-    }
+    return createReceiveErrors
   }
 
   private getDateTime(timestamp: number | undefined, errorMessages: string[]) {
@@ -151,7 +155,7 @@ class MessageListView extends React.Component<Props, State> {
         className={errorMessages.length ? 'invalid' : ''}
         title={errorMessages.join(', ')}
       >
-        {BaseUtilities.getDateTime(timestamp)}
+        <DateTime timestamp={timestamp} />
       </span>
     )
   }
