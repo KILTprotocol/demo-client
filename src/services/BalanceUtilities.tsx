@@ -1,5 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
+import { Store } from 'redux'
+
 import ContactPresentation from '../components/ContactPresentation/ContactPresentation'
 import * as Balances from '../state/ducks/Balances'
 import * as Wallet from '../state/ducks/Wallet'
@@ -33,6 +35,16 @@ class BalanceUtilities {
           )
         })
     }
+  }
+
+  public static connectMyIdentities(store?: Store) {
+    const _store = store || PersistentStore.store
+
+    Wallet.getAllIdentities(_store.getState()).forEach(
+      (myIdentity: MyIdentity) => {
+        BalanceUtilities.connect(myIdentity)
+      }
+    )
   }
 
   public static async makeTransfer(

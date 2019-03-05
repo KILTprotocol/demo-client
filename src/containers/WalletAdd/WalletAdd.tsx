@@ -4,6 +4,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
+import BalanceUtilities from '../../services/BalanceUtilities'
 
 import BlockchainService from '../../services/BlockchainService'
 import contactRepository from '../../services/ContactRepository'
@@ -162,11 +163,13 @@ class WalletAdd extends React.Component<Props, State> {
         blockUi.updateMessage('adding identity to contact repository (3/3)')
         contactRepository.add(newContact).then(
           () => {
-            this.props.saveIdentity({
+            const newIdentity = {
               ...newContact,
               identity,
               phrase,
-            })
+            }
+            this.props.saveIdentity(newIdentity)
+            BalanceUtilities.connect(newIdentity)
             blockUi.remove()
             notifySuccess(`Identity ${alias} successfully created.`)
             this.props.history.push('/wallet')
