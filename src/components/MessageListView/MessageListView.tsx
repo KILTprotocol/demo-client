@@ -18,10 +18,45 @@ type Props = {
 type State = {}
 
 class MessageListView extends React.Component<Props, State> {
+  private static getCreateReceiveErrors(message: MessageOutput) {
+    const { createdAt, receivedAt } = message
+    const validDifference = 1000
+    const createReceiveErrors: CreateReceiveErrors = {
+      createdAt: [],
+      receivedAt: [],
+    }
+
+    if (!receivedAt) {
+      createReceiveErrors.receivedAt.push('No receive date found')
+    } else if (createdAt > receivedAt) {
+      const error = `Created after received`
+      createReceiveErrors.createdAt.push(error)
+      createReceiveErrors.receivedAt.push(error)
+    } else if (createdAt + validDifference < receivedAt) {
+      const error = `Received more than ${validDifference}ms after creation`
+      createReceiveErrors.createdAt.push(error)
+      createReceiveErrors.receivedAt.push(error)
+    }
+
+    return createReceiveErrors
+  }
+
+  private static getDateTime(
+    timestamp: number | undefined,
+    errorMessages: string[]
+  ) {
+    return (
+      <span
+        className={errorMessages.length ? 'invalid' : ''}
+        title={errorMessages.join(', ')}
+      >
+        <DateTime timestamp={timestamp} />
+      </span>
+    )
+  }
+
   constructor(props: Props) {
     super(props)
-    this.handleDelete = this.handleDelete.bind(this)
-    this.openMessage = this.openMessage.bind(this)
   }
 
   public render() {
@@ -61,12 +96,14 @@ class MessageListView extends React.Component<Props, State> {
             </thead>
             <tbody>
               {messages.map((message: MessageOutput) => {
-                const createReceiveErrors = this.getCreateReceiveErrors(message)
-                const created = this.getDateTime(
+                const createReceiveErrors = MessageListView.getCreateReceiveErrors(
+                  message
+                )
+                const created = MessageListView.getDateTime(
                   message.createdAt,
                   createReceiveErrors.createdAt
                 )
-                const received = this.getDateTime(
+                const received = MessageListView.getDateTime(
                   message.receivedAt,
                   createReceiveErrors.receivedAt
                 )
@@ -76,7 +113,7 @@ class MessageListView extends React.Component<Props, State> {
                       <div>
                         <ContactPresentation address={message.senderAddress} />
                       </div>
-                      <div onClick={this.openMessage(message)}>
+                      <div onClick={this.openMessage.bind(this, message)}>
                         <MessageSubject message={message} />
                       </div>
                       <div title={`created`}>{created}</div>
@@ -86,7 +123,7 @@ class MessageListView extends React.Component<Props, State> {
                       <div>
                         <ContactPresentation address={message.senderAddress} />
                       </div>
-                      <div onClick={this.openMessage(message)}>
+                      <div onClick={this.openMessage.bind(this, message)}>
                         <MessageSubject message={message} />
                       </div>
                     </td>
@@ -94,7 +131,7 @@ class MessageListView extends React.Component<Props, State> {
                       <ContactPresentation address={message.senderAddress} />
                     </td>
                     <td className="subject">
-                      <div onClick={this.openMessage(message)}>
+                      <div onClick={this.openMessage.bind(this, message)}>
                         <MessageSubject message={message} />
                       </div>
                     </td>
@@ -108,11 +145,11 @@ class MessageListView extends React.Component<Props, State> {
                       <div className="actions">
                         <button
                           className="delete"
-                          onClick={this.handleDelete(message)}
+                          onClick={this.handleDelete.bind(this, message)}
                         />
                         <button
                           className="open"
-                          onClick={this.openMessage(message)}
+                          onClick={this.openMessage.bind(this, message)}
                         />
                       </div>
                     </td>
@@ -126,46 +163,12 @@ class MessageListView extends React.Component<Props, State> {
     )
   }
 
-  private getCreateReceiveErrors(message: MessageOutput) {
-    const { createdAt, receivedAt } = message
-    const validDifference = 1000
-    const createReceiveErrors: CreateReceiveErrors = {
-      createdAt: [],
-      receivedAt: [],
-    }
-
-    if (!receivedAt) {
-      createReceiveErrors.receivedAt.push('No receive date found')
-    } else if (createdAt > receivedAt) {
-      const error = `Created after received`
-      createReceiveErrors.createdAt.push(error)
-      createReceiveErrors.receivedAt.push(error)
-    } else if (createdAt + validDifference < receivedAt) {
-      const error = `Received more than ${validDifference}ms after creation`
-      createReceiveErrors.createdAt.push(error)
-      createReceiveErrors.receivedAt.push(error)
-    }
-
-    return createReceiveErrors
-  }
-
-  private getDateTime(timestamp: number | undefined, errorMessages: string[]) {
-    return (
-      <span
-        className={errorMessages.length ? 'invalid' : ''}
-        title={errorMessages.join(', ')}
-      >
-        <DateTime timestamp={timestamp} />
-      </span>
-    )
-  }
-
-  private handleDelete = (message: IMessage): (() => void) => () => {
+  private handleDelete(message: IMessage) {
     const { onDelete } = this.props
     onDelete(message)
   }
 
-  private openMessage = (message: IMessage): (() => void) => () => {
+  private openMessage(message: IMessage) {
     const { onOpen } = this.props
     onOpen(message)
   }
