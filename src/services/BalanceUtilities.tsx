@@ -37,10 +37,8 @@ class BalanceUtilities {
     }
   }
 
-  public static connectMyIdentities(store?: Store) {
-    const _store = store || PersistentStore.store
-
-    Wallet.getAllIdentities(_store.getState()).forEach(
+  public static connectMyIdentities(store: Store = PersistentStore.store) {
+    Wallet.getAllIdentities(store.getState()).forEach(
       (myIdentity: MyIdentity) => {
         BalanceUtilities.connect(myIdentity)
       }
