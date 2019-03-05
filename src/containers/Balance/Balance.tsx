@@ -23,7 +23,7 @@ import './Balance.scss'
 
 type Props = {
   balances: Immutable.Map<string, number>
-  myIdentity?: MyIdentity
+  myIdentity: MyIdentity
 }
 
 type State = {
@@ -70,16 +70,9 @@ class Balance extends React.Component<Props, State> {
     )
   }
 
-  private getMyIdentity(): MyIdentity {
-    const { myIdentity } = this.props
-    return (
-      myIdentity || Wallet.getSelectedIdentity(PersistentStore.store.getState())
-    )
-  }
-
   private getMyBalance(): number | undefined {
-    const { balances } = this.props
-    return balances.get(this.getMyIdentity().identity.address)
+    const { balances, myIdentity } = this.props
+    return balances.get(myIdentity.identity.address)
   }
 
   private getTokenTransferElement(balance: number | undefined): ReactNode {
@@ -167,7 +160,7 @@ class Balance extends React.Component<Props, State> {
   }
 
   private checkTransferTokens(receiver: Contact) {
-    const myIdentity = this.getMyIdentity()
+    const { myIdentity } = this.props
     const selectedIdentity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     )
@@ -200,12 +193,13 @@ class Balance extends React.Component<Props, State> {
   }
 
   private transferTokens(receiver: Contact) {
+    const { myIdentity } = this.props
     const { transferTokens } = this.state
 
     this.setState({ transferTokens: '' })
 
     BalanceUtilities.makeTransfer(
-      this.getMyIdentity(),
+      myIdentity,
       receiver.publicIdentity.address,
       Number(transferTokens)
     )

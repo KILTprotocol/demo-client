@@ -28,7 +28,7 @@ class Dashboard extends React.Component<Props, State> {
         <div className="actions">
           <Link to={`/wallet`}>Manage Identities</Link>
         </div>
-        <Balance />
+        <Balance myIdentity={selectedIdentity} />
       </section>
     )
   }

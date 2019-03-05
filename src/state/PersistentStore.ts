@@ -1,6 +1,8 @@
 import { combineReducers, createStore, Store } from 'redux'
+import BalanceUtilities from '../services/BalanceUtilities'
 
 import errorService from '../services/ErrorService'
+import { MyIdentity } from '../types/Contact'
 import * as Attestations from './ducks/Attestations'
 import * as Balances from './ducks/Balances'
 import * as Claims from './ducks/Claims'
@@ -95,6 +97,8 @@ class PersistentStore {
         PersistentStore.serialize(this._store.getState())
       )
     })
+
+    BalanceUtilities.connectMyIdentities(this.store)
   }
 }
 
