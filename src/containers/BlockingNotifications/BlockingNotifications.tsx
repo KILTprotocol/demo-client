@@ -42,6 +42,8 @@ class BlockingNotifications extends Component<Props, State> {
         preventCloseOnConfirm={true}
         showOnInit={true}
         type={notification.modalType || ModalType.ALERT}
+        okButtonLabel={notification.okButtonLabel}
+        cancelButtonLabel={notification.cancelButtonLabel}
       >
         {notification.message}
         <div className="console-log">( for details refer to console )</div>

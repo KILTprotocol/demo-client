@@ -60,11 +60,15 @@ class FeedbackService {
     onConfirm,
     modalType,
     type,
+    okButtonLabel,
+    cancelButtonLabel,
   }: Partial<BlockingNotification>): BlockingNotification {
     const blockingNotification: Partial<BlockingNotification> = {
       ...FeedbackService.getNotificationBase({ className, message, type }),
+      cancelButtonLabel,
       header,
       modalType,
+      okButtonLabel,
       onCancel,
       onConfirm,
     }

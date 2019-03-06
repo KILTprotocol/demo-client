@@ -4,7 +4,6 @@ import { Store } from 'redux'
 
 import ContactPresentation from '../components/ContactPresentation/ContactPresentation'
 import * as Balances from '../state/ducks/Balances'
-import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
 import BlockchainService from './BlockchainService'
@@ -35,6 +34,11 @@ class BalanceUtilities {
           )
         })
     }
+  }
+
+  public static async getMyBalance(identity: MyIdentity): Promise<number> {
+    const blockchain: sdk.Blockchain = await BlockchainService.connect()
+    return blockchain.getBalance(identity.identity.address)
   }
 
   public static connectMyIdentities(store: Store = PersistentStore.store) {

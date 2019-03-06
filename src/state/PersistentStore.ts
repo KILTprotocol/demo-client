@@ -8,6 +8,7 @@ import * as Balances from './ducks/Balances'
 import * as Claims from './ducks/Claims'
 import * as UiState from './ducks/UiState'
 import * as Wallet from './ducks/Wallet'
+import * as Parameters from './ducks/Parameters'
 
 declare global {
   /* tslint:disable */
@@ -24,6 +25,7 @@ export type State = {
   wallet: Wallet.ImmutableState
   attestations: Attestations.ImmutableState
   balances: Balances.ImmutableState
+  parameters: Parameters.ImmutableState
 }
 
 type SerializedState = {
@@ -31,6 +33,7 @@ type SerializedState = {
   uiState: UiState.SerializedState
   wallet: Wallet.SerializedState
   attestations: Attestations.SerializedState
+  parameters: Parameters.SerializedState
 }
 
 class PersistentStore {
@@ -44,6 +47,7 @@ class PersistentStore {
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
+      parameters: Parameters.Store.deserialize(obj.parameters),
       uiState: UiState.Store.deserialize(obj.uiState),
       wallet: Wallet.Store.deserialize(obj.wallet),
     }
@@ -53,6 +57,7 @@ class PersistentStore {
     const obj: SerializedState = {
       attestations: Attestations.Store.serialize(state.attestations),
       claims: Claims.Store.serialize(state.claims),
+      parameters: Parameters.Store.serialize(state.parameters),
       uiState: UiState.Store.serialize(state.uiState),
       wallet: Wallet.Store.serialize(state.wallet),
     }
@@ -83,6 +88,7 @@ class PersistentStore {
         attestations: Attestations.Store.reducer,
         balances: Balances.Store.reducer,
         claims: Claims.Store.reducer,
+        parameters: Parameters.Store.reducer,
         uiState: UiState.Store.reducer,
         wallet: Wallet.Store.reducer,
       }),
@@ -99,6 +105,10 @@ class PersistentStore {
     })
 
     BalanceUtilities.connectMyIdentities(this.store)
+  }
+
+  public reset(): void {
+    localStorage.clear()
   }
 }
 
