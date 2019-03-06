@@ -199,8 +199,9 @@ class MessageDetailView extends React.Component<Props, State> {
       | undefined = this.getMessageBodyType(message)
 
     return (
-      messageBodyType !== undefined &&
-      messageBodyType !== sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
+      messageBodyType !== undefined
+      // messageBodyType !== undefined &&
+      // messageBodyType !== sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
     )
   }
 }

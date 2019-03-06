@@ -30,7 +30,7 @@ class BalanceUtilities {
           notify(
             <div>
               Now listening to balance changes of{' '}
-              <ContactPresentation myIdentity={myIdentity} />
+              <ContactPresentation myIdentity={myIdentity} inline={true} />
             </div>
           )
         })
@@ -65,7 +65,7 @@ class BalanceUtilities {
             <span>Successfully transfered </span>
             <span className="kilt-token">{amount}</span>
             <span> to </span>
-            <ContactPresentation address={receiverAddress} />.
+            <ContactPresentation address={receiverAddress} inline={true} />.
           </div>
         )
         if (successCallback) {
@@ -78,7 +78,7 @@ class BalanceUtilities {
             <span>Transfer of </span>
             <span className="kilt-token">{amount}</span>
             <span> to </span>
-            <ContactPresentation address={receiverAddress} />
+            <ContactPresentation address={receiverAddress} inline={true} />
             <span> initiated.</span>
           </div>
         )

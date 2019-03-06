@@ -1,23 +1,32 @@
 .AttestedClaimVerificationView {
   
-  @include card;
-  padding: $base-padding;
+  @include labeledCard(1);
 
-  & header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: {
-      bottom: $base-padding;
+  & .refresh {
+    @include labeledCardActions;
+
+    & button {
+      @include button-icon-only($icon-refresh);
     }
   }
 
-  & h3 {
-    margin: 0;
+  & h2 {
+
+    & > span {
+      margin-right: $base-padding;
+    }
+
+    & .status {
+      font-size: 16px;
+    }
+
+    & .Spinner {
+      display: inline-block;
+    }
   }
 
   & .attributes {
+
     & > div {
       @include label_input_combo;
     }
@@ -49,10 +58,6 @@
         color: $color-success;
       }
     }
-  }
-
-  & .refresh {
-    @include button-icon-only($icon-refresh);
   }
 
   & .attestationStatusView {

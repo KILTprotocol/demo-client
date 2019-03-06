@@ -1,5 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
+import attestationService from '../../services/AttestationService'
 
 import { CType } from '../../types/Ctype'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -8,13 +9,9 @@ import Spinner from '../Spinner/Spinner'
 import './AttestedClaimVerificationView.scss'
 
 type Props = {
-  attesterAddress: sdk.PublicIdentity['address']
   attestedClaim: sdk.IAttestedClaim
   context?: 'legitimation'
   cType?: CType
-  onVerifyAttestatedClaim: (
-    attestatedClaim: sdk.IAttestedClaim
-  ) => Promise<boolean>
 }
 
 type State = {
@@ -45,14 +42,20 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
       <section className="AttestedClaimVerificationView">
         {attestedClaim ? (
           <React.Fragment>
-            <header>
-              <h3>{context || 'Attested claim'}</h3>
+            <h2>
+              <span>{context || 'Attested claim'}</span>
+              {this.getAttestationStatusView()}
+              <ContactPresentation
+                address={attestedClaim.attestation.owner}
+                inline={true}
+              />
+            </h2>
+            <div className="refresh">
               <button
-                className="refresh"
                 onClick={this.verifyAttestatedClaim}
                 disabled={verificationPending}
               />
-            </header>
+            </div>
             {this.buildClaimPropertiesView(attestedClaim)}
           </React.Fragment>
         ) : (
@@ -65,17 +68,6 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
   private buildClaimPropertiesView(attestedClaim: sdk.IAttestedClaim) {
     const propertyNames: string[] = Object.keys(
       attestedClaim.request.claimHashTree
-    )
-    const { attesterAddress } = this.props
-    const { verificationPending, verificationSucceeded } = this.state
-    const attestationStatusView = verificationPending ? (
-      <Spinner size={20} color="#ef5a28" strength={3} />
-    ) : (
-      <div
-        className={
-          'status ' + (verificationSucceeded ? 'verified' : 'unverified')
-        }
-      />
     )
 
     return (
@@ -92,17 +84,20 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
             </div>
           )
         })}
-        <div>
-          <label>Attester</label>
-          <div>
-            <ContactPresentation address={attesterAddress} />
-          </div>
-        </div>
-        <div>
-          <label>Valid</label>
-          <div className="attestationStatusView">{attestationStatusView}</div>
-        </div>
       </div>
+    )
+  }
+
+  private getAttestationStatusView() {
+    const { verificationPending, verificationSucceeded } = this.state
+    return verificationPending ? (
+      <Spinner size={20} color="#ef5a28" strength={3} />
+    ) : (
+      <span
+        className={
+          'status ' + (verificationSucceeded ? 'verified' : 'unverified')
+        }
+      />
     )
   }
 
@@ -113,12 +108,11 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
 
   private verifyAttestatedClaim() {
     const { attestedClaim } = this.props
-    const { onVerifyAttestatedClaim } = this.props
     this.setState({
       verificationPending: true,
       verificationSucceeded: false,
     })
-    onVerifyAttestatedClaim(attestedClaim).then(verified => {
+    attestationService.verifyAttestatedClaim(attestedClaim).then(verified => {
       this.setState({
         verificationPending: false,
         verificationSucceeded: verified,

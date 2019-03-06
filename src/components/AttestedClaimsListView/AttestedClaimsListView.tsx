@@ -3,10 +3,30 @@ import React from 'react'
 
 import attestationService from '../../services/AttestationService'
 import contactRepository from '../../services/ContactRepository'
+import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
+import ClaimDetailView from '../ClaimDetailView/ClaimDetailView'
+import Code from '../Code/Code'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Spinner from '../Spinner/Spinner'
 
 import './AttestedClaimsListView.scss'
+
+type Labels = {
+  default: { [key: string]: string }
+  legitimations: { [key: string]: string }
+}
+
+const LABELS: Labels = {
+  default: {
+    h2: 'Attested claims',
+    emptyList: 'No attestations found.',
+  },
+  legitimations: {
+    h2: 'Legitimations',
+    emptyList: 'No legitimations found.',
+  },
+}
 
 const enum STATUS {
   PENDING = 'pending',
@@ -20,11 +40,14 @@ type AttestationStatus = {
 
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
+  context?: 'legitimations'
 }
 
 type State = {
-  canResolveAttesters: boolean
   attestationStatus: AttestationStatus
+  canResolveAttesters: boolean
+  labels: { [key: string]: string }
+  openedAttestedClaim?: sdk.IAttestedClaim
 }
 
 class AttestedClaimsListView extends React.Component<Props, State> {
@@ -36,6 +59,10 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     this.state = {
       attestationStatus: {},
       canResolveAttesters: false,
+      labels:
+        LABELS[
+          props.context && LABELS[props.context] ? props.context : 'default'
+        ],
     }
     setTimeout(() => {
       this.verifyAttestations()
@@ -52,9 +79,14 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
   public render() {
     const { attestedClaims }: Props = this.props
+    const { openedAttestedClaim } = this.state
 
     return attestedClaims ? (
-      <section className="AttestedClaimsListView">
+      <section
+        className={`AttestedClaimsListView ${
+          openedAttestedClaim ? 'opened' : ''
+        }`}
+      >
         {this.getAttestations(attestedClaims)}
       </section>
     ) : (
@@ -63,29 +95,43 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   private getAttestations(attestations: sdk.IAttestedClaim[]) {
-    const { attestationStatus } = this.state
+    const { attestationStatus, labels, openedAttestedClaim } = this.state
     return (
       <section className="attestations">
-        <h2>Attestations</h2>
+        <h2 onClick={this.toggleOpen.bind(this, openedAttestedClaim)}>
+          {labels.h2}
+        </h2>
         <div className="refresh">
           <button onClick={this.verifyAttestations} />
         </div>
         {!!attestations && !!attestations.length ? (
-          <table>
+          <table className={openedAttestedClaim ? 'opened' : ''}>
             <thead>
               <tr>
                 <th className="attester">Attester</th>
+                <th className="cType">CType</th>
                 <th className="status">Attested</th>
+                <th />
               </tr>
             </thead>
-            <tbody>
-              {attestations.map((attestedClaim: sdk.IAttestedClaim) => {
-                const { signature } = attestedClaim.attestation
-                return (
-                  <tr key={attestedClaim.attestation.signature}>
+            {attestations.map((attestedClaim: sdk.IAttestedClaim) => {
+              const { signature } = attestedClaim.attestation
+              const opened = attestedClaim === openedAttestedClaim
+
+              return (
+                <tbody
+                  key={attestedClaim.attestation.signature}
+                  className={opened ? 'opened' : ''}
+                >
+                  <tr>
                     <td className="attester">
                       <ContactPresentation
                         address={attestedClaim.attestation.owner}
+                      />
+                    </td>
+                    <td className="attester">
+                      <CTypePresentation
+                        cTypeHash={attestedClaim.request.claim.cType}
                       />
                     </td>
                     <td className={`status ${attestationStatus[signature]}`}>
@@ -93,16 +139,45 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                         <Spinner size={20} color="#ef5a28" strength={3} />
                       )}
                     </td>
+                    <td className="actionsTd">
+                      <button
+                        className="open"
+                        onClick={this.toggleOpen.bind(this, attestedClaim)}
+                      />
+                    </td>
                   </tr>
-                )
-              })}
-            </tbody>
+                  {opened && (
+                    <tr>
+                      <td className="listDetailContainer" colSpan={3}>
+                        <AttestedClaimsListView
+                          attestedClaims={attestedClaim.request.legitimations}
+                          context="legitimations"
+                        />
+                        <AttestedClaimVerificationView
+                          attestedClaim={attestedClaim}
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              )
+            })}
           </table>
         ) : (
-          <div>No Attestations found.</div>
+          <div>{labels.emptyList}</div>
         )}
       </section>
     )
+  }
+
+  private toggleOpen(attestedClaim: sdk.IAttestedClaim) {
+    const { openedAttestedClaim } = this.state
+
+    if (attestedClaim === openedAttestedClaim) {
+      this.setState({ openedAttestedClaim: undefined })
+    } else {
+      this.setState({ openedAttestedClaim: attestedClaim })
+    }
   }
 
   private verifyAttestations(): void {

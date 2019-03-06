@@ -28,7 +28,6 @@ class VerifyClaim extends React.Component<Props, State> {
       attestersResolved: false,
       cTypesResolved: false,
     }
-    this.onVerifyAttestation = this.onVerifyAttestation.bind(this)
   }
 
   public componentDidMount() {
@@ -67,8 +66,6 @@ class VerifyClaim extends React.Component<Props, State> {
               attestedClaim={attestedClaim}
               context={context}
               cType={this.cTypeMap[attestedClaim.request.claim.cType]}
-              attesterAddress={attestedClaim.attestation.owner}
-              onVerifyAttestatedClaim={this.onVerifyAttestation}
             />
           )
         })}
@@ -76,12 +73,6 @@ class VerifyClaim extends React.Component<Props, State> {
     ) : (
       <Spinner size={20} color="#ef5a28" strength={3} />
     )
-  }
-
-  private async onVerifyAttestation(
-    attestation: sdk.IAttestedClaim
-  ): Promise<boolean> {
-    return attestationService.verifyAttestatedClaim(attestation)
   }
 }
 

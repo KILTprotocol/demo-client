@@ -210,6 +210,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
               >
                 <ContactPresentation
                   address={attestedClaim.attestation.owner}
+                  inline={true}
                 />
               </span>
             </label>

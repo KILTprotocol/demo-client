@@ -123,12 +123,17 @@ input {
 table {
   width: 100%;
   text-align: left;
+  border-collapse: collapse;
 
   & th {
 
     &.actions {
       text-align: right;
     }
+  }
+
+  & td {
+    padding: 0;
   }
 }
 

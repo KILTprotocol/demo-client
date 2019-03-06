@@ -2,6 +2,6 @@
 
   & .ClaimCreate,
   & .ClaimDetailView {
-    @include card;
+    @include labeledCard;
   }
 }

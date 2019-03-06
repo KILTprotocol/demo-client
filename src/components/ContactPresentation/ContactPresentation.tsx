@@ -12,6 +12,7 @@ import './ContactPresentation.scss'
 type Props = {
   address?: sdk.IPublicIdentity['address']
   contact?: Contact
+  inline?: true
   iconOnly?: boolean
   myIdentity?: MyIdentity
   size?: number
@@ -42,7 +43,7 @@ class ContactPresentation extends React.Component<Props, State> {
   }
 
   public render() {
-    const { iconOnly, size } = this.props
+    const { inline, iconOnly, size } = this.props
     const { address, contact, myIdentity } = this.state
 
     const name = myIdentity
@@ -53,8 +54,10 @@ class ContactPresentation extends React.Component<Props, State> {
       ? address.substr(0, 20)
       : '-'
 
+    const classes = ['ContactPresentation', inline ? 'inline' : '']
+
     return (
-      <div className="ContactPresentation">
+      <div className={classes.join(' ')}>
         <Identicon
           value={address}
           size={size || DEFAULT_SIZE}

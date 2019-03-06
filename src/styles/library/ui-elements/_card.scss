@@ -1,0 +1,118 @@
+$labeledCardActions-padding-outer: $base-padding/2;
+$labeledCardActions-padding-inner: $base-padding/2;
+
+@mixin card {
+  @include box-shadow(2px 2px 5px transparentize($color-black, 0.8));
+  @include border-radius($base-border-radius);
+
+  position: relative;
+  margin: {
+    bottom: 2*$base-padding;
+  }
+  padding: $base-padding;
+  background: $color-white;
+  border: $base-border;
+
+  &:last-child {
+    margin: {
+      bottom: 0
+    }
+  }
+}
+
+@mixin cardLabel($buttons: 0) {
+  $max-width: calc(100% + #{$base-padding});
+  @if($buttons > 0){
+    $placeForButtons: $buttons * $base-button-height + ($buttons - 1) * $labeledCardActions-padding-inner + $labeledCardActions-padding-outer;
+    $max-width: calc(100% - #{$placeForButtons - $base-padding/2});
+  }
+
+  @include border-radius($base-border-radius);
+
+  position: relative;
+  display: inline-block;
+  bottom: 1em;
+  left: -$base-padding/2;
+  max-width: $max-width;
+  margin: {
+    bottom: -$base-padding;
+  };
+  padding: $base-padding/4 $base-padding;
+  border: $base-border;
+  background: $color-white;
+  line-height: 1.2;
+  font-size: 24px;
+
+  & > * {
+
+    &:not(:last-child){
+      margin: {
+        top: 0;
+        right: $base-padding;
+        bottom: 0;
+        left: 0;
+      }
+    }
+  }
+}
+
+@mixin labeledCardActions {
+  position: absolute;
+  top: -20px;
+  right: $base-padding/2;
+  padding: 0 $labeledCardActions-padding-outer;
+  background: $color-white;
+
+  & button {
+
+    &:not(:first-child){
+      margin:{
+        left: $labeledCardActions-padding-inner;
+      }
+    }
+  }
+}
+
+@mixin labeledCard($labeledCardActionsButtons: 0) {
+  @include card;
+
+  padding: {
+    top: 0;
+  }
+
+  margin: {
+    top: 3*$base-padding;
+  }
+
+  & > h1,
+  & > h2,
+  & > h3,
+  & > h4,
+  & > h5,
+  & > h6 {
+
+    &:first-child {
+      @include cardLabel($labeledCardActionsButtons);
+    }
+  }
+}
+
+@mixin removeCard{
+  @include box-shadow(none);
+  @include border-radius(0);
+
+  margin: {
+    bottom: 0;
+  }
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+@mixin removeLabeledCard{
+  @include removeCard;
+
+  margin: {
+    top: 0;
+  }
+}

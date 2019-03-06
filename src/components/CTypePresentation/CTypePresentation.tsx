@@ -11,8 +11,9 @@ import './CTypePresentation.scss'
 type Props = {
   cType?: ICType
   cTypeHash?: ICType['cType']['hash']
+  inline?: true
   size?: number
-  linked?: boolean
+  linked?: false
 }
 
 type State = {
@@ -42,11 +43,13 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   public render() {
-    const { size } = this.props
+    const { inline, size } = this.props
     const { cType } = this.state
 
+    const classes = ['CTypePresentation', inline ? 'inline' : '']
+
     return (
-      <div className="CTypePresentation">
+      <div className={classes.join(' ')}>
         {cType &&
           cType.cType &&
           this.wrapInLink(
