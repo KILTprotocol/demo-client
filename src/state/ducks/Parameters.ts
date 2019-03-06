@@ -86,9 +86,7 @@ class Store {
 }
 
 const _getParameters = (state: ReduxState) => {
-  return state.parameters
-    ? state.parameters.get('parameters')
-    : ({} as Parameters)
+  return state.parameters.get('parameters')
 }
 
 const getParameters = createSelector(

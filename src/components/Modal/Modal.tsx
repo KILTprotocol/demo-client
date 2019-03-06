@@ -62,11 +62,11 @@ class Modal extends React.Component<Props, State> {
               <footer>
                 {type === ModalType.CONFIRM && (
                   <button className="cancel" onClick={this.handleCancel}>
-                    {cancelButtonLabel ? cancelButtonLabel : 'Cancel'}
+                    {cancelButtonLabel == null ? 'Cancel' : cancelButtonLabel}
                   </button>
                 )}
                 <button className="confirm" onClick={this.handleConfirm}>
-                  {okButtonLabel ? okButtonLabel : 'OK'}
+                  {okButtonLabel == null ? 'OK' : okButtonLabel}
                 </button>
               </footer>
             )}

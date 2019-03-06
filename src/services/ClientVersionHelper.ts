@@ -34,7 +34,6 @@ class ClientVersionHelper {
           }
         }
       }
-      console.log(resetCause)
       resolve(resetCause)
     })
   }
