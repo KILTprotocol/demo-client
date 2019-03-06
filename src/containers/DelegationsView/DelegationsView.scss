@@ -1,0 +1,6 @@
+.DelegationsView {
+
+  & h1 {
+    @include h1('Ctype');
+  }
+}
