@@ -152,7 +152,8 @@ class WalletAdd extends React.Component<Props, State> {
     const alice = Identity.buildFromSeedString('Alice')
     blockUi.updateMessage('transfer initial tokens (2/3)')
     blockchain
-      .makeTransfer(alice, identity.address, 1000, () => {
+      .makeTransfer(alice, identity.address, 1000)
+      .then((result: any) => {
         const { address, boxPublicKeyAsHex } = identity
         const newContact: Contact = {
           metaData: {

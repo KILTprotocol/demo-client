@@ -63,10 +63,7 @@ class CtypeListView extends React.Component<Props, State> {
                             label: 'Get Legitimation',
                           },
                           {
-                            callback: this.createDelegation.bind(
-                              this,
-                              cType
-                            ),
+                            callback: this.createDelegation.bind(this, cType),
                             label: 'Create Delegation',
                           },
                         ]}
