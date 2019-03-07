@@ -4,6 +4,11 @@
 }
 
 .AttestedClaimsListView {
+  margin-bottom: $base-padding;
+
+  & & {
+    margin-bottom: 0;
+  }
 
   & .attestations {
     @include labeledCard(1);

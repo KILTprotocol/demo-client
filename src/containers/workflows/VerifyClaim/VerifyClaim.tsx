@@ -1,6 +1,8 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import AttestedClaimVerificationView from 'src/components/AttestedClaimVerificationView/AttestedClaimVerificationView'
+import AttestedClaimsListView
+  from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import Spinner from '../../../components/Spinner/Spinner'
 
 import attestationService from '../../../services/AttestationService'
@@ -58,18 +60,7 @@ class VerifyClaim extends React.Component<Props, State> {
     const { attestersResolved, cTypesResolved } = this.state
 
     return attestersResolved && cTypesResolved ? (
-      <React.Fragment>
-        {attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => {
-          return (
-            <AttestedClaimVerificationView
-              key={attestedClaim.attestation.signature}
-              attestedClaim={attestedClaim}
-              context={context}
-              cType={this.cTypeMap[attestedClaim.request.claim.cType]}
-            />
-          )
-        })}
-      </React.Fragment>
+      <AttestedClaimsListView attestedClaims={attestedClaims} />
     ) : (
       <Spinner size={20} color="#ef5a28" strength={3} />
     )
