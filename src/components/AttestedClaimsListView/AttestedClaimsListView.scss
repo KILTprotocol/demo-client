@@ -86,18 +86,21 @@
     }
   }
 
-  & .refresh {
-    @include labeledCardActions;
+  & .container-actions {
 
-    & button {
+    & .refresh {
       @include button-icon-only($icon-refresh);
+    }
+
+    & .close {
+      @include button-icon-only($icon-times);
     }
   }
 
   & .actionsTd {
 
     & .open {
-      @include button-icon-only($icon-chevron-down);
+      @include button-icon-only($icon-eye);
     }
   }
 
@@ -120,12 +123,14 @@
     & > .attestations {
 
       & > h2 {
-        border-color: $color-primary;
         cursor: pointer;
       }
 
-      & > .refresh {
-        display: none;
+      & > .container-actions {
+
+        & > .refresh {
+          display: none;
+        }
       }
     }
 
@@ -136,6 +141,13 @@
 
         & > h2 {
           display: none;
+        }
+
+        & > .container-actions {
+
+          & > .close {
+            display: none;
+          }
         }
       }
 
@@ -191,8 +203,11 @@
             display: none;
           }
 
-          & > .refresh {
-            display: none;
+          & > .container-actions {
+
+            & > .refresh {
+              display: none;
+            }
           }
         }
 

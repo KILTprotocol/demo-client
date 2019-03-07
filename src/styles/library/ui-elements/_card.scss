@@ -95,6 +95,10 @@ $labeledCardActions-padding-inner: $base-padding/2;
       @include cardLabel($labeledCardActionsButtons);
     }
   }
+
+  & .container-actions {
+    @include labeledCardActions;
+  }
 }
 
 @mixin removeCard{

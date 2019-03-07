@@ -44,8 +44,9 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
         {attestedClaim ? (
           <React.Fragment>
             {this.getHeadline()}
-            <div className="refresh">
+            <div className="container-actions">
               <button
+                className="refresh"
                 onClick={this.verifyAttestatedClaim}
                 disabled={verificationPending}
               />

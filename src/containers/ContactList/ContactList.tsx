@@ -113,7 +113,7 @@ class ContactList extends React.Component<Props, State> {
                   {contact.publicIdentity.address}
                 </td>
                 <td className="actionsTd">
-                  <div className="actions">
+                  <div>
                     <button
                       className="requestClaimBtn"
                       title="Request claim for verification"

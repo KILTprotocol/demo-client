@@ -20,8 +20,12 @@
   & .actionsTd {
 
     &,
-    & .actions {
+    & > div {
       padding: 0;
+    }
+
+    & > div {
+      @include actions;
     }
 
     & .react-select__menu {

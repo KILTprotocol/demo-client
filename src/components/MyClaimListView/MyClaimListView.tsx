@@ -60,7 +60,7 @@ class MyClaimListView extends React.Component<Props, State> {
                     }
                   />
                   <td className="actionsTd">
-                    <div className="actions">
+                    <div>
                       <SelectAction
                         actions={[
                           {

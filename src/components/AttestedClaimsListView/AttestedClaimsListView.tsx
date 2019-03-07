@@ -103,11 +103,21 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     const { attestationStatus, labels, openedAttestedClaim } = this.state
     return (
       <section className="attestations">
-        <h2 onClick={this.toggleOpen.bind(this, openedAttestedClaim)}>
-          {labels.h2}
-        </h2>
-        <div className="refresh">
-          <button onClick={this.verifyAttestations} />
+        {openedAttestedClaim ? (
+          <h2 onClick={this.toggleOpen.bind(this, openedAttestedClaim)}>
+            {labels.h2}
+          </h2>
+        ) : (
+          <h2>{labels.h2}</h2>
+        )}
+        <div className="container-actions">
+          <button className="refresh" onClick={this.verifyAttestations} />
+          {openedAttestedClaim && (
+            <button
+              className="close"
+              onClick={this.toggleOpen.bind(this, openedAttestedClaim)}
+            />
+          )}
         </div>
 
         {!!attestations && !!attestations.length ? (
@@ -117,7 +127,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                 <th className="attester">Attester</th>
                 <th className="cType">CType</th>
                 <th className="status">Attested</th>
-                <th />
+                <th className="actionsTd" />
               </tr>
             </thead>
 
@@ -147,10 +157,12 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                       )}
                     </td>
                     <td className="actionsTd">
-                      <button
-                        className="open"
-                        onClick={this.toggleOpen.bind(this, attestedClaim)}
-                      />
+                      <div>
+                        <button
+                          className="open"
+                          onClick={this.toggleOpen.bind(this, attestedClaim)}
+                        />
+                      </div>
                     </td>
                   </tr>
 

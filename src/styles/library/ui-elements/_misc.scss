@@ -134,3 +134,20 @@
     color: $color-success;
   }
 }
+
+@mixin actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  clear: both;
+
+  & button,
+  & a {
+    margin: {
+      left: $base-padding/2;
+      bottom: $base-padding/2;
+    }
+  }
+}

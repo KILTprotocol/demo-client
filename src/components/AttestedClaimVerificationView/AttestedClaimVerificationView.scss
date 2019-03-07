@@ -1,13 +1,9 @@
 .AttestedClaimVerificationView {
-  
+
   @include labeledCard(1);
 
   & .refresh {
-    @include labeledCardActions;
-
-    & button {
-      @include button-icon-only($icon-refresh);
-    }
+    @include button-icon-only($icon-refresh);
   }
 
   & h2 {

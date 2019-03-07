@@ -48,7 +48,7 @@ class CtypeListView extends React.Component<Props, State> {
                     <ContactPresentation address={cType.metaData.author} />
                   </td>
                   <td className="actionsTd">
-                    <div className="actions">
+                    <div>
                       <SelectAction
                         actions={[
                           {

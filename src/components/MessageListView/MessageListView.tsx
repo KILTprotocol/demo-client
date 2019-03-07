@@ -142,7 +142,7 @@ class MessageListView extends React.Component<Props, State> {
                       <div title="received">{received}</div>
                     </td>
                     <td className="actionsTd">
-                      <div className="actions">
+                      <div>
                         <button
                           className="delete"
                           onClick={this.handleDelete.bind(this, message)}
