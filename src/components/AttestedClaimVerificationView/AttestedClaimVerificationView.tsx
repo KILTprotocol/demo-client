@@ -4,13 +4,14 @@ import attestationService from '../../services/AttestationService'
 
 import { CType } from '../../types/Ctype'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Spinner from '../Spinner/Spinner'
 
 import './AttestedClaimVerificationView.scss'
 
 type Props = {
   attestedClaim: sdk.IAttestedClaim
-  context?: 'legitimation'
+  context?: string
   cType?: CType
 }
 
@@ -42,14 +43,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
       <section className="AttestedClaimVerificationView">
         {attestedClaim ? (
           <React.Fragment>
-            <h2>
-              <span>{context || 'Attested claim'}</span>
-              {this.getAttestationStatusView()}
-              <ContactPresentation
-                address={attestedClaim.attestation.owner}
-                inline={true}
-              />
-            </h2>
+            {this.getHeadline()}
             <div className="refresh">
               <button
                 onClick={this.verifyAttestatedClaim}
@@ -62,6 +56,27 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
           <div>Claim not found</div>
         )}
       </section>
+    )
+  }
+
+  private getHeadline() {
+    const { attestedClaim, context }: Props = this.props
+    const _context = context != null ? context : 'Attested claim'
+
+    return (
+      <h2>
+        {_context && <span>{_context}</span>}
+        <ContactPresentation
+          address={attestedClaim.attestation.owner}
+          inline={true}
+        />
+        <CTypePresentation
+          cTypeHash={attestedClaim.request.claim.cType}
+          linked={false}
+          inline={true}
+        />
+        {this.getAttestationStatusView()}
+      </h2>
     )
   }
 

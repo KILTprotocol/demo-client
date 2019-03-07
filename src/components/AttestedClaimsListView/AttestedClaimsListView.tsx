@@ -4,8 +4,6 @@ import React from 'react'
 import attestationService from '../../services/AttestationService'
 import contactRepository from '../../services/ContactRepository'
 import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
-import ClaimDetailView from '../ClaimDetailView/ClaimDetailView'
-import Code from '../Code/Code'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Spinner from '../Spinner/Spinner'
@@ -19,12 +17,12 @@ type Labels = {
 
 const LABELS: Labels = {
   default: {
-    h2: 'Attested claims',
     emptyList: 'No attestations found.',
+    h2: 'Attested claims',
   },
   legitimations: {
-    h2: 'Legitimations',
     emptyList: 'No legitimations found.',
+    h2: 'Legitimations',
   },
 }
 
@@ -41,11 +39,13 @@ type AttestationStatus = {
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
   context?: 'legitimations'
+  onToggleChildOpen?: (closeCallback?: () => void | undefined) => void
 }
 
 type State = {
   attestationStatus: AttestationStatus
   canResolveAttesters: boolean
+  closeOpenedChild?: () => void
   labels: { [key: string]: string }
   openedAttestedClaim?: sdk.IAttestedClaim
 }
@@ -64,6 +64,10 @@ class AttestedClaimsListView extends React.Component<Props, State> {
           props.context && LABELS[props.context] ? props.context : 'default'
         ],
     }
+
+    this.toggleChildOpen = this.toggleChildOpen.bind(this)
+    this.closeOpenedChild = this.closeOpenedChild.bind(this)
+
     setTimeout(() => {
       this.verifyAttestations()
     }, 500)
@@ -81,12 +85,13 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     const { attestedClaims }: Props = this.props
     const { openedAttestedClaim } = this.state
 
+    const classes = [
+      'AttestedClaimsListView',
+      openedAttestedClaim ? 'opened' : '',
+    ]
+
     return attestedClaims ? (
-      <section
-        className={`AttestedClaimsListView ${
-          openedAttestedClaim ? 'opened' : ''
-        }`}
-      >
+      <section className={classes.join(' ')}>
         {this.getAttestations(attestedClaims)}
       </section>
     ) : (
@@ -104,6 +109,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
         <div className="refresh">
           <button onClick={this.verifyAttestations} />
         </div>
+
         {!!attestations && !!attestations.length ? (
           <table className={openedAttestedClaim ? 'opened' : ''}>
             <thead>
@@ -114,6 +120,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                 <th />
               </tr>
             </thead>
+
             {attestations.map((attestedClaim: sdk.IAttestedClaim) => {
               const { signature } = attestedClaim.attestation
               const opened = attestedClaim === openedAttestedClaim
@@ -146,14 +153,18 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                       />
                     </td>
                   </tr>
+
                   {opened && (
                     <tr>
                       <td className="listDetailContainer" colSpan={3}>
                         <AttestedClaimsListView
                           attestedClaims={attestedClaim.request.legitimations}
                           context="legitimations"
+                          onToggleChildOpen={this.toggleChildOpen}
                         />
+                        <div className="back" onClick={this.closeOpenedChild} />
                         <AttestedClaimVerificationView
+                          context=""
                           attestedClaim={attestedClaim}
                         />
                       </td>
@@ -170,13 +181,34 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     )
   }
 
-  private toggleOpen(attestedClaim: sdk.IAttestedClaim) {
+  private toggleOpen(attestedClaim: sdk.IAttestedClaim | undefined) {
+    const { onToggleChildOpen } = this.props
     const { openedAttestedClaim } = this.state
 
-    if (attestedClaim === openedAttestedClaim) {
-      this.setState({ openedAttestedClaim: undefined })
-    } else {
-      this.setState({ openedAttestedClaim: attestedClaim })
+    this.setState({
+      openedAttestedClaim:
+        attestedClaim === openedAttestedClaim ? undefined : attestedClaim,
+    })
+
+    if (onToggleChildOpen) {
+      onToggleChildOpen(
+        attestedClaim === openedAttestedClaim
+          ? undefined
+          : () => {
+              this.toggleOpen(openedAttestedClaim)
+            }
+      )
+    }
+  }
+
+  private toggleChildOpen(closeCallback?: () => void | undefined) {
+    this.setState({ closeOpenedChild: closeCallback })
+  }
+
+  private closeOpenedChild() {
+    const { closeOpenedChild } = this.state
+    if (closeOpenedChild) {
+      closeOpenedChild()
     }
   }
 

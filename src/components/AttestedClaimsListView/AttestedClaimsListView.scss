@@ -1,3 +1,8 @@
+//TODO: remove
+@function getActionTdWidth($buttons: 0){
+  @return $base-button-height;
+}
+
 .AttestedClaimsListView {
 
   & .attestations {
@@ -19,6 +24,13 @@
 
     & table {
       @include table;
+      @include responsiveTable(
+          (
+            phone: ('*', '*', 100px, getActionTdWidth(1)),
+            tablet: ('*', '*', 100px, getActionTdWidth(1)),
+            desktop: ('*', '*', 100px, getActionTdWidth(1)),
+          )
+      );
 
       &.opened {
 
@@ -90,6 +102,7 @@
   }
 
   & .listDetailContainer {
+    position: relative;
     display: flex;
     flex-direction: column;
 
@@ -104,70 +117,98 @@
 
   &.opened {
 
-    & .opened {
+    & > .attestations {
+
+      & > h2 {
+        border-color: $color-primary;
+        cursor: pointer;
+      }
+
+      & > .refresh {
+        display: none;
+      }
+    }
+
+    & & {
 
       & > .attestations {
         @include removeLabeledCard;
 
-        & > h2,
-        & > .refresh {
+        & > h2 {
           display: none;
         }
       }
 
-      & + .AttestedClaimVerificationView {
-        @include transform(scale(0.8));
-        @include transform-origin(0, 50%);
-        @include transition($base-transition);
+      & + .back {
+        position: absolute;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        cursor: pointer;
 
-        margin-top: 20px;
-        padding-bottom: 0;
+        & + .AttestedClaimVerificationView {
+          @include transform(scale(0.8));
+          @include transform-origin(0, 50%);
+          @include transition($base-transition);
 
-        & > h2 {
+          position: relative;
+          z-index: 1;
+          margin-top: 20px;
+          padding-bottom: 0;
 
-          &:after {
-            @include transition($base-transition);
-            @include opacity(0.5);
+          & > h2 {
+            border-color: $color-primary;
+
+            &:after {
+              @include transition($base-transition);
+              @include opacity(0.5);
+
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: $color-white;
+            }
+          }
+
+          &:before {
+            @include background-image(linear-gradient(transparent, $color-white 90%));
 
             content: '';
             position: absolute;
+            display: block;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: $color-white;
+            left: -10px;
+            right: -10px;
+            bottom: -6px;
+          }
+
+          & > .attributes {
+            display: none;
+          }
+
+          & > .refresh {
+            display: none;
           }
         }
 
-        &:before {
-          @include background-image(linear-gradient(transparent, $color-white 90%));
-
-          content: '';
-          position: absolute;
-          display: block;
-          top: 0;
-          left: -10px;
-          right: -10px;
-          bottom: -6px;
-        }
-
-        & > .attributes {
-          display: none;
-        }
-
-        & > .refresh {
-          display: none;
-        }
-
         &:hover {
-          @include transform(scale(1));
 
-          margin-top: 30px;
+          & + .AttestedClaimVerificationView {
 
-          & > h2 {
+            @include transform(scale(1));
 
-            &:after {
-              @include opacity(0);
+            margin-top: 30px;
+
+            & > h2 {
+
+              &:after {
+                @include opacity(0);
+              }
             }
           }
         }
