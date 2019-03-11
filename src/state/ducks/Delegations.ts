@@ -40,8 +40,6 @@ class Store {
     const store: SerializedState = {
       delegations: [],
     }
-    console.log('state.get(delegations)', state.get('delegations'))
-
     store.delegations = state
       .get('delegations')
       .map((myDelegation: MyDelegationRoot) => {
