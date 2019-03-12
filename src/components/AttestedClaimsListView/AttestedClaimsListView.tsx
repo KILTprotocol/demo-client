@@ -18,11 +18,13 @@ type Labels = {
 const LABELS: Labels = {
   default: {
     emptyList: 'No attestations found.',
-    h2: 'Attested claims',
+    h2_multi: 'Attested claims',
+    h2_single: 'Attested claim',
   },
   legitimations: {
     emptyList: 'No legitimations found.',
-    h2: 'Legitimations',
+    h2_multi: 'Legitimations',
+    h2_single: 'Legitimation',
   },
 }
 
@@ -56,13 +58,13 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     this.verifyAttestation = this.verifyAttestation.bind(this)
     this.verifyAttestations = this.verifyAttestations.bind(this)
 
+    const context =
+      props.context && LABELS[props.context] ? props.context : 'default'
+
     this.state = {
       attestationStatus: {},
       canResolveAttesters: false,
-      labels:
-        LABELS[
-          props.context && LABELS[props.context] ? props.context : 'default'
-        ],
+      labels: LABELS[context],
     }
 
     this.toggleChildOpen = this.toggleChildOpen.bind(this)
@@ -105,10 +107,10 @@ class AttestedClaimsListView extends React.Component<Props, State> {
       <section className="attestations">
         {openedAttestedClaim ? (
           <h2 onClick={this.toggleOpen.bind(this, openedAttestedClaim)}>
-            {labels.h2}
+            {labels.h2_single}
           </h2>
         ) : (
-          <h2>{labels.h2}</h2>
+          <h2>{labels.h2_multi}</h2>
         )}
         <div className="container-actions">
           {!!attestations && !!attestations.length && (

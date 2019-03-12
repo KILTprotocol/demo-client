@@ -1,10 +1,8 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
-import AttestedClaimVerificationView from 'src/components/AttestedClaimVerificationView/AttestedClaimVerificationView'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import Spinner from '../../../components/Spinner/Spinner'
 
-import attestationService from '../../../services/AttestationService'
 import contactRepository from '../../../services/ContactRepository'
 import CTypeRepository from '../../../services/CtypeRepository'
 import { CType, ICType } from '../../../types/Ctype'

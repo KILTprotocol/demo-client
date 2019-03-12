@@ -10,7 +10,6 @@ import ErrorService from '../../../services/ErrorService'
 import * as Claims from '../../../state/ducks/Claims'
 import PersistentStore from '../../../state/PersistentStore'
 import { Contact } from '../../../types/Contact'
-import VerifyClaim from '../VerifyClaim/VerifyClaim'
 
 import './RequestAttestation.scss'
 
