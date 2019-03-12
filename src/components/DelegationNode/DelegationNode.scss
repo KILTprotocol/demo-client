@@ -49,6 +49,10 @@
         @include invertedPresentation;
       }
     }
+
+    & > .getChildren {
+      margin-top: $labelPadding;
+    }
   }
 
   & .DelegationNode {
