@@ -111,7 +111,9 @@ class AttestedClaimsListView extends React.Component<Props, State> {
           <h2>{labels.h2}</h2>
         )}
         <div className="container-actions">
-          <button className="refresh" onClick={this.verifyAttestations} />
+          {!!attestations && !!attestations.length && (
+            <button className="refresh" onClick={this.verifyAttestations} />
+          )}
           {openedAttestedClaim && (
             <button
               className="close"
