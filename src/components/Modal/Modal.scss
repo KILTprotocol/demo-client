@@ -78,4 +78,11 @@
       }
     }
   }
+
+  &.small {
+
+    & > .container {
+      max-width: 640px;
+    }
+  }
 }

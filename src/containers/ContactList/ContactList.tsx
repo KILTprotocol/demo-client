@@ -130,6 +130,7 @@ class ContactList extends React.Component<Props, State> {
           ref={el => {
             this.selectCtypeModal = el
           }}
+          className="small"
           type={ModalType.CONFIRM}
           header="Select CTYPE"
           onCancel={this.onCancelRequestClaim}
