@@ -4,6 +4,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
+import DateTime from '../../components/DateTime/DateTime'
 import ShortHash from '../../components/ShortHash/ShortHash'
 import attestationService from '../../services/AttestationService'
 import FeedbackService, { safeDelete } from '../../services/FeedbackService'
@@ -53,11 +54,8 @@ class AttestationsView extends React.Component<Props, State> {
                 <td className="cType" title={attestation.cTypeHash}>
                   <CTypePresentation cTypeHash={attestation.cTypeHash} />
                 </td>
-                <td
-                  className="created"
-                  title={attestation.created.format('YYYY-MM-DD HH:mm')}
-                >
-                  {attestation.created.format('YY-MM-DD')}
+                <td className="created">
+                  <DateTime timestamp={attestation.created} />
                 </td>
                 <td
                   className={

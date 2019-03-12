@@ -12,6 +12,7 @@ class Utilities extends React.Component<Props, State> {
   public render() {
     return (
       <section className="Utilities">
+        <h1>Utilities</h1>
         <ChainStats />
         <TestUserFeedback />
       </section>

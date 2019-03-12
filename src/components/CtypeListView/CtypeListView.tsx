@@ -24,7 +24,12 @@ class CtypeListView extends React.Component<Props, State> {
           <table>
             <thead>
               <tr>
-                <th className="name">CTYPE</th>
+                <th className="ctype-author">
+                  CTYPE
+                  <br />
+                  Author
+                </th>
+                <th className="ctype">CTYPE</th>
                 <th className="author">Author</th>
                 <th className="actionsTd" />
               </tr>
@@ -32,10 +37,11 @@ class CtypeListView extends React.Component<Props, State> {
             <tbody>
               {cTypes.map(cType => (
                 <tr key={cType.cType.hash}>
-                  <td
-                    className="name"
-                    title={cType.cType.metadata.title.default}
-                  >
+                  <td className="ctype-author">
+                    <CTypePresentation cType={cType} />
+                    <ContactPresentation address={cType.metaData.author} />
+                  </td>
+                  <td className="ctype">
                     <CTypePresentation cType={cType} />
                   </td>
                   <td className="author">

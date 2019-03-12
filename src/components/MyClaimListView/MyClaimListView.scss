@@ -2,22 +2,13 @@
 
   & table {
     @include table;
-  }
-
-  & .alias {
-    width: 30%;
-  }
-
-  & .content {
-    width: 100%;
-  }
-
-  & .cType {
-    width: 30%;
-  }
-
-  & .actionsTd {
-    width: 270px;
+    @include responsiveTable(
+        (
+          phone: (30%, 30%, false, 30px, 120px),
+          tablet: (30%, 30%, false, 100px, 170px),
+          desktop: (30%, 30%, '*', 100px, 270px),
+        )
+    );
   }
 
   & .deleteClaim {

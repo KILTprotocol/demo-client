@@ -2,17 +2,31 @@
   width: 100%;
   table-layout: fixed;
 
+  & th,
+  & td {
+    text-align: left;
+    vertical-align: top;
+  }
+
   & th {
+    @extend %ellipsis;
+
     @include baseFont-bold;
 
     color: $color-primary;
-  }
+    padding-bottom: $base-padding;
+ }
 
   & .actionsTd {
 
     &,
     & .actions {
       padding: 0;
+    }
+
+    & .react-select__menu {
+      right: 0;
+      min-width: 200px;
     }
   }
 

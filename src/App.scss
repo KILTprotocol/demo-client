@@ -135,3 +135,20 @@ table {
 .kilt-token {
   @include colored-kilt-token;
 }
+
+.date-time {
+  $time-size: 0.8em;
+  $line-height: 1.2;
+
+  position: relative;
+  display: inline-block;
+  margin-bottom: $time-size * $line-height;
+
+  & small {
+    position: absolute;
+    right: 0;
+    bottom: -$time-size * $line-height;
+    padding-left: $base-padding/4;
+    font-size: $time-size;
+  }
+}

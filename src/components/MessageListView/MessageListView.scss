@@ -2,6 +2,13 @@
 
   & table {
     @include table;
+    @include responsiveTable(
+      (
+        phone: ('*', false, false, false, false, false, false, getActionTdWidth(2)),
+        tablet: (false, '*', false, false, false, false, 130px, getActionTdWidth(2)),
+        desktop: (false, false, 40%, '*', 120px, 120px, false, getActionTdWidth(2)),
+      )
+    );
   }
 
   & th,
@@ -11,20 +18,8 @@
     text-align: left;
   }
 
-  & .actionsTd {
-    width: 2*$base-button-height + $base-padding;
-  }
-
-  & .sender {
-    width: 20%;
-  }
-
-  & .subject {
-    width: 60%;
-
-    & > div {
-      @extend %ellipsis;
-    }
+  & th {
+    @extend %ellipsis;
   }
 
   & .delete {
@@ -41,6 +36,25 @@
     &:hover {
       text-decoration: underline;
       color: $color-primary;
+    }
+  }
+
+  & .invalid {
+
+    &:before {
+      @include icon($icon-warning);
+
+      color: $color-danger;
+      margin:{
+        right: $base-padding/4;
+      }
+    }
+  }
+
+  @include breakpoint(phone-tablet-only){
+
+    & td {
+      padding-bottom: $base-padding;
     }
   }
 }

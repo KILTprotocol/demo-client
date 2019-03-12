@@ -3,6 +3,8 @@ import {
   IRequestAttestationForClaim,
   IRequestClaimsForCtype,
   IRequestLegitimations,
+  ISubmitAttestationForClaim,
+  ISubmitClaimsForCtype,
   ISubmitLegitimations,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
@@ -46,12 +48,40 @@ const MessageSubject = (props: Props) => {
           </span>
         )
         break
+      case MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={
+                (message.body as ISubmitAttestationForClaim).content.request
+                  .claim.cType
+              }
+            />
+            )
+          </span>
+        )
+        break
       case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
         additionalInfo = (
           <span>
             <span> (cType: </span>
             <CTypePresentation
               cTypeHash={(message.body as IRequestClaimsForCtype).content}
+            />
+            )
+          </span>
+        )
+        break
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={
+                (message.body as ISubmitClaimsForCtype).content[0].request.claim
+                  .cType
+              }
             />
             )
           </span>
