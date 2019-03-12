@@ -195,7 +195,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
           </h4>
           {attestations.map((attestedClaim: sdk.IAttestedClaim) => (
             <label
-              key={attestedClaim.attestation.signature}
+              key={attestedClaim.attestation.owner}
               className={allAttestedClaimsSelected ? 'selected-all' : ''}
             >
               <input
@@ -262,8 +262,8 @@ class SelectAttestedClaim extends React.Component<Props, State> {
 
     const attestationSelected = selectedAttestedClaims.find(
       (selectedAttestedClaim: sdk.IAttestedClaim) =>
-        attestedClaim.attestation.signature ===
-        selectedAttestedClaim.attestation.signature
+        attestedClaim.attestation.owner ===
+        selectedAttestedClaim.attestation.owner
     )
 
     if (checked && !attestationSelected) {
@@ -278,8 +278,8 @@ class SelectAttestedClaim extends React.Component<Props, State> {
         {
           selectedAttestedClaims: selectedAttestedClaims.filter(
             (selectedAttestedClaim: sdk.IAttestedClaim) =>
-              attestedClaim.attestation.signature !==
-              selectedAttestedClaim.attestation.signature
+              attestedClaim.attestation.owner !==
+              selectedAttestedClaim.attestation.owner
           ),
         },
         this.selectionsChanged

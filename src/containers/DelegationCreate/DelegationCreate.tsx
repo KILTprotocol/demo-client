@@ -16,8 +16,8 @@ import Spinner from '../../components/Spinner/Spinner'
 import FeedbackService, {
   notifySuccess,
   notifyFailure,
-} from 'src/services/FeedbackService'
-import { BlockUi } from 'src/types/UserFeedback'
+} from '../../services/FeedbackService'
+import { BlockUi } from '../../types/UserFeedback'
 
 import './DelegationCreate.scss'
 
@@ -64,7 +64,6 @@ class DelegationCreate extends React.Component<Props, State> {
   }
 
   public render() {
-    const { selectedIdentity } = this.props
     const { cType, alias, delegation } = this.state
     return (
       <section className="DelegationCreate">
@@ -119,6 +118,7 @@ class DelegationCreate extends React.Component<Props, State> {
 
   private submit(): void {
     const { delegation, alias } = this.state
+    const { history } = this.props
     if (delegation) {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Creating Root-Delegation',
@@ -129,6 +129,7 @@ class DelegationCreate extends React.Component<Props, State> {
         .then(() => {
           blockUi.remove()
           notifySuccess('Delegation successfully created')
+          history.push('/delegations')
         })
         .catch(err => {
           console.log(err)

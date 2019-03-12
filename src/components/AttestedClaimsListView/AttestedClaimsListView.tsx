@@ -35,7 +35,7 @@ const enum STATUS {
 }
 
 type AttestationStatus = {
-  [signature: string]: STATUS
+  [owner: string]: STATUS
 }
 
 type Props = {
@@ -136,12 +136,12 @@ class AttestedClaimsListView extends React.Component<Props, State> {
             </thead>
 
             {attestations.map((attestedClaim: sdk.IAttestedClaim) => {
-              const { signature } = attestedClaim.attestation
+              const { owner } = attestedClaim.attestation
               const opened = attestedClaim === openedAttestedClaim
 
               return (
                 <tbody
-                  key={attestedClaim.attestation.signature}
+                  key={attestedClaim.attestation.owner}
                   className={opened ? 'opened' : ''}
                 >
                   <tr>
@@ -150,13 +150,8 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                         address={attestedClaim.attestation.owner}
                       />
                     </td>
-                    <td className="attester">
-                      <CTypePresentation
-                        cTypeHash={attestedClaim.request.claim.cType}
-                      />
-                    </td>
-                    <td className={`status ${attestationStatus[signature]}`}>
-                      {attestationStatus[signature] === STATUS.PENDING && (
+                    <td className={`status ${attestationStatus[owner]}`}>
+                      {attestationStatus[owner] === STATUS.PENDING && (
                         <Spinner size={20} color="#ef5a28" strength={3} />
                       )}
                     </td>
@@ -237,14 +232,14 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
   private verifyAttestation(attestedClaim: sdk.IAttestedClaim) {
     const { attestationStatus } = this.state
-    const { signature } = attestedClaim.attestation
+    const { owner } = attestedClaim.attestation
 
     // if we are currently already fetching - cancel
-    if (attestationStatus[signature] === STATUS.PENDING) {
+    if (attestationStatus[owner] === STATUS.PENDING) {
       return
     }
 
-    attestationStatus[signature] = STATUS.PENDING
+    attestationStatus[owner] = STATUS.PENDING
 
     this.setState({
       attestationStatus,
@@ -254,9 +249,9 @@ class AttestedClaimsListView extends React.Component<Props, State> {
       .verifyAttestatedClaim(attestedClaim)
       .then((verified: boolean) => {
         if (verified) {
-          attestationStatus[signature] = STATUS.ATTESTED
+          attestationStatus[owner] = STATUS.ATTESTED
         } else {
-          attestationStatus[signature] = STATUS.UNVERIFIED
+          attestationStatus[owner] = STATUS.UNVERIFIED
         }
 
         this.setState({
