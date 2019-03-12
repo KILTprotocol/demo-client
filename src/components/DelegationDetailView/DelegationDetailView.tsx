@@ -104,10 +104,7 @@ class DelegationDetailView extends React.Component<Props, State> {
     currentNode: DelegationsTreeNode
   ): Promise<DelegationsTreeNode> {
     return CTypeRepository.findAll().then((cTypes: ICType[]) => {
-      return {
-        ...currentNode,
-        ctypeHash: cTypes[0].cType.hash,
-      }
+      return { ...currentNode, cTypeHash: cTypes[0].cType.hash }
     })
   }
 
