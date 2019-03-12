@@ -23,56 +23,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-@mixin card {
-  @include box-shadow(2px 2px 5px transparentize($color-black, 0.8));
-  @include border-radius($base-border-radius);
-
-  position: relative;
-  margin:{
-    bottom: 2*$base-padding;
-  }
-  padding: $base-padding;
-  background: $color-white;
-  border: $base-border;
-
-  &:last-child {
-    margin: {
-      bottom: 0
-    }
-  }
-}
-
-@mixin labeledCard {
-  @include card;
-
-  padding:{
-    top: 1.5*$base-padding;
-  }
-
-  margin:{
-    top: 3*$base-padding;
-  }
-
-  & > h1,
-  & > h2,
-  & > h3,
-  & > h4,
-  & > h5,
-  & > h6 {
-
-    &:first-child {
-      @include border-radius($base-border-radius);
-
-      position: absolute;
-      top: -1.2em;
-      left: $base-padding/2;
-      padding: 0.2em 1em;
-      border: $base-border;
-      background: $color-white;
-    }
-  }
-}
-
 @mixin label {
   @include baseFont-bold;
 
@@ -85,7 +35,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: flex-start;
-  padding: $base-padding/2 $base-padding;
+  padding: 0 $base-padding;
 
   & > label {
     $breakpoint: 600px;
@@ -182,5 +132,22 @@
 
   &.increased {
     color: $color-success;
+  }
+}
+
+@mixin actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  clear: both;
+
+  & button,
+  & a {
+    margin: {
+      left: $base-padding/2;
+      bottom: $base-padding/2;
+    }
   }
 }

@@ -175,9 +175,9 @@ class Balance extends React.Component<Props, State> {
             <span>You are trying so transfer </span>
             <span className="kilt-token" />
             <span> from your identity </span>
-            <ContactPresentation myIdentity={myIdentity} />
+            <ContactPresentation myIdentity={myIdentity} inline={true} />
             <span> which is not your currently active identity </span>
-            <ContactPresentation myIdentity={selectedIdentity} />
+            <ContactPresentation myIdentity={selectedIdentity} inline={true} />
           </div>
         ),
         modalType: ModalType.CONFIRM,

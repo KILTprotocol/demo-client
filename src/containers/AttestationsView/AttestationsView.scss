@@ -1,5 +1,9 @@
 .AttestationsView {
 
+  & h1 {
+    @include h1('Claim-attested');
+  }
+
   & table {
     @include table;
     @include responsiveTable(

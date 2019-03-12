@@ -1,3 +1,6 @@
+@mixin inlinePresentation {
+}
+
 @mixin presentation {
   white-space: nowrap;
 
@@ -21,10 +24,13 @@
   & .label {
     @extend %ellipsis;
 
+    @include baseFont;
+
     padding:{
       right: $base-padding/4;
       left: $base-padding/4;
     }
+    font-size: 16px;
 
     & small {
       @include baseFont;
@@ -33,12 +39,12 @@
       margin-left: 0.4em;
     }
   }
-}
 
-@mixin inlinePresentation {
-  display: inline-block;
-  margin-left: $base-padding/2;
-  vertical-align: 2px;
+  &.inline {
+    display: inline-block;
+    margin-left: $base-padding/2;
+    vertical-align: 2px;
+  }
 }
 
 @mixin detailPresentation {

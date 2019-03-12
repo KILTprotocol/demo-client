@@ -1,5 +1,5 @@
 .ClaimDetailView {
-  @include card;
+  @include labeledCard;
 
   & > div {
     @include label_input_combo;

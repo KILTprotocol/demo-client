@@ -86,15 +86,11 @@ input {
 }
 
 .actions {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: center;
-  flex-wrap: wrap;
+  @include actions;
+
   padding: {
     top: $base-padding;
   }
-  clear: both;
 
   & button,
   & a {
@@ -123,12 +119,17 @@ input {
 table {
   width: 100%;
   text-align: left;
+  border-collapse: collapse;
 
   & th {
 
     &.actions {
       text-align: right;
     }
+  }
+
+  & td {
+    padding: 0;
   }
 }
 

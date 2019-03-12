@@ -34,7 +34,9 @@ class BlockingNotifications extends Component<Props, State> {
     return (
       <Modal
         key={notification.id}
-        className={[notification.className, notification.type].join(' ')}
+        className={[notification.className, notification.type, 'small'].join(
+          ' '
+        )}
         header={notification.header || notification.type}
         onConfirm={this.onConfirm(notification)}
         onCancel={this.onCancel(notification)}

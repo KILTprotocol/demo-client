@@ -1,7 +1,8 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
 
+import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
+import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import contactRepository from '../../../services/ContactRepository'
 import errorService from '../../../services/ErrorService'
@@ -10,7 +11,6 @@ import FeedbackService, {
 } from '../../../services/FeedbackService'
 import { Contact } from '../../../types/Contact'
 import { BlockUi } from '../../../types/UserFeedback'
-import VerifyClaim from '../VerifyClaim/VerifyClaim'
 
 type Props = {
   senderAddress: Contact['publicIdentity']['address']
@@ -33,9 +33,9 @@ class AttestClaim extends React.Component<Props, State> {
     return (
       <section className="AttestClaim">
         <ClaimDetailView claim={requestForAttestation.claim} />
-        <VerifyClaim
+        <AttestedClaimsListView
           attestedClaims={requestForAttestation.legitimations}
-          context="legitimation"
+          context="legitimations"
         />
         <div className="actions">
           <button onClick={this.attestClaim}>Attest Claim</button>

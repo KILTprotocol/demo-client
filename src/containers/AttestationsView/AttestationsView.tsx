@@ -64,7 +64,7 @@ class AttestationsView extends React.Component<Props, State> {
                   }
                 />
                 <td className="actionsTd">
-                  <div className="actions">
+                  <div>
                     {!attestation.attestation.revoked ? (
                       <button
                         title="Revoke"

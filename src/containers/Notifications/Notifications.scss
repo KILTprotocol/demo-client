@@ -74,8 +74,4 @@
     border: none;
     color: $color-font;
   }
-
-  & .ContactPresentation {
-    @include inlinePresentation;
-  }
 }

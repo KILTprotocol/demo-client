@@ -15,7 +15,6 @@ import SelectAttestedClaim, {
   State as SelectAttestedClaimState,
 } from '../../../components/SelectAttestedClaim/SelectAttestedClaim'
 import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'
-import ShortHash from '../../../components/ShortHash/ShortHash'
 import contactRepository from '../../../services/ContactRepository'
 import CTypeRepository from '../../../services/CtypeRepository'
 import errorService from '../../../services/ErrorService'
@@ -244,7 +243,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     return (
       <div className="cType-container" key={cTypeHash}>
         <h4>
-          CType <CTypePresentation cTypeHash={cTypeHash} />
+          CType <CTypePresentation cTypeHash={cTypeHash} inline={true} />
         </h4>
         {relevantClaimEntries[cTypeHash].map((claimEntry: Claims.Entry) =>
           this.getSelectAttestedClaim(claimEntry)

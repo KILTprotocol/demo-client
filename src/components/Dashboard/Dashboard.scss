@@ -2,10 +2,6 @@
 
   & h1 {
     @include h1('Identity');
-
-    & .ContactPresentation {
-      margin: 0 $base-padding/2;
-    }
   }
 
   & .IdentityView {
