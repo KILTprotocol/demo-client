@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 
+import * as Wallet from '../../state/ducks/Wallet'
 import DelegationDetailView from '../../components/DelegationDetailView/DelegationDetailView'
+import PersistentStore from '../../state/PersistentStore'
 
 type Props = RouteComponentProps<{ delegationId: string }> & {}
 
@@ -19,7 +21,9 @@ class DelegationView extends React.Component<Props, State> {
       <section className="DelegationView">
         <DelegationDetailView
           id={
-            delegationId || '5Dk1WKyFyXwPbVGibxkZMKF6cRJS45R3qt9FeD13beajN5Vg'
+            delegationId ||
+            Wallet.getSelectedIdentity(PersistentStore.store.getState())
+              .identity.address
           }
         />
       </section>

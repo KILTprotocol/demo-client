@@ -1,0 +1,14 @@
+.DelegationDetailView {
+
+  & .delegationNodeContainer {
+    @include labeledCard;
+
+    width: 100%;
+  }
+
+  & .delegationNodeScrollContainer {
+    display: inline-block;
+    max-width: 100%;
+    overflow: auto;
+  }
+}

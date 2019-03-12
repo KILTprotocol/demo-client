@@ -62,3 +62,28 @@
     display: none;
   }
 }
+
+@mixin invertedPresentation {
+
+  & .container {
+    $borderWidth: 1px;
+
+    position: relative;
+
+    &:after {
+      @include border-radius(50%);
+
+      content: '';
+      position: absolute;
+      top: -$borderWidth;
+      right: -$borderWidth;
+      bottom: -$borderWidth;
+      left: -$borderWidth;
+      border: $borderWidth solid $color-font-inverted;
+    }
+  }
+
+  & .label {
+    color: $color-font-inverted;
+  }
+}

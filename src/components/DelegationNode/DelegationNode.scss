@@ -1,17 +1,57 @@
 .DelegationNode {
-  position: relative;
+  $identiconSize: 24px;
+  $marginTop: $base-padding/2;
+  $marginLeft: 2 * $base-padding;
+  $lineWidth: 2px;
+  $lineIdenticonDistance: 0;
+  $addLineHeight: $base-padding/2;
+  $labelPadding: $base-padding/4;
 
-  & > * {
-    vertical-align: middle;
+  position: relative;
+  width: auto;
+  white-space: nowrap;
+
+  & .label {
+    position: relative;
+    display: inline-block;
+    padding: $base-padding/4;
+
+    & > * {
+      vertical-align: middle;
+    }
+  }
+
+  &.myNode {
+
+    & > .label {
+
+      &:before {
+        @include border-radius($base-border-radius);
+
+        content: '';
+        position: absolute;
+        z-index: 0;
+        top: 0;
+        right: 0;
+        bottom: $labelPadding;
+        left: 0;
+        background: $color-secondary;
+      }
+
+      & .permissions {
+
+        & span {
+          background: $color-white;
+        }
+      }
+
+      & .ContactPresentation {
+        @include invertedPresentation;
+      }
+    }
   }
 
   & .DelegationNode {
-    $identiconSize: 24px;
-    $marginTop: $base-padding/2;
-    $marginLeft: 2 * $base-padding;
-    $lineWidth: 2px;
-    $lineIdenticonDistance: $base-padding/4;
-    $addLineHeight: $base-padding/2;
 
     margin: {
       top: $marginTop;
@@ -25,10 +65,10 @@
       content: '';
       position: absolute;
       z-index: 1;
-      top: -$marginTop + $lineIdenticonDistance;
-      left: $identiconSize/2 - $lineWidth/2 - $marginLeft;
-      height: $marginTop + $identiconSize/2;
-      width: $marginLeft - $identiconSize/2 - $lineIdenticonDistance;
+      top: -$marginTop + $lineIdenticonDistance - $labelPadding;
+      left: $identiconSize/2 - $lineWidth/2 - $marginLeft + $labelPadding;
+      height: $marginTop + $identiconSize/2 + $labelPadding;
+      width: $marginLeft - $identiconSize/2 - $lineIdenticonDistance - $labelPadding;
       border: {
         color: $color-grey;
         style: solid;
@@ -89,19 +129,19 @@
 
     & .getSiblings {
       display: none;
-      top: $marginTop + $identiconSize/2 + $addLineHeight - $marginTop + $lineIdenticonDistance;
-      left: $identiconSize/2 - $marginLeft;
+      top: $marginTop + $identiconSize/2 + $addLineHeight - $marginTop + $lineIdenticonDistance + $labelPadding;
+      left: $identiconSize/2 - $marginLeft + $labelPadding;
     }
 
     & .getChildren {
-      top: $marginTop + $identiconSize + $addLineHeight - $marginTop + $lineIdenticonDistance;
-      left: $marginLeft + $identiconSize/2 - $marginLeft;
+      top: $marginTop + $identiconSize + $addLineHeight - $marginTop + $lineIdenticonDistance + 2 * $labelPadding;
+      left: $marginLeft + $identiconSize/2 - $marginLeft + $labelPadding;
     }
 
     &:last-child {
 
       &:before {
-        height: $marginTop + $identiconSize/2;
+        height: $marginTop + $identiconSize/2 + $labelPadding;
       }
 
       & > .getSiblings {
@@ -203,9 +243,5 @@
         background: $color-danger;
       }
     }
-  }
-
-  &.isRoot {
-    @include labeledCard;
   }
 }

@@ -9,6 +9,7 @@ import CTypePresentation from '../CTypePresentation/CTypePresentation'
 export interface DelegationsTreeNode extends sdk.IDelegationNode {
   cTypeHash?: sdk.IDelegationRootNode['ctypeHash']
   childNodes: DelegationsTreeNode[]
+  myNode?: true
 }
 
 type Props = {
@@ -34,21 +35,19 @@ class DelegationNode extends React.Component<Props, State> {
   public render() {
     const { onGetChildren } = this.props
     const { node } = this.state
-    const { permissions, cTypeHash } = node
+    const { permissions, myNode } = node
 
     return (
       <section
-        className={`DelegationNode ${
-          !node.childNodes.length ? 'hasNoChildren' : ''
-        } ${cTypeHash ? 'isRoot' : ''}`}
+        className={`DelegationNode
+        ${!node.childNodes.length ? 'hasNoChildren' : ''}
+        ${myNode ? 'myNode' : ''}
+        `}
       >
-        {cTypeHash && (
-          <h2>
-            CType: <CTypePresentation cTypeHash={cTypeHash} />
-          </h2>
-        )}
-        <ContactPresentation address={node.account} />
-        {permissions && this.getPermissions()}
+        <div className="label">
+          <ContactPresentation address={node.account} />
+          {permissions && this.getPermissions()}
+        </div>
         {onGetChildren && (
           <button className="getSiblings" onClick={this.getSiblings} />
         )}

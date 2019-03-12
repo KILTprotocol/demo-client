@@ -6,10 +6,12 @@ import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
-
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import DelegationNode, {
   DelegationsTreeNode,
 } from '../DelegationNode/DelegationNode'
+
+import './DelegationDetailView.scss'
 
 type Props = {
   id: sdk.IDelegationBaseNode['id']
@@ -33,7 +35,7 @@ class DelegationDetailView extends React.Component<Props, State> {
     // TODO: use sdk's getNode()
     this.getNode(id).then((myNode: sdk.IDelegationNode) => {
       // start resolving to root
-      this.resolveParent({ ...myNode, childNodes: [] }).then(
+      this.resolveParent({ ...myNode, childNodes: [], myNode: true }).then(
         (delegationsTreeNode: DelegationsTreeNode) => {
           this.setState({ delegationsTreeNode })
         }
@@ -47,7 +49,18 @@ class DelegationDetailView extends React.Component<Props, State> {
     return (
       <section className="DelegationDetailView">
         <h1>Delegation view</h1>
-        {delegationsTreeNode && <DelegationNode node={delegationsTreeNode} />}
+        <div className="delegationNodeContainer">
+          {delegationsTreeNode && (
+            <>
+              <h2>
+                <CTypePresentation cTypeHash={delegationsTreeNode.cTypeHash} />
+              </h2>
+              <div className="delegationNodeScrollContainer">
+                <DelegationNode node={delegationsTreeNode} />
+              </div>
+            </>
+          )}
+        </div>
       </section>
     )
   }
