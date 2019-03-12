@@ -10,6 +10,7 @@ import ClaimView from '../containers/ClaimView/ClaimView'
 import ContactList from '../containers/ContactList/ContactList'
 import CTypeCreate from '../containers/CtypeCreate/CtypeCreate'
 import CtypeView from '../containers/CtypeView/CtypeView'
+import DelegationView from '../containers/DelegationView/DelegationView'
 import MessageList from '../containers/MessageView/MessageView'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
 import WalletView from '../containers/WalletView/WalletView'
@@ -63,6 +64,10 @@ const Routes: React.FunctionComponent<{}> = props => {
         <Route
           path={'/delegations/new/:cTypeHash'}
           component={requiresIdentity(DelegationCreate)}
+        />
+        <Route
+            path={'/delegations/:delegationId'}
+            component={requiresIdentity(DelegationView)}
         />
         <Route
           path={'/delegations'}

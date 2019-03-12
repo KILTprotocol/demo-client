@@ -1,0 +1,211 @@
+.DelegationNode {
+  position: relative;
+
+  & > * {
+    vertical-align: middle;
+  }
+
+  & .DelegationNode {
+    $identiconSize: 24px;
+    $marginTop: $base-padding/2;
+    $marginLeft: 2 * $base-padding;
+    $lineWidth: 2px;
+    $lineIdenticonDistance: $base-padding/4;
+    $addLineHeight: $base-padding/2;
+
+    margin: {
+      top: $marginTop;
+      left: $marginLeft;
+    }
+
+    &:before,
+    &:after,
+    & .getSiblings:after,
+    & .getChildren:after {
+      content: '';
+      position: absolute;
+      z-index: 1;
+      top: -$marginTop + $lineIdenticonDistance;
+      left: $identiconSize/2 - $lineWidth/2 - $marginLeft;
+      height: $marginTop + $identiconSize/2;
+      width: $marginLeft - $identiconSize/2 - $lineIdenticonDistance;
+      border: {
+        color: $color-grey;
+        style: solid;
+      }
+    }
+
+    &:before {
+      height: calc(100% + #{$lineIdenticonDistance + $marginTop});
+      border: {
+        width: 0 0 0 $lineWidth;
+      }
+    }
+
+    &:after {
+      border: {
+        width: 0 0 $lineWidth 0;
+      }
+    }
+
+    & .getSiblings,
+    & .getChildren {
+      $size: $base-padding;
+
+      @extend %centerH;
+
+      @include border-radius(50%);
+      @include transition($base-transition);
+
+      position: absolute;
+      width: $size;
+      height: $size;
+      padding: 0;
+      background: none;
+      border: $lineWidth solid transparent;
+      outline: none;
+      color: $color-primary;
+      cursor: pointer;
+
+      &:before {
+        @extend %centerHV;
+
+        @include icon($icon-plus);
+      }
+
+      &:after {
+        top: -$addLineHeight - $lineWidth;
+        left: calc(50% - #{$lineWidth/2});
+        height: $addLineHeight;
+        border: {
+          width: 0 0 0 $lineWidth;
+        }
+      }
+
+      &:hover {
+        border-color: $color-primary;
+      }
+    }
+
+    & .getSiblings {
+      display: none;
+      top: $marginTop + $identiconSize/2 + $addLineHeight - $marginTop + $lineIdenticonDistance;
+      left: $identiconSize/2 - $marginLeft;
+    }
+
+    & .getChildren {
+      top: $marginTop + $identiconSize + $addLineHeight - $marginTop + $lineIdenticonDistance;
+      left: $marginLeft + $identiconSize/2 - $marginLeft;
+    }
+
+    &:last-child {
+
+      &:before {
+        height: $marginTop + $identiconSize/2;
+      }
+
+      & > .getSiblings {
+        display: block;
+      }
+    }
+
+    &.hasNoChildren {
+      $paddingBottom: 2 * $base-padding;
+
+      padding: {
+        bottom: $paddingBottom;
+      }
+    }
+  }
+
+  & .ContactPresentation {
+    position: relative;
+    display: inline-flex;
+    z-index: 2;
+  }
+
+  & .permissions {
+    $size: 1.6em;
+    $border-size: 0.2em;
+
+    @include baseFont-bold;
+
+    display: inline-block;
+    margin: {
+      left: $base-padding/2;
+    }
+
+    & > span {
+      @include border-radius(50%);
+
+      position: relative;
+      display: inline-block;
+      width: $size;
+      height: $size;
+      margin: {
+        left: $base-padding/4;
+      }
+      border: $border-size solid transparent;
+      font-size: 12px;
+      line-height: 1;
+
+      &:before {
+        @extend %centerHV;
+
+        position: absolute;
+        margin: {
+          top: 0.05em;
+        }
+        line-height: 1;
+      }
+    }
+
+    & .canAttest {
+
+      &:before {
+        content: 'A';
+      }
+    }
+
+    & .canDelegate {
+
+      &:before {
+        content: 'D';
+      }
+    }
+
+    @mixin colorize($color) {
+      border: {
+        color: $color;
+      }
+      //color: $color-white;
+      //background-color: $color;
+      color: $color;
+    }
+
+    & .allowed {
+      @include colorize($color-success);
+    }
+
+    & .denied {
+      @include colorize($color-danger);
+
+      &:after {
+        @extend %centerHV;
+
+        @include transform-origin(50%, 50%);
+        @include transform(translateX(-50%) translateY(-50%) rotate(-45deg));
+
+        content: '';
+        position: absolute;
+        width: 130%;
+        height: $border-size;
+        background: $color-danger;
+      }
+    }
+  }
+
+  &.isRoot {
+    @include labeledCard;
+  }
+}

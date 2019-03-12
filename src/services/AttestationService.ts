@@ -76,7 +76,7 @@ class AttestationService {
     return new Promise<void>(async (resolve, reject) => {
       attestation
         .revoke(blockchain, selectedIdentity)
-        .then(() => {
+        .then((value: any) => {
           notifySuccess('Attestation successfully revoked')
           persistentStore.store.dispatch(
             Attestations.Store.revokeAttestation(attestation.claimHash)

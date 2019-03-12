@@ -14,6 +14,7 @@ const links: NavLink[] = [
   { url: 'delegations', label: 'Delegations' },
   { url: 'contacts', label: 'Contacts' },
   { url: 'messages', label: 'Messages' },
+  { url: 'delegations', label: 'DAG' },
   { url: 'utilities', label: 'Utilities' },
 ]
 
