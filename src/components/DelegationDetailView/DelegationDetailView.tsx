@@ -1,5 +1,11 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+import CTypeRepository from '../../services/CtypeRepository'
+
+import * as Wallet from '../../state/ducks/Wallet'
+import PersistentStore from '../../state/PersistentStore'
+import { MyIdentity } from '../../types/Contact'
+import { ICType } from '../../types/Ctype'
 
 import DelegationNode, {
   DelegationsTreeNode,
@@ -59,48 +65,49 @@ class DelegationDetailView extends React.Component<Props, State> {
         })
       } else {
         // TODO: adjust when sdk can handle dags
-        return {
-          ...currentNode,
-          cTypeHash:
-            '0x124e8787af5e2518e6499018735f28b4af301f5f15fd70febcd5ab027813076d',
-        }
+        return this.getRootNode(currentNode)
       }
     })
   }
 
   // TODO: use sdk methods
   private rotateIds(id: sdk.IDelegationBaseNode['id']) {
-    const ids = {
-      '5Dk1WKyFyXwPbVGibxkZMKF6cRJS45R3qt9FeD13beajN5Vg':
-        '5F91Bu2oFeBi2JWid98jFvNrseVCDsxskPfYRQdpnBpbTSMm',
-      '5F6HP6FHy3Gs65oX2dUUbovKFdXGFGXgmPGFNcis1ePGkanF':
-        '5Dk1WKyFyXwPbVGibxkZMKF6cRJS45R3qt9FeD13beajN5Vg',
-      '5F91Bu2oFeBi2JWid98jFvNrseVCDsxskPfYRQdpnBpbTSMm':
-        '5F6HP6FHy3Gs65oX2dUUbovKFdXGFGXgmPGFNcis1ePGkanF',
+    const myIdentities = Wallet.getAllIdentities(
+      PersistentStore.store.getState()
+    )
+
+    const idIndex = myIdentities.findIndex(
+      (myIdentity: MyIdentity) => myIdentity.identity.address === id
+    )
+
+    if (idIndex !== -1) {
+      return myIdentities[idIndex + 1]
+        ? myIdentities[idIndex + 1].identity.address
+        : myIdentities[0].identity.address
+    } else {
+      return id
     }
-    return ids[id]
   }
 
   private getPermissions(id: sdk.IDelegationBaseNode['id']) {
-    const ids = {
-      '5Dk1WKyFyXwPbVGibxkZMKF6cRJS45R3qt9FeD13beajN5Vg': [
-        'canAttest',
-        'canDelegate',
-      ],
-      '5F6HP6FHy3Gs65oX2dUUbovKFdXGFGXgmPGFNcis1ePGkanF': ['canAttest'],
-      '5F91Bu2oFeBi2JWid98jFvNrseVCDsxskPfYRQdpnBpbTSMm': [],
-    }
-    return ids[id]
+    const myIdentities = Wallet.getAllIdentities(
+      PersistentStore.store.getState()
+    )
+    const possiblePermisions = [['canAttest', 'canDelegate'], ['canAttest']]
+    const idIndex = myIdentities.findIndex(
+      (myIdentity: MyIdentity) => myIdentity.identity.address === id
+    )
+    return possiblePermisions[idIndex] || []
   }
 
   private async getRootNode(
-    id: sdk.IDelegationBaseNode['id']
-  ): Promise<sdk.IDelegationRootNode> {
-    const node = await this.getNode(id)
-    return Promise.resolve({
-      ...node,
-      ctypeHash:
-        '0x124e8787af5e2518e6499018735f28b4af301f5f15fd70febcd5ab027813076d',
+    currentNode: DelegationsTreeNode
+  ): Promise<DelegationsTreeNode> {
+    return CTypeRepository.findAll().then((cTypes: ICType[]) => {
+      return {
+        ...currentNode,
+        ctypeHash: cTypes[0].cType.hash,
+      }
     })
   }
 
@@ -125,25 +132,14 @@ class DelegationDetailView extends React.Component<Props, State> {
   }
 
   private getChildren(): Promise<sdk.IDelegationNode[]> {
-    return new Promise<sdk.IDelegationNode[]>((resolve, reject) => {
-      const children: sdk.IDelegationNode[] = []
-      this.getNode('5Dk1WKyFyXwPbVGibxkZMKF6cRJS45R3qt9FeD13beajN5Vg').then(
-        (node1: sdk.IDelegationNode) => {
-          children.push(node1)
-          this.getNode('5F6HP6FHy3Gs65oX2dUUbovKFdXGFGXgmPGFNcis1ePGkanF').then(
-            (node2: sdk.IDelegationNode) => {
-              children.push(node2)
-              this.getNode(
-                '5F91Bu2oFeBi2JWid98jFvNrseVCDsxskPfYRQdpnBpbTSMm'
-              ).then((node3: sdk.IDelegationNode) => {
-                children.push(node3)
-                resolve(children)
-              })
-            }
-          )
-        }
+    const myIdentities = Wallet.getAllIdentities(
+      PersistentStore.store.getState()
+    )
+    return Promise.all(
+      myIdentities.map((myIdentity: MyIdentity) =>
+        this.getNode(myIdentity.identity.address)
       )
-    })
+    )
   }
 }
 
