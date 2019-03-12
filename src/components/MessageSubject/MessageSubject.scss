@@ -9,8 +9,6 @@
   }
 
   & .CTypePresentation {
-    display: inline-block;
-    margin-left: $base-padding/2;
-    vertical-align: 2px;
+    @include inlinePresentation;
   }
 }

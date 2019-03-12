@@ -20,7 +20,7 @@ const Spinner = (props: Props) => {
   }
 
   return (
-    <div className="spinner">
+    <div className="Spinner">
       <div className="lds-ring" style={ldsRingStyles}>
         <div style={ldsRingPartialStyles} />
         <div style={ldsRingPartialStyles} />

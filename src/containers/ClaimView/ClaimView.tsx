@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { Redirect, RouteComponentProps, withRouter } from 'react-router'
-import SelectAttestersModal from '../../components/Modal/SelectAttestersModal'
+import SelectContactsModal from '../../components/Modal/SelectContactsModal'
 import MyClaimDetailView from '../../components/MyClaimDetailView/MyClaimDetailView'
 import MyClaimListView from '../../components/MyClaimListView/MyClaimListView'
 import attestationWorkflow from '../../services/AttestationWorkflow'
@@ -26,7 +26,7 @@ type State = {
 }
 
 class ClaimView extends React.Component<Props, State> {
-  private selectAttestersModal: SelectAttestersModal | null
+  private selectAttestersModal: SelectContactsModal | null
   private claimIdToAttest: Claims.Entry['id']
   private claimIdToLegitimate: Claims.Entry['id']
 
@@ -83,10 +83,11 @@ class ClaimView extends React.Component<Props, State> {
           />
         )}
         {}
-        <SelectAttestersModal
+        <SelectContactsModal
           ref={el => {
             this.selectAttestersModal = el
           }}
+          placeholder="Select attester#{multi}…"
           onCancel={this.cancelSelectAttesters}
           onConfirm={this.finishSelectAttesters}
         />

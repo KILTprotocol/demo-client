@@ -19,6 +19,8 @@ type Props = {
   preventCloseOnConfirm?: boolean
   showOnInit?: boolean
   type: ModalType
+  okButtonLabel?: string
+  cancelButtonLabel?: string
 }
 
 type State = {
@@ -37,7 +39,14 @@ class Modal extends React.Component<Props, State> {
   }
 
   public render() {
-    const { className, children, header, type } = this.props
+    const {
+      className,
+      children,
+      header,
+      type,
+      okButtonLabel,
+      cancelButtonLabel,
+    } = this.props
     const { show } = this.state
 
     const classes = ['Modal', className, type]
@@ -53,11 +62,11 @@ class Modal extends React.Component<Props, State> {
               <footer>
                 {type === ModalType.CONFIRM && (
                   <button className="cancel" onClick={this.handleCancel}>
-                    Cancel
+                    {cancelButtonLabel == null ? 'Cancel' : cancelButtonLabel}
                   </button>
                 )}
                 <button className="confirm" onClick={this.handleConfirm}>
-                  OK
+                  {okButtonLabel == null ? 'OK' : okButtonLabel}
                 </button>
               </footer>
             )}

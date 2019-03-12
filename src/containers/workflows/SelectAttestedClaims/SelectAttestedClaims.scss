@@ -1,12 +1,10 @@
 .SelectAttestedClaims {
 
   & .cType-container {
-    @include card;
+    @include labeledCard;
 
-    & > h4 {
-      margin: {
-        top: 0;
-      }
+    & .CTypePresentation {
+      @include inlinePresentation;
     }
   }
 }

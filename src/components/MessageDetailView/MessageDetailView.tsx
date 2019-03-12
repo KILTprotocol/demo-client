@@ -5,6 +5,7 @@ import ImportAttestation from '../../containers/workflows/ImportAttestation/Impo
 import RequestAttestation from '../../containers/workflows/RequestAttestation/RequestAttestation'
 import SelectAttestedClaims from '../../containers/workflows/SelectAttestedClaims/SelectAttestedClaims'
 import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
+import { MessageOutput } from '../../services/MessageRepository'
 
 import Code from '../Code/Code'
 import MessageSubject from '../MessageSubject/MessageSubject'
@@ -12,24 +13,27 @@ import MessageSubject from '../MessageSubject/MessageSubject'
 import './MessageDetailView.scss'
 
 type Props = {
-  message: sdk.IMessage
-  onDelete: (message: sdk.IMessage) => void
+  message: MessageOutput
+  onDelete: (message: MessageOutput) => void
   onCancel: (id: string) => void
 }
 
 type State = {
   showCode: boolean
+  selectedCode: 'encrypted' | 'decrypted'
 }
 
 class MessageDetailView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
+      selectedCode: 'decrypted',
       showCode: true,
     }
     this.handleDelete = this.handleDelete.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
     this.toggleShowCode = this.toggleShowCode.bind(this)
+    this.selectCode = this.selectCode.bind(this)
   }
 
   public render() {
@@ -59,19 +63,40 @@ class MessageDetailView extends React.Component<Props, State> {
     )
   }
 
-  private getCode(message: sdk.IMessage) {
-    const { showCode } = this.state
+  private getCode(message: MessageOutput) {
+    const { selectedCode, showCode } = this.state
+    const { sender, encryptedMessage, ...decryptedMessage } = message
     return (
       showCode && (
-        <div className="code">
-          <div>Message source:</div>
-          <Code>{message}</Code>
+        <div className={`code ${selectedCode}`}>
+          <div className="code-tabs">
+            <div
+              className="decrypted"
+              onClick={this.selectCode.bind(this, 'decrypted')}
+            >
+              Decrypted Message
+            </div>
+            <div
+              className="encrypted"
+              onClick={this.selectCode.bind(this, 'encrypted')}
+            >
+              Encrypted Message
+            </div>
+          </div>
+          {selectedCode === 'decrypted' && <Code>{decryptedMessage}</Code>}
+          {selectedCode === 'encrypted' && <Code>{encryptedMessage}</Code>}
         </div>
       )
     )
   }
 
-  private getWorkflow(message: sdk.IMessage): ReactNode | undefined {
+  private selectCode(requestedCode: State['selectedCode']) {
+    this.setState({
+      selectedCode: requestedCode,
+    })
+  }
+
+  private getWorkflow(message: MessageOutput): ReactNode | undefined {
     if (!message || !message.body || !message.body.content) {
       return undefined
     }
@@ -163,20 +188,17 @@ class MessageDetailView extends React.Component<Props, State> {
   }
 
   private getMessageBodyType(
-    message: sdk.IMessage
+    message: MessageOutput
   ): sdk.MessageBodyType | undefined {
     return message && message.body && message.body.type
   }
 
-  private canDisplayContentAsCode(message: sdk.IMessage): boolean {
+  private canDisplayContentAsCode(message: MessageOutput): boolean {
     const messageBodyType:
       | sdk.MessageBodyType
       | undefined = this.getMessageBodyType(message)
 
-    return (
-      messageBodyType !== undefined &&
-      messageBodyType !== sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
-    )
+    return messageBodyType !== undefined
   }
 }
 

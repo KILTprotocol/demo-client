@@ -3,13 +3,15 @@ import {
   IRequestAttestationForClaim,
   IRequestClaimsForCtype,
   IRequestLegitimations,
+  ISubmitAttestationForClaim,
+  ISubmitClaimsForCtype,
+  ISubmitLegitimations,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
 import { ReactNode } from 'react'
 import * as React from 'react'
 
 import './MessageSubject.scss'
-import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
@@ -40,6 +42,36 @@ const MessageSubject = (props: Props) => {
                 (message.body as IRequestAttestationForClaim).content.claim
                   .cType
               }
+              inline={true}
+            />
+            )
+          </span>
+        )
+        break
+      case MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={
+                (message.body as ISubmitAttestationForClaim).content.request
+                  .claim.cType
+              }
+              inline={true}
+            />
+            )
+          </span>
+        )
+        break
+      case MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={
+                (message.body as ISubmitAttestationForClaim).content.request
+                  .claim.cType
+              }
             />
             )
           </span>
@@ -51,6 +83,36 @@ const MessageSubject = (props: Props) => {
             <span> (cType: </span>
             <CTypePresentation
               cTypeHash={(message.body as IRequestClaimsForCtype).content}
+              inline={true}
+            />
+            )
+          </span>
+        )
+        break
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={
+                (message.body as ISubmitClaimsForCtype).content[0].request.claim
+                  .cType
+              }
+              inline={true}
+            />
+            )
+          </span>
+        )
+        break
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={
+                (message.body as ISubmitClaimsForCtype).content[0].request.claim
+                  .cType
+              }
             />
             )
           </span>
@@ -62,6 +124,21 @@ const MessageSubject = (props: Props) => {
             <span> (cType: </span>
             <CTypePresentation
               cTypeHash={(message.body as IRequestLegitimations).content.cType}
+              inline={true}
+            />
+            )
+          </span>
+        )
+        break
+      case MessageBodyType.SUBMIT_LEGITIMATIONS:
+        additionalInfo = (
+          <span>
+            <span> (cType: </span>
+            <CTypePresentation
+              cTypeHash={
+                (message.body as ISubmitLegitimations).content.claim.cType
+              }
+              inline={true}
             />
             )
           </span>

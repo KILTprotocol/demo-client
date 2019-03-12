@@ -30,4 +30,6 @@ export interface BlockingNotification extends Notification {
   modalType?: ModalType
   onConfirm?: (notification: BlockingNotification) => void
   onCancel?: (notification: BlockingNotification) => void
+  okButtonLabel?: string
+  cancelButtonLabel?: string
 }

@@ -14,8 +14,10 @@
                         display: none;
                     } @else if (type-of($columnWidth) == string) {
                         width: 100% * str-length($columnWidth);
+                        display: table-cell;
                     } @else {
                         width: $columnWidth;
+                        display: table-cell;
                     }
                 }
             }

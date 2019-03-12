@@ -26,7 +26,7 @@
     position: relative;
     z-index: $z-index-modal + 2;
     width: 100%;
-    max-width: 640px;
+    max-width: 1024px - 2*$base-padding;
     margin: auto;
     background: $color-white;
     border: $base-border;
@@ -46,12 +46,6 @@
       flex-direction: row;
       justify-content: left;
       align-items: center;
-
-      & .ContactPresentation {
-        margin: {
-          left: $base-padding;
-        }
-      }
     }
   }
 
@@ -61,10 +55,6 @@
 
     & footer {
       margin: $base-padding (-$base-padding) (-$base-padding/2);
-    }
-
-    & .ContactPresentation {
-      display: inline-flex;
     }
   }
 
@@ -86,6 +76,13 @@
       &.confirm {
         @include button-primary;
       }
+    }
+  }
+
+  &.small {
+
+    & > .container {
+      max-width: 640px;
     }
   }
 }

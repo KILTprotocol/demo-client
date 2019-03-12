@@ -1,5 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 
 import MyClaimCreateView from '../../../components/MyClaimCreateView/MyClaimCreateView'
 import MyClaimDetailView from '../../../components/MyClaimDetailView/MyClaimDetailView'
@@ -9,7 +10,6 @@ import ErrorService from '../../../services/ErrorService'
 import * as Claims from '../../../state/ducks/Claims'
 import PersistentStore from '../../../state/PersistentStore'
 import { Contact } from '../../../types/Contact'
-import VerifyClaim from '../VerifyClaim/VerifyClaim'
 
 import './RequestAttestation.scss'
 
@@ -61,7 +61,11 @@ class RequestAttestation extends React.Component<Props, State> {
           />
         )}
 
-        <VerifyClaim attestedClaims={legitimations} context="legitimation" />
+        <AttestedClaimsListView
+          attestedClaims={legitimations}
+          context="legitimations"
+        />
+
         <div className="actions">
           <button
             className="request-attestation"

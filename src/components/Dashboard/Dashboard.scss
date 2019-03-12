@@ -1,0 +1,20 @@
+.Dashboard {
+
+  & h1 {
+    @include h1('Identity');
+  }
+
+  & .IdentityView {
+
+    & ~ .actions {
+      margin:{
+        top: -2*$base-padding;
+        bottom: 2*$base-padding;
+      }
+    }
+  }
+
+  & .Balance {
+    @include labeledCard;
+  }
+}

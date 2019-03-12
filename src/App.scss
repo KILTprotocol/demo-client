@@ -44,6 +44,20 @@ section {
   & section {
     padding: 0;
   }
+
+  & h1,
+  & h2,
+  & h3,
+  & h4,
+  & h5,
+  & h6 {
+
+    &:first-child {
+      margin: {
+        top: 0;
+      }
+    }
+  }
 }
 
 h1 {
@@ -72,15 +86,11 @@ input {
 }
 
 .actions {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: center;
-  flex-wrap: wrap;
+  @include actions;
+
   padding: {
     top: $base-padding;
   }
-  clear: both;
 
   & button,
   & a {
@@ -109,11 +119,37 @@ input {
 table {
   width: 100%;
   text-align: left;
+  border-collapse: collapse;
 
   & th {
 
     &.actions {
       text-align: right;
     }
+  }
+
+  & td {
+    padding: 0;
+  }
+}
+
+.kilt-token {
+  @include colored-kilt-token;
+}
+
+.date-time {
+  $time-size: 0.8em;
+  $line-height: 1.2;
+
+  position: relative;
+  display: inline-block;
+  margin-bottom: $time-size * $line-height;
+
+  & small {
+    position: absolute;
+    right: 0;
+    bottom: -$time-size * $line-height;
+    padding-left: $base-padding/4;
+    font-size: $time-size;
   }
 }

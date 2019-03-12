@@ -28,7 +28,7 @@ class BlockUi extends Component<Props, State> {
         <div className="container">
           {blockUis.map((blockUi: IBlockUi) => this.getBlockUi(blockUi))}
         </div>
-        <div className="spinner">
+        <div className="Spinner">
           <Spinner size={64} strength={8} color="#fff" />
         </div>
       </section>

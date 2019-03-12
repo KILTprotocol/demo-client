@@ -1,6 +1,8 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
+import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
+import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
 
 import { notifySuccess } from '../../../services/FeedbackService'
 import * as Claims from '../../../state/ducks/Claims'
@@ -21,8 +23,14 @@ class ImportAttestation extends React.Component<Props, State> {
   }
 
   public render() {
+    const { attestedClaim } = this.props
     return (
       <section className="ImportAttestation">
+        <ClaimDetailView claim={attestedClaim.request.claim} />
+        <AttestedClaimsListView
+          attestedClaims={attestedClaim.request.legitimations}
+          context="legitimations"
+        />
         <div className="actions">
           <button onClick={this.importAttestation}>Import Attestation</button>
         </div>

@@ -1,17 +1,12 @@
 .AttestedClaimsListView {
-  
-  & .attributes {
-    @include card;
+  margin-bottom: $base-padding;
 
-    & > div {
-      @include label_input_combo;
-    }
+  & & {
+    margin-bottom: 0;
   }
 
   & .attestations {
-    @include card;
-
-    padding: $base-padding;
+    @include labeledCard(1);
 
     & .header {
       width: 100%;
@@ -29,6 +24,37 @@
 
     & table {
       @include table;
+      @include responsiveTable(
+          (
+            phone: ('*', '*', 100px, getActionTdWidth(1)),
+            tablet: ('*', '*', 100px, getActionTdWidth(1)),
+            desktop: ('*', '*', 100px, getActionTdWidth(1)),
+          )
+      );
+
+      &.opened {
+
+        & > thead,
+        & > tbody {
+
+          &:not(.opened) {
+            display: none;
+          }
+        }
+
+        & > tbody {
+
+          &.opened {
+
+            & > tr {
+
+              &:first-child {
+                display: none;
+              }
+            }
+          }
+        }
+      }
     }
 
     & .attesterName {
@@ -60,7 +86,148 @@
     }
   }
 
-  & .refresh {
-    @include button-icon-only($icon-refresh);
+  & .container-actions {
+
+    & .refresh {
+      @include button-icon-only($icon-refresh);
+    }
+
+    & .close {
+      @include button-icon-only($icon-times);
+    }
+  }
+
+  & .actionsTd {
+
+    & .open {
+      @include button-icon-only($icon-eye);
+    }
+  }
+
+  & .listDetailContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    & .AttestedClaimsListView {
+      order: 1;
+    }
+
+    & .AttestedClaimVerificationView {
+      order: 0;
+    }
+  }
+
+  &.opened {
+
+    & > .attestations {
+
+      & > h2 {
+        cursor: pointer;
+      }
+
+      & > .container-actions {
+
+        & > .refresh {
+          display: none;
+        }
+      }
+    }
+
+    & & {
+
+      & > .attestations {
+        @include removeLabeledCard;
+
+        & > h2 {
+          display: none;
+        }
+
+        & > .container-actions {
+
+          & > .close {
+            display: none;
+          }
+        }
+      }
+
+      & + .back {
+        position: absolute;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        cursor: pointer;
+
+        & + .AttestedClaimVerificationView {
+          @include transform(scale(0.8));
+          @include transform-origin(0, 50%);
+          @include transition($base-transition);
+
+          position: relative;
+          z-index: 1;
+          margin-top: 20px;
+          padding-bottom: 0;
+
+          & > h2 {
+            border-color: $color-primary;
+
+            &:after {
+              @include transition($base-transition);
+              @include opacity(0.5);
+
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: $color-white;
+            }
+          }
+
+          &:before {
+            @include background-image(linear-gradient(transparent, $color-white 90%));
+
+            content: '';
+            position: absolute;
+            display: block;
+            top: 0;
+            left: -10px;
+            right: -10px;
+            bottom: -6px;
+          }
+
+          & > .attributes {
+            display: none;
+          }
+
+          & > .container-actions {
+
+            & > .refresh {
+              display: none;
+            }
+          }
+        }
+
+        &:hover {
+
+          & + .AttestedClaimVerificationView {
+
+            @include transform(scale(1));
+
+            margin-top: 30px;
+
+            & > h2 {
+
+              &:after {
+                @include opacity(0);
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

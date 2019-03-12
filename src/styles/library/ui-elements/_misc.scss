@@ -23,24 +23,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-@mixin card {
-  @include box-shadow(2px 2px 5px transparentize($color-black, 0.8));
-  @include border-radius($base-border-radius);
-
-  margin:{
-    bottom: $base-padding;
-  }
-  padding: $base-padding;
-  background: $color-white;
-  border: $base-border;
-
-  &:last-child {
-    margin: {
-      bottom: 0
-    }
-  }
-}
-
 @mixin label {
   @include baseFont-bold;
 
@@ -53,7 +35,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: flex-start;
-  padding: $base-padding/2 $base-padding;
+  padding: 0 $base-padding;
 
   & > label {
     $breakpoint: 600px;
@@ -110,6 +92,62 @@
         top: 10px;
       }
       font-size: 10px;
+    }
+  }
+}
+
+@mixin kilt-token {
+  display: inline-block;
+
+  @include baseFont-bold;
+
+  &:after {
+    $font-size: 0.8em;
+    $size: 1.6;
+
+    @include border-radius(50%);
+
+    content: 'K';
+    display: inline-block;
+    width: #{$size}em;
+    height: #{$size}em;
+    margin:{
+      left: 0.5em;
+    }
+    border: 1px solid $color-primary;
+    font-size: $font-size;
+    line-height: $size;
+    text-align: center;
+    vertical-align: bottom;
+    color: $color-primary;
+  }
+}
+
+@mixin colored-kilt-token {
+  @include kilt-token;
+
+  &.decreased {
+    color: $color-danger;
+  }
+
+  &.increased {
+    color: $color-success;
+  }
+}
+
+@mixin actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  clear: both;
+
+  & button,
+  & a {
+    margin: {
+      left: $base-padding/2;
+      bottom: $base-padding/2;
     }
   }
 }

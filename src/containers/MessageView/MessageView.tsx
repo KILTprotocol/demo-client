@@ -74,7 +74,10 @@ class MessageView extends React.Component<Props, State> {
             header={
               <div className="header-ContactPresentation">
                 Message from{' '}
-                <ContactPresentation address={currentMessage.senderAddress} />
+                <ContactPresentation
+                  address={currentMessage.senderAddress}
+                  inline={true}
+                />
               </div>
             }
             onCancel={this.onCloseMessage}
@@ -98,7 +101,7 @@ class MessageView extends React.Component<Props, State> {
         headline: 'Fetching messages',
       })
       MessageRepository.findByMyIdentity(selectedIdentity.identity)
-        .then((messages: IMessage[]) => {
+        .then((messages: MessageOutput[]) => {
           this.setState({
             messages,
           })
@@ -136,7 +139,7 @@ class MessageView extends React.Component<Props, State> {
     safeDelete(
       <span>
         the message '<MessageSubject message={message} />' from{' '}
-        <ContactPresentation address={message.senderAddress} />
+        <ContactPresentation address={message.senderAddress} inline={true} />
       </span>,
       (notification: BlockingNotification) => {
         MessageRepository.deleteByMessageId(message.messageId as string)
@@ -157,7 +160,7 @@ class MessageView extends React.Component<Props, State> {
     )
   }
 
-  private onOpenMessage(message: IMessage) {
+  private onOpenMessage(message: MessageOutput) {
     this.setState(
       {
         currentMessage: message,

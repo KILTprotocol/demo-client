@@ -3,11 +3,7 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import { BlockUi, NotificationType } from '../../types/UserFeedback'
 
-type Props = {
-  claimStore: Claims.Entry[]
-  onRemoveClaim: (hash: string) => void
-  onRequestAttestation: (hash: string) => void
-}
+type Props = {}
 
 type State = {
   notificationMessage: string
@@ -27,21 +23,20 @@ class TestUserFeedback extends React.Component<Props, State> {
   public render() {
     return (
       <section className="TestUserFeedBack">
-        <button onClick={this.testBlockUi}>Test BlockUi</button>
-        <br />
-        <button onClick={this.testBlockingFailure}>
-          Test Blocking 'Failure' Modal
-        </button>
-        <button onClick={this.testBlockingSuccess}>
-          Test Blocking 'Success' Modal
-        </button>
-        <button onClick={this.testBlockingNeutral}>
-          Test Blocking 'Neutral' Modal
-        </button>
-        <br />
-        <button onClick={this.testFailure}>Test 'Failure' Notification</button>
-        <button onClick={this.testSuccess}>Test 'Success' Notification</button>
-        <button onClick={this.testNeutral}>Test 'Neutral' Notification</button>
+        <h2>Test User Feedback</h2>
+
+        <h4>Block UI</h4>
+        <button onClick={this.testBlockUi}>Test</button>
+
+        <h4>Blocking Modals</h4>
+        <button onClick={this.testBlockingFailure}>Failure</button>
+        <button onClick={this.testBlockingSuccess}>Success</button>
+        <button onClick={this.testBlockingNeutral}>Neutral</button>
+
+        <h4>Notifications</h4>
+        <button onClick={this.testFailure}>Failure</button>
+        <button onClick={this.testSuccess}>Success</button>
+        <button onClick={this.testNeutral}>Neutral</button>
       </section>
     )
   }

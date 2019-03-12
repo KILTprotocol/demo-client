@@ -35,8 +35,12 @@ class Notifications extends Component<Props, State> {
     const now = Date.now()
     if (now - notification.created >= Notifications.DISPLAY_TIME) {
       if (notification.remove) {
-        notification.remove()
+        // prevent update while rendering
+        setTimeout(() => {
+          notification.remove()
+        })
       }
+      return ''
     } else {
       setTimeout(() => {
         if (notification.remove) {

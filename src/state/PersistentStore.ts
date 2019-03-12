@@ -1,10 +1,14 @@
 import { combineReducers, createStore, Store } from 'redux'
+import BalanceUtilities from '../services/BalanceUtilities'
 
 import errorService from '../services/ErrorService'
+import { MyIdentity } from '../types/Contact'
 import * as Attestations from './ducks/Attestations'
+import * as Balances from './ducks/Balances'
 import * as Claims from './ducks/Claims'
 import * as UiState from './ducks/UiState'
 import * as Wallet from './ducks/Wallet'
+import * as Parameters from './ducks/Parameters'
 
 declare global {
   /* tslint:disable */
@@ -20,6 +24,8 @@ export type State = {
   uiState: UiState.ImmutableState
   wallet: Wallet.ImmutableState
   attestations: Attestations.ImmutableState
+  balances: Balances.ImmutableState
+  parameters: Parameters.ImmutableState
 }
 
 type SerializedState = {
@@ -27,6 +33,7 @@ type SerializedState = {
   uiState: UiState.SerializedState
   wallet: Wallet.SerializedState
   attestations: Attestations.SerializedState
+  parameters: Parameters.SerializedState
 }
 
 class PersistentStore {
@@ -36,10 +43,11 @@ class PersistentStore {
 
   private static NAME = 'reduxState'
 
-  private static deserialize(obj: SerializedState): State {
+  private static deserialize(obj: SerializedState): Partial<State> {
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
+      parameters: Parameters.Store.deserialize(obj.parameters),
       uiState: UiState.Store.deserialize(obj.uiState),
       wallet: Wallet.Store.deserialize(obj.wallet),
     }
@@ -49,6 +57,7 @@ class PersistentStore {
     const obj: SerializedState = {
       attestations: Attestations.Store.serialize(state.attestations),
       claims: Claims.Store.serialize(state.claims),
+      parameters: Parameters.Store.serialize(state.parameters),
       uiState: UiState.Store.serialize(state.uiState),
       wallet: Wallet.Store.serialize(state.wallet),
     }
@@ -60,7 +69,7 @@ class PersistentStore {
 
   constructor() {
     const localState = localStorage.getItem(PersistentStore.NAME)
-    let persistedState = {} as State
+    let persistedState: Partial<State> = {}
     if (localState) {
       try {
         persistedState = PersistentStore.deserialize(JSON.parse(localState))
@@ -77,7 +86,9 @@ class PersistentStore {
     this._store = createStore(
       combineReducers({
         attestations: Attestations.Store.reducer,
+        balances: Balances.Store.reducer,
         claims: Claims.Store.reducer,
+        parameters: Parameters.Store.reducer,
         uiState: UiState.Store.reducer,
         wallet: Wallet.Store.reducer,
       }),
@@ -92,6 +103,12 @@ class PersistentStore {
         PersistentStore.serialize(this._store.getState())
       )
     })
+
+    BalanceUtilities.connectMyIdentities(this.store)
+  }
+
+  public reset(): void {
+    localStorage.clear()
   }
 }
 
