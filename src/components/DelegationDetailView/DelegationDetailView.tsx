@@ -125,7 +125,7 @@ class DelegationDetailView extends React.Component<Props, State> {
     id: sdk.IDelegationBaseNode['id']
   ): Promise<sdk.IDelegationBaseNode | sdk.IDelegationRootNode | null> {
     this.depth++
-    return this.depth <= 10 ? this.getNode(id) : null
+    return this.depth <= 5 ? this.getNode(id) : null
   }
 
   private async getNode(
