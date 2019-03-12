@@ -8,6 +8,7 @@ import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
 import BlockchainService from './BlockchainService'
 import { notify, notifySuccess } from './FeedbackService'
+import * as Wallet from '../state/ducks/Wallet'
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
