@@ -3,8 +3,8 @@ import { ReactNode } from 'react'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
-import { Contact } from '../../types/Contact'
-import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import { ICType } from '../../types/Ctype'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type SelectOption = {
   baseValue: string
@@ -14,10 +14,10 @@ type SelectOption = {
 
 type Props = {
   closeMenuOnSelect?: boolean
-  contacts: Contact[]
+  cTypes: ICType[]
   isMulti?: boolean
   name: string
-  onChange?: (selectedContacts: Contact[]) => void
+  onChange?: (selectedCTypes: ICType[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
   placeholder?: string
@@ -25,7 +25,7 @@ type Props = {
 
 type State = {}
 
-class SelectContacts extends React.Component<Props, State> {
+class SelectCTypes extends React.Component<Props, State> {
   public static defaultProps = {
     closeMenuOnSelect: true,
     isMulti: false,
@@ -47,7 +47,7 @@ class SelectContacts extends React.Component<Props, State> {
   public render() {
     const {
       closeMenuOnSelect,
-      contacts,
+      cTypes,
       isMulti,
       name,
       onMenuOpen,
@@ -55,25 +55,25 @@ class SelectContacts extends React.Component<Props, State> {
       placeholder,
     } = this.props
 
-    const options: SelectOption[] = contacts.map(
-      (contact: Contact): SelectOption => ({
-        baseValue: contact.publicIdentity.address,
-        label: <ContactPresentation address={contact.publicIdentity.address} />,
-        value: `${contact.metaData.name} ${contact.publicIdentity.address}`,
+    const options: SelectOption[] = cTypes.map(
+      (cType: ICType): SelectOption => ({
+        baseValue: `${cType.cType.hash}`,
+        label: <CTypePresentation cType={cType} linked={false} />,
+        value: `${cType.cType.metadata.title.default} ${cType.cType.hash}`,
       })
     )
 
-    const _placeholder = `Select contact${isMulti ? 's' : ''}…`
+    const _placeholder = `Select cType${isMulti ? 's' : ''}…`
 
     return (
-      !!contacts &&
-      !!contacts.length && (
+      !!cTypes &&
+      !!cTypes.length && (
         <Select
           className="react-select-container"
           classNamePrefix="react-select"
-          isClearable={isMulti && contacts.length > 1}
+          isClearable={isMulti && cTypes.length > 1}
           isSearchable={true}
-          isMulti={isMulti && contacts.length > 1}
+          isMulti={isMulti && cTypes.length > 1}
           closeMenuOnSelect={closeMenuOnSelect}
           name={name}
           options={options}
@@ -88,7 +88,7 @@ class SelectContacts extends React.Component<Props, State> {
   }
 
   private onChange(selectedOptions: SelectOption | SelectOption[]) {
-    const { contacts, onChange } = this.props
+    const { cTypes, onChange } = this.props
 
     // normalize selectedOptions to Array
     const _selectedOptions: Array<SelectOption['value']> = (Array.isArray(
@@ -98,15 +98,14 @@ class SelectContacts extends React.Component<Props, State> {
       : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.baseValue)
 
-    const selectedContacts: Contact[] = contacts.filter(
-      (contact: Contact) =>
-        _selectedOptions.indexOf(contact.publicIdentity.address) !== -1
+    const selectedCTypes: ICType[] = cTypes.filter(
+      (cType: ICType) => _selectedOptions.indexOf(`${cType.cType.hash}`) !== -1
     )
 
     if (onChange) {
-      onChange(selectedContacts)
+      onChange(selectedCTypes)
     }
   }
 }
 
-export default SelectContacts
+export default SelectCTypes
