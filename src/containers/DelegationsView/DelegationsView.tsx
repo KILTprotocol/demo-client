@@ -58,7 +58,10 @@ class DelegationsView extends React.Component<Props, State> {
     delegationId: Delegations.MyDelegation['id']
   ): Delegations.MyDelegation | undefined {
     const { delegationEntries } = this.props
-    return delegationEntries.find((delegationEntry: Delegations.Entry) => delegationEntry.id === delegationId)
+    return delegationEntries.find(
+      (delegationEntry: Delegations.Entry) =>
+        delegationEntry.id === delegationId
+    )
   }
 }
 
