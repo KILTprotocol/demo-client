@@ -1,8 +1,7 @@
 {
   "name": "kilt-prototype-client",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
-  "homepage": ".",
   "dependencies": {
     "@kiltprotocol/prototype-sdk": "^0.x",
     "@polkadot/ui-identicon": "^0.25.8",
