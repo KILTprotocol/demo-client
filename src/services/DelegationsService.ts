@@ -21,7 +21,7 @@ class DelegationsService {
           PersistentStore.store.dispatch(
             Delegations.Store.saveDelegationAction({
               account: delegationRoot.account || '',
-              cType: delegationRoot.ctypeHash,
+              cType: delegationRoot.cTypeHash,
               id: delegationRoot.id,
               metaData: {
                 alias,
