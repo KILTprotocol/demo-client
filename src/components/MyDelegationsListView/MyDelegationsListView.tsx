@@ -47,7 +47,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
                   </td>
                   <td className="id">{delegationEntry.id}</td>
                   <td className="cType">
-                    <CTypePresentation cTypeHash={delegationEntry.ctype} />
+                    <CTypePresentation cTypeHash={delegationEntry.cType} />
                   </td>
                   <td className="account">
                     <ContactPresentation address={delegationEntry.account} />

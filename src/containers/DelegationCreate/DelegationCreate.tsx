@@ -82,7 +82,7 @@ class DelegationCreate extends React.Component<Props, State> {
               <div>
                 <label>CTYPE</label>
                 <div>
-                  <CTypePresentation cType={cType} size={24} />
+                  <CTypePresentation cType={cType} />
                 </div>
               </div>
               <div>

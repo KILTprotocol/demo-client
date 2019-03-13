@@ -7,7 +7,7 @@ import { State as ReduxState } from '../PersistentStore'
 export interface MyDelegation {
   id: sdk.IDelegationBaseNode['id']
   account: sdk.IPublicIdentity['address']
-  ctype?: sdk.ICType['hash']
+  cType?: sdk.ICType['hash']
   metaData: {
     alias: string
   }

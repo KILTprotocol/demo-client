@@ -45,7 +45,7 @@ class AttestationService {
     return new Promise<sdk.AttestedClaim>(async (resolve, reject) => {
       attestation
         .store(blockchain, selectedIdentity)
-        .then((result: any) => {
+        .then(() => {
           resolve(attestedClaim)
         })
         .catch(error => {
@@ -76,7 +76,7 @@ class AttestationService {
     return new Promise<void>(async (resolve, reject) => {
       attestation
         .revoke(blockchain, selectedIdentity)
-        .then((result: any) => {
+        .then(() => {
           notifySuccess('Attestation successfully revoked')
           persistentStore.store.dispatch(
             Attestations.Store.revokeAttestation(attestation.claimHash)
