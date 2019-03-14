@@ -1,17 +1,11 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import {
   IRequestClaimsForCtype,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
-import { ReactNode } from 'react'
 import * as React from 'react'
 
-import Select, { createFilter } from 'react-select'
-import { Config } from 'react-select/lib/filters'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
-import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
-import Modal, { ModalType } from '../../components/Modal/Modal'
-
+import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
 import contactRepository from '../../services/ContactRepository'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
@@ -30,21 +24,9 @@ interface State {
   cTypes: ICType[]
 }
 
-type SelectOption = {
-  label: ReactNode
-  value: sdk.ICType['hash']
-}
-
 class ContactList extends React.Component<Props, State> {
-  private selectCtypeModal: Modal | null
-  private selectedCtype: ICType | undefined
+  private selectCTypesModal: SelectCTypesModal | null
   private selectedContact: Contact | undefined
-  private filterConfig: Config = {
-    ignoreAccents: true,
-    ignoreCase: true,
-    matchFrom: 'any',
-    trim: true,
-  }
 
   constructor(props: Props) {
     super(props)
@@ -57,7 +39,6 @@ class ContactList extends React.Component<Props, State> {
     this.onRequestClaimForVerification = this.onRequestClaimForVerification.bind(
       this
     )
-    this.onSelectCtype = this.onSelectCtype.bind(this)
   }
 
   public componentDidMount() {
@@ -126,66 +107,29 @@ class ContactList extends React.Component<Props, State> {
           </tbody>
         </table>
 
-        <Modal
+        <SelectCTypesModal
           ref={el => {
-            this.selectCtypeModal = el
+            this.selectCTypesModal = el
           }}
-          className="small"
-          type={ModalType.CONFIRM}
-          header="Select CTYPE"
+          placeholder="Select cType#{multi}…"
           onCancel={this.onCancelRequestClaim}
           onConfirm={this.onFinishRequestClaim}
-        >
-          {this.getSelectCtypes()}
-        </Modal>
+        />
       </section>
     )
   }
 
-  private getSelectCtypes() {
-    const { cTypes } = this.state
-
-    const options: SelectOption[] = cTypes.map((cType: ICType) => ({
-      label: <CTypePresentation cType={cType} linked={false} />,
-      value: cType.cType.hash,
-    }))
-    return (
-      <Select
-        className="react-select-container"
-        classNamePrefix="react-select"
-        isClearable={true}
-        isSearchable={true}
-        isDisabled={false}
-        isMulti={false}
-        isRtl={false}
-        closeMenuOnSelect={true}
-        name="selectCtypes"
-        options={options}
-        onChange={this.onSelectCtype}
-        filterOption={createFilter(this.filterConfig)}
-      />
-    )
-  }
-
-  private onSelectCtype(selectedOption: SelectOption) {
-    const { cTypes } = this.state
-
-    this.selectedCtype = cTypes.find(
-      (cType: ICType) => selectedOption.value === cType.cType.hash
-    )
-  }
-
   private onCancelRequestClaim() {
-    this.selectedCtype = undefined
+    this.selectedContact = undefined
   }
 
-  private onFinishRequestClaim() {
-    if (this.selectedContact && this.selectedCtype) {
+  private onFinishRequestClaim(selectedCTypes: ICType[]) {
+    if (this.selectedContact && selectedCTypes) {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Sending Message',
       })
       const request: IRequestClaimsForCtype = {
-        content: this.selectedCtype.cType.hash,
+        content: selectedCTypes[0].cType.hash,
         type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
       }
 
@@ -212,8 +156,8 @@ class ContactList extends React.Component<Props, State> {
     contact?: Contact
   ): (() => void) => () => {
     this.selectedContact = contact
-    if (this.selectCtypeModal) {
-      this.selectCtypeModal.show()
+    if (this.selectCTypesModal) {
+      this.selectCTypesModal.show()
     }
   }
 }
