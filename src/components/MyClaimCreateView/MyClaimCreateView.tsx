@@ -16,6 +16,7 @@ import { BlockUi } from '../../types/UserFeedback'
 
 import './MyClaimCreateView.scss'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
+import Input from '../Input/Input'
 
 type Props = {
   onCancel?: () => void
@@ -93,7 +94,12 @@ class MyClaimCreateView extends Component<Props, State> {
               </div>
               <div>
                 <label>Claim alias</label>
-                <input type="text" onChange={this.handleNameChange} />
+                <Input
+                  type="text"
+                  autoFocus={true}
+                  onChange={this.handleNameChange}
+                  onSubmit={this.handleSubmit}
+                />
               </div>
             </div>
             <SchemaEditor
