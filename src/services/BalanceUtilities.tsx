@@ -59,7 +59,8 @@ class BalanceUtilities {
     const blockchain = await BlockchainService.connect()
 
     blockchain
-      .makeTransfer(myIdentity.identity, receiverAddress, amount, () => {
+      .makeTransfer(myIdentity.identity, receiverAddress, amount)
+      .then((result: any) => {
         notifySuccess(
           <div>
             <span>Successfully transfered </span>

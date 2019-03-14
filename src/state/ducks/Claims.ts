@@ -150,8 +150,7 @@ class Store {
           state.getIn(['claims', claimId, 'attestations']) || []
         attestations = attestations.filter(
           (_attestation: sdk.IAttestedClaim) =>
-            _attestation.attestation.signature !==
-            attestation.attestation.signature
+            _attestation.attestation.owner !== attestation.attestation.owner
         )
 
         return state.setIn(
@@ -168,8 +167,8 @@ class Store {
         let attestations =
           state.getIn(['claims', claimId, 'attestations']) || []
         attestations = attestations.map((_attestation: sdk.IAttestedClaim) => {
-          return _attestation.attestation.signature ===
-            attestation.attestation.signature
+          return _attestation.attestation.owner ===
+            attestation.attestation.owner
             ? attestation
             : _attestation
         })

@@ -2,12 +2,12 @@ import { combineReducers, createStore, Store } from 'redux'
 import BalanceUtilities from '../services/BalanceUtilities'
 
 import errorService from '../services/ErrorService'
-import { MyIdentity } from '../types/Contact'
 import * as Attestations from './ducks/Attestations'
 import * as Balances from './ducks/Balances'
 import * as Claims from './ducks/Claims'
 import * as UiState from './ducks/UiState'
 import * as Wallet from './ducks/Wallet'
+import * as Delegations from './ducks/Delegations'
 import * as Parameters from './ducks/Parameters'
 
 declare global {
@@ -25,6 +25,7 @@ export type State = {
   wallet: Wallet.ImmutableState
   attestations: Attestations.ImmutableState
   balances: Balances.ImmutableState
+  delegations: Delegations.ImmutableState
   parameters: Parameters.ImmutableState
 }
 
@@ -33,6 +34,7 @@ type SerializedState = {
   uiState: UiState.SerializedState
   wallet: Wallet.SerializedState
   attestations: Attestations.SerializedState
+  delegations: Delegations.SerializedState
   parameters: Parameters.SerializedState
 }
 
@@ -47,6 +49,7 @@ class PersistentStore {
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
+      delegations: Delegations.Store.deserialize(obj.delegations),
       parameters: Parameters.Store.deserialize(obj.parameters),
       uiState: UiState.Store.deserialize(obj.uiState),
       wallet: Wallet.Store.deserialize(obj.wallet),
@@ -57,6 +60,7 @@ class PersistentStore {
     const obj: SerializedState = {
       attestations: Attestations.Store.serialize(state.attestations),
       claims: Claims.Store.serialize(state.claims),
+      delegations: Delegations.Store.serialize(state.delegations),
       parameters: Parameters.Store.serialize(state.parameters),
       uiState: UiState.Store.serialize(state.uiState),
       wallet: Wallet.Store.serialize(state.wallet),
@@ -88,6 +92,7 @@ class PersistentStore {
         attestations: Attestations.Store.reducer,
         balances: Balances.Store.reducer,
         claims: Claims.Store.reducer,
+        delegations: Delegations.Store.reducer,
         parameters: Parameters.Store.reducer,
         uiState: UiState.Store.reducer,
         wallet: Wallet.Store.reducer,
