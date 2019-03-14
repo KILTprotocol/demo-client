@@ -4,6 +4,8 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import * as Delegations from '../../state/ducks/Delegations'
 import { State as ReduxState } from '../../state/PersistentStore'
 import MyDelegationsListView from '../../components/MyDelegationsListView/MyDelegationsListView'
+import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
+import { ICType } from '../../types/Ctype'
 
 import './DelegationsView.scss'
 
@@ -17,10 +19,14 @@ type State = {
 }
 
 class DelegationsView extends React.Component<Props, State> {
+  private selectCTypesModal: SelectCTypesModal | null
+
   constructor(props: Props) {
     super(props)
     this.state = {}
     this.deleteDelegation = this.deleteDelegation.bind(this)
+    this.createDelegation = this.createDelegation.bind(this)
+    this.onSelectCType = this.onSelectCType.bind(this)
   }
 
   public componentDidMount() {
@@ -36,14 +42,24 @@ class DelegationsView extends React.Component<Props, State> {
     const { currentDelegation } = this.state
     const { delegationEntries } = this.props
     return (
-      <section className="DelegationsView">
-        {!currentDelegation && (
-          <MyDelegationsListView
-            delegationEntries={delegationEntries}
-            onRemoveDelegation={this.deleteDelegation}
-          />
-        )}
-      </section>
+      <React.Fragment>
+        <section className="DelegationsView">
+          {!currentDelegation && (
+            <MyDelegationsListView
+              delegationEntries={delegationEntries}
+              onRemoveDelegation={this.deleteDelegation}
+              onCreateDelegation={this.createDelegation}
+            />
+          )}
+        </section>
+        <SelectCTypesModal
+          ref={el => {
+            this.selectCTypesModal = el
+          }}
+          placeholder="Select cType#{multi}…"
+          onConfirm={this.onSelectCType}
+        />
+      </React.Fragment>
     )
   }
 
@@ -62,6 +78,20 @@ class DelegationsView extends React.Component<Props, State> {
       (delegationEntry: Delegations.Entry) =>
         delegationEntry.id === delegationId
     )
+  }
+
+  private createDelegation(): void {
+    if (this.selectCTypesModal) {
+      this.selectCTypesModal.show()
+    }
+  }
+
+  private onSelectCType(selectedCTypes: ICType[]) {
+    if (selectedCTypes && selectedCTypes.length === 1) {
+      this.props.history.push(
+        `/delegations/new/${selectedCTypes[0].cType.hash}`
+      )
+    }
   }
 }
 

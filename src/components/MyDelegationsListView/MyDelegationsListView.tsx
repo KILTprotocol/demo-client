@@ -10,6 +10,7 @@ import './MyDelegationsListView.scss'
 type Props = {
   delegationEntries: Delegations.Entry[]
   onRemoveDelegation: (delegation: Delegations.Entry) => void
+  onCreateDelegation: () => void
 }
 
 type State = {}
@@ -18,6 +19,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {}
+    this.handleCreate = this.handleCreate.bind(this)
     this.handleDelete = this.handleDelete.bind(this)
   }
 
@@ -63,8 +65,20 @@ class MyDelegationsListView extends React.Component<Props, State> {
             </tbody>
           </table>
         )}
+        <div className="actions">
+          <button className="create" onClick={this.handleCreate}>
+            New Delegation
+          </button>
+        </div>
       </section>
     )
+  }
+
+  private handleCreate(): void {
+    const { onCreateDelegation } = this.props
+    if (onCreateDelegation) {
+      onCreateDelegation()
+    }
   }
 
   private handleDelete = (
