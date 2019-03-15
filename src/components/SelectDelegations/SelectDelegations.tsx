@@ -2,10 +2,12 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
-import ContactRepository from '../../services/ContactRepository'
 
-import { Contact } from '../../types/Contact'
+import ContactRepository from '../../services/ContactRepository'
+import PersistentStore from '../../state/PersistentStore'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import * as Delegations from '../../state/ducks/Delegations'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type SelectOption = {
   baseValue: string
@@ -15,20 +17,20 @@ type SelectOption = {
 
 type Props = {
   closeMenuOnSelect?: boolean
-  contacts?: Contact[]
+  delegations?: Delegations.Entry[]
   isMulti?: boolean
   name?: string
-  onChange?: (selectedContacts: Contact[]) => void
+  onChange?: (selectedDelegations: Delegations.Entry[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
   placeholder?: string
 }
 
 type State = {
-  contacts: Contact[]
+  delegations: Delegations.Entry[]
 }
 
-class SelectContacts extends React.Component<Props, State> {
+class SelectDelegations extends React.Component<Props, State> {
   public static defaultProps = {
     closeMenuOnSelect: true,
     isMulti: false,
@@ -44,18 +46,20 @@ class SelectContacts extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      contacts: props.contacts || [],
+      delegations: props.delegations || [],
     }
 
     this.onChange = this.onChange.bind(this)
   }
 
   public componentDidMount() {
-    const { contacts } = this.state
+    const { delegations } = this.state
 
-    if (!contacts.length) {
-      ContactRepository.findAll().then(_contacts => {
-        this.setState({ contacts: _contacts })
+    if (!delegations.length) {
+      this.setState({
+        delegations: Delegations.getDelegations(
+          PersistentStore.store.getState()
+        ),
       })
     }
   }
@@ -69,27 +73,32 @@ class SelectContacts extends React.Component<Props, State> {
       onMenuClose,
       placeholder,
     } = this.props
-    const { contacts } = this.state
+    const { delegations } = this.state
 
-    const options: SelectOption[] = contacts.map(
-      (contact: Contact): SelectOption => ({
-        baseValue: contact.publicIdentity.address,
-        label: <ContactPresentation address={contact.publicIdentity.address} />,
-        value: `${contact.metaData.name} ${contact.publicIdentity.address}`,
+    const options: SelectOption[] = delegations.map(
+      (delegation: Delegations.Entry): SelectOption => ({
+        baseValue: delegation.id,
+        label: (
+          <span>
+            {delegation.metaData.alias}
+            <CTypePresentation cTypeHash={delegation.cType} inline={true} />
+          </span>
+        ),
+        value: `${delegation.metaData.alias} ${delegation.id}`,
       })
     )
 
-    const _placeholder = `Select contact${isMulti ? 's' : ''}…`
+    const _placeholder = `Select delegation${isMulti ? 's' : ''}…`
 
     return (
-      !!contacts &&
-      !!contacts.length && (
+      !!delegations &&
+      !!delegations.length && (
         <Select
           className="react-select-container"
           classNamePrefix="react-select"
-          isClearable={isMulti && contacts.length > 1}
+          isClearable={isMulti && delegations.length > 1}
           isSearchable={true}
-          isMulti={isMulti && contacts.length > 1}
+          isMulti={isMulti && delegations.length > 1}
           closeMenuOnSelect={closeMenuOnSelect}
           name={name}
           options={options}
@@ -105,7 +114,7 @@ class SelectContacts extends React.Component<Props, State> {
 
   private onChange(selectedOptions: SelectOption | SelectOption[]) {
     const { onChange } = this.props
-    const { contacts } = this.state
+    const { delegations } = this.state
 
     // normalize selectedOptions to Array
     const _selectedOptions: Array<SelectOption['value']> = (Array.isArray(
@@ -115,9 +124,9 @@ class SelectContacts extends React.Component<Props, State> {
       : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.baseValue)
 
-    const selectedContacts: Contact[] = contacts.filter(
-      (contact: Contact) =>
-        _selectedOptions.indexOf(contact.publicIdentity.address) !== -1
+    const selectedContacts: Delegations.Entry[] = delegations.filter(
+      (delegation: Delegations.Entry) =>
+        _selectedOptions.indexOf(delegation.id) !== -1
     )
 
     if (onChange) {
@@ -126,4 +135,4 @@ class SelectContacts extends React.Component<Props, State> {
   }
 }
 
-export default SelectContacts
+export default SelectDelegations

@@ -6,6 +6,8 @@ import * as React from 'react'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
+import MyDelegationsInviteView from '../../components/MyDelegationsInviteView/MyDelegationsInviteView'
+import SelectAction from '../../components/SelectAction/SelectAction'
 import contactRepository from '../../services/ContactRepository'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
@@ -22,11 +24,24 @@ interface Props {}
 interface State {
   contacts: Contact[]
   cTypes: ICType[]
+  contactForDelegationInvite?: Contact
 }
 
 class ContactList extends React.Component<Props, State> {
   private selectCTypesModal: SelectCTypesModal | null
   private selectedContact: Contact | undefined
+
+  private inviteToDelegation = {
+    cancel: () => {
+      this.setState({ contactForDelegationInvite: undefined })
+    },
+    confirm: () => {
+      this.setState({ contactForDelegationInvite: undefined })
+    },
+    request: (contact: Contact) => {
+      this.setState({ contactForDelegationInvite: contact })
+    },
+  }
 
   constructor(props: Props) {
     super(props)
@@ -39,6 +54,8 @@ class ContactList extends React.Component<Props, State> {
     this.onRequestClaimForVerification = this.onRequestClaimForVerification.bind(
       this
     )
+    this.inviteToDelegation.cancel = this.inviteToDelegation.cancel.bind(this)
+    this.inviteToDelegation.confirm = this.inviteToDelegation.confirm.bind(this)
   }
 
   public componentDidMount() {
@@ -70,7 +87,7 @@ class ContactList extends React.Component<Props, State> {
   }
 
   public render() {
-    const { contacts } = this.state
+    const { contacts, contactForDelegationInvite } = this.state
     return (
       <section className="ContactList">
         <h1>Contacts</h1>
@@ -95,10 +112,23 @@ class ContactList extends React.Component<Props, State> {
                 </td>
                 <td className="actionsTd">
                   <div>
-                    <button
-                      className="requestClaimBtn"
-                      title="Request claim for verification"
-                      onClick={this.onRequestClaimForVerification(contact)}
+                    <SelectAction
+                      actions={[
+                        {
+                          callback: this.onRequestClaimForVerification.bind(
+                            this,
+                            contact
+                          ),
+                          label: 'Request claim(s)',
+                        },
+                        {
+                          callback: this.inviteToDelegation.request.bind(
+                            this,
+                            contact
+                          ),
+                          label: 'Invite to Delegation',
+                        },
+                      ]}
                     />
                   </div>
                 </td>
@@ -115,6 +145,13 @@ class ContactList extends React.Component<Props, State> {
           onCancel={this.onCancelRequestClaim}
           onConfirm={this.onFinishRequestClaim}
         />
+        {contactForDelegationInvite && (
+          <MyDelegationsInviteView
+            contactsSelected={[contactForDelegationInvite]}
+            onCancel={this.inviteToDelegation.cancel}
+            onConfirm={this.inviteToDelegation.confirm}
+          />
+        )}
       </section>
     )
   }
@@ -152,9 +189,7 @@ class ContactList extends React.Component<Props, State> {
     }
   }
 
-  private onRequestClaimForVerification = (
-    contact?: Contact
-  ): (() => void) => () => {
+  private onRequestClaimForVerification = (contact?: Contact) => {
     this.selectedContact = contact
     if (this.selectCTypesModal) {
       this.selectCTypesModal.show()

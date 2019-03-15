@@ -4,8 +4,13 @@ import * as Wallet from '../state/ducks/Wallet'
 import BlockchainService from './BlockchainService'
 import PersistentStore from '../state/PersistentStore'
 import * as Delegations from '../state/ducks/Delegations'
+import { v4 as uuid } from 'uuid'
 
 class DelegationsService {
+  public createID() {
+    return uuid()
+  }
+
   public async store(
     delegationRoot: sdk.DelegationRootNode,
     alias: string

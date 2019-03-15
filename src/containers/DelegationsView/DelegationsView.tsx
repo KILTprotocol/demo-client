@@ -1,11 +1,17 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
+
+import MyDelegationsInviteView from '../../components/MyDelegationsInviteView/MyDelegationsInviteView'
+import MyDelegationsListView from '../../components/MyDelegationsListView/MyDelegationsListView'
+import { safeDelete } from '../../services/FeedbackService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { State as ReduxState } from '../../state/PersistentStore'
 import MyDelegationsListView from '../../components/MyDelegationsListView/MyDelegationsListView'
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
 import { ICType } from '../../types/Ctype'
+import { Contact } from '../../types/Contact'
 
 import './DelegationsView.scss'
 
@@ -16,6 +22,9 @@ type Props = RouteComponentProps<{ delegationId: string }> & {
 
 type State = {
   currentDelegation?: Delegations.MyDelegation
+  inviteDelegation?: Delegations.Entry
+  selectedContacts?: Contact[]
+  invitePermissions?: sdk.Permission[]
 }
 
 class DelegationsView extends React.Component<Props, State> {
@@ -24,9 +33,14 @@ class DelegationsView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {}
+
     this.deleteDelegation = this.deleteDelegation.bind(this)
     this.createDelegation = this.createDelegation.bind(this)
     this.onSelectCType = this.onSelectCType.bind(this)
+    this.selectContact = this.selectContact.bind(this)
+    this.requestInviteContact = this.requestInviteContact.bind(this)
+    this.cancelInvite = this.cancelInvite.bind(this)
+    this.confirmInvite = this.confirmInvite.bind(this)
   }
 
   public componentDidMount() {
@@ -39,34 +53,61 @@ class DelegationsView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { currentDelegation } = this.state
     const { delegationEntries } = this.props
+    const { currentDelegation, inviteDelegation } = this.state
     return (
-      <React.Fragment>
         <section className="DelegationsView">
           {!currentDelegation && (
             <MyDelegationsListView
               delegationEntries={delegationEntries}
               onRemoveDelegation={this.deleteDelegation}
               onCreateDelegation={this.createDelegation}
+              onRequestInviteContacts={this.requestInviteContact}
             />
           )}
+          {inviteDelegation && (
+            <MyDelegationsInviteView
+              delegationsSelected={[inviteDelegation]}
+              onCancel={this.cancelInvite}
+              onConfirm={this.confirmInvite}
+            />
+          )}
+          <SelectCTypesModal
+            ref={el => {
+              this.selectCTypesModal = el
+            }}
+            placeholder="Select cType#{multi}…"
+            onConfirm={this.onSelectCType}
+          />
         </section>
-        <SelectCTypesModal
-          ref={el => {
-            this.selectCTypesModal = el
-          }}
-          placeholder="Select cType#{multi}…"
-          onConfirm={this.onSelectCType}
-        />
-      </React.Fragment>
     )
+  }
+
+  private requestInviteContact(inviteDelegation: Delegations.Entry) {
+    this.setState({ inviteDelegation })
+  }
+
+  private selectContact(selectedContacts: Contact[]) {
+    this.setState({ selectedContacts })
+  }
+
+  private cancelInvite() {
+    this.setState({ inviteDelegation: undefined })
+  }
+
+  private confirmInvite() {
+    this.setState({ inviteDelegation: undefined })
   }
 
   private deleteDelegation(delegation: Delegations.Entry) {
     const { removeDelegation } = this.props
     if (removeDelegation) {
-      removeDelegation(delegation)
+      safeDelete(
+        `delegation '${delegation.metaData.alias || delegation.id}'`,
+        () => {
+          removeDelegation(delegation)
+        }
+      )
     }
   }
 

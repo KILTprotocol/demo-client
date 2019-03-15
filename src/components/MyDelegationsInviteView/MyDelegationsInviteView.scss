@@ -1,0 +1,37 @@
+.MyDelegationsInviteView {
+
+  & .permissions,
+  & .contactsSelect,
+  & .delegationsSelect {
+    @include labeledCard;
+  }
+
+  & .permissions {
+
+    & label {
+      @include checkbox;
+
+      display: block;
+      margin: {
+        top: $base-padding/2;
+      }
+
+      &:first-child {
+        margin: 0;
+      }
+    }
+  }
+
+  & .delegationsSelect {
+    margin: {
+      bottom: $base-padding !important;
+    }
+  }
+
+  & button {
+
+    &.invite {
+      @include button-primary;
+    }
+  }
+}

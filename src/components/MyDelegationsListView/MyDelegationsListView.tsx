@@ -6,11 +6,13 @@ import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 import './MyDelegationsListView.scss'
+import SelectAction from '../SelectAction/SelectAction'
 
 type Props = {
   delegationEntries: Delegations.Entry[]
-  onRemoveDelegation: (delegation: Delegations.Entry) => void
   onCreateDelegation: () => void
+  onRemoveDelegation: (delegation: Delegations.Entry) => void
+  onRequestInviteContacts: (delegation: Delegations.Entry) => void
 }
 
 type State = {}
@@ -20,11 +22,10 @@ class MyDelegationsListView extends React.Component<Props, State> {
     super(props)
     this.state = {}
     this.handleCreate = this.handleCreate.bind(this)
-    this.handleDelete = this.handleDelete.bind(this)
   }
 
   public render() {
-    const { delegationEntries } = this.props
+    const { delegationEntries, onRequestInviteContacts } = this.props
     return (
       <section className="MyDelegationsListView">
         <h1>My Delegations</h1>
@@ -32,6 +33,11 @@ class MyDelegationsListView extends React.Component<Props, State> {
           <table>
             <thead>
               <tr>
+                <th className="alias_ctype">
+                  Alias
+                  <br />
+                  CTYPE
+                </th>
                 <th className="alias">Alias</th>
                 <th className="id">ID</th>
                 <th className="cType">CTYPE</th>
@@ -42,6 +48,12 @@ class MyDelegationsListView extends React.Component<Props, State> {
             <tbody>
               {delegationEntries.map(delegationEntry => (
                 <tr key={delegationEntry.id}>
+                  <td className="alias_ctype">
+                    <Link to={`/delegations/${delegationEntry.id}`}>
+                      {delegationEntry.metaData.alias}
+                    </Link>
+                    <CTypePresentation cTypeHash={delegationEntry.cType} />
+                  </td>
                   <td className="alias">
                     <Link to={`/delegations/${delegationEntry.id}`}>
                       {delegationEntry.metaData.alias}
@@ -55,10 +67,26 @@ class MyDelegationsListView extends React.Component<Props, State> {
                     <ContactPresentation address={delegationEntry.account} />
                   </td>
                   <td className="actionsTd">
-                    <button
-                      className="delete"
-                      onClick={this.handleDelete(delegationEntry)}
-                    />
+                    <div>
+                      <SelectAction
+                        actions={[
+                          {
+                            callback: this.requestInviteContacts.bind(
+                              this,
+                              delegationEntry
+                            ),
+                            label: 'Invite contact',
+                          },
+                          {
+                            callback: this.handleDelete.bind(
+                              this,
+                              delegationEntry
+                            ),
+                            label: 'Delete',
+                          },
+                        ]}
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -81,9 +109,15 @@ class MyDelegationsListView extends React.Component<Props, State> {
     }
   }
 
-  private handleDelete = (
-    delegation: Delegations.Entry
-  ): (() => void) => () => {
+  private requestInviteContacts(delegationEntry: Delegations.Entry) {
+    const { onRequestInviteContacts } = this.props
+
+    if (onRequestInviteContacts) {
+      onRequestInviteContacts(delegationEntry)
+    }
+  }
+
+  private handleDelete = (delegation: Delegations.Entry) => {
     const { onRemoveDelegation } = this.props
     onRemoveDelegation(delegation)
   }

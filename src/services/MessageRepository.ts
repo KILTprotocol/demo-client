@@ -1,10 +1,4 @@
-import {
-  Identity,
-  IEncryptedMessage,
-  IMessage,
-  MessageBody,
-} from '@kiltprotocol/prototype-sdk'
-import Message from '@kiltprotocol/prototype-sdk/build/messaging/Message'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import persistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
@@ -12,8 +6,8 @@ import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import contactRepository from './ContactRepository'
 import errorService from './ErrorService'
 
-export interface MessageOutput extends IMessage {
-  encryptedMessage: IEncryptedMessage
+export interface MessageOutput extends sdk.IMessage {
+  encryptedMessage: sdk.IEncryptedMessage
   sender?: Contact
 }
 
@@ -23,8 +17,8 @@ export interface MessageOutput extends IMessage {
 class MessageRepository {
   public static async findByMessageId(
     messageId: string,
-    myIdentity: Identity
-  ): Promise<IMessage | undefined> {
+    myIdentity: sdk.Identity
+  ): Promise<sdk.IMessage | undefined> {
     return fetch(
       `${MessageRepository.URL}/inbox/${
         myIdentity.signPublicKeyAsHex
@@ -35,7 +29,7 @@ class MessageRepository {
         return contactRepository
           .findByAddress(message.senderAddress)
           .then((sender: Contact) =>
-            Message.createFromEncryptedMessage(
+            sdk.Message.createFromEncryptedMessage(
               message,
               sender.publicIdentity,
               myIdentity
@@ -45,23 +39,23 @@ class MessageRepository {
   }
 
   public static async findByMyIdentity(
-    myIdentity: Identity
+    myIdentity: sdk.Identity
   ): Promise<MessageOutput[]> {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
-      .then((encryptedMessages: IEncryptedMessage[]) => {
+      .then((encryptedMessages: sdk.IEncryptedMessage[]) => {
         return Promise.all(
-          encryptedMessages.map((encryptedMessage: IEncryptedMessage) => {
+          encryptedMessages.map((encryptedMessage: sdk.IEncryptedMessage) => {
             return contactRepository
               .findByAddress(encryptedMessage.senderAddress)
               .then((sender: Contact) => {
                 try {
-                  const m: IMessage = Message.createFromEncryptedMessage(
+                  const m: sdk.IMessage = sdk.Message.createFromEncryptedMessage(
                     encryptedMessage,
                     sender.publicIdentity,
                     myIdentity
                   )
-                  Message.ensureOwnerIsSender(m)
+                  sdk.Message.ensureOwnerIsSender(m)
                   return {
                     ...m,
                     encryptedMessage,
@@ -99,12 +93,12 @@ class MessageRepository {
 
   public static async send(
     receiver: Contact,
-    messageBody: MessageBody
+    messageBody: sdk.MessageBody
   ): Promise<void> {
     try {
       const sender: MyIdentity = persistentStore.store.getState().wallet
         .selectedIdentity
-      const message: Message = new Message(
+      const message: sdk.Message = new sdk.Message(
         messageBody,
         sender.identity,
         receiver.publicIdentity
