@@ -325,10 +325,6 @@ class SelectAttestedClaims extends React.Component<Props, State> {
       return
     }
 
-    const blockUi: BlockUi = FeedbackService.addBlockUi({
-      headline: 'Resolving receiver (1/2)',
-    })
-
     const attestedClaims: sdk.IAttestedClaim[] = []
     selectedClaimEntryIds.forEach(
       (selectedClaimEntryId: Claims.Entry['id']) => {
@@ -370,17 +366,14 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     contactRepository
       .findByAddress(senderAddress)
       .then((receiver: Contact) => {
-        blockUi.updateMessage(this.labels.message.sending as string)
         MessageRepository.send(receiver, request)
           .then(() => {
-            blockUi.remove()
             notifySuccess(this.labels.message.sent.success)
             if (onFinished) {
               onFinished()
             }
           })
           .catch(error => {
-            blockUi.remove()
             errorService.log({
               error,
               message: this.labels.message.sent.failure,
@@ -390,7 +383,6 @@ class SelectAttestedClaims extends React.Component<Props, State> {
           })
       })
       .catch(error => {
-        blockUi.remove()
         errorService.log({
           error: new Error(),
           message: 'Could not retrieve receiver',

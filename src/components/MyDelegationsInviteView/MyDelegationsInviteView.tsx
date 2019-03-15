@@ -9,11 +9,11 @@ import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Delegations from '../../state/ducks/Delegations'
+import { MyDelegation, MyRootDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
-import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Modal, { ModalType } from '../Modal/Modal'
 import SelectContacts from '../SelectContacts/SelectContacts'
 import SelectDelegations from '../SelectDelegations/SelectDelegations'
@@ -161,10 +161,11 @@ class MyDelegationsInviteView extends React.Component<Props, State> {
               {delegationsSelected.map((delegation: Delegations.Entry) => (
                 <div key={delegation.id}>
                   {delegation.metaData.alias}
-                  <CTypePresentation
-                    cTypeHash={delegation.cType}
-                    inline={true}
-                  />
+                  {/* TODO: CTypePresentation so far only works with root delegations*/}
+                  {/*<CTypePresentation*/}
+                  {/*cTypeHash={delegation.cTypeH}*/}
+                  {/*inline={true}*/}
+                  {/*/>*/}
                 </div>
               ))}
             </div>
@@ -344,26 +345,32 @@ class MyDelegationsInviteView extends React.Component<Props, State> {
   }
 
   private getDelegationData(
-    delegation: Delegations.Entry
+    receiver: Contact,
+    delegation: MyDelegation | MyRootDelegation
   ): sdk.IRequestAcceptDelegation['content']['delegationData'] {
     const { permissions } = this.state
 
     return {
-      childDelegationId: delegationService.createID(),
-      parentDelegationId: delegation.id,
+      account: receiver.publicIdentity.address,
+      id: delegationService.createID(),
+      parentId: delegation.id,
       permissions,
     }
   }
 
   private sendSingleInvitation(
     receiver: Contact,
-    delegationData: sdk.IRequestAcceptDelegation['content']['delegationData']
+    delegation: Delegations.Entry
   ) {
     const { selectedIdentity } = this.props
+    const { metaData } = delegation
+
+    const delegationData = this.getDelegationData(receiver, delegation)
 
     const request: sdk.IRequestAcceptDelegation = {
       content: {
         delegationData,
+        metaData,
         signatures: {
           inviter: selectedIdentity.identity.signStr(
             JSON.stringify(delegationData)
@@ -395,7 +402,7 @@ class MyDelegationsInviteView extends React.Component<Props, State> {
     if (this.isInvitationValid()) {
       contacts.selected.forEach((contact: Contact) => {
         delegations.selected.forEach((delegation: Delegations.Entry) => {
-          this.sendSingleInvitation(contact, this.getDelegationData(delegation))
+          this.sendSingleInvitation(contact, delegation)
         })
       })
     }

@@ -4,6 +4,7 @@ import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
 import ContactRepository from '../../services/ContactRepository'
+import { MyDelegation, MyRootDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import * as Delegations from '../../state/ducks/Delegations'
@@ -76,16 +77,20 @@ class SelectDelegations extends React.Component<Props, State> {
     const { delegations } = this.state
 
     const options: SelectOption[] = delegations.map(
-      (delegation: Delegations.Entry): SelectOption => ({
-        baseValue: delegation.id,
-        label: (
-          <span>
-            {delegation.metaData.alias}
-            <CTypePresentation cTypeHash={delegation.cType} inline={true} />
-          </span>
-        ),
-        value: `${delegation.metaData.alias} ${delegation.id}`,
-      })
+      (delegation: MyDelegation | MyRootDelegation): SelectOption => {
+        // TODO: refactor when sdk can resolve root Node to a given node
+        const cTypeHash = (delegation as MyRootDelegation).cTypeHash
+        return {
+          baseValue: delegation.id,
+          label: (
+            <span>
+              {delegation.metaData.alias}
+              <CTypePresentation cTypeHash={cTypeHash} inline={true} />
+            </span>
+          ),
+          value: `${delegation.metaData.alias} ${delegation.id}`,
+        }
+      }
     )
 
     const _placeholder = `Select delegation${isMulti ? 's' : ''}…`

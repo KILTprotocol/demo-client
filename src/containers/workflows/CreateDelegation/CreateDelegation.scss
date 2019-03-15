@@ -1,0 +1,14 @@
+.AcceptDelegation {
+  @include labeledCard;
+
+  & .delegationData {
+
+    & > div {
+      @include label-input_combo;
+    }
+  }
+
+  & .danger {
+    color: $color-danger;
+  }
+}

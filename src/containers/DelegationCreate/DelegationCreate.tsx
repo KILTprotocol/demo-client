@@ -124,7 +124,7 @@ class DelegationCreate extends React.Component<Props, State> {
       })
 
       delegationService
-        .store(delegation, alias)
+        .storeRoot(delegation, alias)
         .then(() => {
           blockUi.remove()
           notifySuccess('Delegation successfully created')
