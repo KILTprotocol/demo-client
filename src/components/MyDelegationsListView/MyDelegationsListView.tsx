@@ -30,6 +30,11 @@ class MyDelegationsListView extends React.Component<Props, State> {
       <section className="MyDelegationsListView">
         <h1>My Delegations</h1>
         {this.getDelegationEntries()}
+        <div className="actions">
+          <button className="create" onClick={this.handleCreate}>
+            New Delegation
+          </button>
+        </div>
       </section>
     )
   }

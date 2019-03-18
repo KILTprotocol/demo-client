@@ -8,7 +8,6 @@ import MyDelegationsListView from '../../components/MyDelegationsListView/MyDele
 import { safeDelete } from '../../services/FeedbackService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { State as ReduxState } from '../../state/PersistentStore'
-import MyDelegationsListView from '../../components/MyDelegationsListView/MyDelegationsListView'
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
 import { ICType } from '../../types/Ctype'
 import { Contact } from '../../types/Contact'
@@ -56,30 +55,30 @@ class DelegationsView extends React.Component<Props, State> {
     const { delegationEntries } = this.props
     const { currentDelegation, inviteDelegation } = this.state
     return (
-        <section className="DelegationsView">
-          {!currentDelegation && (
-            <MyDelegationsListView
-              delegationEntries={delegationEntries}
-              onRemoveDelegation={this.deleteDelegation}
-              onCreateDelegation={this.createDelegation}
-              onRequestInviteContacts={this.requestInviteContact}
-            />
-          )}
-          {inviteDelegation && (
-            <MyDelegationsInviteView
-              delegationsSelected={[inviteDelegation]}
-              onCancel={this.cancelInvite}
-              onConfirm={this.confirmInvite}
-            />
-          )}
-          <SelectCTypesModal
-            ref={el => {
-              this.selectCTypesModal = el
-            }}
-            placeholder="Select cType#{multi}…"
-            onConfirm={this.onSelectCType}
+      <section className="DelegationsView">
+        {!currentDelegation && (
+          <MyDelegationsListView
+            delegationEntries={delegationEntries}
+            onRemoveDelegation={this.deleteDelegation}
+            onCreateDelegation={this.createDelegation}
+            onRequestInviteContacts={this.requestInviteContact}
           />
-        </section>
+        )}
+        {inviteDelegation && (
+          <MyDelegationsInviteView
+            delegationsSelected={[inviteDelegation]}
+            onCancel={this.cancelInvite}
+            onConfirm={this.confirmInvite}
+          />
+        )}
+        <SelectCTypesModal
+          ref={el => {
+            this.selectCTypesModal = el
+          }}
+          placeholder="Select cType#{multi}…"
+          onConfirm={this.onSelectCType}
+        />
+      </section>
     )
   }
 
