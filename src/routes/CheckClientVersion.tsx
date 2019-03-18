@@ -16,8 +16,9 @@ const openResetModal = () => {
         Your client version differs from the current blockchain version.
       </div>
     ),
-    modalType: ModalType.ALERT,
+    modalType: ModalType.CONFIRM,
     okButtonLabel: 'Reset client',
+    onCancel: (notification: BlockingNotification) => notification.remove(),
     onConfirm: (notification: BlockingNotification) => {
       notification.remove()
       clientVersionHelper.resetAndReloadClient()
