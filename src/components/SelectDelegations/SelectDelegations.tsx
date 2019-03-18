@@ -85,7 +85,11 @@ class SelectDelegations extends React.Component<Props, State> {
           label: (
             <span>
               {delegation.metaData.alias}
-              <CTypePresentation cTypeHash={cTypeHash} inline={true} />
+              <CTypePresentation
+                cTypeHash={cTypeHash}
+                inline={true}
+                linked={false}
+              />
             </span>
           ),
           value: `${delegation.metaData.alias} ${delegation.id}`,

@@ -25,8 +25,7 @@ type Props = {
 }
 
 type State = {
-  isInvitersSignatureValid?: boolean
-  isInviteesSignatureValid?: boolean
+  isSignatureValid?: boolean
 }
 
 class CreateDelegation extends React.Component<Props, State> {
@@ -39,16 +38,16 @@ class CreateDelegation extends React.Component<Props, State> {
 
   public componentDidMount() {
     // TODO: check inviters signature?
-    this.checkSignatures()
+    this.checkSignature()
   }
 
   public render() {
     const { delegationData, inviteeAddress, inviterAddress } = this.props
-    const { isInviteesSignatureValid, isInvitersSignatureValid } = this.state
+    const { isSignatureValid } = this.state
 
     return (
       <section className="AcceptDelegation">
-        {!isInvitersSignatureValid ? (
+        {isSignatureValid ? (
           <>
             <h2>Accept invitation?</h2>
 
@@ -68,7 +67,7 @@ class CreateDelegation extends React.Component<Props, State> {
                 <div>
                   {delegationData.permissions.map(
                     (permission: sdk.Permission) => (
-                      <div key={permission}>{permission}</div>
+                      <div key={permission}>{sdk.Permission[permission]}</div>
                     )
                   )}
                 </div>
@@ -91,8 +90,7 @@ class CreateDelegation extends React.Component<Props, State> {
               <button onClick={this.createDelegation}>Create delegation</button>
             </div>
           </>
-        ) : isInvitersSignatureValid == null ||
-          isInviteesSignatureValid == null ? (
+        ) : isSignatureValid == null ? (
           <Spinner />
         ) : (
           <>
@@ -136,10 +134,15 @@ class CreateDelegation extends React.Component<Props, State> {
       })
   }
 
-  private checkSignatures() {
+  private checkSignature() {
+    const { delegationData, signatures, inviterAddress } = this.props
+    const valid = sdk.Crypto.verify(
+      JSON.stringify(delegationData),
+      signatures.inviter,
+      inviterAddress
+    )
     this.setState({
-      isInviteesSignatureValid: true,
-      isInvitersSignatureValid: true,
+      isSignatureValid: valid,
     })
   }
 

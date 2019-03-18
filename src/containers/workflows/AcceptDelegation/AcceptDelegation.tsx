@@ -23,7 +23,7 @@ type Props = {
 }
 
 type State = {
-  isInvitersSignatureValid?: boolean
+  isSignatureValid?: boolean
 }
 
 class AcceptDelegation extends React.Component<Props, State> {
@@ -36,16 +36,16 @@ class AcceptDelegation extends React.Component<Props, State> {
 
   public componentDidMount() {
     // TODO: check inviters signature?
-    this.checkInvitersSignature()
+    this.checkSignature()
   }
 
   public render() {
     const { delegationData, inviterAddress, metaData } = this.props
-    const { isInvitersSignatureValid } = this.state
+    const { isSignatureValid } = this.state
 
     return (
       <section className="AcceptDelegation">
-        {!isInvitersSignatureValid ? (
+        {isSignatureValid ? (
           <>
             <h2>Accept invitation?</h2>
 
@@ -71,7 +71,7 @@ class AcceptDelegation extends React.Component<Props, State> {
                 <div>
                   {delegationData.permissions.map(
                     (permission: sdk.Permission) => (
-                      <div key={permission}>{permission}</div>
+                      <div key={permission}>{sdk.Permission[permission]}</div>
                     )
                   )}
                 </div>
@@ -88,7 +88,7 @@ class AcceptDelegation extends React.Component<Props, State> {
               <button onClick={this.signAndReply}>Accept Inivitation</button>
             </div>
           </>
-        ) : isInvitersSignatureValid == null ? (
+        ) : isSignatureValid == null ? (
           <Spinner />
         ) : (
           <>
@@ -171,8 +171,14 @@ class AcceptDelegation extends React.Component<Props, State> {
     return selectedIdentity.identity.signStr(newDelegationNode.generateHash())
   }
 
-  private checkInvitersSignature() {
-    this.setState({ isInvitersSignatureValid: true })
+  private checkSignature() {
+    const { delegationData, signatures, inviterAddress } = this.props
+    const valid = sdk.Crypto.verify(
+      JSON.stringify(delegationData),
+      signatures.inviter,
+      inviterAddress
+    )
+    this.setState({ isSignatureValid: valid })
   }
 }
 

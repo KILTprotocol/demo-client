@@ -74,15 +74,23 @@ class MyDelegationsInviteView extends React.Component<Props, State> {
         <div className="permissions">
           <h2>Permissions</h2>
           <div>
-            {Object.keys(sdk.Permission).map((permission: string) => (
-              <label key={permission}>
-                <input
-                  type="checkbox"
-                  onChange={this.permissions.change.bind(this, permission)}
-                />
-                <span>{permission}</span>
-              </label>
-            ))}
+            {Object.keys(sdk.Permission)
+              .filter(
+                (permission: string) =>
+                  typeof sdk.Permission[permission] === 'number'
+              )
+              .map((permission: string) => (
+                <label key={permission}>
+                  <input
+                    type="checkbox"
+                    onChange={this.permissions.change.bind(
+                      this,
+                      sdk.Permission[permission]
+                    )}
+                  />
+                  <span>{permission}</span>
+                </label>
+              ))}
           </div>
         </div>
       )
