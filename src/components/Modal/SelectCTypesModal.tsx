@@ -13,7 +13,7 @@ type Props = {
   name?: string
   placeholder?: string
   closeMenuOnSelect?: boolean
-  onCancel: () => void
+  onCancel?: () => void
   onConfirm: (selectedCTypes: ICType[]) => void
 }
 
