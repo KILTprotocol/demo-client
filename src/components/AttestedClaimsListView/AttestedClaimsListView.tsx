@@ -150,6 +150,11 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                         address={attestedClaim.attestation.owner}
                       />
                     </td>
+                    <td className="cType">
+                      <CTypePresentation
+                        cTypeHash={attestedClaim.attestation.cTypeHash}
+                      />
+                    </td>
                     <td className={`status ${attestationStatus[owner]}`}>
                       {attestationStatus[owner] === STATUS.PENDING && (
                         <Spinner size={20} color="#ef5a28" strength={3} />

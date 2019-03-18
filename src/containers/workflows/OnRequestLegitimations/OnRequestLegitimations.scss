@@ -1,0 +1,6 @@
+.OnRequestLegitimations {
+
+  & > div {
+    @include labeledCard;
+  }
+}

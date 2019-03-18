@@ -1,0 +1,6 @@
+.OnRequestClaimsForCType {
+
+  & > div {
+    @include labeledCard;
+  }
+}

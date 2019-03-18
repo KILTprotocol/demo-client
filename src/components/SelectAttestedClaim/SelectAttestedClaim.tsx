@@ -4,14 +4,14 @@ import { ChangeEvent } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { SelectAttestedClaimsLabels } from '../../containers/workflows/SelectAttestedClaims/SelectAttestedClaims'
 import CTypeRepository from '../../services/CtypeRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { CType, ICType } from '../../types/Ctype'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import { SelectAttestedClaimsLabels } from '../SelectAttestedClaims/SelectAttestedClaims'
 
 import './SelectAttestedClaim.scss'
-import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 type Props = {
   claimEntry: Claims.Entry
@@ -109,7 +109,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
 
   private getClaimPropertySelect() {
     const { labels, claimEntry } = this.props
-    const { selectedClaimProperties, allClaimPropertiesSelected } = this.state
+    const { allClaimPropertiesSelected } = this.state
 
     const propertyNames: string[] = Object.keys(claimEntry.claim.contents)
 
