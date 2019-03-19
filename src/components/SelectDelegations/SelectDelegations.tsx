@@ -3,11 +3,9 @@ import { ReactNode } from 'react'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
-import ContactRepository from '../../services/ContactRepository'
+import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation, MyRootDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
-import ContactPresentation from '../ContactPresentation/ContactPresentation'
-import * as Delegations from '../../state/ducks/Delegations'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type SelectOption = {
@@ -18,17 +16,21 @@ type SelectOption = {
 
 type Props = {
   closeMenuOnSelect?: boolean
-  delegations?: Delegations.Entry[]
+  delegations?: Array<MyDelegation | MyRootDelegation>
+  defaultValues?: Array<MyDelegation | MyRootDelegation>
   isMulti?: boolean
   name?: string
-  onChange?: (selectedDelegations: Delegations.Entry[]) => void
+  placeholder?: string
+
+  onChange?: (
+    selectedDelegations: Array<MyDelegation | MyRootDelegation>
+  ) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
-  placeholder?: string
 }
 
 type State = {
-  delegations: Delegations.Entry[]
+  delegations: Array<MyDelegation | MyRootDelegation>
 }
 
 class SelectDelegations extends React.Component<Props, State> {
@@ -68,34 +70,26 @@ class SelectDelegations extends React.Component<Props, State> {
   public render() {
     const {
       closeMenuOnSelect,
+      defaultValues,
       isMulti,
       name,
+      placeholder,
+
       onMenuOpen,
       onMenuClose,
-      placeholder,
     } = this.props
     const { delegations } = this.state
 
-    const options: SelectOption[] = delegations.map(
-      (delegation: MyDelegation | MyRootDelegation): SelectOption => {
-        // TODO: refactor when sdk can resolve root Node to a given node
-        const cTypeHash = (delegation as MyRootDelegation).cTypeHash
-        return {
-          baseValue: delegation.id,
-          label: (
-            <span>
-              {delegation.metaData.alias}
-              <CTypePresentation
-                cTypeHash={cTypeHash}
-                inline={true}
-                linked={false}
-              />
-            </span>
-          ),
-          value: `${delegation.metaData.alias} ${delegation.id}`,
-        }
-      }
+    const options: SelectOption[] = delegations.map(delegation =>
+      this.getOption(delegation)
     )
+
+    let defaultOptions: SelectOption[] = []
+    if (defaultValues) {
+      defaultOptions = defaultValues.map(delegation =>
+        this.getOption(delegation)
+      )
+    }
 
     const _placeholder = `Select delegation${isMulti ? 's' : ''}…`
 
@@ -111,6 +105,7 @@ class SelectDelegations extends React.Component<Props, State> {
           closeMenuOnSelect={closeMenuOnSelect}
           name={name}
           options={options}
+          defaultValue={defaultOptions}
           onChange={this.onChange}
           onMenuOpen={onMenuOpen}
           onMenuClose={onMenuClose}
@@ -119,6 +114,25 @@ class SelectDelegations extends React.Component<Props, State> {
         />
       )
     )
+  }
+
+  private getOption(delegation: MyDelegation | MyRootDelegation): SelectOption {
+    // TODO: refactor when sdk can resolve root Node to a given node
+    const cTypeHash = (delegation as MyRootDelegation).cTypeHash
+    return {
+      baseValue: delegation.id,
+      label: (
+        <span>
+          {delegation.metaData.alias}
+          <CTypePresentation
+            cTypeHash={cTypeHash}
+            inline={true}
+            linked={false}
+          />
+        </span>
+      ),
+      value: `${delegation.metaData.alias} ${delegation.id}`,
+    }
   }
 
   private onChange(selectedOptions: SelectOption | SelectOption[]) {
@@ -133,13 +147,15 @@ class SelectDelegations extends React.Component<Props, State> {
       : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.baseValue)
 
-    const selectedContacts: Delegations.Entry[] = delegations.filter(
-      (delegation: Delegations.Entry) =>
+    const selectedDelegations: Array<
+      MyDelegation | MyRootDelegation
+    > = delegations.filter(
+      (delegation: MyDelegation | MyRootDelegation) =>
         _selectedOptions.indexOf(delegation.id) !== -1
     )
 
     if (onChange) {
-      onChange(selectedContacts)
+      onChange(selectedDelegations)
     }
   }
 }

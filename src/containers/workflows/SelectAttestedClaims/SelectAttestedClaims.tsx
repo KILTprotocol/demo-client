@@ -18,15 +18,12 @@ import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'
 import contactRepository from '../../../services/ContactRepository'
 import CTypeRepository from '../../../services/CtypeRepository'
 import errorService from '../../../services/ErrorService'
-import FeedbackService, {
-  notifySuccess,
-} from '../../../services/FeedbackService'
+import { notifySuccess } from '../../../services/FeedbackService'
 import MessageRepository from '../../../services/MessageRepository'
 import * as Claims from '../../../state/ducks/Claims'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact } from '../../../types/Contact'
 import { CType, ICType } from '../../../types/Ctype'
-import { BlockUi } from '../../../types/UserFeedback'
 
 import './SelectAttestedClaims.scss'
 
@@ -384,7 +381,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
       })
       .catch(error => {
         errorService.log({
-          error: new Error(),
+          error,
           message: 'Could not retrieve receiver',
           origin: 'SelectAttestedClaim.sendClaim()',
         })

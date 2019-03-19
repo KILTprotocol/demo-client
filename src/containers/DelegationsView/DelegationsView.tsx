@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 
-import MyDelegationsInviteView from '../../components/MyDelegationsInviteView/MyDelegationsInviteView'
+import MyDelegationsInviteView from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
 import MyDelegationsListView from '../../components/MyDelegationsListView/MyDelegationsListView'
 import { safeDelete } from '../../services/FeedbackService'
 import * as Delegations from '../../state/ducks/Delegations'

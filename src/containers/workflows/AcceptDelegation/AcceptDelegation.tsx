@@ -35,7 +35,6 @@ class AcceptDelegation extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    // TODO: check inviters signature?
     this.checkSignature()
   }
 

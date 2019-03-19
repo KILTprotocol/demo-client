@@ -1,6 +1,5 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-import { ChangeEvent } from 'react'
 import { connect } from 'react-redux'
 
 import ContactRepository from '../../services/ContactRepository'
@@ -13,22 +12,21 @@ import { MyDelegation, MyRootDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../types/Contact'
-import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import Modal, { ModalType } from '../Modal/Modal'
 import SelectContacts from '../SelectContacts/SelectContacts'
 import SelectDelegations from '../SelectDelegations/SelectDelegations'
-import Spinner from '../Spinner/Spinner'
+import SelectPermissions from '../SelectPermissions/SelectPermissions'
 
-import './MyDelegationsInviteView.scss'
+import './MyDelegationsInviteModal.scss'
 
 type Props = {
   contactsPool?: Contact[]
   contactsSelected?: Contact[]
-  delegationsPool?: Delegations.Entry[]
-  delegationsSelected?: Delegations.Entry[]
+  delegationsPool?: Array<MyDelegation | MyRootDelegation>
+  delegationsSelected?: Array<MyDelegation | MyRootDelegation>
   onCancel?: () => void
   onConfirm?: () => void
-  myDelegations: Delegations.Entry[]
+  myDelegations: Array<MyDelegation | MyRootDelegation>
   selectedIdentity: MyIdentity
 }
 
@@ -39,181 +37,17 @@ type State = {
     isSelectOpen: boolean
   }
   delegations: {
-    pool: Delegations.Entry[]
-    selected: Delegations.Entry[]
+    pool: Array<MyDelegation | MyRootDelegation>
+    selected: Array<MyDelegation | MyRootDelegation>
     isSelectOpen: boolean
   }
   permissions: sdk.Permission[]
 }
 
-class MyDelegationsInviteView extends React.Component<Props, State> {
+class MyDelegationsInviteModal extends React.Component<Props, State> {
   public static defaultProps: Partial<Props> = {}
 
   private modal: Modal | null
-
-  private permissions = {
-    change: (
-      permission: sdk.Permission,
-      event: ChangeEvent<HTMLInputElement>
-    ) => {
-      const { permissions } = this.state
-      const { checked } = event.target
-
-      const newPermissions = permissions.filter(
-        (_permission: sdk.Permission) => _permission !== permission
-      )
-
-      if (checked) {
-        newPermissions.push(permission)
-      }
-
-      this.setState({ permissions: newPermissions })
-    },
-    getElement: () => {
-      return (
-        <div className="permissions">
-          <h2>Permissions</h2>
-          <div>
-            {Object.keys(sdk.Permission)
-              .filter(
-                (permission: string) =>
-                  typeof sdk.Permission[permission] === 'number'
-              )
-              .map((permission: string) => (
-                <label key={permission}>
-                  <input
-                    type="checkbox"
-                    onChange={this.permissions.change.bind(
-                      this,
-                      sdk.Permission[permission]
-                    )}
-                  />
-                  <span>{permission}</span>
-                </label>
-              ))}
-          </div>
-        </div>
-      )
-    },
-  }
-
-  private contacts = {
-    changeSelected: (selected: Contact[]) => {
-      const { contacts } = this.state
-      this.setState({ contacts: { ...contacts, selected } })
-    },
-    getSelectElement: () => {
-      const { contactsSelected } = this.props
-      const { contacts } = this.state
-
-      if (contactsSelected) {
-        return (
-          <div className="contactsSelect">
-            <h2>Selected contact(s)</h2>
-            <div>
-              {contactsSelected.map(contact => (
-                <ContactPresentation
-                  key={contact.publicIdentity.address}
-                  contact={contact}
-                />
-              ))}
-            </div>
-          </div>
-        )
-      } else if (contacts.pool) {
-        return (
-          <div className="contactsSelect">
-            <h2>Select contact(s)</h2>
-            <SelectContacts
-              contacts={contacts.pool}
-              name="selectContactsForInvite"
-              isMulti={true}
-              closeMenuOnSelect={true}
-              onChange={this.contacts.changeSelected}
-              onMenuOpen={this.contacts.setSelectOpen.bind(this, true)}
-              onMenuClose={this.contacts.setSelectOpen.bind(this, false, 500)}
-            />
-          </div>
-        )
-      } else {
-        return (
-          <div className="contactsSelect">
-            <h2>Select contact(s)</h2>
-            <Spinner />
-          </div>
-        )
-      }
-    },
-    setSelectOpen: (isSelectOpen: boolean, delay = 0) => {
-      setTimeout(() => {
-        const { contacts } = this.state
-        this.setState({ contacts: { ...contacts, isSelectOpen } })
-      }, delay)
-    },
-  }
-
-  private delegations = {
-    changeSelected: (selected: Delegations.Entry[]) => {
-      const { delegations } = this.state
-      this.setState({ delegations: { ...delegations, selected } })
-    },
-    getSelectElement: () => {
-      const { delegationsSelected } = this.props
-      const { delegations } = this.state
-
-      if (delegationsSelected) {
-        return (
-          <div className="delegationsSelect">
-            <h2>Selected delegation(s)</h2>
-            <div>
-              {delegationsSelected.map((delegation: Delegations.Entry) => (
-                <div key={delegation.id}>
-                  {delegation.metaData.alias}
-                  {/* TODO: CTypePresentation so far only works with root delegations*/}
-                  {/*<CTypePresentation*/}
-                  {/*cTypeHash={delegation.cTypeH}*/}
-                  {/*inline={true}*/}
-                  {/*/>*/}
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      } else if (delegations.pool) {
-        return (
-          <div className="delegationsSelect">
-            <h2>Select delegation(s)</h2>
-            <SelectDelegations
-              delegations={delegations.pool}
-              name="selectDelegationsForInvite"
-              isMulti={true}
-              closeMenuOnSelect={true}
-              onChange={this.delegations.changeSelected}
-              onMenuOpen={this.delegations.setSelectOpen.bind(this, true)}
-              onMenuClose={this.delegations.setSelectOpen.bind(
-                this,
-                false,
-                500
-              )}
-            />
-          </div>
-        )
-      } else {
-        return (
-          <div className="delegationsSelect">
-            <h2>Select delegation(s)</h2>
-            <Spinner />
-          </div>
-        )
-      }
-    },
-    setSelectOpen: (isSelectOpen: boolean, delay = 0) => {
-      setTimeout(() => {
-        const { delegations } = this.state
-        this.setState({ delegations: { ...delegations, isSelectOpen } })
-      }, delay)
-    },
-  }
 
   constructor(props: Props) {
     super(props)
@@ -234,10 +68,13 @@ class MyDelegationsInviteView extends React.Component<Props, State> {
     this.cancel = this.cancel.bind(this)
     this.confirm = this.confirm.bind(this)
 
-    this.contacts.changeSelected = this.contacts.changeSelected.bind(this)
-    this.delegations.changeSelected = this.delegations.changeSelected.bind(this)
-    this.permissions.change = this.permissions.change.bind(this)
-    this.permissions.getElement = this.permissions.getElement.bind(this)
+    this.changePermissions = this.changePermissions.bind(this)
+
+    this.changeContacts = this.changeContacts.bind(this)
+    this.setSelectContactsOpen = this.setSelectContactsOpen.bind(this)
+
+    this.changeDelegations = this.changeDelegations.bind(this)
+    this.setSelectDelegationsOpen = this.setSelectDelegationsOpen.bind(this)
   }
 
   public componentDidMount() {
@@ -263,7 +100,7 @@ class MyDelegationsInviteView extends React.Component<Props, State> {
 
   public render() {
     return (
-      <section className="MyDelegationsInviteView">
+      <section className="MyDelegationsInviteModal">
         {this.getModalElement()}
       </section>
     )
@@ -283,7 +120,7 @@ class MyDelegationsInviteView extends React.Component<Props, State> {
 
   private getModalElement() {
     const { contactsSelected, delegationsSelected } = this.props
-    const { contacts, delegations } = this.state
+    const { contacts, delegations, permissions } = this.state
 
     const selectables = ['permissions']
     if (!contactsSelected) {
@@ -306,9 +143,41 @@ class MyDelegationsInviteView extends React.Component<Props, State> {
         type={ModalType.BLANK}
         showOnInit={true}
       >
-        {this.permissions.getElement()}
-        {this.contacts.getSelectElement()}
-        {this.delegations.getSelectElement()}
+        <SelectPermissions
+          permissions={permissions}
+          onChange={this.changePermissions}
+        />
+
+        <div className="contactsSelect">
+          {contactsSelected && <h2>Selected contact(s)</h2>}
+          {!contactsSelected && <h2>Select contact(s)</h2>}
+          <SelectContacts
+            contacts={contacts.pool}
+            name="selectContactsForInvite"
+            defaultValues={contactsSelected}
+            isMulti={true}
+            closeMenuOnSelect={true}
+            onChange={this.changeContacts}
+            onMenuOpen={this.setSelectContactsOpen.bind(this, true)}
+            onMenuClose={this.setSelectContactsOpen.bind(this, false, 500)}
+          />
+        </div>
+
+        <div className="delegationsSelect">
+          {delegationsSelected && <h2>Selected delegation(s)</h2>}
+          {!delegationsSelected && <h2>Select delegation(s)</h2>}
+          <SelectDelegations
+            delegations={delegations.pool}
+            name="selectDelegationsForInvite"
+            defaultValues={delegationsSelected}
+            isMulti={true}
+            closeMenuOnSelect={true}
+            onChange={this.changeDelegations}
+            onMenuOpen={this.setSelectDelegationsOpen.bind(this, true)}
+            onMenuClose={this.setSelectDelegationsOpen.bind(this, false, 500)}
+          />
+        </div>
+
         <footer>
           <button className="cancel" onClick={this.cancel}>
             Cancel
@@ -325,9 +194,38 @@ class MyDelegationsInviteView extends React.Component<Props, State> {
     )
   }
 
+  private changePermissions(newPermissions: sdk.Permission[]) {
+    console.log('newPermissions', newPermissions)
+
+    this.setState({ permissions: newPermissions })
+  }
+
+  private changeContacts(selected: Contact[]) {
+    const { contacts } = this.state
+    this.setState({ contacts: { ...contacts, selected } })
+  }
+
+  private setSelectContactsOpen(isSelectOpen: boolean, delay?: number) {
+    setTimeout(() => {
+      const { contacts } = this.state
+      this.setState({ contacts: { ...contacts, isSelectOpen } })
+    }, delay)
+  }
+
+  private changeDelegations(selected: Array<MyDelegation | MyRootDelegation>) {
+    const { delegations } = this.state
+    this.setState({ delegations: { ...delegations, selected } })
+  }
+
+  private setSelectDelegationsOpen(isSelectOpen: boolean, delay?: number) {
+    setTimeout(() => {
+      const { delegations } = this.state
+      this.setState({ delegations: { ...delegations, isSelectOpen } })
+    }, delay)
+  }
+
   private cancel() {
     const { onCancel } = this.props
-
     if (onCancel) {
       onCancel()
     }
@@ -335,9 +233,7 @@ class MyDelegationsInviteView extends React.Component<Props, State> {
 
   private confirm() {
     const { onConfirm } = this.props
-
     this.sendInvitations()
-
     if (onConfirm) {
       onConfirm()
     }
@@ -422,4 +318,4 @@ const mapStateToProps = (state: ReduxState) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-export default connect(mapStateToProps)(MyDelegationsInviteView)
+export default connect(mapStateToProps)(MyDelegationsInviteModal)

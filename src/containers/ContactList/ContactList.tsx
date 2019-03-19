@@ -6,7 +6,7 @@ import * as React from 'react'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
-import MyDelegationsInviteView from '../../components/MyDelegationsInviteView/MyDelegationsInviteView'
+import MyDelegationsInviteView from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
 import SelectAction from '../../components/SelectAction/SelectAction'
 import contactRepository from '../../services/ContactRepository'
 import CTypeRepository from '../../services/CtypeRepository'
