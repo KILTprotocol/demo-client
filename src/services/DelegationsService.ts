@@ -47,19 +47,18 @@ class DelegationsService {
 
   public static async queryNode(
     delegationNodeId: string
-  ): Promise<sdk.IDelegationNode> {
+  ): Promise<sdk.IDelegationNode | undefined> {
     const blockchain = await BlockchainService.connect()
     return sdk.DelegationNode.query(blockchain, delegationNodeId)
   }
 
   public static async queryRootNode(
     delegationNodeId: sdk.IDelegationBaseNode['id']
-  ): Promise<sdk.IDelegationRootNode> {
+  ): Promise<sdk.IDelegationRootNode | undefined> {
     const blockchain = await BlockchainService.connect()
-    const node: sdk.IDelegationNode = await sdk.DelegationNode.query(
-      blockchain,
-      delegationNodeId
-    )
+    const node:
+      | sdk.IDelegationNode
+      | undefined = await sdk.DelegationNode.query(blockchain, delegationNodeId)
     if (node) {
       return await node.getRoot(blockchain)
     }
