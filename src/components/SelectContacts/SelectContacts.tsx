@@ -3,6 +3,7 @@ import { ReactNode } from 'react'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
+import ContactRepository from '../../services/ContactRepository'
 import { Contact } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
@@ -14,16 +15,20 @@ type SelectOption = {
 
 type Props = {
   closeMenuOnSelect?: boolean
-  contacts: Contact[]
+  contacts?: Contact[]
+  defaultValues?: Contact[]
   isMulti?: boolean
-  name: string
+  name?: string
+  placeholder?: string
+
   onChange?: (selectedContacts: Contact[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
-  placeholder?: string
 }
 
-type State = {}
+type State = {
+  contacts: Contact[]
+}
 
 class SelectContacts extends React.Component<Props, State> {
   public static defaultProps = {
@@ -40,28 +45,44 @@ class SelectContacts extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
+    this.state = {
+      contacts: props.contacts || [],
+    }
 
     this.onChange = this.onChange.bind(this)
+  }
+
+  public componentDidMount() {
+    const { contacts } = this.state
+
+    if (!contacts.length) {
+      ContactRepository.findAll().then(_contacts => {
+        this.setState({ contacts: _contacts })
+      })
+    }
   }
 
   public render() {
     const {
       closeMenuOnSelect,
-      contacts,
+      defaultValues,
       isMulti,
       name,
+      placeholder,
+
       onMenuOpen,
       onMenuClose,
-      placeholder,
     } = this.props
+    const { contacts } = this.state
 
-    const options: SelectOption[] = contacts.map(
-      (contact: Contact): SelectOption => ({
-        baseValue: contact.publicIdentity.address,
-        label: <ContactPresentation address={contact.publicIdentity.address} />,
-        value: `${contact.metaData.name} ${contact.publicIdentity.address}`,
-      })
+    const options: SelectOption[] = contacts.map(contact =>
+      this.getOption(contact)
     )
+
+    let defaultOptions: SelectOption[] = []
+    if (defaultValues) {
+      defaultOptions = defaultValues.map(contact => this.getOption(contact))
+    }
 
     const _placeholder = `Select contact${isMulti ? 's' : ''}…`
 
@@ -77,6 +98,7 @@ class SelectContacts extends React.Component<Props, State> {
           closeMenuOnSelect={closeMenuOnSelect}
           name={name}
           options={options}
+          defaultValue={defaultOptions}
           onChange={this.onChange}
           onMenuOpen={onMenuOpen}
           onMenuClose={onMenuClose}
@@ -87,8 +109,17 @@ class SelectContacts extends React.Component<Props, State> {
     )
   }
 
+  private getOption(contact: Contact): SelectOption {
+    return {
+      baseValue: contact.publicIdentity.address,
+      label: <ContactPresentation address={contact.publicIdentity.address} />,
+      value: `${contact.metaData.name} ${contact.publicIdentity.address}`,
+    }
+  }
+
   private onChange(selectedOptions: SelectOption | SelectOption[]) {
-    const { contacts, onChange } = this.props
+    const { onChange } = this.props
+    const { contacts } = this.state
 
     // normalize selectedOptions to Array
     const _selectedOptions: Array<SelectOption['value']> = (Array.isArray(

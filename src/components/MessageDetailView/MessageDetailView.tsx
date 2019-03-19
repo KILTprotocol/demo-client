@@ -1,6 +1,8 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { ReactNode } from 'react'
+import AcceptDelegation from '../../containers/workflows/AcceptDelegation/AcceptDelegation'
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
+import CreateDelegation from '../../containers/workflows/CreateDelegation/CreateDelegation'
 import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
 import RequestAttestation from '../../containers/workflows/RequestAttestation/RequestAttestation'
 import SelectAttestedClaims from '../../containers/workflows/SelectAttestedClaims/SelectAttestedClaims'
@@ -161,6 +163,32 @@ class MessageDetailView extends React.Component<Props, State> {
             attestedClaims={(message.body as sdk.ISubmitClaimsForCtype).content}
           />
         )
+      case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION: {
+        const messageContent = (message.body as sdk.IRequestAcceptDelegation)
+          .content
+        return (
+          <AcceptDelegation
+            delegationData={messageContent.delegationData}
+            signatures={messageContent.signatures}
+            inviterAddress={message.senderAddress}
+            metaData={messageContent.metaData}
+            onFinished={this.handleDelete}
+          />
+        )
+      }
+      case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION: {
+        const messageContent = (message.body as sdk.ISubmitAcceptDelegation)
+          .content
+        return (
+          <CreateDelegation
+            delegationData={messageContent.delegationData}
+            signatures={messageContent.signatures}
+            inviteeAddress={message.senderAddress}
+            inviterAddress={message.senderAddress}
+            onFinished={this.handleDelete}
+          />
+        )
+      }
       default:
         return undefined
     }

@@ -1,40 +1,77 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-
-import * as Wallet from '../state/ducks/Wallet'
-import BlockchainService from './BlockchainService'
-import PersistentStore from '../state/PersistentStore'
+import { v4 as uuid } from 'uuid'
+import { MyDelegation, MyRootDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
 
+import * as Wallet from '../state/ducks/Wallet'
+import PersistentStore from '../state/PersistentStore'
+import BlockchainService from './BlockchainService'
+
 class DelegationsService {
-  public async store(
+  public static createID() {
+    return uuid()
+  }
+
+  public static async storeRoot(
     delegationRoot: sdk.DelegationRootNode,
     alias: string
   ): Promise<void> {
+    return DelegationsService.storeRootOnChain(delegationRoot).then(() => {
+      const { account, cTypeHash, id } = delegationRoot
+
+      DelegationsService.store({
+        account,
+        cTypeHash,
+        id,
+        metaData: { alias },
+      } as MyRootDelegation)
+    })
+  }
+
+  public static async storeOnChain(
+    delegation: sdk.DelegationNode,
+    signature: string
+  ) {
+    const blockchain = await BlockchainService.connect()
     const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
+    return delegation.store(blockchain, selectedIdentity, signature)
+  }
+
+  public static store(delegation: MyRootDelegation | MyDelegation) {
+    PersistentStore.store.dispatch(
+      Delegations.Store.saveDelegationAction(delegation)
+    )
+  }
+
+  public static async queryNode(
+    delegationNodeId: string
+  ): Promise<sdk.IDelegationNode | undefined> {
     const blockchain = await BlockchainService.connect()
-    return new Promise<void>((resolve, reject) => {
-      delegationRoot
-        .store(blockchain, selectedIdentity)
-        .then((result: any) => {
-          PersistentStore.store.dispatch(
-            Delegations.Store.saveDelegationAction({
-              account: delegationRoot.account || '',
-              cType: delegationRoot.cTypeHash,
-              id: delegationRoot.id,
-              metaData: {
-                alias,
-              },
-            })
-          )
-          resolve()
-        })
-        .catch(err => {
-          reject(err)
-        })
-    })
+    return sdk.DelegationNode.query(blockchain, delegationNodeId)
+  }
+
+  public static async queryRootNode(
+    delegationNodeId: sdk.IDelegationBaseNode['id']
+  ): Promise<sdk.IDelegationRootNode | undefined> {
+    const blockchain = await BlockchainService.connect()
+    const node:
+      | sdk.IDelegationNode
+      | undefined = await sdk.DelegationNode.query(blockchain, delegationNodeId)
+    if (node) {
+      return await node.getRoot(blockchain)
+    }
+    return await sdk.DelegationRootNode.query(blockchain, delegationNodeId)
+  }
+
+  private static async storeRootOnChain(delegation: sdk.DelegationRootNode) {
+    const blockchain = await BlockchainService.connect()
+    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
+      PersistentStore.store.getState()
+    ).identity
+    return delegation.store(blockchain, selectedIdentity)
   }
 }
 
-export default new DelegationsService()
+export default DelegationsService

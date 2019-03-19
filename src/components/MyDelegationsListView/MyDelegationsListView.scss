@@ -2,38 +2,20 @@
 
   & table {
     @include table;
-  }
-
-  & th,
-  & td {
-    @extend %ellipsis;
-
-    text-align: left;
-  }
-
-  & .alias {
-    width: 25%;
-  }
-
-  & .id {
-    width: 25%;
-    padding-right: 30px;
-  }
-
-  & .cType {
-    width: 25%;
-  }
-
-  & .account {
-    width: 20%;
-  }
-
-  & .actionsTd {
-    width: 5%;
-    text-align: right;
+    @include responsiveTable(
+        (
+          phone: (100%, false, false, false, false, 120px),
+          tablet: (false, 100%, false, 100%, false, 170px),
+          desktop: (false, 100%, 100%, 100%, 100%,  270px),
+        )
+    );
   }
 
   & .delete {
     @include button-icon-only($icon-trash-o);
+  }
+
+  & .invite {
+    @include button-icon-only($icon-times);
   }
 }

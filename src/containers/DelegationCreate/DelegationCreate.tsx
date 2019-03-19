@@ -3,7 +3,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
@@ -54,7 +53,7 @@ class DelegationCreate extends React.Component<Props, State> {
           alias,
           cType,
           delegation: new sdk.DelegationRootNode(
-            uuid(),
+            delegationService.createID(),
             ctypeHash,
             selectedIdentity.identity.address
           ),
@@ -125,7 +124,7 @@ class DelegationCreate extends React.Component<Props, State> {
       })
 
       delegationService
-        .store(delegation, alias)
+        .storeRoot(delegation, alias)
         .then(() => {
           blockUi.remove()
           notifySuccess('Delegation successfully created')

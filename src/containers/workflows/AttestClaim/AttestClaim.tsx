@@ -6,11 +6,8 @@ import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import contactRepository from '../../../services/ContactRepository'
 import errorService from '../../../services/ErrorService'
-import FeedbackService, {
-  notifySuccess,
-} from '../../../services/FeedbackService'
+import { notifySuccess } from '../../../services/FeedbackService'
 import { Contact } from '../../../types/Contact'
-import { BlockUi } from '../../../types/UserFeedback'
 
 type Props = {
   senderAddress: Contact['publicIdentity']['address']
@@ -47,10 +44,6 @@ class AttestClaim extends React.Component<Props, State> {
   private attestClaim() {
     const { requestForAttestation, onFinished, senderAddress } = this.props
 
-    const blockUi: BlockUi = FeedbackService.addBlockUi({
-      headline: 'Attesting claim',
-    })
-
     contactRepository
       .findByAddress(senderAddress)
       .then((claimer: Contact) => {
@@ -58,17 +51,12 @@ class AttestClaim extends React.Component<Props, State> {
           .approveAndSubmitAttestationForClaim(requestForAttestation, claimer)
           .then(() => {
             notifySuccess('Claim attested and sent to claimer.')
-            blockUi.remove()
             if (onFinished) {
               onFinished()
             }
           })
-          .catch((rejectedReceivers: Contact[]) => {
-            blockUi.remove()
-          })
       })
       .catch(error => {
-        blockUi.remove()
         errorService.log({
           error,
           message: 'Could not retrieve claimer',
