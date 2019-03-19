@@ -152,9 +152,9 @@ class CreateDelegation extends React.Component<Props, State> {
   private replyToInvitee() {
     const { delegationData, onFinished, inviteeAddress } = this.props
 
-    const request: sdk.ISubmitCreateDelegation = {
+    const request: sdk.IInformCreateDelegation = {
       content: delegationData.id,
-      type: sdk.MessageBodyType.SUBMIT_CREATE_DELEGATION,
+      type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
     }
 
     ContactRepository.findByAddress(inviteeAddress)
