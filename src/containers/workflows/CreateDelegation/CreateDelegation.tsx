@@ -108,15 +108,18 @@ class CreateDelegation extends React.Component<Props, State> {
     const { delegationData, signatures } = this.props
     const { account, id, parentId, permissions } = delegationData
 
-    // TODO: replace with getRoot method on parent delegation node
-    const rootId = parentId
+    const rootId = parentId // TODO: query root node: DelegationService.queryRootNode(parentId)
+    let optionalParentId: sdk.IDelegationNode['parentId']
+    if (rootId !== parentId) {
+      optionalParentId = parentId
+    }
 
     const newDelegationNode = new sdk.DelegationNode(
       id,
       rootId,
       account,
       permissions,
-      parentId
+      optionalParentId
     )
 
     DelegationService.storeOnChain(newDelegationNode, signatures.invitee)

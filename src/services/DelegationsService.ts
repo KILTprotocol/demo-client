@@ -45,6 +45,27 @@ class DelegationsService {
     )
   }
 
+  public static async queryNode(
+    delegationNodeId: string
+  ): Promise<sdk.IDelegationNode> {
+    const blockchain = await BlockchainService.connect()
+    return sdk.DelegationNode.query(blockchain, delegationNodeId)
+  }
+
+  public static async queryRootNode(
+    delegationNodeId: sdk.IDelegationBaseNode['id']
+  ): Promise<sdk.IDelegationRootNode> {
+    const blockchain = await BlockchainService.connect()
+    const node: sdk.IDelegationNode = await sdk.DelegationNode.query(
+      blockchain,
+      delegationNodeId
+    )
+    if (node) {
+      return await node.getRoot(blockchain)
+    }
+    return await sdk.DelegationRootNode.query(blockchain, delegationNodeId)
+  }
+
   private static async storeRootOnChain(delegation: sdk.DelegationRootNode) {
     const blockchain = await BlockchainService.connect()
     const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
