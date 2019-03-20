@@ -4,19 +4,17 @@ import {
   IRequestAttestationForClaim,
   IRequestLegitimations,
   ISubmitAttestationForClaim,
-  MessageBody,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
 import { Error } from 'tslint/lib/error'
 
 import attestationService from '../services/AttestationService'
 import * as Attestations from '../state/ducks/Attestations'
+import { MyDelegation, MyRootDelegation } from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import { Contact } from '../types/Contact'
 import ContactRepository from './ContactRepository'
-import errorService from './ErrorService'
-import { notifyFailure, notifySuccess } from './FeedbackService'
 import MessageRepository from './MessageRepository'
 
 class AttestationWorkflow {
@@ -26,7 +24,7 @@ class AttestationWorkflow {
    * @param claim the partial claim we request legitimation for
    * @param attesters the attesters to send the legitimation request to
    */
-  public requestLegitimations(
+  public static async requestLegitimations(
     claim: IPartialClaim,
     attesters: Contact[]
   ): Promise<void> {
@@ -35,7 +33,10 @@ class AttestationWorkflow {
       type: MessageBodyType.REQUEST_LEGITIMATIONS,
     } as IRequestLegitimations
 
-    return this.bulkSend(attesters, messageBody)
+    return MessageRepository.sendToAddress(
+      attesters.map((attester: Contact) => attester.publicIdentity.address),
+      messageBody
+    )
   }
 
   /**
@@ -45,14 +46,44 @@ class AttestationWorkflow {
    * @param claim the (partial) claim to attest
    * @param legitimations the list of legitimations to be included in the
    *   attestation
-   * @param claimer the claimer who requested the legitimation
+   * @param receiverAddress claimers address who requested the legitimation
+   * @param delegation delegation to add to legitimations
    */
-  public submitLegitimations(
+  public static async submitLegitimations(
     claim: IPartialClaim,
-    legitimations: sdk.AttestedClaim[],
-    claimer: Contact
+    legitimations: sdk.IAttestedClaim[],
+    receiverAddress: Contact['publicIdentity']['address'],
+    delegation?: MyDelegation | MyRootDelegation
   ): Promise<void> {
-    throw new Error('not implemented')
+    const messageBody: sdk.ISubmitLegitimations = {
+      content: { claim, legitimations },
+      type: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
+    }
+
+    if (delegation) {
+      messageBody.content.delegationId = delegation.id
+    }
+
+    return MessageRepository.sendToAddress(receiverAddress, messageBody)
+  }
+
+  /**
+   * Sends back attested claims to verifier.
+   *
+   * @param attestedClaims the list of attested claims to be included in the
+   *   attestation
+   * @param receiverAddress verifiers address who requested the attested claims
+   */
+  public static async submitClaimsForCtype(
+    attestedClaims: sdk.IAttestedClaim[],
+    receiverAddress: Contact['publicIdentity']['address']
+  ): Promise<void> {
+    const messageBody: sdk.ISubmitClaimsForCtype = {
+      content: attestedClaims,
+      type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
+    }
+
+    return MessageRepository.sendToAddress(receiverAddress, messageBody)
   }
 
   /**
@@ -63,7 +94,7 @@ class AttestationWorkflow {
    * @param [legitimations] - the legitimations the claimer requested
    *   beforehand from attester
    */
-  public requestAttestationForClaim(
+  public static async requestAttestationForClaim(
     claim: sdk.IClaim,
     attesters: Contact[],
     legitimations: sdk.AttestedClaim[] = []
@@ -81,7 +112,7 @@ class AttestationWorkflow {
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     } as IRequestAttestationForClaim
 
-    return this.bulkSend(attesters, messageBody)
+    return MessageRepository.send(attesters, messageBody)
   }
 
   /**
@@ -92,7 +123,7 @@ class AttestationWorkflow {
    *   and attested
    * @param claimerAddress the contacts address who wants his claim to be attested
    */
-  public approveAndSubmitAttestationForClaim(
+  public static async approveAndSubmitAttestationForClaim(
     requestForAttestation: sdk.IRequestForAttestation,
     claimerAddress: Contact['publicIdentity']['address']
   ): Promise<void> {
@@ -121,60 +152,22 @@ class AttestationWorkflow {
   }
 
   /**
-   * Import the attested claim to local storage.
+   * informs the delegate about the created delegation node
    *
-   * @param attestedClaim the attested claim to import
+   * @param delegationNodeId id of the just created delegation node
+   * @param delegateAddress owner of the just created delegation node
    */
-  public importAttestedClaim(attestedClaim: sdk.IAttestedClaim): Promise<void> {
-    throw new Error('not implemented')
-  }
-
-  /**
-   * sends a bulk of requests to several attesters
-   *
-   * @param attesters
-   * @param messageBody
-   */
-  private bulkSend(
-    attesters: Contact[],
-    messageBody: MessageBody
+  public static async informCreateDelegation(
+    delegationNodeId: sdk.DelegationNode['id'],
+    delegateAddress: Contact['publicIdentity']['address']
   ): Promise<void> {
-    const failedReceivers: Contact[] = []
-
-    if (!attesters || !attesters.length) {
-      notifyFailure('No attesters selected')
-      return Promise.reject()
+    const messageBody: sdk.ISubmitCreateDelegation = {
+      content: delegationNodeId,
+      type: sdk.MessageBodyType.SUBMIT_CREATE_DELEGATION,
     }
 
-    return new Promise((resolve, reject) => {
-      Promise.all(
-        attesters.map((attester: Contact) => {
-          return MessageRepository.send(attester, messageBody)
-        })
-      )
-        .then(() => {
-          notifySuccess(
-            `'${messageBody.type}' message${
-              attesters.length > 1 ? 's' : ''
-            } successfully sent.`
-          )
-          resolve()
-        })
-        .catch(error => {
-          errorService.log({
-            error,
-            message: `Failed to send '${messageBody.type}' message${
-              failedReceivers.length > 1 ? 's' : ''
-            } to '${failedReceivers
-              .map((receiver: Contact) => receiver.metaData.name)
-              .join(',')}'`,
-            origin: 'AttestationsWorkflow.bulkSend()',
-            type: 'ERROR.FETCH.POST',
-          })
-          reject(failedReceivers)
-        })
-    })
+    return MessageRepository.sendToAddress(delegateAddress, messageBody)
   }
 }
 
-export default new AttestationWorkflow()
+export default AttestationWorkflow

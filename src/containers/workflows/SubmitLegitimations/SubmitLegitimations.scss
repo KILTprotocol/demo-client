@@ -1,6 +1,7 @@
 .SubmitLegitimations {
 
-  & > div {
+  & .selectLegitimations,
+  & .selectDelegation {
     @include labeledCard;
   }
 }

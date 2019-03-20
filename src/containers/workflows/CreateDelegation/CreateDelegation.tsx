@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import ContactPresentation from '../../../components/ContactPresentation/ContactPresentation'
 import ShortHash from '../../../components/ShortHash/ShortHash'
 import Spinner from '../../../components/Spinner/Spinner'
+import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import ContactRepository from '../../../services/ContactRepository'
 import DelegationService from '../../../services/DelegationsService'
 import errorService from '../../../services/ErrorService'
@@ -196,12 +197,10 @@ class CreateDelegation extends React.Component<Props, State> {
   private replyToInvitee() {
     const { delegationData, onFinished, inviteeAddress } = this.props
 
-    const messageBody: sdk.IInformCreateDelegation = {
-      content: delegationData.id,
-      type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
-    }
-
-    MessageRepository.sendToAddress(inviteeAddress, messageBody).then(() => {
+    AttestationWorkflow.informCreateDelegation(
+      delegationData.id,
+      inviteeAddress
+    ).then(() => {
       if (onFinished) {
         onFinished()
       }

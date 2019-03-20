@@ -12,6 +12,12 @@ class ContactRepository {
 
   public async findAll(): Promise<Contact[]> {
     return fetch(`${ContactRepository.URL}`)
+      .then(response => {
+        if (!response.ok) {
+          throw Error(response.statusText)
+        }
+        return response
+      })
       .then(response => response.json())
       .catch(error => {
         ErrorService.log({
@@ -20,12 +26,18 @@ class ContactRepository {
           origin: 'ContactRepository.findAll()',
           type: 'ERROR.FETCH.GET',
         })
-        throw new Error()
+        return error
       })
   }
 
   public findByAddress(address: string): Promise<Contact> {
     return fetch(`${ContactRepository.URL}/${address}`)
+      .then(response => {
+        if (!response.ok) {
+          throw Error(response.statusText)
+        }
+        return response
+      })
       .then(response => response.json())
       .catch(error => {
         ErrorService.log({
@@ -34,7 +46,6 @@ class ContactRepository {
           origin: 'ContactRepository.findByAddress()',
           type: 'ERROR.FETCH.GET',
         })
-        throw new Error()
       })
   }
 
@@ -42,15 +53,22 @@ class ContactRepository {
     return fetch(`${ContactRepository.URL}`, {
       ...BasePostParams,
       body: JSON.stringify(contact),
-    }).catch(error => {
-      ErrorService.log({
-        error,
-        message: `Could not add contact`,
-        origin: 'ContactRepository.add()',
-        type: 'ERROR.FETCH.POST',
-      })
-      throw new Error()
     })
+      .then(response => {
+        if (!response.ok) {
+          throw Error(response.statusText)
+        }
+        return response
+      })
+      .catch(error => {
+        ErrorService.log({
+          error,
+          message: `Could not add contact`,
+          origin: 'ContactRepository.add()',
+          type: 'ERROR.FETCH.POST',
+        })
+        return error
+      })
   }
 }
 

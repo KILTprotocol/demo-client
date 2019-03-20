@@ -7,6 +7,7 @@ import SelectDelegations from '../../../components/SelectDelegations/SelectDeleg
 import withSelectAttestedClaims, {
   InjectedProps as InjectedSelectProps,
 } from '../../../components/withSelectAttestedClaims/withSelectAttestedClaims'
+import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import MessageRepository from '../../../services/MessageRepository'
 import {
   MyDelegation,
@@ -33,7 +34,6 @@ class SubmitLegitimations extends React.Component<Props, State> {
     this.state = {}
 
     this.changeDelegation = this.changeDelegation.bind(this)
-    this.createMessageBody = this.createMessageBody.bind(this)
     this.sendClaim = this.sendClaim.bind(this)
   }
 
@@ -91,34 +91,24 @@ class SubmitLegitimations extends React.Component<Props, State> {
   }
 
   private sendClaim() {
-    const { receiverAddress, onFinished } = this.props
-    MessageRepository.sendToAddress(
+    const {
+      sentClaim,
+      getAttestedClaims,
       receiverAddress,
-      this.createMessageBody()
+      onFinished,
+    } = this.props
+    const { selectedDelegation } = this.state
+
+    AttestationWorkflow.submitLegitimations(
+      sentClaim,
+      getAttestedClaims(),
+      receiverAddress,
+      selectedDelegation
     ).then(() => {
       if (onFinished) {
         onFinished()
       }
     })
-  }
-
-  private createMessageBody(): sdk.ISubmitLegitimations {
-    const { sentClaim, getAttestedClaims } = this.props
-    const { selectedDelegation } = this.state
-
-    const messageBody: sdk.ISubmitLegitimations = {
-      content: {
-        claim: sentClaim,
-        legitimations: getAttestedClaims(),
-      },
-      type: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
-    }
-
-    if (selectedDelegation) {
-      messageBody.content.delegationId = selectedDelegation.id
-    }
-
-    return messageBody
   }
 
   private changeDelegation(selectedDelegations: MyDelegation[]) {
