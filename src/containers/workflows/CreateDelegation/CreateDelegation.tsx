@@ -196,43 +196,16 @@ class CreateDelegation extends React.Component<Props, State> {
   private replyToInvitee() {
     const { delegationData, onFinished, inviteeAddress } = this.props
 
-    const request: sdk.IInformCreateDelegation = {
+    const messageBody: sdk.IInformCreateDelegation = {
       content: delegationData.id,
       type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
     }
 
-    ContactRepository.findByAddress(inviteeAddress)
-      .then((invitee: Contact) => {
-        MessageRepository.send(invitee, request)
-          .then(() => {
-            notifySuccess('Delegation creation successfully communicated.')
-            if (onFinished) {
-              onFinished()
-            }
-          })
-          .catch(error => {
-            errorService.log({
-              error,
-              message: `Could not send message ${request.type} to ${
-                invitee!.metaData.name
-              }`,
-              origin: 'CreateDelegation.replyToInvitee()',
-              type: 'ERROR.FETCH.POST',
-            })
-          })
-      })
-      .catch(error => {
-        errorService.log({
-          error,
-          message: `Could not resolve invitee '${inviteeAddress}'`,
-          origin: 'CreateDelegation.replyToInvitee()',
-          type: 'ERROR.FETCH.GET',
-        })
-      })
-
-    if (onFinished) {
-      onFinished()
-    }
+    MessageRepository.sendToAddress(inviteeAddress, messageBody).then(() => {
+      if (onFinished) {
+        onFinished()
+      }
+    })
   }
 }
 

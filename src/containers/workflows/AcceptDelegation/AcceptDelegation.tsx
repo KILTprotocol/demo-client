@@ -3,9 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import ContactPresentation from '../../../components/ContactPresentation/ContactPresentation'
 import Spinner from '../../../components/Spinner/Spinner'
-import ContactRepository from '../../../services/ContactRepository'
-import errorService from '../../../services/ErrorService'
-import { notifySuccess, notifyFailure } from '../../../services/FeedbackService'
+import { notifyFailure } from '../../../services/FeedbackService'
 import MessageRepository from '../../../services/MessageRepository'
 import * as Wallet from '../../../state/ducks/Wallet'
 import { State as ReduxState } from '../../../state/PersistentStore'
@@ -112,7 +110,7 @@ class AcceptDelegation extends React.Component<Props, State> {
 
     const signature = await this.signNewDelegationNode(delegationData)
 
-    const request: sdk.ISubmitAcceptDelegation = {
+    const messageBody: sdk.ISubmitAcceptDelegation = {
       content: {
         delegationData,
         signatures: {
@@ -123,34 +121,11 @@ class AcceptDelegation extends React.Component<Props, State> {
       type: sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION,
     }
 
-    ContactRepository.findByAddress(inviterAddress)
-      .then((inviter: Contact) => {
-        MessageRepository.send(inviter, request)
-          .then(() => {
-            notifySuccess('Delegation invitation acceptance successfully sent.')
-            if (onFinished) {
-              onFinished()
-            }
-          })
-          .catch(error => {
-            errorService.log({
-              error,
-              message: `Could not send message ${request.type} to ${
-                inviter!.metaData.name
-              }`,
-              origin: 'AcceptDelegation.signAndReply()',
-              type: 'ERROR.FETCH.POST',
-            })
-          })
-      })
-      .catch(error => {
-        errorService.log({
-          error,
-          message: `Could not resolve inviter '${inviterAddress}'`,
-          origin: 'AcceptDelegation.signAndReply()',
-          type: 'ERROR.FETCH.GET',
-        })
-      })
+    MessageRepository.sendToAddress(inviterAddress, messageBody).then(() => {
+      if (onFinished) {
+        onFinished()
+      }
+    })
   }
 
   private async signNewDelegationNode(

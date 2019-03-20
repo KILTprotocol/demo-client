@@ -4,11 +4,9 @@ import AcceptDelegation from '../../containers/workflows/AcceptDelegation/Accept
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
 import CreateDelegation from '../../containers/workflows/CreateDelegation/CreateDelegation'
 import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
-import OnRequestClaimsForCType from '../../containers/workflows/OnRequestClaimsForCType/OnRequestClaimsForCType'
-import OnRequestLegitimations from '../../containers/workflows/OnRequestLegitimations/OnRequestLegitimations'
+import SubmitClaimsForCType from '../../containers/workflows/SubmitClaimsForCType/SubmitClaimsForCType'
+import SubmitLegitimations from '../../containers/workflows/SubmitLegitimations/SubmitLegitimations'
 import RequestAttestation from '../../containers/workflows/RequestAttestation/RequestAttestation'
-import RequestLegitimations from '../../containers/workflows/RequestLegitimations/RequestLegitimations'
-import SelectAttestedClaims from '../../containers/workflows/OnRequestClaimsForCType/OnRequestClaimsForCType'
 import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
 import { MessageOutput } from '../../services/MessageRepository'
 
@@ -114,8 +112,8 @@ class MessageDetailView extends React.Component<Props, State> {
     switch (messageBodyType) {
       case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
         return (
-          <OnRequestLegitimations
-            senderAddress={message.senderAddress}
+          <SubmitLegitimations
+            receiverAddress={message.senderAddress}
             sentClaim={(message.body as sdk.IRequestLegitimations).content}
             onFinished={this.handleDelete}
           />
@@ -136,7 +134,7 @@ class MessageDetailView extends React.Component<Props, State> {
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return (
           <AttestClaim
-            senderAddress={message.senderAddress}
+            claimerAddress={message.senderAddress}
             requestForAttestation={
               (message.body as sdk.IRequestAttestationForClaim).content
             }
@@ -154,8 +152,8 @@ class MessageDetailView extends React.Component<Props, State> {
         )
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
         return (
-          <OnRequestClaimsForCType
-            senderAddress={message.senderAddress}
+          <SubmitClaimsForCType
+            receiverAddress={message.senderAddress}
             cTypeHash={(message.body as sdk.IRequestClaimsForCtype).content}
             onFinished={this.handleDelete}
           />
@@ -210,7 +208,9 @@ class MessageDetailView extends React.Component<Props, State> {
   private handleDelete() {
     const { message, onDelete } = this.props
     if (message && onDelete) {
-      onDelete(message)
+      setTimeout(() => {
+        onDelete(message)
+      })
     }
   }
 

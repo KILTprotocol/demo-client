@@ -269,7 +269,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 
     const delegationData = this.getDelegationData(receiver, delegation)
 
-    const request: sdk.IRequestAcceptDelegation = {
+    const messageBody: sdk.IRequestAcceptDelegation = {
       content: {
         delegationData,
         metaData,
@@ -282,20 +282,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
       type: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
     }
 
-    MessageRepository.send(receiver, request)
-      .then(() => {
-        notifySuccess('Delegation invitation successfully sent.')
-      })
-      .catch(error => {
-        errorService.log({
-          error,
-          message: `Could not send message ${request.type} to ${
-            receiver!.metaData.name
-          }`,
-          origin: 'DelegationsView.confirmSelectContacts()',
-          type: 'ERROR.FETCH.POST',
-        })
-      })
+    MessageRepository.send(receiver, messageBody)
   }
 
   private sendInvitations() {

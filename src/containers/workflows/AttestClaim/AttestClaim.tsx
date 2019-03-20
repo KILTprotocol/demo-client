@@ -7,10 +7,11 @@ import attestationWorkflow from '../../../services/AttestationWorkflow'
 import contactRepository from '../../../services/ContactRepository'
 import errorService from '../../../services/ErrorService'
 import { notifySuccess } from '../../../services/FeedbackService'
+import MessageRepository from '../../../services/MessageRepository'
 import { Contact } from '../../../types/Contact'
 
 type Props = {
-  senderAddress: Contact['publicIdentity']['address']
+  claimerAddress: Contact['publicIdentity']['address']
   requestForAttestation: sdk.IRequestForAttestation
   onFinished?: () => void
 }
@@ -42,26 +43,17 @@ class AttestClaim extends React.Component<Props, State> {
   }
 
   private attestClaim() {
-    const { requestForAttestation, onFinished, senderAddress } = this.props
+    const { requestForAttestation, onFinished, claimerAddress } = this.props
 
-    contactRepository
-      .findByAddress(senderAddress)
-      .then((claimer: Contact) => {
-        attestationWorkflow
-          .approveAndSubmitAttestationForClaim(requestForAttestation, claimer)
-          .then(() => {
-            notifySuccess('Claim attested and sent to claimer.')
-            if (onFinished) {
-              onFinished()
-            }
-          })
-      })
-      .catch(error => {
-        errorService.log({
-          error,
-          message: 'Could not retrieve claimer',
-          origin: 'AttestClaim.attestClaim()',
-        })
+    attestationWorkflow
+      .approveAndSubmitAttestationForClaim(
+        requestForAttestation,
+        claimerAddress
+      )
+      .then(() => {
+        if (onFinished) {
+          onFinished()
+        }
       })
   }
 }

@@ -5,6 +5,7 @@ import { Contact, MyIdentity } from '../types/Contact'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import contactRepository from './ContactRepository'
 import errorService from './ErrorService'
+import { notifySuccess } from './FeedbackService'
 
 export interface MessageOutput extends sdk.IMessage {
   encryptedMessage: sdk.IEncryptedMessage
@@ -95,27 +96,48 @@ class MessageRepository {
     receiver: Contact,
     messageBody: sdk.MessageBody
   ): Promise<void> {
-    try {
-      const sender: MyIdentity = persistentStore.store.getState().wallet
-        .selectedIdentity
-      const message: sdk.Message = new sdk.Message(
-        messageBody,
-        sender.identity,
-        receiver.publicIdentity
-      )
+    const sender: MyIdentity = persistentStore.store.getState().wallet
+      .selectedIdentity
+    const message: sdk.Message = new sdk.Message(
+      messageBody,
+      sender.identity,
+      receiver.publicIdentity
+    )
 
-      return fetch(`${MessageRepository.URL}`, {
-        ...BasePostParams,
-        body: JSON.stringify(message.getEncryptedMessage()),
-      }).then(response => response.json())
-    } catch (error) {
-      errorService.log({
-        error,
-        message: 'error just before sending messageBody',
-        origin: 'MessageRepository.send()',
+    return fetch(`${MessageRepository.URL}`, {
+      ...BasePostParams,
+      body: JSON.stringify(message.getEncryptedMessage()),
+    })
+      .then(response => response.json())
+      .then(() => {
+        notifySuccess(
+          `Message '${messageBody.type}' to ${
+            receiver!.metaData.name
+          } successfully sent.`
+        )
       })
-      return Promise.reject()
-    }
+      .catch(error => {
+        errorService.logWithNotification({
+          error,
+          message: `Could not send message '${messageBody.type}' to ${
+            receiver!.metaData.name
+          }`,
+          origin: 'MessageRepository.send()',
+          type: 'ERROR.FETCH.POST',
+        })
+        throw new Error()
+      })
+  }
+
+  public static sendToAddress(
+    receiverAddress: Contact['publicIdentity']['address'],
+    messageBody: sdk.MessageBody
+  ): Promise<void> {
+    return contactRepository
+      .findByAddress(receiverAddress)
+      .then((receiver: Contact) => {
+        return MessageRepository.send(receiver, messageBody)
+      })
   }
 
   public static async deleteByMessageId(messageId: string) {

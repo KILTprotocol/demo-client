@@ -14,6 +14,7 @@ import * as Attestations from '../state/ducks/Attestations'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import { Contact } from '../types/Contact'
+import ContactRepository from './ContactRepository'
 import errorService from './ErrorService'
 import { notifyFailure, notifySuccess } from './FeedbackService'
 import MessageRepository from './MessageRepository'
@@ -89,53 +90,34 @@ class AttestationWorkflow {
    *
    * @param requestForAttestation the request for attestation to be verified
    *   and attested
-   * @param claimer the contact who wants his claim to be attested
+   * @param claimerAddress the contacts address who wants his claim to be attested
    */
   public approveAndSubmitAttestationForClaim(
     requestForAttestation: sdk.IRequestForAttestation,
-    claimer: Contact
+    claimerAddress: Contact['publicIdentity']['address']
   ): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      attestationService
-        .attestClaim(requestForAttestation)
-        .then((attestedClaim: sdk.IAttestedClaim) => {
-          // store attestation locally
-          attestationService.saveInStore({
-            attestation: attestedClaim.attestation,
-            cTypeHash: attestedClaim.request.claim.cType,
-            claimerAddress: attestedClaim.request.claim.owner,
-            claimerAlias: claimer.metaData.name,
-          } as Attestations.Entry)
+    return ContactRepository.findByAddress(claimerAddress).then(
+      (claimer: Contact) => {
+        return attestationService
+          .attestClaim(requestForAttestation)
+          .then((attestedClaim: sdk.IAttestedClaim) => {
+            // store attestation locally
+            attestationService.saveInStore({
+              attestation: attestedClaim.attestation,
+              cTypeHash: attestedClaim.request.claim.cType,
+              claimerAddress: attestedClaim.request.claim.owner,
+              claimerAlias: claimer.metaData.name,
+            } as Attestations.Entry)
 
-          // build 'claim attested' message and send to claimer
-          const attestationMessageBody: ISubmitAttestationForClaim = {
-            content: attestedClaim,
-            type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
-          }
-          MessageRepository.send(claimer, attestationMessageBody)
-            .then(message => {
-              resolve()
-            })
-            .catch(error => {
-              errorService.log({
-                error,
-                message: 'Could send attested claim to claimer',
-                origin:
-                  'AttestationWorkflow.approveAndSubmitAttestationForClaim()',
-                type: 'ERROR.FETCH.POST',
-              })
-              reject(error)
-            })
-        })
-        .catch(error => {
-          errorService.log({
-            error,
-            message: 'Could not create attestation for claim',
-            origin: 'AttestationWorkflow.approveAndSubmitAttestationForClaim()',
+            // build 'claim attested' message and send to claimer
+            const attestationMessageBody: ISubmitAttestationForClaim = {
+              content: attestedClaim,
+              type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
+            }
+            return MessageRepository.send(claimer, attestationMessageBody)
           })
-          reject(error)
-        })
-    })
+      }
+    )
   }
 
   /**

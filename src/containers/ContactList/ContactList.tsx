@@ -162,30 +162,12 @@ class ContactList extends React.Component<Props, State> {
 
   private onFinishRequestClaim(selectedCTypes: ICType[]) {
     if (this.selectedContact && selectedCTypes) {
-      const blockUi: BlockUi = FeedbackService.addBlockUi({
-        headline: 'Sending Message',
-      })
-      const request: IRequestClaimsForCtype = {
+      const messageBody: IRequestClaimsForCtype = {
         content: selectedCTypes[0].cType.hash,
         type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
       }
 
-      MessageRepository.send(this.selectedContact, request)
-        .then(() => {
-          blockUi.remove()
-          notifySuccess('Request Claims successfully sent.')
-        })
-        .catch(error => {
-          blockUi.remove()
-          errorService.log({
-            error,
-            message: `Could not send message ${request.type} to ${
-              this.selectedContact!.metaData.name
-            }`,
-            origin: 'ContactList.onFinishRequestClaim()',
-            type: 'ERROR.FETCH.POST',
-          })
-        })
+      MessageRepository.send(this.selectedContact, messageBody)
     }
   }
 
