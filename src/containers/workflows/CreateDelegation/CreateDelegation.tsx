@@ -7,7 +7,7 @@ import Spinner from '../../../components/Spinner/Spinner'
 import ContactRepository from '../../../services/ContactRepository'
 import DelegationService from '../../../services/DelegationsService'
 import errorService from '../../../services/ErrorService'
-import { notifySuccess } from '../../../services/FeedbackService'
+import { notifySuccess, notifyFailure } from '../../../services/FeedbackService'
 import MessageRepository from '../../../services/MessageRepository'
 import * as Wallet from '../../../state/ducks/Wallet'
 import { State as ReduxState } from '../../../state/PersistentStore'
@@ -104,11 +104,18 @@ class CreateDelegation extends React.Component<Props, State> {
     )
   }
 
-  private createDelegation() {
+  private async createDelegation() {
     const { delegationData, signatures } = this.props
     const { account, id, parentId, permissions } = delegationData
 
-    const rootId = parentId // TODO: query root node: DelegationService.queryRootNode(parentId)
+    const rootNode:
+      | sdk.IDelegationRootNode
+      | undefined = await DelegationService.queryRootNode(parentId)
+    if (!rootNode) {
+      notifyFailure('Root delegation not found')
+      return
+    }
+    const rootId = rootNode.id
     let optionalParentId: sdk.IDelegationNode['parentId']
     if (rootId !== parentId) {
       optionalParentId = parentId
