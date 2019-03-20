@@ -5,6 +5,11 @@ import { createSelector } from 'reselect'
 import KiltAction from '../../types/Action'
 import { State as ReduxState } from '../PersistentStore'
 
+export enum DelegationType {
+  Root = 'root',
+  Node = 'node',
+}
+
 interface MyBaseDelegation {
   account: sdk.IDelegationBaseNode['account']
   id: sdk.IDelegationBaseNode['id']
@@ -14,12 +19,14 @@ interface MyBaseDelegation {
 }
 
 export interface MyDelegation extends MyBaseDelegation {
+  type: DelegationType
   rootId: sdk.IDelegationNode['rootId']
   permissions: sdk.IDelegationNode['permissions']
   parentId: sdk.IDelegationNode['parentId']
 }
 
 export interface MyRootDelegation extends MyBaseDelegation {
+  type: DelegationType
   cTypeHash: sdk.IDelegationRootNode['cTypeHash']
 }
 

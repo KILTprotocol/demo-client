@@ -1,17 +1,11 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-import { v4 as uuid } from 'uuid'
-import { MyDelegation, MyRootDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
-
+import { MyDelegation, MyRootDelegation } from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
 import BlockchainService from './BlockchainService'
 
 class DelegationsService {
-  public static createID() {
-    return uuid()
-  }
-
   public static async storeRoot(
     delegationRoot: sdk.DelegationRootNode,
     alias: string
@@ -24,6 +18,7 @@ class DelegationsService {
         cTypeHash,
         id,
         metaData: { alias },
+        type: Delegations.DelegationType.Root,
       } as MyRootDelegation)
     })
   }
@@ -63,6 +58,37 @@ class DelegationsService {
       return await node.getRoot(blockchain)
     }
     return await sdk.DelegationRootNode.query(blockchain, delegationNodeId)
+  }
+
+  public static async importDelegation(
+    delegationNodeId: sdk.IDelegationBaseNode['id'],
+    alias?: string
+  ): Promise<MyDelegation | undefined> {
+    return new Promise<MyDelegation | undefined>((resolve, reject) => {
+      DelegationsService.queryNode(delegationNodeId)
+        .then((delegation: sdk.IDelegationNode | undefined) => {
+          if (delegation) {
+            const myDelegation: Delegations.MyDelegation = {
+              account: delegation.account,
+              id: delegation.id,
+              metaData: {
+                alias: alias || 'Unnamed delegation',
+              },
+              parentId: delegation.parentId,
+              permissions: delegation.permissions,
+              rootId: delegation.rootId,
+              type: Delegations.DelegationType.Node,
+            }
+            DelegationsService.store(myDelegation)
+            resolve(myDelegation)
+          } else {
+            resolve(undefined)
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
   }
 
   private static async storeRootOnChain(delegation: sdk.DelegationRootNode) {

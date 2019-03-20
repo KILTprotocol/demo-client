@@ -53,6 +53,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
                 CTYPE
               </th>
               <th className="alias">Alias</th>
+              <th className="type">Type</th>
               <th className="id">ID</th>
               <th className="cType">CTYPE</th>
               <th className="account">Account</th>
@@ -63,24 +64,40 @@ class MyDelegationsListView extends React.Component<Props, State> {
             {delegationEntries.map(
               (delegationEntry: MyDelegation | MyRootDelegation) => {
                 // TODO: refactor when sdk can resolve root Node to a given node
-                const cTypeHash = (delegationEntry as MyRootDelegation)
-                  .cTypeHash
+                const isRoot: boolean =
+                  delegationEntry.type === Delegations.DelegationType.Root
+                const cTypeHash = isRoot
+                  ? (delegationEntry as MyRootDelegation).cTypeHash
+                  : undefined
                 return (
                   <tr key={delegationEntry.id}>
                     <td className="alias_ctype">
                       <Link to={`/delegations/${delegationEntry.id}`}>
                         {delegationEntry.metaData.alias}
                       </Link>
-                      <CTypePresentation cTypeHash={cTypeHash} />
+                      {cTypeHash ? (
+                        <CTypePresentation cTypeHash={cTypeHash} />
+                      ) : (
+                        ''
+                      )}
                     </td>
                     <td className="alias">
                       <Link to={`/delegations/${delegationEntry.id}`}>
                         {delegationEntry.metaData.alias}
                       </Link>
                     </td>
+                    <td>
+                      {delegationEntry.type === Delegations.DelegationType.Root
+                        ? 'root'
+                        : 'node'}
+                    </td>
                     <td className="id">{delegationEntry.id}</td>
                     <td className="cType">
-                      <CTypePresentation cTypeHash={cTypeHash} />
+                      {cTypeHash ? (
+                        <CTypePresentation cTypeHash={cTypeHash} />
+                      ) : (
+                        ''
+                      )}
                     </td>
                     <td className="account">
                       <ContactPresentation address={delegationEntry.account} />

@@ -256,7 +256,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 
     return {
       account: receiver.publicIdentity.address,
-      id: delegationService.createID(),
+      id: sdk.UUID.generate(),
       parentId: delegation.id,
       permissions,
     }
