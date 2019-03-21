@@ -161,9 +161,9 @@ class AttestationWorkflow {
     delegationNodeId: sdk.DelegationNode['id'],
     delegateAddress: Contact['publicIdentity']['address']
   ): Promise<void> {
-    const messageBody: sdk.ISubmitCreateDelegation = {
+    const messageBody: sdk.IInformCreateDelegation = {
       content: delegationNodeId,
-      type: sdk.MessageBodyType.SUBMIT_CREATE_DELEGATION,
+      type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
     }
 
     return MessageRepository.sendToAddress(delegateAddress, messageBody)
