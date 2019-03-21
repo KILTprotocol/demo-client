@@ -1,4 +1,6 @@
 import React, { ReactNode } from 'react'
+import { v4 as uuid } from 'uuid'
+
 import { ModalType } from '../components/Modal/Modal'
 import * as UiState from '../state/ducks/UiState'
 import persistentStore from '../state/PersistentStore'
@@ -16,7 +18,7 @@ class FeedbackService {
     type,
   }: Partial<Notification>): Partial<Notification> {
     const created = Date.now()
-    const id = [created, type, message].join('-') as string
+    const id = uuid()
     return {
       className,
       created,

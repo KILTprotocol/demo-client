@@ -1,4 +1,5 @@
 import Identicon from '@polkadot/ui-identicon'
+import _ from 'lodash'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
@@ -37,7 +38,7 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   public componentDidUpdate(nextProps: Props) {
-    if (nextProps !== this.props) {
+    if (!_.isEqual(this.props, nextProps)) {
       this.setCType()
     }
   }
