@@ -37,7 +37,7 @@ class ContactPresentation extends React.Component<Props, State> {
   }
 
   public componentDidUpdate(nextProps: Props) {
-    if (nextProps !== this.props) {
+    if (this.havePropsChanged(nextProps)) {
       this.setIdentityOrContact()
     }
   }
@@ -71,6 +71,21 @@ class ContactPresentation extends React.Component<Props, State> {
         )}
       </div>
     )
+  }
+
+  private havePropsChanged(nextProps: Props) {
+    switch (true) {
+      case nextProps.address !== this.props.address:
+      case nextProps.contact && !this.props.contact:
+      case !nextProps.contact && this.props.contact:
+      case nextProps.contact &&
+        this.props.contact &&
+        nextProps.contact.publicIdentity.address !==
+          this.props.contact.publicIdentity.address:
+        return true
+      default:
+        return false
+    }
   }
 
   private setIdentityOrContact() {

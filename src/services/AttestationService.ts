@@ -99,15 +99,7 @@ class AttestationService {
     attestedClaim: sdk.IAttestedClaim
   ): Promise<boolean> {
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    return sdk.AttestedClaim.fromObject(attestedClaim)
-      .verify(blockchain)
-      .then((verified: boolean) => {
-        attestedClaim.attestation.revoked = !verified
-        persistentStore.store.dispatch(
-          Claims.Store.updateAttestation(attestedClaim)
-        )
-        return verified
-      })
+    return sdk.AttestedClaim.fromObject(attestedClaim).verify(blockchain)
   }
 
   public saveInStore(attestationEntry: Attestations.Entry): void {

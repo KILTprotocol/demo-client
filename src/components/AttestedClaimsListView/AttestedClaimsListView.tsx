@@ -141,7 +141,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
               return (
                 <tbody
-                  key={attestedClaim.attestation.owner}
+                  key={attestedClaim.attestation.claimHash}
                   className={opened ? 'opened' : ''}
                 >
                   <tr>

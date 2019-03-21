@@ -33,13 +33,6 @@ interface AddAttestationAction extends KiltAction {
   }
 }
 
-interface UpdateAttestationAction extends KiltAction {
-  payload: {
-    claimId: Entry['id']
-    attestation: sdk.IAttestedClaim
-  }
-}
-
 type Action = SaveAction | RemoveAction | AddAttestationAction
 
 type Entry = {
@@ -150,32 +143,12 @@ class Store {
           state.getIn(['claims', claimId, 'attestations']) || []
         attestations = attestations.filter(
           (_attestation: sdk.IAttestedClaim) =>
-            _attestation.attestation.owner !== attestation.attestation.owner
+            !Store.areAttestationsEqual(attestation, _attestation)
         )
 
         return state.setIn(
           ['claims', claimId, 'attestations'],
           [...attestations, attestation]
-        )
-      }
-      case Store.ACTIONS.UPDATE_ATTESTATION: {
-        const {
-          claimId,
-          attestation,
-        } = (action as UpdateAttestationAction).payload
-
-        let attestations =
-          state.getIn(['claims', claimId, 'attestations']) || []
-        attestations = attestations.map((_attestation: sdk.IAttestedClaim) => {
-          return _attestation.attestation.owner ===
-            attestation.attestation.owner
-            ? attestation
-            : _attestation
-        })
-
-        return state.setIn(
-          ['claims', claimId, 'attestations'],
-          [...attestations]
         )
       }
       default:
@@ -210,15 +183,6 @@ class Store {
     }
   }
 
-  public static updateAttestation(
-    attestation: sdk.IAttestedClaim
-  ): UpdateAttestationAction {
-    return {
-      payload: { claimId: hash(attestation.request.claim), attestation },
-      type: Store.ACTIONS.UPDATE_ATTESTATION,
-    }
-  }
-
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
       claims: Immutable.Map<string, Entry>(),
@@ -229,7 +193,18 @@ class Store {
     ADD_ATTESTATION: 'client/claims/ADD_ATTESTATION',
     REMOVE_CLAIM: 'client/claims/REMOVE_CLAIM',
     SAVE_CLAIM: 'client/claims/SAVE_CLAIM',
-    UPDATE_ATTESTATION: 'client/claims/UPDATE_ATTESTATION',
+  }
+
+  private static areAttestationsEqual(
+    attestatedClaim1: sdk.IAttestedClaim,
+    attestatedClaim2: sdk.IAttestedClaim
+  ) {
+    const { attestation: attestation1 } = attestatedClaim1
+    const { attestation: attestation2 } = attestatedClaim2
+    return (
+      attestation1.owner === attestation2.owner &&
+      attestation1.claimHash === attestation2.claimHash
+    )
   }
 }
 

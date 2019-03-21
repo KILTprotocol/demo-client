@@ -37,7 +37,7 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   public componentDidUpdate(nextProps: Props) {
-    if (nextProps !== this.props) {
+    if (this.havePropsChanged(nextProps)) {
       this.setCType()
     }
   }
@@ -66,6 +66,20 @@ class CTypePresentation extends React.Component<Props, State> {
           )}
       </div>
     )
+  }
+
+  private havePropsChanged(nextProps: Props) {
+    switch (true) {
+      case nextProps.cTypeHash !== this.props.cTypeHash:
+      case nextProps.cType && !this.props.cType:
+      case !nextProps.cType && this.props.cType:
+      case nextProps.cType &&
+        this.props.cType &&
+        nextProps.cType.cType.hash !== this.props.cType.cType.hash:
+        return true
+      default:
+        return false
+    }
   }
 
   private wrapInLink(content: ReactNode) {
