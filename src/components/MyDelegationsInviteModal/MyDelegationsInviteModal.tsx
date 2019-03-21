@@ -8,7 +8,7 @@ import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Delegations from '../../state/ducks/Delegations'
-import { MyDelegation, MyRootDelegation } from '../../state/ducks/Delegations'
+import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../types/Contact'
@@ -22,11 +22,11 @@ import './MyDelegationsInviteModal.scss'
 type Props = {
   contactsPool?: Contact[]
   contactsSelected?: Contact[]
-  delegationsPool?: Array<MyDelegation | MyRootDelegation>
-  delegationsSelected?: Array<MyDelegation | MyRootDelegation>
+  delegationsPool?: MyDelegation[]
+  delegationsSelected?: MyDelegation[]
   onCancel?: () => void
   onConfirm?: () => void
-  myDelegations: Array<MyDelegation | MyRootDelegation>
+  myDelegations: MyDelegation[]
   selectedIdentity: MyIdentity
 }
 
@@ -37,8 +37,8 @@ type State = {
     isSelectOpen: boolean
   }
   delegations: {
-    pool: Array<MyDelegation | MyRootDelegation>
-    selected: Array<MyDelegation | MyRootDelegation>
+    pool: MyDelegation[]
+    selected: MyDelegation[]
     isSelectOpen: boolean
   }
   permissions: sdk.Permission[]
@@ -212,7 +212,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
     }, delay)
   }
 
-  private changeDelegations(selected: Array<MyDelegation | MyRootDelegation>) {
+  private changeDelegations(selected: MyDelegation[]) {
     const { delegations } = this.state
     this.setState({ delegations: { ...delegations, selected } })
   }
@@ -250,7 +250,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 
   private getDelegationData(
     receiver: Contact,
-    delegation: MyDelegation | MyRootDelegation
+    delegation: MyDelegation
   ): sdk.IRequestAcceptDelegation['content']['delegationData'] {
     const { permissions } = this.state
 

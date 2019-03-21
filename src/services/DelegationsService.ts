@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as Delegations from '../state/ducks/Delegations'
-import { MyDelegation, MyRootDelegation } from '../state/ducks/Delegations'
+import { MyDelegation } from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
 import BlockchainService from './BlockchainService'
@@ -19,7 +19,7 @@ class DelegationsService {
         id,
         metaData: { alias },
         type: Delegations.DelegationType.Root,
-      } as MyRootDelegation)
+      } as MyDelegation)
     })
   }
 
@@ -34,7 +34,7 @@ class DelegationsService {
     return delegation.store(blockchain, selectedIdentity, signature)
   }
 
-  public static store(delegation: MyRootDelegation | MyDelegation) {
+  public static store(delegation: MyDelegation) {
     PersistentStore.store.dispatch(
       Delegations.Store.saveDelegationAction(delegation)
     )
@@ -76,30 +76,36 @@ class DelegationsService {
     delegationNodeId: sdk.IDelegationBaseNode['id'],
     alias?: string
   ): Promise<MyDelegation | undefined> {
-    return new Promise<MyDelegation | undefined>((resolve, reject) => {
-      DelegationsService.queryNode(delegationNodeId)
-        .then((delegation: sdk.IDelegationNode | undefined) => {
-          if (delegation) {
-            const myDelegation: Delegations.MyDelegation = {
-              account: delegation.account,
-              id: delegation.id,
-              metaData: {
-                alias: alias || 'Unnamed delegation',
-              },
-              parentId: delegation.parentId,
-              permissions: delegation.permissions,
-              rootId: delegation.rootId,
-              type: Delegations.DelegationType.Node,
-            }
-            DelegationsService.store(myDelegation)
-            resolve(myDelegation)
-          } else {
-            resolve(undefined)
+    return new Promise<MyDelegation | undefined>(async (resolve, reject) => {
+      try {
+        const delegation:
+          | sdk.IDelegationNode
+          | undefined = await DelegationsService.queryNode(delegationNodeId)
+        if (delegation) {
+          const blockchain = await BlockchainService.connect()
+          const root:
+            | sdk.IDelegationRootNode
+            | undefined = await delegation.getRoot(blockchain)
+          const myDelegation: Delegations.MyDelegation = {
+            account: delegation.account,
+            cTypeHash: root && root.cTypeHash,
+            id: delegation.id,
+            metaData: {
+              alias: alias || 'Unnamed delegation',
+            },
+            parentId: delegation.parentId,
+            permissions: delegation.permissions,
+            rootId: delegation.rootId,
+            type: Delegations.DelegationType.Node,
           }
-        })
-        .catch(error => {
-          reject(error)
-        })
+          DelegationsService.store(myDelegation)
+          resolve(myDelegation)
+        } else {
+          resolve(undefined)
+        }
+      } catch (error) {
+        reject(error)
+      }
     })
   }
 

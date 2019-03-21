@@ -53,11 +53,11 @@ class ImportDelegation extends React.Component<Props, State> {
       .then((myDelegation: Delegations.MyDelegation | undefined) => {
         if (myDelegation) {
           notifySuccess('Delegation successfully imported.')
+          if (onFinished) {
+            onFinished()
+          }
         } else {
           notifyFailure(`Delegation not found for id '${delegationId}'`)
-        }
-        if (onFinished) {
-          onFinished()
         }
       })
       .catch(error => {

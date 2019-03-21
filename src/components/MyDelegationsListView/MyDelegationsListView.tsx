@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { MyDelegation, MyRootDelegation } from '../../state/ducks/Delegations'
+import { MyDelegation } from '../../state/ducks/Delegations'
 
 import * as Delegations from '../../state/ducks/Delegations'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -11,7 +11,7 @@ import SelectAction from '../SelectAction/SelectAction'
 
 type Props = {
   onCreateDelegation: () => void
-  delegationEntries: Array<MyDelegation | MyRootDelegation>
+  delegationEntries: MyDelegation[]
   onRemoveDelegation: (delegation: Delegations.Entry) => void
   onRequestInviteContacts: (delegation: Delegations.Entry) => void
 }
@@ -56,78 +56,67 @@ class MyDelegationsListView extends React.Component<Props, State> {
               <th className="type">Type</th>
               <th className="id">ID</th>
               <th className="cType">CTYPE</th>
-              <th className="account">Account</th>
               <th />
             </tr>
           </thead>
           <tbody>
-            {delegationEntries.map(
-              (delegationEntry: MyDelegation | MyRootDelegation) => {
-                // TODO: refactor when sdk can resolve root Node to a given node
-                const isRoot: boolean =
-                  delegationEntry.type === Delegations.DelegationType.Root
-                const cTypeHash = isRoot
-                  ? (delegationEntry as MyRootDelegation).cTypeHash
-                  : undefined
-                return (
-                  <tr key={delegationEntry.id}>
-                    <td className="alias_ctype">
-                      <Link to={`/delegations/${delegationEntry.id}`}>
-                        {delegationEntry.metaData.alias}
-                      </Link>
-                      {cTypeHash ? (
-                        <CTypePresentation cTypeHash={cTypeHash} />
-                      ) : (
-                        ''
-                      )}
-                    </td>
-                    <td className="alias">
-                      <Link to={`/delegations/${delegationEntry.id}`}>
-                        {delegationEntry.metaData.alias}
-                      </Link>
-                    </td>
-                    <td>
-                      {delegationEntry.type === Delegations.DelegationType.Root
-                        ? 'root'
-                        : 'node'}
-                    </td>
-                    <td className="id">{delegationEntry.id}</td>
-                    <td className="cType">
-                      {cTypeHash ? (
-                        <CTypePresentation cTypeHash={cTypeHash} />
-                      ) : (
-                        ''
-                      )}
-                    </td>
-                    <td className="account">
-                      <ContactPresentation address={delegationEntry.account} />
-                    </td>
-                    <td className="actionsTd">
-                      <div>
-                        <SelectAction
-                          actions={[
-                            {
-                              callback: this.requestInviteContacts.bind(
-                                this,
-                                delegationEntry
-                              ),
-                              label: 'Invite contact',
-                            },
-                            {
-                              callback: this.handleDelete.bind(
-                                this,
-                                delegationEntry
-                              ),
-                              label: 'Delete',
-                            },
-                          ]}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                )
-              }
-            )}
+            {delegationEntries.map((delegationEntry: MyDelegation) => {
+              const cTypeHash = delegationEntry.cTypeHash
+              return (
+                <tr key={delegationEntry.id}>
+                  <td className="alias_ctype">
+                    <Link to={`/delegations/${delegationEntry.id}`}>
+                      {delegationEntry.metaData.alias}
+                    </Link>
+                    {cTypeHash ? (
+                      <CTypePresentation cTypeHash={cTypeHash} />
+                    ) : (
+                      ''
+                    )}
+                  </td>
+                  <td className="alias">
+                    <Link to={`/delegations/${delegationEntry.id}`}>
+                      {delegationEntry.metaData.alias}
+                    </Link>
+                  </td>
+                  <td>
+                    {delegationEntry.type === Delegations.DelegationType.Root
+                      ? 'root'
+                      : 'node'}
+                  </td>
+                  <td className="id">{delegationEntry.id}</td>
+                  <td className="cType">
+                    {cTypeHash ? (
+                      <CTypePresentation cTypeHash={cTypeHash} />
+                    ) : (
+                      ''
+                    )}
+                  </td>
+                  <td className="actionsTd">
+                    <div>
+                      <SelectAction
+                        actions={[
+                          {
+                            callback: this.requestInviteContacts.bind(
+                              this,
+                              delegationEntry
+                            ),
+                            label: 'Invite contact',
+                          },
+                          {
+                            callback: this.handleDelete.bind(
+                              this,
+                              delegationEntry
+                            ),
+                            label: 'Delete',
+                          },
+                        ]}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       )

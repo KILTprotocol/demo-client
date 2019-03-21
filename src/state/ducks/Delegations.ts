@@ -10,32 +10,25 @@ export enum DelegationType {
   Node = 'node',
 }
 
-interface MyBaseDelegation {
+export interface MyDelegation {
   account: sdk.IDelegationBaseNode['account']
   id: sdk.IDelegationBaseNode['id']
   metaData: {
     alias: string
   }
-}
-
-export interface MyDelegation extends MyBaseDelegation {
   type: DelegationType
-  rootId: sdk.IDelegationNode['rootId']
-  permissions: sdk.IDelegationNode['permissions']
-  parentId: sdk.IDelegationNode['parentId']
-}
-
-export interface MyRootDelegation extends MyBaseDelegation {
-  type: DelegationType
-  cTypeHash: sdk.IDelegationRootNode['cTypeHash']
+  rootId?: sdk.IDelegationNode['rootId']
+  permissions?: sdk.IDelegationNode['permissions']
+  parentId?: sdk.IDelegationNode['parentId']
+  cTypeHash?: sdk.IDelegationRootNode['cTypeHash']
 }
 
 interface SaveAction extends KiltAction {
-  payload: MyDelegation | MyRootDelegation
+  payload: MyDelegation
 }
 
 interface RemoveAction extends KiltAction {
-  payload: MyDelegation | MyRootDelegation
+  payload: MyDelegation
 }
 
 type Action = SaveAction | RemoveAction
@@ -43,7 +36,7 @@ type Action = SaveAction | RemoveAction
 type Entry = MyDelegation
 
 type State = {
-  delegations: Immutable.List<MyDelegation | MyRootDelegation>
+  delegations: Immutable.List<MyDelegation>
 }
 
 type ImmutableState = Immutable.Record<State>
@@ -59,7 +52,7 @@ class Store {
     }
     store.delegations = state
       .get('delegations')
-      .map((myDelegation: MyDelegation | MyRootDelegation) => {
+      .map((myDelegation: MyDelegation) => {
         return JSON.stringify(myDelegation)
       })
       .toArray()
@@ -68,11 +61,11 @@ class Store {
   }
 
   public static deserialize(serializedState: SerializedState): ImmutableState {
-    const delegations: Array<
-      MyDelegation | MyRootDelegation
-    > = serializedState.delegations.map((serialized: string) => {
-      return JSON.parse(serialized) as MyDelegation | MyRootDelegation
-    })
+    const delegations: MyDelegation[] = serializedState.delegations.map(
+      (serialized: string) => {
+        return JSON.parse(serialized) as MyDelegation
+      }
+    )
 
     return Store.createState({
       delegations: Immutable.List(delegations),
@@ -85,14 +78,11 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.SAVE_DELEGATION:
-        const myDelegation:
-          | MyDelegation
-          | MyRootDelegation = (action as SaveAction).payload
+        const myDelegation: MyDelegation = (action as SaveAction).payload
         return state.mergeIn(['delegations'], [myDelegation])
       case Store.ACTIONS.REMOVE_DELEGATION:
-        const myDelegationToRemove:
-          | MyDelegation
-          | MyRootDelegation = (action as RemoveAction).payload
+        const myDelegationToRemove: MyDelegation = (action as RemoveAction)
+          .payload
         return state.set(
           'delegations',
           state
@@ -104,9 +94,7 @@ class Store {
     }
   }
 
-  public static saveDelegationAction(
-    myDelegation: MyDelegation | MyRootDelegation
-  ): SaveAction {
+  public static saveDelegationAction(myDelegation: MyDelegation): SaveAction {
     return {
       payload: myDelegation,
       type: Store.ACTIONS.SAVE_DELEGATION,
@@ -114,7 +102,7 @@ class Store {
   }
 
   public static removeDelegationAction(
-    myDelegation: MyDelegation | MyRootDelegation
+    myDelegation: MyDelegation
   ): RemoveAction {
     return {
       payload: myDelegation,
@@ -124,7 +112,7 @@ class Store {
 
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
-      delegations: Immutable.List<MyDelegation | MyRootDelegation>(),
+      delegations: Immutable.List<MyDelegation>(),
     } as State)(obj)
   }
 

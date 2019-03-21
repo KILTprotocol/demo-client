@@ -7,13 +7,17 @@ import Spinner from '../../../components/Spinner/Spinner'
 import ContactRepository from '../../../services/ContactRepository'
 import DelegationService from '../../../services/DelegationsService'
 import errorService from '../../../services/ErrorService'
-import { notifySuccess, notifyFailure } from '../../../services/FeedbackService'
+import FeedbackService, {
+  notifySuccess,
+  notifyFailure,
+} from '../../../services/FeedbackService'
 import MessageRepository from '../../../services/MessageRepository'
 import * as Wallet from '../../../state/ducks/Wallet'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../../types/Contact'
 
 import './CreateDelegation.scss'
+import { BlockUi } from 'src/types/UserFeedback'
 
 type Props = {
   delegationData: sdk.ISubmitAcceptDelegation['content']['delegationData']
@@ -108,6 +112,10 @@ class CreateDelegation extends React.Component<Props, State> {
     const { delegationData, signatures } = this.props
     const { account, id, parentId, permissions } = delegationData
 
+    const blockUi: BlockUi = FeedbackService.addBlockUi({
+      headline: 'Creating delegation...',
+    })
+
     const rootNode:
       | sdk.IDelegationRootNode
       | undefined = await DelegationService.queryRootNodeForIntermediateNode(
@@ -134,9 +142,11 @@ class CreateDelegation extends React.Component<Props, State> {
     DelegationService.storeOnChain(newDelegationNode, signatures.invitee)
       .then(() => {
         notifySuccess('Delegation successfully created')
+        blockUi.remove()
         this.replyToInvitee()
       })
       .catch(error => {
+        blockUi.remove()
         errorService.logWithNotification({
           error,
           message: `Delegation creation failed.`,

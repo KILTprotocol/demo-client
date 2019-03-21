@@ -4,9 +4,9 @@
     @include table;
     @include responsiveTable(
         (
-          phone: (100%, false, false, false, false, false, 120px),
-          tablet: (false, 100%, 100%, false, 100%, false, 170px),
-          desktop: (false, 100%, 100%, 100%, 100%, 100%,  270px),
+          phone: (100%, false, false, false, false, 120px),
+          tablet: (false, 100%, 50%, false, 100%, 170px),
+          desktop: (false, 100%, 50%, 100%, 100%,  270px),
         )
     );
   }
@@ -14,6 +14,7 @@
   & .id {
     text-overflow: ellipsis;
     overflow: hidden;
+    padding-right: 20px;
   }
 
   & .delete {
