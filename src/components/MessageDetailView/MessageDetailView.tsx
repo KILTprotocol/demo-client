@@ -13,6 +13,7 @@ import Code from '../Code/Code'
 import MessageSubject from '../MessageSubject/MessageSubject'
 
 import './MessageDetailView.scss'
+import ImportDelegation from 'src/containers/workflows/ImportDelegation/ImportDelegation'
 
 type Props = {
   message: MessageOutput
@@ -185,6 +186,16 @@ class MessageDetailView extends React.Component<Props, State> {
             signatures={messageContent.signatures}
             inviteeAddress={message.senderAddress}
             inviterAddress={message.senderAddress}
+            onFinished={this.handleDelete}
+          />
+        )
+      }
+      case sdk.MessageBodyType.INFORM_CREATE_DELEGATION: {
+        const delegationId = (message.body as sdk.IInformCreateDelegation)
+          .content
+        return (
+          <ImportDelegation
+            delegationId={delegationId}
             onFinished={this.handleDelete}
           />
         )

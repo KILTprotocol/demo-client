@@ -1,17 +1,11 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-import { v4 as uuid } from 'uuid'
-import { MyDelegation, MyRootDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
-
+import { MyDelegation } from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
 import BlockchainService from './BlockchainService'
 
 class DelegationsService {
-  public static createID() {
-    return uuid()
-  }
-
   public static async storeRoot(
     delegationRoot: sdk.DelegationRootNode,
     alias: string
@@ -24,7 +18,8 @@ class DelegationsService {
         cTypeHash,
         id,
         metaData: { alias },
-      } as MyRootDelegation)
+        type: Delegations.DelegationType.Root,
+      } as MyDelegation)
     })
   }
 
@@ -39,7 +34,7 @@ class DelegationsService {
     return delegation.store(blockchain, selectedIdentity, signature)
   }
 
-  public static store(delegation: MyRootDelegation | MyDelegation) {
+  public static store(delegation: MyDelegation) {
     PersistentStore.store.dispatch(
       Delegations.Store.saveDelegationAction(delegation)
     )
@@ -52,8 +47,13 @@ class DelegationsService {
     return sdk.DelegationNode.query(blockchain, delegationNodeId)
   }
 
-  public static async queryRootNode(
-    delegationNodeId: sdk.IDelegationBaseNode['id']
+  /**
+   * Query the root node for the intermediate node with `delegationNodeId`.
+   *
+   * @param delegationNodeId the id of the non-root node to query the root for
+   */
+  public static async queryRootNodeForIntermediateNode(
+    delegationNodeId: sdk.IDelegationNode['id']
   ): Promise<sdk.IDelegationRootNode | undefined> {
     const blockchain = await BlockchainService.connect()
     const node:
@@ -62,7 +62,51 @@ class DelegationsService {
     if (node) {
       return await node.getRoot(blockchain)
     }
-    return await sdk.DelegationRootNode.query(blockchain, delegationNodeId)
+    return await DelegationsService.queryRootNode(delegationNodeId)
+  }
+
+  public static async queryRootNode(
+    rootNodeId: sdk.IDelegationRootNode['id']
+  ): Promise<sdk.IDelegationRootNode | undefined> {
+    const blockchain = await BlockchainService.connect()
+    return await sdk.DelegationRootNode.query(blockchain, rootNodeId)
+  }
+
+  public static async importDelegation(
+    delegationNodeId: sdk.IDelegationBaseNode['id'],
+    alias?: string
+  ): Promise<MyDelegation | undefined> {
+    return new Promise<MyDelegation | undefined>(async (resolve, reject) => {
+      try {
+        const delegation:
+          | sdk.IDelegationNode
+          | undefined = await DelegationsService.queryNode(delegationNodeId)
+        if (delegation) {
+          const blockchain = await BlockchainService.connect()
+          const root:
+            | sdk.IDelegationRootNode
+            | undefined = await delegation.getRoot(blockchain)
+          const myDelegation: Delegations.MyDelegation = {
+            account: delegation.account,
+            cTypeHash: root && root.cTypeHash,
+            id: delegation.id,
+            metaData: {
+              alias: alias || 'Unnamed delegation',
+            },
+            parentId: delegation.parentId,
+            permissions: delegation.permissions,
+            rootId: delegation.rootId,
+            type: Delegations.DelegationType.Node,
+          }
+          DelegationsService.store(myDelegation)
+          resolve(myDelegation)
+        } else {
+          resolve(undefined)
+        }
+      } catch (error) {
+        reject(error)
+      }
+    })
   }
 
   private static async storeRootOnChain(delegation: sdk.DelegationRootNode) {

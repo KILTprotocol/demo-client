@@ -4,7 +4,7 @@ import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
 import * as Delegations from '../../state/ducks/Delegations'
-import { MyDelegation, MyRootDelegation } from '../../state/ducks/Delegations'
+import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
@@ -16,21 +16,19 @@ type SelectOption = {
 
 type Props = {
   closeMenuOnSelect?: boolean
-  delegations?: Array<MyDelegation | MyRootDelegation>
-  defaultValues?: Array<MyDelegation | MyRootDelegation>
+  delegations?: MyDelegation[]
+  defaultValues?: MyDelegation[]
   isMulti?: boolean
   name?: string
   placeholder?: string
 
-  onChange?: (
-    selectedDelegations: Array<MyDelegation | MyRootDelegation>
-  ) => void
+  onChange?: (selectedDelegations: MyDelegation[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
 }
 
 type State = {
-  delegations: Array<MyDelegation | MyRootDelegation>
+  delegations: MyDelegation[]
 }
 
 class SelectDelegations extends React.Component<Props, State> {
@@ -116,9 +114,9 @@ class SelectDelegations extends React.Component<Props, State> {
     )
   }
 
-  private getOption(delegation: MyDelegation | MyRootDelegation): SelectOption {
+  private getOption(delegation: MyDelegation): SelectOption {
     // TODO: refactor when sdk can resolve root Node to a given node
-    const cTypeHash = (delegation as MyRootDelegation).cTypeHash
+    const cTypeHash = delegation.cTypeHash
     return {
       baseValue: delegation.id,
       label: (
@@ -147,10 +145,8 @@ class SelectDelegations extends React.Component<Props, State> {
       : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.baseValue)
 
-    const selectedDelegations: Array<
-      MyDelegation | MyRootDelegation
-    > = delegations.filter(
-      (delegation: MyDelegation | MyRootDelegation) =>
+    const selectedDelegations: MyDelegation[] = delegations.filter(
+      (delegation: MyDelegation) =>
         _selectedOptions.indexOf(delegation.id) !== -1
     )
 

@@ -53,7 +53,7 @@ class DelegationCreate extends React.Component<Props, State> {
           alias,
           cType,
           delegation: new sdk.DelegationRootNode(
-            delegationService.createID(),
+            sdk.UUID.generate(),
             ctypeHash,
             selectedIdentity.identity.address
           ),
