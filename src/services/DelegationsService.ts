@@ -47,8 +47,13 @@ class DelegationsService {
     return sdk.DelegationNode.query(blockchain, delegationNodeId)
   }
 
-  public static async queryRootNode(
-    delegationNodeId: sdk.IDelegationBaseNode['id']
+  /**
+   * Query the root node for the intermediate node with `delegationNodeId`.
+   *
+   * @param delegationNodeId the id of the non-root node to query the root for
+   */
+  public static async queryRootNodeForIntermediateNode(
+    delegationNodeId: sdk.IDelegationNode['id']
   ): Promise<sdk.IDelegationRootNode | undefined> {
     const blockchain = await BlockchainService.connect()
     const node:
@@ -57,7 +62,14 @@ class DelegationsService {
     if (node) {
       return await node.getRoot(blockchain)
     }
-    return await sdk.DelegationRootNode.query(blockchain, delegationNodeId)
+    return await DelegationsService.queryRootNode(delegationNodeId)
+  }
+
+  public static async queryRootNode(
+    rootNodeId: sdk.IDelegationRootNode['id']
+  ): Promise<sdk.IDelegationRootNode | undefined> {
+    const blockchain = await BlockchainService.connect()
+    return await sdk.DelegationRootNode.query(blockchain, rootNodeId)
   }
 
   public static async importDelegation(
