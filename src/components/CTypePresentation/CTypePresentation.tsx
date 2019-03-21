@@ -1,4 +1,5 @@
 import Identicon from '@polkadot/ui-identicon'
+import _ from 'lodash'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
@@ -37,7 +38,7 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   public componentDidUpdate(nextProps: Props) {
-    if (this.havePropsChanged(nextProps)) {
+    if (!_.isEqual(this.props, nextProps)) {
       this.setCType()
     }
   }
@@ -66,20 +67,6 @@ class CTypePresentation extends React.Component<Props, State> {
           )}
       </div>
     )
-  }
-
-  private havePropsChanged(nextProps: Props) {
-    switch (true) {
-      case nextProps.cTypeHash !== this.props.cTypeHash:
-      case nextProps.cType && !this.props.cType:
-      case !nextProps.cType && this.props.cType:
-      case nextProps.cType &&
-        this.props.cType &&
-        nextProps.cType.cType.hash !== this.props.cType.cType.hash:
-        return true
-      default:
-        return false
-    }
   }
 
   private wrapInLink(content: ReactNode) {
