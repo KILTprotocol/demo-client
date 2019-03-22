@@ -66,8 +66,8 @@ const Routes: React.FunctionComponent<{}> = props => {
           component={requiresIdentity(DelegationCreate)}
         />
         <Route
-            path={'/delegations/:delegationId'}
-            component={requiresIdentity(DelegationView)}
+          path={'/delegations/:delegationId'}
+          component={requiresIdentity(DelegationView)}
         />
         <Route
           path={'/delegations'}

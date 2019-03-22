@@ -13,6 +13,7 @@ import { ICType } from '../../types/Ctype'
 import { Contact } from '../../types/Contact'
 
 import './DelegationsView.scss'
+import DelegationDetailView from 'src/components/DelegationDetailView/DelegationDetailView'
 
 type Props = RouteComponentProps<{ delegationId: string }> & {
   delegationEntries: Delegations.Entry[]
@@ -63,6 +64,9 @@ class DelegationsView extends React.Component<Props, State> {
             onCreateDelegation={this.createDelegation}
             onRequestInviteContacts={this.requestInviteContact}
           />
+        )}
+        {currentDelegation && (
+          <DelegationDetailView id={currentDelegation.id} />
         )}
         {inviteDelegation && (
           <MyDelegationsInviteView

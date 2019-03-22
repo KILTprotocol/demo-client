@@ -40,7 +40,13 @@ class DelegationsService {
     )
   }
 
-  public static async queryNode(
+  /**
+   * Performs a lookup for a delegation node with the given `delegationNodeId`.
+   * Note: the lookup will not check for root node types.
+   *
+   * @param delegationNodeId id of the intermediate node (non-root node)
+   */
+  public static async lookupNodeById(
     delegationNodeId: string
   ): Promise<sdk.IDelegationNode | undefined> {
     const blockchain = await BlockchainService.connect()
@@ -48,11 +54,23 @@ class DelegationsService {
   }
 
   /**
-   * Query the root node for the intermediate node with `delegationNodeId`.
+   * Performs a lookup for a delegation root not with the given `rootNodeId`
    *
-   * @param delegationNodeId the id of the non-root node to query the root for
+   * @param rootNodeId id of the desired root node
    */
-  public static async queryRootNodeForIntermediateNode(
+  public static async lookupRootNodeById(
+    rootNodeId: sdk.IDelegationRootNode['id']
+  ): Promise<sdk.IDelegationRootNode | undefined> {
+    const blockchain = await BlockchainService.connect()
+    return await sdk.DelegationRootNode.query(blockchain, rootNodeId)
+  }
+
+  /**
+   * Tries to find the root node for an arbitrary node within the hierarchy.
+   *
+   * @param delegationNodeId the id of the node to find the root node for
+   */
+  public static async findRootNode(
     delegationNodeId: sdk.IDelegationNode['id']
   ): Promise<sdk.IDelegationRootNode | undefined> {
     const blockchain = await BlockchainService.connect()
@@ -62,14 +80,7 @@ class DelegationsService {
     if (node) {
       return await node.getRoot(blockchain)
     }
-    return await DelegationsService.queryRootNode(delegationNodeId)
-  }
-
-  public static async queryRootNode(
-    rootNodeId: sdk.IDelegationRootNode['id']
-  ): Promise<sdk.IDelegationRootNode | undefined> {
-    const blockchain = await BlockchainService.connect()
-    return await sdk.DelegationRootNode.query(blockchain, rootNodeId)
+    return await DelegationsService.lookupRootNodeById(delegationNodeId)
   }
 
   public static async importDelegation(
@@ -80,7 +91,9 @@ class DelegationsService {
       try {
         const delegation:
           | sdk.IDelegationNode
-          | undefined = await DelegationsService.queryNode(delegationNodeId)
+          | undefined = await DelegationsService.lookupNodeById(
+          delegationNodeId
+        )
         if (delegation) {
           const blockchain = await BlockchainService.connect()
           const root:

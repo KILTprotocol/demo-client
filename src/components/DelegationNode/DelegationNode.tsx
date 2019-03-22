@@ -1,15 +1,14 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-
+import BlockchainService from 'src/services/BlockchainService'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
-
 import './DelegationNode.scss'
-import CTypePresentation from '../CTypePresentation/CTypePresentation'
+import ShortHash from '../ShortHash/ShortHash'
 
-export interface DelegationsTreeNode extends sdk.IDelegationNode {
-  cTypeHash?: sdk.IDelegationRootNode['ctypeHash']
-  childNodes: DelegationsTreeNode[]
-  myNode?: true
+export class DelegationsTreeNode {
+  public delegation: sdk.IDelegationNode | sdk.IDelegationRootNode
+  public childNodes: DelegationsTreeNode[]
+  public myNode: boolean
 }
 
 type Props = {
@@ -35,18 +34,21 @@ class DelegationNode extends React.Component<Props, State> {
   public render() {
     const { onGetChildren } = this.props
     const { node } = this.state
-    const { permissions, myNode } = node
+    const { delegation, myNode } = node
+    const { permissions } = delegation as sdk.IDelegationNode
 
     return (
       <section
+        key={delegation.id}
         className={`DelegationNode
         ${!node.childNodes.length ? 'hasNoChildren' : ''}
         ${myNode ? 'myNode' : ''}
         `}
       >
         <div className="label">
-          <ContactPresentation address={node.account} />
-          {permissions && this.getPermissions()}
+          <ContactPresentation address={delegation.account} />
+          {permissions && this.getPermissions()}{' '}
+          <ShortHash length={10}>{delegation.id}</ShortHash>'
         </div>
         {onGetChildren && (
           <button className="getSiblings" onClick={this.getSiblings} />
@@ -56,7 +58,7 @@ class DelegationNode extends React.Component<Props, State> {
         )}
         {node.childNodes.map((childNode: DelegationsTreeNode) => (
           <DelegationNode
-            key={node.id}
+            key={childNode.delegation.id}
             node={childNode}
             onGetChildren={this.getChildren}
           />
@@ -67,20 +69,21 @@ class DelegationNode extends React.Component<Props, State> {
 
   private getPermissions() {
     const { node } = this.state
-    const { permissions } = node
-    const possiblePermissions = ['canAttest', 'canDelegate']
+    const { delegation } = node
+    const { permissions } = delegation as sdk.IDelegationNode
+    const possiblePermissions = [sdk.Permission.ATTEST, sdk.Permission.DELEGATE]
 
     return (
       <div className="permissions">
-        {possiblePermissions.map(possiblePermission => {
+        {possiblePermissions.map((possiblePermission: sdk.Permission) => {
           const allowed = permissions.indexOf(possiblePermission) !== -1
-
+          const permissionClassName: string = this.getPermissionName(
+            possiblePermission
+          )
           return (
             <span
               key={possiblePermission}
-              title={possiblePermission
-                .toLowerCase()
-                .replace('can', allowed ? 'can ' : 'can NOT ')}
+              title={this.getPermissionTitle(possiblePermission, allowed)}
               className={`${possiblePermission} ${
                 allowed ? 'allowed' : 'denied'
               }`}
@@ -91,6 +94,25 @@ class DelegationNode extends React.Component<Props, State> {
     )
   }
 
+  private getPermissionName(permission: sdk.Permission): string {
+    if (permission === sdk.Permission.ATTEST) {
+      return 'attest'
+    } else if (permission === sdk.Permission.DELEGATE) {
+      return 'delegate'
+    }
+    return ''
+  }
+
+  private getPermissionTitle(
+    permission: sdk.Permission,
+    allowed: boolean
+  ): string {
+    if (allowed) {
+      return 'can ' + this.getPermissionName(permission)
+    }
+    return 'can NOT ' + this.getPermissionName(permission)
+  }
+
   private getSiblings() {
     const { onGetChildren } = this.props
     if (onGetChildren) {
@@ -98,24 +120,26 @@ class DelegationNode extends React.Component<Props, State> {
     }
   }
 
-  private getChildren() {
+  private async getChildren() {
     const { node } = this.state
-    node.getChildren().then((childNodes: sdk.IDelegationNode[]) => {
-      const childTreeNodes = childNodes.map(
-        (childNode: sdk.IDelegationNode) => {
-          return {
-            ...childNode,
-            childNodes: [],
-          }
-        }
-      )
+    const { delegation } = node
+    const blockchain = await BlockchainService.connect()
+    const children: sdk.IDelegationNode[] = await delegation.getChildren(
+      blockchain
+    )
 
-      this.setState({
-        node: {
-          ...node,
-          childNodes: childTreeNodes,
-        },
-      })
+    this.setState({
+      node: {
+        childNodes: children.map((childNode: sdk.IDelegationNode) => {
+          return {
+            childNodes: [],
+            delegation: childNode,
+            myNode: false,
+          } as DelegationsTreeNode
+        }),
+        delegation,
+        myNode: node.myNode,
+      } as DelegationsTreeNode,
     })
   }
 }

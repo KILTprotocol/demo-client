@@ -1,16 +1,12 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-import CTypeRepository from '../../services/CtypeRepository'
-
-import * as Wallet from '../../state/ducks/Wallet'
-import PersistentStore from '../../state/PersistentStore'
-import { MyIdentity } from '../../types/Contact'
-import { ICType } from '../../types/Ctype'
+import BlockchainService from 'src/services/BlockchainService'
+import DelegationsService from 'src/services/DelegationsService'
+import { notifyFailure } from 'src/services/FeedbackService'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import DelegationNode, {
   DelegationsTreeNode,
 } from '../DelegationNode/DelegationNode'
-
 import './DelegationDetailView.scss'
 
 type Props = {
@@ -19,6 +15,7 @@ type Props = {
 
 type State = {
   delegationsTreeNode?: DelegationsTreeNode
+  rootCTypeHash: sdk.ICType['hash']
 }
 
 class DelegationDetailView extends React.Component<Props, State> {
@@ -26,25 +23,37 @@ class DelegationDetailView extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
-    this.state = {}
+    this.state = {
+      rootCTypeHash: undefined,
+    }
   }
 
   public componentDidMount() {
     const { id } = this.props
 
-    // TODO: use sdk's getNode()
-    this.getNode(id).then((myNode: sdk.IDelegationNode) => {
-      // start resolving to root
-      this.resolveParent({ ...myNode, childNodes: [], myNode: true }).then(
-        (delegationsTreeNode: DelegationsTreeNode) => {
-          this.setState({ delegationsTreeNode })
-        }
+    this.getNode(id).then(async (delegationNode: sdk.IDelegationNode) => {
+      const treeNode: DelegationsTreeNode = {
+        childNodes: [],
+        delegation: delegationNode,
+        myNode: true,
+      } as DelegationsTreeNode
+
+      const parentTreeNode:
+        | DelegationsTreeNode
+        | undefined = await this.resolveParent(treeNode)
+      const cTypeHash: sdk.ICType['hash'] = await this.resolveRootCtype(
+        treeNode
       )
+      // DelegationDetailView#setState
+      this.setState({
+        delegationsTreeNode: parentTreeNode ? parentTreeNode : treeNode,
+        rootCTypeHash: cTypeHash,
+      })
     })
   }
 
   public render() {
-    const { delegationsTreeNode } = this.state
+    const { delegationsTreeNode, rootCTypeHash } = this.state
 
     return (
       <section className="DelegationDetailView">
@@ -53,10 +62,13 @@ class DelegationDetailView extends React.Component<Props, State> {
           {delegationsTreeNode && (
             <>
               <h2>
-                <CTypePresentation cTypeHash={delegationsTreeNode.cTypeHash} />
+                <CTypePresentation cTypeHash={rootCTypeHash} />
               </h2>
               <div className="delegationNodeScrollContainer">
-                <DelegationNode node={delegationsTreeNode} />
+                <DelegationNode
+                  key={delegationsTreeNode.delegation.id}
+                  node={delegationsTreeNode}
+                />
               </div>
             </>
           )}
@@ -67,89 +79,59 @@ class DelegationDetailView extends React.Component<Props, State> {
 
   private async resolveParent(
     currentNode: DelegationsTreeNode
-  ): Promise<DelegationsTreeNode> {
-    return currentNode.getParent().then((parentNode: sdk.IDelegationNode) => {
-      // so far we assume we never have a broken branch,
-      // so the last parent equals the root
-      if (parentNode) {
-        return this.resolveParent({
-          ...parentNode,
-          childNodes: [currentNode],
-        })
-      } else {
-        // TODO: adjust when sdk can handle dags
-        return this.getRootNode(currentNode)
+  ): Promise<DelegationsTreeNode | undefined> {
+    const blockchain = await BlockchainService.connect()
+    let parentDelegation:
+      | sdk.IDelegationBaseNode
+      | undefined = await currentNode.delegation.getParent(blockchain)
+
+    if (!parentDelegation) {
+      parentDelegation = await currentNode.delegation.getRoot(blockchain)
+      if (
+        parentDelegation &&
+        parentDelegation.id === currentNode.delegation.id
+      ) {
+        parentDelegation = undefined
       }
-    })
-  }
-
-  // TODO: use sdk methods
-  private rotateIds(id: sdk.IDelegationBaseNode['id']) {
-    const myIdentities = Wallet.getAllIdentities(
-      PersistentStore.store.getState()
-    )
-
-    const idIndex = myIdentities.findIndex(
-      (myIdentity: MyIdentity) => myIdentity.identity.address === id
-    )
-
-    if (idIndex !== -1) {
-      return myIdentities[idIndex + 1]
-        ? myIdentities[idIndex + 1].identity.address
-        : myIdentities[0].identity.address
-    } else {
-      return id
     }
+    if (!parentDelegation) {
+      return undefined
+    }
+    return {
+      childNodes: [currentNode],
+      delegation: parentDelegation,
+      myNode: false,
+    } as DelegationsTreeNode
   }
 
-  private getPermissions(id: sdk.IDelegationBaseNode['id']) {
-    const myIdentities = Wallet.getAllIdentities(
-      PersistentStore.store.getState()
-    )
-    const possiblePermisions = [['canAttest', 'canDelegate'], ['canAttest']]
-    const idIndex = myIdentities.findIndex(
-      (myIdentity: MyIdentity) => myIdentity.identity.address === id
-    )
-    return possiblePermisions[idIndex] || []
-  }
-
-  private async getRootNode(
+  private async resolveRootCtype(
     currentNode: DelegationsTreeNode
-  ): Promise<DelegationsTreeNode> {
-    return CTypeRepository.findAll().then((cTypes: ICType[]) => {
-      return { ...currentNode, cTypeHash: cTypes[0].cType.hash }
-    })
-  }
-
-  private async getParentNode(
-    id: sdk.IDelegationBaseNode['id']
-  ): Promise<sdk.IDelegationBaseNode | sdk.IDelegationRootNode | null> {
-    this.depth++
-    return this.depth <= 5 ? this.getNode(id) : null
+  ): Promise<sdk.ICType['hash']> {
+    const rootNode:
+      | sdk.IDelegationRootNode
+      | undefined = await DelegationsService.findRootNode(
+      currentNode.delegation.id
+    )
+    if (rootNode) {
+      return rootNode.cTypeHash
+    }
+    return undefined
   }
 
   private async getNode(
     id: sdk.IDelegationBaseNode['id']
-  ): Promise<sdk.IDelegationNode> {
-    return Promise.resolve({
-      account: id,
-      getChildren: this.getChildren.bind(this),
-      getParent: this.getParentNode.bind(this, this.rotateIds(id)),
-      getRoot: this.getRootNode.bind(this, id),
-      id: id + Date.now(),
-      permissions: this.getPermissions(id),
-    })
-  }
-
-  private getChildren(): Promise<sdk.IDelegationNode[]> {
-    const myIdentities = Wallet.getAllIdentities(
-      PersistentStore.store.getState()
-    )
-    return Promise.all(
-      myIdentities.map((myIdentity: MyIdentity) =>
-        this.getNode(myIdentity.identity.address)
-      )
-    )
+  ): Promise<sdk.IDelegationBaseNode> {
+    let node:
+      | sdk.IDelegationBaseNode
+      | undefined = await DelegationsService.lookupNodeById(id)
+    if (!node) {
+      node = await DelegationsService.lookupRootNodeById(id)
+    }
+    if (!node) {
+      notifyFailure('Node not found')
+      throw new Error('Node not found')
+    }
+    return node
   }
 }
 

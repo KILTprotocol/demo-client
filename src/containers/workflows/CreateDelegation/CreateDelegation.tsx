@@ -118,9 +118,7 @@ class CreateDelegation extends React.Component<Props, State> {
 
     const rootNode:
       | sdk.IDelegationRootNode
-      | undefined = await DelegationService.queryRootNodeForIntermediateNode(
-      parentId
-    )
+      | undefined = await DelegationService.findRootNode(parentId)
     if (!rootNode) {
       notifyFailure('Root delegation not found')
       return

@@ -204,14 +204,14 @@
       }
     }
 
-    & .canAttest {
+    & .attest {
 
       &:before {
         content: 'A';
       }
     }
 
-    & .canDelegate {
+    & .delegate {
 
       &:before {
         content: 'D';
