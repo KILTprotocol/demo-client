@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { MyDelegation } from '../../state/ducks/Delegations'
 
+import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Delegations from '../../state/ducks/Delegations'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
@@ -11,8 +11,8 @@ import SelectAction from '../SelectAction/SelectAction'
 type Props = {
   onCreateDelegation: () => void
   delegationEntries: MyDelegation[]
-  onRemoveDelegation: (delegation: Delegations.Entry) => void
-  onRequestInviteContacts: (delegation: Delegations.Entry) => void
+  onRemoveDelegation: (delegation: MyDelegation) => void
+  onRequestInviteContacts: (delegation: MyDelegation) => void
 }
 
 type State = {}
@@ -129,7 +129,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
     }
   }
 
-  private requestInviteContacts(delegationEntry: Delegations.Entry) {
+  private requestInviteContacts(delegationEntry: MyDelegation) {
     const { onRequestInviteContacts } = this.props
 
     if (onRequestInviteContacts) {
@@ -137,7 +137,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
     }
   }
 
-  private handleDelete = (delegation: Delegations.Entry) => {
+  private handleDelete = (delegation: MyDelegation) => {
     const { onRemoveDelegation } = this.props
     onRemoveDelegation(delegation)
   }

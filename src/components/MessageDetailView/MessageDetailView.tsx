@@ -127,6 +127,9 @@ class MessageDetailView extends React.Component<Props, State> {
             legitimations={
               (message.body as sdk.ISubmitLegitimations).content.legitimations
             }
+            delegationId={
+              (message.body as sdk.ISubmitLegitimations).content.delegationId
+            }
             attesterAddress={message.senderAddress}
             onFinished={this.handleDelete}
           />

@@ -8,11 +8,7 @@ import withSelectAttestedClaims, {
   InjectedProps as InjectedSelectProps,
 } from '../../../components/withSelectAttestedClaims/withSelectAttestedClaims'
 import AttestationWorkflow from '../../../services/AttestationWorkflow'
-import MessageRepository from '../../../services/MessageRepository'
-import {
-  MyDelegation,
-  MyRootDelegation,
-} from '../../../state/ducks/Delegations'
+import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
 
 import './SubmitLegitimations.scss'
@@ -25,7 +21,7 @@ type Props = InjectedSelectProps & {
 }
 
 type State = {
-  selectedDelegation?: MyDelegation | MyRootDelegation
+  selectedDelegation?: MyDelegation
 }
 
 class SubmitLegitimations extends React.Component<Props, State> {

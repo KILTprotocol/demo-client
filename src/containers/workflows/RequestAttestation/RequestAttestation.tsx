@@ -6,7 +6,6 @@ import MyClaimCreateView from '../../../components/MyClaimCreateView/MyClaimCrea
 import MyClaimDetailView from '../../../components/MyClaimDetailView/MyClaimDetailView'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import ContactRepository from '../../../services/ContactRepository'
-import ErrorService from '../../../services/ErrorService'
 import * as Claims from '../../../state/ducks/Claims'
 import PersistentStore from '../../../state/PersistentStore'
 import { Contact } from '../../../types/Contact'
@@ -17,6 +16,9 @@ type Props = {
   initialClaim: sdk.IPartialClaim
   legitimations: sdk.IAttestedClaim[]
   attesterAddress: sdk.PublicIdentity['address']
+
+  delegationId?: sdk.DelegationNode['id']
+
   onFinished: () => void
 }
 
@@ -44,7 +46,7 @@ class RequestAttestation extends React.Component<Props, State> {
   }
 
   public render() {
-    const { initialClaim, legitimations } = this.props
+    const { initialClaim, legitimations, delegationId } = this.props
     const { savedClaimEntry } = this.state
 
     return (
@@ -63,6 +65,7 @@ class RequestAttestation extends React.Component<Props, State> {
 
         <AttestedClaimsListView
           attestedClaims={legitimations}
+          delegationId={delegationId}
           context="legitimations"
         />
 
@@ -89,7 +92,12 @@ class RequestAttestation extends React.Component<Props, State> {
   }
 
   private handleSubmit() {
-    const { attesterAddress, legitimations, onFinished } = this.props
+    const {
+      attesterAddress,
+      legitimations,
+      delegationId,
+      onFinished,
+    } = this.props
     const { savedClaimEntry } = this.state
 
     if (savedClaimEntry) {
@@ -101,7 +109,8 @@ class RequestAttestation extends React.Component<Props, State> {
               [attester],
               legitimations.map((legitimation: sdk.IAttestedClaim) =>
                 sdk.AttestedClaim.fromObject(legitimation)
-              )
+              ),
+              delegationId
             )
             .then(() => {
               onFinished()

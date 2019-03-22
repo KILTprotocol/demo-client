@@ -19,7 +19,7 @@ class ClaimDetailView extends Component<Props, State> {
 
     return (
       <section className="ClaimDetailView">
-        <h2>Claim</h2>
+        <h2>Claim details</h2>
         <div>
           <label>Ctype</label>
           <div>

@@ -6,9 +6,11 @@ import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import contactRepository from '../../../services/ContactRepository'
 import errorService from '../../../services/ErrorService'
+import FeedbackService from '../../../services/FeedbackService'
 import { notifySuccess } from '../../../services/FeedbackService'
 import MessageRepository from '../../../services/MessageRepository'
 import { Contact } from '../../../types/Contact'
+import { BlockUi } from '../../../types/UserFeedback'
 
 type Props = {
   claimerAddress: Contact['publicIdentity']['address']
@@ -31,10 +33,13 @@ class AttestClaim extends React.Component<Props, State> {
     return (
       <section className="AttestClaim">
         <ClaimDetailView claim={requestForAttestation.claim} />
+
         <AttestedClaimsListView
           attestedClaims={requestForAttestation.legitimations}
+          delegationId={requestForAttestation.delegationId}
           context="legitimations"
         />
+
         <div className="actions">
           <button onClick={this.attestClaim}>Attest Claim</button>
         </div>
@@ -44,6 +49,9 @@ class AttestClaim extends React.Component<Props, State> {
 
   private attestClaim() {
     const { requestForAttestation, onFinished, claimerAddress } = this.props
+    const blockUi: BlockUi = FeedbackService.addBlockUi({
+      headline: 'Writing attestation to chain',
+    })
 
     attestationWorkflow
       .approveAndSubmitAttestationForClaim(
@@ -51,6 +59,7 @@ class AttestClaim extends React.Component<Props, State> {
         claimerAddress
       )
       .then(() => {
+        blockUi.remove()
         if (onFinished) {
           onFinished()
         }

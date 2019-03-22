@@ -35,6 +35,7 @@ $labeledCardActions-padding-inner: $base-padding/2;
   left: -$base-padding/2;
   max-width: $max-width;
   margin: {
+    top: 0;
     bottom: -$base-padding;
   };
   padding: $base-padding/4 $base-padding;

@@ -7,11 +7,7 @@ import withSelectAttestedClaims, {
   InjectedProps as InjectedSelectProps,
 } from '../../../components/withSelectAttestedClaims/withSelectAttestedClaims'
 import AttestationWorkflow from '../../../services/AttestationWorkflow'
-import MessageRepository from '../../../services/MessageRepository'
-import {
-  MyDelegation,
-  MyRootDelegation,
-} from '../../../state/ducks/Delegations'
+import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
 
 import './SubmitClaimsForCType.scss'
@@ -24,10 +20,16 @@ type Props = InjectedSelectProps & {
 }
 
 type State = {
-  selectedDelegation?: MyDelegation | MyRootDelegation
+  selectedDelegation?: MyDelegation
 }
 
 class SubmitClaimsForCType extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+
+    this.sendClaim = this.sendClaim.bind(this)
+  }
+
   public render() {
     const {
       cTypeHash,

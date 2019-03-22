@@ -6,11 +6,10 @@ import {
   ISubmitAttestationForClaim,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
-import { Error } from 'tslint/lib/error'
 
 import attestationService from '../services/AttestationService'
 import * as Attestations from '../state/ducks/Attestations'
-import { MyDelegation, MyRootDelegation } from '../state/ducks/Delegations'
+import { MyDelegation } from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import { Contact } from '../types/Contact'
@@ -53,7 +52,7 @@ class AttestationWorkflow {
     claim: IPartialClaim,
     legitimations: sdk.IAttestedClaim[],
     receiverAddress: Contact['publicIdentity']['address'],
-    delegation?: MyDelegation | MyRootDelegation
+    delegation?: MyDelegation
   ): Promise<void> {
     const messageBody: sdk.ISubmitLegitimations = {
       content: { claim, legitimations },
@@ -93,11 +92,13 @@ class AttestationWorkflow {
    * @param attesters - the attesters to send the request to
    * @param [legitimations] - the legitimations the claimer requested
    *   beforehand from attester
+   * @param [delegationId] - the delegation the attester added as legitimation
    */
   public static async requestAttestationForClaim(
     claim: sdk.IClaim,
     attesters: Contact[],
-    legitimations: sdk.AttestedClaim[] = []
+    legitimations: sdk.AttestedClaim[] = [],
+    delegationId?: sdk.DelegationNode['id']
   ): Promise<void> {
     const identity: sdk.Identity = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
@@ -105,7 +106,8 @@ class AttestationWorkflow {
     const requestForAttestation: sdk.IRequestForAttestation = new sdk.RequestForAttestation(
       claim,
       legitimations,
-      identity
+      identity,
+      delegationId
     )
     const messageBody = {
       content: requestForAttestation,

@@ -32,7 +32,7 @@ class MyClaimDetailView extends Component<Props, State> {
 
     return claimEntry ? (
       <section className="MyClaimDetailView">
-        <h1>{claimEntry.meta.alias}</h1>
+        <h1>My claim '{claimEntry.meta.alias}'</h1>
         <ClaimDetailView claim={claimEntry.claim} />
         {!hideAttestedClaims && (
           <AttestedClaimsListView attestedClaims={claimEntry.attestations} />

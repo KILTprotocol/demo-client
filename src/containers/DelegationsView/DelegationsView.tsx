@@ -148,7 +148,7 @@ class DelegationsView extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: ReduxState) => ({
-  delegationEntries: Delegations.getDelegations(state),
+  delegationEntries: Delegations.getAllDelegations(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

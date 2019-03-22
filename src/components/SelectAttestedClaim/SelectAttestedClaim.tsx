@@ -3,6 +3,7 @@ import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import _ from 'lodash'
 
 import CTypeRepository from '../../services/CtypeRepository'
 import * as Claims from '../../state/ducks/Claims'
@@ -195,7 +196,9 @@ class SelectAttestedClaim extends React.Component<Props, State> {
           </h4>
           {attestations.map((attestedClaim: sdk.IAttestedClaim) => (
             <label
-              key={attestedClaim.attestation.owner}
+              key={`${attestedClaim.attestation.claimHash}-${
+                attestedClaim.attestation.owner
+              }`}
               className={allAttestedClaimsSelected ? 'selected-all' : ''}
             >
               <input
@@ -262,8 +265,13 @@ class SelectAttestedClaim extends React.Component<Props, State> {
 
     const attestationSelected = selectedAttestedClaims.find(
       (selectedAttestedClaim: sdk.IAttestedClaim) =>
-        attestedClaim.attestation.owner ===
-        selectedAttestedClaim.attestation.owner
+        _.isEqual(selectedAttestedClaim, attestedClaim)
+    )
+
+    console.log(
+      'attestationSelected, attestedClaim',
+      attestationSelected,
+      attestedClaim
     )
 
     if (checked && !attestationSelected) {

@@ -91,26 +91,25 @@ class SelectDelegations extends React.Component<Props, State> {
 
     const _placeholder = `Select delegation${isMulti ? 's' : ''}…`
 
-    return (
-      !!delegations &&
-      !!delegations.length && (
-        <Select
-          className="react-select-container"
-          classNamePrefix="react-select"
-          isClearable={isMulti && delegations.length > 1}
-          isSearchable={true}
-          isMulti={isMulti && delegations.length > 1}
-          closeMenuOnSelect={closeMenuOnSelect}
-          name={name}
-          options={options}
-          defaultValue={defaultOptions}
-          onChange={this.onChange}
-          onMenuOpen={onMenuOpen}
-          onMenuClose={onMenuClose}
-          placeholder={placeholder || _placeholder}
-          filterOption={createFilter(this.filterConfig)}
-        />
-      )
+    return !!delegations && !!delegations.length ? (
+      <Select
+        className="react-select-container"
+        classNamePrefix="react-select"
+        isClearable={isMulti && delegations.length > 1}
+        isSearchable={true}
+        isMulti={isMulti && delegations.length > 1}
+        closeMenuOnSelect={closeMenuOnSelect}
+        name={name}
+        options={options}
+        defaultValue={defaultOptions}
+        onChange={this.onChange}
+        onMenuOpen={onMenuOpen}
+        onMenuClose={onMenuClose}
+        placeholder={placeholder || _placeholder}
+        filterOption={createFilter(this.filterConfig)}
+      />
+    ) : (
+      <div>No eligible delegations found.</div>
     )
   }
 
