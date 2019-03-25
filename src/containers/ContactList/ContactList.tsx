@@ -11,11 +11,9 @@ import SelectAction from '../../components/SelectAction/SelectAction'
 import contactRepository from '../../services/ContactRepository'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
-import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
-import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
 
@@ -167,7 +165,7 @@ class ContactList extends React.Component<Props, State> {
         type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
       }
 
-      MessageRepository.send(this.selectedContact, messageBody)
+      MessageRepository.send([this.selectedContact], messageBody)
     }
   }
 

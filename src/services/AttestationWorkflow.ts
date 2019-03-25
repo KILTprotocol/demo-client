@@ -32,7 +32,7 @@ class AttestationWorkflow {
       type: MessageBodyType.REQUEST_LEGITIMATIONS,
     } as IRequestLegitimations
 
-    return MessageRepository.sendToAddress(
+    return MessageRepository.sendToAddresses(
       attesters.map((attester: Contact) => attester.publicIdentity.address),
       messageBody
     )
@@ -63,7 +63,7 @@ class AttestationWorkflow {
       messageBody.content.delegationId = delegation.id
     }
 
-    return MessageRepository.sendToAddress(receiverAddress, messageBody)
+    return MessageRepository.sendToAddresses([receiverAddress], messageBody)
   }
 
   /**
@@ -82,7 +82,7 @@ class AttestationWorkflow {
       type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
     }
 
-    return MessageRepository.sendToAddress(receiverAddress, messageBody)
+    return MessageRepository.sendToAddresses([receiverAddress], messageBody)
   }
 
   /**
@@ -98,7 +98,7 @@ class AttestationWorkflow {
     claim: sdk.IClaim,
     attesters: Contact[],
     legitimations: sdk.AttestedClaim[] = [],
-    delegationId?: sdk.DelegationNode['id']
+    delegationId?: sdk.IDelegationNode['id']
   ): Promise<void> {
     const identity: sdk.Identity = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
@@ -147,7 +147,7 @@ class AttestationWorkflow {
               content: attestedClaim,
               type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
             }
-            return MessageRepository.send(claimer, attestationMessageBody)
+            return MessageRepository.send([claimer], attestationMessageBody)
           })
       }
     )
@@ -168,7 +168,7 @@ class AttestationWorkflow {
       type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
     }
 
-    return MessageRepository.sendToAddress(delegateAddress, messageBody)
+    return MessageRepository.sendToAddresses([delegateAddress], messageBody)
   }
 }
 

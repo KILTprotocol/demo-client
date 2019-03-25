@@ -3,7 +3,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import ContactRepository from '../../services/ContactRepository'
-import delegationService from '../../services/DelegationsService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
@@ -280,7 +279,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
       type: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
     }
 
-    MessageRepository.send(receiver, messageBody)
+    MessageRepository.send([receiver], messageBody)
   }
 
   private sendInvitations() {

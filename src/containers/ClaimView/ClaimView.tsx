@@ -15,6 +15,7 @@ import { State as ReduxState } from '../../state/PersistentStore'
 import { Contact } from '../../types/Contact'
 
 import './ClaimView.scss'
+import { ICType } from '../../types/Ctype'
 
 type Props = RouteComponentProps<{ claimId: Claims.Entry['id'] }> & {
   claimEntries: Claims.Entry[]
@@ -41,6 +42,8 @@ class ClaimView extends React.Component<Props, State> {
 
     this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
     this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
+
+    this.createClaimFromCType = this.createClaimFromCType.bind(this)
   }
 
   public componentDidMount() {
@@ -77,6 +80,7 @@ class ClaimView extends React.Component<Props, State> {
         {!isDetailView && (
           <MyClaimListView
             claimStore={claimEntries}
+            onCreateClaimFromCType={this.createClaimFromCType}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={this.requestAttestation}
             onRequestLegitimation={this.requestLegitimation}
@@ -183,6 +187,10 @@ class ClaimView extends React.Component<Props, State> {
     } else {
       return undefined
     }
+  }
+
+  private createClaimFromCType(selectedCTypes: ICType[]) {
+    this.props.history.push(`/claim/new/${selectedCTypes[0].cType.hash}`)
   }
 }
 

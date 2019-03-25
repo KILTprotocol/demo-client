@@ -6,22 +6,20 @@ import ContactPresentation from '../../../components/ContactPresentation/Contact
 import ShortHash from '../../../components/ShortHash/ShortHash'
 import Spinner from '../../../components/Spinner/Spinner'
 import AttestationWorkflow from '../../../services/AttestationWorkflow'
-import ContactRepository from '../../../services/ContactRepository'
 import DelegationService from '../../../services/DelegationsService'
 import errorService from '../../../services/ErrorService'
 import FeedbackService, {
   notifySuccess,
   notifyFailure,
 } from '../../../services/FeedbackService'
-import MessageRepository from '../../../services/MessageRepository'
 import { MyDelegation } from '../../../state/ducks/Delegations'
 import * as Wallet from '../../../state/ducks/Wallet'
 import * as Delegations from '../../../state/ducks/Delegations'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../../types/Contact'
+import { BlockUi } from '../../../types/UserFeedback'
 
 import './CreateDelegation.scss'
-import { BlockUi } from 'src/types/UserFeedback'
 
 type Props = {
   delegationData: sdk.ISubmitAcceptDelegation['content']['delegationData']

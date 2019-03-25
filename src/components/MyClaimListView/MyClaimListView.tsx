@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import * as Claims from '../../state/ducks/Claims'
 import { ICType } from '../../types/Ctype'
@@ -10,8 +10,10 @@ import SelectAction from '../SelectAction/SelectAction'
 
 import './MyClaimListView.scss'
 
-type Props = RouteComponentProps<{}> & {
+type Props = {
   claimStore: Claims.Entry[]
+
+  onCreateClaimFromCType: (selectedCTypes: ICType[]) => void
   onRemoveClaim: (claimId: Claims.Entry['id']) => void
   onRequestAttestation: (claimId: Claims.Entry['id']) => void
   onRequestLegitimation: (claimId: Claims.Entry['id']) => void
@@ -20,13 +22,12 @@ type Props = RouteComponentProps<{}> & {
 type State = {}
 
 class MyClaimListView extends React.Component<Props, State> {
-  selectCTypesModal: SelectCTypesModal | null
+  private selectCTypesModal: SelectCTypesModal | null
 
   constructor(props: Props) {
     super(props)
 
     this.openCTypeModal = this.openCTypeModal.bind(this)
-    this.createClaimFromCType = this.createClaimFromCType.bind(this)
   }
 
   public render() {
@@ -140,8 +141,9 @@ class MyClaimListView extends React.Component<Props, State> {
   }
 
   private createClaimFromCType(selectedCTypes: ICType[]) {
-    this.props.history.push(`/claim/new/${selectedCTypes[0].cType.hash}`)
+    const { onCreateClaimFromCType } = this.props
+    onCreateClaimFromCType(selectedCTypes)
   }
 }
 
-export default withRouter(MyClaimListView)
+export default MyClaimListView

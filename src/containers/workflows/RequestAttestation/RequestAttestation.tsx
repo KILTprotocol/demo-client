@@ -17,7 +17,7 @@ type Props = {
   legitimations: sdk.IAttestedClaim[]
   attesterAddress: sdk.PublicIdentity['address']
 
-  delegationId?: sdk.DelegationNode['id']
+  delegationId?: sdk.IDelegationNode['id']
 
   onFinished: () => void
 }

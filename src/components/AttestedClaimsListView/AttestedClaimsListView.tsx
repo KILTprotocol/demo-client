@@ -42,7 +42,7 @@ type Props = {
   attestedClaims: sdk.IAttestedClaim[]
 
   context?: 'legitimations'
-  delegationId?: sdk.DelegationNode['id']
+  delegationId?: sdk.IDelegationNode['id']
 
   onToggleChildOpen?: (closeCallback?: () => void | undefined) => void
 }
@@ -50,8 +50,9 @@ type Props = {
 type State = {
   attestationStatus: AttestationStatus
   canResolveAttesters: boolean
-  closeOpenedChild?: () => void
   labels: { [key: string]: string }
+
+  closeOpenedChild?: () => void
   openedAttestedClaim?: sdk.IAttestedClaim
 }
 

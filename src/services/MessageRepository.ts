@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 
-import persistentStore from '../state/PersistentStore'
+import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import contactRepository from './ContactRepository'
@@ -26,10 +26,10 @@ class MessageRepository {
    * @param messageBody
    */
   public static async send(
-    receivers: Contact | Contact[],
+    receivers: Contact[],
     messageBody: sdk.MessageBody
   ): Promise<void> {
-    const sender: MyIdentity = persistentStore.store.getState().wallet
+    const sender: MyIdentity = PersistentStore.store.getState().wallet
       .selectedIdentity
 
     if (Array.isArray(receivers)) {
@@ -48,10 +48,8 @@ class MessageRepository {
    * @param receiverAddresses
    * @param messageBody
    */
-  public static sendToAddress(
-    receiverAddresses:
-      | Contact['publicIdentity']['address']
-      | Array<Contact['publicIdentity']['address']>,
+  public static sendToAddresses(
+    receiverAddresses: Array<Contact['publicIdentity']['address']>,
     messageBody: sdk.MessageBody
   ): Promise<void> {
     // normalize address(es)
@@ -172,7 +170,7 @@ class MessageRepository {
       })
         .then(response => {
           if (!response.ok) {
-            throw Error(response.statusText)
+            throw new Error(response.statusText)
           }
           return response
         })

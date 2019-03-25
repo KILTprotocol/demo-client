@@ -1,5 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { ReactNode } from 'react'
+
 import AcceptDelegation from '../../containers/workflows/AcceptDelegation/AcceptDelegation'
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
 import CreateDelegation from '../../containers/workflows/CreateDelegation/CreateDelegation'

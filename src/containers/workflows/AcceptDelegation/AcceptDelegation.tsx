@@ -121,11 +121,13 @@ class AcceptDelegation extends React.Component<Props, State> {
       type: sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION,
     }
 
-    MessageRepository.sendToAddress(inviterAddress, messageBody).then(() => {
-      if (onFinished) {
-        onFinished()
+    MessageRepository.sendToAddresses([inviterAddress], messageBody).then(
+      () => {
+        if (onFinished) {
+          onFinished()
+        }
       }
-    })
+    )
   }
 
   private async signNewDelegationNode(
