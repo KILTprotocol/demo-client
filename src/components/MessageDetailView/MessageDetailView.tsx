@@ -185,7 +185,7 @@ class MessageDetailView extends React.Component<Props, State> {
             delegationData={messageContent.delegationData}
             signatures={messageContent.signatures}
             inviteeAddress={message.senderAddress}
-            inviterAddress={message.senderAddress}
+            inviterAddress={message.receiverAddress}
             onFinished={this.handleDelete}
           />
         )
