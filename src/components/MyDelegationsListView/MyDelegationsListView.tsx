@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { MyDelegation } from '../../state/ducks/Delegations'
 
 import * as Delegations from '../../state/ducks/Delegations'
-import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 import './MyDelegationsListView.scss'

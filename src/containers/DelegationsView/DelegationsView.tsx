@@ -3,25 +3,30 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 
-import MyDelegationsInviteView from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
+import MyDelegationsInviteModal from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
 import MyDelegationsListView from '../../components/MyDelegationsListView/MyDelegationsListView'
 import { safeDelete } from '../../services/FeedbackService'
+import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Delegations from '../../state/ducks/Delegations'
+import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
 import { ICType } from '../../types/Ctype'
-import { Contact } from '../../types/Contact'
+import { Contact, MyIdentity } from '../../types/Contact'
 
 import './DelegationsView.scss'
+import DelegationDetailView from 'src/components/DelegationDetailView/DelegationDetailView'
 
 type Props = RouteComponentProps<{ delegationId: string }> & {
-  delegationEntries: Delegations.Entry[]
-  removeDelegation: (delegation: Delegations.Entry) => void
+  removeDelegation: (delegation: MyDelegation) => void
+
+  delegationEntries: MyDelegation[]
+  selectedIdentity: MyIdentity
 }
 
 type State = {
-  currentDelegation?: Delegations.MyDelegation
-  inviteDelegation?: Delegations.Entry
+  currentDelegation?: MyDelegation
+  inviteDelegation?: MyDelegation
   selectedContacts?: Contact[]
   invitePermissions?: sdk.Permission[]
 }
@@ -44,6 +49,7 @@ class DelegationsView extends React.Component<Props, State> {
 
   public componentDidMount() {
     const { delegationId } = this.props.match.params
+
     if (delegationId) {
       this.setState({
         currentDelegation: this.loadDelegationForId(delegationId),
@@ -52,8 +58,9 @@ class DelegationsView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { delegationEntries } = this.props
+    const { delegationEntries, selectedIdentity } = this.props
     const { currentDelegation, inviteDelegation } = this.state
+
     return (
       <section className="DelegationsView">
         {!currentDelegation && (
@@ -64,8 +71,14 @@ class DelegationsView extends React.Component<Props, State> {
             onRequestInviteContacts={this.requestInviteContact}
           />
         )}
+        {currentDelegation && (
+          <DelegationDetailView
+            id={currentDelegation.id}
+            selectedIdentity={selectedIdentity}
+          />
+        )}
         {inviteDelegation && (
-          <MyDelegationsInviteView
+          <MyDelegationsInviteModal
             delegationsSelected={[inviteDelegation]}
             onCancel={this.cancelInvite}
             onConfirm={this.confirmInvite}
@@ -82,7 +95,7 @@ class DelegationsView extends React.Component<Props, State> {
     )
   }
 
-  private requestInviteContact(inviteDelegation: Delegations.Entry) {
+  private requestInviteContact(inviteDelegation: MyDelegation) {
     this.setState({ inviteDelegation })
   }
 
@@ -98,7 +111,7 @@ class DelegationsView extends React.Component<Props, State> {
     this.setState({ inviteDelegation: undefined })
   }
 
-  private deleteDelegation(delegation: Delegations.Entry) {
+  private deleteDelegation(delegation: MyDelegation) {
     const { removeDelegation } = this.props
     if (removeDelegation) {
       safeDelete(
@@ -115,8 +128,7 @@ class DelegationsView extends React.Component<Props, State> {
   ): Delegations.MyDelegation | undefined {
     const { delegationEntries } = this.props
     return delegationEntries.find(
-      (delegationEntry: Delegations.Entry) =>
-        delegationEntry.id === delegationId
+      (delegationEntry: MyDelegation) => delegationEntry.id === delegationId
     )
   }
 
@@ -137,11 +149,12 @@ class DelegationsView extends React.Component<Props, State> {
 
 const mapStateToProps = (state: ReduxState) => ({
   delegationEntries: Delegations.getDelegations(state),
+  selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
 const mapDispatchToProps = (dispatch: (action: Delegations.Action) => void) => {
   return {
-    removeDelegation: (delegation: Delegations.Entry) => {
+    removeDelegation: (delegation: MyDelegation) => {
       dispatch(Delegations.Store.removeDelegationAction(delegation))
     },
   }

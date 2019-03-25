@@ -1,0 +1,316 @@
+.DelegationNode {
+  $identiconSize: 24px;
+  $marginTop: $base-padding;
+  $marginLeft: 2 * $base-padding;
+  $lineWidth: 2px;
+  $lineIdenticonDistance: 0;
+  $addLineHeight: $base-padding/2;
+  $labelPadding: $base-padding/4;
+
+  position: relative;
+  width: auto;
+  white-space: nowrap;
+
+  & > .label {
+    position: relative;
+    display: inline-block;
+    padding: $base-padding/4;
+
+    & .content {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap;
+      z-index: 2;
+      min-height: $base-button-height;
+    }
+
+    & .permissions {
+      $size: 1.6em;
+      $border-size: 0.2em;
+
+      @include baseFont-bold;
+
+      display: inline-block;
+      margin: {
+        right: $base-padding/4;
+        left: $base-padding/4;
+      }
+      line-height: 0;
+
+      & > span {
+        @include border-radius(50%);
+
+        position: relative;
+        display: inline-block;
+        width: $size;
+        height: $size;
+        margin: {
+          left: $base-padding/4;
+        }
+        border: $border-size solid transparent;
+        font-size: 10px;
+        line-height: 1;
+
+        &:before {
+          @extend %centerHV;
+
+          position: absolute;
+          margin: {
+            top: 0.05em;
+          }
+          line-height: 1;
+        }
+
+        &:first-child {
+          margin: {
+            left: 0;
+          }
+        }
+      }
+
+      & .ATTEST {
+
+        &:before {
+          content: 'A';
+        }
+      }
+
+      & .DELEGATE {
+
+        &:before {
+          content: 'D';
+        }
+      }
+
+      @mixin colorize($color) {
+        border: {
+          color: $color;
+        }
+        //color: $color-white;
+        //background-color: $color;
+        color: $color;
+      }
+
+      & .allowed {
+        @include colorize($color-success);
+      }
+
+      & .denied {
+        @include colorize($color-danger);
+
+        &:after {
+          @extend %centerHV;
+
+          @include transform-origin(50%, 50%);
+          @include transform(translateX(-50%) translateY(-50%) rotate(-45deg));
+
+          content: '';
+          position: absolute;
+          width: 130%;
+          height: $border-size;
+          background: $color-danger;
+        }
+      }
+    }
+  }
+
+  & .short-hash {
+    position: relative;
+    font-size: 12px;
+  }
+
+  &.myNode {
+
+    & h3 {
+      @include baseFont-bold;
+
+      position: relative;
+      display: inline-block;
+      margin:{right: $base-padding/2;
+        bottom: $base-padding/4;
+        left: $base-padding/4;
+      }
+      font-size: 18px;
+      color: $color-secondary;
+    }
+
+    & > .label {
+
+      &:before {
+        @include border-radius($base-border-radius);
+
+        content: '';
+        position: absolute;
+        z-index: 0;
+        top: 0;
+        right: 0;
+        bottom: $labelPadding;
+        left: 0;
+        border: 2px solid $color-secondary;
+        background: transparent;
+      }
+    }
+
+    &.focusedNode {
+
+      & > .label {
+
+        &:before {
+          background: $color-secondary;
+        }
+
+        & h3 {
+          color: $color-font-inverted;
+        }
+
+        & .permissions {
+
+          & span {
+            background: $color-white;
+          }
+        }
+
+        & .short-hash {
+          color: $color-font-inverted;
+        }
+
+        & .ContactPresentation {
+          @include invertedPresentation;
+        }
+      }
+    }
+  }
+
+  &:before,
+  &:after,
+  & .getSiblings:after,
+  & .getChildren:after {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    top: -$marginTop + $lineIdenticonDistance - $labelPadding;
+    left: $identiconSize/2 - $lineWidth/2 - $marginLeft + $labelPadding;
+    height: $marginTop + $identiconSize/2 + $labelPadding;
+    width: $marginLeft - $identiconSize/2 - $lineIdenticonDistance - $labelPadding;
+    border: {
+      color: $color-grey;
+      style: solid;
+    }
+  }
+
+  &:before {
+    height: calc(100% + #{$lineIdenticonDistance + $marginTop});
+    border: {
+      width: 0 0 0 $lineWidth;
+    }
+  }
+
+  &:after {
+    border: {
+      width: 0 0 $lineWidth 0;
+    }
+  }
+
+  & .getSiblings,
+  & .getChildren {
+    $size: $base-padding;
+
+    @extend %centerH;
+
+    @include border-radius(50%);
+    @include transition($base-transition);
+
+    position: absolute;
+    width: $size;
+    height: $size;
+    padding: 0;
+    background: none;
+    border: $lineWidth solid transparent;
+    outline: none;
+    color: $color-primary;
+    cursor: pointer;
+
+    &:before {
+      @extend %centerHV;
+
+      @include icon($icon-plus);
+    }
+
+    &:after {
+      top: -$addLineHeight - $lineWidth;
+      left: calc(50% - #{$lineWidth/2});
+      height: $addLineHeight;
+      border: {
+        width: 0 0 0 $lineWidth;
+      }
+    }
+
+    &:hover {
+      border-color: $color-primary;
+    }
+
+    &.got {
+      color: $color-grey;
+
+      &:hover {
+        color: $color-primary;
+      }
+    }
+  }
+
+  & .getSiblings {
+    display: none;
+    top: $marginTop + $identiconSize/2 + $addLineHeight - $marginTop + $lineIdenticonDistance + $labelPadding;
+    left: $identiconSize/2 - $marginLeft + $labelPadding;
+  }
+
+  & .getChildren {
+    bottom: 0 - 2*$labelPadding;
+    left: $marginLeft + $identiconSize/2 - $marginLeft + $labelPadding;
+  }
+
+  & .Spinner {
+    border: none;
+
+    & .lds-ring {
+      margin-left: -2px;
+    }
+
+    &:before {
+      display: none;
+    }
+  }
+
+  &:last-child {
+
+    &:before {
+      height: $marginTop + $identiconSize/2 + $labelPadding;
+    }
+
+    & > .getSiblings {
+      display: block;
+    }
+  }
+
+  &.hasNoChildren {
+    $paddingBottom: $base-padding;
+
+    padding: {
+      bottom: $paddingBottom;
+    }
+  }
+
+  & & {
+    margin: {
+      top: $marginTop;
+      left: $marginLeft;
+    }
+  }
+
+  & .SelectAction {
+    @include react-select-right;
+    @include react-select-min-width;
+  }
+}

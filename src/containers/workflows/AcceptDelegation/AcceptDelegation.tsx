@@ -5,13 +5,14 @@ import ContactPresentation from '../../../components/ContactPresentation/Contact
 import Spinner from '../../../components/Spinner/Spinner'
 import ContactRepository from '../../../services/ContactRepository'
 import errorService from '../../../services/ErrorService'
-import { notifySuccess } from '../../../services/FeedbackService'
+import { notifySuccess, notifyFailure } from '../../../services/FeedbackService'
 import MessageRepository from '../../../services/MessageRepository'
 import * as Wallet from '../../../state/ducks/Wallet'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../../types/Contact'
 
 import './AcceptDelegation.scss'
+import DelegationsService from 'src/services/DelegationsService'
 
 type Props = {
   delegationData: sdk.IRequestAcceptDelegation['content']['delegationData']
@@ -101,7 +102,7 @@ class AcceptDelegation extends React.Component<Props, State> {
     )
   }
 
-  private signAndReply() {
+  private async signAndReply() {
     const {
       delegationData,
       inviterAddress,
@@ -109,12 +110,14 @@ class AcceptDelegation extends React.Component<Props, State> {
       signatures,
     } = this.props
 
+    const signature = await this.signNewDelegationNode(delegationData)
+
     const request: sdk.ISubmitAcceptDelegation = {
       content: {
         delegationData,
         signatures: {
           ...signatures,
-          invitee: this.signNewDelegationNode(delegationData),
+          invitee: signature,
         },
       },
       type: sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION,
@@ -150,18 +153,23 @@ class AcceptDelegation extends React.Component<Props, State> {
       })
   }
 
-  private signNewDelegationNode(
+  private async signNewDelegationNode(
     delegationData: sdk.IRequestAcceptDelegation['content']['delegationData']
-  ): string {
+  ): Promise<string> {
     const { selectedIdentity } = this.props
     const { account, id, parentId, permissions } = delegationData
 
-    // TODO: replace with getRoot method on parent delegation node
-    const rootId = parentId
+    const rootNode:
+      | sdk.IDelegationRootNode
+      | undefined = await DelegationsService.findRootNode(parentId)
+    if (!rootNode) {
+      notifyFailure('Cannot sign: unable to find root node')
+      throw new Error(`Root node not found for node ${parentId}`)
+    }
 
     const newDelegationNode = new sdk.DelegationNode(
       id,
-      rootId,
+      rootNode.id,
       account,
       permissions,
       parentId

@@ -7,8 +7,8 @@
   right: 0;
   bottom: 0;
   left: 0;
-  max-width: none;
-  padding: 0;
+  max-width: none !important;
+  padding: 0 !important;
 
   & .backdrop {
     position: absolute;

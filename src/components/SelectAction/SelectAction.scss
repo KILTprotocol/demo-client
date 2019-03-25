@@ -1,0 +1,11 @@
+.SelectAction {
+  @include react-select;
+
+  &.minimal {
+    @include react-select-minimal;
+
+    &.inverted {
+      @include react-select-minimal-inverted;
+    }
+  }
+}
