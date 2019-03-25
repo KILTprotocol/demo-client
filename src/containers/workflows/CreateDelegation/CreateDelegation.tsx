@@ -3,6 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import ContactPresentation from '../../../components/ContactPresentation/ContactPresentation'
+import ShortHash from '../../../components/ShortHash/ShortHash'
 import Spinner from '../../../components/Spinner/Spinner'
 import ContactRepository from '../../../services/ContactRepository'
 import DelegationService from '../../../services/DelegationsService'
@@ -12,7 +13,9 @@ import FeedbackService, {
   notifyFailure,
 } from '../../../services/FeedbackService'
 import MessageRepository from '../../../services/MessageRepository'
+import { MyDelegation } from '../../../state/ducks/Delegations'
 import * as Wallet from '../../../state/ducks/Wallet'
+import * as Delegations from '../../../state/ducks/Delegations'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../../types/Contact'
 
@@ -23,9 +26,13 @@ type Props = {
   delegationData: sdk.ISubmitAcceptDelegation['content']['delegationData']
   inviteeAddress: Contact['publicIdentity']['address']
   inviterAddress: Contact['publicIdentity']['address']
-  selectedIdentity: MyIdentity
   signatures: sdk.ISubmitAcceptDelegation['content']['signatures']
+
   onFinished?: () => void
+
+  // redux
+  selectedIdentity: MyIdentity
+  myDelegations: MyDelegation[]
 }
 
 type State = {
@@ -46,19 +53,39 @@ class CreateDelegation extends React.Component<Props, State> {
   }
 
   public render() {
-    const { delegationData, inviteeAddress, inviterAddress } = this.props
+    const {
+      delegationData,
+      inviteeAddress,
+      inviterAddress,
+      myDelegations,
+    } = this.props
     const { isSignatureValid } = this.state
+
+    const myInvitersDelegation = myDelegations.find(
+      (myDelegation: MyDelegation) =>
+        myDelegation.id === delegationData.parentId
+    )
 
     return (
       <section className="AcceptDelegation">
         {isSignatureValid ? (
           <>
-            <h2>Accept invitation?</h2>
+            <h2>Create delegation</h2>
 
             <div className="delegationData">
               <div>
                 <label>Inviters delegation ID</label>
-                <div>{delegationData.parentId}</div>
+                <div>
+                  {myInvitersDelegation && (
+                    <>
+                      <span>{myInvitersDelegation.metaData.alias} </span>(
+                      <ShortHash>{delegationData.parentId}</ShortHash>)
+                    </>
+                  )}
+                  {!myInvitersDelegation && (
+                    <ShortHash>{delegationData.parentId}</ShortHash>
+                  )}
+                </div>
               </div>
               <div>
                 <label>CType</label>
@@ -210,6 +237,7 @@ class CreateDelegation extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: ReduxState) => ({
+  myDelegations: Delegations.getDelegations(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

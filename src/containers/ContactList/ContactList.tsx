@@ -6,7 +6,7 @@ import * as React from 'react'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
-import MyDelegationsInviteView from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
+import MyDelegationsInviteModal from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
 import SelectAction from '../../components/SelectAction/SelectAction'
 import contactRepository from '../../services/ContactRepository'
 import CTypeRepository from '../../services/CtypeRepository'
@@ -146,7 +146,7 @@ class ContactList extends React.Component<Props, State> {
           onConfirm={this.onFinishRequestClaim}
         />
         {contactForDelegationInvite && (
-          <MyDelegationsInviteView
+          <MyDelegationsInviteModal
             contactsSelected={[contactForDelegationInvite]}
             onCancel={this.inviteToDelegation.cancel}
             onConfirm={this.inviteToDelegation.confirm}

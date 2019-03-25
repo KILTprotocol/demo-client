@@ -3,6 +3,7 @@ import * as React from 'react'
 import BlockchainService from 'src/services/BlockchainService'
 import DelegationsService from 'src/services/DelegationsService'
 import { notifyFailure } from 'src/services/FeedbackService'
+import { MyIdentity } from '../../types/Contact'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import DelegationNode, {
   DelegationsTreeNode,
@@ -11,49 +12,48 @@ import './DelegationDetailView.scss'
 
 type Props = {
   id: sdk.IDelegationBaseNode['id']
+  selectedIdentity: MyIdentity
 }
 
 type State = {
   delegationsTreeNode?: DelegationsTreeNode
-  rootCTypeHash: sdk.ICType['hash']
+  rootNode?: sdk.IDelegationRootNode
 }
 
 class DelegationDetailView extends React.Component<Props, State> {
-  private depth = 0
-
   constructor(props: Props) {
     super(props)
-    this.state = {
-      rootCTypeHash: undefined,
-    }
+    this.state = {}
   }
 
   public componentDidMount() {
     const { id } = this.props
 
-    this.getNode(id).then(async (delegationNode: sdk.IDelegationNode) => {
-      const treeNode: DelegationsTreeNode = {
-        childNodes: [],
-        delegation: delegationNode,
-        myNode: true,
-      } as DelegationsTreeNode
+    this.getNode(id)
+      .then(async (delegationNode: sdk.IDelegationNode) => {
+        const treeNode: DelegationsTreeNode = {
+          childNodes: [],
+          delegation: delegationNode,
+        } as DelegationsTreeNode
 
-      const parentTreeNode:
-        | DelegationsTreeNode
-        | undefined = await this.resolveParent(treeNode)
-      const cTypeHash: sdk.ICType['hash'] = await this.resolveRootCtype(
-        treeNode
-      )
-      // DelegationDetailView#setState
-      this.setState({
-        delegationsTreeNode: parentTreeNode ? parentTreeNode : treeNode,
-        rootCTypeHash: cTypeHash,
+        const rootNode: State['rootNode'] = await this.resolveRootNode(treeNode)
+        const parentTreeNode: DelegationsTreeNode = await this.resolveParent(
+          treeNode
+        )
+
+        this.setState({
+          delegationsTreeNode: parentTreeNode ? parentTreeNode : treeNode,
+          rootNode,
+        })
       })
-    })
+      .catch(error => {
+        console.log('error', error)
+      })
   }
 
   public render() {
-    const { delegationsTreeNode, rootCTypeHash } = this.state
+    const { selectedIdentity, id } = this.props
+    const { delegationsTreeNode, rootNode } = this.state
 
     return (
       <section className="DelegationDetailView">
@@ -61,13 +61,23 @@ class DelegationDetailView extends React.Component<Props, State> {
         <div className="delegationNodeContainer">
           {delegationsTreeNode && (
             <>
-              <h2>
-                <CTypePresentation cTypeHash={rootCTypeHash} />
-              </h2>
+              {rootNode && (
+                <h2>
+                  <span>CType: </span>
+                  <CTypePresentation
+                    cTypeHash={rootNode.cTypeHash}
+                    inline={true}
+                  />
+                </h2>
+              )}
+              {!rootNode && <h2>No CType!</h2>}
+              <br />
               <div className="delegationNodeScrollContainer">
                 <DelegationNode
                   key={delegationsTreeNode.delegation.id}
                   node={delegationsTreeNode}
+                  selectedIdentity={selectedIdentity}
+                  focusedNodeId={id}
                 />
               </div>
             </>
@@ -79,43 +89,31 @@ class DelegationDetailView extends React.Component<Props, State> {
 
   private async resolveParent(
     currentNode: DelegationsTreeNode
-  ): Promise<DelegationsTreeNode | undefined> {
+  ): Promise<DelegationsTreeNode> {
     const blockchain = await BlockchainService.connect()
-    let parentDelegation:
+    const parentDelegation:
       | sdk.IDelegationBaseNode
       | undefined = await currentNode.delegation.getParent(blockchain)
 
     if (!parentDelegation) {
-      parentDelegation = await currentNode.delegation.getRoot(blockchain)
-      if (
-        parentDelegation &&
-        parentDelegation.id === currentNode.delegation.id
-      ) {
-        parentDelegation = undefined
-      }
+      return currentNode
+    } else {
+      return this.resolveParent({
+        childNodes: [currentNode],
+        delegation: parentDelegation,
+      } as DelegationsTreeNode)
     }
-    if (!parentDelegation) {
-      return undefined
-    }
-    return {
-      childNodes: [currentNode],
-      delegation: parentDelegation,
-      myNode: false,
-    } as DelegationsTreeNode
   }
 
-  private async resolveRootCtype(
+  private async resolveRootNode(
     currentNode: DelegationsTreeNode
-  ): Promise<sdk.ICType['hash']> {
+  ): Promise<sdk.IDelegationRootNode | undefined> {
     const rootNode:
       | sdk.IDelegationRootNode
       | undefined = await DelegationsService.findRootNode(
       currentNode.delegation.id
     )
-    if (rootNode) {
-      return rootNode.cTypeHash
-    }
-    return undefined
+    return rootNode
   }
 
   private async getNode(

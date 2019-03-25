@@ -195,8 +195,6 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
   }
 
   private changePermissions(newPermissions: sdk.Permission[]) {
-    console.log('newPermissions', newPermissions)
-
     this.setState({ permissions: newPermissions })
   }
 

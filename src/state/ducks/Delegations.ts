@@ -3,7 +3,9 @@ import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 
 import KiltAction from '../../types/Action'
+import { MyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
+import * as Wallet from './Wallet'
 
 export enum DelegationType {
   Root = 'root',
@@ -126,10 +128,34 @@ const _getAllDelegations = (state: ReduxState) =>
   state.delegations.get('delegations').toArray()
 
 const getDelegations = createSelector(
-  [_getAllDelegations],
-  (entries: Entry[]) => {
-    return entries
+  [Wallet.getSelectedIdentity, _getAllDelegations],
+  (selectedIdentity: MyIdentity, myDelegations: MyDelegation[]) => {
+    return myDelegations.filter(
+      (myDelegation: MyDelegation) =>
+        myDelegation.account === selectedIdentity.identity.address
+    )
   }
 )
 
-export { Store, ImmutableState, SerializedState, Entry, Action, getDelegations }
+const _getDelegationId = (
+  state: ReduxState,
+  delegationId: MyDelegation['id']
+) => delegationId
+
+const getDelegation = createSelector(
+  [_getAllDelegations, _getDelegationId],
+  (myDelegations: MyDelegation[], delegationId: MyDelegation['id']) =>
+    myDelegations.find(
+      (myDelegation: MyDelegation) => myDelegation.id === delegationId
+    )
+)
+
+export {
+  Store,
+  ImmutableState,
+  SerializedState,
+  Entry,
+  Action,
+  getDelegation,
+  getDelegations,
+}

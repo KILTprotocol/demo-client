@@ -30,31 +30,33 @@ body {
     bottom: 0;
     left: 0;
   }
-;
   background: $color-white;
   color: $color-font;
 }
 
-section {
-  width: 100%;
-  max-width: $base-content-max-width;
-  margin: auto;
-  padding: $base-padding;
+.App {
 
-  & section {
-    padding: 0;
-  }
+  &,
+  & > header {
 
-  & h1,
-  & h2,
-  & h3,
-  & h4,
-  & h5,
-  & h6 {
+    & > section {
+      width: 100%;
+      max-width: $base-content-max-width;
+      margin: auto;
+      padding: $base-padding;
 
-    &:first-child {
-      margin: {
-        top: 0;
+      & h1,
+      & h2,
+      & h3,
+      & h4,
+      & h5,
+      & h6 {
+
+        &:first-child {
+          margin: {
+            top: 0;
+          }
+        }
       }
     }
   }

@@ -42,3 +42,52 @@
     display: initial;
   }
 }
+
+@mixin react-select-minimal {
+
+  & .react-select {
+
+    &__value-container,
+    &__indicator-separator{
+      @include opacity(0);
+
+      padding: 0;
+    }
+
+    &__control {
+      border: none !important;
+      background: none;
+    }
+  }
+}
+
+@mixin react-select-minimal-inverted {
+
+  & .react-select {
+
+    &__indicator {
+
+      &:hover,
+      &:active {
+
+        & svg {
+          fill: $color-font-inverted !important;
+        }
+      }
+    }
+  }
+}
+
+@mixin react-select-right($right: 0) {
+
+  & .react-select__menu {
+    right: $right;
+  }
+}
+
+@mixin react-select-min-width($minWidth: 200px) {
+
+  & .react-select__menu {
+    min-width: $minWidth;
+  }
+}
