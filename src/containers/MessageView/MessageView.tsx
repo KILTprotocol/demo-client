@@ -1,4 +1,3 @@
-import { IMessage } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
@@ -133,7 +132,9 @@ class MessageView extends React.Component<Props, State> {
 
     if (currentMessage) {
       this.onCloseMessage()
-      this.fetchMessages()
+      setTimeout(() => {
+        this.fetchMessages()
+      })
     }
 
     safeDelete(

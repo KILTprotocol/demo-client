@@ -163,19 +163,27 @@ export function notify(message: string | ReactNode, blocking = false) {
 export function safeDelete(
   message: ReactNode,
   onConfirm: (notification: BlockingNotification) => void,
-  removeNotificationInstantly = true
+  removeNotificationInstantly = true,
+  onCancel?: (notification: BlockingNotification) => void
 ) {
   FeedbackService.addBlockingNotification({
     header: 'Are you sure?',
     message: <div>Do you want to delete {message}?</div>,
     modalType: ModalType.CONFIRM,
+    type: NotificationType.INFO,
+
+    onCancel: (notification: BlockingNotification) => {
+      if (onCancel) {
+        onCancel(notification)
+      }
+      notification.remove()
+    },
     onConfirm: (notification: BlockingNotification) => {
       onConfirm(notification)
       if (removeNotificationInstantly) {
         notification.remove()
       }
     },
-    type: NotificationType.INFO,
   })
 }
 

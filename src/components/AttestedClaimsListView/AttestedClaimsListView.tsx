@@ -40,15 +40,19 @@ type AttestationStatus = {
 
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
+
   context?: 'legitimations'
+  delegationId?: sdk.IDelegationNode['id']
+
   onToggleChildOpen?: (closeCallback?: () => void | undefined) => void
 }
 
 type State = {
   attestationStatus: AttestationStatus
   canResolveAttesters: boolean
-  closeOpenedChild?: () => void
   labels: { [key: string]: string }
+
+  closeOpenedChild?: () => void
   openedAttestedClaim?: sdk.IAttestedClaim
 }
 
@@ -84,8 +88,8 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { attestedClaims }: Props = this.props
-    const { openedAttestedClaim } = this.state
+    const { attestedClaims, context, delegationId } = this.props
+    const { labels, openedAttestedClaim } = this.state
 
     const classes = [
       'AttestedClaimsListView',
@@ -94,10 +98,28 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
     return attestedClaims ? (
       <section className={classes.join(' ')}>
-        {this.getAttestations(attestedClaims)}
+        <div className={context}>
+          <h2>{labels.h2_multi}</h2>
+          {this.getLegitimations(attestedClaims, delegationId)}
+        </div>
       </section>
     ) : (
       <section className="ClaimDetailView">Claim not found</section>
+    )
+  }
+
+  private getLegitimations(
+    attestedClaims: Props['attestedClaims'],
+    delegationId: Props['delegationId']
+  ) {
+    if (!delegationId && !attestedClaims.length) {
+      return <div>{LABELS.legitimations.emptyList}</div>
+    }
+    return (
+      <>
+        {this.getAttestations(attestedClaims)}
+        {this.getDelegation(delegationId)}
+      </>
     )
   }
 
@@ -107,10 +129,10 @@ class AttestedClaimsListView extends React.Component<Props, State> {
       <section className="attestations">
         {openedAttestedClaim ? (
           <h2 onClick={this.toggleOpen.bind(this, openedAttestedClaim)}>
-            {labels.h2_single}
+            {LABELS.default.h2_single}
           </h2>
         ) : (
-          <h2>{labels.h2_multi}</h2>
+          <h2>{LABELS.default.h2_multi}</h2>
         )}
         <div className="container-actions">
           {!!attestations && !!attestations.length && (
@@ -150,6 +172,11 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                         address={attestedClaim.attestation.owner}
                       />
                     </td>
+                    <td className="cType">
+                      <CTypePresentation
+                        cTypeHash={attestedClaim.attestation.cTypeHash}
+                      />
+                    </td>
                     <td className={`status ${attestationStatus[owner]}`}>
                       {attestationStatus[owner] === STATUS.PENDING && (
                         <Spinner size={20} color="#ef5a28" strength={3} />
@@ -170,10 +197,13 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                       <td className="listDetailContainer" colSpan={3}>
                         <AttestedClaimsListView
                           attestedClaims={attestedClaim.request.legitimations}
+                          delegationId={attestedClaim.request.delegationId}
                           context="legitimations"
                           onToggleChildOpen={this.toggleChildOpen}
                         />
+
                         <div className="back" onClick={this.closeOpenedChild} />
+
                         <AttestedClaimVerificationView
                           context=""
                           attestedClaim={attestedClaim}
@@ -186,9 +216,22 @@ class AttestedClaimsListView extends React.Component<Props, State> {
             })}
           </table>
         ) : (
-          <div>{labels.emptyList}</div>
+          <div>{LABELS.default.emptyList}</div>
         )}
       </section>
+    )
+  }
+
+  private getDelegation(delegationId: Props['delegationId']) {
+    return (
+      <div className="delegation">
+        <h2>Delegation</h2>
+        {delegationId ? (
+          <div>{delegationId}</div>
+        ) : (
+          <div>No delegation found.</div>
+        )}
+      </div>
     )
   }
 

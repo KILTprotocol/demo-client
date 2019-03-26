@@ -6,5 +6,11 @@
     & .CTypePresentation {
       @include inlinePresentation;
     }
+
+    &:last-child {
+      margin: {
+        bottom: $base-padding;
+      }
+    }
   }
 }

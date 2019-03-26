@@ -98,6 +98,7 @@ class SelectCTypesModal extends React.Component<Props, State> {
         ref={el => {
           this.modal = el
         }}
+        className="small"
         type={ModalType.CONFIRM}
         header={finalHeader}
         onCancel={onCancel}

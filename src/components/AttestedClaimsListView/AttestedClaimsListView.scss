@@ -5,6 +5,39 @@
     margin-bottom: 0;
   }
 
+  & > div:not(.legitimations) {
+
+    & > h2,
+    & > .delegation {
+      display: none;
+    }
+  }
+
+  & .legitimations {
+
+    &,
+    & > .delegation {
+      @include labeledCard;
+    }
+
+    & > .attestations {
+      margin: {
+        top: 2*$base-padding;
+      }
+    }
+
+    & > .delegation,
+    & > .attestations {
+
+      & > h2 {
+
+        &:first-child {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+
   & .attestations {
     @include labeledCard(1);
 
@@ -109,6 +142,10 @@
     display: flex;
     flex-direction: column;
 
+    & .delegation {
+      order: 2;
+    }
+
     & .AttestedClaimsListView {
       order: 1;
     }
@@ -120,33 +157,48 @@
 
   &.opened {
 
-    & > .attestations {
+    & > div {
 
-      & > h2 {
-        cursor: pointer;
+      & > .attestations {
+        margin-bottom: 0;
+
+        & > h2 {
+          cursor: pointer;
+        }
+
+        & > .container-actions {
+
+          & > .refresh {
+            display: none;
+          }
+        }
       }
 
-      & > .container-actions {
-
-        & > .refresh {
-          display: none;
-        }
+      & > .delegation {
+        display: none;
       }
     }
 
     & & {
 
-      & > .attestations {
-        @include removeLabeledCard;
+      & > .legitimations {
 
-        & > h2 {
-          display: none;
+        &,
+        & > .attestations {
+          @include removeLabeledCard;
+
+          & > h2 {
+            display: none;
+          }
         }
 
-        & > .container-actions {
+        & > .attestations {
 
-          & > .close {
-            display: none;
+          & > .container-actions {
+
+            & > .close {
+              display: none;
+            }
           }
         }
       }

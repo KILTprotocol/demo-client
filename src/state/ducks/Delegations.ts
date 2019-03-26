@@ -127,6 +127,25 @@ class Store {
 const _getAllDelegations = (state: ReduxState) =>
   state.delegations.get('delegations').toArray()
 
+const getAllDelegations = createSelector(
+  [Wallet.getSelectedIdentity, _getAllDelegations],
+  (selectedIdentity: MyIdentity, myDelegations: MyDelegation[]) => {
+    return myDelegations.filter(
+      (myDelegation: MyDelegation) =>
+        myDelegation.account === selectedIdentity.identity.address
+    )
+  }
+)
+
+// TODO: filter by isRoot
+const getRootDelegations = createSelector(
+  [_getAllDelegations],
+  (entries: Entry[]) => {
+    return entries.filter((entry: Entry) => entry)
+  }
+)
+
+// TODO: filter by !isRoot
 const getDelegations = createSelector(
   [Wallet.getSelectedIdentity, _getAllDelegations],
   (selectedIdentity: MyIdentity, myDelegations: MyDelegation[]) => {
@@ -156,6 +175,8 @@ export {
   SerializedState,
   Entry,
   Action,
-  getDelegation,
+  getAllDelegations,
+  getRootDelegations,
   getDelegations,
+  getDelegation,
 }

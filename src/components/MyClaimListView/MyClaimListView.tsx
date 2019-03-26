@@ -3,13 +3,17 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import * as Claims from '../../state/ducks/Claims'
+import { ICType } from '../../types/Ctype'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
+import SelectCTypesModal from '../Modal/SelectCTypesModal'
 import SelectAction from '../SelectAction/SelectAction'
 
 import './MyClaimListView.scss'
 
 type Props = {
   claimStore: Claims.Entry[]
+
+  onCreateClaimFromCType: (selectedCTypes: ICType[]) => void
   onRemoveClaim: (claimId: Claims.Entry['id']) => void
   onRequestAttestation: (claimId: Claims.Entry['id']) => void
   onRequestLegitimation: (claimId: Claims.Entry['id']) => void
@@ -18,6 +22,14 @@ type Props = {
 type State = {}
 
 class MyClaimListView extends React.Component<Props, State> {
+  private selectCTypesModal: SelectCTypesModal | null
+
+  constructor(props: Props) {
+    super(props)
+
+    this.openCTypeModal = this.openCTypeModal.bind(this)
+  }
+
   public render() {
     const { claimStore } = this.props
     return (
@@ -94,8 +106,15 @@ class MyClaimListView extends React.Component<Props, State> {
           </table>
         )}
         <div className="actions">
-          <Link to="/ctype">Create Claim from CTYPE</Link>
+          <button onClick={this.openCTypeModal}>Create Claim from CTYPE</button>
         </div>
+
+        <SelectCTypesModal
+          ref={el => {
+            this.selectCTypesModal = el
+          }}
+          onConfirm={this.createClaimFromCType}
+        />
       </section>
     )
   }
@@ -113,6 +132,17 @@ class MyClaimListView extends React.Component<Props, State> {
   private requestLegitimation(claimId: Claims.Entry['id']) {
     const { onRequestLegitimation } = this.props
     onRequestLegitimation(claimId)
+  }
+
+  private openCTypeModal() {
+    if (this.selectCTypesModal) {
+      this.selectCTypesModal.show()
+    }
+  }
+
+  private createClaimFromCType(selectedCTypes: ICType[]) {
+    const { onCreateClaimFromCType } = this.props
+    onCreateClaimFromCType(selectedCTypes)
   }
 }
 

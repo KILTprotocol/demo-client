@@ -1,0 +1,6 @@
+.SubmitClaimsForCType {
+
+  & .selectAttestedClaims {
+    @include labeledCard;
+  }
+}

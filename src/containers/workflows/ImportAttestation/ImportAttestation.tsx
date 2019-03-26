@@ -27,10 +27,13 @@ class ImportAttestation extends React.Component<Props, State> {
     return (
       <section className="ImportAttestation">
         <ClaimDetailView claim={attestedClaim.request.claim} />
+
         <AttestedClaimsListView
           attestedClaims={attestedClaim.request.legitimations}
+          delegationId={attestedClaim.request.delegationId}
           context="legitimations"
         />
+
         <div className="actions">
           <button onClick={this.importAttestation}>Import Attestation</button>
         </div>

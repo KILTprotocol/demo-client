@@ -3,9 +3,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import ContactRepository from '../../services/ContactRepository'
-import delegationService from '../../services/DelegationsService'
-import errorService from '../../services/ErrorService'
-import { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
@@ -269,7 +266,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 
     const delegationData = this.getDelegationData(receiver, delegation)
 
-    const request: sdk.IRequestAcceptDelegation = {
+    const messageBody: sdk.IRequestAcceptDelegation = {
       content: {
         delegationData,
         metaData,
@@ -282,20 +279,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
       type: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
     }
 
-    MessageRepository.send(receiver, request)
-      .then(() => {
-        notifySuccess('Delegation invitation successfully sent.')
-      })
-      .catch(error => {
-        errorService.log({
-          error,
-          message: `Could not send message ${request.type} to ${
-            receiver!.metaData.name
-          }`,
-          origin: 'DelegationsView.confirmSelectContacts()',
-          type: 'ERROR.FETCH.POST',
-        })
-      })
+    MessageRepository.send([receiver], messageBody)
   }
 
   private sendInvitations() {
@@ -312,7 +296,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: ReduxState) => ({
-  myDelegations: Delegations.getDelegations(state),
+  myDelegations: Delegations.getAllDelegations(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

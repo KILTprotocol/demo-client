@@ -5,22 +5,21 @@ import { connect } from 'react-redux'
 import ContactPresentation from '../../../components/ContactPresentation/ContactPresentation'
 import ShortHash from '../../../components/ShortHash/ShortHash'
 import Spinner from '../../../components/Spinner/Spinner'
-import ContactRepository from '../../../services/ContactRepository'
+import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import DelegationService from '../../../services/DelegationsService'
 import errorService from '../../../services/ErrorService'
 import FeedbackService, {
   notifySuccess,
   notifyFailure,
 } from '../../../services/FeedbackService'
-import MessageRepository from '../../../services/MessageRepository'
 import { MyDelegation } from '../../../state/ducks/Delegations'
 import * as Wallet from '../../../state/ducks/Wallet'
 import * as Delegations from '../../../state/ducks/Delegations'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../../types/Contact'
+import { BlockUi } from '../../../types/UserFeedback'
 
 import './CreateDelegation.scss'
-import { BlockUi } from 'src/types/UserFeedback'
 
 type Props = {
   delegationData: sdk.ISubmitAcceptDelegation['content']['delegationData']
@@ -196,43 +195,14 @@ class CreateDelegation extends React.Component<Props, State> {
   private replyToInvitee() {
     const { delegationData, onFinished, inviteeAddress } = this.props
 
-    const request: sdk.IInformCreateDelegation = {
-      content: delegationData.id,
-      type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
-    }
-
-    ContactRepository.findByAddress(inviteeAddress)
-      .then((invitee: Contact) => {
-        MessageRepository.send(invitee, request)
-          .then(() => {
-            notifySuccess('Delegation creation successfully communicated.')
-            if (onFinished) {
-              onFinished()
-            }
-          })
-          .catch(error => {
-            errorService.log({
-              error,
-              message: `Could not send message ${request.type} to ${
-                invitee!.metaData.name
-              }`,
-              origin: 'CreateDelegation.replyToInvitee()',
-              type: 'ERROR.FETCH.POST',
-            })
-          })
-      })
-      .catch(error => {
-        errorService.log({
-          error,
-          message: `Could not resolve invitee '${inviteeAddress}'`,
-          origin: 'CreateDelegation.replyToInvitee()',
-          type: 'ERROR.FETCH.GET',
-        })
-      })
-
-    if (onFinished) {
-      onFinished()
-    }
+    AttestationWorkflow.informCreateDelegation(
+      delegationData.id,
+      inviteeAddress
+    ).then(() => {
+      if (onFinished) {
+        onFinished()
+      }
+    })
   }
 }
 

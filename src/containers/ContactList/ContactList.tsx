@@ -11,11 +11,9 @@ import SelectAction from '../../components/SelectAction/SelectAction'
 import contactRepository from '../../services/ContactRepository'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
-import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
-import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
 
@@ -162,30 +160,12 @@ class ContactList extends React.Component<Props, State> {
 
   private onFinishRequestClaim(selectedCTypes: ICType[]) {
     if (this.selectedContact && selectedCTypes) {
-      const blockUi: BlockUi = FeedbackService.addBlockUi({
-        headline: 'Sending Message',
-      })
-      const request: IRequestClaimsForCtype = {
+      const messageBody: IRequestClaimsForCtype = {
         content: selectedCTypes[0].cType.hash,
         type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
       }
 
-      MessageRepository.send(this.selectedContact, request)
-        .then(() => {
-          blockUi.remove()
-          notifySuccess('Request Claims successfully sent.')
-        })
-        .catch(error => {
-          blockUi.remove()
-          errorService.log({
-            error,
-            message: `Could not send message ${request.type} to ${
-              this.selectedContact!.metaData.name
-            }`,
-            origin: 'ContactList.onFinishRequestClaim()',
-            type: 'ERROR.FETCH.POST',
-          })
-        })
+      MessageRepository.send([this.selectedContact], messageBody)
     }
   }
 

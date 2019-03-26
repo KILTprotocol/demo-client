@@ -63,7 +63,7 @@ body {
 }
 
 h1 {
-  @include baseFont;
+  @include baseFont-bold;
 
   display: flex;
   align-items: center;
@@ -71,10 +71,9 @@ h1 {
   height: $h1-icon-size;
   margin: {
     top: $base-padding;
-    bottom: 2*$base-padding;
+    bottom: 4*$base-padding;
   }
-  text-transform: uppercase;
-  font-size: 24px;
+  font-size: 30px;
 }
 
 // base form elements

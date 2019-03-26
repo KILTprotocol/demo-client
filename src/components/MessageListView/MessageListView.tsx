@@ -1,5 +1,6 @@
 import { IMessage } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+
 import { MessageOutput } from '../../services/MessageRepository'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import DateTime from '../DateTime/DateTime'
