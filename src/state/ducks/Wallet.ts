@@ -30,6 +30,7 @@ type State = {
 type ImmutableState = Immutable.Record<State>
 
 type SerializedIdentity = {
+  did?: MyIdentity['did']
   name: MyIdentity['metaData']['name']
   phrase: MyIdentity['phrase']
 }
@@ -49,6 +50,7 @@ class Store {
       .get('identities')
       .toList()
       .map((myIdentity: MyIdentity) => ({
+        did: myIdentity.did,
         name: myIdentity.metaData.name,
         phrase: myIdentity.phrase,
       }))
@@ -70,12 +72,13 @@ class Store {
     const identities: { [key: string]: MyIdentity } = {}
 
     serializedIdentities.forEach((serializedIdentity: SerializedIdentity) => {
-      const { name, phrase } = serializedIdentity
+      const { did, name, phrase } = serializedIdentity
 
       // TODO: use real wallet later instead of stored phrase
 
       const identity = sdk.Identity.buildFromMnemonic(phrase)
       const myIdentity: MyIdentity = {
+        did,
         identity,
         metaData: {
           name,

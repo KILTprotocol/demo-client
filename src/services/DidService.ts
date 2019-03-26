@@ -5,9 +5,12 @@ import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 
 export class DidService {
-  public static async createDid(myIdentity: MyIdentity): Promise<sdk.IDid> {
+  public static async createDid(
+    myIdentity: MyIdentity,
+    documentStore?: sdk.IDid['documentStore']
+  ): Promise<sdk.IDid> {
     const blockchain = await BlockchainService.connect()
-    const did = sdk.Did.fromIdentity(myIdentity.identity) // TODO include documentStore
+    const did = sdk.Did.fromIdentity(myIdentity.identity, documentStore)
     const status = await did.store(blockchain, myIdentity.identity)
     if (status.type !== 'Finalised') {
       throw new Error(

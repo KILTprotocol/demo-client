@@ -15,7 +15,7 @@ import { State as ReduxState } from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 
 import './WalletView.scss'
-import { DidService } from 'src/services/DidService'
+import { DidService } from '../../services/DidService'
 
 type Props = RouteComponentProps<{}> & {
   selectIdentity: (address: MyIdentity['identity']['address']) => void
@@ -84,7 +84,7 @@ class WalletView extends React.Component<Props, State> {
     const blockUi = FeedbackService.addBlockUi({
       headline: 'Generating DID...',
     })
-    DidService.createDid(myIdentity)
+    DidService.createDid(myIdentity) // TODO: add document reference 
       .then((did: sdk.IDid) => {
         notifySuccess(`DID successfully generated: ${did.identifier}`)
         blockUi.remove()
@@ -103,6 +103,7 @@ class WalletView extends React.Component<Props, State> {
       DidService.deleteDid(myIdentity)
         .then(() => {
           notifySuccess('Successfully deleted DID')
+          blockUi.remove()
         })
         .catch(err => {
           notifyFailure(err)

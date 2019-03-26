@@ -1,8 +1,6 @@
 import * as React from 'react'
-
 import { MyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
-
 import './IdentityView.scss'
 
 type Props = {
