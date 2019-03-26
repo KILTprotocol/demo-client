@@ -2,14 +2,20 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import IdentityView from '../../components/IdentityView/IdentityView'
-import { safeDelete } from '../../services/FeedbackService'
+import FeedbackService, {
+  safeDelete,
+  notifyFailure,
+  notifySuccess,
+} from '../../services/FeedbackService'
 
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 
 import './WalletView.scss'
+import { DidService } from 'src/services/DidService'
 
 type Props = RouteComponentProps<{}> & {
   selectIdentity: (address: MyIdentity['identity']['address']) => void
@@ -42,6 +48,8 @@ class WalletView extends React.Component<Props, State> {
           selected={selected}
           onDelete={this.removeIdentity}
           onSelect={this.selectIdentity}
+          onCreateDid={this.createDid}
+          onDeleteDid={this.deleteDid}
         />
       )
     })
@@ -70,6 +78,37 @@ class WalletView extends React.Component<Props, State> {
         removeIdentity(identityToDelete.identity.address)
       })
     }
+  }
+
+  private createDid(myIdentity: MyIdentity) {
+    const blockUi = FeedbackService.addBlockUi({
+      headline: 'Generating DID...',
+    })
+    DidService.createDid(myIdentity)
+      .then((did: sdk.IDid) => {
+        notifySuccess(`DID successfully generated: ${did.identifier}`)
+        blockUi.remove()
+      })
+      .catch(err => {
+        notifyFailure(err)
+        blockUi.remove()
+      })
+  }
+
+  private deleteDid(myIdentity: MyIdentity) {
+    safeDelete(`your identity's DID`, () => {
+      const blockUi = FeedbackService.addBlockUi({
+        headline: `Removing DID for identity ${myIdentity.metaData.name}`,
+      })
+      DidService.deleteDid(myIdentity)
+        .then(() => {
+          notifySuccess('Successfully deleted DID')
+        })
+        .catch(err => {
+          notifyFailure(err)
+          blockUi.remove()
+        })
+    })
   }
 
   private selectIdentity = (address: MyIdentity['identity']['address']) => {

@@ -12,6 +12,8 @@ type Props = {
   // output
   onDelete?: (address: MyIdentity['identity']['address']) => void
   onSelect?: (seedAsHex: MyIdentity['identity']['address']) => void
+  onCreateDid?: (identity: MyIdentity) => void
+  onDeleteDid?: (identity: MyIdentity) => void
 }
 
 class IdentityView extends React.Component<Props, {}> {
@@ -20,7 +22,14 @@ class IdentityView extends React.Component<Props, {}> {
   }
 
   public render() {
-    const { myIdentity, onDelete, onSelect, selected } = this.props
+    const {
+      myIdentity,
+      onDelete,
+      onSelect,
+      onCreateDid,
+      onDeleteDid,
+      selected,
+    } = this.props
 
     const classes = ['IdentityView', selected ? 'selected' : '']
 
@@ -70,6 +79,16 @@ class IdentityView extends React.Component<Props, {}> {
                 disabled={selected}
               >
                 Select
+              </button>
+            )}
+            {onCreateDid && !myIdentity.did && (
+              <button onClick={onCreateDid.bind(this, myIdentity)}>
+                Create DID
+              </button>
+            )}
+            {onDeleteDid && myIdentity.did && (
+              <button onClick={onDeleteDid.bind(this, myIdentity)}>
+                Delete DID
               </button>
             )}
           </div>
