@@ -24,8 +24,7 @@ export class DidService {
 
   public static async deleteDid(myIdentity: MyIdentity) {
     const blockchain = await BlockchainService.connect()
-    const did = sdk.Did.fromIdentity(myIdentity.identity)
-    const status = await did.remove(blockchain, myIdentity.identity)
+    const status = await sdk.Did.remove(blockchain, myIdentity.identity)
     if (status.type !== 'Finalised') {
       throw new Error(
         `Error deleting DID for identity ${myIdentity.metaData.name}`
