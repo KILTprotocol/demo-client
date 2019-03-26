@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
+import BlockchainService from '../../services/BlockchainService'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Delegations from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
@@ -31,6 +32,7 @@ class SelectDelegationAction extends React.Component<Props, State> {
     const actions: State['actions'] = [
       this.getInviteAction(),
       this.getDeleteAction(),
+      this.getRevokeAttestationsAction(),
     ].filter((action: Action) => action)
     this.setState({ actions })
   }
@@ -78,6 +80,22 @@ class SelectDelegationAction extends React.Component<Props, State> {
       }
     }
     return undefined
+  }
+
+  private getRevokeAttestationsAction() {
+    const { delegationEntry } = this.props
+    return {
+      callback: async () => {
+        const blockchain = await BlockchainService.connect()
+        const hashes = sdk.DelegationNode.getAttestationHashes(
+          blockchain,
+          delegationEntry.id
+        )
+        // TODO: revoke attestations. use static method `revoke` from sdk class `Attestation`
+        console.log(hashes)
+      },
+      label: 'Revoke all Attestations',
+    }
   }
 
   private isMine() {
