@@ -28,6 +28,7 @@ class MyClaimListView extends React.Component<Props, State> {
     super(props)
 
     this.openCTypeModal = this.openCTypeModal.bind(this)
+    this.createClaimFromCType = this.createClaimFromCType.bind(this)
   }
 
   public render() {
