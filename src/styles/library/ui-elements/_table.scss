@@ -30,7 +30,8 @@
       @include actions;
     }
 
-    & .SelectAction {
+    & .SelectAction,
+    & .SelectDelegationAction {
       width: 100%;
     }
   }

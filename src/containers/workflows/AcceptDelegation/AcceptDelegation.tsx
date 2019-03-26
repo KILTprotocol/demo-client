@@ -1,23 +1,29 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
-import ContactPresentation from '../../../components/ContactPresentation/ContactPresentation'
+
+import DelegationDetailView from '../../../components/DelegationDetailView/DelegationDetailView'
+import Permissions from '../../../components/Permissions/Permissions'
 import Spinner from '../../../components/Spinner/Spinner'
 import { notifyFailure } from '../../../services/FeedbackService'
 import MessageRepository from '../../../services/MessageRepository'
 import * as Wallet from '../../../state/ducks/Wallet'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../../types/Contact'
+import DelegationsService from '../../../services/DelegationsService'
 
 import './AcceptDelegation.scss'
-import DelegationsService from 'src/services/DelegationsService'
 
 type Props = {
   delegationData: sdk.IRequestAcceptDelegation['content']['delegationData']
   inviterAddress: Contact['publicIdentity']['address']
-  metaData?: sdk.IRequestAcceptDelegation['content']['metaData']
-  selectedIdentity: MyIdentity
   signatures: sdk.IRequestAcceptDelegation['content']['signatures']
+
+  // redux
+  selectedIdentity: MyIdentity
+
+  metaData?: sdk.IRequestAcceptDelegation['content']['metaData']
+
   onFinished?: () => void
 }
 
@@ -38,7 +44,7 @@ class AcceptDelegation extends React.Component<Props, State> {
   }
 
   public render() {
-    const { delegationData, inviterAddress, metaData } = this.props
+    const { delegationData, metaData } = this.props
     const { isSignatureValid } = this.state
 
     return (
@@ -49,38 +55,19 @@ class AcceptDelegation extends React.Component<Props, State> {
 
             <div className="delegationData">
               <div>
-                <label>Inviters delegation ID</label>
-                <div>{delegationData.parentId}</div>
-              </div>
-              {metaData && metaData.alias && (
-                <div>
-                  <label>Alias</label>
-                  <div>{metaData.alias}</div>
-                </div>
-              )}
-              <div>
-                <label>CType</label>
-                <div>
-                  <i>'not yet implemented'</i>
-                </div>
-              </div>
-              <div>
                 <label>Your permissions</label>
                 <div>
-                  {delegationData.permissions.map(
-                    (permission: sdk.Permission) => (
-                      <div key={permission}>{sdk.Permission[permission]}</div>
-                    )
-                  )}
-                </div>
-              </div>
-              <div>
-                <label>Inviter</label>
-                <div>
-                  <ContactPresentation address={inviterAddress} />
+                  <Permissions permissions={delegationData.permissions} />
                 </div>
               </div>
             </div>
+
+            <DelegationDetailView
+              id={delegationData.parentId}
+              focusedNodeAlias={
+                metaData && metaData.alias ? metaData.alias : undefined
+              }
+            />
 
             <div className="actions">
               <button onClick={this.signAndReply}>Accept Inivitation</button>

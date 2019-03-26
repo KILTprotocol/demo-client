@@ -8,7 +8,9 @@ import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
+import Permissions from '../Permissions/Permissions'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
+import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
 import ShortHash from '../ShortHash/ShortHash'
 import Spinner from '../Spinner/Spinner'
 
@@ -26,6 +28,7 @@ type Props = {
 
   gotSiblings?: true
   gettingSiblings?: boolean
+  focusedNodeAlias?: MyDelegation['metaData']['alias']
 
   onGetChildren?: () => void
 }
@@ -73,7 +76,7 @@ class DelegationNode extends React.Component<Props, State> {
   }
 
   public render() {
-    const { focusedNodeId, selectedIdentity } = this.props
+    const { focusedNodeAlias, focusedNodeId, selectedIdentity } = this.props
     const {
       delegationForInvite,
       focusedNode,
@@ -85,8 +88,6 @@ class DelegationNode extends React.Component<Props, State> {
     } = this.state
     const { delegation } = node
     const { permissions } = delegation as sdk.IDelegationNode
-
-    const actions = this.getActions()
 
     return (
       <section
@@ -100,15 +101,19 @@ class DelegationNode extends React.Component<Props, State> {
         <div className="label">
           <div className="header">
             {myDelegation && <h3>{myDelegation.metaData.alias}</h3>}
+            {!myDelegation && !!focusedNodeAlias && focusedNode && (
+              <h3>{focusedNodeAlias}</h3>
+            )}
             <ShortHash length={10}>{delegation.id}</ShortHash>
           </div>
           <div className="content">
             <ContactPresentation address={delegation.account} />
-            {permissions && this.getPermissions()}
-            {!!actions.length && (
-              <SelectAction
-                actions={actions}
+            {!!permissions && <Permissions permissions={permissions} />}
+            {!!myDelegation && (
+              <SelectDelegationAction
                 className={`minimal ${focusedNode ? 'inverted' : ''}`}
+                delegationEntry={myDelegation}
+                onInvite={this.inviteTo.bind(this, myDelegation)}
               />
             )}
           </div>
@@ -124,6 +129,7 @@ class DelegationNode extends React.Component<Props, State> {
             onGetChildren={this.getChildren}
             gotSiblings={gotChildren}
             gettingSiblings={gettingChildren}
+            focusedNodeAlias={focusedNodeAlias}
           />
         ))}
         {delegationForInvite && (
@@ -185,64 +191,11 @@ class DelegationNode extends React.Component<Props, State> {
     )
   }
 
-  private getPermissions() {
-    const { node } = this.state
-    const { delegation } = node
-    const { permissions } = delegation as sdk.IDelegationNode
-
-    return (
-      <div className="permissions">
-        {Object.keys(sdk.Permission)
-          .filter(
-            (permission: string) =>
-              typeof sdk.Permission[permission] === 'number'
-          )
-          .map((permission: string) => {
-            const allowed =
-              permissions.indexOf(sdk.Permission[permission]) !== -1
-            return (
-              <span
-                key={permission}
-                title={this.getPermissionTitle(permission, allowed)}
-                className={`${permission} ${allowed ? 'allowed' : 'denied'}`}
-              />
-            )
-          })}
-      </div>
-    )
-  }
-
-  private getPermissionTitle(permission: string, allowed: boolean): string {
-    if (allowed) {
-      return 'can ' + permission.toLowerCase()
-    }
-    return 'can NOT ' + permission.toLowerCase()
-  }
-
   private getSiblings() {
     const { onGetChildren } = this.props
     if (onGetChildren) {
       onGetChildren()
     }
-  }
-
-  private getActions(): Action[] {
-    const { isRoot, myDelegation, node } = this.state
-    const { delegation } = node
-    const { permissions } = delegation as sdk.IDelegationNode
-
-    const actions: Action[] = []
-
-    const canDelegate =
-      !!permissions && permissions.indexOf(sdk.Permission.DELEGATE) !== -1
-    if (myDelegation && (isRoot || canDelegate)) {
-      actions.push({
-        callback: this.inviteTo.bind(this, myDelegation),
-        label: 'Invite contact',
-      })
-    }
-
-    return actions
   }
 
   private inviteTo(delegationForInvite: State['delegationForInvite']) {

@@ -162,7 +162,7 @@ const _getDelegationId = (
 ) => delegationId
 
 const getDelegation = createSelector(
-  [_getAllDelegations, _getDelegationId],
+  [getAllDelegations, _getDelegationId],
   (myDelegations: MyDelegation[], delegationId: MyDelegation['id']) =>
     myDelegations.find(
       (myDelegation: MyDelegation) => myDelegation.id === delegationId

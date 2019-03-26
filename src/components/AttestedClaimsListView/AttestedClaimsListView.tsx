@@ -6,6 +6,7 @@ import contactRepository from '../../services/ContactRepository'
 import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
+import DelegationDetailView from '../DelegationDetailView/DelegationDetailView'
 import Spinner from '../Spinner/Spinner'
 
 import './AttestedClaimsListView.scss'
@@ -100,7 +101,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
       <section className={classes.join(' ')}>
         <div className={context}>
           <h2>{labels.h2_multi}</h2>
-          {this.getLegitimations(attestedClaims, delegationId)}
+          {this.getAttestedClaims(attestedClaims, delegationId)}
         </div>
       </section>
     ) : (
@@ -108,12 +109,13 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     )
   }
 
-  private getLegitimations(
+  private getAttestedClaims(
     attestedClaims: Props['attestedClaims'],
     delegationId: Props['delegationId']
   ) {
+    const { labels } = this.state
     if (!delegationId && !attestedClaims.length) {
-      return <div>{LABELS.legitimations.emptyList}</div>
+      return <div>{labels.emptyList}</div>
     }
     return (
       <>
@@ -227,7 +229,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
       <div className="delegation">
         <h2>Delegation</h2>
         {delegationId ? (
-          <div>{delegationId}</div>
+          <DelegationDetailView id={delegationId} />
         ) : (
           <div>No delegation found.</div>
         )}

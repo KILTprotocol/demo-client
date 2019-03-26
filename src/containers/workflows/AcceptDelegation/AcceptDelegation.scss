@@ -6,9 +6,17 @@
     & > div {
       @include label-input_combo;
     }
+
+    & .Permissions {
+      font-size: 18px;
+    }
   }
 
   & .danger {
     color: $color-danger;
+  }
+
+  & .DelegationDetailView {
+    @include detailViewInMessage;
   }
 }

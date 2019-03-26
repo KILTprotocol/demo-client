@@ -3,7 +3,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import ContactPresentation from '../../../components/ContactPresentation/ContactPresentation'
-import ShortHash from '../../../components/ShortHash/ShortHash'
+import DelegationDetailView from '../../../components/DelegationDetailView/DelegationDetailView'
+import Permissions from '../../../components/Permissions/Permissions'
 import Spinner from '../../../components/Spinner/Spinner'
 import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import DelegationService from '../../../services/DelegationsService'
@@ -13,10 +14,9 @@ import FeedbackService, {
   notifyFailure,
 } from '../../../services/FeedbackService'
 import { MyDelegation } from '../../../state/ducks/Delegations'
-import * as Wallet from '../../../state/ducks/Wallet'
 import * as Delegations from '../../../state/ducks/Delegations'
 import { State as ReduxState } from '../../../state/PersistentStore'
-import { Contact, MyIdentity } from '../../../types/Contact'
+import { Contact } from '../../../types/Contact'
 import { BlockUi } from '../../../types/UserFeedback'
 
 import './CreateDelegation.scss'
@@ -30,7 +30,6 @@ type Props = {
   onFinished?: () => void
 
   // redux
-  selectedIdentity: MyIdentity
   myDelegations: MyDelegation[]
 }
 
@@ -52,18 +51,8 @@ class CreateDelegation extends React.Component<Props, State> {
   }
 
   public render() {
-    const {
-      delegationData,
-      inviteeAddress,
-      inviterAddress,
-      myDelegations,
-    } = this.props
+    const { delegationData, inviteeAddress } = this.props
     const { isSignatureValid } = this.state
-
-    const myInvitersDelegation = myDelegations.find(
-      (myDelegation: MyDelegation) =>
-        myDelegation.id === delegationData.parentId
-    )
 
     return (
       <section className="AcceptDelegation">
@@ -73,48 +62,20 @@ class CreateDelegation extends React.Component<Props, State> {
 
             <div className="delegationData">
               <div>
-                <label>Inviters delegation ID</label>
-                <div>
-                  {myInvitersDelegation && (
-                    <>
-                      <span>{myInvitersDelegation.metaData.alias} </span>(
-                      <ShortHash>{delegationData.parentId}</ShortHash>)
-                    </>
-                  )}
-                  {!myInvitersDelegation && (
-                    <ShortHash>{delegationData.parentId}</ShortHash>
-                  )}
-                </div>
-              </div>
-              <div>
-                <label>CType</label>
-                <div>
-                  <i>'not yet implemented'</i>
-                </div>
-              </div>
-              <div>
-                <label>Invitees permissions</label>
-                <div>
-                  {delegationData.permissions.map(
-                    (permission: sdk.Permission) => (
-                      <div key={permission}>{sdk.Permission[permission]}</div>
-                    )
-                  )}
-                </div>
-              </div>
-              <div>
-                <label>Inviter</label>
-                <div>
-                  <ContactPresentation address={inviterAddress} />
-                </div>
-              </div>
-              <div>
                 <label>Invitee</label>
                 <div>
                   <ContactPresentation address={inviteeAddress} />
                 </div>
               </div>
+              <div>
+                <label>Invitees permissions</label>
+                <div>
+                  <Permissions permissions={delegationData.permissions} />
+                </div>
+              </div>
             </div>
+
+            <DelegationDetailView id={delegationData.parentId} />
 
             <div className="actions">
               <button onClick={this.createDelegation}>Create delegation</button>
@@ -208,7 +169,6 @@ class CreateDelegation extends React.Component<Props, State> {
 
 const mapStateToProps = (state: ReduxState) => ({
   myDelegations: Delegations.getDelegations(state),
-  selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
 export default connect(mapStateToProps)(CreateDelegation)

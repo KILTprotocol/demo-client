@@ -10,12 +10,11 @@ import SubmitLegitimations from '../../containers/workflows/SubmitLegitimations/
 import RequestAttestation from '../../containers/workflows/RequestAttestation/RequestAttestation'
 import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
 import { MessageOutput } from '../../services/MessageRepository'
-
 import Code from '../Code/Code'
 import MessageSubject from '../MessageSubject/MessageSubject'
+import ImportDelegation from '../../containers/workflows/ImportDelegation/ImportDelegation'
 
 import './MessageDetailView.scss'
-import ImportDelegation from 'src/containers/workflows/ImportDelegation/ImportDelegation'
 
 type Props = {
   message: MessageOutput

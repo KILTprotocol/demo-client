@@ -2,7 +2,7 @@ $labeledCardActions-padding-outer: $base-padding/2;
 $labeledCardActions-padding-inner: $base-padding/2;
 
 @mixin card {
-  @include box-shadow(2px 2px 5px transparentize($color-black, 0.8));
+  @include box-shadow(2px 2px 5px transparentize($color-black, 0.9));
   @include border-radius($base-border-radius);
 
   position: relative;

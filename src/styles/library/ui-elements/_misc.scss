@@ -151,3 +151,22 @@
     }
   }
 }
+
+@mixin detailViewInMessage {
+
+  margin:{
+    bottom: $base-padding;
+  }
+
+  & h1 {
+    font-size: 24px;
+    margin:{
+      top: 2*$base-padding !important;
+      bottom: -$base-padding;
+    }
+
+    &:before {
+      display: none;
+    }
+  }
+}
