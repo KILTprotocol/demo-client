@@ -8,7 +8,7 @@ import withSelectAttestedClaims, {
   InjectedProps as InjectedSelectProps,
 } from '../../../components/withSelectAttestedClaims/withSelectAttestedClaims'
 import AttestationWorkflow from '../../../services/AttestationWorkflow'
-import { MyDelegation } from '../../../state/ducks/Delegations'
+import { DelegationType, MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
 
 import './SubmitLegitimations.scss'
@@ -67,6 +67,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
               <SelectDelegations
                 isMulti={false}
                 onChange={this.changeDelegation}
+                type={DelegationType.Node}
               />
             </div>
 

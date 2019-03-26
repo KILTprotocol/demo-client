@@ -89,18 +89,18 @@
         &:before {
           background: $color-secondary;
         }
-      }
 
-      & h3 {
-        color: $color-font-inverted;
-      }
+        & h3 {
+          color: $color-font-inverted;
+        }
 
-      & .short-hash {
-        color: $color-font-inverted;
-      }
+        & .short-hash {
+          color: $color-font-inverted;
+        }
 
-      & .ContactPresentation {
-        @include invertedPresentation;
+        & .ContactPresentation {
+          @include invertedPresentation;
+        }
       }
     }
   }
