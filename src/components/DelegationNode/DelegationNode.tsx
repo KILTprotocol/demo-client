@@ -3,6 +3,12 @@ import { Blockchain } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
 import BlockchainService from '../../services/BlockchainService'
+import {
+  notify,
+  notifySuccess,
+  notifyFailure,
+} from '../../services/FeedbackService'
+import errorService from '../../services/ErrorService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
@@ -246,11 +252,27 @@ class DelegationNode extends React.Component<Props, State> {
     const blockchain = await BlockchainService.connect()
     const hashes = await delegation.getAttestationHashes(blockchain)
 
+    notify(`Start revoking Attestations for Delegation: ${delegation.id}`)
+
     Promise.all(
       hashes.map(hash =>
         sdk.Attestation.revoke(blockchain, hash, selectedIdentity.identity)
       )
     )
+      .then(() => {
+        notifySuccess(
+          `All Attestations revoked for Delegation: ${delegation.id}`,
+          true
+        )
+      })
+      .catch(err => {
+        errorService.log(err)
+        notifyFailure(
+          `Something went wrong, while revoking Attestations for Delegation: ${
+            delegation.id
+          }. Please try again`
+        )
+      })
   }
 
   private async getChildren() {
