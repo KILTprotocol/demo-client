@@ -1,4 +1,5 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import { Blockchain } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
 import BlockchainService from '../../services/BlockchainService'
@@ -9,7 +10,6 @@ import { MyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
 import Permissions from '../Permissions/Permissions'
-import SelectAction, { Action } from '../SelectAction/SelectAction'
 import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
 import ShortHash from '../ShortHash/ShortHash'
 import Spinner from '../Spinner/Spinner'
@@ -36,6 +36,7 @@ type Props = {
 type State = {
   node: DelegationsTreeNode
 
+  attestationHashes: string[]
   delegationForInvite?: MyDelegation
   focusedNode?: boolean
   gettingChildren?: boolean
@@ -50,6 +51,7 @@ class DelegationNode extends React.Component<Props, State> {
     super(props)
     this.state = {
       node: props.node,
+      attestationHashes: [],
     }
 
     this.getChildren = this.getChildren.bind(this)
@@ -68,17 +70,26 @@ class DelegationNode extends React.Component<Props, State> {
       node.delegation.id
     )
 
-    this.setState({
-      focusedNode: node.delegation.id === focusedNodeId,
-      isRoot: !!(node.delegation as sdk.IDelegationRootNode).cTypeHash,
-      myDelegation,
-      myNode: node.delegation.account === selectedIdentity.identity.address,
+    BlockchainService.connect().then((blockchain: Blockchain) => {
+      node.delegation
+        .getAttestationHashes(blockchain)
+        .then((attestationHashes: string[]) => {
+          this.setState({
+            attestationHashes,
+            focusedNode: node.delegation.id === focusedNodeId,
+            isRoot: !!(node.delegation as sdk.IDelegationRootNode).cTypeHash,
+            myDelegation,
+            myNode:
+              node.delegation.account === selectedIdentity.identity.address,
+          })
+        })
     })
   }
 
   public render() {
     const { focusedNodeAlias, focusedNodeId, selectedIdentity } = this.props
     const {
+      attestationHashes,
       delegationForInvite,
       focusedNode,
       gettingChildren,
@@ -106,6 +117,14 @@ class DelegationNode extends React.Component<Props, State> {
               <h3>{focusedNodeAlias}</h3>
             )}
             <ShortHash length={10}>{delegation.id}</ShortHash>
+            <span
+              className="attestedClaims"
+              title={`${
+                attestationHashes.length
+              } attested claims created with this delegation`}
+            >
+              ({attestationHashes.length})
+            </span>
           </div>
           <div className="content">
             <ContactPresentation address={delegation.account} />
