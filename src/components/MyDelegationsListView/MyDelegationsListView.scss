@@ -4,11 +4,15 @@
     @include table;
     @include responsiveTable(
         (
-          phone: (100%, false, false, false, false, 120px),
-          tablet: (false, 100%, 50%, false, 100%, 170px),
-          desktop: (false, 100%, 50%, 100%, 100%,  270px),
+          phone: (100%, false, false, false, false, false, 120px),
+          tablet: (false, 100%, 70px, 100%, 120px, false, 170px),
+          desktop: (false, 100%, 70px, 100%, 120px, 100%, 270px),
         )
     );
+  }
+
+  & .permissions {
+    text-align: center;
   }
 
   & .id {

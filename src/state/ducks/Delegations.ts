@@ -137,21 +137,20 @@ const getAllDelegations = createSelector(
   }
 )
 
-// TODO: filter by isRoot
 const getRootDelegations = createSelector(
-  [_getAllDelegations],
-  (entries: Entry[]) => {
-    return entries.filter((entry: Entry) => entry)
+  [getAllDelegations],
+  (myDelegations: MyDelegation[]) => {
+    return myDelegations.filter(
+      (myDelegation: MyDelegation) => myDelegation.type === DelegationType.Root
+    )
   }
 )
 
-// TODO: filter by !isRoot
 const getDelegations = createSelector(
-  [Wallet.getSelectedIdentity, _getAllDelegations],
-  (selectedIdentity: MyIdentity, myDelegations: MyDelegation[]) => {
+  [getAllDelegations],
+  (myDelegations: MyDelegation[]) => {
     return myDelegations.filter(
-      (myDelegation: MyDelegation) =>
-        myDelegation.account === selectedIdentity.identity.address
+      (myDelegation: MyDelegation) => myDelegation.type !== DelegationType.Root
     )
   }
 )
@@ -162,7 +161,7 @@ const _getDelegationId = (
 ) => delegationId
 
 const getDelegation = createSelector(
-  [_getAllDelegations, _getDelegationId],
+  [getAllDelegations, _getDelegationId],
   (myDelegations: MyDelegation[], delegationId: MyDelegation['id']) =>
     myDelegations.find(
       (myDelegation: MyDelegation) => myDelegation.id === delegationId

@@ -1,18 +1,28 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-import BlockchainService from 'src/services/BlockchainService'
-import DelegationsService from 'src/services/DelegationsService'
-import { notifyFailure } from 'src/services/FeedbackService'
+import { connect } from 'react-redux'
+
+import BlockchainService from '../../services/BlockchainService'
+import DelegationsService from '../../services/DelegationsService'
+import { notifyFailure } from '../../services/FeedbackService'
+import { MyDelegation } from '../../state/ducks/Delegations'
+import * as Wallet from '../../state/ducks/Wallet'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import DelegationNode, {
   DelegationsTreeNode,
 } from '../DelegationNode/DelegationNode'
+
 import './DelegationDetailView.scss'
 
 type Props = {
   id: sdk.IDelegationBaseNode['id']
+
+  // redux
   selectedIdentity: MyIdentity
+
+  focusedNodeAlias?: MyDelegation['metaData']['alias']
 }
 
 type State = {
@@ -52,12 +62,12 @@ class DelegationDetailView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { selectedIdentity, id } = this.props
+    const { focusedNodeAlias, selectedIdentity, id } = this.props
     const { delegationsTreeNode, rootNode } = this.state
 
     return (
       <section className="DelegationDetailView">
-        <h1>Delegation view</h1>
+        <h1>Delegation tree</h1>
         <div className="delegationNodeContainer">
           {delegationsTreeNode && (
             <>
@@ -78,6 +88,7 @@ class DelegationDetailView extends React.Component<Props, State> {
                   node={delegationsTreeNode}
                   selectedIdentity={selectedIdentity}
                   focusedNodeId={id}
+                  focusedNodeAlias={focusedNodeAlias}
                 />
               </div>
             </>
@@ -133,4 +144,8 @@ class DelegationDetailView extends React.Component<Props, State> {
   }
 }
 
-export default DelegationDetailView
+const mapStateToProps = (state: ReduxState) => ({
+  selectedIdentity: Wallet.getSelectedIdentity(state),
+})
+
+export default connect(mapStateToProps)(DelegationDetailView)

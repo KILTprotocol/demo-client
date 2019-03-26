@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 
-import PersistentStore from 'src/state/PersistentStore'
+import PersistentStore from '../state/PersistentStore'
 import * as Parameters from '../state/ducks/Parameters'
 import * as Wallet from '../state/ducks/Wallet'
 import BalanceUtilities from './BalanceUtilities'

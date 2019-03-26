@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Delegations from '../../state/ducks/Delegations'
+import { MyDelegation } from '../../state/ducks/Delegations'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
+import Permissions from '../Permissions/Permissions'
+import SelectAction from '../SelectAction/SelectAction'
 
 import './MyDelegationsListView.scss'
-import SelectAction from '../SelectAction/SelectAction'
+import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
 
 type Props = {
   onCreateDelegation: () => void
@@ -53,8 +55,9 @@ class MyDelegationsListView extends React.Component<Props, State> {
               </th>
               <th className="alias">Alias</th>
               <th className="type">Type</th>
-              <th className="id">ID</th>
               <th className="cType">CTYPE</th>
+              <th className="permissions">Permissions</th>
+              <th className="id">ID</th>
               <th />
             </tr>
           </thead>
@@ -78,12 +81,11 @@ class MyDelegationsListView extends React.Component<Props, State> {
                       {delegationEntry.metaData.alias}
                     </Link>
                   </td>
-                  <td>
+                  <td className="type">
                     {delegationEntry.type === Delegations.DelegationType.Root
                       ? 'root'
                       : 'node'}
                   </td>
-                  <td className="id">{delegationEntry.id}</td>
                   <td className="cType">
                     {cTypeHash ? (
                       <CTypePresentation cTypeHash={cTypeHash} />
@@ -91,25 +93,31 @@ class MyDelegationsListView extends React.Component<Props, State> {
                       ''
                     )}
                   </td>
+                  <td className="permissions">
+                    {delegationEntry.permissions && (
+                      <Permissions permissions={delegationEntry.permissions} />
+                    )}
+                    {!delegationEntry.permissions &&
+                      delegationEntry.type ===
+                        Delegations.DelegationType.Root && (
+                        <Permissions permissions={[1, 2]} />
+                      )}
+                    {!delegationEntry.permissions &&
+                      delegationEntry.type !==
+                        Delegations.DelegationType.Root && (
+                        <Permissions permissions={[]} />
+                      )}
+                  </td>
+                  <td className="id">{delegationEntry.id}</td>
                   <td className="actionsTd">
                     <div>
-                      <SelectAction
-                        actions={[
-                          {
-                            callback: this.requestInviteContacts.bind(
-                              this,
-                              delegationEntry
-                            ),
-                            label: 'Invite contact',
-                          },
-                          {
-                            callback: this.handleDelete.bind(
-                              this,
-                              delegationEntry
-                            ),
-                            label: 'Delete',
-                          },
-                        ]}
+                      <SelectDelegationAction
+                        delegationEntry={delegationEntry}
+                        onInvite={this.requestInviteContacts.bind(
+                          this,
+                          delegationEntry
+                        )}
+                        onDelete={this.handleDelete.bind(this, delegationEntry)}
                       />
                     </div>
                   </td>

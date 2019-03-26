@@ -8,12 +8,15 @@
 
     &__control {
       @include box-shadow(none !important);
+
       border: $base-border !important;
+      cursor: pointer;
     }
 
     &__option {
       background: $color-white !important;
       color: $color-font !important;
+      cursor: pointer;
 
       &--is-selected {
         background: transparentize($color-primary, 0.8) !important;

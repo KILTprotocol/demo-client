@@ -1,5 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+import DelegationDetailView from '../../../components/DelegationDetailView/DelegationDetailView'
 import DelegationsService from '../../../services/DelegationsService'
 import { notifyFailure, notifySuccess } from '../../../services/FeedbackService'
 import * as Delegations from '../../../state/ducks/Delegations'
@@ -8,6 +9,7 @@ import './ImportDelegation.scss'
 
 type Props = {
   delegationId: sdk.IDelegationBaseNode['id']
+
   onFinished?: () => void
 }
 
@@ -24,14 +26,19 @@ class ImportDelegation extends React.Component<Props, State> {
   }
 
   public render() {
+    const { delegationId } = this.props
+
     return (
       <section className="ImportDelegation">
         <div className="Delegation-base">
           <div>
-            <label>Alias</label>
+            <label>Name your delegation</label>
             <input type="text" onChange={this.handleAliasChange} />
           </div>
         </div>
+
+        <DelegationDetailView id={delegationId} />
+
         <div className="actions">
           <button onClick={this.importDelegation}>Import Delegation</button>
         </div>

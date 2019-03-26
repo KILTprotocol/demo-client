@@ -4,7 +4,7 @@ import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
 import * as Delegations from '../../state/ducks/Delegations'
-import { MyDelegation } from '../../state/ducks/Delegations'
+import { DelegationType, MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
@@ -21,6 +21,7 @@ type Props = {
   isMulti?: boolean
   name?: string
   placeholder?: string
+  type?: DelegationType
 
   onChange?: (selectedDelegations: MyDelegation[]) => void
   onMenuOpen?: () => void
@@ -57,10 +58,28 @@ class SelectDelegations extends React.Component<Props, State> {
     const { delegations } = this.state
 
     if (!delegations.length) {
+      const { type } = this.props
+      let _delegations
+
+      switch (type) {
+        case DelegationType.Root:
+          _delegations = Delegations.getRootDelegations(
+            PersistentStore.store.getState()
+          )
+          break
+        case DelegationType.Node:
+          _delegations = Delegations.getDelegations(
+            PersistentStore.store.getState()
+          )
+          break
+        default:
+          _delegations = Delegations.getAllDelegations(
+            PersistentStore.store.getState()
+          )
+      }
+
       this.setState({
-        delegations: Delegations.getDelegations(
-          PersistentStore.store.getState()
-        ),
+        delegations: _delegations,
       })
     }
   }

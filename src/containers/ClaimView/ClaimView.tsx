@@ -10,20 +10,25 @@ import attestationWorkflow from '../../services/AttestationWorkflow'
 import errorService from '../../services/ErrorService'
 import { notifyFailure, safeDelete } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
+import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 
-import { Contact } from '../../types/Contact'
+import { Contact, MyIdentity } from '../../types/Contact'
 
 import './ClaimView.scss'
 import { ICType } from '../../types/Ctype'
 
 type Props = RouteComponentProps<{ claimId: Claims.Entry['id'] }> & {
-  claimEntries: Claims.Entry[]
   removeClaim: (claimId: Claims.Entry['id']) => void
+
+  // redux
+  claimEntries: Claims.Entry[]
+  selectedIdentity: MyIdentity
 }
 
 type State = {
   isSelectAttestersOpen: boolean
+  redirect?: string
 }
 
 class ClaimView extends React.Component<Props, State> {
@@ -53,9 +58,21 @@ class ClaimView extends React.Component<Props, State> {
     }
   }
 
+  public componentDidUpdate(nextProps: Props) {
+    if (
+      nextProps.selectedIdentity.identity.address !==
+      this.props.selectedIdentity.identity.address
+    ) {
+      this.setState({
+        redirect: '/claim',
+      })
+    }
+  }
+
   public render() {
     const { claimEntries } = this.props
     const { claimId } = this.props.match.params
+    const { redirect } = this.state
 
     const isDetailView = this.isDetailView()
 
@@ -64,9 +81,11 @@ class ClaimView extends React.Component<Props, State> {
       currentClaimEntry = this.getCurrentClaimEntry(claimId)
     }
 
-    return isDetailView && !currentClaimEntry ? (
-      <Redirect to="/claim" />
-    ) : (
+    if (redirect) {
+      return <Redirect to={redirect} />
+    }
+
+    return (
       <section className="ClaimView">
         {isDetailView && currentClaimEntry && (
           <MyClaimDetailView
@@ -108,21 +127,7 @@ class ClaimView extends React.Component<Props, State> {
   private getCurrentClaimEntry(id: Claims.Entry['id']) {
     const { claimEntries } = this.props
 
-    const currentClaimEntry = claimEntries.find(
-      (claimEntry: Claims.Entry) => claimEntry.id === id
-    )
-
-    if (!currentClaimEntry) {
-      const message = `Could not get claim with id '${id}' from local list of claims`
-      errorService.log({
-        error: { name: 'Error while setting current claim', message },
-        message,
-        origin: 'ClaimView.getCurrentClaimEntry()',
-      })
-      return undefined
-    } else {
-      return currentClaimEntry
-    }
+    return claimEntries.find((claimEntry: Claims.Entry) => claimEntry.id === id)
   }
 
   private deleteClaim(claimId: Claims.Entry['id']) {
@@ -196,6 +201,7 @@ class ClaimView extends React.Component<Props, State> {
 
 const mapStateToProps = (state: ReduxState) => ({
   claimEntries: Claims.getClaims(state),
+  selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
 const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {

@@ -5,10 +5,20 @@
 
     & > div {
       @include label-input_combo;
+
+      margin-bottom: $base-padding;
+    }
+
+    & .Permissions {
+      font-size: 18px;
     }
   }
 
   & .danger {
     color: $color-danger;
+  }
+
+  & .DelegationDetailView {
+    @include detailViewInMessage;
   }
 }

@@ -14,114 +14,22 @@
   & > .label {
     position: relative;
     display: inline-block;
-    padding: $base-padding/4;
+    min-width: 210px;
+    padding: $labelPadding;
 
-    & .content {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: nowrap;
-      z-index: 2;
-      min-height: $base-button-height;
+    &:before {
+      @include border-radius($base-border-radius);
+
+      content: '';
+      position: absolute;
+      z-index: 0;
+      top: 0;
+      right: 0;
+      bottom: $labelPadding;
+      left: 0;
+      border: 2px solid $color-grey;
+      background: transparent;
     }
-
-    & .permissions {
-      $size: 1.6em;
-      $border-size: 0.2em;
-
-      @include baseFont-bold;
-
-      display: inline-block;
-      margin: {
-        right: $base-padding/4;
-        left: $base-padding/4;
-      }
-      line-height: 0;
-
-      & > span {
-        @include border-radius(50%);
-
-        position: relative;
-        display: inline-block;
-        width: $size;
-        height: $size;
-        margin: {
-          left: $base-padding/4;
-        }
-        border: $border-size solid transparent;
-        font-size: 10px;
-        line-height: 1;
-
-        &:before {
-          @extend %centerHV;
-
-          position: absolute;
-          margin: {
-            top: 0.05em;
-          }
-          line-height: 1;
-        }
-
-        &:first-child {
-          margin: {
-            left: 0;
-          }
-        }
-      }
-
-      & .ATTEST {
-
-        &:before {
-          content: 'A';
-        }
-      }
-
-      & .DELEGATE {
-
-        &:before {
-          content: 'D';
-        }
-      }
-
-      @mixin colorize($color) {
-        border: {
-          color: $color;
-        }
-        //color: $color-white;
-        //background-color: $color;
-        color: $color;
-      }
-
-      & .allowed {
-        @include colorize($color-success);
-      }
-
-      & .denied {
-        @include colorize($color-danger);
-
-        &:after {
-          @extend %centerHV;
-
-          @include transform-origin(50%, 50%);
-          @include transform(translateX(-50%) translateY(-50%) rotate(-45deg));
-
-          content: '';
-          position: absolute;
-          width: 130%;
-          height: $border-size;
-          background: $color-danger;
-        }
-      }
-    }
-  }
-
-  & .short-hash {
-    position: relative;
-    font-size: 12px;
-  }
-
-  &.myNode {
 
     & h3 {
       @include baseFont-bold;
@@ -133,27 +41,48 @@
         left: $base-padding/4;
       }
       font-size: 18px;
+    }
+
+    & .content {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap;
+      z-index: 2;
+      min-height: $base-button-height;
+    }
+  }
+
+  & .short-hash {
+    position: relative;
+    font-size: 12px;
+  }
+
+  &.myNode {
+
+    & h3 {
       color: $color-secondary;
     }
 
     & > .label {
 
       &:before {
-        @include border-radius($base-border-radius);
+        border-color: $color-secondary;
+      }
+    }
+  }
 
-        content: '';
-        position: absolute;
-        z-index: 0;
-        top: 0;
-        right: 0;
-        bottom: $labelPadding;
-        left: 0;
-        border: 2px solid $color-secondary;
-        background: transparent;
+  &.focusedNode {
+
+    & > .label {
+
+      &:before {
+        background: $color-grey;
       }
     }
 
-    &.focusedNode {
+    &.myNode {
 
       & > .label {
 
@@ -163,13 +92,6 @@
 
         & h3 {
           color: $color-font-inverted;
-        }
-
-        & .permissions {
-
-          & span {
-            background: $color-white;
-          }
         }
 
         & .short-hash {
@@ -306,6 +228,12 @@
     margin: {
       top: $marginTop;
       left: $marginLeft;
+    }
+  }
+
+  & .SelectDelegationAction {
+    margin: {
+      right: -$labelPadding;
     }
   }
 

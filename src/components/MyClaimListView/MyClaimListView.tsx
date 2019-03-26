@@ -107,7 +107,7 @@ class MyClaimListView extends React.Component<Props, State> {
           </table>
         )}
         <div className="actions">
-          <button onClick={this.openCTypeModal}>Create Claim from CTYPE</button>
+          <button onClick={this.openCTypeModal}>Create Claim</button>
         </div>
 
         <SelectCTypesModal

@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
+import { Redirect, RouteComponentProps, withRouter } from 'react-router'
 
 import MyDelegationsInviteModal from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
 import MyDelegationsListView from '../../components/MyDelegationsListView/MyDelegationsListView'
@@ -13,9 +13,9 @@ import { State as ReduxState } from '../../state/PersistentStore'
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
 import { ICType } from '../../types/Ctype'
 import { Contact, MyIdentity } from '../../types/Contact'
+import DelegationDetailView from '../../components/DelegationDetailView/DelegationDetailView'
 
 import './DelegationsView.scss'
-import DelegationDetailView from 'src/components/DelegationDetailView/DelegationDetailView'
 
 type Props = RouteComponentProps<{ delegationId: string }> & {
   removeDelegation: (delegation: MyDelegation) => void
@@ -27,8 +27,9 @@ type Props = RouteComponentProps<{ delegationId: string }> & {
 type State = {
   currentDelegation?: MyDelegation
   inviteDelegation?: MyDelegation
-  selectedContacts?: Contact[]
   invitePermissions?: sdk.Permission[]
+  selectedContacts?: Contact[]
+  redirect?: string
 }
 
 class DelegationsView extends React.Component<Props, State> {
@@ -57,9 +58,24 @@ class DelegationsView extends React.Component<Props, State> {
     }
   }
 
+  public componentDidUpdate(nextProps: Props) {
+    if (
+      nextProps.selectedIdentity.identity.address !==
+      this.props.selectedIdentity.identity.address
+    ) {
+      this.setState({
+        redirect: '/delegations',
+      })
+    }
+  }
+
   public render() {
-    const { delegationEntries, selectedIdentity } = this.props
-    const { currentDelegation, inviteDelegation } = this.state
+    const { delegationEntries } = this.props
+    const { currentDelegation, inviteDelegation, redirect } = this.state
+
+    if (redirect) {
+      return <Redirect to={redirect} />
+    }
 
     return (
       <section className="DelegationsView">
@@ -72,10 +88,7 @@ class DelegationsView extends React.Component<Props, State> {
           />
         )}
         {currentDelegation && (
-          <DelegationDetailView
-            id={currentDelegation.id}
-            selectedIdentity={selectedIdentity}
-          />
+          <DelegationDetailView id={currentDelegation.id} />
         )}
         {inviteDelegation && (
           <MyDelegationsInviteModal
