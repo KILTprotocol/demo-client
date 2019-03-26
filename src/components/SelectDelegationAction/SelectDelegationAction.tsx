@@ -14,6 +14,7 @@ type Props = {
 
   onInvite?: (delegationEntry: MyDelegation) => void
   onDelete?: (delegationEntry: MyDelegation) => void
+  onRevokeAttestations?: () => void
 }
 
 type State = {
@@ -83,19 +84,15 @@ class SelectDelegationAction extends React.Component<Props, State> {
   }
 
   private getRevokeAttestationsAction() {
-    const { delegationEntry } = this.props
-    return {
-      callback: async () => {
-        const blockchain = await BlockchainService.connect()
-        const hashes = sdk.DelegationNode.getAttestationHashes(
-          blockchain,
-          delegationEntry.id
-        )
-        // TODO: revoke attestations. use static method `revoke` from sdk class `Attestation`
-        console.log(hashes)
-      },
-      label: 'Revoke all Attestations',
+    const { onRevokeAttestations } = this.props
+
+    if (onRevokeAttestations) {
+      return {
+        callback: onRevokeAttestations,
+        label: 'Revoke all Attestations',
+      }
     }
+    return undefined
   }
 
   private isMine() {

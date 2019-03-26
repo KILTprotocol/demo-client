@@ -56,6 +56,7 @@ class DelegationNode extends React.Component<Props, State> {
     this.getSiblings = this.getSiblings.bind(this)
     this.cancelInvite = this.cancelInvite.bind(this)
     this.confirmInvite = this.confirmInvite.bind(this)
+    this.revokeAttestations = this.revokeAttestations.bind(this)
   }
 
   public componentDidMount() {
@@ -114,6 +115,7 @@ class DelegationNode extends React.Component<Props, State> {
                 className={`minimal ${focusedNode ? 'inverted' : ''}`}
                 delegationEntry={myDelegation}
                 onInvite={this.inviteTo.bind(this, myDelegation)}
+                onRevokeAttestations={this.revokeAttestations}
               />
             )}
           </div>
@@ -214,6 +216,22 @@ class DelegationNode extends React.Component<Props, State> {
     this.setState({
       delegationForInvite: undefined,
     })
+  }
+
+  private async revokeAttestations() {
+    const {
+      selectedIdentity,
+      node: { delegation },
+    } = this.props
+
+    const blockchain = await BlockchainService.connect()
+    const hashes = await delegation.getAttestationHashes(blockchain)
+
+    Promise.all(
+      hashes.map(hash =>
+        sdk.Attestation.revoke(blockchain, hash, selectedIdentity.identity)
+      )
+    )
   }
 
   private async getChildren() {
