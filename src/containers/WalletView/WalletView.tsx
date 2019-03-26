@@ -84,7 +84,7 @@ class WalletView extends React.Component<Props, State> {
     const blockUi = FeedbackService.addBlockUi({
       headline: 'Generating DID...',
     })
-    DidService.createDid(myIdentity) // TODO: add document reference 
+    DidService.createDid(myIdentity) // TODO: add document reference
       .then((did: sdk.IDid) => {
         notifySuccess(`DID successfully generated: ${did.identifier}`)
         blockUi.remove()
