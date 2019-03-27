@@ -1,7 +1,14 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import { Blockchain } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
 import BlockchainService from '../../services/BlockchainService'
+import {
+  notify,
+  notifySuccess,
+  notifyFailure,
+} from '../../services/FeedbackService'
+import errorService from '../../services/ErrorService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
@@ -9,7 +16,6 @@ import { MyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
 import Permissions from '../Permissions/Permissions'
-import SelectAction, { Action } from '../SelectAction/SelectAction'
 import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
 import ShortHash from '../ShortHash/ShortHash'
 import Spinner from '../Spinner/Spinner'
@@ -36,6 +42,7 @@ type Props = {
 type State = {
   node: DelegationsTreeNode
 
+  attestationHashes: string[]
   delegationForInvite?: MyDelegation
   focusedNode?: boolean
   gettingChildren?: boolean
@@ -50,12 +57,14 @@ class DelegationNode extends React.Component<Props, State> {
     super(props)
     this.state = {
       node: props.node,
+      attestationHashes: [],
     }
 
     this.getChildren = this.getChildren.bind(this)
     this.getSiblings = this.getSiblings.bind(this)
     this.cancelInvite = this.cancelInvite.bind(this)
     this.confirmInvite = this.confirmInvite.bind(this)
+    this.revokeAttestations = this.revokeAttestations.bind(this)
   }
 
   public componentDidMount() {
@@ -73,11 +82,20 @@ class DelegationNode extends React.Component<Props, State> {
       myDelegation,
       myNode: node.delegation.account === selectedIdentity.identity.address,
     })
+
+    BlockchainService.connect().then((blockchain: Blockchain) => {
+      node.delegation
+        .getAttestationHashes(blockchain)
+        .then((attestationHashes: string[]) => {
+          this.setState({ attestationHashes })
+        })
+    })
   }
 
   public render() {
     const { focusedNodeAlias, focusedNodeId, selectedIdentity } = this.props
     const {
+      attestationHashes,
       delegationForInvite,
       focusedNode,
       gettingChildren,
@@ -105,17 +123,24 @@ class DelegationNode extends React.Component<Props, State> {
               <h3>{focusedNodeAlias}</h3>
             )}
             <ShortHash length={10}>{delegation.id}</ShortHash>
+            <span
+              className="attestedClaims"
+              title={`${
+                attestationHashes.length
+              } attested claims created with this delegation`}
+            >
+              ({attestationHashes.length})
+            </span>
           </div>
           <div className="content">
             <ContactPresentation address={delegation.account} />
             {!!permissions && <Permissions permissions={permissions} />}
-            {!!myDelegation && (
-              <SelectDelegationAction
-                className={`minimal ${focusedNode ? 'inverted' : ''}`}
-                delegationEntry={myDelegation}
-                onInvite={this.inviteTo.bind(this, myDelegation)}
-              />
-            )}
+            <SelectDelegationAction
+              className={`minimal ${focusedNode ? 'inverted' : ''}`}
+              delegationEntry={myDelegation}
+              onInvite={this.inviteTo.bind(this, myDelegation)}
+              onRevokeAttestations={this.revokeAttestations}
+            />
           </div>
         </div>
         {this.getElement_getSiblings()}
@@ -214,6 +239,53 @@ class DelegationNode extends React.Component<Props, State> {
     this.setState({
       delegationForInvite: undefined,
     })
+  }
+
+  private async revokeAttestations() {
+    const {
+      selectedIdentity,
+      node: { delegation },
+    } = this.props
+
+    const { myDelegation } = this.state
+
+    const blockchain = await BlockchainService.connect()
+    const hashes = await delegation.getAttestationHashes(blockchain)
+
+    const delegationTitle = (
+      <span>
+        <strong>
+          {myDelegation ? `${myDelegation.metaData.alias}: ` : ''}
+        </strong>
+        <ShortHash>{delegation.id}</ShortHash>
+      </span>
+    )
+    notify(
+      <span>Start revoking Attestations for Delegation: {delegationTitle}</span>
+    )
+
+    Promise.all(
+      hashes.map(hash =>
+        sdk.Attestation.revoke(blockchain, hash, selectedIdentity.identity)
+      )
+    )
+      .then(() => {
+        notifySuccess(
+          <span>
+            All Attestations revoked for Delegation: {delegationTitle}
+          </span>,
+          true
+        )
+      })
+      .catch(err => {
+        errorService.log(err)
+        notifyFailure(
+          <span>
+            Something went wrong, while revoking Attestations for Delegation:{' '}
+            {delegationTitle}. Please try again
+          </span>
+        )
+      })
   }
 
   private async getChildren() {

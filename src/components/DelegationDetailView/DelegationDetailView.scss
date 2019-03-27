@@ -9,7 +9,19 @@
   & .delegationNodeScrollContainer {
     display: inline-block;
     max-width: 100%;
-    padding-bottom: 2*$base-padding;
+    padding:{
+      right: $base-padding/4;
+      bottom: 2*$base-button-height;
+      left: $base-padding/4;
+    }
     overflow: auto;
+
+    & > .DelegationNode {
+
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
   }
 }

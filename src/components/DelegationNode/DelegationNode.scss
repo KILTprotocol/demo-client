@@ -22,7 +22,6 @@
 
       content: '';
       position: absolute;
-      z-index: 0;
       top: 0;
       right: 0;
       bottom: $labelPadding;
@@ -31,10 +30,20 @@
       background: transparent;
     }
 
+    & .header {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    & .attestedClaims {
+      font-size: 12px;
+    }
+
     & h3 {
       @include baseFont-bold;
 
-      position: relative;
       display: inline-block;
       margin:{right: $base-padding/2;
         bottom: $base-padding/4;
@@ -49,7 +58,6 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: nowrap;
-      z-index: 2;
       min-height: $base-button-height;
     }
   }
@@ -90,11 +98,9 @@
           background: $color-secondary;
         }
 
-        & h3 {
-          color: $color-font-inverted;
-        }
-
-        & .short-hash {
+        & h3,
+        & .short-hash,
+        & .attestedClaims {
           color: $color-font-inverted;
         }
 
@@ -111,7 +117,6 @@
   & .getChildren:after {
     content: '';
     position: absolute;
-    z-index: 1;
     top: -$marginTop + $lineIdenticonDistance - $labelPadding;
     left: $identiconSize/2 - $lineWidth/2 - $marginLeft + $labelPadding;
     height: $marginTop + $identiconSize/2 + $labelPadding;
