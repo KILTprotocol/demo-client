@@ -99,4 +99,16 @@ $base-icon-size: $base-font-size;
   }
 }
 
+@mixin button-icon-only-inline($icon) {
+  $icon-size: 14px;
+  $button-size: 24px;
+  @include button-icon-only($icon, $icon-size); 
+
+  min-width: $button-size;
+  padding: 0px;
+  width: $button-size;
+  height: $button-size;
+}
+
+
 // MISC BUTTONS

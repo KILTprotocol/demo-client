@@ -60,6 +60,32 @@ class IdentityView extends React.Component<Props, {}> {
             <label>Encryption Public Key</label>
             <div>{myIdentity.identity.boxPublicKeyAsHex}</div>
           </div>
+          <div>
+            <label>DID</label>
+            <div>
+              {myIdentity.did ? (
+                <span className="did">{myIdentity.did}</span>
+              ) : (
+                ''
+              )}
+              <span className="didActions">
+                {onCreateDid && !myIdentity.did && (
+                  <button
+                    title="Generate DID..."
+                    className="didCreate"
+                    onClick={onCreateDid.bind(this, myIdentity)}
+                  />
+                )}
+                {onDeleteDid && myIdentity.did && (
+                  <button
+                    title="Delete DID"
+                    className="didDelete"
+                    onClick={onDeleteDid.bind(this, myIdentity)}
+                  />
+                )}
+              </span>
+            </div>
+          </div>
         </div>
         {!selected && (
           <div className="actions">
@@ -77,16 +103,6 @@ class IdentityView extends React.Component<Props, {}> {
                 disabled={selected}
               >
                 Select
-              </button>
-            )}
-            {onCreateDid && !myIdentity.did && (
-              <button onClick={onCreateDid.bind(this, myIdentity)}>
-                Create DID
-              </button>
-            )}
-            {onDeleteDid && myIdentity.did && (
-              <button onClick={onDeleteDid.bind(this, myIdentity)}>
-                Delete DID
               </button>
             )}
           </div>
