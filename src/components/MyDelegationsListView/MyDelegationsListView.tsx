@@ -112,7 +112,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
                   <td className="actionsTd">
                     <div>
                       <SelectDelegationAction
-                        delegationEntry={delegationEntry}
+                        delegation={delegationEntry}
                         onInvite={this.requestInviteContacts.bind(
                           this,
                           delegationEntry

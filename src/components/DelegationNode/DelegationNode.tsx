@@ -137,7 +137,7 @@ class DelegationNode extends React.Component<Props, State> {
             {!!permissions && <Permissions permissions={permissions} />}
             <SelectDelegationAction
               className={`minimal ${focusedNode ? 'inverted' : ''}`}
-              delegationEntry={myDelegation}
+              delegation={node.delegation}
               onInvite={this.inviteTo.bind(this, myDelegation)}
               onRevokeAttestations={this.revokeAttestations}
             />

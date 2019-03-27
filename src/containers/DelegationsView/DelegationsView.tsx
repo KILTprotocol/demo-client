@@ -48,16 +48,6 @@ class DelegationsView extends React.Component<Props, State> {
     this.confirmInvite = this.confirmInvite.bind(this)
   }
 
-  public componentDidMount() {
-    const { delegationId } = this.props.match.params
-
-    if (delegationId) {
-      this.setState({
-        currentDelegation: this.loadDelegationForId(delegationId),
-      })
-    }
-  }
-
   public componentDidUpdate(nextProps: Props) {
     if (
       nextProps.selectedIdentity.identity.address !==
@@ -71,7 +61,8 @@ class DelegationsView extends React.Component<Props, State> {
 
   public render() {
     const { delegationEntries } = this.props
-    const { currentDelegation, inviteDelegation, redirect } = this.state
+    const { delegationId } = this.props.match.params
+    const { inviteDelegation, redirect } = this.state
 
     if (redirect) {
       return <Redirect to={redirect} />
@@ -79,7 +70,7 @@ class DelegationsView extends React.Component<Props, State> {
 
     return (
       <section className="DelegationsView">
-        {!currentDelegation && (
+        {!delegationId && (
           <MyDelegationsListView
             delegationEntries={delegationEntries}
             onRemoveDelegation={this.deleteDelegation}
@@ -87,8 +78,8 @@ class DelegationsView extends React.Component<Props, State> {
             onRequestInviteContacts={this.requestInviteContact}
           />
         )}
-        {currentDelegation && (
-          <DelegationDetailView id={currentDelegation.id} />
+        {delegationId && (
+          <DelegationDetailView id={delegationId} />
         )}
         {inviteDelegation && (
           <MyDelegationsInviteModal
@@ -134,15 +125,6 @@ class DelegationsView extends React.Component<Props, State> {
         }
       )
     }
-  }
-
-  private loadDelegationForId(
-    delegationId: Delegations.MyDelegation['id']
-  ): Delegations.MyDelegation | undefined {
-    const { delegationEntries } = this.props
-    return delegationEntries.find(
-      (delegationEntry: MyDelegation) => delegationEntry.id === delegationId
-    )
   }
 
   private createDelegation(): void {
