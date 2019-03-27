@@ -76,18 +76,18 @@ class DelegationNode extends React.Component<Props, State> {
       node.delegation.id
     )
 
+    this.setState({
+      focusedNode: node.delegation.id === focusedNodeId,
+      isRoot: !!(node.delegation as sdk.IDelegationRootNode).cTypeHash,
+      myDelegation,
+      myNode: node.delegation.account === selectedIdentity.identity.address,
+    })
+
     BlockchainService.connect().then((blockchain: Blockchain) => {
       node.delegation
         .getAttestationHashes(blockchain)
         .then((attestationHashes: string[]) => {
-          this.setState({
-            attestationHashes,
-            focusedNode: node.delegation.id === focusedNodeId,
-            isRoot: !!(node.delegation as sdk.IDelegationRootNode).cTypeHash,
-            myDelegation,
-            myNode:
-              node.delegation.account === selectedIdentity.identity.address,
-          })
+          this.setState({ attestationHashes })
         })
     })
   }
