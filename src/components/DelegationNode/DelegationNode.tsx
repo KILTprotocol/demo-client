@@ -135,14 +135,12 @@ class DelegationNode extends React.Component<Props, State> {
           <div className="content">
             <ContactPresentation address={delegation.account} />
             {!!permissions && <Permissions permissions={permissions} />}
-            {!!myDelegation && (
-              <SelectDelegationAction
-                className={`minimal ${focusedNode ? 'inverted' : ''}`}
-                delegationEntry={myDelegation}
-                onInvite={this.inviteTo.bind(this, myDelegation)}
-                onRevokeAttestations={this.revokeAttestations}
-              />
-            )}
+            <SelectDelegationAction
+              className={`minimal ${focusedNode ? 'inverted' : ''}`}
+              delegationEntry={myDelegation}
+              onInvite={this.inviteTo.bind(this, myDelegation)}
+              onRevokeAttestations={this.revokeAttestations}
+            />
           </div>
         </div>
         {this.getElement_getSiblings()}
@@ -249,10 +247,22 @@ class DelegationNode extends React.Component<Props, State> {
       node: { delegation },
     } = this.props
 
+    const { myDelegation } = this.state
+
     const blockchain = await BlockchainService.connect()
     const hashes = await delegation.getAttestationHashes(blockchain)
 
-    notify(`Start revoking Attestations for Delegation: ${delegation.id}`)
+    const delegationTitle = (
+      <span>
+        <strong>
+          {myDelegation ? `${myDelegation.metaData.alias}: ` : ''}
+        </strong>
+        <ShortHash>{delegation.id}</ShortHash>
+      </span>
+    )
+    notify(
+      <span>Start revoking Attestations for Delegation: {delegationTitle}</span>
+    )
 
     Promise.all(
       hashes.map(hash =>
@@ -261,16 +271,19 @@ class DelegationNode extends React.Component<Props, State> {
     )
       .then(() => {
         notifySuccess(
-          `All Attestations revoked for Delegation: ${delegation.id}`,
+          <span>
+            All Attestations revoked for Delegation: {delegationTitle}
+          </span>,
           true
         )
       })
       .catch(err => {
         errorService.log(err)
         notifyFailure(
-          `Something went wrong, while revoking Attestations for Delegation: ${
-            delegation.id
-          }. Please try again`
+          <span>
+            Something went wrong, while revoking Attestations for Delegation:{' '}
+            {delegationTitle}. Please try again
+          </span>
         )
       })
   }

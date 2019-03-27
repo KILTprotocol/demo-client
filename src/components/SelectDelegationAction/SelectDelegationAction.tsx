@@ -8,7 +8,7 @@ import PersistentStore from '../../state/PersistentStore'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
 
 type Props = {
-  delegationEntry: MyDelegation
+  delegationEntry?: MyDelegation
 
   className?: string
 
@@ -53,6 +53,11 @@ class SelectDelegationAction extends React.Component<Props, State> {
 
   private getInviteAction(): Action | undefined {
     const { delegationEntry, onInvite } = this.props
+
+    if (!delegationEntry) {
+      return undefined
+    }
+
     const { permissions, type } = delegationEntry
 
     const canDelegate =
@@ -97,6 +102,9 @@ class SelectDelegationAction extends React.Component<Props, State> {
 
   private isMine() {
     const { delegationEntry } = this.props
+    if (!delegationEntry) {
+      return undefined
+    }
     return !!Delegations.getDelegation(
       PersistentStore.store.getState(),
       delegationEntry.id
