@@ -1,25 +1,19 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import {
   IRequestClaimsForCtype,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
-import { ReactNode } from 'react'
 import * as React from 'react'
 
-import Select, { createFilter } from 'react-select'
-import { Config } from 'react-select/lib/filters'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
-import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
-import Modal, { ModalType } from '../../components/Modal/Modal'
-
+import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
+import MyDelegationsInviteModal from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
+import SelectAction from '../../components/SelectAction/SelectAction'
 import contactRepository from '../../services/ContactRepository'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
-import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import MessageRepository from '../../services/MessageRepository'
 import { Contact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
-import { BlockUi } from '../../types/UserFeedback'
 
 import './ContactList.scss'
 
@@ -28,22 +22,23 @@ interface Props {}
 interface State {
   contacts: Contact[]
   cTypes: ICType[]
-}
-
-type SelectOption = {
-  label: ReactNode
-  value: sdk.ICType['hash']
+  contactForDelegationInvite?: Contact
 }
 
 class ContactList extends React.Component<Props, State> {
-  private selectCtypeModal: Modal | null
-  private selectedCtype: ICType | undefined
+  private selectCTypesModal: SelectCTypesModal | null
   private selectedContact: Contact | undefined
-  private filterConfig: Config = {
-    ignoreAccents: true,
-    ignoreCase: true,
-    matchFrom: 'any',
-    trim: true,
+
+  private inviteToDelegation = {
+    cancel: () => {
+      this.setState({ contactForDelegationInvite: undefined })
+    },
+    confirm: () => {
+      this.setState({ contactForDelegationInvite: undefined })
+    },
+    request: (contact: Contact) => {
+      this.setState({ contactForDelegationInvite: contact })
+    },
   }
 
   constructor(props: Props) {
@@ -57,7 +52,8 @@ class ContactList extends React.Component<Props, State> {
     this.onRequestClaimForVerification = this.onRequestClaimForVerification.bind(
       this
     )
-    this.onSelectCtype = this.onSelectCtype.bind(this)
+    this.inviteToDelegation.cancel = this.inviteToDelegation.cancel.bind(this)
+    this.inviteToDelegation.confirm = this.inviteToDelegation.confirm.bind(this)
   }
 
   public componentDidMount() {
@@ -89,7 +85,7 @@ class ContactList extends React.Component<Props, State> {
   }
 
   public render() {
-    const { contacts } = this.state
+    const { contacts, contactForDelegationInvite } = this.state
     return (
       <section className="ContactList">
         <h1>Contacts</h1>
@@ -114,10 +110,23 @@ class ContactList extends React.Component<Props, State> {
                 </td>
                 <td className="actionsTd">
                   <div>
-                    <button
-                      className="requestClaimBtn"
-                      title="Request claim for verification"
-                      onClick={this.onRequestClaimForVerification(contact)}
+                    <SelectAction
+                      actions={[
+                        {
+                          callback: this.onRequestClaimForVerification.bind(
+                            this,
+                            contact
+                          ),
+                          label: 'Request claim(s)',
+                        },
+                        {
+                          callback: this.inviteToDelegation.request.bind(
+                            this,
+                            contact
+                          ),
+                          label: 'Invite to Delegation',
+                        },
+                      ]}
                     />
                   </div>
                 </td>
@@ -126,94 +135,44 @@ class ContactList extends React.Component<Props, State> {
           </tbody>
         </table>
 
-        <Modal
+        <SelectCTypesModal
           ref={el => {
-            this.selectCtypeModal = el
+            this.selectCTypesModal = el
           }}
-          className="small"
-          type={ModalType.CONFIRM}
-          header="Select CTYPE"
+          placeholder="Select cType#{multi}…"
           onCancel={this.onCancelRequestClaim}
           onConfirm={this.onFinishRequestClaim}
-        >
-          {this.getSelectCtypes()}
-        </Modal>
+        />
+        {contactForDelegationInvite && (
+          <MyDelegationsInviteModal
+            contactsSelected={[contactForDelegationInvite]}
+            onCancel={this.inviteToDelegation.cancel}
+            onConfirm={this.inviteToDelegation.confirm}
+          />
+        )}
       </section>
     )
   }
 
-  private getSelectCtypes() {
-    const { cTypes } = this.state
-
-    const options: SelectOption[] = cTypes.map((cType: ICType) => ({
-      label: <CTypePresentation cType={cType} linked={false} />,
-      value: cType.cType.hash,
-    }))
-    return (
-      <Select
-        className="react-select-container"
-        classNamePrefix="react-select"
-        isClearable={true}
-        isSearchable={true}
-        isDisabled={false}
-        isMulti={false}
-        isRtl={false}
-        closeMenuOnSelect={true}
-        name="selectCtypes"
-        options={options}
-        onChange={this.onSelectCtype}
-        filterOption={createFilter(this.filterConfig)}
-      />
-    )
-  }
-
-  private onSelectCtype(selectedOption: SelectOption) {
-    const { cTypes } = this.state
-
-    this.selectedCtype = cTypes.find(
-      (cType: ICType) => selectedOption.value === cType.cType.hash
-    )
-  }
-
   private onCancelRequestClaim() {
-    this.selectedCtype = undefined
+    this.selectedContact = undefined
   }
 
-  private onFinishRequestClaim() {
-    if (this.selectedContact && this.selectedCtype) {
-      const blockUi: BlockUi = FeedbackService.addBlockUi({
-        headline: 'Sending Message',
-      })
-      const request: IRequestClaimsForCtype = {
-        content: this.selectedCtype.cType.hash,
+  private onFinishRequestClaim(selectedCTypes: ICType[]) {
+    if (this.selectedContact && selectedCTypes) {
+      const messageBody: IRequestClaimsForCtype = {
+        content: selectedCTypes[0].cType.hash,
         type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
       }
 
-      MessageRepository.send(this.selectedContact, request)
-        .then(() => {
-          blockUi.remove()
-          notifySuccess('Request Claims successfully sent.')
-        })
-        .catch(error => {
-          blockUi.remove()
-          errorService.log({
-            error,
-            message: `Could not send message ${request.type} to ${
-              this.selectedContact!.metaData.name
-            }`,
-            origin: 'ContactList.onFinishRequestClaim()',
-            type: 'ERROR.FETCH.POST',
-          })
-        })
+      MessageRepository.send([this.selectedContact], messageBody)
     }
   }
 
-  private onRequestClaimForVerification = (
-    contact?: Contact
-  ): (() => void) => () => {
+  private onRequestClaimForVerification = (contact?: Contact) => {
     this.selectedContact = contact
-    if (this.selectCtypeModal) {
-      this.selectCtypeModal.show()
+    if (this.selectCTypesModal) {
+      this.selectCTypesModal.show()
     }
   }
 }

@@ -8,9 +8,9 @@
     @include table;
     @include responsiveTable(
         (
-          phone: ('*', false, getActionTdWidth(1)),
-          tablet: ('*', '**', getActionTdWidth(1)),
-          desktop: ('*', '**', getActionTdWidth(1)),
+          phone: ('*', false,  120px),
+          tablet: ('*', '**',  170px),
+          desktop: ('*', '**', 270px),
         )
     );
 

@@ -1,18 +1,21 @@
 import * as React from 'react'
 import Select from 'react-select'
 
+import './SelectAction.scss'
+
 type SelectActionOption = {
   label: string
   value: string
 }
 
-type Action = {
+export type Action = {
   label: string
   callback: () => void
 }
 
 type Props = {
   actions: Action[]
+  className?: string
 }
 
 type State = {
@@ -38,10 +41,11 @@ class SelectAction extends React.Component<Props, State> {
   }
 
   public render() {
+    const { className } = this.props
     const { selectActionOptions } = this.state
 
     return (
-      <section className="SelectAction">
+      <section className={`SelectAction ${className}`}>
         <Select
           className="react-select-container"
           classNamePrefix="react-select"

@@ -7,9 +7,9 @@
   z-index: $z-index;
   top: $header-height;
   right: 0;
-  max-width: $notification-width + 2 * $base-padding;
+  max-width: $notification-width + 2 * $base-padding !important;
   max-height: calc(100% - #{$header-height});
-  padding: 0 0 $base-padding/2 0;
+  padding: 0 0 $base-padding/2 0 !important;
   overflow: auto;
 
   & header {

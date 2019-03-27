@@ -6,6 +6,7 @@ import contactRepository from '../../services/ContactRepository'
 import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
+import DelegationDetailView from '../DelegationDetailView/DelegationDetailView'
 import Spinner from '../Spinner/Spinner'
 
 import './AttestedClaimsListView.scss'
@@ -35,20 +36,24 @@ const enum STATUS {
 }
 
 type AttestationStatus = {
-  [signature: string]: STATUS
+  [owner: string]: STATUS
 }
 
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
+
   context?: 'legitimations'
+  delegationId?: sdk.IDelegationNode['id']
+
   onToggleChildOpen?: (closeCallback?: () => void | undefined) => void
 }
 
 type State = {
   attestationStatus: AttestationStatus
   canResolveAttesters: boolean
-  closeOpenedChild?: () => void
   labels: { [key: string]: string }
+
+  closeOpenedChild?: () => void
   openedAttestedClaim?: sdk.IAttestedClaim
 }
 
@@ -84,8 +89,8 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { attestedClaims }: Props = this.props
-    const { openedAttestedClaim } = this.state
+    const { attestedClaims, context, delegationId } = this.props
+    const { labels, openedAttestedClaim } = this.state
 
     const classes = [
       'AttestedClaimsListView',
@@ -94,10 +99,29 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
     return attestedClaims ? (
       <section className={classes.join(' ')}>
-        {this.getAttestations(attestedClaims)}
+        <div className={context}>
+          <h2>{labels.h2_multi}</h2>
+          {this.getAttestedClaims(attestedClaims, delegationId)}
+        </div>
       </section>
     ) : (
       <section className="ClaimDetailView">Claim not found</section>
+    )
+  }
+
+  private getAttestedClaims(
+    attestedClaims: Props['attestedClaims'],
+    delegationId: Props['delegationId']
+  ) {
+    const { labels } = this.state
+    if (!delegationId && !attestedClaims.length) {
+      return <div>{labels.emptyList}</div>
+    }
+    return (
+      <>
+        {this.getAttestations(attestedClaims)}
+        {this.getDelegation(delegationId)}
+      </>
     )
   }
 
@@ -107,10 +131,10 @@ class AttestedClaimsListView extends React.Component<Props, State> {
       <section className="attestations">
         {openedAttestedClaim ? (
           <h2 onClick={this.toggleOpen.bind(this, openedAttestedClaim)}>
-            {labels.h2_single}
+            {LABELS.default.h2_single}
           </h2>
         ) : (
-          <h2>{labels.h2_multi}</h2>
+          <h2>{LABELS.default.h2_multi}</h2>
         )}
         <div className="container-actions">
           {!!attestations && !!attestations.length && (
@@ -136,12 +160,12 @@ class AttestedClaimsListView extends React.Component<Props, State> {
             </thead>
 
             {attestations.map((attestedClaim: sdk.IAttestedClaim) => {
-              const { signature } = attestedClaim.attestation
+              const { owner } = attestedClaim.attestation
               const opened = attestedClaim === openedAttestedClaim
 
               return (
                 <tbody
-                  key={attestedClaim.attestation.signature}
+                  key={attestedClaim.attestation.claimHash}
                   className={opened ? 'opened' : ''}
                 >
                   <tr>
@@ -150,13 +174,13 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                         address={attestedClaim.attestation.owner}
                       />
                     </td>
-                    <td className="attester">
+                    <td className="cType">
                       <CTypePresentation
-                        cTypeHash={attestedClaim.request.claim.cType}
+                        cTypeHash={attestedClaim.attestation.cTypeHash}
                       />
                     </td>
-                    <td className={`status ${attestationStatus[signature]}`}>
-                      {attestationStatus[signature] === STATUS.PENDING && (
+                    <td className={`status ${attestationStatus[owner]}`}>
+                      {attestationStatus[owner] === STATUS.PENDING && (
                         <Spinner size={20} color="#ef5a28" strength={3} />
                       )}
                     </td>
@@ -175,10 +199,13 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                       <td className="listDetailContainer" colSpan={3}>
                         <AttestedClaimsListView
                           attestedClaims={attestedClaim.request.legitimations}
+                          delegationId={attestedClaim.request.delegationId}
                           context="legitimations"
                           onToggleChildOpen={this.toggleChildOpen}
                         />
+
                         <div className="back" onClick={this.closeOpenedChild} />
+
                         <AttestedClaimVerificationView
                           context=""
                           attestedClaim={attestedClaim}
@@ -191,9 +218,22 @@ class AttestedClaimsListView extends React.Component<Props, State> {
             })}
           </table>
         ) : (
-          <div>{labels.emptyList}</div>
+          <div>{LABELS.default.emptyList}</div>
         )}
       </section>
+    )
+  }
+
+  private getDelegation(delegationId: Props['delegationId']) {
+    return (
+      <div className="delegation">
+        <h2>Delegation</h2>
+        {delegationId ? (
+          <DelegationDetailView id={delegationId} />
+        ) : (
+          <div>No delegation found.</div>
+        )}
+      </div>
     )
   }
 
@@ -237,14 +277,14 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
   private verifyAttestation(attestedClaim: sdk.IAttestedClaim) {
     const { attestationStatus } = this.state
-    const { signature } = attestedClaim.attestation
+    const { owner } = attestedClaim.attestation
 
     // if we are currently already fetching - cancel
-    if (attestationStatus[signature] === STATUS.PENDING) {
+    if (attestationStatus[owner] === STATUS.PENDING) {
       return
     }
 
-    attestationStatus[signature] = STATUS.PENDING
+    attestationStatus[owner] = STATUS.PENDING
 
     this.setState({
       attestationStatus,
@@ -254,9 +294,9 @@ class AttestedClaimsListView extends React.Component<Props, State> {
       .verifyAttestatedClaim(attestedClaim)
       .then((verified: boolean) => {
         if (verified) {
-          attestationStatus[signature] = STATUS.ATTESTED
+          attestationStatus[owner] = STATUS.ATTESTED
         } else {
-          attestationStatus[signature] = STATUS.UNVERIFIED
+          attestationStatus[owner] = STATUS.UNVERIFIED
         }
 
         this.setState({

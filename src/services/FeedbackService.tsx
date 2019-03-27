@@ -1,4 +1,6 @@
 import React, { ReactNode } from 'react'
+import { v4 as uuid } from 'uuid'
+
 import { ModalType } from '../components/Modal/Modal'
 import * as UiState from '../state/ducks/UiState'
 import persistentStore from '../state/PersistentStore'
@@ -16,7 +18,7 @@ class FeedbackService {
     type,
   }: Partial<Notification>): Partial<Notification> {
     const created = Date.now()
-    const id = [created, type, message].join('-') as string
+    const id = uuid()
     return {
       className,
       created,
@@ -161,19 +163,27 @@ export function notify(message: string | ReactNode, blocking = false) {
 export function safeDelete(
   message: ReactNode,
   onConfirm: (notification: BlockingNotification) => void,
-  removeNotificationInstantly = true
+  removeNotificationInstantly = true,
+  onCancel?: (notification: BlockingNotification) => void
 ) {
   FeedbackService.addBlockingNotification({
     header: 'Are you sure?',
     message: <div>Do you want to delete {message}?</div>,
     modalType: ModalType.CONFIRM,
+    type: NotificationType.INFO,
+
+    onCancel: (notification: BlockingNotification) => {
+      if (onCancel) {
+        onCancel(notification)
+      }
+      notification.remove()
+    },
     onConfirm: (notification: BlockingNotification) => {
       onConfirm(notification)
       if (removeNotificationInstantly) {
         notification.remove()
       }
     },
-    type: NotificationType.INFO,
   })
 }
 

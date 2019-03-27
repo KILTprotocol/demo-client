@@ -4,6 +4,7 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 import Dashboard from '../components/Dashboard/Dashboard'
 import Utilities from '../components/Utilities/Utilities'
 import AttestationsView from '../containers/AttestationsView/AttestationsView'
+import DelegationsView from '../containers/DelegationsView/DelegationsView'
 import ClaimCreate from '../containers/ClaimCreate/ClaimCreate'
 import ClaimView from '../containers/ClaimView/ClaimView'
 import ContactList from '../containers/ContactList/ContactList'
@@ -14,6 +15,7 @@ import WalletAdd from '../containers/WalletAdd/WalletAdd'
 import WalletView from '../containers/WalletView/WalletView'
 import requiresIdentity from './RequiresIdentity'
 import CheckClientVersion from './CheckClientVersion'
+import DelegationCreate from '../containers/DelegationCreate/DelegationCreate'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
@@ -56,6 +58,19 @@ const Routes: React.FunctionComponent<{}> = props => {
         <Route
           path={'/attestations'}
           component={requiresIdentity(AttestationsView)}
+        />
+
+        <Route
+          path={'/delegations/new/:cTypeHash'}
+          component={requiresIdentity(DelegationCreate)}
+        />
+        <Route
+          path={'/delegations/:delegationId'}
+          component={requiresIdentity(DelegationsView)}
+        />
+        <Route
+          path={'/delegations'}
+          component={requiresIdentity(DelegationsView)}
         />
 
         <Redirect to="/dashboard" />

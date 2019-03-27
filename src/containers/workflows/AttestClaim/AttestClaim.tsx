@@ -4,16 +4,12 @@ import * as React from 'react'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
-import contactRepository from '../../../services/ContactRepository'
-import errorService from '../../../services/ErrorService'
-import FeedbackService, {
-  notifySuccess,
-} from '../../../services/FeedbackService'
+import FeedbackService from '../../../services/FeedbackService'
 import { Contact } from '../../../types/Contact'
 import { BlockUi } from '../../../types/UserFeedback'
 
 type Props = {
-  senderAddress: Contact['publicIdentity']['address']
+  claimerAddress: Contact['publicIdentity']['address']
   requestForAttestation: sdk.IRequestForAttestation
   onFinished?: () => void
 }
@@ -33,10 +29,13 @@ class AttestClaim extends React.Component<Props, State> {
     return (
       <section className="AttestClaim">
         <ClaimDetailView claim={requestForAttestation.claim} />
+
         <AttestedClaimsListView
           attestedClaims={requestForAttestation.legitimations}
+          delegationId={requestForAttestation.delegationId}
           context="legitimations"
         />
+
         <div className="actions">
           <button onClick={this.attestClaim}>Attest Claim</button>
         </div>
@@ -45,35 +44,21 @@ class AttestClaim extends React.Component<Props, State> {
   }
 
   private attestClaim() {
-    const { requestForAttestation, onFinished, senderAddress } = this.props
-
+    const { requestForAttestation, onFinished, claimerAddress } = this.props
     const blockUi: BlockUi = FeedbackService.addBlockUi({
-      headline: 'Attesting claim',
+      headline: 'Writing attestation to chain',
     })
 
-    contactRepository
-      .findByAddress(senderAddress)
-      .then((claimer: Contact) => {
-        attestationWorkflow
-          .approveAndSubmitAttestationForClaim(requestForAttestation, claimer)
-          .then(() => {
-            notifySuccess('Claim attested and sent to claimer.')
-            blockUi.remove()
-            if (onFinished) {
-              onFinished()
-            }
-          })
-          .catch((rejectedReceivers: Contact[]) => {
-            blockUi.remove()
-          })
-      })
-      .catch(error => {
+    attestationWorkflow
+      .approveAndSubmitAttestationForClaim(
+        requestForAttestation,
+        claimerAddress
+      )
+      .then(() => {
         blockUi.remove()
-        errorService.log({
-          error,
-          message: 'Could not retrieve claimer',
-          origin: 'AttestClaim.attestClaim()',
-        })
+        if (onFinished) {
+          onFinished()
+        }
       })
   }
 }

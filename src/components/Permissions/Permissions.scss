@@ -1,0 +1,89 @@
+.Permissions {
+  $size: 1.6em;
+  $border-size: 0.2em;
+
+  @include baseFont-bold;
+
+  display: inline-block;
+  margin: {
+    right: $base-padding/4;
+    left: $base-padding/4;
+  }
+  font-size: 10px;
+  line-height: 0;
+
+  & > span {
+    @include border-radius(50%);
+
+    position: relative;
+    display: inline-block;
+    width: $size;
+    height: $size;
+    margin: {
+      left: $base-padding/4;
+    }
+    border: $border-size solid transparent;
+    background: $color-white;
+    line-height: 1;
+
+    &:before {
+      @extend %centerHV;
+
+      position: absolute;
+      margin: {
+        top: 0.05em;
+      }
+      line-height: 1;
+    }
+
+    &:first-child {
+      margin: {
+        left: 0;
+      }
+    }
+  }
+
+  & .ATTEST {
+
+    &:before {
+      content: 'A';
+    }
+  }
+
+  & .DELEGATE {
+
+    &:before {
+      content: 'D';
+    }
+  }
+
+  @mixin colorize($color) {
+    border: {
+      color: $color;
+    }
+    //color: $color-white;
+    //background-color: $color;
+    color: $color;
+  }
+
+  & .allowed {
+    @include colorize($color-success);
+  }
+
+  & .denied {
+    @include colorize($color-danger);
+
+    &:after {
+      @extend %centerHV;
+
+      @include transform-origin(50%, 50%);
+      @include transform(translateX(-50%) translateY(-50%) rotate(-45deg));
+
+      content: '';
+      position: absolute;
+      width: 130%;
+      height: $border-size;
+      background: $color-danger;
+    }
+  }
+}

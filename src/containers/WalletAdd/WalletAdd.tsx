@@ -4,6 +4,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
+import Input from '../../components/Input/Input'
 import BalanceUtilities from '../../services/BalanceUtilities'
 
 import BlockchainService from '../../services/BlockchainService'
@@ -56,10 +57,12 @@ class WalletAdd extends React.Component<Props, State> {
           <div className="name">
             <label>Name your ID</label>
             <div>
-              <input
+              <Input
                 type="text"
                 value={this.state.alias}
+                autoFocus={true}
                 onChange={this.setAlias}
+                onSubmit={this.addIdentity}
               />
             </div>
           </div>
@@ -152,7 +155,8 @@ class WalletAdd extends React.Component<Props, State> {
     const alice = Identity.buildFromSeedString('Alice')
     blockUi.updateMessage('transfer initial tokens (2/3)')
     blockchain
-      .makeTransfer(alice, identity.address, 1000, () => {
+      .makeTransfer(alice, identity.address, 1000)
+      .then((result: any) => {
         const { address, boxPublicKeyAsHex } = identity
         const newContact: Contact = {
           metaData: {

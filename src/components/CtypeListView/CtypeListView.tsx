@@ -62,6 +62,10 @@ class CtypeListView extends React.Component<Props, State> {
                             ),
                             label: 'Get Legitimation',
                           },
+                          {
+                            callback: this.createDelegation.bind(this, cType),
+                            label: 'Create Delegation',
+                          },
                         ]}
                       />
                     </div>
@@ -85,6 +89,10 @@ class CtypeListView extends React.Component<Props, State> {
   private requestLegitimation(cType: ICType) {
     const { onRequestLegitimation } = this.props
     onRequestLegitimation(cType)
+  }
+
+  private createDelegation(cType: ICType) {
+    this.props.history.push(`/delegations/new/${cType.cType.hash}`)
   }
 }
 

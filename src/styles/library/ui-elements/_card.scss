@@ -2,7 +2,7 @@ $labeledCardActions-padding-outer: $base-padding/2;
 $labeledCardActions-padding-inner: $base-padding/2;
 
 @mixin card {
-  @include box-shadow(2px 2px 5px transparentize($color-black, 0.8));
+  @include box-shadow(2px 2px 5px transparentize($color-black, 0.9));
   @include border-radius($base-border-radius);
 
   position: relative;
@@ -35,6 +35,7 @@ $labeledCardActions-padding-inner: $base-padding/2;
   left: -$base-padding/2;
   max-width: $max-width;
   margin: {
+    top: 0;
     bottom: -$base-padding;
   };
   padding: $base-padding/4 $base-padding;

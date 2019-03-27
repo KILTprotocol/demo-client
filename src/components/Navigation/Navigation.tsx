@@ -11,6 +11,7 @@ const links: NavLink[] = [
   { url: 'ctype', label: 'CTYPEs' },
   { url: 'claim', label: 'Claims' },
   { url: 'attestations', label: 'Attestations' },
+  { url: 'delegations', label: 'Delegations' },
   { url: 'contacts', label: 'Contacts' },
   { url: 'messages', label: 'Messages' },
   { url: 'utilities', label: 'Utilities' },

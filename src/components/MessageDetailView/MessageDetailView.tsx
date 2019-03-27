@@ -1,14 +1,18 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { ReactNode } from 'react'
+
+import AcceptDelegation from '../../containers/workflows/AcceptDelegation/AcceptDelegation'
 import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
+import CreateDelegation from '../../containers/workflows/CreateDelegation/CreateDelegation'
 import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
+import SubmitClaimsForCType from '../../containers/workflows/SubmitClaimsForCType/SubmitClaimsForCType'
+import SubmitLegitimations from '../../containers/workflows/SubmitLegitimations/SubmitLegitimations'
 import RequestAttestation from '../../containers/workflows/RequestAttestation/RequestAttestation'
-import SelectAttestedClaims from '../../containers/workflows/SelectAttestedClaims/SelectAttestedClaims'
 import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
 import { MessageOutput } from '../../services/MessageRepository'
-
 import Code from '../Code/Code'
 import MessageSubject from '../MessageSubject/MessageSubject'
+import ImportDelegation from '../../containers/workflows/ImportDelegation/ImportDelegation'
 
 import './MessageDetailView.scss'
 
@@ -108,11 +112,10 @@ class MessageDetailView extends React.Component<Props, State> {
     switch (messageBodyType) {
       case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
         return (
-          <SelectAttestedClaims
-            senderAddress={message.senderAddress}
+          <SubmitLegitimations
+            receiverAddress={message.senderAddress}
             sentClaim={(message.body as sdk.IRequestLegitimations).content}
             onFinished={this.handleDelete}
-            context="legitimation"
           />
         )
       case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
@@ -124,6 +127,9 @@ class MessageDetailView extends React.Component<Props, State> {
             legitimations={
               (message.body as sdk.ISubmitLegitimations).content.legitimations
             }
+            delegationId={
+              (message.body as sdk.ISubmitLegitimations).content.delegationId
+            }
             attesterAddress={message.senderAddress}
             onFinished={this.handleDelete}
           />
@@ -131,7 +137,7 @@ class MessageDetailView extends React.Component<Props, State> {
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return (
           <AttestClaim
-            senderAddress={message.senderAddress}
+            claimerAddress={message.senderAddress}
             requestForAttestation={
               (message.body as sdk.IRequestAttestationForClaim).content
             }
@@ -149,8 +155,8 @@ class MessageDetailView extends React.Component<Props, State> {
         )
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
         return (
-          <SelectAttestedClaims
-            senderAddress={message.senderAddress}
+          <SubmitClaimsForCType
+            receiverAddress={message.senderAddress}
             cTypeHash={(message.body as sdk.IRequestClaimsForCtype).content}
             onFinished={this.handleDelete}
           />
@@ -161,6 +167,42 @@ class MessageDetailView extends React.Component<Props, State> {
             attestedClaims={(message.body as sdk.ISubmitClaimsForCtype).content}
           />
         )
+      case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION: {
+        const messageContent = (message.body as sdk.IRequestAcceptDelegation)
+          .content
+        return (
+          <AcceptDelegation
+            delegationData={messageContent.delegationData}
+            signatures={messageContent.signatures}
+            inviterAddress={message.senderAddress}
+            metaData={messageContent.metaData}
+            onFinished={this.handleDelete}
+          />
+        )
+      }
+      case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION: {
+        const messageContent = (message.body as sdk.ISubmitAcceptDelegation)
+          .content
+        return (
+          <CreateDelegation
+            delegationData={messageContent.delegationData}
+            signatures={messageContent.signatures}
+            inviteeAddress={message.senderAddress}
+            inviterAddress={message.receiverAddress}
+            onFinished={this.handleDelete}
+          />
+        )
+      }
+      case sdk.MessageBodyType.INFORM_CREATE_DELEGATION: {
+        const delegationId = (message.body as sdk.IInformCreateDelegation)
+          .content
+        return (
+          <ImportDelegation
+            delegationId={delegationId}
+            onFinished={this.handleDelete}
+          />
+        )
+      }
       default:
         return undefined
     }
@@ -169,7 +211,9 @@ class MessageDetailView extends React.Component<Props, State> {
   private handleDelete() {
     const { message, onDelete } = this.props
     if (message && onDelete) {
-      onDelete(message)
+      setTimeout(() => {
+        onDelete(message)
+      })
     }
   }
 

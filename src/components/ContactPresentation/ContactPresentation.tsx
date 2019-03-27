@@ -1,5 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import Identicon from '@polkadot/ui-identicon'
+import _ from 'lodash'
 import * as React from 'react'
 
 import ContactRepository from '../../services/ContactRepository'
@@ -37,7 +38,7 @@ class ContactPresentation extends React.Component<Props, State> {
   }
 
   public componentDidUpdate(nextProps: Props) {
-    if (nextProps !== this.props) {
+    if (!_.isEqual(this.props, nextProps)) {
       this.setIdentityOrContact()
     }
   }

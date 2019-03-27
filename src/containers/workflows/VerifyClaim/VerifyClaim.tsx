@@ -53,7 +53,7 @@ class VerifyClaim extends React.Component<Props, State> {
   }
 
   public render() {
-    const { attestedClaims, context } = this.props
+    const { attestedClaims } = this.props
     const { attestersResolved, cTypesResolved } = this.state
 
     return attestersResolved && cTypesResolved ? (

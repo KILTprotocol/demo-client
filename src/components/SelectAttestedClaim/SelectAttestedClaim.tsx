@@ -3,15 +3,16 @@ import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import isEqual from 'lodash/isEqual'
 
-import { SelectAttestedClaimsLabels } from '../../containers/workflows/SelectAttestedClaims/SelectAttestedClaims'
 import CTypeRepository from '../../services/CtypeRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { CType, ICType } from '../../types/Ctype'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import { SelectAttestedClaimsLabels } from '../SelectAttestedClaims/SelectAttestedClaims'
 
 import './SelectAttestedClaim.scss'
-import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 type Props = {
   claimEntry: Claims.Entry
@@ -109,7 +110,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
 
   private getClaimPropertySelect() {
     const { labels, claimEntry } = this.props
-    const { selectedClaimProperties, allClaimPropertiesSelected } = this.state
+    const { allClaimPropertiesSelected } = this.state
 
     const propertyNames: string[] = Object.keys(claimEntry.claim.contents)
 
@@ -195,7 +196,9 @@ class SelectAttestedClaim extends React.Component<Props, State> {
           </h4>
           {attestations.map((attestedClaim: sdk.IAttestedClaim) => (
             <label
-              key={attestedClaim.attestation.signature}
+              key={`${attestedClaim.attestation.claimHash}-${
+                attestedClaim.attestation.owner
+              }`}
               className={allAttestedClaimsSelected ? 'selected-all' : ''}
             >
               <input
@@ -262,8 +265,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
 
     const attestationSelected = selectedAttestedClaims.find(
       (selectedAttestedClaim: sdk.IAttestedClaim) =>
-        attestedClaim.attestation.signature ===
-        selectedAttestedClaim.attestation.signature
+        isEqual(selectedAttestedClaim, attestedClaim)
     )
 
     if (checked && !attestationSelected) {
@@ -278,8 +280,8 @@ class SelectAttestedClaim extends React.Component<Props, State> {
         {
           selectedAttestedClaims: selectedAttestedClaims.filter(
             (selectedAttestedClaim: sdk.IAttestedClaim) =>
-              attestedClaim.attestation.signature !==
-              selectedAttestedClaim.attestation.signature
+              attestedClaim.attestation.owner !==
+              selectedAttestedClaim.attestation.owner
           ),
         },
         this.selectionsChanged

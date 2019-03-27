@@ -18,6 +18,8 @@
  }
 
   & .actionsTd {
+    @include react-select-right;
+    @include react-select-min-width;
 
     &,
     & > div {
@@ -28,9 +30,9 @@
       @include actions;
     }
 
-    & .react-select__menu {
-      right: 0;
-      min-width: 200px;
+    & .SelectAction,
+    & .SelectDelegationAction {
+      width: 100%;
     }
   }
 
