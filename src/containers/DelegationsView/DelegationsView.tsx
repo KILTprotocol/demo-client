@@ -78,9 +78,7 @@ class DelegationsView extends React.Component<Props, State> {
             onRequestInviteContacts={this.requestInviteContact}
           />
         )}
-        {delegationId && (
-          <DelegationDetailView id={delegationId} />
-        )}
+        {delegationId && <DelegationDetailView id={delegationId} />}
         {inviteDelegation && (
           <MyDelegationsInviteModal
             delegationsSelected={[inviteDelegation]}

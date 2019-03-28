@@ -58,16 +58,15 @@ class SelectDelegationAction extends React.Component<Props, State> {
       return undefined
     }
 
-    const permissions = (delegation as sdk.IDelegationNode).permissions || [1,2]
+    const permissions = (delegation as sdk.IDelegationNode).permissions || [
+      1,
+      2,
+    ]
 
     const canDelegate =
       !!permissions && permissions.indexOf(sdk.Permission.DELEGATE) !== -1
 
-    if (
-      !!onInvite &&
-      this.isMine() &&
-      canDelegate
-    ) {
+    if (!!onInvite && this.isMine() && canDelegate) {
       return {
         callback: onInvite.bind(delegation),
         label: 'Invite contact',
