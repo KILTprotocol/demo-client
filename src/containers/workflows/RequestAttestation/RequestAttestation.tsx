@@ -67,6 +67,7 @@ class RequestAttestation extends React.Component<Props, State> {
           attestedClaims={legitimations}
           delegationId={delegationId}
           context="legitimations"
+          currentDelegationView={true}
         />
 
         <div className="actions">

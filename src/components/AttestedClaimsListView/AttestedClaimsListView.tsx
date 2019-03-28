@@ -44,6 +44,7 @@ type Props = {
 
   context?: 'legitimations'
   delegationId?: sdk.IDelegationNode['id']
+  currentDelegationView?: boolean
 
   onToggleChildOpen?: (closeCallback?: () => void | undefined) => void
 }
@@ -225,11 +226,15 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   private getDelegation(delegationId: Props['delegationId']) {
+    const { currentDelegationView } = this.props
     return (
       <div className="delegation">
         <h2>Delegation</h2>
         {delegationId ? (
-          <DelegationDetailView id={delegationId} />
+          <DelegationDetailView
+            id={delegationId}
+            currentView={currentDelegationView}
+          />
         ) : (
           <div>No delegation found.</div>
         )}
