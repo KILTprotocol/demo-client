@@ -9,38 +9,44 @@ import './ImportDelegation.scss'
 
 type Props = {
   delegationId: sdk.IDelegationBaseNode['id']
+  isPCR: boolean
 
   onFinished?: () => void
 }
 
 type State = {
-  alias?: string
+  alias: string
 }
 
 class ImportDelegation extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    this.state = {}
+    this.state = {
+      alias: '',
+    }
     this.importDelegation = this.importDelegation.bind(this)
     this.handleAliasChange = this.handleAliasChange.bind(this)
   }
 
   public render() {
-    const { delegationId } = this.props
+    const { delegationId, isPCR } = this.props
+    const { alias } = this.state
 
     return (
       <section className="ImportDelegation">
         <div className="Delegation-base">
           <div>
-            <label>Name your delegation</label>
+            <label>Name your {isPCR ? 'PCR member' : 'delegation'}</label>
             <input type="text" onChange={this.handleAliasChange} />
           </div>
         </div>
 
-        <DelegationDetailView id={delegationId} />
+        <DelegationDetailView id={delegationId} isPCR={isPCR} />
 
         <div className="actions">
-          <button onClick={this.importDelegation}>Import Delegation</button>
+          <button onClick={this.importDelegation} disabled={!alias}>
+            Import {isPCR ? 'PCR member' : 'delegation'}
+          </button>
         </div>
       </section>
     )
@@ -53,22 +59,28 @@ class ImportDelegation extends React.Component<Props, State> {
   }
 
   private importDelegation() {
-    const { delegationId, onFinished } = this.props
+    const { delegationId, isPCR, onFinished } = this.props
     const { alias } = this.state
 
-    DelegationsService.importDelegation(delegationId, alias)
+    DelegationsService.importDelegation(delegationId, alias, isPCR)
       .then((myDelegation: Delegations.MyDelegation | undefined) => {
         if (myDelegation) {
-          notifySuccess('Delegation successfully imported.')
+          notifySuccess(
+            `${isPCR ? 'PCR member' : 'Delegation'} successfully imported.`
+          )
           if (onFinished) {
             onFinished()
           }
         } else {
-          notifyFailure(`Delegation not found for id '${delegationId}'`)
+          notifyFailure(
+            `${
+              isPCR ? 'PCR member' : 'Delegation'
+            } not found for id '${delegationId}'`
+          )
         }
       })
       .catch(error => {
-        notifyFailure(`Unable to import delegation`)
+        notifyFailure(`Unable to import ${isPCR ? 'PCR member' : 'delegation'}`)
       })
   }
 }

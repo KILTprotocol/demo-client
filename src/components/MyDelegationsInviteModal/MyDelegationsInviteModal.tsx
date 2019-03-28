@@ -17,14 +17,17 @@ import SelectPermissions from '../SelectPermissions/SelectPermissions'
 import './MyDelegationsInviteModal.scss'
 
 type Props = {
+  delegationsSelected?: MyDelegation[]
+  myDelegations: MyDelegation[]
+  selectedIdentity: MyIdentity
+  isPCR: boolean
+
   contactsPool?: Contact[]
   contactsSelected?: Contact[]
   delegationsPool?: MyDelegation[]
-  delegationsSelected?: MyDelegation[]
+
   onCancel?: () => void
   onConfirm?: () => void
-  myDelegations: MyDelegation[]
-  selectedIdentity: MyIdentity
 }
 
 type State = {
@@ -59,7 +62,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
         pool: props.delegationsPool || [],
         selected: props.delegationsSelected || [],
       },
-      permissions: [],
+      permissions: props.isPCR ? [1] : [],
     }
 
     this.cancel = this.cancel.bind(this)
@@ -116,15 +119,15 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
   }
 
   private getModalElement() {
-    const { contactsSelected, delegationsSelected } = this.props
+    const { contactsSelected, delegationsSelected, isPCR } = this.props
     const { contacts, delegations, permissions } = this.state
 
-    const selectables = ['permissions']
+    const selectables = isPCR ? [] : ['permissions']
     if (!contactsSelected) {
       selectables.push('contact(s)')
     }
     if (!delegationsSelected) {
-      selectables.push('delegation(s)')
+      selectables.push(isPCR ? 'PCR(s)' : 'delegation(s)')
     }
 
     return (
@@ -140,10 +143,12 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
         type={ModalType.BLANK}
         showOnInit={true}
       >
-        <SelectPermissions
-          permissions={permissions}
-          onChange={this.changePermissions}
-        />
+        {!isPCR && (
+          <SelectPermissions
+            permissions={permissions}
+            onChange={this.changePermissions}
+          />
+        )}
 
         <div className="contactsSelect">
           {contactsSelected && <h2>Selected contact(s)</h2>}
@@ -161,14 +166,19 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
         </div>
 
         <div className="delegationsSelect">
-          {delegationsSelected && <h2>Selected delegation(s)</h2>}
-          {!delegationsSelected && <h2>Select delegation(s)</h2>}
+          {delegationsSelected && (
+            <h2>Selected {isPCR ? 'PCR' : 'delegation'}(s)</h2>
+          )}
+          {!delegationsSelected && (
+            <h2>Select {isPCR ? 'PCR' : 'delegation'}(s)</h2>
+          )}
           <SelectDelegations
             delegations={delegations.pool}
             name="selectDelegationsForInvite"
             defaultValues={delegationsSelected}
             isMulti={true}
             closeMenuOnSelect={true}
+            placeholder={isPCR ? `Select PCRs…` : undefined}
             onChange={this.changeDelegations}
             onMenuOpen={this.setSelectDelegationsOpen.bind(this, true)}
             onMenuClose={this.setSelectDelegationsOpen.bind(this, false, 500)}
@@ -247,11 +257,13 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
     receiver: Contact,
     delegation: MyDelegation
   ): sdk.IRequestAcceptDelegation['content']['delegationData'] {
+    const { isPCR } = this.props
     const { permissions } = this.state
 
     return {
       account: receiver.publicIdentity.address,
       id: sdk.UUID.generate(),
+      isPCR,
       parentId: delegation.id,
       permissions,
     }

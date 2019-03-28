@@ -158,13 +158,18 @@ class AttestationWorkflow {
    *
    * @param delegationNodeId id of the just created delegation node
    * @param delegateAddress owner of the just created delegation node
+   * @param delegationIsPCR is the delegation a pcr
    */
   public static async informCreateDelegation(
     delegationNodeId: sdk.DelegationNode['id'],
-    delegateAddress: Contact['publicIdentity']['address']
+    delegateAddress: Contact['publicIdentity']['address'],
+    delegationIsPCR: sdk.ISubmitAcceptDelegation['content']['delegationData']['isPCR']
   ): Promise<void> {
     const messageBody: sdk.IInformCreateDelegation = {
-      content: delegationNodeId,
+      content: {
+        delegationId: delegationNodeId,
+        isPCR: delegationIsPCR,
+      },
       type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
     }
 

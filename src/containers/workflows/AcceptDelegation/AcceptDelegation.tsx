@@ -45,32 +45,34 @@ class AcceptDelegation extends React.Component<Props, State> {
 
   public render() {
     const { delegationData, metaData } = this.props
+    const { isPCR, parentId, permissions } = delegationData
     const { isSignatureValid } = this.state
 
     return (
       <section className="AcceptDelegation">
         {isSignatureValid ? (
           <>
-            <h2>Accept invitation?</h2>
+            <h2>Accept invitation to {isPCR ? 'PCR' : 'Delegation'}?</h2>
 
             <div className="delegationData">
               <div>
                 <label>Your permissions</label>
                 <div>
-                  <Permissions permissions={delegationData.permissions} />
+                  <Permissions permissions={permissions} />
                 </div>
               </div>
             </div>
 
             <DelegationDetailView
-              id={delegationData.parentId}
+              id={parentId}
               focusedNodeAlias={
                 metaData && metaData.alias ? metaData.alias : undefined
               }
+              isPCR={isPCR}
             />
 
             <div className="actions">
-              <button onClick={this.signAndReply}>Accept Inivitation</button>
+              <button onClick={this.signAndReply}>Accept Invitation</button>
             </div>
           </>
         ) : isSignatureValid == null ? (
@@ -79,7 +81,7 @@ class AcceptDelegation extends React.Component<Props, State> {
           <>
             <h2 className="danger">Alert!</h2>
             <div className="danger">
-              Inviters signature does not match attached delegationData
+              Inviters signature does not match attached data
             </div>
           </>
         )}

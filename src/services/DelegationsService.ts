@@ -8,7 +8,8 @@ import BlockchainService from './BlockchainService'
 class DelegationsService {
   public static async storeRoot(
     delegationRoot: sdk.DelegationRootNode,
-    alias: string
+    alias: string,
+    isPCR: boolean
   ): Promise<void> {
     return DelegationsService.storeRootOnChain(delegationRoot).then(() => {
       const { account, cTypeHash, id } = delegationRoot
@@ -17,6 +18,7 @@ class DelegationsService {
         account,
         cTypeHash,
         id,
+        isPCR,
         metaData: { alias },
         type: Delegations.DelegationType.Root,
       } as MyDelegation)
@@ -85,7 +87,8 @@ class DelegationsService {
 
   public static async importDelegation(
     delegationNodeId: sdk.IDelegationBaseNode['id'],
-    alias?: string
+    alias: string,
+    isPCR?: boolean
   ): Promise<MyDelegation | undefined> {
     return new Promise<MyDelegation | undefined>(async (resolve, reject) => {
       try {
@@ -103,9 +106,8 @@ class DelegationsService {
             account: delegation.account,
             cTypeHash: root && root.cTypeHash,
             id: delegation.id,
-            metaData: {
-              alias: alias || 'Unnamed delegation',
-            },
+            isPCR,
+            metaData: { alias },
             parentId: delegation.parentId,
             permissions: delegation.permissions,
             rootId: delegation.rootId,
