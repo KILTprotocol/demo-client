@@ -19,10 +19,12 @@ import './DelegationDetailView.scss'
 type Props = {
   id: sdk.IDelegationBaseNode['id']
 
-  // redux
-  selectedIdentity: MyIdentity
-
+  currentView?: boolean
+  editable?: boolean
   focusedNodeAlias?: MyDelegation['metaData']['alias']
+
+  // mapStateToProps
+  selectedIdentity: MyIdentity
 }
 
 type State = {
@@ -62,7 +64,13 @@ class DelegationDetailView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { focusedNodeAlias, selectedIdentity, id } = this.props
+    const {
+      currentView,
+      editable,
+      id,
+      focusedNodeAlias,
+      selectedIdentity,
+    } = this.props
     const { delegationsTreeNode, rootNode } = this.state
 
     return (
@@ -89,8 +97,16 @@ class DelegationDetailView extends React.Component<Props, State> {
                   selectedIdentity={selectedIdentity}
                   focusedNodeId={id}
                   focusedNodeAlias={focusedNodeAlias}
+                  editable={editable}
+                  currentView={currentView}
                 />
               </div>
+              {!currentView && (
+                <div className="currentViewLabel">Tree at creation</div>
+              )}
+              {currentView && (
+                <div className="currentViewLabel">Current tree</div>
+              )}
             </>
           )}
         </div>
