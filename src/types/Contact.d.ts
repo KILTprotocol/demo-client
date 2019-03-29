@@ -6,6 +6,9 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 export interface Contact {
   metaData: {
     name: string
+    addedAt?: number // timestamp
+    addedBy?: MyIdentity['identity']['address']
+    persisted?: boolean
   }
   publicIdentity: sdk.PublicIdentity
 }

@@ -1,7 +1,6 @@
 import { combineReducers, createStore, Store } from 'redux'
 import BalanceUtilities from '../services/BalanceUtilities'
 
-import errorService from '../services/ErrorService'
 import * as Attestations from './ducks/Attestations'
 import * as Balances from './ducks/Balances'
 import * as Claims from './ducks/Claims'
@@ -9,6 +8,7 @@ import * as UiState from './ducks/UiState'
 import * as Wallet from './ducks/Wallet'
 import * as Delegations from './ducks/Delegations'
 import * as Parameters from './ducks/Parameters'
+import * as Contacts from './ducks/Contacts'
 
 declare global {
   /* tslint:disable */
@@ -20,22 +20,24 @@ declare global {
 }
 
 export type State = {
-  claims: Claims.ImmutableState
-  uiState: UiState.ImmutableState
-  wallet: Wallet.ImmutableState
   attestations: Attestations.ImmutableState
   balances: Balances.ImmutableState
+  claims: Claims.ImmutableState
+  contacts: Contacts.ImmutableState
   delegations: Delegations.ImmutableState
   parameters: Parameters.ImmutableState
+  uiState: UiState.ImmutableState
+  wallet: Wallet.ImmutableState
 }
 
 type SerializedState = {
-  claims: Claims.SerializedState
-  uiState: UiState.SerializedState
-  wallet: Wallet.SerializedState
   attestations: Attestations.SerializedState
+  claims: Claims.SerializedState
+  contacts: Contacts.SerializedState
   delegations: Delegations.SerializedState
   parameters: Parameters.SerializedState
+  uiState: UiState.SerializedState
+  wallet: Wallet.SerializedState
 }
 
 class PersistentStore {
@@ -49,6 +51,7 @@ class PersistentStore {
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
+      contacts: Contacts.Store.deserialize(obj.contacts),
       delegations: Delegations.Store.deserialize(obj.delegations),
       parameters: Parameters.Store.deserialize(obj.parameters),
       uiState: UiState.Store.deserialize(obj.uiState),
@@ -60,6 +63,7 @@ class PersistentStore {
     const obj: SerializedState = {
       attestations: Attestations.Store.serialize(state.attestations),
       claims: Claims.Store.serialize(state.claims),
+      contacts: Contacts.Store.serialize(state.contacts),
       delegations: Delegations.Store.serialize(state.delegations),
       parameters: Parameters.Store.serialize(state.parameters),
       uiState: UiState.Store.serialize(state.uiState),
@@ -78,12 +82,7 @@ class PersistentStore {
       try {
         persistedState = PersistentStore.deserialize(JSON.parse(localState))
       } catch (error) {
-        errorService.log({
-          error,
-          message: 'Could not restore persistentStore from local storage',
-          origin: 'PersistentStore.constructor()',
-        })
-        // TODO: what to do on failure?
+        console.error('Could not construct persistentStore', error)
       }
     }
 
@@ -92,6 +91,7 @@ class PersistentStore {
         attestations: Attestations.Store.reducer,
         balances: Balances.Store.reducer,
         claims: Claims.Store.reducer,
+        contacts: Contacts.Store.reducer,
         delegations: Delegations.Store.reducer,
         parameters: Parameters.Store.reducer,
         uiState: UiState.Store.reducer,
