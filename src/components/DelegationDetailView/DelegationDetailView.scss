@@ -24,4 +24,12 @@
       }
     }
   }
+
+  & .viewTypeLabel {
+    position: absolute;
+    top: $base-padding/4;
+    right: $base-padding/2;
+    font-size: 10px;
+    color: $color-grey;
+  }
 }

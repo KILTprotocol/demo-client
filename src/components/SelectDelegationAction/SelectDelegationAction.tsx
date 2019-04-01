@@ -8,7 +8,7 @@ import PersistentStore from '../../state/PersistentStore'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
 
 type Props = {
-  delegationEntry?: MyDelegation
+  delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | MyDelegation
 
   className?: string
 
@@ -52,24 +52,23 @@ class SelectDelegationAction extends React.Component<Props, State> {
   }
 
   private getInviteAction(): Action | undefined {
-    const { delegationEntry, onInvite } = this.props
+    const { delegation, onInvite } = this.props
 
-    if (!delegationEntry) {
+    if (!delegation) {
       return undefined
     }
 
-    const { permissions, type } = delegationEntry
+    const permissions = (delegation as sdk.IDelegationNode).permissions || [
+      sdk.Permission.ATTEST,
+      sdk.Permission.DELEGATE,
+    ]
 
     const canDelegate =
       !!permissions && permissions.indexOf(sdk.Permission.DELEGATE) !== -1
 
-    if (
-      onInvite &&
-      this.isMine() &&
-      (type === Delegations.DelegationType.Root || canDelegate)
-    ) {
+    if (!!onInvite && this.isMine() && canDelegate) {
       return {
-        callback: onInvite.bind(delegationEntry),
+        callback: onInvite.bind(delegation),
         label: 'Invite contact',
       }
     }
@@ -77,11 +76,11 @@ class SelectDelegationAction extends React.Component<Props, State> {
   }
 
   private getDeleteAction() {
-    const { delegationEntry, onDelete } = this.props
+    const { delegation, onDelete } = this.props
 
     if (onDelete && this.isMine()) {
       return {
-        callback: onDelete.bind(delegationEntry),
+        callback: onDelete.bind(delegation),
         label: 'Delete',
       }
     }
@@ -101,13 +100,13 @@ class SelectDelegationAction extends React.Component<Props, State> {
   }
 
   private isMine() {
-    const { delegationEntry } = this.props
-    if (!delegationEntry) {
+    const { delegation } = this.props
+    if (!delegation) {
       return undefined
     }
     return !!Delegations.getDelegation(
       PersistentStore.store.getState(),
-      delegationEntry.id
+      delegation.id
     )
   }
 }

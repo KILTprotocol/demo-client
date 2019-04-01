@@ -60,6 +60,19 @@
       flex-wrap: nowrap;
       min-height: $base-button-height;
     }
+
+    & .revokedLabel {
+      @extend %centerHV;
+
+      @include baseFont-bold;
+      @include transform-origin(50% 50%);
+      @include transform(translateX(-50%) translateY(-50%) rotate(-10deg));
+      @include text-shadow(0 0 5px $color-danger);
+
+      position: absolute;
+      font-size: 24px;
+      color: $color-danger;
+    }
   }
 
   & .short-hash {
@@ -106,6 +119,21 @@
 
         & .ContactPresentation {
           @include invertedPresentation;
+        }
+      }
+    }
+  }
+
+  &.viewType-present{
+
+    &.revoked {
+
+      & > .label {
+
+        & .header,
+        & .content,
+        &:before {
+          @include opacity(0.3);
         }
       }
     }

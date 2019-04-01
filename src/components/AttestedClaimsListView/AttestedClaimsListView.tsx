@@ -7,6 +7,7 @@ import AttestedClaimVerificationView from '../AttestedClaimVerificationView/Atte
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import DelegationDetailView from '../DelegationDetailView/DelegationDetailView'
+import { ViewType } from '../DelegationNode/DelegationNode'
 import Spinner from '../Spinner/Spinner'
 
 import './AttestedClaimsListView.scss'
@@ -44,6 +45,7 @@ type Props = {
 
   context?: 'legitimations'
   delegationId?: sdk.IDelegationNode['id']
+  currentDelegationViewType?: ViewType
 
   onToggleChildOpen?: (closeCallback?: () => void | undefined) => void
 }
@@ -225,11 +227,15 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   private getDelegation(delegationId: Props['delegationId']) {
+    const { currentDelegationViewType } = this.props
     return (
       <div className="delegation">
         <h2>Delegation</h2>
         {delegationId ? (
-          <DelegationDetailView id={delegationId} />
+          <DelegationDetailView
+            id={delegationId}
+            viewType={currentDelegationViewType}
+          />
         ) : (
           <div>No delegation found.</div>
         )}
