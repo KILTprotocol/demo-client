@@ -4,6 +4,8 @@ import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
 import ContactRepository from '../../services/ContactRepository'
+import * as Contacts from '../../state/ducks/Contacts'
+import PersistentStore from '../../state/PersistentStore'
 import { Contact } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
@@ -14,6 +16,7 @@ type SelectOption = {
 }
 
 type Props = {
+  allContacts?: boolean
   closeMenuOnSelect?: boolean
   contacts?: Contact[]
   defaultValues?: Contact[]
@@ -53,12 +56,19 @@ class SelectContacts extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
+    const { allContacts } = this.props
     const { contacts } = this.state
 
     if (!contacts.length) {
-      ContactRepository.findAll().then(_contacts => {
-        this.setState({ contacts: _contacts })
-      })
+      if (allContacts) {
+        ContactRepository.findAll().then(_contacts => {
+          this.setState({ contacts: _contacts })
+        })
+      } else {
+        this.setState({
+          contacts: Contacts.getMyContacts(PersistentStore.store.getState()),
+        })
+      }
     }
   }
 

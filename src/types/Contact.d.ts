@@ -8,7 +8,6 @@ export interface Contact {
     name: string
     addedAt?: number // timestamp
     addedBy?: MyIdentity['identity']['address']
-    persisted?: boolean
   }
   publicIdentity: sdk.PublicIdentity
 }

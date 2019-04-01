@@ -1,29 +1,32 @@
-import {
-  IRequestClaimsForCtype,
-  MessageBodyType,
-} from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+import { connect } from 'react-redux'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
 import MyDelegationsInviteModal from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
 import SelectAction from '../../components/SelectAction/SelectAction'
 import contactRepository from '../../services/ContactRepository'
-import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import MessageRepository from '../../services/MessageRepository'
+import * as Contacts from '../../state/ducks/Contacts'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { Contact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
 
 import './ContactList.scss'
 
-interface Props {}
+interface Props {
+  // mapStateToProps
+  myContacts: Contact[]
+}
 
 interface State {
-  contacts: Contact[]
-  cTypes: ICType[]
+  allContacts: Contact[]
+
   contactForDelegationInvite?: Contact
   isPCR?: boolean
+  showAllContacts?: boolean
 }
 
 class ContactList extends React.Component<Props, State> {
@@ -48,51 +51,40 @@ class ContactList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      cTypes: [],
-      contacts: [],
+      allContacts: [],
     }
     this.onCancelRequestClaim = this.onCancelRequestClaim.bind(this)
     this.onFinishRequestClaim = this.onFinishRequestClaim.bind(this)
     this.onRequestClaimForVerification = this.onRequestClaimForVerification.bind(
       this
     )
+    this.toggleContacts = this.toggleContacts.bind(this)
+    this.fetchAllContacts = this.fetchAllContacts.bind(this)
     this.inviteToDelegation.cancel = this.inviteToDelegation.cancel.bind(this)
     this.inviteToDelegation.confirm = this.inviteToDelegation.confirm.bind(this)
   }
 
-  public componentDidMount() {
-    contactRepository
-      .findAll()
-      .then((contacts: Contact[]) => {
-        this.setState({ contacts })
-      })
-      .catch(error => {
-        errorService.log({
-          error,
-          message: 'Could not fetch contacts',
-          origin: 'ContactList.componentDidMount()',
-          type: 'ERROR.FETCH.GET',
-        })
-      })
-    CTypeRepository.findAll()
-      .then((cTypes: ICType[]) => {
-        this.setState({ cTypes })
-      })
-      .catch(error => {
-        errorService.log({
-          error,
-          message: 'Could not fetch CTYPEs',
-          origin: 'ContactList.componentDidMount()',
-          type: 'ERROR.FETCH.GET',
-        })
-      })
-  }
-
   public render() {
-    const { contacts, contactForDelegationInvite, isPCR } = this.state
+    const { myContacts } = this.props
+    const {
+      allContacts,
+      contactForDelegationInvite,
+      isPCR,
+      showAllContacts,
+    } = this.state
+
     return (
       <section className="ContactList">
         <h1>Contacts</h1>
+        <div className="contactActions">
+          <button
+            className={`toggleContacts ${showAllContacts ? 'all' : 'my'}`}
+            onClick={this.toggleContacts}
+          />
+          {showAllContacts && (
+            <button className="refresh" onClick={this.fetchAllContacts} />
+          )}
+        </div>
         <table>
           <thead>
             <tr>
@@ -102,49 +94,12 @@ class ContactList extends React.Component<Props, State> {
             </tr>
           </thead>
           <tbody>
-            {contacts.map((contact: Contact) => (
-              <tr key={contact.publicIdentity.address}>
-                <td className="name">
-                  <ContactPresentation
-                    address={contact.publicIdentity.address}
-                  />
-                </td>
-                <td className="address" title={contact.publicIdentity.address}>
-                  {contact.publicIdentity.address}
-                </td>
-                <td className="actionsTd">
-                  <div>
-                    <SelectAction
-                      actions={[
-                        {
-                          callback: this.onRequestClaimForVerification.bind(
-                            this,
-                            contact
-                          ),
-                          label: 'Request claim(s)',
-                        },
-                        {
-                          callback: this.inviteToDelegation.request.bind(
-                            this,
-                            contact,
-                            false
-                          ),
-                          label: 'Invite to Delegation',
-                        },
-                        {
-                          callback: this.inviteToDelegation.request.bind(
-                            this,
-                            contact,
-                            true
-                          ),
-                          label: 'Invite to PCR',
-                        },
-                      ]}
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {!showAllContacts &&
+              myContacts.map((contact: Contact) => this.getContactRow(contact))}
+            {showAllContacts &&
+              allContacts.map((contact: Contact) =>
+                this.getContactRow(contact)
+              )}
           </tbody>
         </table>
 
@@ -168,15 +123,88 @@ class ContactList extends React.Component<Props, State> {
     )
   }
 
+  private getContactRow(contact: Contact) {
+    const { publicIdentity } = contact
+    const { address } = publicIdentity
+
+    return (
+      <tr key={address}>
+        <td className="name">
+          <ContactPresentation address={address} interactive={true} />
+        </td>
+        <td className="address" title={address}>
+          {address}
+        </td>
+        <td className="actionsTd">
+          <div>
+            <SelectAction
+              actions={[
+                {
+                  callback: this.onRequestClaimForVerification.bind(
+                    this,
+                    contact
+                  ),
+                  label: 'Request claim(s)',
+                },
+                {
+                  callback: this.inviteToDelegation.request.bind(
+                    this,
+                    contact,
+                    false
+                  ),
+                  label: 'Invite to Delegation',
+                },
+                {
+                  callback: this.inviteToDelegation.request.bind(
+                    this,
+                    contact,
+                    true
+                  ),
+                  label: 'Invite to PCR',
+                },
+              ]}
+            />
+          </div>
+        </td>
+      </tr>
+    )
+  }
+
+  private toggleContacts() {
+    const { showAllContacts } = this.state
+
+    this.setState({ showAllContacts: !showAllContacts })
+
+    if (!showAllContacts) {
+      this.fetchAllContacts()
+    }
+  }
+
+  private fetchAllContacts() {
+    contactRepository
+      .findAll()
+      .then((allContacts: Contact[]) => {
+        this.setState({ allContacts })
+      })
+      .catch(error => {
+        errorService.log({
+          error,
+          message: 'Could not fetch allContacts',
+          origin: 'ContactList.componentDidMount()',
+          type: 'ERROR.FETCH.GET',
+        })
+      })
+  }
+
   private onCancelRequestClaim() {
     this.selectedContact = undefined
   }
 
   private onFinishRequestClaim(selectedCTypes: ICType[]) {
     if (this.selectedContact && selectedCTypes) {
-      const messageBody: IRequestClaimsForCtype = {
+      const messageBody: sdk.IRequestClaimsForCtype = {
         content: selectedCTypes[0].cType.hash,
-        type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
+        type: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
       }
 
       MessageRepository.send([this.selectedContact], messageBody)
@@ -191,4 +219,8 @@ class ContactList extends React.Component<Props, State> {
   }
 }
 
-export default ContactList
+const mapStateToProps = (state: ReduxState) => ({
+  myContacts: Contacts.getMyContacts(state),
+})
+
+export default connect(mapStateToProps)(ContactList)

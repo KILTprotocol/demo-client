@@ -45,6 +45,22 @@
     margin-left: $base-padding/2;
     vertical-align: 2px;
   }
+
+  &.withActions {
+    position: relative;
+    padding: {
+      right: $base-button-height;
+    }
+
+    & .SelectAction {
+      @include react-select-right;
+      @include react-select-min-width;
+
+      position: absolute;
+      top: -5px;
+      right: 0;
+    }
+  }
 }
 
 @mixin detailPresentation {

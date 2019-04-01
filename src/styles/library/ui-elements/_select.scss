@@ -6,6 +6,13 @@
 
   & .react-select {
 
+    &__single-value {
+      height: $base-button-height;
+      padding: {
+        top: 8px;
+      }
+    }
+
     &__control {
       @include box-shadow(none !important);
 

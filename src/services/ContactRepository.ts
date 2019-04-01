@@ -1,3 +1,5 @@
+import * as Contacts from '../state/ducks/Contacts'
+import PersistentStore from '../state/PersistentStore'
 import { Contact } from '../types/Contact'
 import { BasePostParams } from './BaseRepository'
 import ErrorService from './ErrorService'
@@ -30,7 +32,16 @@ class ContactRepository {
       })
   }
 
-  public findByAddress(address: string): Promise<Contact> {
+  public findByAddress(address: string): Promise<void | Contact> {
+    const persistedContact = Contacts.getContact(
+      PersistentStore.store.getState(),
+      address
+    )
+
+    if (persistedContact) {
+      return Promise.resolve(persistedContact)
+    }
+
     return fetch(`${ContactRepository.URL}/${address}`)
       .then(response => {
         if (!response.ok) {
@@ -39,6 +50,10 @@ class ContactRepository {
         return response
       })
       .then(response => response.json())
+      .then((contact: Contact) => {
+        PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
+        return contact
+      })
       .catch(error => {
         ErrorService.log({
           error,

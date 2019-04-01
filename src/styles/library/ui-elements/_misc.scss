@@ -170,3 +170,10 @@
     }
   }
 }
+
+@mixin favorite {
+  @include icon($icon-star);
+
+  color: yellow;
+  text-shadow: 0 0 1px black;
+}

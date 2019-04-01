@@ -1,11 +1,32 @@
 @mixin table {
   width: 100%;
   table-layout: fixed;
+  border: 1px solid $color-grey;
+
+  & thead {
+    border: {
+      bottom: 1px solid $color-grey;
+    }
+  }
 
   & th,
   & td {
+    position: relative;
+    padding: $cell-padding-v $cell-padding-h;
+    background: $color-grey-light;
     text-align: left;
     vertical-align: top;
+
+    &:after {
+      @include background-image(linear-gradient(to right, transparent, $color-grey-light));
+
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: $cell-padding-h;
+    }
   }
 
   & th {
@@ -13,15 +34,36 @@
 
     @include baseFont-bold;
 
+    padding: $cell-padding-h;
+    background: $color-grey-light;
     color: $color-primary;
-    padding-bottom: $base-padding;
- }
+  }
+
+  & tbody {
+
+    & tr {
+
+      &:nth-child(odd) {
+
+        & td {
+          background: $color-white;
+
+          &:after {
+            @include background-image(linear-gradient(to right, transparent, $color-white));
+          }
+        }
+      }
+    }
+  }
 
   & .actionsTd {
     @include react-select-right;
     @include react-select-min-width;
 
-    &,
+    padding: {
+      right: $cell-padding-v;
+    }
+
     & > div {
       padding: 0;
     }

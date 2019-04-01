@@ -22,7 +22,7 @@ class Dashboard extends React.Component<Props, State> {
     return (
       <section className="Dashboard">
         <h1>
-          My Dashboard -{' '}
+          <div>My Dashboard</div>
           <ContactPresentation myIdentity={selectedIdentity} inline={true} />
         </h1>
         <IdentityView myIdentity={selectedIdentity} selected={true} />

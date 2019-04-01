@@ -29,7 +29,7 @@ class Store {
     const contacts = state
       .get('contacts')
       .toList()
-      .filter((contact: Contact) => contact.metaData.persisted)
+      .filter((contact: Contact) => contact.metaData.addedAt)
       .map((contact: Contact) => {
         return JSON.stringify(contact)
       })
@@ -39,14 +39,16 @@ class Store {
   }
 
   public static deserialize(serializedState: SerializedState): ImmutableState {
-    let contactsArray: Contact[] = []
+    let contactsArray: Contact[]
     const contacts: { [address: string]: Contact } = {}
 
     try {
       contactsArray = serializedState.contacts.map((serialized: string) => {
         return JSON.parse(serialized) as Contact
       })
-    } catch (e) {}
+    } catch (e) {
+      contactsArray = []
+    }
 
     contactsArray.forEach((contact: Contact) => {
       const { address } = contact.publicIdentity
@@ -68,7 +70,17 @@ class Store {
       }
       case Store.ACTIONS.REMOVE_CONTACT: {
         const address = (action as RemoveAction).payload
-        return state.deleteIn(['contacts', address])
+
+        const contact = state.getIn(['contacts', address])
+        const { metaData, publicIdentity } = contact
+
+        delete metaData.addedAt
+        delete metaData.addedBy
+
+        return state.setIn(['contacts', address], {
+          metaData: { ...metaData },
+          publicIdentity,
+        })
       }
       default:
         return state
@@ -104,13 +116,21 @@ class Store {
 }
 
 const _getContacts = (state: ReduxState) => {
-  return state.contacts.get('contacts')
+  return state.contacts
+    .get('contacts')
+    .toList()
+    .toArray()
 }
 
 const getContacts = createSelector(
   [_getContacts],
-  (contacts: Immutable.Map<Contact['publicIdentity']['address'], Contact>) =>
-    contacts
+  (contacts: Contact[]) => contacts
+)
+
+const getMyContacts = createSelector(
+  [getContacts],
+  (contacts: Contact[]) =>
+    contacts.filter((contact: Contact) => contact.metaData.addedAt)
 )
 
 const _getContact = (
@@ -130,4 +150,5 @@ export {
   Action,
   getContacts,
   getContact,
+  getMyContacts,
 }

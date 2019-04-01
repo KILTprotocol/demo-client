@@ -151,7 +151,10 @@ class DelegationNode extends React.Component<Props, State> {
             )}
           </div>
           <div className="content">
-            <ContactPresentation address={delegation.account} />
+            <ContactPresentation
+              address={delegation.account}
+              interactive={true}
+            />
             {!!permissions && <Permissions permissions={permissions} />}
             {editable && myDelegation && (
               <SelectDelegationAction

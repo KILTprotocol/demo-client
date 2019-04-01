@@ -26,6 +26,17 @@
 
   & .ContactPresentation {
     @include detailPresentation;
+
+    & .ui--IdentityIcon {
+
+      &:after {
+        font-size: 16px;
+        margin: {
+          top: 4px;
+          left: -4px;
+        }
+      }
+    }
   }
 
   & .didDelete {
