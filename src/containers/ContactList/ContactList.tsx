@@ -77,13 +77,13 @@ class ContactList extends React.Component<Props, State> {
       <section className="ContactList">
         <h1>Contacts</h1>
         <div className="contactActions">
+          {showAllContacts && (
+            <button className="refresh" onClick={this.fetchAllContacts} />
+          )}
           <button
             className={`toggleContacts ${showAllContacts ? 'all' : 'my'}`}
             onClick={this.toggleContacts}
           />
-          {showAllContacts && (
-            <button className="refresh" onClick={this.fetchAllContacts} />
-          )}
         </div>
         <table>
           <thead>

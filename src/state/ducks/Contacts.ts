@@ -1,18 +1,20 @@
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
+
 import KiltAction from '../../types/Action'
 import { Contact, MyIdentity } from '../../types/Contact'
-import { State as ReduxState } from '../PersistentStore'
+import PersistentStore, { State as ReduxState } from '../PersistentStore'
+import * as Wallet from '../../state/ducks/Wallet'
 
 interface AddAction extends KiltAction {
   payload: Contact
 }
 
-interface RemoveAction extends KiltAction {
+interface RemoveMyAction extends KiltAction {
   payload: Contact['publicIdentity']['address']
 }
 
-type Action = AddAction | RemoveAction
+type Action = AddAction | RemoveMyAction
 
 type State = {
   contacts: Immutable.Map<Contact['publicIdentity']['address'], Contact>
@@ -68,8 +70,8 @@ class Store {
         const { publicIdentity } = contact
         return state.setIn(['contacts', publicIdentity.address], contact)
       }
-      case Store.ACTIONS.REMOVE_CONTACT: {
-        const address = (action as RemoveAction).payload
+      case Store.ACTIONS.REMOVE_MY_CONTACT: {
+        const address = (action as RemoveMyAction).payload
 
         const contact = state.getIn(['contacts', address])
         const { metaData, publicIdentity } = contact
@@ -94,12 +96,12 @@ class Store {
     }
   }
 
-  public static removeContact(
+  public static removeMyContact(
     address: MyIdentity['identity']['address']
-  ): RemoveAction {
+  ): RemoveMyAction {
     return {
       payload: address,
-      type: Store.ACTIONS.REMOVE_CONTACT,
+      type: Store.ACTIONS.REMOVE_MY_CONTACT,
     }
   }
 
@@ -111,7 +113,7 @@ class Store {
 
   private static ACTIONS = {
     ADD_CONTACT: 'contacts/ADD_CONTACT',
-    REMOVE_CONTACT: 'contacts/REMOVE_CONTACT',
+    REMOVE_MY_CONTACT: 'contacts/REMOVE_MY_CONTACT',
   }
 }
 

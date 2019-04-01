@@ -204,7 +204,7 @@ class ContactPresentation extends React.Component<Props, State> {
     const { address } = this.state
 
     if (address) {
-      PersistentStore.store.dispatch(Contacts.Store.removeContact(address))
+      PersistentStore.store.dispatch(Contacts.Store.removeMyContact(address))
     }
   }
 }

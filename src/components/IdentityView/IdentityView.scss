@@ -14,26 +14,25 @@
 
   &.selected {
     @include labeledCard;
-
-    & .actions {
-      display: none;
-    }
   }
 
-  &:not(.selected){
+  &:not(.selected) {
     @include card;
   }
 
   & .ContactPresentation {
     @include detailPresentation;
 
-    & .ui--IdentityIcon {
+    &.internal {
 
-      &:after {
-        font-size: 16px;
-        margin: {
-          top: 4px;
-          left: -4px;
+      & .ui--IdentityIcon {
+
+        &:after {
+          font-size: 16px;
+          margin: {
+            top: 4px;
+            left: -4px;
+          }
         }
       }
     }
@@ -49,5 +48,14 @@
 
   & .did {
     margin-right: 10px;
+  }
+
+  & .toggleContacts {
+    @include button-icon-only($icon-star);
+    @include favorite;
+
+    &.isMyContact {
+      color: $color-grey-light;
+    }
   }
 }
