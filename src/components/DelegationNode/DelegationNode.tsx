@@ -22,6 +22,11 @@ import Spinner from '../Spinner/Spinner'
 
 import './DelegationNode.scss'
 
+export enum ViewType {
+  Present = 'present',
+  OnCreation = 'onCreation',
+}
+
 export type DelegationsTreeNode = {
   delegation: sdk.IDelegationNode | sdk.IDelegationRootNode
   childNodes: DelegationsTreeNode[]
@@ -32,11 +37,11 @@ type Props = {
   selectedIdentity: MyIdentity
   focusedNodeId: DelegationsTreeNode['delegation']['id']
 
-  currentView?: boolean
   editable?: boolean
+  focusedNodeAlias?: MyDelegation['metaData']['alias']
   gotSiblings?: true
   gettingSiblings?: boolean
-  focusedNodeAlias?: MyDelegation['metaData']['alias']
+  viewType?: ViewType
 
   onGetChildren?: () => void
 }
@@ -97,11 +102,11 @@ class DelegationNode extends React.Component<Props, State> {
 
   public render() {
     const {
-      currentView,
       editable,
       focusedNodeAlias,
       focusedNodeId,
       selectedIdentity,
+      viewType,
     } = this.props
     const {
       attestationHashes,
@@ -123,7 +128,7 @@ class DelegationNode extends React.Component<Props, State> {
           ${myNode ? 'myNode' : ''}
           ${focusedNode ? 'focusedNode' : ''}
           ${editable ? 'editable' : ''}
-          ${currentView ? 'currentView' : ''}
+          viewType-${viewType}
           ${revoked ? 'revoked' : ''}
         `}
       >
@@ -134,7 +139,7 @@ class DelegationNode extends React.Component<Props, State> {
               <h3>{focusedNodeAlias}</h3>
             )}
             <ShortHash length={10}>{delegation.id}</ShortHash>
-            {editable && currentView && (
+            {editable && viewType === ViewType.Present && (
               <span
                 className="attestedClaims"
                 title={`${
@@ -157,12 +162,12 @@ class DelegationNode extends React.Component<Props, State> {
               />
             )}
           </div>
-          {currentView && revoked && (
+          {viewType === ViewType.Present && revoked && (
             <div className="revokedLabel">REVOKED</div>
           )}
         </div>
-        {currentView && this.getElement_getSiblings()}
-        {currentView && this.getElement_getChildren()}
+        {viewType === ViewType.Present && this.getElement_getSiblings()}
+        {viewType === ViewType.Present && this.getElement_getChildren()}
         {node.childNodes.map((childNode: DelegationsTreeNode) => (
           <DelegationNode
             selectedIdentity={selectedIdentity}
@@ -174,10 +179,10 @@ class DelegationNode extends React.Component<Props, State> {
             gettingSiblings={gettingChildren}
             focusedNodeAlias={focusedNodeAlias}
             editable={editable}
-            currentView={currentView}
+            viewType={viewType}
           />
         ))}
-        {editable && currentView && delegationForInvite && (
+        {editable && viewType === ViewType.Present && delegationForInvite && (
           <MyDelegationsInviteModal
             delegationsSelected={[delegationForInvite]}
             onCancel={this.cancelInvite}

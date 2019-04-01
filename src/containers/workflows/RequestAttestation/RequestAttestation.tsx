@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
+import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 
 import MyClaimCreateView from '../../../components/MyClaimCreateView/MyClaimCreateView'
 import MyClaimDetailView from '../../../components/MyClaimDetailView/MyClaimDetailView'
@@ -67,7 +68,7 @@ class RequestAttestation extends React.Component<Props, State> {
           attestedClaims={legitimations}
           delegationId={delegationId}
           context="legitimations"
-          currentDelegationView={true}
+          currentDelegationViewType={ViewType.Present}
         />
 
         <div className="actions">

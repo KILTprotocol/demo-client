@@ -12,6 +12,7 @@ import { MyIdentity } from '../../types/Contact'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import DelegationNode, {
   DelegationsTreeNode,
+  ViewType,
 } from '../DelegationNode/DelegationNode'
 
 import './DelegationDetailView.scss'
@@ -19,7 +20,7 @@ import './DelegationDetailView.scss'
 type Props = {
   id: sdk.IDelegationBaseNode['id']
 
-  currentView?: boolean
+  viewType?: ViewType
   editable?: boolean
   focusedNodeAlias?: MyDelegation['metaData']['alias']
 
@@ -65,7 +66,7 @@ class DelegationDetailView extends React.Component<Props, State> {
 
   public render() {
     const {
-      currentView,
+      viewType,
       editable,
       id,
       focusedNodeAlias,
@@ -98,14 +99,14 @@ class DelegationDetailView extends React.Component<Props, State> {
                   focusedNodeId={id}
                   focusedNodeAlias={focusedNodeAlias}
                   editable={editable}
-                  currentView={currentView}
+                  viewType={viewType}
                 />
               </div>
-              {!currentView && (
-                <div className="currentViewLabel">Tree at creation</div>
+              {viewType === ViewType.OnCreation && (
+                <div className="viewTypeLabel">Tree at creation</div>
               )}
-              {currentView && (
-                <div className="currentViewLabel">Current tree</div>
+              {viewType === ViewType.Present && (
+                <div className="viewTypeLabel">Current tree</div>
               )}
             </>
           )}

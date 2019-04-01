@@ -59,8 +59,8 @@ class SelectDelegationAction extends React.Component<Props, State> {
     }
 
     const permissions = (delegation as sdk.IDelegationNode).permissions || [
-      1,
-      2,
+      sdk.Permission.ATTEST,
+      sdk.Permission.DELEGATE,
     ]
 
     const canDelegate =

@@ -2,18 +2,19 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps, withRouter } from 'react-router'
+import DelegationDetailView from '../../components/DelegationDetailView/DelegationDetailView'
+import { ViewType } from '../../components/DelegationNode/DelegationNode'
+import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
 
 import MyDelegationsInviteModal from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
 import MyDelegationsListView from '../../components/MyDelegationsListView/MyDelegationsListView'
 import { safeDelete } from '../../services/FeedbackService'
-import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Delegations from '../../state/ducks/Delegations'
+import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
-import { ICType } from '../../types/Ctype'
 import { Contact, MyIdentity } from '../../types/Contact'
-import DelegationDetailView from '../../components/DelegationDetailView/DelegationDetailView'
+import { ICType } from '../../types/Ctype'
 
 import './DelegationsView.scss'
 
@@ -82,7 +83,7 @@ class DelegationsView extends React.Component<Props, State> {
           <DelegationDetailView
             id={delegationId}
             editable={true}
-            currentView={true}
+            viewType={ViewType.Present}
           />
         )}
         {inviteDelegation && (
