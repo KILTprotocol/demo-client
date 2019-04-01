@@ -1,9 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
-
-import BlockchainService from '../../services/BlockchainService'
-import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Delegations from '../../state/ducks/Delegations'
+import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
 
@@ -15,6 +13,7 @@ type Props = {
   onInvite?: (delegationEntry: MyDelegation) => void
   onDelete?: (delegationEntry: MyDelegation) => void
   onRevokeAttestations?: () => void
+  onRevokeDelegation?: () => void
 }
 
 type State = {
@@ -33,6 +32,7 @@ class SelectDelegationAction extends React.Component<Props, State> {
     const actions: State['actions'] = [
       this.getInviteAction(),
       this.getDeleteAction(),
+      this.getRevokeDelegationAction(),
       this.getRevokeAttestationsAction(),
     ].filter((action: Action) => action)
     this.setState({ actions })
@@ -94,6 +94,18 @@ class SelectDelegationAction extends React.Component<Props, State> {
       return {
         callback: onRevokeAttestations,
         label: 'Revoke all Attestations',
+      }
+    }
+    return undefined
+  }
+
+  private getRevokeDelegationAction() {
+    const { onRevokeDelegation } = this.props
+
+    if (onRevokeDelegation) {
+      return {
+        callback: onRevokeDelegation,
+        label: 'Revoke delegation',
       }
     }
     return undefined
