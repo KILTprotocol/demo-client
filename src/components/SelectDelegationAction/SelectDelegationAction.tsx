@@ -4,7 +4,6 @@ import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
-import {IDelegationBaseNode} from "@kiltprotocol/prototype-sdk";
 
 type Props = {
   delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | MyDelegation
@@ -18,6 +17,13 @@ type Props = {
 }
 
 class SelectDelegationAction extends React.Component<Props> {
+  private static canDelegate(
+    delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | MyDelegation
+  ): boolean {
+    const permissions = (delegation as sdk.IDelegationNode | MyDelegation)
+      .permissions || [sdk.Permission.ATTEST, sdk.Permission.DELEGATE]
+    return !!permissions && permissions.indexOf(sdk.Permission.DELEGATE) !== -1
+  }
   constructor(props: Props) {
     super(props)
   }
@@ -48,15 +54,11 @@ class SelectDelegationAction extends React.Component<Props> {
       return undefined
     }
 
-    const permissions = (delegation as sdk.IDelegationNode).permissions || [
-      sdk.Permission.ATTEST,
-      sdk.Permission.DELEGATE,
-    ]
-
-    const canDelegate =
-      !!permissions && permissions.indexOf(sdk.Permission.DELEGATE) !== -1
-
-    if (!!onInvite && this.isMine() && canDelegate) {
+    if (
+      !!onInvite &&
+      this.isMine() &&
+      SelectDelegationAction.canDelegate(delegation)
+    ) {
       return {
         callback: onInvite.bind(delegation),
         label: 'Invite contact',
@@ -98,14 +100,10 @@ class SelectDelegationAction extends React.Component<Props> {
     if (!delegation || delegation.revoked) {
       return undefined
     }
-    const { permissions, type } = delegation as MyDelegation
-
-    const canDelegate =
-      !!permissions && permissions.indexOf(sdk.Permission.DELEGATE) !== -1
 
     if (
       this.isMine() &&
-      (type === Delegations.DelegationType.Root || canDelegate) &&
+      SelectDelegationAction.canDelegate(delegation) &&
       onRevokeDelegation
     ) {
       return {
@@ -116,7 +114,7 @@ class SelectDelegationAction extends React.Component<Props> {
     return undefined
   }
 
-  private isMine() : boolean {
+  private isMine(): boolean {
     const { delegation } = this.props
     if (!delegation) {
       return false

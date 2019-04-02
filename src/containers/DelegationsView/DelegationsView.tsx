@@ -103,13 +103,13 @@ class DelegationsView extends React.Component<Props, State> {
 
   public render() {
     const { isPCR } = this.props
-      const { delegationId } = this.props.match.params
-      const {
-          delegationEntries,
-          currentDelegation,
-          inviteDelegation,
-          redirect,
-      } = this.state
+    const { delegationId } = this.props.match.params
+    const {
+      delegationEntries,
+      currentDelegation,
+      inviteDelegation,
+      redirect,
+    } = this.state
 
     if (redirect) {
       return <Redirect to={redirect} />
