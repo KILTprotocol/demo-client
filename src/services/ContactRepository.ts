@@ -54,13 +54,9 @@ class ContactRepository {
         PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
         return contact
       })
-      .catch(error => {
-        ErrorService.log({
-          error,
-          message: `Could not resolve contact with address '${address}'`,
-          origin: 'ContactRepository.findByAddress()',
-          type: 'ERROR.FETCH.GET',
-        })
+      .catch(() => {
+        // since we dont register identities automatically in services anymore
+        // this is not an actual error case anymore
       })
   }
 
