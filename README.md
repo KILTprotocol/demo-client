@@ -20,6 +20,8 @@ Then install
 yarn install
 ```
 
+The client also needs the sdk linked to it. See [KILT sdk](https://github.com/KILTprotocol/prototype-sdk) for details.
+
 ## Build and Run
 
 This project is using semantic UI. Source code in /semantic will be build by `yarn start` and places within /src/dist.
