@@ -73,9 +73,21 @@ class ContactList extends React.Component<Props, State> {
       showAllContacts,
     } = this.state
 
+    const _contacts = showAllContacts ? allContacts : myContacts
+    const noContactsMessage = showAllContacts ? (
+      <div className="noContactsMessage">No contacts found.</div>
+    ) : (
+      <div className="noContactsMessage">
+        No bookmarked contacts found.{' '}
+        <button className="allContacts" onClick={this.toggleContacts}>
+          Fetch all contacts
+        </button>
+      </div>
+    )
+
     return (
       <section className="ContactList">
-        <h1>Contacts</h1>
+        <h1>{showAllContacts ? 'All contacts': 'My contacts'}</h1>
         <div className="contactActions">
           {showAllContacts && (
             <button className="refresh" onClick={this.fetchAllContacts} />
@@ -94,12 +106,13 @@ class ContactList extends React.Component<Props, State> {
             </tr>
           </thead>
           <tbody>
-            {!showAllContacts &&
-              myContacts.map((contact: Contact) => this.getContactRow(contact))}
-            {showAllContacts &&
-              allContacts.map((contact: Contact) =>
-                this.getContactRow(contact)
-              )}
+            {!_contacts.length && (
+              <tr>
+                <td colSpan={3}>{noContactsMessage}</td>
+              </tr>
+            )}
+            {!!_contacts.length &&
+              _contacts.map((contact: Contact) => this.getContactRow(contact))}
           </tbody>
         </table>
 

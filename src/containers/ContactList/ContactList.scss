@@ -56,5 +56,15 @@
   & .refresh {
     @include button-icon-only($icon-refresh);
   }
+
+  & .noContactsMessage {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    & button {
+      @include button-secondary;
+    }
+  }
 }
   
