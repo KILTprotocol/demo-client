@@ -148,11 +148,7 @@ class MessageRepository {
       })
   }
 
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/messaging`
-
-  private static singleSend(
+  public static singleSend(
     messageBody: sdk.MessageBody,
     sender: MyIdentity,
     receiver: Contact
@@ -201,6 +197,11 @@ class MessageRepository {
       })
     }
   }
+
+  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/messaging`
+
 }
 
 export default MessageRepository
