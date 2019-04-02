@@ -73,6 +73,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
     this.changeContacts = this.changeContacts.bind(this)
     this.setSelectContactsOpen = this.setSelectContactsOpen.bind(this)
 
+    this.filterDelegations = this.filterDelegations.bind(this)
     this.changeDelegations = this.changeDelegations.bind(this)
     this.setSelectDelegationsOpen = this.setSelectDelegationsOpen.bind(this)
   }
@@ -179,6 +180,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
             isMulti={true}
             closeMenuOnSelect={true}
             placeholder={isPCR ? `Select PCRs…` : undefined}
+            filter={this.filterDelegations}
             onChange={this.changeDelegations}
             onMenuOpen={this.setSelectDelegationsOpen.bind(this, true)}
             onMenuClose={this.setSelectDelegationsOpen.bind(this, false, 500)}
@@ -198,6 +200,21 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
           </button>
         </footer>
       </Modal>
+    )
+  }
+
+  private filterDelegations(delegation: MyDelegation): boolean {
+    const { isPCR } = this.props
+
+    // check PCR
+    if (isPCR != null && !delegation.isPCR !== !isPCR) {
+      return false
+    }
+
+    // check permissions
+    return !(
+      delegation.permissions &&
+      delegation.permissions.indexOf(sdk.Permission.DELEGATE) === -1
     )
   }
 

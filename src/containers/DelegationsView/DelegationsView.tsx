@@ -3,10 +3,8 @@ import isEqual from 'lodash/isEqual'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps, withRouter } from 'react-router'
-import DelegationDetailView from '../../components/DelegationDetailView/DelegationDetailView'
-import { ViewType } from '../../components/DelegationNode/DelegationNode'
-import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
 
+import { ViewType } from '../../components/DelegationNode/DelegationNode'
 import DelegationDetailView from '../../components/DelegationDetailView/DelegationDetailView'
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
 import MyDelegationsInviteModal from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
@@ -68,7 +66,7 @@ class DelegationsView extends React.Component<Props, State> {
       if (delegationId) {
         const delegation = this.loadDelegationForId(delegationId)
         if (delegation) {
-          if (delegation.isPCR !== isPCR) {
+          if (!delegation.isPCR !== !isPCR) {
             const redirect = url.replace(
               /^\/.*\//,
               delegation.isPCR ? '/pcrs/' : '/delegations/'

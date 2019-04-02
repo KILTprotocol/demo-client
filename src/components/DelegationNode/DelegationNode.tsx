@@ -153,7 +153,7 @@ class DelegationNode extends React.Component<Props, State> {
           <div className="content">
             <ContactPresentation address={delegation.account} />
             {!!permissions && <Permissions permissions={permissions} />}
-            {editable && (
+            {editable && myDelegation && (
               <SelectDelegationAction
                 className={`minimal ${focusedNode ? 'inverted' : ''}`}
                 delegation={node.delegation}
@@ -185,6 +185,7 @@ class DelegationNode extends React.Component<Props, State> {
         {editable && viewType === ViewType.Present && delegationForInvite && (
           <MyDelegationsInviteModal
             delegationsSelected={[delegationForInvite]}
+            isPCR={!!delegationForInvite.isPCR}
             onCancel={this.cancelInvite}
             onConfirm={this.confirmInvite}
           />
