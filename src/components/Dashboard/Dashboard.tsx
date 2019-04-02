@@ -23,7 +23,10 @@ class Dashboard extends React.Component<Props, State> {
       <section className="Dashboard">
         <h1>
           <div>My Dashboard</div>
-          <ContactPresentation myIdentity={selectedIdentity} inline={true} />
+          <ContactPresentation
+            address={selectedIdentity.identity.address}
+            inline={true}
+          />
         </h1>
         <IdentityView myIdentity={selectedIdentity} selected={true} />
         <div className="actions">

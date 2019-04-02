@@ -38,7 +38,12 @@ class IdentitySelector extends React.Component<Props, State> {
 
     const identityOptions: SelectIdentityOption[] = myIdentities.map(
       (myIdentity: MyIdentity) => ({
-        label: <ContactPresentation myIdentity={myIdentity} size={20} />,
+        label: (
+          <ContactPresentation
+            address={myIdentity.identity.address}
+            size={20}
+          />
+        ),
         value: myIdentity.identity.address,
       })
     )

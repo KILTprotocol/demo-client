@@ -61,7 +61,7 @@ class IdentityView extends React.Component<Props, State> {
     return (
       <section className={classes.join(' ')}>
         {selected && <h2>Active identity</h2>}
-        <ContactPresentation contact={contact} size={50} />
+        <ContactPresentation address={myIdentity.identity.address} size={50} />
         <div className="attributes">
           <div>
             <label>Alias</label>
@@ -144,6 +144,7 @@ class IdentityView extends React.Component<Props, State> {
             />
           )}
           {!contact && <button onClick={this.registerContact}>Register</button>}
+          <span />
         </div>
       </section>
     )

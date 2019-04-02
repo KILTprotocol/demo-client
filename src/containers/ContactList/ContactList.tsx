@@ -87,7 +87,7 @@ class ContactList extends React.Component<Props, State> {
 
     return (
       <section className="ContactList">
-        <h1>{showAllContacts ? 'All contacts': 'My contacts'}</h1>
+        <h1>{showAllContacts ? 'All contacts' : 'My contacts'}</h1>
         <div className="contactActions">
           {showAllContacts && (
             <button className="refresh" onClick={this.fetchAllContacts} />
