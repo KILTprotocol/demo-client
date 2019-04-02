@@ -104,7 +104,7 @@ class FeedbackService {
 
   public static addBlockUi({ headline, message }: Partial<BlockUi>): BlockUi {
     const created = Date.now()
-    const id = created + (message || '')
+    const id = uuid()
     const blockUi: Partial<BlockUi> = { created, id, headline, message }
 
     blockUi.remove = () => {
