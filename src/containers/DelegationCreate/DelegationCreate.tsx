@@ -23,6 +23,8 @@ import './DelegationCreate.scss'
 type Props = RouteComponentProps<{
   cTypeHash: sdk.ICType['hash']
 }> & {
+  isPCR: boolean
+
   selectedIdentity?: Wallet.Entry
 }
 
@@ -63,10 +65,11 @@ class DelegationCreate extends React.Component<Props, State> {
   }
 
   public render() {
+    const { isPCR } = this.props
     const { cType, alias, delegation } = this.state
     return (
       <section className="DelegationCreate">
-        <h1>New Root Delegation</h1>
+        <h1>{isPCR ? `New Root PCR` : `New Root Delegation`}</h1>
         {delegation ? (
           <React.Fragment>
             <div className="Delegation-base">
@@ -92,7 +95,7 @@ class DelegationCreate extends React.Component<Props, State> {
               </div>
             </div>
             <div className="actions">
-              <Link to="/delegations">Cancel</Link>
+              <Link to={`/${isPCR ? 'pcrs' : 'delegations'}`}>Cancel</Link>
               <button
                 className="submit-delegation"
                 disabled={alias.length === 0}
@@ -116,15 +119,16 @@ class DelegationCreate extends React.Component<Props, State> {
   }
 
   private submit(): void {
+    const { history, isPCR } = this.props
     const { delegation, alias } = this.state
-    const { history } = this.props
+
     if (delegation) {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Creating Root-Delegation',
       })
 
       delegationService
-        .storeRoot(delegation, alias)
+        .storeRoot(delegation, alias, isPCR)
         .then(() => {
           blockUi.remove()
           notifySuccess('Delegation successfully created')

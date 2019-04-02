@@ -23,6 +23,7 @@ interface State {
   contacts: Contact[]
   cTypes: ICType[]
   contactForDelegationInvite?: Contact
+  isPCR?: boolean
 }
 
 class ContactList extends React.Component<Props, State> {
@@ -31,13 +32,16 @@ class ContactList extends React.Component<Props, State> {
 
   private inviteToDelegation = {
     cancel: () => {
-      this.setState({ contactForDelegationInvite: undefined })
+      this.setState({ contactForDelegationInvite: undefined, isPCR: undefined })
     },
     confirm: () => {
-      this.setState({ contactForDelegationInvite: undefined })
+      this.setState({ contactForDelegationInvite: undefined, isPCR: undefined })
     },
-    request: (contact: Contact) => {
-      this.setState({ contactForDelegationInvite: contact })
+    request: (contactForDelegationInvite: Contact, isPCR: boolean) => {
+      this.setState({
+        contactForDelegationInvite,
+        isPCR,
+      })
     },
   }
 
@@ -85,7 +89,7 @@ class ContactList extends React.Component<Props, State> {
   }
 
   public render() {
-    const { contacts, contactForDelegationInvite } = this.state
+    const { contacts, contactForDelegationInvite, isPCR } = this.state
     return (
       <section className="ContactList">
         <h1>Contacts</h1>
@@ -122,9 +126,18 @@ class ContactList extends React.Component<Props, State> {
                         {
                           callback: this.inviteToDelegation.request.bind(
                             this,
-                            contact
+                            contact,
+                            false
                           ),
                           label: 'Invite to Delegation',
+                        },
+                        {
+                          callback: this.inviteToDelegation.request.bind(
+                            this,
+                            contact,
+                            true
+                          ),
+                          label: 'Invite to PCR',
                         },
                       ]}
                     />
@@ -145,6 +158,7 @@ class ContactList extends React.Component<Props, State> {
         />
         {contactForDelegationInvite && (
           <MyDelegationsInviteModal
+            isPCR={isPCR}
             contactsSelected={[contactForDelegationInvite]}
             onCancel={this.inviteToDelegation.cancel}
             onConfirm={this.inviteToDelegation.confirm}

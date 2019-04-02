@@ -22,6 +22,7 @@ type Props = {
   name?: string
   placeholder?: string
   type?: DelegationType
+  filter?: (delegation: MyDelegation) => boolean
 
   onChange?: (selectedDelegations: MyDelegation[]) => void
   onMenuOpen?: () => void
@@ -55,6 +56,7 @@ class SelectDelegations extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
+    const { filter } = this.props
     const { delegations } = this.state
 
     if (!delegations.length) {
@@ -76,6 +78,12 @@ class SelectDelegations extends React.Component<Props, State> {
           _delegations = Delegations.getAllDelegations(
             PersistentStore.store.getState()
           )
+      }
+
+      if (filter) {
+        _delegations = _delegations.filter((delegation: MyDelegation) =>
+          filter(delegation)
+        )
       }
 
       this.setState({

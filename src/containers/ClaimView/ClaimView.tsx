@@ -58,9 +58,9 @@ class ClaimView extends React.Component<Props, State> {
     }
   }
 
-  public componentDidUpdate(nextProps: Props) {
+  public componentDidUpdate(prevProps: Props) {
     if (
-      nextProps.selectedIdentity.identity.address !==
+      prevProps.selectedIdentity.identity.address !==
       this.props.selectedIdentity.identity.address
     ) {
       this.setState({

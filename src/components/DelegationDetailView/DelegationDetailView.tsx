@@ -20,9 +20,10 @@ import './DelegationDetailView.scss'
 type Props = {
   id: sdk.IDelegationBaseNode['id']
 
-  viewType?: ViewType
   editable?: boolean
   focusedNodeAlias?: MyDelegation['metaData']['alias']
+  isPCR?: boolean
+  viewType?: ViewType
 
   // mapStateToProps
   selectedIdentity: MyIdentity
@@ -69,6 +70,7 @@ class DelegationDetailView extends React.Component<Props, State> {
       viewType,
       editable,
       id,
+      isPCR,
       focusedNodeAlias,
       selectedIdentity,
     } = this.props
@@ -76,7 +78,7 @@ class DelegationDetailView extends React.Component<Props, State> {
 
     return (
       <section className="DelegationDetailView">
-        <h1>Delegation tree</h1>
+        <h1>{isPCR ? 'PCR view' : 'Delegation tree'}</h1>
         <div className="delegationNodeContainer">
           {delegationsTreeNode && (
             <>

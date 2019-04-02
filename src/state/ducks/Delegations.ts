@@ -23,6 +23,7 @@ export interface MyDelegation {
   permissions?: sdk.IDelegationNode['permissions']
   parentId?: sdk.IDelegationNode['parentId']
   cTypeHash?: sdk.IDelegationRootNode['cTypeHash']
+  isPCR?: boolean
 }
 
 interface SaveAction extends KiltAction {
@@ -124,7 +125,7 @@ class Store {
   }
 }
 
-const _getAllDelegations = (state: ReduxState) =>
+const _getAllDelegations = (state: ReduxState): MyDelegation[] =>
   state.delegations.get('delegations').toArray()
 
 const getAllDelegations = createSelector(
