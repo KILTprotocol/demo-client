@@ -14,14 +14,16 @@ class DelegationsService {
     return DelegationsService.storeRootOnChain(delegationRoot).then(() => {
       const { account, cTypeHash, id } = delegationRoot
 
-      DelegationsService.store({
+      const myDelegation: MyDelegation = {
         account,
         cTypeHash,
         id,
         isPCR,
         metaData: { alias },
+        revoked: false,
         type: Delegations.DelegationType.Root,
-      } as MyDelegation)
+      }
+      DelegationsService.store(myDelegation)
     })
   }
 
@@ -110,6 +112,7 @@ class DelegationsService {
             metaData: { alias },
             parentId: delegation.parentId,
             permissions: delegation.permissions,
+            revoked: false,
             rootId: delegation.rootId,
             type: Delegations.DelegationType.Node,
           }
@@ -122,6 +125,21 @@ class DelegationsService {
         reject(error)
       }
     })
+  }
+
+  public static async revoke(
+    node: sdk.IDelegationBaseNode,
+    identity: sdk.Identity
+  ) {
+    const blockchain = await BlockchainService.connect()
+    try {
+      await node.revoke(blockchain, identity)
+      PersistentStore.store.dispatch(
+        Delegations.Store.revokeDelegationAction(node.id)
+      )
+    } catch (error) {
+      throw error
+    }
   }
 
   private static async storeRootOnChain(delegation: sdk.DelegationRootNode) {

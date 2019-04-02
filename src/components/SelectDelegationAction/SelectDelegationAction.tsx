@@ -4,6 +4,7 @@ import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
+import {IDelegationBaseNode} from "@kiltprotocol/prototype-sdk";
 
 type Props = {
   delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | MyDelegation
@@ -16,31 +17,20 @@ type Props = {
   onRevokeDelegation?: () => void
 }
 
-type State = {
-  actions: Array<Action | undefined>
-}
-
-class SelectDelegationAction extends React.Component<Props, State> {
+class SelectDelegationAction extends React.Component<Props> {
   constructor(props: Props) {
     super(props)
-    this.state = {
-      actions: [],
-    }
   }
 
-  public componentDidMount() {
-    const actions: State['actions'] = [
+  public render() {
+    const { className } = this.props
+
+    const actions: Array<Action | undefined> = [
       this.getInviteAction(),
       this.getDeleteAction(),
       this.getRevokeDelegationAction(),
       this.getRevokeAttestationsAction(),
     ].filter((action: Action) => action)
-    this.setState({ actions })
-  }
-
-  public render() {
-    const { className } = this.props
-    const { actions } = this.state
 
     return (
       <section className="SelectDelegationAction">
@@ -54,7 +44,7 @@ class SelectDelegationAction extends React.Component<Props, State> {
   private getInviteAction(): Action | undefined {
     const { delegation, onInvite } = this.props
 
-    if (!delegation) {
+    if (!delegation || delegation.revoked) {
       return undefined
     }
 
@@ -88,7 +78,11 @@ class SelectDelegationAction extends React.Component<Props, State> {
   }
 
   private getRevokeAttestationsAction() {
-    const { onRevokeAttestations } = this.props
+    const { delegation, onRevokeAttestations } = this.props
+
+    if (!delegation || delegation.revoked) {
+      return undefined
+    }
 
     if (onRevokeAttestations) {
       return {
@@ -100,9 +94,20 @@ class SelectDelegationAction extends React.Component<Props, State> {
   }
 
   private getRevokeDelegationAction() {
-    const { onRevokeDelegation } = this.props
+    const { delegation, onRevokeDelegation } = this.props
+    if (!delegation || delegation.revoked) {
+      return undefined
+    }
+    const { permissions, type } = delegation as MyDelegation
 
-    if (onRevokeDelegation) {
+    const canDelegate =
+      !!permissions && permissions.indexOf(sdk.Permission.DELEGATE) !== -1
+
+    if (
+      this.isMine() &&
+      (type === Delegations.DelegationType.Root || canDelegate) &&
+      onRevokeDelegation
+    ) {
       return {
         callback: onRevokeDelegation,
         label: 'Revoke delegation',
@@ -111,10 +116,10 @@ class SelectDelegationAction extends React.Component<Props, State> {
     return undefined
   }
 
-  private isMine() {
+  private isMine() : boolean {
     const { delegation } = this.props
     if (!delegation) {
-      return undefined
+      return false
     }
     return !!Delegations.getDelegation(
       PersistentStore.store.getState(),

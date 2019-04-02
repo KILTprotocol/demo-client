@@ -17,6 +17,7 @@ import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
 import Permissions from '../Permissions/Permissions'
 import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
+import DelegationsService from '../../services/DelegationsService'
 import ShortHash from '../ShortHash/ShortHash'
 import Spinner from '../Spinner/Spinner'
 
@@ -344,13 +345,14 @@ class DelegationNode extends React.Component<Props, State> {
         const blockUi = FeedbackService.addBlockUi({
           headline: 'Revoking delegation',
         })
-        node.delegation
-          .revoke(blockchain, selectedIdentity.identity)
+
+        DelegationsService.revoke(node.delegation, selectedIdentity.identity)
           .then(() => {
             node.delegation.revoked = true
             this.setState({
               node,
             })
+
             blockUi.remove()
             notifySuccess(<span>Delegation successfully revoked</span>, true)
           })
