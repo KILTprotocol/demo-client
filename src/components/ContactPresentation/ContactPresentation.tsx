@@ -51,6 +51,7 @@ class ContactPresentation extends React.Component<Props, State> {
   public componentDidUpdate(prevProps: Props) {
     if (!_.isEqual(this.props, prevProps)) {
       this.setContact()
+      this.setMyIdentity()
     }
   }
 
@@ -58,13 +59,14 @@ class ContactPresentation extends React.Component<Props, State> {
     const { address, inline, interactive, iconOnly, size } = this.props
     const { contact, myIdentity } = this.state
 
-    const name = myIdentity
-      ? myIdentity.metaData.name
-      : contact && contact.metaData
-      ? contact.metaData.name
-      : address
-      ? address.substr(0, 20)
-      : '-'
+    const name =
+      contact && contact.metaData
+        ? contact.metaData.name
+        : myIdentity
+        ? myIdentity.metaData.name
+        : address
+        ? address.substr(0, 20)
+        : '-'
 
     let actions: Action[] = []
 

@@ -2,7 +2,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import ContactRepository from '../../services/ContactRepository'
-import contactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import * as Contacts from '../../state/ducks/Contacts'
@@ -135,13 +134,18 @@ class IdentityView extends React.Component<Props, State> {
               )}
             </>
           )}
-          {contact && (
-            <button
-              className={`toggleContacts ${
-                contact.metaData.addedAt ? 'isMyContact' : 'isNotMyContact'
-              }`}
-              onClick={this.toggleContacts}
-            />
+
+          <button
+            className={`toggleContacts ${
+              contact && contact.metaData.addedAt
+                ? 'isMyContact'
+                : 'isNotMyContact'
+            }`}
+            onClick={this.toggleContacts}
+          />
+
+          {(!contact || (contact && contact.metaData.unregistered)) && (
+            <button onClick={this.registerContact}>Register</button>
           )}
           {!contact && <button onClick={this.registerContact}>Register</button>}
           <span />
@@ -161,7 +165,7 @@ class IdentityView extends React.Component<Props, State> {
       publicIdentity: { address, boxPublicKeyAsHex },
     }
 
-    contactRepository.add(contact).then(
+    ContactRepository.add(contact).then(
       () => {
         notifySuccess(`Identity '${name}' successfully registered.`)
       },
@@ -179,13 +183,13 @@ class IdentityView extends React.Component<Props, State> {
   private toggleContacts() {
     const { contacts, myIdentity } = this.props
 
-    const contact = contacts.find(
+    let contact = contacts.find(
       (myContact: Contact) =>
         myContact.publicIdentity.address === myIdentity.identity.address
     )
 
     if (!contact) {
-      return
+      contact = ContactRepository.getContactFromIdentity(myIdentity)
     }
 
     const { metaData, publicIdentity } = contact

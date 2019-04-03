@@ -6,7 +6,7 @@ import ContactPresentation from '../../components/ContactPresentation/ContactPre
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
 import MyDelegationsInviteModal from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
 import SelectAction from '../../components/SelectAction/SelectAction'
-import contactRepository from '../../services/ContactRepository'
+import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Contacts from '../../state/ducks/Contacts'
@@ -194,8 +194,7 @@ class ContactList extends React.Component<Props, State> {
   }
 
   private fetchAllContacts() {
-    contactRepository
-      .findAll()
+    ContactRepository.findAll()
       .then((allContacts: Contact[]) => {
         this.setState({ allContacts })
       })

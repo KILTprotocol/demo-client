@@ -3,7 +3,7 @@ import React from 'react'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import Spinner from '../../../components/Spinner/Spinner'
 
-import contactRepository from '../../../services/ContactRepository'
+import ContactRepository from '../../../services/ContactRepository'
 import CTypeRepository from '../../../services/CtypeRepository'
 import { CType, ICType } from '../../../types/Ctype'
 
@@ -31,7 +31,7 @@ class VerifyClaim extends React.Component<Props, State> {
 
   public componentDidMount() {
     const { attestedClaims } = this.props
-    contactRepository.findAll().then(() => {
+    ContactRepository.findAll().then(() => {
       this.setState({
         attestersResolved: true,
       })

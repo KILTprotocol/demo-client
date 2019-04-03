@@ -2,7 +2,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 
 import attestationService from '../../services/AttestationService'
-import contactRepository from '../../services/ContactRepository'
+import ContactRepository from '../../services/ContactRepository'
 import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
@@ -83,7 +83,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    contactRepository.findAll().then(() => {
+    ContactRepository.findAll().then(() => {
       this.setState({
         canResolveAttesters: true,
       })

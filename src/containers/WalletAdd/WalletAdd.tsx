@@ -7,9 +7,12 @@ import { Link, withRouter } from 'react-router-dom'
 
 import Input from '../../components/Input/Input'
 import BlockchainService from '../../services/BlockchainService'
+import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import { notify, notifySuccess } from '../../services/FeedbackService'
+import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
+import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 
 import './WalletAdd.scss'
@@ -159,6 +162,11 @@ class WalletAdd extends React.Component<Props, State> {
           phrase,
         }
         this.props.saveIdentity(newIdentity)
+        PersistentStore.store.dispatch(
+          Contacts.Store.addContact(
+            ContactRepository.getContactFromIdentity(newIdentity)
+          )
+        )
         notifySuccess(`New identity '${alias}' successfully created`)
       })
       .catch(error => {

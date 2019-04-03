@@ -8,6 +8,7 @@ export interface Contact {
     name: string
     addedAt?: number // timestamp
     addedBy?: MyIdentity['identity']['address']
+    unregistered?: boolean
   }
   publicIdentity: sdk.PublicIdentity
 }

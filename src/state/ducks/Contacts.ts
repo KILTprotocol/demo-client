@@ -6,15 +6,19 @@ import { Contact, MyIdentity } from '../../types/Contact'
 import PersistentStore, { State as ReduxState } from '../PersistentStore'
 import * as Wallet from '../../state/ducks/Wallet'
 
-interface AddAction extends KiltAction {
+interface AddContactAction extends KiltAction {
   payload: Contact
 }
 
-interface RemoveMyAction extends KiltAction {
+interface AddContactsAction extends KiltAction {
+  payload: Contact[]
+}
+
+interface RemoveContactAction extends KiltAction {
   payload: Contact['publicIdentity']['address']
 }
 
-type Action = AddAction | RemoveMyAction
+type Action = AddContactAction | AddContactsAction | RemoveContactAction
 
 type State = {
   contacts: Immutable.Map<Contact['publicIdentity']['address'], Contact>
@@ -41,23 +45,17 @@ class Store {
   }
 
   public static deserialize(serializedState: SerializedState): ImmutableState {
-    let contactsArray: Contact[]
-    const contacts: { [address: string]: Contact } = {}
+    let contacts: Contact[]
 
     try {
-      contactsArray = serializedState.contacts.map((serialized: string) => {
+      contacts = serializedState.contacts.map((serialized: string) => {
         return JSON.parse(serialized) as Contact
       })
     } catch (e) {
-      contactsArray = []
+      contacts = []
     }
 
-    contactsArray.forEach((contact: Contact) => {
-      const { address } = contact.publicIdentity
-      contacts[address] = contact
-    })
-
-    return Store.createState({ contacts: Immutable.Map(contacts) })
+    return Store.createState({ contacts: arrayToMap(contacts) })
   }
 
   public static reducer(
@@ -66,12 +64,17 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.ADD_CONTACT: {
-        const contact = (action as AddAction).payload
+        const contact = (action as AddContactAction).payload
         const { publicIdentity } = contact
         return state.setIn(['contacts', publicIdentity.address], contact)
       }
-      case Store.ACTIONS.REMOVE_MY_CONTACT: {
-        const address = (action as RemoveMyAction).payload
+      case Store.ACTIONS.ADD_CONTACTS: {
+        const contacts = arrayToMap((action as AddContactsAction).payload)
+        const currentContacts = state.getIn(['contacts'])
+        return state.setIn(['contacts'], currentContacts.merge(contacts))
+      }
+      case Store.ACTIONS.REMOVE_CONTACT: {
+        const address = (action as RemoveContactAction).payload
 
         const contact = state.getIn(['contacts', address])
         const { metaData, publicIdentity } = contact
@@ -89,19 +92,26 @@ class Store {
     }
   }
 
-  public static addContact(contact: Contact): AddAction {
+  public static addContact(contact: Contact): AddContactAction {
     return {
       payload: contact,
       type: Store.ACTIONS.ADD_CONTACT,
     }
   }
 
+  public static addContacts(contacts: Contact[]): AddContactsAction {
+    return {
+      payload: contacts,
+      type: Store.ACTIONS.ADD_CONTACTS,
+    }
+  }
+
   public static removeMyContact(
     address: MyIdentity['identity']['address']
-  ): RemoveMyAction {
+  ): RemoveContactAction {
     return {
       payload: address,
-      type: Store.ACTIONS.REMOVE_MY_CONTACT,
+      type: Store.ACTIONS.REMOVE_CONTACT,
     }
   }
 
@@ -113,8 +123,20 @@ class Store {
 
   private static ACTIONS = {
     ADD_CONTACT: 'contacts/ADD_CONTACT',
-    REMOVE_MY_CONTACT: 'contacts/REMOVE_MY_CONTACT',
+    ADD_CONTACTS: 'contacts/ADD_CONTACTS',
+    REMOVE_CONTACT: 'contacts/REMOVE_CONTACT',
   }
+}
+
+const arrayToMap = (
+  contactsArray: Contact[]
+): Immutable.Map<Contact['publicIdentity']['address'], Contact> => {
+  const contacts: { [address: string]: Contact } = {}
+  contactsArray.forEach((contact: Contact) => {
+    const { address } = contact.publicIdentity
+    contacts[address] = contact
+  })
+  return Immutable.Map(contacts)
 }
 
 const _getContacts = (state: ReduxState) => {

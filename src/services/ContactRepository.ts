@@ -1,6 +1,6 @@
 import * as Contacts from '../state/ducks/Contacts'
 import PersistentStore from '../state/PersistentStore'
-import { Contact } from '../types/Contact'
+import { Contact, MyIdentity } from '../types/Contact'
 import { BasePostParams } from './BaseRepository'
 import ErrorService from './ErrorService'
 
@@ -8,11 +8,7 @@ import ErrorService from './ErrorService'
 // (for other tests)
 
 class ContactRepository {
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/contacts`
-
-  public async findAll(): Promise<Contact[]> {
+  public static async findAll(): Promise<Contact[]> {
     return fetch(`${ContactRepository.URL}`)
       .then(response => {
         if (!response.ok) {
@@ -21,6 +17,10 @@ class ContactRepository {
         return response
       })
       .then(response => response.json())
+      .then((contacts: Contact[]) => {
+        PersistentStore.store.dispatch(Contacts.Store.addContacts(contacts))
+        return Contacts.getContacts(PersistentStore.store.getState())
+      })
       .catch(error => {
         ErrorService.log({
           error,
@@ -32,7 +32,7 @@ class ContactRepository {
       })
   }
 
-  public findByAddress(address: string): Promise<void | Contact> {
+  public static findByAddress(address: string): Promise<void | Contact> {
     const persistedContact = Contacts.getContact(
       PersistentStore.store.getState(),
       address
@@ -60,7 +60,7 @@ class ContactRepository {
       })
   }
 
-  public async add(contact: Contact): Promise<Response> {
+  public static async add(contact: Contact): Promise<void> {
     return fetch(`${ContactRepository.URL}`, {
       ...BasePostParams,
       body: JSON.stringify(contact),
@@ -71,6 +71,9 @@ class ContactRepository {
         }
         return response
       })
+      .then(() => {
+        PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
+      })
       .catch(error => {
         ErrorService.log({
           error,
@@ -78,9 +81,23 @@ class ContactRepository {
           origin: 'ContactRepository.add()',
           type: 'ERROR.FETCH.POST',
         })
-        return error
       })
   }
+
+  public static getContactFromIdentity(myIdentity: MyIdentity) {
+    const { identity, metaData } = myIdentity
+    const { address, boxPublicKeyAsHex } = identity
+    const { name } = metaData
+
+    return {
+      metaData: { name, unregistered: true },
+      publicIdentity: { address, boxPublicKeyAsHex },
+    } as Contact
+  }
+
+  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/contacts`
 }
 
-export default new ContactRepository()
+export default ContactRepository
