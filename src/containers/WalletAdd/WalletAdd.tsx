@@ -152,7 +152,7 @@ class WalletAdd extends React.Component<Props, State> {
     }
 
     const blockchain: Blockchain = await BlockchainService.connect()
-    const alice = Identity.buildFromSeedString('Alice')
+    const alice = Identity.buildFromURI('//Alice')
     blockUi.updateMessage('transfer initial tokens (2/3)')
     blockchain
       .makeTransfer(alice, identity.address, 1000)
