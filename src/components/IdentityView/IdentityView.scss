@@ -27,4 +27,16 @@
   & .ContactPresentation {
     @include detailPresentation;
   }
+
+  & .didDelete {
+    @include button-icon-only-inline($icon-trash-o);
+  }
+
+  & .didCreate {
+    @include button-icon-only-inline($icon-plus);
+  }
+
+  & .did {
+    margin-right: 10px;
+  }
 }
