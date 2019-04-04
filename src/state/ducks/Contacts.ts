@@ -71,7 +71,7 @@ class Store {
       case Store.ACTIONS.ADD_CONTACTS: {
         const contacts = arrayToMap((action as AddContactsAction).payload)
         const currentContacts = state.getIn(['contacts'])
-        return state.setIn(['contacts'], currentContacts.merge(contacts))
+        return state.setIn(['contacts'], currentContacts.mergeDeep(contacts))
       }
       case Store.ACTIONS.REMOVE_CONTACT: {
         const address = (action as RemoveContactAction).payload

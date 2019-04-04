@@ -147,7 +147,6 @@ class IdentityView extends React.Component<Props, State> {
           {(!contact || (contact && contact.metaData.unregistered)) && (
             <button onClick={this.registerContact}>Register</button>
           )}
-          {!contact && <button onClick={this.registerContact}>Register</button>}
           <span />
         </div>
       </section>
