@@ -52,7 +52,6 @@ type Props = {
 
 type State = {
   attestationStatus: AttestationStatus
-  canResolveAttesters: boolean
   labels: { [key: string]: string }
 
   closeOpenedChild?: () => void
@@ -70,7 +69,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
     this.state = {
       attestationStatus: {},
-      canResolveAttesters: false,
       labels: LABELS[context],
     }
 
@@ -80,14 +78,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     setTimeout(() => {
       this.verifyAttestations()
     }, 500)
-  }
-
-  public componentDidMount() {
-    ContactRepository.findAll().then(() => {
-      this.setState({
-        canResolveAttesters: true,
-      })
-    })
   }
 
   public render() {

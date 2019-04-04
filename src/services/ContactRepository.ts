@@ -89,10 +89,12 @@ class ContactRepository {
     const { address, boxPublicKeyAsHex } = identity
     const { name } = metaData
 
-    return {
+    const contact: Contact = {
       metaData: { name, unregistered: true },
       publicIdentity: { address, boxPublicKeyAsHex },
-    } as Contact
+    }
+
+    return contact
   }
 
   private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${

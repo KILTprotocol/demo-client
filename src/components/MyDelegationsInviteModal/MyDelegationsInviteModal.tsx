@@ -7,7 +7,10 @@ import MessageRepository from '../../services/MessageRepository'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
-import { State as ReduxState } from '../../state/PersistentStore'
+import * as Contacts from '../../state/ducks/Contacts'
+import PersistentStore, {
+  State as ReduxState,
+} from '../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../types/Contact'
 import Modal, { ModalType } from '../Modal/Modal'
 import SelectContacts from '../SelectContacts/SelectContacts'
@@ -81,17 +84,15 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
   public componentDidMount() {
     const {
       contactsPool,
-      contactsSelected,
       delegationsPool,
       delegationsSelected,
       myDelegations,
     }: Props = this.props
     const { contacts, delegations }: State = this.state
 
-    if (!contactsPool && !contactsSelected) {
-      ContactRepository.findAll().then((pool: Contact[]) => {
-        this.setState({ contacts: { ...contacts, pool } })
-      })
+    if (!contactsPool) {
+      const pool = Contacts.getMyContacts(PersistentStore.store.getState())
+      this.setState({ contacts: { ...contacts, pool } })
     }
 
     if (!delegationsPool && !delegationsSelected) {
