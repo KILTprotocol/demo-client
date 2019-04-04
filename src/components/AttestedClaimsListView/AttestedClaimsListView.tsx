@@ -2,7 +2,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 
 import attestationService from '../../services/AttestationService'
-import contactRepository from '../../services/ContactRepository'
+import ContactRepository from '../../services/ContactRepository'
 import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
@@ -52,7 +52,6 @@ type Props = {
 
 type State = {
   attestationStatus: AttestationStatus
-  canResolveAttesters: boolean
   labels: { [key: string]: string }
 
   closeOpenedChild?: () => void
@@ -70,7 +69,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
     this.state = {
       attestationStatus: {},
-      canResolveAttesters: false,
       labels: LABELS[context],
     }
 
@@ -80,14 +78,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     setTimeout(() => {
       this.verifyAttestations()
     }, 500)
-  }
-
-  public componentDidMount() {
-    contactRepository.findAll().then(() => {
-      this.setState({
-        canResolveAttesters: true,
-      })
-    })
   }
 
   public render() {

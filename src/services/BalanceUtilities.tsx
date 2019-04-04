@@ -30,7 +30,10 @@ class BalanceUtilities {
           notify(
             <div>
               Now listening to balance changes of{' '}
-              <ContactPresentation myIdentity={myIdentity} inline={true} />
+              <ContactPresentation
+                address={myIdentity.identity.address}
+                inline={true}
+              />
             </div>
           )
         })

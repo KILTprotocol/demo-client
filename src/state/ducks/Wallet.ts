@@ -66,7 +66,9 @@ class Store {
 
   public static deserialize(serializedState: SerializedState): ImmutableState {
     const serializedIdentities: SerializedIdentity[] =
-      serializedState.identities && Array.isArray(serializedState.identities)
+      serializedState &&
+      serializedState.identities &&
+      Array.isArray(serializedState.identities)
         ? serializedState.identities
         : []
     const identities: { [key: string]: MyIdentity } = {}

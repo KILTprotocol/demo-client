@@ -3,7 +3,7 @@ import React from 'react'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import Spinner from '../../../components/Spinner/Spinner'
 
-import contactRepository from '../../../services/ContactRepository'
+import ContactRepository from '../../../services/ContactRepository'
 import CTypeRepository from '../../../services/CtypeRepository'
 import { CType, ICType } from '../../../types/Ctype'
 
@@ -13,7 +13,6 @@ type Props = {
 }
 
 type State = {
-  attestersResolved: boolean
   cTypesResolved: boolean
 }
 
@@ -24,18 +23,12 @@ class VerifyClaim extends React.Component<Props, State> {
     super(props)
     this.cTypeMap = new Map()
     this.state = {
-      attestersResolved: false,
       cTypesResolved: false,
     }
   }
 
   public componentDidMount() {
     const { attestedClaims } = this.props
-    contactRepository.findAll().then(() => {
-      this.setState({
-        attestersResolved: true,
-      })
-    })
     Promise.all(
       attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => {
         return CTypeRepository.findByHash(attestedClaim.request.claim.cType)
@@ -54,9 +47,9 @@ class VerifyClaim extends React.Component<Props, State> {
 
   public render() {
     const { attestedClaims } = this.props
-    const { attestersResolved, cTypesResolved } = this.state
+    const { cTypesResolved } = this.state
 
-    return attestersResolved && cTypesResolved ? (
+    return cTypesResolved ? (
       <AttestedClaimsListView attestedClaims={attestedClaims} />
     ) : (
       <Spinner size={20} color="#ef5a28" strength={3} />

@@ -64,11 +64,14 @@ class Store {
   }
 
   public static deserialize(serializedState: SerializedState): ImmutableState {
-    const delegations: MyDelegation[] = serializedState.delegations.map(
-      (serialized: string) => {
-        return JSON.parse(serialized) as MyDelegation
-      }
-    )
+    const delegations: MyDelegation[] =
+      serializedState &&
+      serializedState.delegations &&
+      Array.isArray(serializedState.delegations)
+        ? serializedState.delegations.map((serialized: string) => {
+            return JSON.parse(serialized) as MyDelegation
+          })
+        : []
 
     return Store.createState({
       delegations: Immutable.List(delegations),

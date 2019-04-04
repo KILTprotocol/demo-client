@@ -3,7 +3,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
-import contactRepository from './ContactRepository'
+import ContactRepository from './ContactRepository'
 import errorService from './ErrorService'
 import { notifySuccess } from './FeedbackService'
 
@@ -59,7 +59,7 @@ class MessageRepository {
 
     const arrayOfPromises = receiverAddressArray.map(
       (receiverAddress: Contact['publicIdentity']['address']) => {
-        return contactRepository.findByAddress(receiverAddress)
+        return ContactRepository.findByAddress(receiverAddress)
       }
     )
 
@@ -94,15 +94,14 @@ class MessageRepository {
     )
       .then(response => response.json())
       .then(message => {
-        return contactRepository
-          .findByAddress(message.senderAddress)
-          .then((sender: Contact) =>
+        return ContactRepository.findByAddress(message.senderAddress).then(
+          (sender: Contact) =>
             sdk.Message.createFromEncryptedMessage(
               message,
               sender.publicIdentity,
               myIdentity
             )
-          )
+        )
       })
   }
 
@@ -114,32 +113,32 @@ class MessageRepository {
       .then((encryptedMessages: sdk.IEncryptedMessage[]) => {
         return Promise.all(
           encryptedMessages.map((encryptedMessage: sdk.IEncryptedMessage) => {
-            return contactRepository
-              .findByAddress(encryptedMessage.senderAddress)
-              .then((sender: Contact) => {
-                try {
-                  const m: sdk.IMessage = sdk.Message.createFromEncryptedMessage(
-                    encryptedMessage,
-                    sender.publicIdentity,
-                    myIdentity
-                  )
-                  sdk.Message.ensureOwnerIsSender(m)
-                  return {
-                    ...m,
-                    encryptedMessage,
-                    sender,
-                  }
-                } catch (error) {
-                  errorService.log({
-                    error,
-                    message:
-                      'error on decrypting message: ' +
-                      JSON.stringify(encryptedMessage),
-                    origin: 'MessageRepository.findByMyIdentity()',
-                  })
-                  return undefined
+            return ContactRepository.findByAddress(
+              encryptedMessage.senderAddress
+            ).then((sender: Contact) => {
+              try {
+                const m: sdk.IMessage = sdk.Message.createFromEncryptedMessage(
+                  encryptedMessage,
+                  sender.publicIdentity,
+                  myIdentity
+                )
+                sdk.Message.ensureOwnerIsSender(m)
+                return {
+                  ...m,
+                  encryptedMessage,
+                  sender,
                 }
-              })
+              } catch (error) {
+                errorService.log({
+                  error,
+                  message:
+                    'error on decrypting message: ' +
+                    JSON.stringify(encryptedMessage),
+                  origin: 'MessageRepository.findByMyIdentity()',
+                })
+                return undefined
+              }
+            })
           })
         ).then((messageOutputList: Array<MessageOutput | undefined>) => {
           return messageOutputList.filter(
