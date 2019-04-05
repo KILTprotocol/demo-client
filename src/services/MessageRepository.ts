@@ -201,7 +201,6 @@ class MessageRepository {
   private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
     process.env.REACT_APP_SERVICE_PORT
   }/messaging`
-
 }
 
 export default MessageRepository

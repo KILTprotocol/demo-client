@@ -1,0 +1,17 @@
+{
+  "ROOT_ATTESTER_IS_OFFICIAL": {
+    "alias": "Root Attester is official",
+    "claimerKey": "ROOT_ATTESTER",
+    "cTypeKey": "IS_OFFICIAL",
+    "data": {}
+  },
+  "DRIVERS_LICENSE": {
+    "alias": "I have a drivers license",
+    "claimerKey": "CLAIMER",
+    "cTypeKey": "DRIVERS_LICENSE",
+    "data": {
+      "age": 30,
+      "name": "CLAIMER"
+    }
+  }
+}

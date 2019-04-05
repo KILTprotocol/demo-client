@@ -1,0 +1,58 @@
+{
+  "DRIVERS_LICENSE": {
+    "schema": {
+      "$id": "DriversLicense",
+      "$schema": "http://kilt-protocol.org/draft-01/ctype#",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "age": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "metadata": {
+      "title": {
+        "default": "DriversLicense"
+      },
+      "description": {
+        "default": ""
+      },
+      "properties": {
+        "name": {
+          "title": {
+            "default": "name"
+          }
+        },
+        "age": {
+          "title": {
+            "default": "age"
+          }
+        }
+      }
+    },
+    "owner": "ROOT_ATTESTER",
+    "hash": "0x5a9d939af9fb5423e3e283f16996438da635de8dc152b13d3a67f01e3d6b0fc0"
+  },
+  "IS_OFFICIAL": {
+    "schema": {
+      "$id": "IsOfficial",
+      "$schema": "http://kilt-protocol.org/draft-01/ctype#",
+      "properties": {},
+      "type": "object"
+    },
+    "metadata": {
+      "title": {
+        "default": "IsOfficial"
+      },
+      "description": {
+        "default": ""
+      },
+      "properties": {}
+    },
+    "owner": "ATTESTER_OF_IS_OFFICIAL",
+    "hash": "0xa7d8f30a154328e4c9e90b9f471f028eafb130e7405d5ca66defa4a59f4c31b5"
+  }
+}

@@ -1,34 +1,62 @@
-import { CType, Claim, IAttestedClaim } from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import * as Claims from '../../state/ducks/Claims'
 import PersistentStore from '../../state/PersistentStore'
+import { BsCType, BsCTypesPool } from './DevTools.ctypes'
+import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 
-import { getIdentity, getCtype } from './DevTools.utils'
+import claims from './data/claims.json'
 
-export const saveClaim = async (
-  ctypeAlias: string,
-  claimAlias: string,
-  claimObj: object,
-  identityAlias: string
-) => {
-  const identity = getIdentity(identityAlias)
-  const localCtype = await getCtype(ctypeAlias)
-  if (!localCtype || !identity) {
-    return false
+type BsClaimsPoolElement = {
+  alias: string
+  claimerKey: keyof BsIdentitiesPool
+  cTypeKey: keyof BsCTypesPool
+  data: object
+}
+
+type BsClaimsPool = {
+  [claimKey: string]: BsClaimsPoolElement
+}
+
+class BsClaim {
+  public static pool: BsClaimsPool = claims as BsClaimsPool
+
+  public static async save(
+    BS_claimData: BsClaimsPoolElement
+  ): Promise<void | sdk.Claim> {
+    const identity = await BsIdentity.getByKey(BS_claimData.claimerKey)
+    const cType = (await BsCType.getByKey(BS_claimData.cTypeKey)).cType
+    const claim = new sdk.Claim(
+      sdk.CType.fromObject(cType),
+      BS_claimData.data,
+      identity.identity
+    )
+
+    PersistentStore.store.dispatch(
+      Claims.Store.saveAction(claim, { alias: BS_claimData.alias })
+    )
+
+    return claim
   }
 
-  // TODO: the ctype object should be already initialised
-  const ctype = CType.fromObject(localCtype.cType)
+  public static async savePool(
+    updateCallback?: (claimAlias: string) => void
+  ): Promise<void | sdk.Claim> {
+    const claimKeys = Object.keys(BsClaim.pool)
+    const requests = claimKeys.reduce((promiseChain, claimKey) => {
+      return promiseChain.then(() => {
+        if (updateCallback) {
+          updateCallback(BsClaim.pool[claimKey].alias)
+        }
+        return BsClaim.save(BsClaim.pool[claimKey])
+      })
+    }, Promise.resolve())
+    return requests
+  }
 
-  const claim = new Claim(ctype, claimObj, identity.identity)
-
-  PersistentStore.store.dispatch(
-    Claims.Store.saveAction(claim, { alias: claimAlias })
-  )
-
-  return claim
+  public static storeAttestation = (attestedClaim: sdk.IAttestedClaim) => {
+    PersistentStore.store.dispatch(Claims.Store.addAttestation(attestedClaim))
+  }
 }
 
-export const storeAttestationForClaim = (attestedClaim: IAttestedClaim) => {
-  PersistentStore.store.dispatch(Claims.Store.addAttestation(attestedClaim))
-}
+export { BsClaim, BsClaimsPool }

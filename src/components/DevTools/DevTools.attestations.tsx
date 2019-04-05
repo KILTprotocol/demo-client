@@ -14,18 +14,17 @@ import {
   ISubmitLegitimations,
 } from '@kiltprotocol/prototype-sdk'
 
-import { MyIdentity, Contact } from '../../types/Contact'
+import { MyIdentity } from '../../types/Contact'
 
 import MessageRepository from '../../services/MessageRepository'
 import BlockchainService from '../../services/BlockchainService'
 import AttestationService from '../../services/AttestationService'
-import AttestationWorkflow from '../../services/AttestationWorkflow'
 
 import * as Attestations from '../../state/ducks/Attestations'
-import { MyDelegation } from '../../state/ducks/Delegations';
+import { MyDelegation } from '../../state/ducks/Delegations'
+import { BsClaim } from './DevTools.claims'
 
 import { toContact } from './DevTools.utils'
-import { storeAttestationForClaim } from './DevTools.claims'
 
 export const requestAttestationForClaim = (
   claim: IClaim,
@@ -98,7 +97,7 @@ export const attestationWorkflow = async (
     claimer
   )
 
-  storeAttestationForClaim(attestedClaim)
+  BsClaim.storeAttestation(attestedClaim)
 
   return { attestedClaim }
 }
@@ -160,5 +159,5 @@ export const attestationWithLegitimationWorkflow = async (
     claimer
   )
 
-  storeAttestationForClaim(attestedClaim)
+  BsClaim.storeAttestation(attestedClaim)
 }

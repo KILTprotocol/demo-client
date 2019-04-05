@@ -1,46 +1,95 @@
-import { Blockchain, CType, ICType } from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 
-import { ICType as IWrapperCtype } from '../../types/Ctype'
-
-import { notifySuccess } from '../../services/FeedbackService'
 import BlockchainService from '../../services/BlockchainService'
-import errorService from '../../services/ErrorService'
 import CTypeRepository from '../../services/CtypeRepository'
+import errorService from '../../services/ErrorService'
+import { notifySuccess } from '../../services/FeedbackService'
+import { ICType } from '../../types/Ctype'
+import { BsIdentity } from './DevTools.wallet'
 
-import { getIdentity } from './DevTools.utils'
+import cTypesPool from './data/cTypes.json'
 
-export const saveCtype = async (rawCtype: ICType, alias: string) => {
-  const cType = CType.fromObject(rawCtype)
-  const blockchain: Blockchain = await BlockchainService.connect()
-
-  const rootAttester = getIdentity('RootAttester')
-  if (!rootAttester) {
-    throw new Error(`${alias} not found`)
-  }
-  const { identity } = rootAttester
-
-  return cType
-    .store(blockchain, identity)
-    .then((value: any) => {
-      const cTypeWrapper: IWrapperCtype = {
-        cType,
-        metaData: {
-          author: identity.address,
-        },
-      }
-      // TODO: add onrejected when sdk provides error handling
-      return CTypeRepository.register(cTypeWrapper)
-    })
-    .then(() => {
-      notifySuccess(
-        `CTYPE ${cType.metadata.title.default} successfully created.`
-      )
-    })
-    .catch(error => {
-      errorService.log({
-        error,
-        message: 'Could not submit CTYPE',
-        origin: 'CTypeCreate.submit()',
-      })
-    })
+interface BsCTypesPoolElement extends sdk.ICType {
+  owner: string
 }
+
+type BsCTypesPool = {
+  [key: string]: BsCTypesPoolElement
+}
+
+class BsCType {
+  public static pool: BsCTypesPool = cTypesPool as BsCTypesPool
+
+  public static async save(
+    bsCTypeData: BsCTypesPoolElement,
+    bsCTypeKey?: keyof BsCTypesPool
+  ): Promise<void> {
+    // replace owner key with his address
+    const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
+      .identity
+
+    // const schema = {...bsCTypeData.schema, $id: sdk.UUID.generate()}
+    // const hash = sdk.Crypto.hashStr(JSON.stringify(schema))
+    const cType = sdk.CType.fromObject({
+      ...bsCTypeData,
+      owner: ownerIdentity.address,
+    })
+    if (!cType) {
+      throw new Error(`Invalid cType ${bsCTypeKey ? `'${bsCTypeKey}'` : ''}`)
+    }
+    const blockchain: sdk.Blockchain = await BlockchainService.connect()
+
+    return cType
+      .store(blockchain, ownerIdentity)
+      .then((value: any) => {
+        const cTypeWrapper: ICType = {
+          cType,
+          metaData: {
+            author: ownerIdentity.address,
+          },
+        }
+        // TODO: add onrejected when sdk provides error handling
+        return CTypeRepository.register(cTypeWrapper)
+      })
+      .then(() => {
+        notifySuccess(
+          `CTYPE ${cType.metadata.title.default} successfully created.`
+        )
+      })
+      .catch(error => {
+        errorService.log({
+          error,
+          message: 'Could not submit CTYPE',
+          origin: 'CTypeCreate.submit()',
+        })
+      })
+  }
+
+  public static async savePool(
+    updateCallback?: (cTypeTitle: string) => void
+  ): Promise<void> {
+    const bsCTypeKeys = Object.keys(BsCType.pool)
+    const requests = bsCTypeKeys.reduce((promiseChain, bsCTypeKey) => {
+      return promiseChain.then(() => {
+        if (updateCallback) {
+          updateCallback(bsCTypeKey)
+        }
+        return BsCType.save(BsCType.pool[bsCTypeKey], bsCTypeKey)
+      })
+    }, Promise.resolve())
+    return requests
+  }
+
+  public static async get(bsCType: BsCTypesPoolElement): Promise<ICType> {
+    return CTypeRepository.findByHash(bsCType.hash)
+  }
+
+  public static async getByKey(
+    bsCTypeKey: keyof BsCTypesPool
+  ): Promise<ICType> {
+    const { hash } = BsCType.pool[bsCTypeKey]
+    return CTypeRepository.findByHash(hash)
+  }
+}
+
+export { BsCTypesPool, BsCType }
