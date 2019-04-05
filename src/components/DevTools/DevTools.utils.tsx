@@ -8,12 +8,7 @@ import CtypeRepository from '../../services/CtypeRepository'
 export const getIdentity = (alias: string) => {
   const identities = Wallet.getAllIdentities(PersistentStore.store.getState())
 
-  return identities.find(value => {
-    if (value.metaData.name === alias) {
-      return true
-    }
-    return false
-  })
+  return identities.find(value => value.metaData.name === alias)
 }
 
 export const toContact = (identity: MyIdentity) => {

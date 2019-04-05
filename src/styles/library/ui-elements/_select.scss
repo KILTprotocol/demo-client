@@ -6,6 +6,11 @@
 
   & .react-select {
 
+    &__menu {
+      width: auto;
+      display: inline-block;
+    }
+
     &__single-value {
       height: $base-button-height;
       padding: {
@@ -99,5 +104,12 @@
 
   & .react-select__menu {
     min-width: $minWidth;
+  }
+}
+
+@mixin react-select-max-width($maxWidth: 100vw) {
+
+  & .react-select__menu {
+    max-width: $maxWidth;
   }
 }

@@ -1,76 +1,137 @@
-import { mnemonicGenerate } from '@polkadot/util-crypto/mnemonic'
 import { Blockchain, Identity } from '@kiltprotocol/prototype-sdk'
+import { mnemonicGenerate } from '@polkadot/util-crypto/mnemonic'
 
-import { Contact, MyIdentity } from '../../types/Contact'
-
-import { notifySuccess } from '../../services/FeedbackService'
+import BalanceUtilities from '../../services/BalanceUtilities'
 import BlockchainService from '../../services/BlockchainService'
 import contactRepository from '../../services/ContactRepository'
-import BalanceUtilities from '../../services/BalanceUtilities'
 import errorService from '../../services/ErrorService'
-
+import { notifySuccess } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore from '../../state/PersistentStore'
+import { Contact, MyIdentity } from '../../types/Contact'
 
-export const createIdentity = (alias: string) => {
-  const randomPhrase = mnemonicGenerate()
-  const identity = Identity.buildFromMnemonic(randomPhrase)
+import identitiesPool from './data/identities.json'
 
-  return saveIdentity(identity, randomPhrase, alias)
+type BsIdentitiesPool = {
+  [key: string]: string
 }
 
-export const saveIdentity = async (
-  identity: Identity,
-  phrase: string,
-  alias: string
-) => {
-  const blockchain: Blockchain = await BlockchainService.connect()
-  const alice = Identity.buildFromSeedString('Alice')
+class BsIdentity {
+  public static pool: BsIdentitiesPool = identitiesPool as BsIdentitiesPool
 
-  return blockchain
-    .makeTransfer(alice, identity.address, 1000)
-    .then((result: any) => {
-      const { address, boxPublicKeyAsHex } = identity
-      const newContact: Contact = {
-        metaData: {
-          name: alias,
+  public static createPool(
+    updateCallback?: (alias: string) => void
+  ): Promise<void | MyIdentity> {
+    const identityLabels = Object.keys(BsIdentity.pool)
+    const requests = identityLabels.reduce((promiseChain, key) => {
+      return promiseChain.then(() => {
+        if (updateCallback) {
+          updateCallback(BsIdentity.pool[key])
+        }
+        return BsIdentity.create(BsIdentity.pool[key])
+      })
+    }, Promise.resolve())
+    return requests
+  }
+
+  public static async create(alias: string): Promise<void | MyIdentity> {
+    const randomPhrase = mnemonicGenerate()
+    const identity = Identity.buildFromMnemonic(randomPhrase)
+
+    return BsIdentity.save(identity, randomPhrase, alias)
+  }
+
+  public static async save(
+    identity: Identity,
+    phrase: string,
+    alias: string
+  ): Promise<void | MyIdentity> {
+    const blockchain: Blockchain = await BlockchainService.connect()
+    const alice = Identity.buildFromURI('//Alice')
+
+    return blockchain
+      .makeTransfer(alice, identity.address, 1000)
+      .then((result: any) => {
+        const { address, boxPublicKeyAsHex } = identity
+        const newContact: Contact = {
+          metaData: {
+            name: alias,
+          },
+          publicIdentity: { address, boxPublicKeyAsHex },
+        }
+
+        return Promise.all([
+          Promise.resolve(newContact),
+          contactRepository.add(newContact),
+        ])
+      })
+      .then(
+        ([newContact]) => {
+          const newIdentity = {
+            ...newContact,
+            identity,
+            phrase,
+          } as MyIdentity
+          PersistentStore.store.dispatch(
+            Wallet.Store.saveIdentityAction(newIdentity)
+          )
+          BalanceUtilities.connect(newIdentity)
+          notifySuccess(`Identity ${alias} successfully created.`)
+
+          return newIdentity
         },
-        publicIdentity: { address, boxPublicKeyAsHex },
-      }
-      return Promise.all([
-        Promise.resolve(newContact),
-        contactRepository.add(newContact),
-      ])
-    })
-    .then(
-      ([newContact]) => {
-        const newIdentity = {
-          ...newContact,
-          identity,
-          phrase,
-        } as MyIdentity
-        PersistentStore.store.dispatch(
-          Wallet.Store.saveIdentityAction(newIdentity)
-        )
-        BalanceUtilities.connect(newIdentity)
-        notifySuccess(`Identity ${alias} successfully created.`)
-
-        return newIdentity
-      },
-      error => {
+        error => {
+          errorService.log({
+            error,
+            message: 'failed to POST new identity',
+            origin: 'WalletAdd.addIdentity()',
+            type: 'ERROR.FETCH.POST',
+          })
+        }
+      )
+      .catch(error => {
         errorService.log({
           error,
-          message: 'failed to POST new identity',
+          message: 'failed to transfer initial tokens to identity',
           origin: 'WalletAdd.addIdentity()',
-          type: 'ERROR.FETCH.POST',
         })
-      }
-    )
-    .catch(error => {
-      errorService.log({
-        error,
-        message: 'failed to transfer initial tokens to identity',
-        origin: 'WalletAdd.addIdentity()',
       })
-    })
+  }
+
+  public static toContact(myIdentity: MyIdentity): Contact {
+    const contact: Contact = {
+      metaData: myIdentity.metaData,
+      publicIdentity: myIdentity.identity,
+    }
+
+    return contact
+  }
+
+  public static async getByKey(
+    bsIdentitiesPoolKey: keyof BsIdentitiesPool
+  ): Promise<MyIdentity> {
+    const identities = Wallet.getAllIdentities(PersistentStore.store.getState())
+    const identity = identities.find(
+      value => value.metaData.name === BsIdentity.pool[bsIdentitiesPoolKey]
+    )
+    if (identity) {
+      return Promise.resolve(identity)
+    }
+    throw new Error(`Identity '${bsIdentitiesPoolKey}' not found`)
+  }
+
+  public static async selectIdentity(identity: MyIdentity): Promise<void> {
+    PersistentStore.store.dispatch(
+      Wallet.Store.selectIdentityAction(identity.identity.address)
+    )
+  }
+
+  public static async selectIdentityByKey(
+    bsIdentitiesPoolKey: keyof BsIdentitiesPool
+  ): Promise<void> {
+    const identity = await BsIdentity.getByKey(bsIdentitiesPoolKey)
+    BsIdentity.selectIdentity(identity)
+  }
 }
+
+export { BsIdentitiesPool, BsIdentity }

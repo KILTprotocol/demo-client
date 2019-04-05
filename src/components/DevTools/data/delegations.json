@@ -1,0 +1,71 @@
+{
+  "DRIVERS_LICENSE": {
+    "alias": "State Department (Node)",
+    "ownerKey": "ROOT_ATTESTER",
+    "cTypeKey": "DRIVERS_LICENSE",
+    "children": [
+      {
+        "alias": "Driving License Authority Berlin (Node)",
+        "ownerKey": "DEPARTMENT_1",
+        "permissions": [
+          "ATTEST",
+          "DELEGATE"
+        ],
+        "children": [
+          {
+            "alias": "Employee 1 Berlin (Node)",
+            "ownerKey": "EMPLOYEE_1_1",
+            "permissions": [
+              "ATTEST"
+            ]
+          },
+          {
+            "alias": "Employee 2 Berlin (Node)",
+            "ownerKey": "EMPLOYEE_1_2",
+            "permissions": [
+              "ATTEST"
+            ]
+          }
+        ]
+      },
+      {
+        "alias": "Driving License Authority Munich (Node)",
+        "ownerKey": "DEPARTMENT_2",
+        "permissions": [
+          "ATTEST",
+          "DELEGATE"
+        ],
+        "children": [
+          {
+            "alias": "Employee 2 Munich (Node)",
+            "ownerKey": "EMPLOYEE_2_1",
+            "permissions": [
+              "ATTEST"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "IS_OFFICIAL": {
+    "alias": "State Department (Node)",
+    "ownerKey": "ROOT_ATTESTER",
+    "cTypeKey": "IS_OFFICIAL",
+    "children": [
+      {
+        "alias": "Driving License Authority Berlin (Node)",
+        "ownerKey": "DEPARTMENT_1",
+        "permissions": [
+          "ATTEST"
+        ]
+      },
+      {
+        "alias": "Driving License Authority Munich (Node)",
+        "ownerKey": "DEPARTMENT_2",
+        "permissions": [
+          "ATTEST"
+        ]
+      }
+    ]
+  }
+}

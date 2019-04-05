@@ -1,4 +1,5 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+
 import { MyDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
