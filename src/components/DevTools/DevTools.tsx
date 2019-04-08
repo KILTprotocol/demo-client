@@ -27,6 +27,7 @@ class DevTools extends React.Component<Props> {
         <button onClick={this.bootstrapIdentities}>Identities</button>
         <button onClick={this.bootstrapCTypes}>CTypes</button>
         <button onClick={this.bootstrapDelegations}>Delegations</button>
+        <button onClick={this.bootstrapPCRs}>PCRs</button>
         <button onClick={this.bootstrapClaims}>Claims</button>
         <button onClick={this.bootstrapLegitimations}>Legitimations</button>
         <button onClick={this.bootstrapAttestations}>Attestations</button>
@@ -53,6 +54,30 @@ class DevTools extends React.Component<Props> {
 
     await BsCType.savePool((cTypeTitle: string) => {
       blockUi.updateMessage(`building ctype: ${cTypeTitle}`)
+    }).then(() => {
+      blockUi.remove()
+    })
+  }
+
+  private async bootstrapDelegations() {
+    const blockUi = FeedbackService.addBlockUi({
+      headline: 'Creating delegations',
+    })
+
+    await BsDelegation.create(false, (delegationAlias: string) => {
+      blockUi.updateMessage(`creating delegation: ${delegationAlias}`)
+    }).then(() => {
+      blockUi.remove()
+    })
+  }
+
+  private async bootstrapPCRs() {
+    const blockUi = FeedbackService.addBlockUi({
+      headline: 'Creating PCRs',
+    })
+
+    await BsDelegation.create(true, (delegationAlias: string) => {
+      blockUi.updateMessage(`creating PCR: ${delegationAlias}`)
     }).then(() => {
       blockUi.remove()
     })
@@ -117,18 +142,6 @@ class DevTools extends React.Component<Props> {
     // )
     //
     // blockUi.remove()
-  }
-
-  private async bootstrapDelegations() {
-    const blockUi = FeedbackService.addBlockUi({
-      headline: 'Creating delegations',
-    })
-
-    await BsDelegation.create((delegationAlias: string) => {
-      blockUi.updateMessage(`creating delegation: ${delegationAlias}`)
-    }).then(() => {
-      blockUi.remove()
-    })
   }
 
   private async bootstrapLegitimations() {
