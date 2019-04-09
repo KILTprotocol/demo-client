@@ -15,7 +15,6 @@ export type Action = {
 
 type Props = {
   actions: Action[]
-
   className?: string
 }
 

@@ -103,6 +103,7 @@ class DelegationsView extends React.Component<Props, State> {
 
   public render() {
     const { isPCR } = this.props
+    const { delegationId } = this.props.match.params
     const {
       delegationEntries,
       currentDelegation,
@@ -116,7 +117,7 @@ class DelegationsView extends React.Component<Props, State> {
 
     return (
       <section className="DelegationsView">
-        {!currentDelegation && (
+        {!delegationId && (
           <MyDelegationsListView
             delegationEntries={delegationEntries}
             onRemoveDelegation={this.deleteDelegation}
@@ -127,7 +128,7 @@ class DelegationsView extends React.Component<Props, State> {
         )}
         {currentDelegation && (
           <DelegationDetailView
-            id={currentDelegation.id}
+            id={delegationId}
             isPCR={isPCR}
             editable={true}
             viewType={ViewType.Present}

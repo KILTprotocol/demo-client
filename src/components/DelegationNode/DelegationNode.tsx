@@ -3,7 +3,7 @@ import { Blockchain } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
 import BlockchainService from '../../services/BlockchainService'
-import {
+import FeedbackService, {
   notify,
   notifySuccess,
   notifyFailure,
@@ -17,10 +17,16 @@ import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
 import Permissions from '../Permissions/Permissions'
 import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
+import DelegationsService from '../../services/DelegationsService'
 import ShortHash from '../ShortHash/ShortHash'
 import Spinner from '../Spinner/Spinner'
 
 import './DelegationNode.scss'
+import { ModalType } from '../Modal/Modal'
+import {
+  BlockingNotification,
+  NotificationType,
+} from '../../types/UserFeedback'
 
 export enum ViewType {
   Present = 'present',
@@ -73,6 +79,7 @@ class DelegationNode extends React.Component<Props, State> {
     this.cancelInvite = this.cancelInvite.bind(this)
     this.confirmInvite = this.confirmInvite.bind(this)
     this.revokeAttestations = this.revokeAttestations.bind(this)
+    this.revokeDelegation = this.revokeDelegation.bind(this)
   }
 
   public componentDidMount() {
@@ -162,6 +169,7 @@ class DelegationNode extends React.Component<Props, State> {
                 delegation={node.delegation}
                 onInvite={this.inviteTo.bind(this, myDelegation)}
                 onRevokeAttestations={this.revokeAttestations}
+                onRevokeDelegation={this.revokeDelegation}
               />
             )}
           </div>
@@ -315,6 +323,52 @@ class DelegationNode extends React.Component<Props, State> {
           </span>
         )
       })
+  }
+
+  private async revokeDelegation() {
+    const { selectedIdentity, node } = this.props
+
+    FeedbackService.addBlockingNotification({
+      header: 'Revoke this delegation?',
+      message: (
+        <div>
+          Are you sure you want to revoke the Delegation '
+          <ShortHash>{node.delegation.id}</ShortHash>'?
+        </div>
+      ),
+      modalType: ModalType.CONFIRM,
+      okButtonLabel: 'Revoke',
+      onCancel: (notification: BlockingNotification) => notification.remove(),
+      onConfirm: async (notification: BlockingNotification) => {
+        notification.remove()
+        const blockchain = await BlockchainService.connect()
+        const blockUi = FeedbackService.addBlockUi({
+          headline: 'Revoking delegation',
+        })
+
+        DelegationsService.revoke(node.delegation, selectedIdentity.identity)
+          .then(() => {
+            node.delegation.revoked = true
+            this.setState({
+              node,
+            })
+
+            blockUi.remove()
+            notifySuccess(<span>Delegation successfully revoked</span>, true)
+          })
+          .catch(error => {
+            blockUi.remove()
+            errorService.log(error)
+            notifyFailure(
+              <span>
+                Something went wrong, while revoking the Delegation. Please try
+                again
+              </span>
+            )
+          })
+      },
+      type: NotificationType.FAILURE,
+    })
   }
 
   private async getChildren() {
