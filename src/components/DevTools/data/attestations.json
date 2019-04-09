@@ -1,0 +1,63 @@
+{
+  "ATTESTATION_1": {
+    "claimKey": "I_AM_OFFICIAL_1",
+    "attest": {
+      "attesterKey": "ATTESTER_OF_IS_OFFICIAL"
+    },
+    "then": {
+      "ATTESTATION_1_1": {
+        "claimKey": "I_AM_OFFICIAL_1_1",
+        "attest": {
+          "attesterKey": "DEPARTMENT_1",
+          "legitimations": ["ATTESTATION_1"]
+        }
+      },
+      "ATTESTATION_1_2": {
+        "claimKey": "I_AM_OFFICIAL_1_2",
+        "attest": {
+          "attesterKey": "DEPARTMENT_1",
+          "legitimations": ["ATTESTATION_1"]
+        }
+      }
+    }
+  },
+  "ATTESTATION_2": {
+    "claimKey": "I_AM_OFFICIAL_2",
+    "attest": {
+      "attesterKey": "ATTESTER_OF_IS_OFFICIAL"
+    },
+    "then": {
+      "ATTESTATION_2_1": {
+        "claimKey": "I_AM_OFFICIAL_2_1",
+        "attest": {
+          "attesterKey": "DEPARTMENT_2",
+          "legitimations": ["ATTESTATION_2"]
+        }
+      }
+    }
+  },
+  "ATTESTATION_3": {
+    "claimKey": "DRIVERS_LICENSE",
+    "attest": {
+      "attesterKey": "EMPLOYEE_1_1",
+      "legitimations": ["ATTESTATION_1_1"],
+      "delegationKey": "DRIVERS_LICENSE_1_1"
+    }
+  },
+  "ATTESTATION_4": {
+    "claimKey": "DRIVERS_LICENSE",
+    "attest": {
+      "attesterKey": "EMPLOYEE_1_2",
+      "legitimations": ["ATTESTATION_1_2"],
+      "delegationKey": "DRIVERS_LICENSE_1_2"
+    }
+  },
+  "ATTESTATION_5": {
+    "claimKey": "DRIVERS_LICENSE",
+    "attest": {
+      "attesterKey": "EMPLOYEE_2_1",
+      "legitimations": ["ATTESTATION_2_1"],
+      "delegationKey": "DRIVERS_LICENSE_2_1"
+    }
+  }
+}

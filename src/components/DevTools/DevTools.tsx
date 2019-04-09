@@ -1,6 +1,7 @@
 import React from 'react'
 
 import FeedbackService from '../../services/FeedbackService'
+import { BsAttestation, BsAttestationsPool } from './DevTools.attestations'
 import { BsClaim } from './DevTools.claims'
 import { BsCType } from './DevTools.ctypes'
 import { BsDelegation } from './DevTools.delegations'
@@ -16,26 +17,53 @@ class DevTools extends React.Component<Props> {
   }
 
   public render() {
+    const withMessages: string[] = ['With messages', 'Without messages']
+
     return (
-      <section className="TestUserFeedBack">
+      <section className="DevTools">
         <h2>Dev Tools</h2>
 
-        <h4>Auto Bootstrap</h4>
-        <button onClick={this.bootstrapAll}>Run</button>
-
-        <h4>Manual Bootstrap</h4>
-        <button onClick={this.bootstrapIdentities}>Identities</button>
-        <button onClick={this.bootstrapCTypes}>CTypes</button>
-        <button onClick={this.bootstrapDelegations}>Delegations</button>
-        <button onClick={this.bootstrapPCRs}>PCRs</button>
-        <button onClick={this.bootstrapClaims}>Claims</button>
-        <button onClick={this.bootstrapLegitimations}>Legitimations</button>
-        <button onClick={this.bootstrapAttestations}>Attestations</button>
+        <div>
+          <div>
+            <h4>Auto Bootstrap</h4>
+            {withMessages.map((_withMessages: string, index: number) => (
+              <button
+                key={_withMessages}
+                onClick={this.bootstrapAll.bind(this, !!index)}
+              >
+                {_withMessages}
+              </button>
+            ))}
+          </div>
+          {withMessages.map((_withMessages: string, index: number) => (
+            <div key={_withMessages}>
+              <h4>{`Manual Bootstrap ${_withMessages}`}</h4>
+              <button onClick={this.bootstrapIdentities.bind(this, !!index)}>
+                Identities
+              </button>
+              <button onClick={this.bootstrapCTypes.bind(this, !!index)}>
+                CTypes
+              </button>
+              <button onClick={this.bootstrapDelegations.bind(this, !!index)}>
+                Delegations
+              </button>
+              <button onClick={this.bootstrapPCRs.bind(this, !!index)}>
+                PCRs
+              </button>
+              <button onClick={this.bootstrapClaims.bind(this, !!index)}>
+                Claims
+              </button>
+              <button onClick={this.bootstrapAttestations.bind(this, !!index)}>
+                Attestations
+              </button>
+            </div>
+          ))}
+        </div>
       </section>
     )
   }
 
-  private async bootstrapIdentities() {
+  private async bootstrapIdentities(withMessages = false) {
     const blockUi = FeedbackService.addBlockUi({
       headline: 'Creating identity',
     })
@@ -47,7 +75,7 @@ class DevTools extends React.Component<Props> {
     })
   }
 
-  private async bootstrapCTypes() {
+  private async bootstrapCTypes(withMessages = false) {
     const blockUi = FeedbackService.addBlockUi({
       headline: 'Creating ctypes',
     })
@@ -59,7 +87,7 @@ class DevTools extends React.Component<Props> {
     })
   }
 
-  private async bootstrapDelegations() {
+  private async bootstrapDelegations(withMessages = false) {
     const blockUi = FeedbackService.addBlockUi({
       headline: 'Creating delegations',
     })
@@ -71,7 +99,7 @@ class DevTools extends React.Component<Props> {
     })
   }
 
-  private async bootstrapPCRs() {
+  private async bootstrapPCRs(withMessages = false) {
     const blockUi = FeedbackService.addBlockUi({
       headline: 'Creating PCRs',
     })
@@ -83,7 +111,7 @@ class DevTools extends React.Component<Props> {
     })
   }
 
-  private async bootstrapClaims() {
+  private async bootstrapClaims(withMessages = false) {
     const blockUi = FeedbackService.addBlockUi({
       headline: 'Creating claims',
     })
@@ -144,12 +172,16 @@ class DevTools extends React.Component<Props> {
     // blockUi.remove()
   }
 
-  private async bootstrapLegitimations() {
-    // Legitimations
-  }
-
   private async bootstrapAttestations() {
-    // attestations
+    const blockUi = FeedbackService.addBlockUi({
+      headline: 'Creating legitimations & attestations',
+    })
+
+    await BsAttestation.create((attestationKey: keyof BsAttestationsPool) => {
+      blockUi.updateMessage(`creating claim: ${attestationKey}`)
+    }).then(() => {
+      blockUi.remove()
+    })
   }
 
   private async bootstrapAll() {

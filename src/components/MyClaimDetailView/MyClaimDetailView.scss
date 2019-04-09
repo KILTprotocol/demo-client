@@ -1,5 +1,13 @@
 .MyClaimDetailView {
 
+  & h1 {
+
+    & .claimId {
+      display: block;
+      font-size: 8px;
+    }
+  }
+
   & .deleteClaim {
     @include button-icon-only($icon-trash)
   }
