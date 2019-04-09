@@ -1,7 +1,9 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import DelegationsService from '../../services/DelegationsService'
-import { DelegationType } from '../../state/ducks/Delegations'
+import * as Delegations from '../../state/ducks/Delegations'
+import { DelegationType, MyDelegation } from '../../state/ducks/Delegations'
+import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
 import delegationsPool from './data/delegations.json'
@@ -79,6 +81,7 @@ class BsDelegation {
     const signature = ownerIdentity.identity.signStr(delegation.generateHash())
     await DelegationsService.storeOnChain(delegation, signature)
     DelegationsService.store({
+      cTypeHash: rootData.rootDelegation.cTypeHash,
       ...delegation,
       isPCR,
       metaData: {
@@ -136,7 +139,7 @@ class BsDelegation {
       throw new Error(
         `Invalid delegation data'${
           BsDelegationKey ? ` for ${BsDelegationKey}` : ''
-          }'`
+        }'`
       )
     }
     const ownerIdentity: MyIdentity = await BsIdentity.getByKey(ownerKey)
@@ -192,6 +195,75 @@ class BsDelegation {
       Promise.resolve()
     )
     return requests
+  }
+
+  public static async getDelegationByKey(
+    bsDelegationKey: keyof BsDelegationsPool
+  ): Promise<MyDelegation> {
+    let match: BsDelegationsPoolElement | undefined
+    match = await BsDelegation.getDelegationByKeyFromPool(
+      bsDelegationKey,
+      BsDelegation.delegationsPool
+    )
+    if (!match) {
+      match = await BsDelegation.getDelegationByKeyFromPool(
+        bsDelegationKey,
+        BsDelegation.pcrPool
+      )
+    }
+
+    if (match) {
+      const allDelegations: MyDelegation[] = Delegations.getAllDelegations(
+        PersistentStore.store.getState()
+      )
+
+      const myDelegation = allDelegations.find(
+        (_myDelegation: MyDelegation) => {
+          return _myDelegation.metaData.alias === match!.alias
+        }
+      )
+
+      if (myDelegation) {
+        return Promise.resolve(myDelegation)
+      }
+      throw new Error(
+        `No delegation or PCR for delegationKey '${bsDelegationKey}' found.`
+      )
+    }
+    throw new Error(
+      `No delegation or PCR for delegationKey '${bsDelegationKey}' found.`
+    )
+  }
+
+  public static async getDelegationByKeyFromPool(
+    bsDelegationKey: keyof BsDelegationsPool,
+    pool: BsDelegationsPool
+  ): Promise<BsDelegationsPoolElement | undefined> {
+    const bsDelegation = pool[bsDelegationKey]
+    if (bsDelegation) {
+      // the current pool contains the requested delegation
+      Delegations.getAllDelegations(PersistentStore.store.getState())
+      return Promise.resolve(pool[bsDelegationKey])
+    } else {
+      // dive deeper
+      return Promise.all(
+        Object.keys(pool).map(
+          async (_bsDelegationKey: keyof BsDelegationsPool) => {
+            const { children } = pool[_bsDelegationKey]
+            if (children) {
+              return BsDelegation.getDelegationByKeyFromPool(
+                bsDelegationKey,
+                children
+              )
+            }
+            return Promise.resolve(undefined)
+          }
+        )
+      ).then((results: Array<BsDelegationsPoolElement | undefined>) => {
+        // remove undefined values und return first match
+        return results.filter(result => result)[0]
+      })
+    }
   }
 }
 

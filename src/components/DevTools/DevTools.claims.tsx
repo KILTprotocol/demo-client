@@ -2,10 +2,10 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import * as Claims from '../../state/ducks/Claims'
 import PersistentStore from '../../state/PersistentStore'
-import { BsCType, BsCTypesPool } from './DevTools.ctypes'
-import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 
 import claims from './data/claims.json'
+import { BsCType, BsCTypesPool } from './DevTools.ctypes'
+import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 
 type BsClaimsPoolElement = {
   alias: string
@@ -54,9 +54,35 @@ class BsClaim {
     return requests
   }
 
+  public static async getBsClaimByKey(
+    bsClaimKey: keyof BsClaimsPool
+  ): Promise<BsClaimsPoolElement> {
+    const bsClaim = BsClaim.pool[bsClaimKey]
+    if (bsClaim) {
+      return Promise.resolve(bsClaim)
+    }
+    throw new Error(`No claim for claimKey '${bsClaimKey}' found.`)
+  }
+
+  public static async getClaimByKey(
+    bsClaimKey: keyof BsClaimsPool
+  ): Promise<Claims.Entry> {
+    const bsClaim = await BsClaim.getBsClaimByKey(bsClaimKey)
+    const myClaims: Claims.Entry[] = Claims.getClaims(
+      PersistentStore.store.getState()
+    )
+    const myClaim: Claims.Entry | undefined = myClaims.find(
+      (claim: Claims.Entry) => claim.meta.alias === bsClaim.alias
+    )
+    if (myClaim) {
+      return Promise.resolve(myClaim)
+    }
+    throw new Error(`No claim for claimKey '${bsClaimKey}' found.`)
+  }
+
   public static storeAttestation = (attestedClaim: sdk.IAttestedClaim) => {
     PersistentStore.store.dispatch(Claims.Store.addAttestation(attestedClaim))
   }
 }
 
-export { BsClaim, BsClaimsPool }
+export { BsClaim, BsClaimsPool, BsClaimsPoolElement }

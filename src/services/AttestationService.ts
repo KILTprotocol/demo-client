@@ -1,5 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import moment from 'moment'
+import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAttestedClaims'
 
 import * as Attestations from '../state/ducks/Attestations'
 import * as Claims from '../state/ducks/Claims'
@@ -17,13 +18,13 @@ class AttestationService {
    * @returns the attestated claim (including the on-chain stored attestation)
    *   in a promise
    */
-  public async attestClaim(
+  public static async attestClaim(
     requestForAttestation: sdk.IRequestForAttestation
   ): Promise<sdk.AttestedClaim> {
     const {
       selectedIdentity,
       blockchain,
-    } = await this.getBlockchainAndIdentity()
+    } = await AttestationService.getBlockchainAndIdentity()
 
     if (!selectedIdentity) {
       return Promise.reject('No identity selected')
@@ -60,14 +61,14 @@ class AttestationService {
     })
   }
 
-  public async revokeAttestation(
+  public static async revokeAttestation(
     iAttestation: sdk.IAttestation
   ): Promise<void> {
     const attestation = sdk.Attestation.fromObject(iAttestation)
     const {
       selectedIdentity,
       blockchain,
-    } = await this.getBlockchainAndIdentity()
+    } = await AttestationService.getBlockchainAndIdentity()
 
     if (!selectedIdentity) {
       return Promise.reject('No identity selected')
@@ -95,27 +96,69 @@ class AttestationService {
     })
   }
 
-  public async verifyAttestatedClaim(
+  public static async verifyAttestatedClaim(
     attestedClaim: sdk.IAttestedClaim
   ): Promise<boolean> {
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    return sdk.AttestedClaim.fromObject(attestedClaim).verify(blockchain)
+    const _attestedClaim = sdk.AttestedClaim.fromObject(attestedClaim)
+    return _attestedClaim.verify(blockchain)
   }
 
-  public saveInStore(attestationEntry: Attestations.Entry): void {
+  public static saveInStore(attestationEntry: Attestations.Entry): void {
     attestationEntry.created = Date.now()
     persistentStore.store.dispatch(
       Attestations.Store.saveAttestation(attestationEntry)
     )
   }
 
-  public removeFromStore(claimHash: sdk.IAttestation['claimHash']): void {
+  public static removeFromStore(
+    claimHash: sdk.IAttestation['claimHash']
+  ): void {
     persistentStore.store.dispatch(
       Attestations.Store.removeAttestation(claimHash)
     )
   }
 
-  private async getBlockchainAndIdentity(): Promise<{
+  public static getExcludedProperties(
+    claimEntry: Claims.Entry,
+    selectedClaimProperties: string[]
+  ): string[] {
+    const propertyNames: string[] = Object.keys(claimEntry.claim.contents)
+    const excludedProperties = propertyNames.filter(
+      (propertyName: string) =>
+        selectedClaimProperties.indexOf(propertyName) === -1
+    )
+    return excludedProperties
+  }
+
+  public static getAttestedClaims(
+    claimSelectionData: ClaimSelectionData
+  ): sdk.IAttestedClaim[] {
+    const selectedClaimEntryIds = Object.keys(claimSelectionData)
+    const attestedClaims: sdk.IAttestedClaim[] = []
+    selectedClaimEntryIds.forEach(
+      (selectedClaimEntryId: Claims.Entry['id']) => {
+        const { claimEntry, state } = claimSelectionData[selectedClaimEntryId]
+        state.selectedAttestedClaims.forEach(
+          (selectedAttestedClaim: sdk.IAttestedClaim) => {
+            attestedClaims.push(
+              sdk.AttestedClaim.fromObject(
+                selectedAttestedClaim
+              ).createPresentation(
+                AttestationService.getExcludedProperties(
+                  claimEntry,
+                  state.selectedClaimProperties
+                )
+              )
+            )
+          }
+        )
+      }
+    )
+    return attestedClaims
+  }
+
+  private static async getBlockchainAndIdentity(): Promise<{
     blockchain: sdk.Blockchain
     selectedIdentity: sdk.Identity
   }> {
@@ -130,4 +173,4 @@ class AttestationService {
   }
 }
 
-export default new AttestationService()
+export default AttestationService

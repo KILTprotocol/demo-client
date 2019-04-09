@@ -1,7 +1,31 @@
 {
-  "ROOT_ATTESTER_IS_OFFICIAL": {
-    "alias": "Root Attester is official",
-    "claimerKey": "ROOT_ATTESTER",
+  "I_AM_OFFICIAL_1": {
+    "alias": "I'm a official attester",
+    "claimerKey": "DEPARTMENT_1",
+    "cTypeKey": "IS_OFFICIAL",
+    "data": {}
+  },
+  "I_AM_OFFICIAL_1_1": {
+    "alias": "I'm a official attester",
+    "claimerKey": "EMPLOYEE_1_1",
+    "cTypeKey": "IS_OFFICIAL",
+    "data": {}
+  },
+  "I_AM_OFFICIAL_1_2": {
+    "alias": "I'm a official attester",
+    "claimerKey": "EMPLOYEE_1_2",
+    "cTypeKey": "IS_OFFICIAL",
+    "data": {}
+  },
+  "I_AM_OFFICIAL_2": {
+    "alias": "I'm a official attester",
+    "claimerKey": "DEPARTMENT_2",
+    "cTypeKey": "IS_OFFICIAL",
+    "data": {}
+  },
+  "I_AM_OFFICIAL_2_1": {
+    "alias": "I'm a official attester",
+    "claimerKey": "EMPLOYEE_2_1",
     "cTypeKey": "IS_OFFICIAL",
     "data": {}
   },

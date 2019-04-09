@@ -1,10 +1,10 @@
 {
   "DRIVERS_LICENSE": {
-    "alias": "State Department (Root)",
+    "alias": "State Department (Delegation Root)",
     "ownerKey": "ROOT_ATTESTER",
     "cTypeKey": "DRIVERS_LICENSE",
     "children": {
-      "DRIVER_LICENSE_1": {
+      "DRIVERS_LICENSE_1": {
         "alias": "Driving License Authority Berlin (Delegation)",
         "ownerKey": "DEPARTMENT_1",
         "permissions": [
@@ -12,14 +12,14 @@
           "DELEGATE"
         ],
         "children": {
-          "DRIVER_LICENSE_1_1": {
+          "DRIVERS_LICENSE_1_1": {
             "alias": "Employee 1 Berlin (Delegation)",
             "ownerKey": "EMPLOYEE_1_1",
             "permissions": [
               "ATTEST"
             ]
           },
-          "DRIVER_LICENSE_1_2": {
+          "DRIVERS_LICENSE_1_2": {
             "alias": "Employee 2 Berlin (Delegation)",
             "ownerKey": "EMPLOYEE_1_2",
             "permissions": [
@@ -28,7 +28,7 @@
           }
         }
       },
-      "DRIVER_LICENSE_2": {
+      "DRIVERS_LICENSE_2": {
         "alias": "Driving License Authority Munich (Delegation)",
         "ownerKey": "DEPARTMENT_2",
         "permissions": [
@@ -36,7 +36,7 @@
           "DELEGATE"
         ],
         "children": {
-          "DRIVER_LICENSE_2_1": {
+          "DRIVERS_LICENSE_2_1": {
             "alias": "Employee 2 Munich (Delegation)",
             "ownerKey": "EMPLOYEE_2_1",
             "permissions": [
@@ -48,7 +48,7 @@
     }
   },
   "IS_OFFICIAL": {
-    "alias": "State Department (Node)",
+    "alias": "State Department (Delegation Root)",
     "ownerKey": "ROOT_ATTESTER",
     "cTypeKey": "IS_OFFICIAL",
     "children": {
