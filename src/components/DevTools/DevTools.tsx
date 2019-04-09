@@ -7,17 +7,19 @@ import { BsCType } from './DevTools.ctypes'
 import { BsDelegation } from './DevTools.delegations'
 import { BsIdentity } from './DevTools.wallet'
 
+type WithMessages = {
+  label: string
+  with: boolean
+}
+
 type Props = {}
 
 class DevTools extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props)
-
-    this.bootstrapAll = this.bootstrapAll.bind(this)
-  }
-
   public render() {
-    const withMessages: string[] = ['With messages', 'Without messages']
+    const withMessages: WithMessages[] = [
+      { label: 'Without messages', with: false },
+      { label: 'With messages', with: true },
+    ]
 
     return (
       <section className="DevTools">
@@ -26,34 +28,34 @@ class DevTools extends React.Component<Props> {
         <div>
           <div>
             <h4>Auto Bootstrap</h4>
-            {withMessages.map((_withMessages: string, index: number) => (
+            {withMessages.map((messages: WithMessages) => (
               <button
-                key={_withMessages}
-                onClick={this.bootstrapAll.bind(this, !!index)}
+                key={messages.label}
+                onClick={this.bootstrapAll.bind(this, messages.with)}
               >
-                {_withMessages}
+                {messages.label}
               </button>
             ))}
           </div>
-          {withMessages.map((_withMessages: string, index: number) => (
-            <div key={_withMessages}>
-              <h4>{`Manual Bootstrap ${_withMessages}`}</h4>
-              <button onClick={this.bootstrapIdentities.bind(this, !!index)}>
-                Identities
-              </button>
-              <button onClick={this.bootstrapCTypes.bind(this, !!index)}>
-                CTypes
-              </button>
-              <button onClick={this.bootstrapDelegations.bind(this, !!index)}>
+          {withMessages.map((messages: WithMessages) => (
+            <div key={messages.label}>
+              <h4>{`Manual Bootstrap ${messages.label}`}</h4>
+              <button onClick={this.bootstrapIdentities}>Identities</button>
+              <button onClick={this.bootstrapCTypes}>CTypes</button>
+              <button
+                onClick={this.bootstrapDelegations.bind(this, messages.with)}
+              >
                 Delegations
               </button>
-              <button onClick={this.bootstrapPCRs.bind(this, !!index)}>
+              <button onClick={this.bootstrapPCRs.bind(this, messages.with)}>
                 PCRs
               </button>
-              <button onClick={this.bootstrapClaims.bind(this, !!index)}>
+              <button onClick={this.bootstrapClaims.bind(this, messages.with)}>
                 Claims
               </button>
-              <button onClick={this.bootstrapAttestations.bind(this, !!index)}>
+              <button
+                onClick={this.bootstrapAttestations.bind(this, messages.with)}
+              >
                 Attestations
               </button>
             </div>
@@ -63,7 +65,7 @@ class DevTools extends React.Component<Props> {
     )
   }
 
-  private async bootstrapIdentities(withMessages = false) {
+  private async bootstrapIdentities() {
     const blockUi = FeedbackService.addBlockUi({
       headline: 'Creating identity',
     })
@@ -75,7 +77,7 @@ class DevTools extends React.Component<Props> {
     })
   }
 
-  private async bootstrapCTypes(withMessages = false) {
+  private async bootstrapCTypes() {
     const blockUi = FeedbackService.addBlockUi({
       headline: 'Creating ctypes',
     })
@@ -92,9 +94,13 @@ class DevTools extends React.Component<Props> {
       headline: 'Creating delegations',
     })
 
-    await BsDelegation.create(false, (delegationAlias: string) => {
-      blockUi.updateMessage(`creating delegation: ${delegationAlias}`)
-    }).then(() => {
+    await BsDelegation.create(
+      false,
+      withMessages,
+      (delegationAlias: string) => {
+        blockUi.updateMessage(`creating delegation: ${delegationAlias}`)
+      }
+    ).then(() => {
       blockUi.remove()
     })
   }
@@ -104,7 +110,7 @@ class DevTools extends React.Component<Props> {
       headline: 'Creating PCRs',
     })
 
-    await BsDelegation.create(true, (delegationAlias: string) => {
+    await BsDelegation.create(true, withMessages, (delegationAlias: string) => {
       blockUi.updateMessage(`creating PCR: ${delegationAlias}`)
     }).then(() => {
       blockUi.remove()
@@ -172,7 +178,7 @@ class DevTools extends React.Component<Props> {
     // blockUi.remove()
   }
 
-  private async bootstrapAttestations() {
+  private async bootstrapAttestations(withMessages = false) {
     const blockUi = FeedbackService.addBlockUi({
       headline: 'Creating legitimations & attestations',
     })
@@ -184,11 +190,12 @@ class DevTools extends React.Component<Props> {
     })
   }
 
-  private async bootstrapAll() {
+  private async bootstrapAll(withMessages = false) {
     await this.bootstrapIdentities()
     await this.bootstrapCTypes()
-    await this.bootstrapClaims()
-    await this.bootstrapDelegations()
+    await this.bootstrapClaims(withMessages)
+    await this.bootstrapDelegations(withMessages)
+    await this.bootstrapAttestations(withMessages)
   }
 }
 
