@@ -1,6 +1,17 @@
 import * as React from 'react'
-import { MyIdentity } from '../../types/Contact'
+import { connect } from 'react-redux'
+
+import ContactRepository from '../../services/ContactRepository'
+import errorService from '../../services/ErrorService'
+import { notifySuccess } from '../../services/FeedbackService'
+import * as Contacts from '../../state/ducks/Contacts'
+import * as Wallet from '../../state/ducks/Wallet'
+import PersistentStore, {
+  State as ReduxState,
+} from '../../state/PersistentStore'
+import { Contact, MyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
+
 import './IdentityView.scss'
 
 type Props = {
@@ -12,29 +23,44 @@ type Props = {
   onSelect?: (seedAsHex: MyIdentity['identity']['address']) => void
   onCreateDid?: (identity: MyIdentity) => void
   onDeleteDid?: (identity: MyIdentity) => void
+  // mapStateToProps
+  contacts: Contact[]
 }
 
-class IdentityView extends React.Component<Props, {}> {
+type State = {}
+
+class IdentityView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
+    this.state = {}
+
+    this.registerContact = this.registerContact.bind(this)
+    this.toggleContacts = this.toggleContacts.bind(this)
   }
 
   public render() {
     const {
+      contacts,
       myIdentity,
+      selected,
+
       onDelete,
       onSelect,
       onCreateDid,
       onDeleteDid,
-      selected,
     } = this.props
+
+    const contact = contacts.find(
+      (myContact: Contact) =>
+        myContact.publicIdentity.address === myIdentity.identity.address
+    )
 
     const classes = ['IdentityView', selected ? 'selected' : '']
 
     return (
       <section className={classes.join(' ')}>
         {selected && <h2>Active identity</h2>}
-        <ContactPresentation myIdentity={myIdentity} size={50} />
+        <ContactPresentation address={myIdentity.identity.address} size={50} />
         <div className="attributes">
           <div>
             <label>Alias</label>
@@ -60,40 +86,135 @@ class IdentityView extends React.Component<Props, {}> {
             <label>Encryption Public Key</label>
             <div>{myIdentity.identity.boxPublicKeyAsHex}</div>
           </div>
-        </div>
-        {!selected && (
-          <div className="actions">
-            {onDelete && (
-              <button
-                onClick={onDelete.bind(this, myIdentity.identity.address)}
-                disabled={selected}
-              >
-                Remove
-              </button>
-            )}
-            {onSelect && (
-              <button
-                onClick={onSelect.bind(this, myIdentity.identity.address)}
-                disabled={selected}
-              >
-                Select
-              </button>
-            )}
-            {onCreateDid && !myIdentity.did && (
-              <button onClick={onCreateDid.bind(this, myIdentity)}>
-                Create DID
-              </button>
-            )}
-            {onDeleteDid && myIdentity.did && (
-              <button onClick={onDeleteDid.bind(this, myIdentity)}>
-                Delete DID
-              </button>
-            )}
+          <div>
+            <label>DID</label>
+            <div>
+              {myIdentity.did ? (
+                <span className="did">{myIdentity.did}</span>
+              ) : (
+                ''
+              )}
+              <span className="didActions">
+                {onCreateDid && !myIdentity.did && (
+                  <button
+                    title="Generate DID..."
+                    className="didCreate"
+                    onClick={onCreateDid.bind(this, myIdentity)}
+                  />
+                )}
+                {onDeleteDid && myIdentity.did && (
+                  <button
+                    title="Delete DID"
+                    className="didDelete"
+                    onClick={onDeleteDid.bind(this, myIdentity)}
+                  />
+                )}
+              </span>
+            </div>
           </div>
-        )}
+        </div>
+        <div className="actions">
+          {!selected && (
+            <>
+              {onDelete && (
+                <button
+                  onClick={onDelete.bind(this, myIdentity.identity.address)}
+                  disabled={selected}
+                >
+                  Remove
+                </button>
+              )}
+              {onSelect && (
+                <button
+                  onClick={onSelect.bind(this, myIdentity.identity.address)}
+                  disabled={selected}
+                >
+                  Select
+                </button>
+              )}
+            </>
+          )}
+
+          <button
+            className={`toggleContacts ${
+              contact && contact.metaData.addedAt
+                ? 'isMyContact'
+                : 'isNotMyContact'
+            }`}
+            onClick={this.toggleContacts}
+          />
+
+          {(!contact || (contact && contact.metaData.unregistered)) && (
+            <button onClick={this.registerContact}>Register</button>
+          )}
+          <span />
+        </div>
       </section>
     )
   }
+
+  private registerContact() {
+    const { myIdentity } = this.props
+    const { identity, metaData } = myIdentity
+    const { address, boxPublicKeyAsHex } = identity
+    const { name } = metaData
+
+    const contact: Contact = {
+      metaData: { name },
+      publicIdentity: { address, boxPublicKeyAsHex },
+    }
+
+    ContactRepository.add(contact).then(
+      () => {
+        notifySuccess(`Identity '${name}' successfully registered.`)
+      },
+      error => {
+        errorService.log({
+          error,
+          message: `Failed to register identity '${name}'`,
+          origin: 'IdentityView.registerContact()',
+          type: 'ERROR.FETCH.POST',
+        })
+      }
+    )
+  }
+
+  private toggleContacts() {
+    const { contacts, myIdentity } = this.props
+
+    let contact = contacts.find(
+      (myContact: Contact) =>
+        myContact.publicIdentity.address === myIdentity.identity.address
+    )
+
+    if (!contact) {
+      contact = ContactRepository.getContactFromIdentity(myIdentity)
+    }
+
+    const { metaData, publicIdentity } = contact
+
+    if (contact.metaData.addedAt) {
+      PersistentStore.store.dispatch(
+        Contacts.Store.removeMyContact(publicIdentity.address)
+      )
+    } else {
+      const myContact = {
+        metaData: {
+          ...metaData,
+          addedAt: Date.now(),
+          addedBy: Wallet.getSelectedIdentity(PersistentStore.store.getState())
+            .identity.address,
+        },
+        publicIdentity,
+      } as Contact
+
+      PersistentStore.store.dispatch(Contacts.Store.addContact(myContact))
+    }
+  }
 }
 
-export default IdentityView
+const mapStateToProps = (state: ReduxState) => ({
+  contacts: Contacts.getContacts(state),
+})
+
+export default connect(mapStateToProps)(IdentityView)

@@ -14,17 +14,48 @@
 
   &.selected {
     @include labeledCard;
-
-    & .actions {
-      display: none;
-    }
   }
 
-  &:not(.selected){
+  &:not(.selected) {
     @include card;
   }
 
   & .ContactPresentation {
     @include detailPresentation;
+
+    &.internal {
+
+      & .ui--IdentityIcon {
+
+        &:after {
+          font-size: 16px;
+          margin: {
+            top: 4px;
+            left: -4px;
+          }
+        }
+      }
+    }
+  }
+
+  & .didDelete {
+    @include button-icon-only-inline($icon-trash-o);
+  }
+
+  & .didCreate {
+    @include button-icon-only-inline($icon-plus);
+  }
+
+  & .did {
+    margin-right: 10px;
+  }
+
+  & .toggleContacts {
+    @include button-icon-only($icon-star);
+    @include favorite;
+
+    &.isMyContact {
+      color: $color-grey-light;
+    }
   }
 }

@@ -9,9 +9,9 @@
   & .delegationNodeScrollContainer {
     display: inline-block;
     max-width: 100%;
-    padding:{
+    padding: {
       right: $base-padding/4;
-      bottom: 2*$base-button-height;
+      bottom: 4*$base-button-height;
       left: $base-padding/4;
     }
     overflow: auto;
@@ -23,5 +23,13 @@
         display: none;
       }
     }
+  }
+
+  & .viewTypeLabel {
+    position: absolute;
+    top: $base-padding/4;
+    right: $base-padding/2;
+    font-size: 10px;
+    color: $color-grey;
   }
 }

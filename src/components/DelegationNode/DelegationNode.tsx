@@ -3,7 +3,7 @@ import { Blockchain } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
 import BlockchainService from '../../services/BlockchainService'
-import {
+import FeedbackService, {
   notify,
   notifySuccess,
   notifyFailure,
@@ -17,10 +17,21 @@ import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
 import Permissions from '../Permissions/Permissions'
 import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
+import DelegationsService from '../../services/DelegationsService'
 import ShortHash from '../ShortHash/ShortHash'
 import Spinner from '../Spinner/Spinner'
 
 import './DelegationNode.scss'
+import { ModalType } from '../Modal/Modal'
+import {
+  BlockingNotification,
+  NotificationType,
+} from '../../types/UserFeedback'
+
+export enum ViewType {
+  Present = 'present',
+  OnCreation = 'onCreation',
+}
 
 export type DelegationsTreeNode = {
   delegation: sdk.IDelegationNode | sdk.IDelegationRootNode
@@ -32,9 +43,11 @@ type Props = {
   selectedIdentity: MyIdentity
   focusedNodeId: DelegationsTreeNode['delegation']['id']
 
+  editable?: boolean
+  focusedNodeAlias?: MyDelegation['metaData']['alias']
   gotSiblings?: true
   gettingSiblings?: boolean
-  focusedNodeAlias?: MyDelegation['metaData']['alias']
+  viewType?: ViewType
 
   onGetChildren?: () => void
 }
@@ -44,6 +57,7 @@ type State = {
 
   attestationHashes: string[]
   delegationForInvite?: MyDelegation
+  editable?: boolean
   focusedNode?: boolean
   gettingChildren?: boolean
   gotChildren?: true
@@ -56,8 +70,8 @@ class DelegationNode extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      node: props.node,
       attestationHashes: [],
+      node: props.node,
     }
 
     this.getChildren = this.getChildren.bind(this)
@@ -65,6 +79,7 @@ class DelegationNode extends React.Component<Props, State> {
     this.cancelInvite = this.cancelInvite.bind(this)
     this.confirmInvite = this.confirmInvite.bind(this)
     this.revokeAttestations = this.revokeAttestations.bind(this)
+    this.revokeDelegation = this.revokeDelegation.bind(this)
   }
 
   public componentDidMount() {
@@ -93,7 +108,13 @@ class DelegationNode extends React.Component<Props, State> {
   }
 
   public render() {
-    const { focusedNodeAlias, focusedNodeId, selectedIdentity } = this.props
+    const {
+      editable,
+      focusedNodeAlias,
+      focusedNodeId,
+      selectedIdentity,
+      viewType,
+    } = this.props
     const {
       attestationHashes,
       delegationForInvite,
@@ -105,15 +126,17 @@ class DelegationNode extends React.Component<Props, State> {
       node,
     } = this.state
     const { delegation } = node
-    const { permissions } = delegation as sdk.IDelegationNode
+    const { permissions, revoked } = delegation as sdk.IDelegationNode
 
     return (
       <section
-        key={delegation.id}
         className={`DelegationNode
           ${!node.childNodes.length ? 'hasNoChildren' : ''}
           ${myNode ? 'myNode' : ''}
           ${focusedNode ? 'focusedNode' : ''}
+          ${editable ? 'editable' : ''}
+          viewType-${viewType}
+          ${revoked ? 'revoked' : ''}
         `}
       >
         <div className="label">
@@ -123,28 +146,39 @@ class DelegationNode extends React.Component<Props, State> {
               <h3>{focusedNodeAlias}</h3>
             )}
             <ShortHash length={10}>{delegation.id}</ShortHash>
-            <span
-              className="attestedClaims"
-              title={`${
-                attestationHashes.length
-              } attested claims created with this delegation`}
-            >
-              ({attestationHashes.length})
-            </span>
+            {editable && viewType === ViewType.Present && (
+              <span
+                className="attestedClaims"
+                title={`${
+                  attestationHashes.length
+                } attested claims created with this delegation`}
+              >
+                ({attestationHashes.length})
+              </span>
+            )}
           </div>
           <div className="content">
-            <ContactPresentation address={delegation.account} />
-            {!!permissions && <Permissions permissions={permissions} />}
-            <SelectDelegationAction
-              className={`minimal ${focusedNode ? 'inverted' : ''}`}
-              delegationEntry={myDelegation}
-              onInvite={this.inviteTo.bind(this, myDelegation)}
-              onRevokeAttestations={this.revokeAttestations}
+            <ContactPresentation
+              address={delegation.account}
+              interactive={true}
             />
+            {!!permissions && <Permissions permissions={permissions} />}
+            {editable && myDelegation && (
+              <SelectDelegationAction
+                className={`minimal ${focusedNode ? 'inverted' : ''}`}
+                delegation={node.delegation}
+                onInvite={this.inviteTo.bind(this, myDelegation)}
+                onRevokeAttestations={this.revokeAttestations}
+                onRevokeDelegation={this.revokeDelegation}
+              />
+            )}
           </div>
+          {viewType === ViewType.Present && revoked && (
+            <div className="revokedLabel">REVOKED</div>
+          )}
         </div>
-        {this.getElement_getSiblings()}
-        {this.getElement_getChildren()}
+        {viewType === ViewType.Present && this.getElement_getSiblings()}
+        {viewType === ViewType.Present && this.getElement_getChildren()}
         {node.childNodes.map((childNode: DelegationsTreeNode) => (
           <DelegationNode
             selectedIdentity={selectedIdentity}
@@ -155,11 +189,14 @@ class DelegationNode extends React.Component<Props, State> {
             gotSiblings={gotChildren}
             gettingSiblings={gettingChildren}
             focusedNodeAlias={focusedNodeAlias}
+            editable={editable}
+            viewType={viewType}
           />
         ))}
-        {delegationForInvite && (
+        {editable && viewType === ViewType.Present && delegationForInvite && (
           <MyDelegationsInviteModal
             delegationsSelected={[delegationForInvite]}
+            isPCR={!!delegationForInvite.isPCR}
             onCancel={this.cancelInvite}
             onConfirm={this.confirmInvite}
           />
@@ -286,6 +323,52 @@ class DelegationNode extends React.Component<Props, State> {
           </span>
         )
       })
+  }
+
+  private async revokeDelegation() {
+    const { selectedIdentity, node } = this.props
+
+    FeedbackService.addBlockingNotification({
+      header: 'Revoke this delegation?',
+      message: (
+        <div>
+          Are you sure you want to revoke the Delegation '
+          <ShortHash>{node.delegation.id}</ShortHash>'?
+        </div>
+      ),
+      modalType: ModalType.CONFIRM,
+      okButtonLabel: 'Revoke',
+      onCancel: (notification: BlockingNotification) => notification.remove(),
+      onConfirm: async (notification: BlockingNotification) => {
+        notification.remove()
+        const blockchain = await BlockchainService.connect()
+        const blockUi = FeedbackService.addBlockUi({
+          headline: 'Revoking delegation',
+        })
+
+        DelegationsService.revoke(node.delegation, selectedIdentity.identity)
+          .then(() => {
+            node.delegation.revoked = true
+            this.setState({
+              node,
+            })
+
+            blockUi.remove()
+            notifySuccess(<span>Delegation successfully revoked</span>, true)
+          })
+          .catch(error => {
+            blockUi.remove()
+            errorService.log(error)
+            notifyFailure(
+              <span>
+                Something went wrong, while revoking the Delegation. Please try
+                again
+              </span>
+            )
+          })
+      },
+      type: NotificationType.FAILURE,
+    })
   }
 
   private async getChildren() {

@@ -52,13 +52,14 @@ class CreateDelegation extends React.Component<Props, State> {
 
   public render() {
     const { delegationData, inviteeAddress } = this.props
+    const { isPCR, permissions } = delegationData
     const { isSignatureValid } = this.state
 
     return (
       <section className="AcceptDelegation">
         {isSignatureValid ? (
           <>
-            <h2>Create delegation</h2>
+            <h2>Create {isPCR ? 'PCR member' : 'delegation'}</h2>
 
             <div className="delegationData">
               <div>
@@ -70,15 +71,17 @@ class CreateDelegation extends React.Component<Props, State> {
               <div>
                 <label>Invitees permissions</label>
                 <div>
-                  <Permissions permissions={delegationData.permissions} />
+                  <Permissions permissions={permissions} />
                 </div>
               </div>
             </div>
 
-            <DelegationDetailView id={delegationData.parentId} />
+            <DelegationDetailView id={delegationData.parentId} isPCR={isPCR} />
 
             <div className="actions">
-              <button onClick={this.createDelegation}>Create delegation</button>
+              <button onClick={this.createDelegation}>
+                Create {isPCR ? 'PCR member' : 'delegation'}
+              </button>
             </div>
           </>
         ) : isSignatureValid == null ? (
@@ -87,7 +90,7 @@ class CreateDelegation extends React.Component<Props, State> {
           <>
             <h2 className="danger">Alert!</h2>
             <div className="danger">
-              Inviters signature does not match attached delegationData
+              Inviters signature does not match attached data
             </div>
           </>
         )}
@@ -97,17 +100,17 @@ class CreateDelegation extends React.Component<Props, State> {
 
   private async createDelegation() {
     const { delegationData, signatures } = this.props
-    const { account, id, parentId, permissions } = delegationData
+    const { account, id, isPCR, parentId, permissions } = delegationData
 
     const blockUi: BlockUi = FeedbackService.addBlockUi({
-      headline: 'Creating delegation...',
+      headline: `Creating ${isPCR ? 'PCR member' : 'delegation'}`,
     })
 
     const rootNode:
       | sdk.IDelegationRootNode
       | undefined = await DelegationService.findRootNode(parentId)
     if (!rootNode) {
-      notifyFailure('Root delegation not found')
+      notifyFailure(`${isPCR ? 'PCR root' : 'Root delegation'} not found`)
       return
     }
     const rootId = rootNode.id
@@ -126,7 +129,9 @@ class CreateDelegation extends React.Component<Props, State> {
 
     DelegationService.storeOnChain(newDelegationNode, signatures.invitee)
       .then(() => {
-        notifySuccess('Delegation successfully created')
+        notifySuccess(
+          `${isPCR ? 'PCR member' : 'Delegation'} successfully created`
+        )
         blockUi.remove()
         this.replyToInvitee()
       })
@@ -134,7 +139,7 @@ class CreateDelegation extends React.Component<Props, State> {
         blockUi.remove()
         errorService.logWithNotification({
           error,
-          message: `Delegation creation failed.`,
+          message: `${isPCR ? 'PCR member' : 'Delegation'} creation failed.`,
           origin: 'CreateDelegation.createDelegation()',
           type: 'ERROR.FETCH.POST',
         })
@@ -158,7 +163,8 @@ class CreateDelegation extends React.Component<Props, State> {
 
     AttestationWorkflow.informCreateDelegation(
       delegationData.id,
-      inviteeAddress
+      inviteeAddress,
+      delegationData.isPCR
     ).then(() => {
       if (onFinished) {
         onFinished()

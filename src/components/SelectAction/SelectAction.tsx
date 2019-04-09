@@ -18,11 +18,7 @@ type Props = {
   className?: string
 }
 
-type State = {
-  selectActionOptions: SelectActionOption[]
-}
-
-class SelectAction extends React.Component<Props, State> {
+class SelectAction extends React.Component<Props> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -30,19 +26,12 @@ class SelectAction extends React.Component<Props, State> {
     }
   }
 
-  public componentDidMount() {
-    const { actions } = this.props
-    this.setState({
-      selectActionOptions: actions.map((action: Action) => ({
-        label: action.label,
-        value: action.label,
-      })),
-    })
-  }
-
   public render() {
-    const { className } = this.props
-    const { selectActionOptions } = this.state
+    const { actions, className } = this.props
+    const selectActionOptions = actions.map((action: Action) => ({
+      label: action.label,
+      value: action.label,
+    }))
 
     return (
       <section className={`SelectAction ${className}`}>

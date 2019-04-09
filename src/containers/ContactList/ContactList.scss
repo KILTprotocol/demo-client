@@ -14,12 +14,56 @@
         )
     );
 
+    & .name {
+      padding: {
+        top: $cell-padding-h;
+      }
+    }
+
     & .address {
       word-break: break-word;
     }
 
     & .requestClaimBtn {
       @include button-icon-only($icon-wpforms);
+    }
+  }
+
+  & .contactActions{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: {
+      bottom: $base-padding;
+    }
+
+    & button {
+      margin:{
+        left: $base-padding / 2;
+      }
+    }
+  }
+
+  & .toggleContacts {
+    @include button-icon-only($icon-star);
+    @include favorite;
+
+    &.all {
+      color: $color-grey-light;
+    }
+  }
+
+  & .refresh {
+    @include button-icon-only($icon-refresh);
+  }
+
+  & .noContactsMessage {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    & button {
+      @include button-secondary;
     }
   }
 }

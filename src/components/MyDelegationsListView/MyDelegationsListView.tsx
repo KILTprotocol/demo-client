@@ -5,16 +5,17 @@ import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Permissions from '../Permissions/Permissions'
-import SelectAction from '../SelectAction/SelectAction'
+import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
 
 import './MyDelegationsListView.scss'
-import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
 
 type Props = {
   onCreateDelegation: () => void
   delegationEntries: MyDelegation[]
   onRemoveDelegation: (delegation: MyDelegation) => void
   onRequestInviteContacts: (delegation: MyDelegation) => void
+
+  isPCR: boolean
 }
 
 type State = {}
@@ -27,13 +28,15 @@ class MyDelegationsListView extends React.Component<Props, State> {
   }
 
   public render() {
+    const { isPCR } = this.props
+
     return (
       <section className="MyDelegationsListView">
-        <h1>My Delegations</h1>
+        <h1>My {isPCR ? 'PCRs' : 'Delegations'}</h1>
         {this.getDelegationEntries()}
         <div className="actions">
           <button className="create" onClick={this.handleCreate}>
-            New Delegation
+            New {isPCR ? 'PCR' : 'Delegation'}
           </button>
         </div>
       </section>
@@ -41,7 +44,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
   }
 
   private getDelegationEntries() {
-    const { delegationEntries } = this.props
+    const { delegationEntries, isPCR } = this.props
     return (
       delegationEntries &&
       !!delegationEntries.length && (
@@ -67,7 +70,11 @@ class MyDelegationsListView extends React.Component<Props, State> {
               return (
                 <tr key={delegationEntry.id}>
                   <td className="alias_ctype">
-                    <Link to={`/delegations/${delegationEntry.id}`}>
+                    <Link
+                      to={`/${isPCR ? 'pcrs' : 'delegations'}/${
+                        delegationEntry.id
+                      }`}
+                    >
                       {delegationEntry.metaData.alias}
                     </Link>
                     {cTypeHash ? (
@@ -77,7 +84,11 @@ class MyDelegationsListView extends React.Component<Props, State> {
                     )}
                   </td>
                   <td className="alias">
-                    <Link to={`/delegations/${delegationEntry.id}`}>
+                    <Link
+                      to={`/${isPCR ? 'pcrs' : 'delegations'}/${
+                        delegationEntry.id
+                      }`}
+                    >
                       {delegationEntry.metaData.alias}
                     </Link>
                   </td>
@@ -112,7 +123,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
                   <td className="actionsTd">
                     <div>
                       <SelectDelegationAction
-                        delegationEntry={delegationEntry}
+                        delegation={delegationEntry}
                         onInvite={this.requestInviteContacts.bind(
                           this,
                           delegationEntry

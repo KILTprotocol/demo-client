@@ -1,24 +1,24 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import ContactRepository from '../../services/ContactRepository'
-import ErrorService from '../../services/ErrorService'
 
 import { Contact } from '../../types/Contact'
 import SelectContacts from '../SelectContacts/SelectContacts'
 import Modal, { ModalType } from './Modal'
 
 type Props = {
+  allContacts?: boolean
+  closeMenuOnSelect?: boolean
+  contacts?: Contact[]
   header?: string | ReactNode
   isMulti?: boolean
   name?: string
   placeholder?: string
-  closeMenuOnSelect?: boolean
+
   onCancel: () => void
   onConfirm: (selectedContacts: Contact[]) => void
 }
 
 type State = {
-  contacts?: Contact[]
   isSelectContactsOpen: boolean
   selectedContacts: Contact[]
 }
@@ -42,42 +42,20 @@ class SelectContactsModal extends React.Component<Props, State> {
     this.onSelectContacts = this.onSelectContacts.bind(this)
   }
 
-  public componentDidMount() {
-    ContactRepository.findAll()
-      .then((contacts: Contact[]) => {
-        this.setState({ contacts })
-      })
-      .catch(error => {
-        ErrorService.logWithNotification({
-          error,
-          message: 'Could not fetch contacts',
-          origin: 'SelectContactsModal.componentDidMount()',
-          type: 'ERROR.FETCH.GET',
-        })
-      })
-  }
-
   public render() {
-    const { contacts } = this.state
-
-    if (!!contacts && !!contacts.length) {
-      return this.getModalElement()
-    } else {
-      return ''
-    }
-  }
-
-  public getModalElement() {
     const {
+      allContacts,
+      closeMenuOnSelect,
+      contacts,
       header,
       isMulti,
       name,
       placeholder,
-      closeMenuOnSelect,
+
       onCancel,
       onConfirm,
     } = this.props
-    const { contacts, isSelectContactsOpen, selectedContacts } = this.state
+    const { isSelectContactsOpen, selectedContacts } = this.state
 
     const finalPlaceholder = (placeholder as string).replace(
       '#{multi}',
@@ -107,6 +85,7 @@ class SelectContactsModal extends React.Component<Props, State> {
       >
         <div>
           <SelectContacts
+            allContacts={allContacts}
             contacts={contacts as Contact[]}
             name={name as string}
             isMulti={isMulti}

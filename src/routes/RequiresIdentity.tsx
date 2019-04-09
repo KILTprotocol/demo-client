@@ -18,7 +18,10 @@ const mapStateToProps = (state: ReduxState) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const requiresIdentity = (WrappedComponent: ComponentType) => {
+const requiresIdentity = (
+  WrappedComponent: ComponentType,
+  additionalProps?: { [key: string]: any }
+) => {
   return connect(mapStateToProps)((props: Props) => {
     const { identities, selectedIdentity } = props
     switch (true) {
@@ -27,7 +30,7 @@ const requiresIdentity = (WrappedComponent: ComponentType) => {
       case !selectedIdentity:
         return <NoSelectedIdentity />
       case !!identities && !!identities.length && !!selectedIdentity:
-        return <WrappedComponent />
+        return <WrappedComponent {...additionalProps} />
       default:
         return <Loading />
     }

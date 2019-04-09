@@ -37,8 +37,8 @@ class CTypePresentation extends React.Component<Props, State> {
     this.setCType()
   }
 
-  public componentDidUpdate(nextProps: Props) {
-    if (!_.isEqual(this.props, nextProps)) {
+  public componentDidUpdate(prevProps: Props) {
+    if (!_.isEqual(this.props, prevProps)) {
       this.setCType()
     }
   }

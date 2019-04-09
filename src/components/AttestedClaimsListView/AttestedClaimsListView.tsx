@@ -2,11 +2,12 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 
 import attestationService from '../../services/AttestationService'
-import contactRepository from '../../services/ContactRepository'
+import ContactRepository from '../../services/ContactRepository'
 import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import DelegationDetailView from '../DelegationDetailView/DelegationDetailView'
+import { ViewType } from '../DelegationNode/DelegationNode'
 import Spinner from '../Spinner/Spinner'
 
 import './AttestedClaimsListView.scss'
@@ -44,13 +45,13 @@ type Props = {
 
   context?: 'legitimations'
   delegationId?: sdk.IDelegationNode['id']
+  currentDelegationViewType?: ViewType
 
   onToggleChildOpen?: (closeCallback?: () => void | undefined) => void
 }
 
 type State = {
   attestationStatus: AttestationStatus
-  canResolveAttesters: boolean
   labels: { [key: string]: string }
 
   closeOpenedChild?: () => void
@@ -68,7 +69,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
     this.state = {
       attestationStatus: {},
-      canResolveAttesters: false,
       labels: LABELS[context],
     }
 
@@ -78,14 +78,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     setTimeout(() => {
       this.verifyAttestations()
     }, 500)
-  }
-
-  public componentDidMount() {
-    contactRepository.findAll().then(() => {
-      this.setState({
-        canResolveAttesters: true,
-      })
-    })
   }
 
   public render() {
@@ -225,11 +217,15 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   private getDelegation(delegationId: Props['delegationId']) {
+    const { currentDelegationViewType } = this.props
     return (
       <div className="delegation">
         <h2>Delegation</h2>
         {delegationId ? (
-          <DelegationDetailView id={delegationId} />
+          <DelegationDetailView
+            id={delegationId}
+            viewType={currentDelegationViewType}
+          />
         ) : (
           <div>No delegation found.</div>
         )}

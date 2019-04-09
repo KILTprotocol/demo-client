@@ -1,3 +1,33 @@
 .ContactPresentation {
   @include presentation;
+
+  & .ui--IdentityIcon {
+    position: relative;
+
+    &:after {
+      @extend %centerHV;
+
+      @include favorite;
+      @include transition($base-transition);
+
+      position: absolute;
+      top: 0;
+      left: 100%;
+      margin: {
+        top: 1px;
+        left: -1px;
+      }
+      font-size: 0;
+    }
+  }
+
+  &.internal {
+
+    & .ui--IdentityIcon {
+
+      &:after {
+        font-size: 12px;
+      }
+    }
+  }
 }

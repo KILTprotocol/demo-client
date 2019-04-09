@@ -62,15 +62,28 @@ const Routes: React.FunctionComponent<{}> = props => {
 
         <Route
           path={'/delegations/new/:cTypeHash'}
-          component={requiresIdentity(DelegationCreate)}
+          component={requiresIdentity(DelegationCreate, { isPCR: false })}
         />
         <Route
           path={'/delegations/:delegationId'}
-          component={requiresIdentity(DelegationsView)}
+          component={requiresIdentity(DelegationsView, { isPCR: false })}
         />
         <Route
           path={'/delegations'}
-          component={requiresIdentity(DelegationsView)}
+          component={requiresIdentity(DelegationsView, { isPCR: false })}
+        />
+
+        <Route
+          path={'/pcrs/new/:cTypeHash'}
+          component={requiresIdentity(DelegationCreate, { isPCR: true })}
+        />
+        <Route
+          path={'/pcrs/:delegationId'}
+          component={requiresIdentity(DelegationsView, { isPCR: true })}
+        />
+        <Route
+          path={'/pcrs'}
+          component={requiresIdentity(DelegationsView, { isPCR: true })}
         />
 
         <Redirect to="/dashboard" />

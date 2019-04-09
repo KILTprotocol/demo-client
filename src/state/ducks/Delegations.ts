@@ -23,6 +23,8 @@ export interface MyDelegation {
   permissions?: sdk.IDelegationNode['permissions']
   parentId?: sdk.IDelegationNode['parentId']
   cTypeHash?: sdk.IDelegationRootNode['cTypeHash']
+  revoked: sdk.IDelegationBaseNode['revoked']
+  isPCR?: boolean
 }
 
 interface SaveAction extends KiltAction {
@@ -33,7 +35,11 @@ interface RemoveAction extends KiltAction {
   payload: MyDelegation
 }
 
-type Action = SaveAction | RemoveAction
+interface RevokeAction extends KiltAction {
+  payload: MyDelegation['id']
+}
+
+type Action = SaveAction | RemoveAction | RevokeAction
 
 type Entry = MyDelegation
 
@@ -63,11 +69,14 @@ class Store {
   }
 
   public static deserialize(serializedState: SerializedState): ImmutableState {
-    const delegations: MyDelegation[] = serializedState.delegations.map(
-      (serialized: string) => {
-        return JSON.parse(serialized) as MyDelegation
-      }
-    )
+    const delegations: MyDelegation[] =
+      serializedState &&
+      serializedState.delegations &&
+      Array.isArray(serializedState.delegations)
+        ? serializedState.delegations.map((serialized: string) => {
+            return JSON.parse(serialized) as MyDelegation
+          })
+        : []
 
     return Store.createState({
       delegations: Immutable.List(delegations),
@@ -91,6 +100,17 @@ class Store {
             .get('delegations')
             .filter((entry: Entry) => entry.id !== myDelegationToRemove.id)
         )
+      case Store.ACTIONS.REVOKE_DELEGATION:
+        const delegationId: MyDelegation['id'] = (action as RevokeAction)
+          .payload
+        const index: number = state
+          .get('delegations')
+          .map((delegation: MyDelegation) => delegation.id)
+          .indexOf(delegationId)
+        state.updateIn(['delegations', index], (delegation: MyDelegation) => {
+          delegation.revoked = true
+        })
+        return state
       default:
         return state
     }
@@ -100,6 +120,13 @@ class Store {
     return {
       payload: myDelegation,
       type: Store.ACTIONS.SAVE_DELEGATION,
+    }
+  }
+
+  public static revokeDelegationAction(id: MyDelegation['id']): RevokeAction {
+    return {
+      payload: id,
+      type: Store.ACTIONS.REVOKE_DELEGATION,
     }
   }
 
@@ -120,11 +147,12 @@ class Store {
 
   private static ACTIONS = {
     REMOVE_DELEGATION: 'client/delegations/REMOVE_DELEGATION',
+    REVOKE_DELEGATION: 'client/delegations/REVOKE_DELEGATION',
     SAVE_DELEGATION: 'client/delegations/SAVE_DELEGATION',
   }
 }
 
-const _getAllDelegations = (state: ReduxState) =>
+const _getAllDelegations = (state: ReduxState): MyDelegation[] =>
   state.delegations.get('delegations').toArray()
 
 const getAllDelegations = createSelector(

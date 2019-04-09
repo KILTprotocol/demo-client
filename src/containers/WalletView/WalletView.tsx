@@ -82,11 +82,13 @@ class WalletView extends React.Component<Props, State> {
 
   private createDid(myIdentity: MyIdentity) {
     const blockUi = FeedbackService.addBlockUi({
-      headline: 'Generating DID...',
+      headline: `Generating DID for '${myIdentity.metaData.name}'`,
     })
     DidService.createDid(myIdentity) // TODO: add document reference
       .then((did: sdk.IDid) => {
-        notifySuccess(`DID successfully generated: ${did.identifier}`)
+        notifySuccess(
+          `DID for '${myIdentity.metaData.name}' successfully generated`
+        )
         blockUi.remove()
       })
       .catch(err => {
@@ -96,13 +98,15 @@ class WalletView extends React.Component<Props, State> {
   }
 
   private deleteDid(myIdentity: MyIdentity) {
-    safeDelete(`your identity's DID`, () => {
+    safeDelete(`the DID for '${myIdentity.metaData.name}'`, () => {
       const blockUi = FeedbackService.addBlockUi({
-        headline: `Removing DID for identity ${myIdentity.metaData.name}`,
+        headline: `Removing DID for '${myIdentity.metaData.name}'`,
       })
       DidService.deleteDid(myIdentity)
         .then(() => {
-          notifySuccess('Successfully deleted DID')
+          notifySuccess(
+            `Successfully deleted DID for '${myIdentity.metaData.name}'`
+          )
           blockUi.remove()
         })
         .catch(err => {

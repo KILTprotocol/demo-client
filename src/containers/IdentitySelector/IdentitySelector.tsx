@@ -4,9 +4,13 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import Select from 'react-select'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
+import ContactRepository from '../../services/ContactRepository'
 
+import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
-import { State as ReduxState } from '../../state/PersistentStore'
+import PersistentStore, {
+  State as ReduxState,
+} from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 
 import './IdentitySelector.scss'
@@ -33,12 +37,27 @@ type State = {
 }
 
 class IdentitySelector extends React.Component<Props, State> {
+  public componentDidMount() {
+    const { myIdentities } = this.props
+    const myIdentityContacts = myIdentities.map((myIdentity: MyIdentity) =>
+      ContactRepository.getContactFromIdentity(myIdentity)
+    )
+    PersistentStore.store.dispatch(
+      Contacts.Store.addContacts(myIdentityContacts)
+    )
+  }
+
   public render() {
     const { myIdentities, selectedIdentity } = this.props
 
     const identityOptions: SelectIdentityOption[] = myIdentities.map(
       (myIdentity: MyIdentity) => ({
-        label: <ContactPresentation myIdentity={myIdentity} size={20} />,
+        label: (
+          <ContactPresentation
+            address={myIdentity.identity.address}
+            size={20}
+          />
+        ),
         value: myIdentity.identity.address,
       })
     )

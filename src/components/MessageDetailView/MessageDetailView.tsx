@@ -194,11 +194,14 @@ class MessageDetailView extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.INFORM_CREATE_DELEGATION: {
-        const delegationId = (message.body as sdk.IInformCreateDelegation)
-          .content
+        const {
+          delegationId,
+          isPCR,
+        } = (message.body as sdk.IInformCreateDelegation).content
         return (
           <ImportDelegation
             delegationId={delegationId}
+            isPCR={isPCR}
             onFinished={this.handleDelete}
           />
         )

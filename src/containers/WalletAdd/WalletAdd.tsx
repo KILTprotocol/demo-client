@@ -4,16 +4,17 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
-import Input from '../../components/Input/Input'
-import BalanceUtilities from '../../services/BalanceUtilities'
 
+import Input from '../../components/Input/Input'
 import BlockchainService from '../../services/BlockchainService'
-import contactRepository from '../../services/ContactRepository'
+import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
-import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
+import { notify, notifySuccess } from '../../services/FeedbackService'
+import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
-import { Contact, MyIdentity } from '../../types/Contact'
-import { BlockUi } from '../../types/UserFeedback'
+import PersistentStore from '../../state/PersistentStore'
+import { MyIdentity } from '../../types/Contact'
+
 import './WalletAdd.scss'
 
 type Props = RouteComponentProps<{}> & {
@@ -132,11 +133,6 @@ class WalletAdd extends React.Component<Props, State> {
   private async addIdentity() {
     const { alias, myPhrase, randomPhrase, useMyPhrase } = this.state
 
-    const blockUi: BlockUi = FeedbackService.addBlockUi({
-      headline: 'Creating identity',
-      message: 'building Identity from phrase (1/3)',
-    })
-
     let identity: Identity
     const phrase = useMyPhrase ? myPhrase : randomPhrase
     try {
@@ -147,55 +143,38 @@ class WalletAdd extends React.Component<Props, State> {
         message: `failed to create identity from phrase '${phrase}'`,
         origin: 'WalletAdd.addIdentity()',
       })
-      blockUi.remove()
       return
     }
 
+    notify(`Creation of identity '${alias}' initiated.`)
+    this.props.history.push('/wallet')
+
     const blockchain: Blockchain = await BlockchainService.connect()
-    const alice = Identity.buildFromSeedString('Alice')
-    blockUi.updateMessage('transfer initial tokens (2/3)')
+    const alice = Identity.buildFromURI('//Alice')
     blockchain
       .makeTransfer(alice, identity.address, 1000)
-      .then((result: any) => {
-        const { address, boxPublicKeyAsHex } = identity
-        const newContact: Contact = {
+      .then(() => {
+        const newIdentity: MyIdentity = {
+          identity,
           metaData: {
             name: alias,
           },
-          publicIdentity: { address, boxPublicKeyAsHex },
+          phrase,
         }
-        blockUi.updateMessage('adding identity to contact repository (3/3)')
-        contactRepository.add(newContact).then(
-          () => {
-            const newIdentity = {
-              ...newContact,
-              identity,
-              phrase,
-            }
-            this.props.saveIdentity(newIdentity)
-            BalanceUtilities.connect(newIdentity)
-            blockUi.remove()
-            notifySuccess(`Identity ${alias} successfully created.`)
-            this.props.history.push('/wallet')
-          },
-          error => {
-            errorService.log({
-              error,
-              message: 'failed to POST new identity',
-              origin: 'WalletAdd.addIdentity()',
-              type: 'ERROR.FETCH.POST',
-            })
-            blockUi.remove()
-          }
+        this.props.saveIdentity(newIdentity)
+        PersistentStore.store.dispatch(
+          Contacts.Store.addContact(
+            ContactRepository.getContactFromIdentity(newIdentity)
+          )
         )
+        notifySuccess(`New identity '${alias}' successfully created`)
       })
       .catch(error => {
         errorService.log({
           error,
-          message: 'failed to transfer initial tokens to identity',
+          message: `Failed to transfer initial tokens to identity '${alias}'`,
           origin: 'WalletAdd.addIdentity()',
         })
-        blockUi.remove()
       })
   }
 
