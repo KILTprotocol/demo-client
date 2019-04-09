@@ -1,6 +1,8 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import ContactRepository from '../../services/ContactRepository'
 
 import DelegationsService from '../../services/DelegationsService'
+import MessageRepository from '../../services/MessageRepository'
 import * as Delegations from '../../state/ducks/Delegations'
 import { DelegationType, MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
@@ -22,6 +24,14 @@ type RootData = {
 type ParentData = {
   ownerIdentity: MyIdentity
   delegation: sdk.DelegationNode | sdk.DelegationRootNode
+  metaData?: MyDelegation['metaData']
+}
+
+type DelegationDataForMessages = {
+  delegation: sdk.DelegationNode
+  isPCR: boolean
+  ownerIdentity: MyIdentity
+  signature: string
 }
 
 type BsDelegationsPoolElement = {
@@ -46,6 +56,7 @@ class BsDelegation {
     rootData: RootData,
     parentData: ParentData,
     isPCR: boolean,
+    withMessages: boolean,
     updateCallback?: (delegationAlias: string) => void
   ): Promise<void> {
     const { alias, children, ownerKey, permissions } = BsDelegationData
@@ -79,16 +90,24 @@ class BsDelegation {
     )
 
     const signature = ownerIdentity.identity.signStr(delegation.generateHash())
+    const metaData = { alias }
     await DelegationsService.storeOnChain(delegation, signature)
     DelegationsService.store({
       cTypeHash: rootData.rootDelegation.cTypeHash,
       ...delegation,
       isPCR,
-      metaData: {
-        alias,
-      },
+      metaData,
       type: DelegationType.Node,
     })
+
+    if (withMessages) {
+      BsDelegation.sendMessages(parentData, {
+        delegation,
+        isPCR,
+        ownerIdentity,
+        signature,
+      })
+    }
 
     if (!isPCR && children) {
       await BsDelegation.createChildren(
@@ -96,9 +115,11 @@ class BsDelegation {
         rootData,
         {
           delegation,
+          metaData,
           ownerIdentity,
         },
         isPCR,
+        withMessages,
         updateCallback
       )
     }
@@ -109,6 +130,7 @@ class BsDelegation {
     rootData: RootData,
     parentData: ParentData,
     isPCR: boolean,
+    withMessages: boolean,
     updateCallback?: (delegationAlias: string) => void
   ) {
     const requests = Object.keys(children).reduce(
@@ -119,6 +141,7 @@ class BsDelegation {
             rootData,
             parentData,
             isPCR,
+            withMessages,
             updateCallback
           )
         })
@@ -132,6 +155,7 @@ class BsDelegation {
     BsDelegationData: BsDelegationsPoolElement,
     BsDelegationKey: keyof BsDelegationsPool,
     isPCR: boolean,
+    withMessages: boolean,
     updateCallback?: (delegationAlias: string) => void
   ): Promise<void> {
     const { alias, children, cTypeKey, ownerKey } = BsDelegationData
@@ -167,9 +191,11 @@ class BsDelegation {
         },
         {
           delegation: rootDelegation,
+          metaData: { alias },
           ownerIdentity,
         },
         isPCR,
+        withMessages,
         updateCallback
       )
     }
@@ -177,6 +203,7 @@ class BsDelegation {
 
   public static async create(
     isPCR: boolean,
+    withMessages: boolean,
     updateCallback?: (delegationAlias: string) => void
   ): Promise<void | sdk.Claim> {
     const pool = isPCR ? BsDelegation.pcrPool : BsDelegation.delegationsPool
@@ -188,6 +215,7 @@ class BsDelegation {
             pool[bsDelegationKey],
             bsDelegationKey,
             isPCR,
+            withMessages,
             updateCallback
           )
         })
@@ -264,6 +292,82 @@ class BsDelegation {
         return results.filter(result => result)[0]
       })
     }
+  }
+
+  /**
+   * sends all the messages of regular delegation process
+   *
+   * @param parentData
+   * @param delegationDataForMessages
+   */
+  private static async sendMessages(
+    parentData: ParentData,
+    delegationDataForMessages: DelegationDataForMessages
+  ) {
+    const {
+      delegation,
+      isPCR,
+      ownerIdentity,
+      signature,
+    } = delegationDataForMessages
+
+    const delegationData: sdk.IRequestAcceptDelegation['content']['delegationData'] = {
+      account: parentData.ownerIdentity.identity.address,
+      id: delegation.id,
+      isPCR,
+      parentId: parentData.delegation.id,
+      permissions: delegation.permissions,
+    }
+
+    /** send invitation from inviter(parentIdentity) to invitee (ownerIdentity) */
+    const requestAcceptDelegation: sdk.IRequestAcceptDelegation = {
+      content: {
+        delegationData,
+        metaData: parentData.metaData,
+        signatures: {
+          inviter: parentData.ownerIdentity.identity.signStr(
+            JSON.stringify(delegationData)
+          ),
+        },
+      },
+      type: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+    }
+    await MessageRepository.singleSend(
+      requestAcceptDelegation,
+      parentData.ownerIdentity,
+      ContactRepository.getContactFromIdentity(ownerIdentity)
+    )
+
+    /** send invitation acceptance back */
+    const submitAcceptDelegation: sdk.ISubmitAcceptDelegation = {
+      content: {
+        delegationData,
+        signatures: {
+          invitee: signature,
+          inviter: requestAcceptDelegation.content.signatures.inviter,
+        },
+      },
+      type: sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION,
+    }
+    await MessageRepository.singleSend(
+      submitAcceptDelegation,
+      ownerIdentity,
+      ContactRepository.getContactFromIdentity(parentData.ownerIdentity)
+    )
+
+    /** inform about delegation creation */
+    const informCreateDelegation: sdk.IInformCreateDelegation = {
+      content: {
+        delegationId: delegation.id,
+        isPCR,
+      },
+      type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
+    }
+    await MessageRepository.singleSend(
+      informCreateDelegation,
+      parentData.ownerIdentity,
+      ContactRepository.getContactFromIdentity(ownerIdentity)
+    )
   }
 }
 

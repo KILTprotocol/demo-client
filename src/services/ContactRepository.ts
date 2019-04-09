@@ -84,13 +84,15 @@ class ContactRepository {
       })
   }
 
-  public static getContactFromIdentity(myIdentity: MyIdentity) {
+  public static getContactFromIdentity(
+    myIdentity: MyIdentity,
+    mergeMetaData?: Partial<Contact['metaData']>
+  ) {
     const { identity, metaData } = myIdentity
     const { address, boxPublicKeyAsHex } = identity
-    const { name } = metaData
 
     const contact: Contact = {
-      metaData: { name, unregistered: true },
+      metaData: { ...metaData, ...mergeMetaData },
       publicIdentity: { address, boxPublicKeyAsHex },
     }
 
