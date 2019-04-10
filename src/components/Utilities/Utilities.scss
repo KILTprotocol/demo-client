@@ -11,4 +11,11 @@
   & button {
     @include button-secondary;
   }
+
+  & .versions {
+
+    & > div {
+      @include label_input_combo;
+    }
+  }
 }
