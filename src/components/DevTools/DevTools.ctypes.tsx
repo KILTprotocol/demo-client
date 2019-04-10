@@ -9,6 +9,8 @@ import { BsIdentity } from './DevTools.wallet'
 
 import cTypesPool from './data/cTypes.json'
 
+type UpdateCallback = (bsCTypeKey: keyof BsCTypesPool) => void
+
 interface BsCTypesPoolElement extends sdk.ICType {
   owner: string
 }
@@ -28,8 +30,6 @@ class BsCType {
     const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
       .identity
 
-    // const schema = {...bsCTypeData.schema, $id: sdk.UUID.generate()}
-    // const hash = sdk.Crypto.hashStr(JSON.stringify(schema))
     const cType = sdk.CType.fromObject({
       ...bsCTypeData,
       owner: ownerIdentity.address,
@@ -65,9 +65,7 @@ class BsCType {
       })
   }
 
-  public static async savePool(
-    updateCallback?: (cTypeTitle: string) => void
-  ): Promise<void> {
+  public static async savePool(updateCallback?: UpdateCallback): Promise<void> {
     const bsCTypeKeys = Object.keys(BsCType.pool)
     const requests = bsCTypeKeys.reduce((promiseChain, bsCTypeKey) => {
       return promiseChain.then(() => {

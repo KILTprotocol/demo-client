@@ -1,16 +1,21 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import { Blockchain, Identity } from '@kiltprotocol/prototype-sdk'
 import { mnemonicGenerate } from '@polkadot/util-crypto/mnemonic'
 
 import BalanceUtilities from '../../services/BalanceUtilities'
 import BlockchainService from '../../services/BlockchainService'
-import contactRepository from '../../services/ContactRepository'
+import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
+import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore from '../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../types/Contact'
 
 import identitiesPool from './data/identities.json'
+import { BsAttestationsPool } from './DevTools.attestations'
+
+type UpdateCallback = (bsIdentityKey: keyof BsIdentitiesPool) => void
 
 type BsIdentitiesPool = {
   [key: string]: string
@@ -20,15 +25,15 @@ class BsIdentity {
   public static pool: BsIdentitiesPool = identitiesPool as BsIdentitiesPool
 
   public static createPool(
-    updateCallback?: (alias: string) => void
+    updateCallback?: UpdateCallback
   ): Promise<void | MyIdentity> {
     const identityLabels = Object.keys(BsIdentity.pool)
-    const requests = identityLabels.reduce((promiseChain, key) => {
+    const requests = identityLabels.reduce((promiseChain, bsIdentityKey) => {
       return promiseChain.then(() => {
         if (updateCallback) {
-          updateCallback(BsIdentity.pool[key])
+          updateCallback(BsIdentity.pool[bsIdentityKey])
         }
-        return BsIdentity.create(BsIdentity.pool[key])
+        return BsIdentity.create(BsIdentity.pool[bsIdentityKey])
       })
     }, Promise.resolve())
     return requests
@@ -60,20 +65,28 @@ class BsIdentity {
           publicIdentity: { address, boxPublicKeyAsHex },
         }
 
-        return Promise.all([
-          Promise.resolve(newContact),
-          contactRepository.add(newContact),
-        ])
+        PersistentStore.store.dispatch(Contacts.Store.addContact(newContact))
+
+        return Promise.all([Promise.resolve(newContact)])
       })
       .then(
-        ([newContact]) => {
+        () => {
           const newIdentity = {
-            ...newContact,
             identity,
+            metaData: {
+              name: alias,
+            },
             phrase,
           } as MyIdentity
           PersistentStore.store.dispatch(
             Wallet.Store.saveIdentityAction(newIdentity)
+          )
+          PersistentStore.store.dispatch(
+            Contacts.Store.addContact(
+              ContactRepository.getContactFromIdentity(newIdentity, {
+                unregistered: true,
+              })
+            )
           )
           BalanceUtilities.connect(newIdentity)
           notifySuccess(`Identity ${alias} successfully created.`)
@@ -96,15 +109,6 @@ class BsIdentity {
           origin: 'WalletAdd.addIdentity()',
         })
       })
-  }
-
-  public static toContact(myIdentity: MyIdentity): Contact {
-    const contact: Contact = {
-      metaData: myIdentity.metaData,
-      publicIdentity: myIdentity.identity,
-    }
-
-    return contact
   }
 
   public static async getByKey(

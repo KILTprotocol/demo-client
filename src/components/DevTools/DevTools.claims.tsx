@@ -2,10 +2,12 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import * as Claims from '../../state/ducks/Claims'
 import PersistentStore from '../../state/PersistentStore'
-
-import claims from './data/claims.json'
 import { BsCType, BsCTypesPool } from './DevTools.ctypes'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
+
+import claims from './data/claims.json'
+
+type UpdateCallback = (bsClaimKey: keyof BsClaimsPool) => void
 
 type BsClaimsPoolElement = {
   alias: string
@@ -40,15 +42,15 @@ class BsClaim {
   }
 
   public static async savePool(
-    updateCallback?: (claimAlias: string) => void
+    updateCallback?: UpdateCallback
   ): Promise<void | sdk.Claim> {
     const claimKeys = Object.keys(BsClaim.pool)
-    const requests = claimKeys.reduce((promiseChain, claimKey) => {
+    const requests = claimKeys.reduce((promiseChain, bsClaimKey) => {
       return promiseChain.then(() => {
         if (updateCallback) {
-          updateCallback(BsClaim.pool[claimKey].alias)
+          updateCallback(bsClaimKey)
         }
-        return BsClaim.save(BsClaim.pool[claimKey])
+        return BsClaim.save(BsClaim.pool[bsClaimKey])
       })
     }, Promise.resolve())
     return requests
@@ -68,6 +70,9 @@ class BsClaim {
     bsClaimKey: keyof BsClaimsPool
   ): Promise<Claims.Entry> {
     const bsClaim = await BsClaim.getBsClaimByKey(bsClaimKey)
+    await BsIdentity.selectIdentity(
+      await BsIdentity.getByKey(bsClaim.claimerKey)
+    )
     const myClaims: Claims.Entry[] = Claims.getClaims(
       PersistentStore.store.getState()
     )
@@ -78,10 +83,6 @@ class BsClaim {
       return Promise.resolve(myClaim)
     }
     throw new Error(`No claim for claimKey '${bsClaimKey}' found.`)
-  }
-
-  public static storeAttestation = (attestedClaim: sdk.IAttestedClaim) => {
-    PersistentStore.store.dispatch(Claims.Store.addAttestation(attestedClaim))
   }
 }
 

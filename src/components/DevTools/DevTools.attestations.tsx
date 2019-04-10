@@ -1,18 +1,22 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 
 import AttestationService from '../../services/AttestationService'
+import ContactRepository from '../../services/ContactRepository'
+import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import * as Attestations from '../../state/ducks/Attestations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
+import { ICType } from '../../types/Ctype'
 import { BsClaim, BsClaimsPool, BsClaimsPoolElement } from './DevTools.claims'
+import { BsCType } from './DevTools.ctypes'
 import { BsDelegation, BsDelegationsPool } from './DevTools.delegations'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 
 import attestationsPool from './data/attestations.json'
 
-type UpdateCallback = (attestationKey: keyof BsAttestationsPool) => void
+type UpdateCallback = (bsAttestationKey: keyof BsAttestationsPool) => void
 
 type BsAttestationsPoolElement = {
   attest: {
@@ -39,6 +43,7 @@ class BsAttestation {
     bsAttestationData: BsAttestationsPoolElement,
     bsAttestationKey: keyof BsAttestationsPool,
     bsAttestedClaims: BsAttestedClaims,
+    withMessages: boolean,
     updateCallback?: UpdateCallback
   ): Promise<void> {
     const { attest, claimKey, then } = bsAttestationData
@@ -62,12 +67,19 @@ class BsAttestation {
     await BsIdentity.selectIdentity(claimerIdentity)
     const claimToAttest: Claims.Entry = await BsClaim.getClaimByKey(claimKey)
 
-    const attestedClaim = await BsAttestation.attesterAttestsClaim(
+    const requestForAttestation: sdk.RequestForAttestation = await BsAttestation.getRequestForAttestation(
+      bsAttestationData,
+      claimToAttest,
+      bsAttestedClaims,
+      claimerIdentity
+    )
+
+    const attestedClaim: sdk.AttestedClaim = await BsAttestation.attesterAttestsClaim(
       bsAttestationData,
       bsAttestationKey,
       bsAttestedClaims,
-      claimToAttest,
-      claimerIdentity
+      claimerIdentity,
+      requestForAttestation
     )
 
     // import to claimers claim
@@ -75,11 +87,22 @@ class BsAttestation {
     await BsIdentity.selectIdentity(claimerIdentity)
     PersistentStore.store.dispatch(Claims.Store.addAttestation(attestedClaim))
 
+    if (withMessages) {
+      BsAttestation.sendMessages(
+        bsAttestationData,
+        claimerIdentity,
+        bsClaim,
+        requestForAttestation,
+        attestedClaim
+      )
+    }
+
     // create dependent attestations
     if (then) {
       await BsAttestation.createAttestations(
         then,
         bsAttestedClaims,
+        withMessages,
         updateCallback
       )
     }
@@ -88,6 +111,7 @@ class BsAttestation {
   public static async createAttestations(
     pool: BsAttestationsPool,
     bsAttestedClaims: BsAttestedClaims,
+    withMessages: boolean,
     updateCallback?: UpdateCallback
   ): Promise<void> {
     const bsAttestationKeys = Object.keys(pool)
@@ -98,6 +122,7 @@ class BsAttestation {
             pool[bsAttestationKey],
             bsAttestationKey,
             bsAttestedClaims,
+            withMessages,
             updateCallback
           )
         })
@@ -107,37 +132,32 @@ class BsAttestation {
     return requests
   }
 
-  public static async create(updateCallback?: UpdateCallback): Promise<void> {
+  public static async create(
+    withMessages: boolean,
+    updateCallback?: UpdateCallback
+  ): Promise<void> {
     return BsAttestation.createAttestations(
       BsAttestation.pool,
       {},
+      withMessages,
       updateCallback
     )
   }
 
-  /**
-   * collection of attesters actions necessary for attesting
-   *
-   * @param bsAttestationData
-   * @param bsAttestationKey
-   * @param bsAttestedClaims
-   * @param claimToAttest
-   * @param claimerIdentity
-   */
-  private static async attesterAttestsClaim(
+  private static async getRequestForAttestation(
     bsAttestationData: BsAttestationsPoolElement,
-    bsAttestationKey: keyof BsAttestationsPool,
-    bsAttestedClaims: BsAttestedClaims,
     claimToAttest: Claims.Entry,
+    bsAttestedClaims: BsAttestedClaims,
     claimerIdentity: MyIdentity
-  ): Promise<sdk.AttestedClaim> {
+  ): Promise<sdk.RequestForAttestation> {
     const { attest } = bsAttestationData
-    const { attesterKey, delegationKey, legitimations } = attest
+    const { delegationKey, legitimations } = attest
 
-    const attesterIdentity: MyIdentity = await BsIdentity.getByKey(attesterKey)
-
-    // for the following actions we need to take the role of the attester
-    await BsIdentity.selectIdentity(attesterIdentity)
+    // resolve delegation
+    let delegation: MyDelegation | undefined
+    if (delegationKey) {
+      delegation = await BsDelegation.getDelegationByKey(delegationKey)
+    }
 
     // get legitimations of attester
     let _legitimations: sdk.AttestedClaim[] = []
@@ -159,19 +179,37 @@ class BsAttestation {
       )
     }
 
-    // resolve delegation
-    let delegation: MyDelegation | undefined
-    if (delegationKey) {
-      delegation = await BsDelegation.getDelegationByKey(delegationKey)
-    }
-
-    // create request for attestation
-    const requestForAttestation: sdk.RequestForAttestation = new sdk.RequestForAttestation(
+    return new sdk.RequestForAttestation(
       claimToAttest.claim,
       _legitimations,
       claimerIdentity.identity,
       delegation ? delegation.id : undefined
     )
+  }
+
+  /**
+   * collection of attesters actions necessary for attesting
+   *
+   * @param bsAttestationData
+   * @param bsAttestationKey
+   * @param bsAttestedClaims
+   * @param claimerIdentity
+   * @param requestForAttestation
+   */
+  private static async attesterAttestsClaim(
+    bsAttestationData: BsAttestationsPoolElement,
+    bsAttestationKey: keyof BsAttestationsPool,
+    bsAttestedClaims: BsAttestedClaims,
+    claimerIdentity: MyIdentity,
+    requestForAttestation: sdk.RequestForAttestation
+  ): Promise<sdk.AttestedClaim> {
+    const { attest } = bsAttestationData
+    const { attesterKey } = attest
+
+    const attesterIdentity: MyIdentity = await BsIdentity.getByKey(attesterKey)
+
+    // for the following actions we need to take the role of the attester
+    await BsIdentity.selectIdentity(attesterIdentity)
 
     // create attested claim and store for reference
     const attestedClaim: sdk.AttestedClaim = await AttestationService.attestClaim(
@@ -189,6 +227,74 @@ class BsAttestation {
     } as Attestations.Entry)
 
     return attestedClaim
+  }
+
+  private static async sendMessages(
+    bsAttestationData: BsAttestationsPoolElement,
+    claimerIdentity: MyIdentity,
+    bsClaim: BsClaimsPoolElement,
+    requestForAttestation: sdk.RequestForAttestation,
+    attestedClaim: sdk.AttestedClaim
+  ): Promise<void> {
+    const { attest } = bsAttestationData
+    const { attesterKey } = attest
+
+    const attesterIdentity: MyIdentity = await BsIdentity.getByKey(attesterKey)
+    const cType: ICType = await BsCType.getByKey(bsClaim.cTypeKey)
+
+    const partialClaim = {
+      cType: cType.cType.hash as string,
+      contents: bsClaim.data,
+      owner: claimerIdentity.identity.address,
+    }
+
+    // send request for legitimation from claimer to attester
+    const requestAcceptDelegation: sdk.IRequestLegitimations = {
+      content: partialClaim,
+      type: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+    }
+    await MessageRepository.singleSend(
+      requestAcceptDelegation,
+      claimerIdentity,
+      ContactRepository.getContactFromIdentity(attesterIdentity)
+    )
+
+    // send legitimations from attester to claimer
+    const submitLegitimations: sdk.ISubmitLegitimations = {
+      content: {
+        claim: partialClaim,
+        delegationId: attestedClaim.request.delegationId,
+        legitimations: attestedClaim.request.legitimations,
+      },
+      type: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
+    }
+    await MessageRepository.singleSend(
+      submitLegitimations,
+      attesterIdentity,
+      ContactRepository.getContactFromIdentity(claimerIdentity)
+    )
+
+    // send signed legitmations from claimer to attester
+    const requestAttestationForClaim: sdk.IRequestAttestationForClaim = {
+      content: requestForAttestation,
+      type: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+    }
+    await MessageRepository.singleSend(
+      requestAttestationForClaim,
+      claimerIdentity,
+      ContactRepository.getContactFromIdentity(attesterIdentity)
+    )
+
+    // send attested claim from attester to claimer
+    const submitAttestationForClaim: sdk.ISubmitAttestationForClaim = {
+      content: attestedClaim,
+      type: sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
+    }
+    await MessageRepository.singleSend(
+      submitAttestationForClaim,
+      attesterIdentity,
+      ContactRepository.getContactFromIdentity(claimerIdentity)
+    )
   }
 }
 
