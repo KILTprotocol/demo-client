@@ -9,6 +9,7 @@ type Props = {
   delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | MyDelegation
 
   className?: string
+  isMyChild?: boolean
 
   onInvite?: (delegationEntry: MyDelegation) => void
   onDelete?: (delegationEntry: MyDelegation) => void
@@ -80,13 +81,13 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 
   private getRevokeAttestationsAction() {
-    const { delegation, onRevokeAttestations } = this.props
+    const { delegation, isMyChild, onRevokeAttestations } = this.props
 
     if (!delegation || delegation.revoked) {
       return undefined
     }
 
-    if (onRevokeAttestations) {
+    if ((this.isMine() || isMyChild) && onRevokeAttestations) {
       return {
         callback: onRevokeAttestations,
         label: 'Revoke all Attestations',
@@ -96,16 +97,12 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 
   private getRevokeDelegationAction() {
-    const { delegation, onRevokeDelegation } = this.props
+    const { delegation, isMyChild, onRevokeDelegation } = this.props
     if (!delegation || delegation.revoked) {
       return undefined
     }
 
-    if (
-      this.isMine() &&
-      SelectDelegationAction.canDelegate(delegation) &&
-      onRevokeDelegation
-    ) {
+    if ((this.isMine() || isMyChild) && onRevokeDelegation) {
       return {
         callback: onRevokeDelegation,
         label: 'Revoke delegation',

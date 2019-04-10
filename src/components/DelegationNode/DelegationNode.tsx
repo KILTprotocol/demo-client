@@ -47,6 +47,7 @@ type Props = {
   focusedNodeAlias?: MyDelegation['metaData']['alias']
   gotSiblings?: true
   gettingSiblings?: boolean
+  isMyChild?: boolean
   viewType?: ViewType
 
   onGetChildren?: () => void
@@ -112,6 +113,7 @@ class DelegationNode extends React.Component<Props, State> {
       editable,
       focusedNodeAlias,
       focusedNodeId,
+      isMyChild,
       selectedIdentity,
       viewType,
     } = this.props
@@ -163,10 +165,11 @@ class DelegationNode extends React.Component<Props, State> {
               interactive={true}
             />
             {!!permissions && <Permissions permissions={permissions} />}
-            {editable && myDelegation && (
+            {editable && (
               <SelectDelegationAction
                 className={`minimal ${focusedNode ? 'inverted' : ''}`}
                 delegation={node.delegation}
+                isMyChild={isMyChild}
                 onInvite={this.inviteTo.bind(this, myDelegation)}
                 onRevokeAttestations={this.revokeAttestations}
                 onRevokeDelegation={this.revokeDelegation}
@@ -181,16 +184,17 @@ class DelegationNode extends React.Component<Props, State> {
         {viewType === ViewType.Present && this.getElement_getChildren()}
         {node.childNodes.map((childNode: DelegationsTreeNode) => (
           <DelegationNode
-            selectedIdentity={selectedIdentity}
             key={childNode.delegation.id}
+            selectedIdentity={selectedIdentity}
+            editable={editable}
             node={childNode}
             focusedNodeId={focusedNodeId}
-            onGetChildren={this.getChildren}
+            focusedNodeAlias={focusedNodeAlias}
             gotSiblings={gotChildren}
             gettingSiblings={gettingChildren}
-            focusedNodeAlias={focusedNodeAlias}
-            editable={editable}
             viewType={viewType}
+            isMyChild={myNode || isMyChild}
+            onGetChildren={this.getChildren}
           />
         ))}
         {editable && viewType === ViewType.Present && delegationForInvite && (

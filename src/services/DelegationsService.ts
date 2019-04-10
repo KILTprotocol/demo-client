@@ -1,4 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+
+import { DelegationsTreeNode } from '../components/DelegationNode/DelegationNode'
 import { MyDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
@@ -139,6 +141,24 @@ class DelegationsService {
       )
     } catch (error) {
       throw error
+    }
+  }
+
+  public static async resolveParent(
+    currentNode: DelegationsTreeNode
+  ): Promise<DelegationsTreeNode> {
+    const blockchain = await BlockchainService.connect()
+    const parentDelegation:
+      | sdk.IDelegationBaseNode
+      | undefined = await currentNode.delegation.getParent(blockchain)
+
+    if (!parentDelegation) {
+      return currentNode
+    } else {
+      return this.resolveParent({
+        childNodes: [currentNode],
+        delegation: parentDelegation,
+      } as DelegationsTreeNode)
     }
   }
 
