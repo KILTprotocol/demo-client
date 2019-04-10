@@ -51,7 +51,7 @@ class DelegationDetailView extends React.Component<Props, State> {
         } as DelegationsTreeNode
 
         const rootNode: State['rootNode'] = await this.resolveRootNode(treeNode)
-        const parentTreeNode: DelegationsTreeNode = await this.resolveParent(
+        const parentTreeNode: DelegationsTreeNode = await DelegationsService.resolveParent(
           treeNode
         )
 
@@ -115,24 +115,6 @@ class DelegationDetailView extends React.Component<Props, State> {
         </div>
       </section>
     )
-  }
-
-  private async resolveParent(
-    currentNode: DelegationsTreeNode
-  ): Promise<DelegationsTreeNode> {
-    const blockchain = await BlockchainService.connect()
-    const parentDelegation:
-      | sdk.IDelegationBaseNode
-      | undefined = await currentNode.delegation.getParent(blockchain)
-
-    if (!parentDelegation) {
-      return currentNode
-    } else {
-      return this.resolveParent({
-        childNodes: [currentNode],
-        delegation: parentDelegation,
-      } as DelegationsTreeNode)
-    }
   }
 
   private async resolveRootNode(
