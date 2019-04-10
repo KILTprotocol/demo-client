@@ -13,7 +13,6 @@ type State = {}
 
 class Utilities extends React.Component<Props, State> {
   public render() {
-    console.log('clientPackage', clientPackage)
     return (
       <section className="Utilities">
         <h1>Utilities</h1>
