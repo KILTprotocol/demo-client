@@ -89,7 +89,7 @@ class ContactPresentation extends React.Component<Props, State> {
           theme="substrate"
         />
         {!iconOnly && (
-          <span className="label">
+          <span className="label" title={name}>
             {name}
             {myIdentity && <small>(me)</small>}
           </span>
@@ -108,14 +108,14 @@ class ContactPresentation extends React.Component<Props, State> {
     if (contact && !contact.metaData.addedAt) {
       actions.push({
         callback: this.import,
-        label: 'Import',
+        label: 'Favorize',
       })
     }
 
     if (contact && contact.metaData.addedAt) {
       actions.push({
         callback: this.remove,
-        label: 'Remove',
+        label: 'Unfavorize',
       })
     }
 

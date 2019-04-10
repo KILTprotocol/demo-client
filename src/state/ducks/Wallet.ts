@@ -110,10 +110,10 @@ class Store {
     switch (action.type) {
       case Store.ACTIONS.SAVE_IDENTITY:
         const myIdentity = (action as SaveAction).payload
-        return state.setIn(
-          ['identities', myIdentity.identity.address],
-          myIdentity
-        )
+        return state.setIn(['identities', myIdentity.identity.address], {
+          ...myIdentity,
+          createdAt: Date.now(),
+        })
       case Store.ACTIONS.REMOVE_IDENTITY:
         const removeAddress = (action as RemoveAction).payload
         return state.deleteIn(['identities', removeAddress])
@@ -184,7 +184,18 @@ const _getAllIdentities = (state: ReduxState) =>
 
 const getAllIdentities = createSelector(
   [_getAllIdentities],
-  (entries: Entry[]) => entries
+  (entries: Entry[]) =>
+    entries.sort((a, b) => {
+      if (!a.createdAt && !b.createdAt) {
+        return 0
+      } else if (!a.createdAt) {
+        return 1
+      } else if (!b.createdAt) {
+        return -1
+      } else {
+        return a.createdAt - b.createdAt
+      }
+    })
 )
 
 const _getIdentity = (
