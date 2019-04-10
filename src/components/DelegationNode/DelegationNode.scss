@@ -68,6 +68,7 @@
       @include transform-origin(50% 50%);
       @include transform(translateX(-50%) translateY(-50%) rotate(-10deg));
       @include text-shadow(0 0 5px $color-danger);
+      @include opacity(0.6);
 
       position: absolute;
       font-size: 24px;

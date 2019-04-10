@@ -1,13 +1,11 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
-
-import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
+import * as Contacts from '../../state/ducks/Contacts'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
-import * as Contacts from '../../state/ducks/Contacts'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
@@ -86,6 +84,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
       contactsPool,
       delegationsPool,
       delegationsSelected,
+      isPCR,
       myDelegations,
     }: Props = this.props
     const { contacts, delegations }: State = this.state
@@ -209,6 +208,11 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 
     // check PCR
     if (isPCR != null && !delegation.isPCR !== !isPCR) {
+      return false
+    }
+
+    // check revoked
+    if (delegation.revoked) {
       return false
     }
 
