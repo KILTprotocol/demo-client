@@ -2,7 +2,10 @@
 }
 
 @mixin presentation {
-  white-space: nowrap;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: nowrap;
 
   & .container {
 
@@ -48,8 +51,14 @@
 
   &.withActions {
     position: relative;
-    padding: {
+    margin: {
       right: $base-button-height;
+    }
+
+    & .label {
+      padding:{
+        right: 0;
+      }
     }
 
     & .SelectAction {
@@ -58,7 +67,7 @@
 
       position: absolute;
       top: -5px;
-      right: 0;
+      left: 100%;
     }
   }
 }
