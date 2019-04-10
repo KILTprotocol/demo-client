@@ -8,11 +8,14 @@ import { DelegationType, MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
-import delegationsPool from './data/delegations.json'
-
-import pcrPool from './data/pcr.json'
+import { BsAttestationsPool } from './DevTools.attestations'
 import { BsCType, BsCTypesPool } from './DevTools.ctypes'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
+
+import delegationsPool from './data/delegations.json'
+import pcrPool from './data/pcr.json'
+
+type UpdateCallback = (bsDelegationKey: keyof BsDelegationsPool) => void
 
 type Permission = 'ATTEST' | 'DELEGATE'
 
@@ -53,11 +56,12 @@ class BsDelegation {
 
   public static async createDelegation(
     BsDelegationData: BsDelegationsPoolElement,
+    bsDelegationKey: keyof BsDelegationsPool,
     rootData: RootData,
     parentData: ParentData,
     isPCR: boolean,
     withMessages: boolean,
-    updateCallback?: (delegationAlias: string) => void
+    updateCallback?: UpdateCallback
   ): Promise<void> {
     const { alias, children, ownerKey, permissions } = BsDelegationData
 
@@ -69,7 +73,7 @@ class BsDelegation {
     await BsIdentity.selectIdentity(parentData.ownerIdentity)
 
     if (updateCallback) {
-      updateCallback(alias)
+      updateCallback(bsDelegationKey)
     }
 
     // creation
@@ -131,13 +135,14 @@ class BsDelegation {
     parentData: ParentData,
     isPCR: boolean,
     withMessages: boolean,
-    updateCallback?: (delegationAlias: string) => void
+    updateCallback?: UpdateCallback
   ) {
     const requests = Object.keys(children).reduce(
       (promiseChain, BsDelegationKey) => {
         return promiseChain.then(() => {
           return BsDelegation.createDelegation(
             children[BsDelegationKey],
+            BsDelegationKey,
             rootData,
             parentData,
             isPCR,
@@ -152,17 +157,17 @@ class BsDelegation {
   }
 
   public static async createRootDelegation(
-    BsDelegationData: BsDelegationsPoolElement,
-    BsDelegationKey: keyof BsDelegationsPool,
+    bsDelegationData: BsDelegationsPoolElement,
+    bsDelegationKey: keyof BsDelegationsPool,
     isPCR: boolean,
     withMessages: boolean,
-    updateCallback?: (delegationAlias: string) => void
+    updateCallback?: UpdateCallback
   ): Promise<void> {
-    const { alias, children, cTypeKey, ownerKey } = BsDelegationData
+    const { alias, children, cTypeKey, ownerKey } = bsDelegationData
     if (!alias || !cTypeKey) {
       throw new Error(
         `Invalid delegation data'${
-          BsDelegationKey ? ` for ${BsDelegationKey}` : ''
+          bsDelegationKey ? ` for ${bsDelegationKey}` : ''
         }'`
       )
     }
@@ -171,7 +176,7 @@ class BsDelegation {
     const cType: ICType = await BsCType.getByKey(cTypeKey)
 
     if (updateCallback) {
-      updateCallback(alias)
+      updateCallback(bsDelegationKey)
     }
 
     // await creation
@@ -204,7 +209,7 @@ class BsDelegation {
   public static async create(
     isPCR: boolean,
     withMessages: boolean,
-    updateCallback?: (delegationAlias: string) => void
+    updateCallback?: UpdateCallback
   ): Promise<void | sdk.Claim> {
     const pool = isPCR ? BsDelegation.pcrPool : BsDelegation.delegationsPool
     const bsDelegationKeys = Object.keys(pool)
@@ -241,6 +246,7 @@ class BsDelegation {
     }
 
     if (match) {
+      await BsIdentity.selectIdentity(await BsIdentity.getByKey(match.ownerKey))
       const allDelegations: MyDelegation[] = Delegations.getAllDelegations(
         PersistentStore.store.getState()
       )
@@ -319,7 +325,7 @@ class BsDelegation {
       permissions: delegation.permissions,
     }
 
-    /** send invitation from inviter(parentIdentity) to invitee (ownerIdentity) */
+    // send invitation from inviter(parentIdentity) to invitee (ownerIdentity)
     const requestAcceptDelegation: sdk.IRequestAcceptDelegation = {
       content: {
         delegationData,
@@ -338,7 +344,7 @@ class BsDelegation {
       ContactRepository.getContactFromIdentity(ownerIdentity)
     )
 
-    /** send invitation acceptance back */
+    // send invitation acceptance back
     const submitAcceptDelegation: sdk.ISubmitAcceptDelegation = {
       content: {
         delegationData,
@@ -355,7 +361,7 @@ class BsDelegation {
       ContactRepository.getContactFromIdentity(parentData.ownerIdentity)
     )
 
-    /** inform about delegation creation */
+    // inform about delegation creation
     const informCreateDelegation: sdk.IInformCreateDelegation = {
       content: {
         delegationId: delegation.id,
