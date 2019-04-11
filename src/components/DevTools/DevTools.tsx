@@ -97,55 +97,6 @@ class DevTools extends React.Component<Props> {
     }).then(() => {
       blockUi.remove()
     })
-
-    // const isOfficialClaim = await saveClaim(
-    //   'IsOfficial',
-    //   'RootAttesterIsOfficial',
-    //   {},
-    //   'RootAttester'
-    // )
-    //
-    // const AttesterOfIsOfficial = BS_identity.getByAlias(BS_identityPool.ATTESTER_OF_IS_OFFICIAL)
-    // const RootAttester = BS_identity.getByAlias(BS_identityPool.ROOT_ATTESTER)
-    //
-    // if (!isOfficialClaim || !RootAttester || !AttesterOfIsOfficial) {
-    //   console.error("isOfficialClaim couldn't be created")
-    //   return
-    // }
-    //
-    // const { attestedClaim } = await attestationWorkflow(
-    //   isOfficialClaim,
-    //   RootAttester,
-    //   AttesterOfIsOfficial
-    // )
-    //
-    // blockUi.updateMessage('DriversLicense')
-    //
-    // const driversLicenseClaim = await BS_claim.save(
-    //   'DriversLicense',
-    //   'ClaimersDriversLicense',
-    //   {
-    //     age: 30,
-    //     name: 'Claimer',
-    //   },
-    //   'Claimer'
-    // )
-    //
-    // const Claimer = getIdentity('Claimer')
-    //
-    // if (!driversLicenseClaim || !RootAttester || !Claimer) {
-    //   console.error("driversLicenseClaim couldn't be created")
-    //   return
-    // }
-    //
-    // attestationWithLegitimationWorkflow(
-    //   driversLicenseClaim,
-    //   [attestedClaim],
-    //   Claimer,
-    //   RootAttester
-    // )
-    //
-    // blockUi.remove()
   }
 
   private async bootstrapDelegations(withMessages = false) {
