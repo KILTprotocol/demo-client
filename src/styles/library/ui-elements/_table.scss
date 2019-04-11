@@ -52,6 +52,10 @@
     color: $color-primary;
   }
 
+  & td {
+    vertical-align: middle;
+  }
+
   & tbody {
 
     & tr {
