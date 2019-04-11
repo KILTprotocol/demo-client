@@ -327,8 +327,8 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
   ) {
     const { contactsSelected, delegationsSelected }: Props = this.props
     const { contacts, delegations }: State = this.state
-    let newContactsPool = contactsPool
-    let newDelegationsPool = delegationsPool
+    let combinedContactsPool = contactsPool
+    let combinedDelegationsPool = delegationsPool
 
     // add selected contacts to pool if not already contained
     if (contactsSelected && contactsSelected.length) {
@@ -340,7 +340,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
               selectedContact.publicIdentity.address
           )
       )
-      newContactsPool = [...contactsPool, ...filteredContactsSelected]
+      combinedContactsPool = [...contactsPool, ...filteredContactsSelected]
     }
 
     // add selected delegations to pool if not already contained
@@ -352,17 +352,20 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
               poolDelegations.id === selectedDelegations.id
           )
       )
-      newDelegationsPool = [...delegationsPool, ...filteredContactsSelected]
+      combinedDelegationsPool = [
+        ...delegationsPool,
+        ...filteredContactsSelected,
+      ]
     }
 
     this.setState({
       contacts: {
         ...contacts,
-        pool: newContactsPool,
+        pool: combinedContactsPool,
       },
       delegations: {
         ...delegations,
-        pool: newDelegationsPool,
+        pool: combinedDelegationsPool,
       },
     })
   }
