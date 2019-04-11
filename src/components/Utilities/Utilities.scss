@@ -41,4 +41,11 @@
       @include label_input_combo;
     }
   }
+
+  & .debugMode {
+
+    & > div {
+      @include checkbox;
+    }
+  }
 }

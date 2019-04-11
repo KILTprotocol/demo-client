@@ -215,3 +215,22 @@
     }
   }
 }
+
+.debugModeLabel {
+  $fontSize: 12px;
+  $margin: $base-padding/4;
+
+  @include transform-origin(left, top);
+  @include transform(rotate(-90deg));
+
+  position: fixed;
+  top: 100%;
+  left: 100%;
+  margin: {
+    top: -$margin;
+    left: -$fontSize - $margin;
+  }
+  color: $color-danger;
+  font-size: $fontSize;
+  white-space: nowrap;
+}
