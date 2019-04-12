@@ -17,10 +17,12 @@ export interface Contact {
  * local Identity
  */
 export interface MyIdentity {
-  did?: sdk.IDid['identifier']
   identity: sdk.Identity
   metaData: {
     name: string
   }
   phrase: string
+
+  did?: sdk.IDid['identifier']
+  createdAt?: number
 }
