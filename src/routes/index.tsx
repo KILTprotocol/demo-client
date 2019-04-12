@@ -14,7 +14,7 @@ import MessageList from '../containers/MessageView/MessageView'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
 import WalletView from '../containers/WalletView/WalletView'
 import requiresIdentity from './RequiresIdentity'
-import CheckClientVersion from './CheckClientVersion'
+import CheckClientVersion from '../components/CheckClientVersion/CheckClientVersion'
 import DelegationCreate from '../containers/DelegationCreate/DelegationCreate'
 
 const Routes: React.FunctionComponent<{}> = props => {
@@ -22,6 +22,7 @@ const Routes: React.FunctionComponent<{}> = props => {
 
   return (
     <React.Fragment>
+      <Route path={'/'} component={CheckClientVersion} />
       <Switch>
         <Route path={'/dashboard'} component={requiresIdentity(Dashboard)} />
 
@@ -88,7 +89,6 @@ const Routes: React.FunctionComponent<{}> = props => {
 
         <Redirect to="/dashboard" />
       </Switch>
-      <Route path={'/'} component={CheckClientVersion} />
     </React.Fragment>
   )
 }

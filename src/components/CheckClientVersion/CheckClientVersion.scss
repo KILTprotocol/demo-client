@@ -1,0 +1,41 @@
+.CheckClientVersion {
+  position: fixed;
+  z-index: $z-index-modal - 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: $color-white  ;
+
+  & .Spinner,
+  & .connecting {
+    @extend %centerHV;
+
+    position: absolute;
+  }
+
+  & .Spinner {
+    @include opacity(0.5);
+
+    & .lds-ring {
+
+      & div {
+        width: 180px;
+        height: 180px;
+      }
+    }
+
+    & + .Spinner {
+      filter: blur(10px);
+    }
+  }
+
+  & .connecting {
+    width: 100%;
+    padding: 2px;
+    background: white;
+    text-align: center;
+    font-size: 14px;
+    color: $color-secondary;
+  }
+}
