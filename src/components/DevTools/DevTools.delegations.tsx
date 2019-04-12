@@ -8,7 +8,6 @@ import { DelegationType, MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
-import { BsAttestationsPool } from './DevTools.attestations'
 import { BsCType, BsCTypesPool } from './DevTools.ctypes'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 
@@ -258,7 +257,7 @@ class BsDelegation {
       )
 
       if (myDelegation) {
-        return Promise.resolve(myDelegation)
+        return myDelegation
       }
       throw new Error(
         `No delegation or PCR for delegationKey '${bsDelegationKey}' found.`
@@ -277,7 +276,7 @@ class BsDelegation {
     if (bsDelegation) {
       // the current pool contains the requested delegation
       Delegations.getAllDelegations(PersistentStore.store.getState())
-      return Promise.resolve(pool[bsDelegationKey])
+      return pool[bsDelegationKey]
     } else {
       // dive deeper
       return Promise.all(
@@ -290,7 +289,7 @@ class BsDelegation {
                 children
               )
             }
-            return Promise.resolve(undefined)
+            return undefined
           }
         )
       ).then((results: Array<BsDelegationsPoolElement | undefined>) => {

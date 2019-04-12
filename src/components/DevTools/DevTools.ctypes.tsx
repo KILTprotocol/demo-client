@@ -34,9 +34,6 @@ class BsCType {
       ...bsCTypeData,
       owner: ownerIdentity.address,
     })
-    if (!cType) {
-      throw new Error(`Invalid cType ${bsCTypeKey ? `'${bsCTypeKey}'` : ''}`)
-    }
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
 
     return cType

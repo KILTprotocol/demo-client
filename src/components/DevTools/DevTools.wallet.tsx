@@ -1,4 +1,3 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import { Blockchain, Identity } from '@kiltprotocol/prototype-sdk'
 import { mnemonicGenerate } from '@polkadot/util-crypto/mnemonic'
 
@@ -13,7 +12,6 @@ import PersistentStore from '../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../types/Contact'
 
 import identitiesPool from './data/identities.json'
-import { BsAttestationsPool } from './DevTools.attestations'
 
 type UpdateCallback = (bsIdentityKey: keyof BsIdentitiesPool) => void
 
@@ -119,7 +117,7 @@ class BsIdentity {
       value => value.metaData.name === BsIdentity.pool[bsIdentitiesPoolKey]
     )
     if (identity) {
-      return Promise.resolve(identity)
+      return identity
     }
     throw new Error(`Identity '${bsIdentitiesPoolKey}' not found`)
   }

@@ -80,7 +80,7 @@ class BsClaim {
       (claim: Claims.Entry) => claim.meta.alias === bsClaim.alias
     )
     if (myClaim) {
-      return Promise.resolve(myClaim)
+      return myClaim
     }
     throw new Error(`No claim for claimKey '${bsClaimKey}' found.`)
   }

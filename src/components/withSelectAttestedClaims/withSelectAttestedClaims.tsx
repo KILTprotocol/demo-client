@@ -1,10 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-import { IPartialClaim } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import AttestationService from '../../services/AttestationService'
 
-import * as Claims from '../../state/ducks/Claims'
-import { Contact } from '../../types/Contact'
 import { ClaimSelectionData } from '../SelectAttestedClaims/SelectAttestedClaims'
 import { Subtract } from 'utility-types'
 
