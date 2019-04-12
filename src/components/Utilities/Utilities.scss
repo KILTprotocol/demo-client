@@ -34,4 +34,11 @@
       }
     }
   }
+
+  & .versions {
+
+    & > div {
+      @include label_input_combo;
+    }
+  }
 }
