@@ -32,14 +32,14 @@ class ContactRepository {
       })
   }
 
-  public static findByAddress(address: string): Promise<void | Contact> {
+  public static async findByAddress(address: string): Promise<void | Contact> {
     const persistedContact = Contacts.getContact(
       PersistentStore.store.getState(),
       address
     )
 
     if (persistedContact) {
-      return Promise.resolve(persistedContact)
+      return persistedContact
     }
 
     return fetch(`${ContactRepository.URL}/${address}`)

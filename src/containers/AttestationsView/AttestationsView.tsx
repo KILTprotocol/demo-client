@@ -41,7 +41,7 @@ class AttestationsView extends React.Component<Props, State> {
           </thead>
           <tbody>
             {attestations.map((attestation: AttestationListModel) => (
-              <tr key={attestation.attestation.owner}>
+              <tr key={attestation.attestation.claimHash}>
                 <td className="claimerAlias">
                   <ContactPresentation address={attestation.claimerAddress} />
                 </td>
