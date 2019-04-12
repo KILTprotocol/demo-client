@@ -3,30 +3,30 @@ import { Blockchain } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
 import BlockchainService from '../../services/BlockchainService'
+import DelegationsService from '../../services/DelegationsService'
+import errorService from '../../services/ErrorService'
 import FeedbackService, {
   notify,
-  notifySuccess,
   notifyFailure,
+  notifySuccess,
 } from '../../services/FeedbackService'
-import errorService from '../../services/ErrorService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
-import ContactPresentation from '../ContactPresentation/ContactPresentation'
-import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
-import Permissions from '../Permissions/Permissions'
-import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
-import DelegationsService from '../../services/DelegationsService'
-import ShortHash from '../ShortHash/ShortHash'
-import Spinner from '../Spinner/Spinner'
-
-import './DelegationNode.scss'
-import { ModalType } from '../Modal/Modal'
 import {
   BlockingNotification,
   NotificationType,
 } from '../../types/UserFeedback'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import { ModalType } from '../Modal/Modal'
+import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
+import Permissions from '../Permissions/Permissions'
+import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
+import ShortHash from '../ShortHash/ShortHash'
+import Spinner from '../Spinner/Spinner'
+
+import './DelegationNode.scss'
 
 export enum ViewType {
   Present = 'present',
@@ -211,6 +211,12 @@ class DelegationNode extends React.Component<Props, State> {
 
   private getElement_getChildren() {
     const { gettingChildren, gotChildren, node } = this.state
+    const { delegation } = node
+    const { permissions } = delegation as sdk.IDelegationNode
+
+    if (permissions && permissions.indexOf(sdk.Permission.DELEGATE) === -1) {
+      return
+    }
 
     const classes = [
       'getChildren',
