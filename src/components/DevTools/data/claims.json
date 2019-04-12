@@ -1,0 +1,41 @@
+{
+  "I_AM_OFFICIAL_1": {
+    "alias": "I'm a official attester",
+    "claimerKey": "DEPARTMENT_1",
+    "cTypeKey": "IS_OFFICIAL",
+    "data": {}
+  },
+  "I_AM_OFFICIAL_1_1": {
+    "alias": "I'm a official attester",
+    "claimerKey": "EMPLOYEE_1_1",
+    "cTypeKey": "IS_OFFICIAL",
+    "data": {}
+  },
+  "I_AM_OFFICIAL_1_2": {
+    "alias": "I'm a official attester",
+    "claimerKey": "EMPLOYEE_1_2",
+    "cTypeKey": "IS_OFFICIAL",
+    "data": {}
+  },
+  "I_AM_OFFICIAL_2": {
+    "alias": "I'm a official attester",
+    "claimerKey": "DEPARTMENT_2",
+    "cTypeKey": "IS_OFFICIAL",
+    "data": {}
+  },
+  "I_AM_OFFICIAL_2_1": {
+    "alias": "I'm a official attester",
+    "claimerKey": "EMPLOYEE_2_1",
+    "cTypeKey": "IS_OFFICIAL",
+    "data": {}
+  },
+  "DRIVERS_LICENSE": {
+    "alias": "I have a drivers license",
+    "claimerKey": "CLAIMER",
+    "cTypeKey": "DRIVERS_LICENSE",
+    "data": {
+      "age": 30,
+      "name": "CLAIMER"
+    }
+  }
+}

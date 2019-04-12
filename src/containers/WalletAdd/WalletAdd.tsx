@@ -164,7 +164,9 @@ class WalletAdd extends React.Component<Props, State> {
         this.props.saveIdentity(newIdentity)
         PersistentStore.store.dispatch(
           Contacts.Store.addContact(
-            ContactRepository.getContactFromIdentity(newIdentity)
+            ContactRepository.getContactFromIdentity(newIdentity, {
+              unregistered: true,
+            })
           )
         )
         notifySuccess(`New identity '${alias}' successfully created`)

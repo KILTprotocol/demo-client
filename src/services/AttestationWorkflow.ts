@@ -7,7 +7,7 @@ import {
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
 
-import attestationService from '../services/AttestationService'
+import AttestationService from '../services/AttestationService'
 import * as Attestations from '../state/ducks/Attestations'
 import { MyDelegation } from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
@@ -131,11 +131,10 @@ class AttestationWorkflow {
   ): Promise<void> {
     return ContactRepository.findByAddress(claimerAddress).then(
       (claimer: Contact) => {
-        return attestationService
-          .attestClaim(requestForAttestation)
-          .then((attestedClaim: sdk.IAttestedClaim) => {
+        return AttestationService.attestClaim(requestForAttestation).then(
+          (attestedClaim: sdk.IAttestedClaim) => {
             // store attestation locally
-            attestationService.saveInStore({
+            AttestationService.saveInStore({
               attestation: attestedClaim.attestation,
               cTypeHash: attestedClaim.request.claim.cType,
               claimerAddress: attestedClaim.request.claim.owner,
@@ -148,7 +147,8 @@ class AttestationWorkflow {
               type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
             }
             return MessageRepository.send([claimer], attestationMessageBody)
-          })
+          }
+        )
       }
     )
   }

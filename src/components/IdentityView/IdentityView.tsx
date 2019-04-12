@@ -188,7 +188,9 @@ class IdentityView extends React.Component<Props, State> {
     )
 
     if (!contact) {
-      contact = ContactRepository.getContactFromIdentity(myIdentity)
+      contact = ContactRepository.getContactFromIdentity(myIdentity, {
+        unregistered: true,
+      })
     }
 
     const { metaData, publicIdentity } = contact

@@ -1,0 +1,11 @@
+{
+  "ATTESTER_OF_IS_OFFICIAL": "State Office (AttesterOfIsOfficial)",
+  "ROOT_ATTESTER": "State Office (RootAttester)",
+  "DEPARTMENT_1": "Driving License Authority Berlin (Department)",
+  "EMPLOYEE_1_1": "Employee 1 of DLA Berlin",
+  "EMPLOYEE_1_2": "Employee 2 of DLA Berlin",
+  "DEPARTMENT_2": "Driving License Authority Munich (Department)",
+  "EMPLOYEE_2_1": "Employee 1 of DLA Munich",
+  "CLAIMER": "Driver (Claimer)",
+  "VERIFIER": "Cop (Verifier)"
+}

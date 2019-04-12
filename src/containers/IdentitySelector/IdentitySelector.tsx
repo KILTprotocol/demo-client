@@ -40,7 +40,9 @@ class IdentitySelector extends React.Component<Props, State> {
   public componentDidMount() {
     const { myIdentities } = this.props
     const myIdentityContacts = myIdentities.map((myIdentity: MyIdentity) =>
-      ContactRepository.getContactFromIdentity(myIdentity)
+      ContactRepository.getContactFromIdentity(myIdentity, {
+        unregistered: true,
+      })
     )
     PersistentStore.store.dispatch(
       Contacts.Store.addContacts(myIdentityContacts)

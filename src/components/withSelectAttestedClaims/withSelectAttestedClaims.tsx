@@ -1,9 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-import { IPartialClaim } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+import AttestationService from '../../services/AttestationService'
 
-import * as Claims from '../../state/ducks/Claims'
-import { Contact } from '../../types/Contact'
 import { ClaimSelectionData } from '../SelectAttestedClaims/SelectAttestedClaims'
 import { Subtract } from 'utility-types'
 
@@ -62,42 +60,9 @@ const withSelectAttestedClaims = <P extends InjectedProps>(
       })
     }
 
-    private getExcludedProperties(
-      claimEntry: Claims.Entry,
-      selectedClaimProperties: string[]
-    ): string[] {
-      const propertyNames: string[] = Object.keys(claimEntry.claim.contents)
-      const excludedProperties = propertyNames.filter(
-        (propertyName: string) =>
-          selectedClaimProperties.indexOf(propertyName) === -1
-      )
-      return excludedProperties
-    }
-
     private getAttestedClaims(): sdk.IAttestedClaim[] {
       const { claimSelectionData } = this.state
-      const selectedClaimEntryIds = Object.keys(claimSelectionData)
-      const attestedClaims: sdk.IAttestedClaim[] = []
-      selectedClaimEntryIds.forEach(
-        (selectedClaimEntryId: Claims.Entry['id']) => {
-          const { claimEntry, state } = claimSelectionData[selectedClaimEntryId]
-          state.selectedAttestedClaims.forEach(
-            (selectedAttestedClaim: sdk.IAttestedClaim) => {
-              attestedClaims.push(
-                sdk.AttestedClaim.fromObject(
-                  selectedAttestedClaim
-                ).createPresentation(
-                  this.getExcludedProperties(
-                    claimEntry,
-                    state.selectedClaimProperties
-                  )
-                )
-              )
-            }
-          )
-        }
-      )
-      return attestedClaims
+      return AttestationService.getAttestedClaims(claimSelectionData)
     }
   }
 

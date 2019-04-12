@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
-import attestationService from '../../services/AttestationService'
+import AttestationService from '../../services/AttestationService'
 
 import { CType } from '../../types/Ctype'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -128,7 +128,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
       verificationPending: true,
       verificationSucceeded: false,
     })
-    attestationService.verifyAttestatedClaim(attestedClaim).then(verified => {
+    AttestationService.verifyAttestatedClaim(attestedClaim).then(verified => {
       this.setState({
         verificationPending: false,
         verificationSucceeded: verified,
