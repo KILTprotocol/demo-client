@@ -16,7 +16,7 @@ class CTypeRepository {
     const storedCType = CTypes.getCType(PersistentStore.store.getState(), hash)
 
     if (storedCType) {
-      return Promise.resolve(storedCType)
+      return storedCType
     }
 
     return fetch(`${CTypeRepository.URL}/${hash}`)
