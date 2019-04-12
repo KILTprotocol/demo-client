@@ -1,3 +1,4 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
@@ -20,14 +21,43 @@ type Props = RouteComponentProps<{}> & {
   attestations: AttestationListModel[]
 }
 
-type State = {}
+type State = {
+  claimHashToRevoke: sdk.IAttestation['claimHash']
+}
 
 class AttestationsView extends React.Component<Props, State> {
+  private claimHash: HTMLInputElement | null
+
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      claimHashToRevoke: '',
+    }
+
+    this.setClaimHashToRevoke = this.setClaimHashToRevoke.bind(this)
+    this.manuallyRevoke = this.manuallyRevoke.bind(this)
+  }
+
   public render() {
     const { attestations } = this.props
+    const { claimHashToRevoke } = this.state
     return (
       <section className="AttestationsView">
         <h1>MANAGE ATTESTATIONS</h1>
+        <section className="revokeByHash">
+          <h2>Revoke claim</h2>
+          <div>
+            <input
+              type="text"
+              onChange={this.setClaimHashToRevoke}
+              placeholder="Insert claim hash"
+              value={claimHashToRevoke}
+            />
+            <button disabled={!claimHashToRevoke} onClick={this.manuallyRevoke}>
+              Revoke
+            </button>
+          </div>
+        </section>
         <table>
           <thead>
             <tr>
@@ -121,6 +151,24 @@ class AttestationsView extends React.Component<Props, State> {
           )
         }
       )
+    }
+  }
+
+  private setClaimHashToRevoke(e: React.ChangeEvent<HTMLInputElement>) {
+    const claimHash = e.target.value.trim()
+
+    this.setState({
+      claimHashToRevoke: claimHash,
+    })
+  }
+
+  private async manuallyRevoke() {
+    const { claimHashToRevoke } = this.state
+
+    if (claimHashToRevoke) {
+      AttestationService.revokeByClaimHash(claimHashToRevoke).then(() => {
+        this.setState({ claimHashToRevoke: '' })
+      })
     }
   }
 }

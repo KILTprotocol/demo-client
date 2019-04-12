@@ -22,10 +22,7 @@ type BsCTypesPool = {
 class BsCType {
   public static pool: BsCTypesPool = cTypesPool as BsCTypesPool
 
-  public static async save(
-    bsCTypeData: BsCTypesPoolElement,
-    bsCTypeKey?: keyof BsCTypesPool
-  ): Promise<void> {
+  public static async save(bsCTypeData: BsCTypesPoolElement): Promise<void> {
     // replace owner key with his address
     const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
       .identity
@@ -69,7 +66,7 @@ class BsCType {
         if (updateCallback) {
           updateCallback(bsCTypeKey)
         }
-        return BsCType.save(BsCType.pool[bsCTypeKey], bsCTypeKey)
+        return BsCType.save(BsCType.pool[bsCTypeKey])
       })
     }, Promise.resolve())
     return requests

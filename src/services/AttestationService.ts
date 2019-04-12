@@ -7,6 +7,7 @@ import * as Claims from '../state/ducks/Claims'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import BlockchainService from './BlockchainService'
+import ErrorService from './ErrorService'
 import errorService from './ErrorService'
 import { notifySuccess } from './FeedbackService'
 
@@ -94,6 +95,31 @@ class AttestationService {
           reject(error)
         })
     })
+  }
+
+  public static async revokeByClaimHash(
+    claimHash: sdk.IAttestation['claimHash']
+  ) {
+    const {
+      selectedIdentity,
+      blockchain,
+    } = await AttestationService.getBlockchainAndIdentity()
+
+    return sdk.Attestation.revoke(blockchain, claimHash, selectedIdentity)
+      .then(() => {
+        notifySuccess(`Attestation successfully revoked.`)
+        persistentStore.store.dispatch(
+          Attestations.Store.revokeAttestation(claimHash)
+        )
+      })
+      .catch(error => {
+        ErrorService.logWithNotification({
+          error,
+          message: `Could not revoke attestation.`,
+          origin: 'AttestationService.revokeByClaimHash()',
+          type: 'ERROR.BLOCKCHAIN',
+        })
+      })
   }
 
   public static async verifyAttestatedClaim(

@@ -1,6 +1,13 @@
 .DelegationsView {
 
   & h1 {
-    @include h1('Ctype');
+    @include h1('DAG');
+  }
+
+  &.isPCR {
+
+    & h1 {
+      @include h1('PCR');
+    }
   }
 }
