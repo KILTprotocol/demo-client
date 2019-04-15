@@ -45,9 +45,8 @@ class CheckClientVersion extends React.Component<Props, State> {
   private showLoading() {
     return (
       <section className="CheckClientVersion">
-        {[1, 1].map(() => (
-          <Spinner size={200} color="#ef5a28" strength={10} />
-        ))}
+        <Spinner size={200} color="#ef5a28" strength={10} />
+        <Spinner size={200} color="#ef5a28" strength={10} />
         <div className="connecting">Connecting to chain</div>
       </section>
     )
