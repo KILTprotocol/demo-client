@@ -62,9 +62,9 @@ class ChainStats extends React.Component<Props, State> {
     return (
       <section className="ChainStats">
         <h2>Chain Stats</h2>
-        Demo module to interact with substrate blockchain
-        <hr />
         <div>
+          Demo module to interact with substrate blockchain
+          <hr />
           <If condition={!chainName} then={<div>Connecting...</div>} />
           <If
             condition={!!chainName}
