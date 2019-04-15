@@ -21,7 +21,7 @@ class Code extends React.Component<Props, State> {
           theme="monokai"
           collapsed={collapsed != null ? collapsed : 1}
           collapseStringsAfterLength={30}
-          enableClipboard={false}
+          enableClipboard={true}
           displayDataTypes={false}
         />
       )

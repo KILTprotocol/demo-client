@@ -33,6 +33,7 @@ type SerializedIdentity = {
   did?: MyIdentity['did']
   name: MyIdentity['metaData']['name']
   phrase: MyIdentity['phrase']
+  createdAt?: MyIdentity['createdAt']
 }
 
 type SerializedState = {
@@ -50,6 +51,7 @@ class Store {
       .get('identities')
       .toList()
       .map((myIdentity: MyIdentity) => ({
+        createdAt: myIdentity.createdAt,
         did: myIdentity.did,
         name: myIdentity.metaData.name,
         phrase: myIdentity.phrase,
@@ -74,12 +76,13 @@ class Store {
     const identities: { [key: string]: MyIdentity } = {}
 
     serializedIdentities.forEach((serializedIdentity: SerializedIdentity) => {
-      const { did, name, phrase } = serializedIdentity
+      const { did, name, phrase, createdAt } = serializedIdentity
 
       // TODO: use real wallet later instead of stored phrase
 
       const identity = sdk.Identity.buildFromMnemonic(phrase)
       const myIdentity: MyIdentity = {
+        createdAt,
         did,
         identity,
         metaData: {
@@ -110,10 +113,10 @@ class Store {
     switch (action.type) {
       case Store.ACTIONS.SAVE_IDENTITY:
         const myIdentity = (action as SaveAction).payload
-        return state.setIn(
-          ['identities', myIdentity.identity.address],
-          myIdentity
-        )
+        return state.setIn(['identities', myIdentity.identity.address], {
+          ...myIdentity,
+          createdAt: Date.now(),
+        })
       case Store.ACTIONS.REMOVE_IDENTITY:
         const removeAddress = (action as RemoveAction).payload
         return state.deleteIn(['identities', removeAddress])
@@ -184,7 +187,18 @@ const _getAllIdentities = (state: ReduxState) =>
 
 const getAllIdentities = createSelector(
   [_getAllIdentities],
-  (entries: Entry[]) => entries
+  (entries: Entry[]) =>
+    entries.sort((a, b) => {
+      if (!a.createdAt && !b.createdAt) {
+        return 0
+      } else if (!a.createdAt) {
+        return 1
+      } else if (!b.createdAt) {
+        return -1
+      } else {
+        return a.createdAt - b.createdAt
+      }
+    })
 )
 
 const _getIdentity = (

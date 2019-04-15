@@ -6,7 +6,7 @@ import ContactPresentation from '../../components/ContactPresentation/ContactPre
 import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
 import DateTime from '../../components/DateTime/DateTime'
 import ShortHash from '../../components/ShortHash/ShortHash'
-import attestationService from '../../services/AttestationService'
+import AttestationService from '../../services/AttestationService'
 import FeedbackService, { safeDelete } from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
@@ -41,7 +41,7 @@ class AttestationsView extends React.Component<Props, State> {
           </thead>
           <tbody>
             {attestations.map((attestation: AttestationListModel) => (
-              <tr key={attestation.attestation.owner}>
+              <tr key={attestation.attestation.claimHash}>
                 <td className="claimerAlias">
                   <ContactPresentation address={attestation.claimerAddress} />
                 </td>
@@ -96,8 +96,7 @@ class AttestationsView extends React.Component<Props, State> {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Revoking attestation',
       })
-      attestationService
-        .revokeAttestation(attestationListModel.attestation)
+      AttestationService.revokeAttestation(attestationListModel.attestation)
         .then(() => {
           blockUi.remove()
         })
@@ -117,7 +116,7 @@ class AttestationsView extends React.Component<Props, State> {
           <ShortHash>{attestationListModel.attestation.claimHash}</ShortHash>'
         </span>,
         () => {
-          attestationService.removeFromStore(
+          AttestationService.removeFromStore(
             attestationListModel.attestation.claimHash
           )
         }

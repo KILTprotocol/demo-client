@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 
-import attestationService from '../../services/AttestationService'
+import AttestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -286,9 +286,8 @@ class AttestedClaimsListView extends React.Component<Props, State> {
       attestationStatus,
     })
 
-    attestationService
-      .verifyAttestatedClaim(attestedClaim)
-      .then((verified: boolean) => {
+    AttestationService.verifyAttestatedClaim(attestedClaim).then(
+      (verified: boolean) => {
         if (verified) {
           attestationStatus[owner] = STATUS.ATTESTED
         } else {
@@ -298,7 +297,8 @@ class AttestedClaimsListView extends React.Component<Props, State> {
         this.setState({
           attestationStatus,
         })
-      })
+      }
+    )
   }
 }
 

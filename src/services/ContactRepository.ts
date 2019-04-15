@@ -32,14 +32,14 @@ class ContactRepository {
       })
   }
 
-  public static findByAddress(address: string): Promise<void | Contact> {
+  public static async findByAddress(address: string): Promise<void | Contact> {
     const persistedContact = Contacts.getContact(
       PersistentStore.store.getState(),
       address
     )
 
     if (persistedContact) {
-      return Promise.resolve(persistedContact)
+      return persistedContact
     }
 
     return fetch(`${ContactRepository.URL}/${address}`)
@@ -84,13 +84,15 @@ class ContactRepository {
       })
   }
 
-  public static getContactFromIdentity(myIdentity: MyIdentity) {
+  public static getContactFromIdentity(
+    myIdentity: MyIdentity,
+    mergeMetaData?: Partial<Contact['metaData']>
+  ) {
     const { identity, metaData } = myIdentity
     const { address, boxPublicKeyAsHex } = identity
-    const { name } = metaData
 
     const contact: Contact = {
-      metaData: { name, unregistered: true },
+      metaData: { ...metaData, ...mergeMetaData },
       publicIdentity: { address, boxPublicKeyAsHex },
     }
 

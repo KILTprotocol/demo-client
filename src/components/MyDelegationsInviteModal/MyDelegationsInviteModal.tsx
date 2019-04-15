@@ -1,13 +1,11 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
-
-import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
+import * as Contacts from '../../state/ducks/Contacts'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
-import * as Contacts from '../../state/ducks/Contacts'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
@@ -35,14 +33,16 @@ type Props = {
 
 type State = {
   contacts: {
-    pool: Contact[]
-    selected: Contact[]
     isSelectOpen: boolean
+    selected: Contact[]
+
+    pool?: Contact[]
   }
   delegations: {
-    pool: MyDelegation[]
-    selected: MyDelegation[]
     isSelectOpen: boolean
+    selected: MyDelegation[]
+
+    pool?: MyDelegation[]
   }
   permissions: sdk.Permission[]
 }
@@ -57,12 +57,10 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
     this.state = {
       contacts: {
         isSelectOpen: false,
-        pool: props.contactsPool || [],
         selected: props.contactsSelected || [],
       },
       delegations: {
         isSelectOpen: false,
-        pool: props.delegationsPool || [],
         selected: props.delegationsSelected || [],
       },
       permissions: props.isPCR ? [1] : [],
@@ -82,22 +80,12 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    const {
-      contactsPool,
-      delegationsPool,
-      delegationsSelected,
-      myDelegations,
-    }: Props = this.props
-    const { contacts, delegations }: State = this.state
+    const { contactsPool, delegationsPool, myDelegations }: Props = this.props
 
-    if (!contactsPool) {
-      const pool = Contacts.getMyContacts(PersistentStore.store.getState())
-      this.setState({ contacts: { ...contacts, pool } })
-    }
-
-    if (!delegationsPool && !delegationsSelected) {
-      this.setState({ delegations: { ...delegations, pool: myDelegations } })
-    }
+    this.createPools(
+      contactsPool || Contacts.getMyContacts(PersistentStore.store.getState()),
+      delegationsPool || myDelegations
+    )
   }
 
   public render() {
@@ -155,16 +143,18 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
         <div className="contactsSelect">
           {contactsSelected && <h2>Selected contact(s)</h2>}
           {!contactsSelected && <h2>Select contact(s)</h2>}
-          <SelectContacts
-            contacts={contacts.pool}
-            name="selectContactsForInvite"
-            defaultValues={contactsSelected}
-            isMulti={true}
-            closeMenuOnSelect={true}
-            onChange={this.changeContacts}
-            onMenuOpen={this.setSelectContactsOpen.bind(this, true)}
-            onMenuClose={this.setSelectContactsOpen.bind(this, false, 500)}
-          />
+          {contacts.pool && (
+            <SelectContacts
+              contacts={contacts.pool}
+              name="selectContactsForInvite"
+              defaultValues={contactsSelected}
+              isMulti={true}
+              closeMenuOnSelect={true}
+              onChange={this.changeContacts}
+              onMenuOpen={this.setSelectContactsOpen.bind(this, true)}
+              onMenuClose={this.setSelectContactsOpen.bind(this, false, 500)}
+            />
+          )}
         </div>
 
         <div className="delegationsSelect">
@@ -174,18 +164,20 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
           {!delegationsSelected && (
             <h2>Select {isPCR ? 'PCR' : 'delegation'}(s)</h2>
           )}
-          <SelectDelegations
-            delegations={delegations.pool}
-            name="selectDelegationsForInvite"
-            defaultValues={delegationsSelected}
-            isMulti={true}
-            closeMenuOnSelect={true}
-            placeholder={isPCR ? `Select PCRs…` : undefined}
-            filter={this.filterDelegations}
-            onChange={this.changeDelegations}
-            onMenuOpen={this.setSelectDelegationsOpen.bind(this, true)}
-            onMenuClose={this.setSelectDelegationsOpen.bind(this, false, 500)}
-          />
+          {delegations.pool && (
+            <SelectDelegations
+              delegations={delegations.pool}
+              name="selectDelegationsForInvite"
+              defaultValues={delegationsSelected}
+              isMulti={true}
+              closeMenuOnSelect={true}
+              placeholder={isPCR ? `Select PCRs…` : undefined}
+              filter={this.filterDelegations}
+              onChange={this.changeDelegations}
+              onMenuOpen={this.setSelectDelegationsOpen.bind(this, true)}
+              onMenuClose={this.setSelectDelegationsOpen.bind(this, false, 500)}
+            />
+          )}
         </div>
 
         <footer>
@@ -209,6 +201,11 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 
     // check PCR
     if (isPCR != null && !delegation.isPCR !== !isPCR) {
+      return false
+    }
+
+    // check revoked
+    if (delegation.revoked) {
       return false
     }
 
@@ -322,6 +319,55 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
         })
       })
     }
+  }
+
+  private createPools(
+    contactsPool: Contact[],
+    delegationsPool: MyDelegation[]
+  ) {
+    const { contactsSelected, delegationsSelected }: Props = this.props
+    const { contacts, delegations }: State = this.state
+    let combinedContactsPool = contactsPool
+    let combinedDelegationsPool = delegationsPool
+
+    // add selected contacts to pool if not already contained
+    if (contactsSelected && contactsSelected.length) {
+      const filteredContactsSelected = contactsSelected.filter(
+        (selectedContact: Contact) =>
+          !contactsPool.find(
+            (poolContact: Contact) =>
+              poolContact.publicIdentity.address ===
+              selectedContact.publicIdentity.address
+          )
+      )
+      combinedContactsPool = [...contactsPool, ...filteredContactsSelected]
+    }
+
+    // add selected delegations to pool if not already contained
+    if (delegationsSelected && delegationsSelected.length) {
+      const filteredContactsSelected = delegationsSelected.filter(
+        (selectedDelegations: MyDelegation) =>
+          !delegationsPool.find(
+            (poolDelegations: MyDelegation) =>
+              poolDelegations.id === selectedDelegations.id
+          )
+      )
+      combinedDelegationsPool = [
+        ...delegationsPool,
+        ...filteredContactsSelected,
+      ]
+    }
+
+    this.setState({
+      contacts: {
+        ...contacts,
+        pool: combinedContactsPool,
+      },
+      delegations: {
+        ...delegations,
+        pool: combinedDelegationsPool,
+      },
+    })
   }
 }
 

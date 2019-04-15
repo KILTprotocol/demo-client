@@ -3,30 +3,30 @@ import { Blockchain } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
 import BlockchainService from '../../services/BlockchainService'
+import DelegationsService from '../../services/DelegationsService'
+import errorService from '../../services/ErrorService'
 import FeedbackService, {
   notify,
-  notifySuccess,
   notifyFailure,
+  notifySuccess,
 } from '../../services/FeedbackService'
-import errorService from '../../services/ErrorService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
-import ContactPresentation from '../ContactPresentation/ContactPresentation'
-import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
-import Permissions from '../Permissions/Permissions'
-import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
-import DelegationsService from '../../services/DelegationsService'
-import ShortHash from '../ShortHash/ShortHash'
-import Spinner from '../Spinner/Spinner'
-
-import './DelegationNode.scss'
-import { ModalType } from '../Modal/Modal'
 import {
   BlockingNotification,
   NotificationType,
 } from '../../types/UserFeedback'
+import ContactPresentation from '../ContactPresentation/ContactPresentation'
+import { ModalType } from '../Modal/Modal'
+import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
+import Permissions from '../Permissions/Permissions'
+import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
+import ShortHash from '../ShortHash/ShortHash'
+import Spinner from '../Spinner/Spinner'
+
+import './DelegationNode.scss'
 
 export enum ViewType {
   Present = 'present',
@@ -47,6 +47,7 @@ type Props = {
   focusedNodeAlias?: MyDelegation['metaData']['alias']
   gotSiblings?: true
   gettingSiblings?: boolean
+  isMyChild?: boolean
   viewType?: ViewType
 
   onGetChildren?: () => void
@@ -112,6 +113,7 @@ class DelegationNode extends React.Component<Props, State> {
       editable,
       focusedNodeAlias,
       focusedNodeId,
+      isMyChild,
       selectedIdentity,
       viewType,
     } = this.props
@@ -163,10 +165,11 @@ class DelegationNode extends React.Component<Props, State> {
               interactive={true}
             />
             {!!permissions && <Permissions permissions={permissions} />}
-            {editable && myDelegation && (
+            {editable && (
               <SelectDelegationAction
                 className={`minimal ${focusedNode ? 'inverted' : ''}`}
                 delegation={node.delegation}
+                isMyChild={isMyChild}
                 onInvite={this.inviteTo.bind(this, myDelegation)}
                 onRevokeAttestations={this.revokeAttestations}
                 onRevokeDelegation={this.revokeDelegation}
@@ -181,16 +184,17 @@ class DelegationNode extends React.Component<Props, State> {
         {viewType === ViewType.Present && this.getElement_getChildren()}
         {node.childNodes.map((childNode: DelegationsTreeNode) => (
           <DelegationNode
-            selectedIdentity={selectedIdentity}
             key={childNode.delegation.id}
+            selectedIdentity={selectedIdentity}
+            editable={editable}
             node={childNode}
             focusedNodeId={focusedNodeId}
-            onGetChildren={this.getChildren}
+            focusedNodeAlias={focusedNodeAlias}
             gotSiblings={gotChildren}
             gettingSiblings={gettingChildren}
-            focusedNodeAlias={focusedNodeAlias}
-            editable={editable}
             viewType={viewType}
+            isMyChild={myNode || isMyChild}
+            onGetChildren={this.getChildren}
           />
         ))}
         {editable && viewType === ViewType.Present && delegationForInvite && (
@@ -207,6 +211,12 @@ class DelegationNode extends React.Component<Props, State> {
 
   private getElement_getChildren() {
     const { gettingChildren, gotChildren, node } = this.state
+    const { delegation } = node
+    const { permissions } = delegation as sdk.IDelegationNode
+
+    if (permissions && permissions.indexOf(sdk.Permission.DELEGATE) === -1) {
+      return
+    }
 
     const classes = [
       'getChildren',

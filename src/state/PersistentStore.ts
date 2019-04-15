@@ -9,6 +9,7 @@ import * as Wallet from './ducks/Wallet'
 import * as Delegations from './ducks/Delegations'
 import * as Parameters from './ducks/Parameters'
 import * as Contacts from './ducks/Contacts'
+import * as CTypes from './ducks/CTypes'
 
 declare global {
   /* tslint:disable */
@@ -24,6 +25,7 @@ export type State = {
   balances: Balances.ImmutableState
   claims: Claims.ImmutableState
   contacts: Contacts.ImmutableState
+  cTypes: CTypes.ImmutableState
   delegations: Delegations.ImmutableState
   parameters: Parameters.ImmutableState
   uiState: UiState.ImmutableState
@@ -90,6 +92,7 @@ class PersistentStore {
       combineReducers({
         attestations: Attestations.Store.reducer,
         balances: Balances.Store.reducer,
+        cTypes: CTypes.Store.reducer,
         claims: Claims.Store.reducer,
         contacts: Contacts.Store.reducer,
         delegations: Delegations.Store.reducer,

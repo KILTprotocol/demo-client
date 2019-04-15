@@ -10,5 +10,35 @@
 
   & button {
     @include button-secondary;
+
+    margin: {
+      left: $base-padding / 2;
+      bottom: $base-padding / 2;
+    }
+
+    &:first-child {
+      margin: {
+        left: 0;
+      }
+    }
+  }
+
+  & .DevTools {
+
+    & > div {
+
+      & > div {
+        margin: {
+          top: $base-padding;
+        }
+      }
+    }
+  }
+
+  & .versions {
+
+    & > div {
+      @include label_input_combo;
+    }
   }
 }

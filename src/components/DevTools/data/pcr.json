@@ -1,0 +1,71 @@
+{
+  "PCR_DRIVERS_LICENSE": {
+    "alias": "State Department (PCR Root)",
+    "ownerKey": "ROOT_ATTESTER",
+    "cTypeKey": "DRIVERS_LICENSE",
+    "children": {
+      "PCR_DRIVERS_LICENSE_1": {
+        "alias": "Driving License Authority Berlin (PCR)",
+        "ownerKey": "DEPARTMENT_1",
+        "permissions": [
+          "ATTEST",
+          "DELEGATE"
+        ],
+        "children": {
+          "PCR_DRIVERS_LICENSE_1_1": {
+            "alias": "Employee 1 Berlin (PCR)",
+            "ownerKey": "EMPLOYEE_1_1",
+            "permissions": [
+              "ATTEST"
+            ]
+          },
+          "PCR_DRIVERS_LICENSE_1_2": {
+            "alias": "Employee 2 Berlin (PCR)",
+            "ownerKey": "EMPLOYEE_1_2",
+            "permissions": [
+              "ATTEST"
+            ]
+          }
+        }
+      },
+      "PCR_DRIVERS_LICENSE_2": {
+        "alias": "Driving License Authority Munich (PCR)",
+        "ownerKey": "DEPARTMENT_2",
+        "permissions": [
+          "ATTEST",
+          "DELEGATE"
+        ],
+        "children": {
+          "PCR_DRIVERS_LICENSE_2_1": {
+            "alias": "Employee 2 Munich (PCR)",
+            "ownerKey": "EMPLOYEE_2_1",
+            "permissions": [
+              "ATTEST"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "PCR_IS_OFFICIAL": {
+    "alias": "State Department (PCR Root)",
+    "ownerKey": "ROOT_ATTESTER",
+    "cTypeKey": "IS_OFFICIAL",
+    "children": {
+      "PCR_IS_OFFICIAL_1": {
+        "alias": "Driving License Authority Berlin (PCR)",
+        "ownerKey": "DEPARTMENT_1",
+        "permissions": [
+          "ATTEST"
+        ]
+      },
+      "PCR_IS_OFFICIAL_2": {
+        "alias": "Driving License Authority Munich (PCR)",
+        "ownerKey": "DEPARTMENT_2",
+        "permissions": [
+          "ATTEST"
+        ]
+      }
+    }
+  }
+}
