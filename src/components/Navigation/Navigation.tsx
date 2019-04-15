@@ -39,7 +39,7 @@ class Navigation extends React.Component<Props, State> {
           {links.map((link: NavLink) => {
             const classes = [
               link.url,
-              this.props.location.pathname.indexOf(link.url) === 1
+              this.props.history.location.pathname.indexOf(link.url) === 1
                 ? 'current'
                 : '',
             ]
