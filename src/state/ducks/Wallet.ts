@@ -33,6 +33,7 @@ type SerializedIdentity = {
   did?: MyIdentity['did']
   name: MyIdentity['metaData']['name']
   phrase: MyIdentity['phrase']
+  createdAt?: MyIdentity['createdAt']
 }
 
 type SerializedState = {
@@ -50,6 +51,7 @@ class Store {
       .get('identities')
       .toList()
       .map((myIdentity: MyIdentity) => ({
+        createdAt: myIdentity.createdAt,
         did: myIdentity.did,
         name: myIdentity.metaData.name,
         phrase: myIdentity.phrase,
@@ -74,12 +76,13 @@ class Store {
     const identities: { [key: string]: MyIdentity } = {}
 
     serializedIdentities.forEach((serializedIdentity: SerializedIdentity) => {
-      const { did, name, phrase } = serializedIdentity
+      const { did, name, phrase, createdAt } = serializedIdentity
 
       // TODO: use real wallet later instead of stored phrase
 
       const identity = sdk.Identity.buildFromMnemonic(phrase)
       const myIdentity: MyIdentity = {
+        createdAt,
         did,
         identity,
         metaData: {
