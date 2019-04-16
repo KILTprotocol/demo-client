@@ -58,7 +58,7 @@ class MessageRepository {
    * @param receiverAddresses
    * @param messageBody
    */
-  public static sendToAddresses(
+  public static async sendToAddresses(
     receiverAddresses: Array<Contact['publicIdentity']['address']>,
     messageBody: sdk.MessageBody
   ): Promise<void> {
@@ -208,7 +208,7 @@ class MessageRepository {
         }'`,
         origin: 'MessageRepository.singleSend()',
       })
-      throw error
+      return Promise.reject()
     }
   }
 
@@ -238,10 +238,10 @@ class MessageRepository {
             /* tslint:enable:jsx-no-lambda */
           ),
           modalType: ModalType.CONFIRM,
-          okButtonLabel: 'Send',
+          okButtonLabel: 'Send manipulated Message',
           onCancel: (notification: BlockingNotification) => {
             notification.remove()
-            return resolve()
+            return resolve(message)
           },
           onConfirm: (notification: BlockingNotification) => {
             notification.remove()
