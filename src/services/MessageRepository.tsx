@@ -1,11 +1,21 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as React from 'react'
+import cloneDeep from 'lodash/cloneDeep'
+import { InteractionProps } from 'react-json-view'
 
+import { ModalType } from '../components/Modal/Modal'
 import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
+import { BlockingNotification, NotificationType } from '../types/UserFeedback'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
+import { clientVersionHelper } from './ClientVersionHelper'
 import ContactRepository from './ContactRepository'
 import errorService from './ErrorService'
+import FeedbackService from './FeedbackService'
 import { notifySuccess } from './FeedbackService'
+import * as UiState from '../state/ducks/UiState'
+import * as Wallet from '../state/ducks/Wallet'
+import Code from '../components/Code/Code'
 
 export interface MessageOutput extends sdk.IMessage {
   encryptedMessage: sdk.IEncryptedMessage
@@ -29,16 +39,14 @@ class MessageRepository {
     receivers: Contact[],
     messageBody: sdk.MessageBody
   ): Promise<void> {
-    const sender: MyIdentity = PersistentStore.store.getState().wallet
-      .selectedIdentity
-
-    if (Array.isArray(receivers)) {
-      receivers.forEach((receiver: Contact) => {
-        MessageRepository.singleSend(messageBody, sender, receiver)
-      })
-    } else {
-      MessageRepository.singleSend(messageBody, sender, receivers)
-    }
+    const sender: MyIdentity = Wallet.getSelectedIdentity(
+      PersistentStore.store.getState()
+    )
+    const _receivers = Array.isArray(receivers) ? receivers : [receivers]
+    const requests = _receivers.reduce((promiseChain, receiver: Contact) => {
+      return MessageRepository.singleSend(messageBody, sender, receiver)
+    }, Promise.resolve())
+    return requests
   }
 
   /**
@@ -48,7 +56,7 @@ class MessageRepository {
    * @param receiverAddresses
    * @param messageBody
    */
-  public static sendToAddresses(
+  public static async sendToAddresses(
     receiverAddresses: Array<Contact['publicIdentity']['address']>,
     messageBody: sdk.MessageBody
   ): Promise<void> {
@@ -148,18 +156,21 @@ class MessageRepository {
       })
   }
 
-  public static singleSend(
+  public static async singleSend(
     messageBody: sdk.MessageBody,
     sender: MyIdentity,
     receiver: Contact
   ) {
     try {
-      const message: sdk.Message = new sdk.Message(
+      let message: sdk.Message = new sdk.Message(
         messageBody,
         sender.identity,
         receiver.publicIdentity
       )
-      fetch(`${MessageRepository.URL}`, {
+
+      message = await MessageRepository.handleDebugMode(message)
+
+      return fetch(`${MessageRepository.URL}`, {
         ...BasePostParams,
         body: JSON.stringify(message.getEncryptedMessage()),
       })
@@ -195,12 +206,55 @@ class MessageRepository {
         }'`,
         origin: 'MessageRepository.singleSend()',
       })
+      return Promise.reject()
     }
   }
 
   private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
     process.env.REACT_APP_SERVICE_PORT
   }/messaging`
+
+  private static async handleDebugMode(
+    message: sdk.Message
+  ): Promise<sdk.Message> {
+    const debugMode = UiState.getDebugMode(PersistentStore.store.getState())
+
+    let manipulatedMessage = cloneDeep(message)
+
+    if (debugMode) {
+      return new Promise<sdk.Message>(async resolve => {
+        FeedbackService.addBlockingNotification({
+          header: 'Manipulate your message before sending',
+          message: (
+            /* tslint:disable:jsx-no-lambda */
+            <Code
+              onEdit={(edit: InteractionProps) => {
+                manipulatedMessage = edit.updated_src as sdk.Message
+              }}
+              onAdd={(add: InteractionProps) => {
+                manipulatedMessage = add.updated_src as sdk.Message
+              }}
+            >
+              {message}
+            </Code>
+            /* tslint:enable:jsx-no-lambda */
+          ),
+          modalType: ModalType.CONFIRM,
+          okButtonLabel: 'Send manipulated Message',
+          onCancel: (notification: BlockingNotification) => {
+            notification.remove()
+            return resolve(message)
+          },
+          onConfirm: (notification: BlockingNotification) => {
+            notification.remove()
+            return resolve(manipulatedMessage)
+          },
+          type: NotificationType.INFO,
+        })
+      })
+    }
+    return message
+  }
 }
 
 export default MessageRepository

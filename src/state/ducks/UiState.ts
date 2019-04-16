@@ -134,8 +134,6 @@ class Store {
         const blockUi: BlockUi = (action as AddBlockUiAction).payload
         return state.setIn(['blockUis', blockUi.id], blockUi)
       case Store.ACTIONS.BLOCK_UI_REMOVE:
-        {
-        }
         const blockUiId = (action as RemoveBlockUiAction).payload
         return state.deleteIn(['blockUis', blockUiId])
       case Store.ACTIONS.BLOCK_UI_UPDATE:
@@ -226,8 +224,8 @@ class Store {
         BlockingNotification['id'],
         BlockingNotification
       >(),
-      notifications: Immutable.Map<Notification['id'], Notification>(),
       debugMode: false,
+      notifications: Immutable.Map<Notification['id'], Notification>(),
     } as State)(obj)
   }
 
