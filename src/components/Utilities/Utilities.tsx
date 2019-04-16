@@ -14,8 +14,9 @@ import clientPackage from '../../../package.json'
 import './Utilities.scss'
 
 type Props = {
+  // mapStateToProps
   debugMode: boolean
-
+  // mapDispatchToProps
   setDebugMode: (debugMode: boolean) => void
 }
 type State = {}

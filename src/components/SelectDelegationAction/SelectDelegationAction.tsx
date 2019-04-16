@@ -1,8 +1,12 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+import { connect } from 'react-redux'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
-import PersistentStore from '../../state/PersistentStore'
+import * as UiState from '../../state/ducks/UiState'
+import PersistentStore, {
+  State as ReduxState,
+} from '../../state/PersistentStore'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
 
 type Props = {
@@ -15,6 +19,9 @@ type Props = {
   onDelete?: (delegationEntry: MyDelegation) => void
   onRevokeAttestations?: () => void
   onRevokeDelegation?: () => void
+
+  // mapStateToProps
+  debugMode: boolean
 }
 
 class SelectDelegationAction extends React.Component<Props> {
@@ -49,16 +56,17 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 
   private getInviteAction(): Action | undefined {
-    const { delegation, onInvite } = this.props
+    const { debugMode, delegation, onInvite } = this.props
 
-    if (!delegation || delegation.revoked) {
+    if (!delegation || !onInvite) {
       return undefined
     }
 
     if (
-      !!onInvite &&
-      this.isMine() &&
-      SelectDelegationAction.canDelegate(delegation)
+      debugMode ||
+      (!delegation.revoked &&
+        this.isMine() &&
+        SelectDelegationAction.canDelegate(delegation))
     ) {
       return {
         callback: onInvite.bind(delegation),
@@ -69,9 +77,13 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 
   private getDeleteAction() {
-    const { delegation, onDelete } = this.props
+    const { debugMode, delegation, onDelete } = this.props
 
-    if (onDelete && this.isMine()) {
+    if (!delegation || !onDelete) {
+      return undefined
+    }
+
+    if (debugMode || this.isMine()) {
       return {
         callback: onDelete.bind(delegation),
         label: 'Delete',
@@ -81,13 +93,18 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 
   private getRevokeAttestationsAction() {
-    const { delegation, isMyChild, onRevokeAttestations } = this.props
+    const {
+      debugMode,
+      delegation,
+      isMyChild,
+      onRevokeAttestations,
+    } = this.props
 
-    if (!delegation || delegation.revoked) {
+    if (!delegation || !onRevokeAttestations) {
       return undefined
     }
 
-    if ((this.isMine() || isMyChild) && onRevokeAttestations) {
+    if (debugMode || (!delegation.revoked && (this.isMine() || isMyChild))) {
       return {
         callback: onRevokeAttestations,
         label: 'Revoke all Attestations',
@@ -97,12 +114,12 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 
   private getRevokeDelegationAction() {
-    const { delegation, isMyChild, onRevokeDelegation } = this.props
-    if (!delegation || delegation.revoked) {
+    const { debugMode, delegation, isMyChild, onRevokeDelegation } = this.props
+    if (!delegation || !onRevokeDelegation) {
       return undefined
     }
 
-    if ((this.isMine() || isMyChild) && onRevokeDelegation) {
+    if (debugMode || (!delegation.revoked && (this.isMine() || isMyChild))) {
       return {
         callback: onRevokeDelegation,
         label: 'Revoke delegation',
@@ -123,4 +140,8 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 }
 
-export default SelectDelegationAction
+const mapStateToProps = (state: ReduxState) => ({
+  debugMode: UiState.getDebugMode(state),
+})
+
+export default connect(mapStateToProps)(SelectDelegationAction)
