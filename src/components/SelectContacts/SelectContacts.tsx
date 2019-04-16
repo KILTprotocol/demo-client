@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
@@ -96,26 +97,28 @@ class SelectContacts extends React.Component<Props, State> {
 
     const _placeholder = `Select contact${isMulti ? 's' : ''}…`
 
-    return (
-      !!contacts &&
-      !!contacts.length && (
-        <Select
-          className="react-select-container"
-          classNamePrefix="react-select"
-          isClearable={isMulti && contacts.length > 1}
-          isSearchable={true}
-          isMulti={isMulti && contacts.length > 1}
-          closeMenuOnSelect={closeMenuOnSelect}
-          name={name}
-          options={options}
-          defaultValue={defaultOptions}
-          onChange={this.onChange}
-          onMenuOpen={onMenuOpen}
-          onMenuClose={onMenuClose}
-          placeholder={placeholder || _placeholder}
-          filterOption={createFilter(this.filterConfig)}
-        />
-      )
+    return !!contacts && !!contacts.length ? (
+      <Select
+        className="react-select-container"
+        classNamePrefix="react-select"
+        isClearable={isMulti && contacts.length > 1}
+        isSearchable={true}
+        isMulti={isMulti && contacts.length > 1}
+        closeMenuOnSelect={closeMenuOnSelect}
+        name={name}
+        options={options}
+        defaultValue={defaultOptions}
+        onChange={this.onChange}
+        onMenuOpen={onMenuOpen}
+        onMenuClose={onMenuClose}
+        placeholder={placeholder || _placeholder}
+        filterOption={createFilter(this.filterConfig)}
+      />
+    ) : (
+      <div>
+        No favorized contacts found. You need to favorize some in{' '}
+        <Link to="/contacts">Contacts</Link> first.
+      </div>
     )
   }
 
