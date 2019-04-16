@@ -170,6 +170,10 @@ class MessageRepository {
 
       message = await MessageRepository.handleDebugMode(message)
 
+      if (!message) {
+        return Promise.reject()
+      }
+
       return fetch(`${MessageRepository.URL}`, {
         ...BasePostParams,
         body: JSON.stringify(message.getEncryptedMessage()),
@@ -240,10 +244,10 @@ class MessageRepository {
             /* tslint:enable:jsx-no-lambda */
           ),
           modalType: ModalType.CONFIRM,
-          okButtonLabel: 'Send manipulated Message',
+          okButtonLabel: 'Send',
           onCancel: (notification: BlockingNotification) => {
             notification.remove()
-            return resolve(message)
+            return resolve()
           },
           onConfirm: (notification: BlockingNotification) => {
             notification.remove()
