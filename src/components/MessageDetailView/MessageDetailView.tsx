@@ -1,18 +1,18 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React, { ReactNode } from 'react'
 
-import AcceptDelegation from '../../containers/workflows/AcceptDelegation/AcceptDelegation'
-import AttestClaim from '../../containers/workflows/AttestClaim/AttestClaim'
-import CreateDelegation from '../../containers/workflows/CreateDelegation/CreateDelegation'
-import ImportAttestation from '../../containers/workflows/ImportAttestation/ImportAttestation'
-import SubmitClaimsForCType from '../../containers/workflows/SubmitClaimsForCType/SubmitClaimsForCType'
-import SubmitLegitimations from '../../containers/workflows/SubmitLegitimations/SubmitLegitimations'
-import RequestAttestation from '../../containers/workflows/RequestAttestation/RequestAttestation'
-import VerifyClaim from '../../containers/workflows/VerifyClaim/VerifyClaim'
+import AcceptDelegation from '../../containers/Tasks/AcceptDelegation/AcceptDelegation'
+import AttestClaim from '../../containers/Tasks/AttestClaim/AttestClaim'
+import CreateDelegation from '../../containers/Tasks/CreateDelegation/CreateDelegation'
+import ImportAttestation from '../../containers/Tasks/ImportAttestation/ImportAttestation'
+import SubmitClaimsForCType from '../../containers/Tasks/SubmitClaimsForCType/SubmitClaimsForCType'
+import SubmitLegitimations from '../../containers/Tasks/SubmitLegitimations/SubmitLegitimations'
+import RequestAttestation from '../../containers/Tasks/RequestAttestation/RequestAttestation'
+import VerifyClaim from '../../containers/Tasks/VerifyClaim/VerifyClaim'
 import { MessageOutput } from '../../services/MessageRepository'
 import Code from '../Code/Code'
 import MessageSubject from '../MessageSubject/MessageSubject'
-import ImportDelegation from '../../containers/workflows/ImportDelegation/ImportDelegation'
+import ImportDelegation from '../../containers/Tasks/ImportDelegation/ImportDelegation'
 
 import './MessageDetailView.scss'
 
@@ -113,31 +113,29 @@ class MessageDetailView extends React.Component<Props, State> {
       case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
         return (
           <SubmitLegitimations
-            receiverAddress={message.senderAddress}
-            sentClaim={(message.body as sdk.IRequestLegitimations).content}
+            receiverAddresses={[message.senderAddress]}
+            claim={(message.body as sdk.IRequestLegitimations).content}
             onFinished={this.handleDelete}
           />
         )
       case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
         return (
           <RequestAttestation
-            initialClaim={
-              (message.body as sdk.ISubmitLegitimations).content.claim
-            }
+            claim={(message.body as sdk.ISubmitLegitimations).content.claim}
             legitimations={
               (message.body as sdk.ISubmitLegitimations).content.legitimations
             }
             delegationId={
               (message.body as sdk.ISubmitLegitimations).content.delegationId
             }
-            attesterAddress={message.senderAddress}
+            receiverAddresses={[message.senderAddress]}
             onFinished={this.handleDelete}
           />
         )
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return (
           <AttestClaim
-            claimerAddress={message.senderAddress}
+            claimerAddresses={[message.senderAddress]}
             requestForAttestation={
               (message.body as sdk.IRequestAttestationForClaim).content
             }
@@ -156,7 +154,7 @@ class MessageDetailView extends React.Component<Props, State> {
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
         return (
           <SubmitClaimsForCType
-            receiverAddress={message.senderAddress}
+            receiverAddresses={[message.senderAddress]}
             cTypeHash={(message.body as sdk.IRequestClaimsForCtype).content}
             onFinished={this.handleDelete}
           />

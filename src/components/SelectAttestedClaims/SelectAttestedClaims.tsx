@@ -81,7 +81,6 @@ type Props = {
 type State = {
   cType?: CType
   claimSelectionData: ClaimSelectionData
-  relevantClaimEntries: GroupedClaimEntries
 }
 
 class SelectAttestedClaims extends React.Component<Props, State> {
@@ -91,7 +90,6 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     super(props)
     this.state = {
       claimSelectionData: {},
-      relevantClaimEntries: this.getRelevantClaimEntries(),
     }
 
     this.labels = LABELS[props.context || 'default']
@@ -111,14 +109,14 @@ class SelectAttestedClaims extends React.Component<Props, State> {
 
   public render() {
     const { cTypeHash } = this.props
-    const { relevantClaimEntries } = this.state
 
-    const relevantCTypes = Object.keys(relevantClaimEntries)
+    const relevantClaimEntries = this.getRelevantClaimEntries()
+    const relevantCTypes = Object.keys(this.getRelevantClaimEntries())
     return (
       <section className="SelectAttestedClaims">
         {!!relevantCTypes && !!relevantCTypes.length
           ? relevantCTypes.map((_cTypeHash: Claims.Entry['claim']['cType']) =>
-              this.getCTypeContainer(_cTypeHash)
+              this.getCTypeContainer(relevantClaimEntries, _cTypeHash)
             )
           : cTypeHash
           ? this.getNoClaimsForCtypeFound()
@@ -154,8 +152,10 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     )
   }
 
-  private getCTypeContainer(cTypeHash: Claims.Entry['claim']['cType']) {
-    const { relevantClaimEntries } = this.state
+  private getCTypeContainer(
+    relevantClaimEntries: GroupedClaimEntries,
+    cTypeHash: Claims.Entry['claim']['cType']
+  ) {
     return (
       <div className="cType-container" key={cTypeHash}>
         <h4>

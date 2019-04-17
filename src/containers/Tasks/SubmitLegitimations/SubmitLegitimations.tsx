@@ -1,7 +1,6 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
-import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'
 import SelectAttestedClaims from '../../../components/SelectAttestedClaims/SelectAttestedClaims'
 import SelectDelegations from '../../../components/SelectDelegations/SelectDelegations'
 import withSelectAttestedClaims, {
@@ -13,12 +12,14 @@ import { Contact } from '../../../types/Contact'
 
 import './SubmitLegitimations.scss'
 
-type Props = InjectedSelectProps & {
-  sentClaim: sdk.IPartialClaim
-  receiverAddress: Contact['publicIdentity']['address']
+export type SubmitLegitimationsProps = {
+  claim: sdk.IPartialClaim
+  receiverAddresses: Array<Contact['publicIdentity']['address']>
 
   onFinished?: () => void
 }
+
+type Props = InjectedSelectProps & SubmitLegitimationsProps
 
 type State = {
   selectedDelegation?: MyDelegation
@@ -35,7 +36,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
 
   public render() {
     const {
-      sentClaim,
+      claim,
       onStartWorkflow,
       workflowStarted,
       claimSelectionData,
@@ -88,17 +89,17 @@ class SubmitLegitimations extends React.Component<Props, State> {
 
   private sendClaim() {
     const {
-      sentClaim,
+      claim,
       getAttestedClaims,
-      receiverAddress,
+      receiverAddresses,
       onFinished,
     } = this.props
     const { selectedDelegation } = this.state
 
     AttestationWorkflow.submitLegitimations(
-      sentClaim,
+      claim,
       getAttestedClaims(),
-      receiverAddress,
+      receiverAddresses[0],
       selectedDelegation
     ).then(() => {
       if (onFinished) {

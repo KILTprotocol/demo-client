@@ -12,12 +12,16 @@ import { Contact } from '../../../types/Contact'
 
 import './SubmitClaimsForCType.scss'
 
-type Props = InjectedSelectProps & {
+export type SubmitClaimsForCTypeProps = {
   cTypeHash: sdk.ICType['hash']
-  receiverAddress: Contact['publicIdentity']['address']
+  receiverAddresses: Array<Contact['publicIdentity']['address']>
+
+  autoStart?: true
 
   onFinished?: () => void
 }
+
+type Props = InjectedSelectProps & SubmitClaimsForCTypeProps
 
 type State = {
   selectedDelegation?: MyDelegation
@@ -33,21 +37,25 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
   public render() {
     const {
       cTypeHash,
-      onStartWorkflow,
       workflowStarted,
       claimSelectionData,
+
+      autoStart,
+
+      onStartWorkflow,
       onChange,
     } = this.props
 
+    const _workFlowStarted = autoStart || workflowStarted
+
     return (
       <section className="SubmitClaimsForCType">
-        {!workflowStarted && (
+        {!_workFlowStarted && (
           <div className="actions">
             <button onClick={onStartWorkflow}>Select attested claim(s)</button>
           </div>
         )}
-
-        {workflowStarted && (
+        {_workFlowStarted && (
           <div className="selectAttestedClaims">
             <h4>Select attested claim(s)</h4>
 
@@ -68,11 +76,11 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
   }
 
   private sendClaim() {
-    const { receiverAddress, onFinished, getAttestedClaims } = this.props
+    const { receiverAddresses, onFinished, getAttestedClaims } = this.props
 
     AttestationWorkflow.submitClaimsForCtype(
       getAttestedClaims(),
-      receiverAddress
+      receiverAddresses[0]
     ).then(() => {
       if (onFinished) {
         onFinished()

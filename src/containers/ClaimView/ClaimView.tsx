@@ -170,7 +170,12 @@ class ClaimView extends React.Component<Props, State> {
 
     if (claim) {
       if (this.claimIdToLegitimate) {
-        attestationWorkflow.requestLegitimations(claim, selectedAttesters)
+        attestationWorkflow.requestLegitimations(
+          claim,
+          selectedAttesters.map(
+            (contact: Contact) => contact.publicIdentity.address
+          )
+        )
       } else if (this.claimIdToAttest) {
         attestationWorkflow.requestAttestationForClaim(claim, selectedAttesters)
       }

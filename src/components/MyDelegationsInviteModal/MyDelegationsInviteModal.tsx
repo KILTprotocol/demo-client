@@ -147,7 +147,9 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
             <SelectContacts
               contacts={contacts.pool}
               name="selectContactsForInvite"
-              defaultValues={contactsSelected}
+              preSelectedAddresses={(contactsSelected || []).map(
+                (contact: Contact) => contact.publicIdentity.address
+              )}
               isMulti={true}
               closeMenuOnSelect={true}
               onChange={this.changeContacts}

@@ -20,10 +20,10 @@ type Props = {
   allContacts?: boolean
   closeMenuOnSelect?: boolean
   contacts?: Contact[]
-  defaultValues?: Contact[]
   isMulti?: boolean
   name?: string
   placeholder?: string
+  preSelectedAddresses?: Array<Contact['publicIdentity']['address']>
 
   onChange?: (selectedContacts: Contact[]) => void
   onMenuOpen?: () => void
@@ -63,23 +63,32 @@ class SelectContacts extends React.Component<Props, State> {
     if (!contacts.length) {
       if (allContacts) {
         ContactRepository.findAll().then(_contacts => {
-          this.setState({ contacts: _contacts })
+          this.setState({ contacts: _contacts }, () => {
+            this.initPreSelection()
+          })
         })
       } else {
-        this.setState({
-          contacts: Contacts.getMyContacts(PersistentStore.store.getState()),
-        })
+        this.setState(
+          {
+            contacts: Contacts.getMyContacts(PersistentStore.store.getState()),
+          },
+          () => {
+            this.initPreSelection()
+          }
+        )
       }
+    } else {
+      this.initPreSelection()
     }
   }
 
   public render() {
     const {
       closeMenuOnSelect,
-      defaultValues,
       isMulti,
       name,
       placeholder,
+      preSelectedAddresses,
 
       onMenuOpen,
       onMenuClose,
@@ -91,8 +100,11 @@ class SelectContacts extends React.Component<Props, State> {
     )
 
     let defaultOptions: SelectOption[] = []
-    if (defaultValues) {
-      defaultOptions = defaultValues.map(contact => this.getOption(contact))
+    if (preSelectedAddresses) {
+      defaultOptions = options.filter(
+        (option: SelectOption) =>
+          preSelectedAddresses.indexOf(option.baseValue) !== -1
+      )
     }
 
     const _placeholder = `Select contact${isMulti ? 's' : ''}…`
@@ -149,6 +161,20 @@ class SelectContacts extends React.Component<Props, State> {
 
     if (onChange) {
       onChange(selectedContacts)
+    }
+  }
+
+  private initPreSelection() {
+    const { preSelectedAddresses, onChange } = this.props
+    const { contacts } = this.state
+
+    if (preSelectedAddresses && preSelectedAddresses.length && onChange) {
+      onChange(
+        contacts.filter(
+          (contact: Contact) =>
+            preSelectedAddresses.indexOf(contact.publicIdentity.address) !== -1
+        )
+      )
     }
   }
 }

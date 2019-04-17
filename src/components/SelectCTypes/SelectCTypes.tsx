@@ -2,6 +2,8 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
+import CTypeRepository from '../../services/CtypeRepository'
+import ErrorService from '../../services/ErrorService'
 
 import { ICType } from '../../types/Ctype'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
@@ -14,21 +16,27 @@ type SelectOption = {
 
 type Props = {
   closeMenuOnSelect?: boolean
-  cTypes: ICType[]
+  cTypes?: ICType[]
   isMulti?: boolean
-  name: string
+  name?: string
+  placeholder?: string
+  preSelectedCTypeHashes?: Array<ICType['cType']['hash']>
+
   onChange?: (selectedCTypes: ICType[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
-  placeholder?: string
 }
 
-type State = {}
+type State = {
+  cTypes: ICType[]
+}
 
 class SelectCTypes extends React.Component<Props, State> {
   public static defaultProps = {
     closeMenuOnSelect: true,
     isMulti: false,
+    name: 'selectCTypes',
+    placeholder: `Select cType#{multi}…`,
   }
 
   private filterConfig: Config = {
@@ -40,33 +48,57 @@ class SelectCTypes extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
+    this.state = {
+      cTypes: props.cTypes || [],
+    }
 
     this.onChange = this.onChange.bind(this)
+  }
+
+  public componentDidMount() {
+    const { cTypes } = this.state
+
+    if (!cTypes.length) {
+      CTypeRepository.findAll()
+        .then((fetchedCTypes: ICType[]) => {
+          this.setState({ cTypes: fetchedCTypes })
+          this.initPreSelection()
+        })
+        .catch(error => {
+          ErrorService.logWithNotification({
+            error,
+            message: 'Could not fetch cTypes',
+            origin: 'SelectCTypes.componentDidMount()',
+            type: 'ERROR.FETCH.GET',
+          })
+        })
+    } else {
+      this.initPreSelection()
+    }
   }
 
   public render() {
     const {
       closeMenuOnSelect,
-      cTypes,
       isMulti,
       name,
       onMenuOpen,
       onMenuClose,
       placeholder,
+      preSelectedCTypeHashes,
     } = this.props
+    const { cTypes } = this.state
 
     const options: SelectOption[] = cTypes.map(
-      (cType: ICType): SelectOption => ({
-        baseValue: `${cType.cType.hash}`,
-        label: <CTypePresentation cType={cType} linked={false} />,
-        value: `${cType.cType.metadata.title.default} ${cType.cType.hash}`,
-      })
+      (cType: ICType): SelectOption => this.getOption(cType)
     )
 
-    const _placeholder = `Select cType${isMulti ? 's' : ''}…`
+    const defaultOptions = options.filter(
+      (option: SelectOption) =>
+        (preSelectedCTypeHashes || []).indexOf(option.baseValue) !== -1
+    )
 
     return (
-      !!cTypes &&
       !!cTypes.length && (
         <Select
           className="react-select-container"
@@ -77,18 +109,28 @@ class SelectCTypes extends React.Component<Props, State> {
           closeMenuOnSelect={closeMenuOnSelect}
           name={name}
           options={options}
+          defaultValue={defaultOptions}
+          placeholder={placeholder!.replace('#{multi}', isMulti ? 's' : '')}
+          filterOption={createFilter(this.filterConfig)}
           onChange={this.onChange}
           onMenuOpen={onMenuOpen}
           onMenuClose={onMenuClose}
-          placeholder={placeholder || _placeholder}
-          filterOption={createFilter(this.filterConfig)}
         />
       )
     )
   }
 
+  private getOption(cType: ICType): SelectOption {
+    return {
+      baseValue: `${cType.cType.hash}`,
+      label: <CTypePresentation cTypeHash={cType.cType.hash} linked={false} />,
+      value: `${cType.cType.metadata.title.default} ${cType.cType.hash}`,
+    }
+  }
+
   private onChange(selectedOptions: SelectOption | SelectOption[]) {
-    const { cTypes, onChange } = this.props
+    const { onChange } = this.props
+    const { cTypes } = this.state
 
     // normalize selectedOptions to Array
     const _selectedOptions: Array<SelectOption['value']> = (Array.isArray(
@@ -103,7 +145,22 @@ class SelectCTypes extends React.Component<Props, State> {
     )
 
     if (onChange) {
+      console.log('selectedCTypes', selectedCTypes)
       onChange(selectedCTypes)
+    }
+  }
+
+  private initPreSelection() {
+    const { preSelectedCTypeHashes, onChange } = this.props
+    const { cTypes } = this.state
+
+    if (preSelectedCTypeHashes && preSelectedCTypeHashes.length && onChange) {
+      onChange(
+        cTypes.filter(
+          (cType: ICType) =>
+            preSelectedCTypeHashes.indexOf(cType.cType.hash) !== -1
+        )
+      )
     }
   }
 }

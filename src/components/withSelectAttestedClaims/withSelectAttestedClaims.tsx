@@ -38,6 +38,7 @@ const withSelectAttestedClaims = <P extends InjectedProps>(
 
     public render() {
       const { workflowStarted, claimSelectionData } = this.state
+
       return (
         <WrappedComponent
           {...this.props as HocProps}

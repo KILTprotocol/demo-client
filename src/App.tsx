@@ -5,6 +5,7 @@ import Header from './components/Header/Header'
 import BlockingNotifications from './containers/BlockingNotifications/BlockingNotifications'
 import BlockUi from './containers/BlockUi/BlockUi'
 import Notifications from './containers/Notifications/Notifications'
+import Tasks from './containers/Tasks/Tasks'
 import Routes from './routes'
 
 class App extends React.Component {
@@ -17,6 +18,7 @@ class App extends React.Component {
           <BlockUi />
           <BlockingNotifications />
           <Notifications />
+          <Tasks />
         </div>
       </Router>
     )

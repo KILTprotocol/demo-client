@@ -1,5 +1,8 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
+import * as UiState from '../../state/ducks/UiState'
+import PersistentStore from '../../state/PersistentStore'
 
 import { ICType } from '../../types/Ctype'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -38,14 +41,26 @@ class CtypeListView extends React.Component<Props, State> {
               {cTypes.map(cType => (
                 <tr key={cType.cType.hash}>
                   <td className="ctype-author">
-                    <CTypePresentation cType={cType} />
-                    <ContactPresentation address={cType.metaData.author} />
+                    <CTypePresentation
+                      cTypeHash={cType.cType.hash}
+                      interactive={true}
+                    />
+                    <ContactPresentation
+                      address={cType.metaData.author}
+                      interactive={true}
+                    />
                   </td>
                   <td className="ctype">
-                    <CTypePresentation cType={cType} />
+                    <CTypePresentation
+                      cTypeHash={cType.cType.hash}
+                      interactive={true}
+                    />
                   </td>
                   <td className="author">
-                    <ContactPresentation address={cType.metaData.author} />
+                    <ContactPresentation
+                      address={cType.metaData.author}
+                      interactive={true}
+                    />
                   </td>
                   <td className="actionsTd">
                     <div>
@@ -65,6 +80,20 @@ class CtypeListView extends React.Component<Props, State> {
                           {
                             callback: this.createDelegation.bind(this, cType),
                             label: 'Create Delegation',
+                          },
+                          {
+                            callback: () => {
+                              PersistentStore.store.dispatch(
+                                UiState.Store.updateCurrentTaskAction({
+                                  objective:
+                                    sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
+                                  props: {
+                                    cTypeHash: cType.cType.hash,
+                                  },
+                                })
+                              )
+                            },
+                            label: 'Submit Claims',
                           },
                         ]}
                       />

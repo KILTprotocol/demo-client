@@ -9,7 +9,7 @@ import { Contact } from '../../../types/Contact'
 import { BlockUi } from '../../../types/UserFeedback'
 
 type Props = {
-  claimerAddress: Contact['publicIdentity']['address']
+  claimerAddresses: Array<Contact['publicIdentity']['address']>
   requestForAttestation: sdk.IRequestForAttestation
   onFinished?: () => void
 }
@@ -44,7 +44,7 @@ class AttestClaim extends React.Component<Props, State> {
   }
 
   private attestClaim() {
-    const { requestForAttestation, onFinished, claimerAddress } = this.props
+    const { requestForAttestation, onFinished, claimerAddresses } = this.props
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Writing attestation to chain',
     })
@@ -52,7 +52,7 @@ class AttestClaim extends React.Component<Props, State> {
     attestationWorkflow
       .approveAndSubmitAttestationForClaim(
         requestForAttestation,
-        claimerAddress
+        claimerAddresses[0]
       )
       .then(() => {
         blockUi.remove()

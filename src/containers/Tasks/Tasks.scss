@@ -1,0 +1,12 @@
+.Tasks {
+
+  & .Modal {
+
+    & .body {
+
+      & > section {
+        @include labeledCard;
+      }
+    }
+  }
+}

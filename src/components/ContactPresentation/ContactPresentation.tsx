@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import ContactRepository from '../../services/ContactRepository'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
+import * as UiState from '../../state/ducks/UiState'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
@@ -102,6 +103,7 @@ class ContactPresentation extends React.Component<Props, State> {
   }
 
   private getActions(): Action[] {
+    const { address } = this.props
     const { contact } = this.state
     const actions: Action[] = []
 
@@ -118,6 +120,20 @@ class ContactPresentation extends React.Component<Props, State> {
         label: 'Unfavorize',
       })
     }
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
+            props: {
+              receiverAddresses: [address],
+            },
+          })
+        )
+      },
+      label: 'Submit Claims',
+    })
 
     return actions
   }

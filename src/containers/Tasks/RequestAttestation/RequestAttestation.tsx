@@ -13,22 +13,25 @@ import { Contact } from '../../../types/Contact'
 
 import './RequestAttestation.scss'
 
-type Props = {
-  initialClaim: sdk.IPartialClaim
+export type RequestAttestationProps = {
+  claim: sdk.IPartialClaim
   legitimations: sdk.IAttestedClaim[]
-  attesterAddress: sdk.PublicIdentity['address']
+  receiverAddresses: Array<sdk.PublicIdentity['address']>
 
   delegationId?: sdk.IDelegationNode['id']
 
-  onFinished: () => void
+  onFinished?: () => void
 }
 
 type State = {
   savedClaimEntry?: Claims.Entry
 }
 
-class RequestAttestation extends React.Component<Props, State> {
-  constructor(props: Props) {
+class RequestAttestation extends React.Component<
+  RequestAttestationProps,
+  State
+> {
+  constructor(props: RequestAttestationProps) {
     super(props)
     this.state = {}
     this.handleCreateClaim = this.handleCreateClaim.bind(this)
@@ -36,18 +39,15 @@ class RequestAttestation extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    const { initialClaim } = this.props
+    const { claim } = this.props
     // check if we already have the messages claim stored
     this.setState({
-      savedClaimEntry: Claims.getClaim(
-        PersistentStore.store.getState(),
-        initialClaim
-      ),
+      savedClaimEntry: Claims.getClaim(PersistentStore.store.getState(), claim),
     })
   }
 
   public render() {
-    const { initialClaim, legitimations, delegationId } = this.props
+    const { claim, legitimations, delegationId } = this.props
     const { savedClaimEntry } = this.state
 
     return (
@@ -59,7 +59,7 @@ class RequestAttestation extends React.Component<Props, State> {
           />
         ) : (
           <MyClaimCreateView
-            partialClaim={initialClaim}
+            partialClaim={claim}
             onCreate={this.handleCreateClaim}
           />
         )}
@@ -95,7 +95,7 @@ class RequestAttestation extends React.Component<Props, State> {
 
   private handleSubmit() {
     const {
-      attesterAddress,
+      receiverAddresses,
       legitimations,
       delegationId,
       onFinished,
@@ -103,7 +103,7 @@ class RequestAttestation extends React.Component<Props, State> {
     const { savedClaimEntry } = this.state
 
     if (savedClaimEntry) {
-      ContactRepository.findByAddress(attesterAddress).then(
+      ContactRepository.findByAddress(receiverAddresses[0]).then(
         (attester: Contact) => {
           attestationWorkflow
             .requestAttestationForClaim(
@@ -115,7 +115,9 @@ class RequestAttestation extends React.Component<Props, State> {
               delegationId
             )
             .then(() => {
-              onFinished()
+              if (onFinished) {
+                onFinished()
+              }
             })
         }
       )

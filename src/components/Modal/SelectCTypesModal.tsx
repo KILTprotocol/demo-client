@@ -24,13 +24,6 @@ type State = {
 }
 
 class SelectCTypesModal extends React.Component<Props, State> {
-  private static defaultProps: Partial<Props> = {
-    closeMenuOnSelect: true,
-    isMulti: false,
-    name: 'selectCTypes',
-    placeholder: `Select cType#{multi}…`,
-  }
-
   private modal: Modal | null
 
   constructor(props: Props) {
@@ -42,32 +35,7 @@ class SelectCTypesModal extends React.Component<Props, State> {
     this.onSelectCTypes = this.onSelectCTypes.bind(this)
   }
 
-  public componentDidMount() {
-    CTypeRepository.findAll()
-      .then((cTypes: ICType[]) => {
-        this.setState({ cTypes })
-      })
-      .catch(error => {
-        ErrorService.logWithNotification({
-          error,
-          message: 'Could not fetch cTypes',
-          origin: 'SelectCTypesModal.componentDidMount()',
-          type: 'ERROR.FETCH.GET',
-        })
-      })
-  }
-
   public render() {
-    const { cTypes } = this.state
-
-    if (!!cTypes && !!cTypes.length) {
-      return this.getModalElement()
-    } else {
-      return ''
-    }
-  }
-
-  public getModalElement() {
     const {
       header,
       isMulti,

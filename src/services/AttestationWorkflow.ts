@@ -21,21 +21,18 @@ class AttestationWorkflow {
    * Sends a legitimation request for attesting claims to attesters
    *
    * @param claim the partial claim we request legitimation for
-   * @param attesters the attesters to send the legitimation request to
+   * @param receiverAddresses the list of attester addresses to send the legitimation request to
    */
   public static async requestLegitimations(
     claim: IPartialClaim,
-    attesters: Contact[]
+    receiverAddresses: Array<Contact['publicIdentity']['address']>
   ): Promise<void> {
     const messageBody = {
       content: claim,
       type: MessageBodyType.REQUEST_LEGITIMATIONS,
     } as IRequestLegitimations
 
-    return MessageRepository.sendToAddresses(
-      attesters.map((attester: Contact) => attester.publicIdentity.address),
-      messageBody
-    )
+    return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
   }
 
   /**
