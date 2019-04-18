@@ -1,8 +1,11 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
 
 import * as Claims from '../../state/ducks/Claims'
+import * as UiState from '../../state/ducks/UiState'
+import PersistentStore from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import SelectCTypesModal from '../Modal/SelectCTypesModal'
@@ -42,7 +45,6 @@ class MyClaimListView extends React.Component<Props, State> {
               <tr>
                 <th className="alias">Alias</th>
                 <th className="cType">CType</th>
-                <th className="content">Content</th>
                 <th className="status">Attested?</th>
                 <th className="actionsTd" />
               </tr>
@@ -56,10 +58,11 @@ class MyClaimListView extends React.Component<Props, State> {
                     </Link>
                   </td>
                   <td className="cType">
-                    <CTypePresentation cTypeHash={claimEntry.claim.cType} />
-                  </td>
-                  <td className="content">
-                    {JSON.stringify(claimEntry.claim.contents)}
+                    <CTypePresentation
+                      cTypeHash={claimEntry.claim.cType}
+                      interactive={true}
+                      linked={true}
+                    />
                   </td>
                   <td
                     className={
@@ -77,11 +80,19 @@ class MyClaimListView extends React.Component<Props, State> {
                       <SelectAction
                         actions={[
                           {
-                            callback: this.requestLegitimation.bind(
-                              this,
-                              claimEntry.id
-                            ),
-                            label: 'Get Legitimation',
+                            callback: () => {
+                              PersistentStore.store.dispatch(
+                                UiState.Store.updateCurrentTaskAction({
+                                  objective:
+                                    sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+                                  props: {
+                                    cTypeHash: claimEntry.claim.cType,
+                                    preSelectedClaimEntries: [claimEntry],
+                                  } as RequestLegitimationsProps,
+                                })
+                              )
+                            },
+                            label: 'Request legitimations',
                           },
                           {
                             callback: this.requestAttestation.bind(

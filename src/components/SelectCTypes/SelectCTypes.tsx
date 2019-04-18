@@ -123,7 +123,7 @@ class SelectCTypes extends React.Component<Props, State> {
   private getOption(cType: ICType): SelectOption {
     return {
       baseValue: `${cType.cType.hash}`,
-      label: <CTypePresentation cTypeHash={cType.cType.hash} linked={false} />,
+      label: <CTypePresentation cTypeHash={cType.cType.hash} />,
       value: `${cType.cType.metadata.title.default} ${cType.cType.hash}`,
     }
   }

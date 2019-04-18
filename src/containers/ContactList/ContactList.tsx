@@ -101,7 +101,7 @@ class ContactList extends React.Component<Props, State> {
           <thead>
             <tr>
               <th className="name">Name</th>
-              <th className="address">Address</th>
+              {/*<th className="address">Address</th>*/}
               <th className="actionTd" />
             </tr>
           </thead>
@@ -143,11 +143,15 @@ class ContactList extends React.Component<Props, State> {
     return (
       <tr key={address}>
         <td className="name">
-          <ContactPresentation address={address} interactive={true} />
+          <ContactPresentation
+            address={address}
+            interactive={true}
+            fullSizeActions={true}
+          />
         </td>
-        <td className="address" title={address}>
-          {address}
-        </td>
+        {/*<td className="address" title={address}>*/}
+        {/*{address}*/}
+        {/*</td>*/}
         <td className="actionsTd">
           <div>
             <SelectAction

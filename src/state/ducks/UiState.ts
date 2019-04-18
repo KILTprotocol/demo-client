@@ -152,9 +152,9 @@ class Store {
         return state.deleteIn(['blockUis', blockUiId])
       }
       case Store.ACTIONS.BLOCK_UI_UPDATE: {
-          const { id, message } = (action as UpdateBlockUiAction).payload
-          return state.setIn(['blockUis', id, 'message'], message)
-        }
+        const { id, message } = (action as UpdateBlockUiAction).payload
+        return state.setIn(['blockUis', id, 'message'], message)
+      }
       case Store.ACTIONS.SET_DEBUG_MODE: {
         const debugMode = (action as SetDebugModeAction).payload
         return state.setIn(['debugMode'], debugMode)
@@ -268,8 +268,8 @@ class Store {
     NOTIFICATION_ADD: 'client/uiState/NOTIFICATION_ADD',
     NOTIFICATION_REMOVE: 'client/uiState/NOTIFICATION_REMOVE',
 
-    SET_DEBUG_MODE: 'client/uiState/SET_DEBUG_MODE',
     CURRENT_TASK_UPDATE: 'client/uiState/CURRENT_TASK_UPDATE',
+    SET_DEBUG_MODE: 'client/uiState/SET_DEBUG_MODE',
   }
 }
 
@@ -333,7 +333,6 @@ export {
   getNotifications,
   getBlockUis,
   getBlockingNotifications,
-
   getCurrentTask,
   getDebugMode,
 }

@@ -73,16 +73,14 @@ class MessageRepository {
     )
 
     return Promise.all(arrayOfPromises)
-      .catch(error => {
+      .catch(() => {
         return arrayOfPromises
       })
+      .then((receiverContacts: Contact[]) =>
+        receiverContacts.filter((receiverContact: Contact) => receiverContact)
+      )
       .then((receiverContacts: Contact[]) => {
-        return MessageRepository.send(
-          receiverContacts.filter(
-            (receiverContact: Contact) => receiverContact
-          ),
-          messageBody
-        )
+        return MessageRepository.send(receiverContacts, messageBody)
       })
   }
 

@@ -18,10 +18,13 @@ import { Action } from '../SelectAction/SelectAction'
 
 type Props = RouteComponentProps<{}> & {
   cTypeHash: ICType['cType']['hash']
+
   inline?: true
   size?: number
-  linked?: false
+  linked?: true
   interactive?: boolean
+  fullSizeActions?: true
+  right?: true
 }
 
 type State = {
@@ -47,7 +50,7 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   public render() {
-    const { inline, interactive, size } = this.props
+    const { inline, interactive, fullSizeActions, right, size } = this.props
     const { cType } = this.state
 
     let actions: Action[] = []
@@ -60,6 +63,8 @@ class CTypePresentation extends React.Component<Props, State> {
       'CTypePresentation',
       inline ? 'inline' : '',
       actions.length ? 'withActions' : '',
+      fullSizeActions ? 'fullSizeActions' : 'minimal',
+      right ? 'alignRight' : '',
     ]
 
     return (
@@ -79,7 +84,10 @@ class CTypePresentation extends React.Component<Props, State> {
             </>
           )}
         {!!actions.length && (
-          <SelectAction className="minimal" actions={actions} />
+          <SelectAction
+            className={fullSizeActions ? 'fullSize' : 'minimal'}
+            actions={actions}
+          />
         )}
       </div>
     )

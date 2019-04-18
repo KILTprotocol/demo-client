@@ -24,6 +24,8 @@ type Props = {
   inline?: true
   interactive?: true
   size?: number
+  fullSizeActions?: true
+  right?: true
 
   // mapStateToProps
   contacts: Contact[]
@@ -58,7 +60,15 @@ class ContactPresentation extends React.Component<Props, State> {
   }
 
   public render() {
-    const { address, inline, interactive, iconOnly, size } = this.props
+    const {
+      address,
+      inline,
+      interactive,
+      iconOnly,
+      fullSizeActions,
+      right,
+      size,
+    } = this.props
     const { contact, myIdentity } = this.state
 
     const name =
@@ -81,6 +91,8 @@ class ContactPresentation extends React.Component<Props, State> {
       inline ? 'inline' : '',
       contact ? (!contact.metaData.addedAt ? 'external' : 'internal') : '',
       actions.length ? 'withActions' : '',
+      fullSizeActions ? 'fullSizeActions' : 'minimal',
+      right ? 'alignRight' : '',
     ]
 
     return (
@@ -97,7 +109,10 @@ class ContactPresentation extends React.Component<Props, State> {
           </span>
         )}
         {!!actions.length && (
-          <SelectAction className="minimal" actions={actions} />
+          <SelectAction
+            className={fullSizeActions ? 'fullSize' : 'minimal'}
+            actions={actions}
+          />
         )}
       </div>
     )

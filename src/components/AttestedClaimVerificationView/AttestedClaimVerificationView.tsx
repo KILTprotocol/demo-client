@@ -73,7 +73,6 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
         />
         <CTypePresentation
           cTypeHash={attestedClaim.request.claim.cType}
-          linked={false}
           inline={true}
         />
         {this.getAttestationStatusView()}

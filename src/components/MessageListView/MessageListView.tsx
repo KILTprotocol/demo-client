@@ -112,7 +112,10 @@ class MessageListView extends React.Component<Props, State> {
                   <tr key={message.messageId}>
                     <td className="sender-subject-created-received">
                       <div>
-                        <ContactPresentation address={message.senderAddress} />
+                        <ContactPresentation
+                          address={message.senderAddress}
+                          interactive={true}
+                        />
                       </div>
                       <div onClick={this.openMessage.bind(this, message)}>
                         <MessageSubject message={message} />
@@ -122,14 +125,20 @@ class MessageListView extends React.Component<Props, State> {
                     </td>
                     <td className="sender-subject">
                       <div>
-                        <ContactPresentation address={message.senderAddress} />
+                        <ContactPresentation
+                          address={message.senderAddress}
+                          interactive={true}
+                        />
                       </div>
                       <div onClick={this.openMessage.bind(this, message)}>
                         <MessageSubject message={message} />
                       </div>
                     </td>
                     <td className="sender">
-                      <ContactPresentation address={message.senderAddress} />
+                      <ContactPresentation
+                        address={message.senderAddress}
+                        interactive={true}
+                      />
                     </td>
                     <td className="subject">
                       <div onClick={this.openMessage.bind(this, message)}>

@@ -25,33 +25,6 @@ import SubmitLegitimations, {
 
 import './Tasks.scss'
 
-type BaseTaskProps = {
-  receiverAddresses: Array<Contact['publicIdentity']['address']>
-  onFinished?: () => void
-}
-
-// export type UndefinedTaskProps = {
-//   objective: undefined
-//   props: undefined
-// }
-//
-// export type RequestLegitimationsTaskProps = {
-//   objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS
-//   props: Partial<RequestLegitimationsProps>
-// }
-// export type SubmitLegitimationsTaskProps = {
-//   objective: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS
-//   props: Partial<SubmitLegitimationsProps>
-// }
-// export type RequestAttestationTaskProps = {
-//   objective: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
-//   props: Partial<RequestAttestationProps>
-// }
-// export type SubmitClaimsForCTypeTaskProps = {
-//   objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
-//   props: Partial<SubmitClaimsForCTypeProps>
-// }
-
 export type TaskProps =
   | {
       objective: undefined
@@ -141,12 +114,14 @@ class Tasks extends React.Component<Props, State> {
           'Request legitimations',
           <>
             {this.getCTypeSelect(false, [props.cTypeHash])}
-            <RequestLegitimation
-              {...props}
-              cTypeHash={cTypeHash}
-              receiverAddresses={selectedReceiverAddresses}
-              onFinished={this.onTaskFinished}
-            />
+            {!!cTypeHash && (
+              <RequestLegitimation
+                {...props}
+                cTypeHash={cTypeHash}
+                receiverAddresses={selectedReceiverAddresses}
+                onFinished={this.onTaskFinished}
+              />
+            )}
           </>,
           props.receiverAddresses
         )

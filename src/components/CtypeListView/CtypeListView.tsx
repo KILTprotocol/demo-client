@@ -1,13 +1,9 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
-import * as UiState from '../../state/ducks/UiState'
-import PersistentStore from '../../state/PersistentStore'
 
 import { ICType } from '../../types/Ctype'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
-import SelectAction from '../SelectAction/SelectAction'
 
 import './CtypeListView.scss'
 
@@ -34,7 +30,6 @@ class CtypeListView extends React.Component<Props, State> {
                 </th>
                 <th className="ctype">CTYPE</th>
                 <th className="author">Author</th>
-                <th className="actionsTd" />
               </tr>
             </thead>
             <tbody>
@@ -44,60 +39,28 @@ class CtypeListView extends React.Component<Props, State> {
                     <CTypePresentation
                       cTypeHash={cType.cType.hash}
                       interactive={true}
+                      linked={true}
+                      right={true}
                     />
                     <ContactPresentation
                       address={cType.metaData.author}
                       interactive={true}
+                      right={true}
                     />
                   </td>
                   <td className="ctype">
                     <CTypePresentation
                       cTypeHash={cType.cType.hash}
                       interactive={true}
+                      linked={true}
                     />
                   </td>
                   <td className="author">
                     <ContactPresentation
                       address={cType.metaData.author}
                       interactive={true}
+                      right={true}
                     />
-                  </td>
-                  <td className="actionsTd">
-                    <div>
-                      <SelectAction
-                        actions={[
-                          {
-                            callback: this.createClaim.bind(this, cType),
-                            label: 'Create Claim',
-                          },
-                          {
-                            callback: this.requestLegitimation.bind(
-                              this,
-                              cType
-                            ),
-                            label: 'Get Legitimation',
-                          },
-                          {
-                            callback: this.createDelegation.bind(this, cType),
-                            label: 'Create Delegation',
-                          },
-                          {
-                            callback: () => {
-                              PersistentStore.store.dispatch(
-                                UiState.Store.updateCurrentTaskAction({
-                                  objective:
-                                    sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
-                                  props: {
-                                    cTypeHash: cType.cType.hash,
-                                  },
-                                })
-                              )
-                            },
-                            label: 'Submit Claims',
-                          },
-                        ]}
-                      />
-                    </div>
                   </td>
                 </tr>
               ))}
@@ -109,19 +72,6 @@ class CtypeListView extends React.Component<Props, State> {
         </div>
       </section>
     )
-  }
-
-  private createClaim(cType: ICType) {
-    this.props.history.push(`/claim/new/${cType.cType.hash}`)
-  }
-
-  private requestLegitimation(cType: ICType) {
-    const { onRequestLegitimation } = this.props
-    onRequestLegitimation(cType)
-  }
-
-  private createDelegation(cType: ICType) {
-    this.props.history.push(`/delegations/new/${cType.cType.hash}`)
   }
 }
 
