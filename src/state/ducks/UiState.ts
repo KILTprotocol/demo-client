@@ -57,7 +57,21 @@ interface UpdateBlockUiAction extends KiltAction {
 
 type BlockUiActions = AddBlockUiAction | RemoveBlockUiAction
 
-type Action = NotificationActions | BlockingNotificationActions | BlockUiActions
+/**
+ * debug state
+ */
+interface SetDebugModeAction extends KiltAction {
+  payload: boolean
+}
+
+/**
+ *
+ */
+type Action =
+  | NotificationActions
+  | BlockingNotificationActions
+  | BlockUiActions
+  | SetDebugModeAction
 
 type State = {
   notifications: Immutable.Map<Notification['id'], Notification>
@@ -66,6 +80,7 @@ type State = {
     BlockingNotification
   >
   blockUis: Immutable.Map<BlockUi['id'], BlockUi>
+  debugMode: boolean
 }
 
 type ImmutableState = Immutable.Record<State>
@@ -127,6 +142,9 @@ class Store {
           message,
         } = (action as UpdateBlockUiAction).payload
         return state.setIn(['blockUis', updateId, 'message'], message)
+      case Store.ACTIONS.SET_DEBUG_MODE:
+        const debugMode = (action as SetDebugModeAction).payload
+        return state.setIn(['debugMode'], debugMode)
       default:
         return state
     }
@@ -192,6 +210,13 @@ class Store {
     }
   }
 
+  public static setDebugModeAction(debug: boolean): SetDebugModeAction {
+    return {
+      payload: debug,
+      type: Store.ACTIONS.SET_DEBUG_MODE,
+    }
+  }
+
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
       blockUis: Immutable.Map<BlockUi['id'], BlockUi>(),
@@ -199,6 +224,7 @@ class Store {
         BlockingNotification['id'],
         BlockingNotification
       >(),
+      debugMode: false,
       notifications: Immutable.Map<Notification['id'], Notification>(),
     } as State)(obj)
   }
@@ -211,6 +237,7 @@ class Store {
     BLOCK_UI_UPDATE: 'client/uiState/BLOCK_UI_UPDATE',
     NOTIFICATION_ADD: 'client/uiState/NOTIFICATION_ADD',
     NOTIFICATION_REMOVE: 'client/uiState/NOTIFICATION_REMOVE',
+    SET_DEBUG_MODE: 'client/uiState/SET_DEBUG_MODE',
   }
 }
 
@@ -250,6 +277,14 @@ const getBlockingNotifications = createSelector(
   (blockingNotifications: BlockingNotification[]) => blockingNotifications
 )
 
+const _getDebugMode = (state: ReduxState): boolean =>
+  state.uiState.get('debugMode')
+
+const getDebugMode = createSelector(
+  [_getDebugMode],
+  (debugMode: boolean) => debugMode
+)
+
 export {
   Store,
   ImmutableState,
@@ -258,4 +293,5 @@ export {
   getNotifications,
   getBlockUis,
   getBlockingNotifications,
+  getDebugMode,
 }

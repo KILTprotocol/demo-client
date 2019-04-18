@@ -1,17 +1,20 @@
 import * as React from 'react'
-import ReactJsonView from 'react-json-view'
+import ReactJsonView, { ReactJsonViewProps } from 'react-json-view'
 
 import './Code.scss'
 
 type Props = {
   collapsed?: boolean | number
+
+  onAdd?: ReactJsonViewProps['onAdd']
+  onEdit?: ReactJsonViewProps['onEdit']
 }
 
 type State = {}
 
 class Code extends React.Component<Props, State> {
   public render() {
-    const { children, collapsed } = this.props
+    const { children, collapsed, onAdd, onEdit } = this.props
 
     if (children && typeof children === 'object') {
       return (
@@ -23,6 +26,8 @@ class Code extends React.Component<Props, State> {
           collapseStringsAfterLength={30}
           enableClipboard={true}
           displayDataTypes={false}
+          onEdit={onEdit}
+          onAdd={onAdd}
         />
       )
     } else {
