@@ -5,7 +5,9 @@ import { createSelector } from 'reselect'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 import { MyIdentity } from '../../types/Contact'
+import { ICType } from '../../types/Ctype'
 import { State as ReduxState } from '../PersistentStore'
+import { MyDelegation } from './Delegations'
 import * as Wallet from './Wallet'
 
 function hash(claim: sdk.IPartialClaim): string {
@@ -228,9 +230,19 @@ const getClaims = createSelector(
   }
 )
 
-const _getClaimHash = (state: ReduxState, claim: sdk.IPartialClaim): string => {
-  return hash(claim)
-}
+const _getCTypeHash = (
+  state: ReduxState,
+  cTypeHash: ICType['cType']['hash']
+): ICType['cType']['hash'] => cTypeHash
+
+const getClaimsByCTypeHash = createSelector(
+  [getClaims, _getCTypeHash],
+  (entries: Entry[], cTypeHash: ICType['cType']['hash']) =>
+    entries.filter((entry: Entry) => entry.claim.cType === cTypeHash)
+)
+
+const _getClaimHash = (state: ReduxState, claim: sdk.IPartialClaim): string =>
+  hash(claim)
 
 const getClaim = createSelector(
   [_getClaimHash, getClaims],
@@ -246,6 +258,7 @@ export {
   Entry,
   Action,
   getClaims,
+  getClaimsByCTypeHash,
   getClaim,
   hash,
 }

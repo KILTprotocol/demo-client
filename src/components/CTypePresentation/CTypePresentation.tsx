@@ -56,7 +56,11 @@ class CTypePresentation extends React.Component<Props, State> {
       actions = this.getActions()
     }
 
-    const classes = ['CTypePresentation', inline ? 'inline' : '']
+    const classes = [
+      'CTypePresentation',
+      inline ? 'inline' : '',
+      actions.length ? 'withActions' : '',
+    ]
 
     return (
       <div className={classes.join(' ')}>
@@ -125,9 +129,7 @@ class CTypePresentation extends React.Component<Props, State> {
             UiState.Store.updateCurrentTaskAction({
               objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
               props: {
-                claim: {
-                  cType: cTypeHash,
-                },
+                cTypeHash,
               } as RequestLegitimationsProps,
             })
           )

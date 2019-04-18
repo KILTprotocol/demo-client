@@ -1,12 +1,7 @@
 .Tasks {
 
-  & .Modal {
-
-    & .body {
-
-      & > section {
-        @include labeledCard;
-      }
-    }
+  & .selectCType,
+  & .selectReceiver {
+    @include labeledCard;
   }
 }

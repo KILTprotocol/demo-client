@@ -1,18 +1,24 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+import SelectClaims from '../../../components/SelectClaims/SelectClaims'
 
 import attestationWorkflow from '../../../services/AttestationWorkflow'
+import * as Claims from '../../../state/ducks/Claims'
+import { ICType } from '../../../types/Ctype'
 
 import './RequestLegitimation.scss'
 
 export type RequestLegitimationsProps = {
-  claim: sdk.IPartialClaim
+  cTypeHash: ICType['cType']['hash']
   receiverAddresses: Array<sdk.PublicIdentity['address']>
+  preSelectedClaimEntries?: Claims.Entry[]
 
   onFinished?: () => void
 }
 
-type State = {}
+type State = {
+  claim?: sdk.IPartialClaim
+}
 
 class RequestLegitimation extends React.Component<
   RequestLegitimationsProps,
@@ -23,12 +29,23 @@ class RequestLegitimation extends React.Component<
     this.state = {}
 
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.onSelectClaimEntry = this.onSelectClaimEntry.bind(this)
   }
 
   public render() {
-    const { receiverAddresses } = this.props
+    const { cTypeHash, preSelectedClaimEntries, receiverAddresses } = this.props
     return (
       <section className="RequestLegitimation">
+        <section className="selectClaims">
+          <h2>
+            …and the claim <small>(optional)</small>
+          </h2>
+          <SelectClaims
+            preSelectedClaimEntries={preSelectedClaimEntries}
+            cTypeHash={cTypeHash}
+            onChange={this.onSelectClaimEntry}
+          />
+        </section>
         <div className="actions">
           <button
             className="requestLegitimation"
@@ -42,16 +59,25 @@ class RequestLegitimation extends React.Component<
     )
   }
 
-  private handleSubmit() {
-    const { claim, receiverAddresses, onFinished } = this.props
+  private onSelectClaimEntry(claimEntries: Claims.Entry[]) {
+    const claim =
+      claimEntries && claimEntries[0] ? claimEntries[0].claim : undefined
+    this.setState({ claim })
+  }
 
-    attestationWorkflow
-      .requestLegitimations(claim, receiverAddresses)
-      .then(() => {
-        if (onFinished) {
-          onFinished()
-        }
-      })
+  private handleSubmit() {
+    const { receiverAddresses, onFinished } = this.props
+    const { claim } = this.state
+
+    if (claim && receiverAddresses) {
+      attestationWorkflow
+        .requestLegitimations(claim, receiverAddresses)
+        .then(() => {
+          if (onFinished) {
+            onFinished()
+          }
+        })
+    }
   }
 }
 

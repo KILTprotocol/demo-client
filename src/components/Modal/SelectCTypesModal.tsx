@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
+import Select from 'react-select'
 import CTypeRepository from '../../services/CtypeRepository'
 
 import ErrorService from '../../services/ErrorService'
@@ -13,6 +14,8 @@ type Props = {
   name?: string
   placeholder?: string
   closeMenuOnSelect?: boolean
+  showOnInit?: boolean
+
   onCancel?: () => void
   onConfirm: (selectedCTypes: ICType[]) => void
 }
@@ -24,6 +27,10 @@ type State = {
 }
 
 class SelectCTypesModal extends React.Component<Props, State> {
+  public static defaultProps = {
+    placeholder: `Select cType#{multi}`,
+  }
+
   private modal: Modal | null
 
   constructor(props: Props) {
@@ -37,11 +44,13 @@ class SelectCTypesModal extends React.Component<Props, State> {
 
   public render() {
     const {
+      closeMenuOnSelect,
       header,
       isMulti,
       name,
       placeholder,
-      closeMenuOnSelect,
+      showOnInit,
+
       onCancel,
       onConfirm,
     } = this.props
@@ -69,9 +78,10 @@ class SelectCTypesModal extends React.Component<Props, State> {
         className="small"
         type={ModalType.CONFIRM}
         header={finalHeader}
+        catchBackdropClick={isSelectCTypesOpen}
+        showOnInit={showOnInit}
         onCancel={onCancel}
         onConfirm={onConfirm.bind(this, selectedCTypes)}
-        catchBackdropClick={isSelectCTypesOpen}
       >
         <div>
           <SelectCTypes

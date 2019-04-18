@@ -120,31 +120,35 @@ class Tasks extends React.Component<Props, State> {
 
   private getTask() {
     const { currentTask } = this.props
-    const { selectedReceivers } = this.state
-    const selectedReceiverAddresses = selectedReceivers.map(
-      (receiver: Contact) => receiver.publicIdentity.address
-    )
 
     if (!currentTask) {
       return ''
     }
 
+    const { selectedCTypes, selectedReceivers } = this.state
+    const selectedReceiverAddresses = selectedReceivers.map(
+      (receiver: Contact) => receiver.publicIdentity.address
+    )
+
     switch (currentTask.objective) {
       case sdk.MessageBodyType.REQUEST_LEGITIMATIONS: {
         const props = currentTask.props as RequestLegitimationsProps
-        const preselectedCTypeHashes =
-          props.claim && props.claim.cType ? [props.claim.cType] : []
+        const cTypeHash =
+          selectedCTypes && selectedCTypes[0]
+            ? selectedCTypes[0].cType.hash
+            : undefined
         return this.getModal(
           'Request legitimations',
           <>
-            {this.getCTypeSelect(false, preselectedCTypeHashes)}
-            <div>To implement: select local claim</div>
+            {this.getCTypeSelect(false, [props.cTypeHash])}
             <RequestLegitimation
               {...props}
+              cTypeHash={cTypeHash}
               receiverAddresses={selectedReceiverAddresses}
               onFinished={this.onTaskFinished}
             />
-          </>
+          </>,
+          props.receiverAddresses
         )
       }
       case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS: {
@@ -175,7 +179,6 @@ class Tasks extends React.Component<Props, State> {
       }
       case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE: {
         const props = currentTask.props as Partial<SubmitClaimsForCTypeProps>
-        const { selectedCTypes } = this.state
 
         return this.getModal(
           'Submit claims for cType',
@@ -242,13 +245,34 @@ class Tasks extends React.Component<Props, State> {
     }, 500)
   }
 
+  private getReceiverSelect(
+    preSelectedAddresses: Array<Contact['publicIdentity']['address']> = []
+  ) {
+    return (
+      <section className="selectReceiver">
+        <h2>Select receivers …</h2>
+        <SelectContacts
+          isMulti={true}
+          preSelectedAddresses={preSelectedAddresses}
+          onChange={this.onSelectReceivers}
+          onMenuOpen={this.onMenuOpen}
+          onMenuClose={this.onMenuClose}
+        />
+      </section>
+    )
+  }
+
+  private onSelectReceivers(selectedReceivers: Contact[]) {
+    this.setState({ selectedReceivers })
+  }
+
   private getCTypeSelect(
     isMulti: boolean,
     preSelectedCTypeHashes: Array<ICType['cType']['hash']> = []
   ) {
     return (
       <section className="selectCType">
-        <h2>…and the cType{isMulti ? 's' : ''}</h2>
+        <h2>… cType{isMulti ? 's' : ''} …</h2>
         <SelectCTypes
           preSelectedCTypeHashes={preSelectedCTypeHashes}
           isMulti={isMulti}
@@ -264,31 +288,10 @@ class Tasks extends React.Component<Props, State> {
     this.setState({ selectedCTypes })
   }
 
-  private onSelectReceivers(selectedReceivers: Contact[]) {
-    this.setState({ selectedReceivers })
-  }
-
   private onTaskFinished() {
     const { finishCurrentTask } = this.props
     finishCurrentTask()
     this.setState(initialState)
-  }
-
-  private getReceiverSelect(
-    preSelectedAddresses: Array<Contact['publicIdentity']['address']> = []
-  ) {
-    return (
-      <section className="selectRecipient">
-        <h2>Select receivers…</h2>
-        <SelectContacts
-          isMulti={true}
-          preSelectedAddresses={preSelectedAddresses}
-          onChange={this.onSelectReceivers}
-          onMenuOpen={this.onMenuOpen}
-          onMenuClose={this.onMenuClose}
-        />
-      </section>
-    )
   }
 }
 

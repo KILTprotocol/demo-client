@@ -3,6 +3,7 @@ import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
 
 import ContactRepository from '../../services/ContactRepository'
 import * as Contacts from '../../state/ducks/Contacts'
@@ -133,6 +134,20 @@ class ContactPresentation extends React.Component<Props, State> {
         )
       },
       label: 'Submit Claims',
+    })
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+            props: {
+              receiverAddresses: [address],
+            } as RequestLegitimationsProps,
+          })
+        )
+      },
+      label: 'Request legitimations',
     })
 
     return actions
