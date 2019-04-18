@@ -56,7 +56,7 @@ class MessageRepository {
    * @param receiverAddresses
    * @param messageBody
    */
-  public static async sendToAddresses(
+  public static sendToAddresses(
     receiverAddresses: Array<Contact['publicIdentity']['address']>,
     messageBody: sdk.MessageBody
   ): Promise<void> {
@@ -170,10 +170,6 @@ class MessageRepository {
 
       message = await MessageRepository.handleDebugMode(message)
 
-      if (!message) {
-        return Promise.reject()
-      }
-
       return fetch(`${MessageRepository.URL}`, {
         ...BasePostParams,
         body: JSON.stringify(message.getEncryptedMessage()),
@@ -210,7 +206,7 @@ class MessageRepository {
         }'`,
         origin: 'MessageRepository.singleSend()',
       })
-      return Promise.reject()
+      throw error
     }
   }
 
