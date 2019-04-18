@@ -148,6 +148,16 @@ class DelegationNode extends React.Component<Props, State> {
               <h3>{focusedNodeAlias}</h3>
             )}
             <ShortHash length={10}>{delegation.id}</ShortHash>
+            {editable && (
+              <SelectDelegationAction
+                className={`minimal ${focusedNode ? 'inverted' : ''}`}
+                delegation={node.delegation}
+                isMyChild={isMyChild}
+                onInvite={this.inviteTo.bind(this, myDelegation)}
+                onRevokeAttestations={this.revokeAttestations}
+                onRevokeDelegation={this.revokeDelegation}
+              />
+            )}
             {editable && viewType === ViewType.Present && (
               <span
                 className="attestedClaims"
@@ -165,16 +175,6 @@ class DelegationNode extends React.Component<Props, State> {
               interactive={true}
             />
             {!!permissions && <Permissions permissions={permissions} />}
-            {editable && (
-              <SelectDelegationAction
-                className={`minimal ${focusedNode ? 'inverted' : ''}`}
-                delegation={node.delegation}
-                isMyChild={isMyChild}
-                onInvite={this.inviteTo.bind(this, myDelegation)}
-                onRevokeAttestations={this.revokeAttestations}
-                onRevokeDelegation={this.revokeDelegation}
-              />
-            )}
           </div>
           {viewType === ViewType.Present && revoked && (
             <div className="revokedLabel">REVOKED</div>

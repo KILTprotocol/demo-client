@@ -4,6 +4,10 @@
   & .ui--IdentityIcon {
     position: relative;
 
+    & > .container {
+      background: $color-white;
+    }
+
     &:after {
       @extend %centerHV;
 

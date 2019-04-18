@@ -1,11 +1,12 @@
-@mixin inlinePresentation {
-}
-
 @mixin presentation {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: nowrap;
+
+  &,
+  & > a {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
 
   & .container {
 
@@ -62,11 +63,10 @@
     }
 
     & .SelectAction {
-      @include react-select-right;
+      @include react-select-left;
       @include react-select-min-width;
 
       position: absolute;
-      top: -5px;
       left: 100%;
     }
   }
@@ -89,23 +89,13 @@
 }
 
 @mixin invertedPresentation {
+  @include react-select-minimal-inverted;
 
   & .container {
     $borderWidth: 1px;
 
     position: relative;
-
-    &:after {
-      @include border-radius(50%);
-
-      content: '';
-      position: absolute;
-      top: -$borderWidth;
-      right: -$borderWidth;
-      bottom: -$borderWidth;
-      left: -$borderWidth;
-      border: $borderWidth solid $color-font-inverted;
-    }
+    background: $color-font-inverted;
   }
 
   & .label {
