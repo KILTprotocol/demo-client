@@ -9,6 +9,7 @@ import FeedbackService, {
   notify,
   notifyFailure,
   notifySuccess,
+  notifyError,
 } from '../../services/FeedbackService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
@@ -369,12 +370,7 @@ class DelegationNode extends React.Component<Props, State> {
           .catch(error => {
             blockUi.remove()
             errorService.log(error)
-            notifyFailure(
-              <span>
-                Something went wrong, while revoking the Delegation. Please try
-                again
-              </span>
-            )
+            notifyError(error)
           })
       },
       type: NotificationType.FAILURE,

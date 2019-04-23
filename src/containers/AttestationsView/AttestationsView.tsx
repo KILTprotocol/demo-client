@@ -8,7 +8,7 @@ import CTypePresentation from '../../components/CTypePresentation/CTypePresentat
 import DateTime from '../../components/DateTime/DateTime'
 import ShortHash from '../../components/ShortHash/ShortHash'
 import AttestationService from '../../services/AttestationService'
-import FeedbackService, { safeDelete } from '../../services/FeedbackService'
+import FeedbackService, { safeDelete, notifyError } from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { BlockUi } from '../../types/UserFeedback'
@@ -45,7 +45,7 @@ class AttestationsView extends React.Component<Props, State> {
       <section className="AttestationsView">
         <h1>MANAGE ATTESTATIONS</h1>
         <section className="revokeByHash">
-          <h2>Revoke claim</h2>
+          <h2>Revoke attestation</h2>
           <div>
             <input
               type="text"
@@ -132,6 +132,7 @@ class AttestationsView extends React.Component<Props, State> {
         })
         .catch(error => {
           blockUi.remove()
+          notifyError(error)
         })
     }
   }
@@ -166,8 +167,16 @@ class AttestationsView extends React.Component<Props, State> {
     const { claimHashToRevoke } = this.state
 
     if (claimHashToRevoke) {
+      const blockUi: BlockUi = FeedbackService.addBlockUi({
+        headline: 'Revoking attestation',
+      })
       AttestationService.revokeByClaimHash(claimHashToRevoke).then(() => {
+        blockUi.remove()
         this.setState({ claimHashToRevoke: '' })
+      })
+      .catch(error => {
+        blockUi.remove()
+        notifyError(error)
       })
     }
   }

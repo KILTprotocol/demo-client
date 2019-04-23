@@ -156,6 +156,12 @@ export function notifyFailure(message: string | ReactNode, blocking = true) {
   _notify(NotificationType.FAILURE, message, blocking)
 }
 
+export function notifyError(error: Error, blocking = true) {
+  try {
+    _notify(NotificationType.FAILURE, error.message, blocking)
+  } catch (error) {}
+}
+
 export function notify(message: string | ReactNode, blocking = false) {
   _notify(NotificationType.INFO, message, blocking)
 }

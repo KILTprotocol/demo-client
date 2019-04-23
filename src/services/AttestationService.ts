@@ -9,7 +9,7 @@ import persistentStore from '../state/PersistentStore'
 import BlockchainService from './BlockchainService'
 import ErrorService from './ErrorService'
 import errorService from './ErrorService'
-import { notifySuccess } from './FeedbackService'
+import { notifySuccess, notifyFailure, notifyError } from './FeedbackService'
 
 class AttestationService {
   /**
@@ -28,7 +28,7 @@ class AttestationService {
     } = await AttestationService.getBlockchainAndIdentity()
 
     if (!selectedIdentity) {
-      return Promise.reject('No identity selected')
+      throw new Error('No identity selected')
     }
 
     const attestation: sdk.Attestation = new sdk.Attestation(
@@ -41,25 +41,21 @@ class AttestationService {
       attestation
     )
     if (!attestedClaim.verifyData()) {
-      return Promise.reject(new Error('verification failed'))
+      throw new Error('Verification failed')
     }
 
-    return new Promise<sdk.AttestedClaim>(async (resolve, reject) => {
-      attestation
-        .store(blockchain, selectedIdentity)
-        .then(() => {
-          resolve(attestedClaim)
-        })
-        .catch(error => {
-          errorService.log({
-            error,
-            message: 'Error storing attestation on blockchain',
-            origin: 'AttestationService.attestClaim()',
-            type: 'ERROR.BLOCKCHAIN',
-          })
-          reject(error)
-        })
-    })
+    try {
+      await attestation.store(blockchain, selectedIdentity)
+    } catch (error) {
+      errorService.log({
+        error,
+        message: 'Error storing attestation on blockchain',
+        origin: 'AttestationService.attestClaim()',
+        type: 'ERROR.BLOCKCHAIN',
+      })
+      throw error
+    }
+    return attestedClaim
   }
 
   public static async revokeAttestation(
@@ -72,29 +68,23 @@ class AttestationService {
     } = await AttestationService.getBlockchainAndIdentity()
 
     if (!selectedIdentity) {
-      return Promise.reject('No identity selected')
+      throw new Error('No identity selected')
     }
-
-    return new Promise<void>(async (resolve, reject) => {
-      attestation
-        .revoke(blockchain, selectedIdentity)
-        .then((value: any) => {
-          notifySuccess('Attestation successfully revoked')
-          persistentStore.store.dispatch(
-            Attestations.Store.revokeAttestation(attestation.claimHash)
-          )
-          resolve()
-        })
-        .catch(error => {
-          errorService.log({
-            error,
-            message: 'Could not revoke Attestation',
-            origin: 'AttestationService.attestClaim()',
-            type: 'ERROR.BLOCKCHAIN',
-          })
-          reject(error)
-        })
-    })
+    try {
+      await attestation.revoke(blockchain, selectedIdentity)
+      notifySuccess('Attestation successfully revoked')
+      persistentStore.store.dispatch(
+        Attestations.Store.revokeAttestation(attestation.claimHash)
+      )
+    } catch (error) {
+      errorService.log({
+        error,
+        message: 'Could not revoke Attestation',
+        origin: 'AttestationService.revokeAttestation()',
+        type: 'ERROR.BLOCKCHAIN',
+      })
+      throw error
+    }
   }
 
   public static async revokeByClaimHash(
@@ -113,12 +103,13 @@ class AttestationService {
         )
       })
       .catch(error => {
-        ErrorService.logWithNotification({
+        ErrorService.log({
           error,
           message: `Could not revoke attestation.`,
           origin: 'AttestationService.revokeByClaimHash()',
           type: 'ERROR.BLOCKCHAIN',
         })
+        notifyError(error)
       })
   }
 

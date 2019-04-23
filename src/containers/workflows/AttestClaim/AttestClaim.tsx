@@ -4,7 +4,7 @@ import * as React from 'react'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
-import FeedbackService from '../../../services/FeedbackService'
+import FeedbackService, { notifyError } from '../../../services/FeedbackService'
 import { Contact } from '../../../types/Contact'
 import { BlockUi } from '../../../types/UserFeedback'
 
@@ -59,6 +59,10 @@ class AttestClaim extends React.Component<Props, State> {
         if (onFinished) {
           onFinished()
         }
+      })
+      .catch(error => {
+        blockUi.remove();
+        notifyError(error)
       })
   }
 }

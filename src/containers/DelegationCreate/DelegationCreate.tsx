@@ -14,7 +14,7 @@ import { ICType } from '../../types/Ctype'
 import Spinner from '../../components/Spinner/Spinner'
 import FeedbackService, {
   notifySuccess,
-  notifyFailure,
+  notifyError,
 } from '../../services/FeedbackService'
 import { BlockUi } from '../../types/UserFeedback'
 
@@ -134,10 +134,9 @@ class DelegationCreate extends React.Component<Props, State> {
           notifySuccess('Delegation successfully created')
           history.push('/delegations')
         })
-        .catch(err => {
-          console.log(err)
+        .catch(error => {
           blockUi.remove()
-          notifyFailure('Delegation creation failed.')
+          notifyError(error)
         })
     }
   }
