@@ -1,16 +1,46 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-import { MyIdentity } from '../types/Contact'
+import { MyIdentity, Contact } from '../types/Contact'
 import BlockchainService from './BlockchainService'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
+import MessageRepository from './MessageRepository'
+import ContactRepository from './ContactRepository'
+import { IURLResolver } from '@kiltprotocol/prototype-sdk/build/identity/PublicIdentity'
 
 export class DidService {
-  public static async createDid(
-    myIdentity: MyIdentity,
-    documentStore?: sdk.IDid['documentStore']
-  ): Promise<sdk.IDid> {
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/contacts/did`
+
+  public static async resolveDid(
+    identifier: string
+  ): Promise<sdk.IPublicIdentity | undefined> {
     const blockchain = await BlockchainService.connect()
+    return sdk.PublicIdentity.resolveFromDid(
+      identifier,
+      blockchain,
+      this.URL_RESOLVER
+    )
+  }
+
+  public static async createDid(myIdentity: MyIdentity): Promise<sdk.IDid> {
+    const documentStore: sdk.IDid['documentStore'] = `${
+      ContactRepository.URL
+    }/${myIdentity.identity.address}`
     const did = sdk.Did.fromIdentity(myIdentity.identity, documentStore)
+    const didDocument = did.getDefaultDocument(`${MessageRepository.URL}`)
+    const hash = sdk.Crypto.hashStr(JSON.stringify(didDocument))
+    const signature = myIdentity.identity.signStr(hash)
+    await ContactRepository.add({
+      did: didDocument,
+      metaData: {
+        name: myIdentity.metaData.name,
+      },
+      publicIdentity: myIdentity.identity.getPublicIdentity(),
+      signature,
+    } as Contact)
+
+    const blockchain = await BlockchainService.connect()
     const status = await did.store(blockchain, myIdentity.identity)
     if (status.type !== 'Finalised') {
       throw new Error(
@@ -30,7 +60,21 @@ export class DidService {
         `Error deleting DID for identity ${myIdentity.metaData.name}`
       )
     }
+    // TODO: remove from service
     myIdentity.did = undefined
     persistentStore.store.dispatch(Wallet.Store.saveIdentityAction(myIdentity))
   }
+
+  private static readonly URL_RESOLVER = {
+    resolve: async (url: string): Promise<object> => {
+      return fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw Error(response.statusText)
+          }
+          return response
+        })
+        .then(response => response.json())
+    },
+  } as IURLResolver
 }

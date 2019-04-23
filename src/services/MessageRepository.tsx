@@ -1,21 +1,19 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
-import * as React from 'react'
-import cloneDeep from 'lodash/cloneDeep'
-import { InteractionProps } from 'react-json-view'
+import * as sdk from '@kiltprotocol/prototype-sdk';
+import cloneDeep from 'lodash/cloneDeep';
+import * as React from 'react';
+import { InteractionProps } from 'react-json-view';
+import Code from '../components/Code/Code';
+import { ModalType } from '../components/Modal/Modal';
+import * as UiState from '../state/ducks/UiState';
+import * as Wallet from '../state/ducks/Wallet';
+import PersistentStore from '../state/PersistentStore';
+import { Contact, MyIdentity } from '../types/Contact';
+import { BlockingNotification, NotificationType } from '../types/UserFeedback';
+import { BaseDeleteParams, BasePostParams } from './BaseRepository';
+import ContactRepository from './ContactRepository';
+import errorService from './ErrorService';
+import FeedbackService, { notifySuccess } from './FeedbackService';
 
-import { ModalType } from '../components/Modal/Modal'
-import PersistentStore from '../state/PersistentStore'
-import { Contact, MyIdentity } from '../types/Contact'
-import { BlockingNotification, NotificationType } from '../types/UserFeedback'
-import { BaseDeleteParams, BasePostParams } from './BaseRepository'
-import { clientVersionHelper } from './ClientVersionHelper'
-import ContactRepository from './ContactRepository'
-import errorService from './ErrorService'
-import FeedbackService from './FeedbackService'
-import { notifySuccess } from './FeedbackService'
-import * as UiState from '../state/ducks/UiState'
-import * as Wallet from '../state/ducks/Wallet'
-import Code from '../components/Code/Code'
 
 export interface MessageOutput extends sdk.IMessage {
   encryptedMessage: sdk.IEncryptedMessage
@@ -26,6 +24,10 @@ export interface MessageOutput extends sdk.IMessage {
 // (for other tests)
 
 class MessageRepository {
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/messaging`
+
   /**
    * takes contact or list of contacts
    * and send a message to every contact in list
@@ -209,10 +211,6 @@ class MessageRepository {
       throw error
     }
   }
-
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/messaging`
 
   private static async handleDebugMode(
     message: sdk.Message
