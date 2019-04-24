@@ -33,11 +33,12 @@
     & .header {
       position: relative;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: baseline;
     }
 
     & .attestedClaims {
+      margin-left: auto;
       font-size: 12px;
     }
 
@@ -272,7 +273,7 @@
   }
 
   & .SelectAction {
-    @include react-select-right;
+    @include react-select-left;
     @include react-select-min-width;
   }
 }

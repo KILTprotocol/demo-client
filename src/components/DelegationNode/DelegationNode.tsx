@@ -9,6 +9,7 @@ import FeedbackService, {
   notify,
   notifyFailure,
   notifySuccess,
+  notifyError,
 } from '../../services/FeedbackService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
@@ -148,6 +149,16 @@ class DelegationNode extends React.Component<Props, State> {
               <h3>{focusedNodeAlias}</h3>
             )}
             <ShortHash length={10}>{delegation.id}</ShortHash>
+            {editable && (
+              <SelectDelegationAction
+                className={`minimal ${focusedNode ? 'inverted' : ''}`}
+                delegation={node.delegation}
+                isMyChild={isMyChild}
+                onInvite={this.inviteTo.bind(this, myDelegation)}
+                onRevokeAttestations={this.revokeAttestations}
+                onRevokeDelegation={this.revokeDelegation}
+              />
+            )}
             {editable && viewType === ViewType.Present && (
               <span
                 className="attestedClaims"
@@ -165,16 +176,6 @@ class DelegationNode extends React.Component<Props, State> {
               interactive={true}
             />
             {!!permissions && <Permissions permissions={permissions} />}
-            {editable && (
-              <SelectDelegationAction
-                className={`minimal ${focusedNode ? 'inverted' : ''}`}
-                delegation={node.delegation}
-                isMyChild={isMyChild}
-                onInvite={this.inviteTo.bind(this, myDelegation)}
-                onRevokeAttestations={this.revokeAttestations}
-                onRevokeDelegation={this.revokeDelegation}
-              />
-            )}
           </div>
           {viewType === ViewType.Present && revoked && (
             <div className="revokedLabel">REVOKED</div>
@@ -369,12 +370,7 @@ class DelegationNode extends React.Component<Props, State> {
           .catch(error => {
             blockUi.remove()
             errorService.log(error)
-            notifyFailure(
-              <span>
-                Something went wrong, while revoking the Delegation. Please try
-                again
-              </span>
-            )
+            notifyError(error)
           })
       },
       type: NotificationType.FAILURE,

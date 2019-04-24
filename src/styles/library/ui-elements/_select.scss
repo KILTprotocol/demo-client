@@ -6,6 +6,13 @@
 
   & .react-select {
 
+    &__indicator {
+
+      & svg {
+        fill: $color-primary;
+      }
+    }
+
     &__menu {
       width: auto;
       display: inline-block;
@@ -62,6 +69,44 @@
 
   & .react-select {
 
+    &__indicator {
+      position: relative;
+      width: $base-button-height;
+      height: $base-button-height;
+
+      &:before {
+        $size: 16px;
+
+        @extend %centerHV;
+
+        @include border-radius($base-border-radius);
+        @include transition($base-transition);
+
+        content: '';
+        position: absolute;
+        width: $size;
+        height: $size;
+        border: 1px solid $color-primary;
+      }
+
+      & svg {
+        @include transition($base-transition);
+        @include transform(scale(0.6));
+      }
+
+      &:hover,
+      &:active {
+
+        &:before {
+          background: $color-primary;
+        }
+
+        & svg {
+          fill: $color-white;
+        }
+      }
+    }
+
     &__value-container,
     &__indicator-separator{
       @include opacity(0);
@@ -82,11 +127,23 @@
 
     &__indicator {
 
+      &:before {
+        border-color: $color-font-inverted;
+      }
+
+      & svg {
+        fill: $color-font-inverted;
+      }
+
       &:hover,
       &:active {
 
+        &:before {
+          background: $color-font-inverted;
+        }
+
         & svg {
-          fill: $color-font-inverted !important;
+          fill: $color-primary;
         }
       }
     }
@@ -96,7 +153,16 @@
 @mixin react-select-right($right: 0) {
 
   & .react-select__menu {
+    left: auto;
     right: $right;
+  }
+}
+
+@mixin react-select-left($left: 0) {
+
+  & .react-select__menu {
+    right: auto;
+    left: $left;
   }
 }
 

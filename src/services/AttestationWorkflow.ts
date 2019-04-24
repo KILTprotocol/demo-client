@@ -129,28 +129,28 @@ class AttestationWorkflow {
     requestForAttestation: sdk.IRequestForAttestation,
     claimerAddress: Contact['publicIdentity']['address']
   ): Promise<void> {
-    return ContactRepository.findByAddress(claimerAddress).then(
-      (claimer: Contact) => {
-        return AttestationService.attestClaim(requestForAttestation).then(
-          (attestedClaim: sdk.IAttestedClaim) => {
-            // store attestation locally
-            AttestationService.saveInStore({
-              attestation: attestedClaim.attestation,
-              cTypeHash: attestedClaim.request.claim.cType,
-              claimerAddress: attestedClaim.request.claim.owner,
-              claimerAlias: claimer.metaData.name,
-            } as Attestations.Entry)
+    const claimer: Contact | void = await ContactRepository.findByAddress(claimerAddress)
+    const attestedClaim: sdk.AttestedClaim = await AttestationService.attestClaim(requestForAttestation)
 
-            // build 'claim attested' message and send to claimer
-            const attestationMessageBody: ISubmitAttestationForClaim = {
-              content: attestedClaim,
-              type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
-            }
-            return MessageRepository.send([claimer], attestationMessageBody)
-          }
-        )
-      }
-    )
+    if (!claimer) {
+      throw new Error('claimer not found')
+    }
+
+    // store attestation locally
+    AttestationService.saveInStore({
+      attestation: attestedClaim.attestation,
+      created: Date.now(),
+      cTypeHash: attestedClaim.request.claim.cType,
+      claimerAddress: attestedClaim.request.claim.owner,
+      claimerAlias: claimer.metaData.name,
+    } as Attestations.Entry)
+
+    // build 'claim attested' message and send to claimer
+    const attestationMessageBody: ISubmitAttestationForClaim = {
+      content: attestedClaim,
+      type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
+    }
+    return MessageRepository.send([claimer], attestationMessageBody)
   }
 
   /**

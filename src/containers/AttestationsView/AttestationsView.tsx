@@ -1,3 +1,4 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
@@ -7,7 +8,7 @@ import CTypePresentation from '../../components/CTypePresentation/CTypePresentat
 import DateTime from '../../components/DateTime/DateTime'
 import ShortHash from '../../components/ShortHash/ShortHash'
 import AttestationService from '../../services/AttestationService'
-import FeedbackService, { safeDelete } from '../../services/FeedbackService'
+import FeedbackService, { safeDelete, notifyError } from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { BlockUi } from '../../types/UserFeedback'
@@ -20,14 +21,43 @@ type Props = RouteComponentProps<{}> & {
   attestations: AttestationListModel[]
 }
 
-type State = {}
+type State = {
+  claimHashToRevoke: sdk.IAttestation['claimHash']
+}
 
 class AttestationsView extends React.Component<Props, State> {
+  private claimHash: HTMLInputElement | null
+
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      claimHashToRevoke: '',
+    }
+
+    this.setClaimHashToRevoke = this.setClaimHashToRevoke.bind(this)
+    this.manuallyRevoke = this.manuallyRevoke.bind(this)
+  }
+
   public render() {
     const { attestations } = this.props
+    const { claimHashToRevoke } = this.state
     return (
       <section className="AttestationsView">
         <h1>MANAGE ATTESTATIONS</h1>
+        <section className="revokeByHash">
+          <h2>Revoke attestation</h2>
+          <div>
+            <input
+              type="text"
+              onChange={this.setClaimHashToRevoke}
+              placeholder="Insert claim hash"
+              value={claimHashToRevoke}
+            />
+            <button disabled={!claimHashToRevoke} onClick={this.manuallyRevoke}>
+              Revoke
+            </button>
+          </div>
+        </section>
         <table>
           <thead>
             <tr>
@@ -102,6 +132,7 @@ class AttestationsView extends React.Component<Props, State> {
         })
         .catch(error => {
           blockUi.remove()
+          notifyError(error)
         })
     }
   }
@@ -121,6 +152,32 @@ class AttestationsView extends React.Component<Props, State> {
           )
         }
       )
+    }
+  }
+
+  private setClaimHashToRevoke(e: React.ChangeEvent<HTMLInputElement>) {
+    const claimHash = e.target.value.trim()
+
+    this.setState({
+      claimHashToRevoke: claimHash,
+    })
+  }
+
+  private async manuallyRevoke() {
+    const { claimHashToRevoke } = this.state
+
+    if (claimHashToRevoke) {
+      const blockUi: BlockUi = FeedbackService.addBlockUi({
+        headline: 'Revoking attestation',
+      })
+      AttestationService.revokeByClaimHash(claimHashToRevoke).then(() => {
+        blockUi.remove()
+        this.setState({ claimHashToRevoke: '' })
+      })
+      .catch(error => {
+        blockUi.remove()
+        notifyError(error)
+      })
     }
   }
 }

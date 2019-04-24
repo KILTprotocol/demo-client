@@ -2,6 +2,9 @@
   @include border-radius($base-border-radius);
   @include transition($base-transition);
   @include baseFont;
+  @include placeholder{
+    color: $color-grey;
+  }
 
   height: $base-input-height;
   padding: 0 $base-padding/2;

@@ -116,7 +116,9 @@ class DelegationsView extends React.Component<Props, State> {
     }
 
     return (
-      <section className="DelegationsView">
+      <section
+        className={`DelegationsView ${isPCR ? 'isPCR' : 'isDelegation'}`}
+      >
         {!delegationId && (
           <MyDelegationsListView
             delegationEntries={delegationEntries}

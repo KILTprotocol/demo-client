@@ -12,6 +12,7 @@ import errorService from '../../../services/ErrorService'
 import FeedbackService, {
   notifySuccess,
   notifyFailure,
+  notifyError,
 } from '../../../services/FeedbackService'
 import { MyDelegation } from '../../../state/ducks/Delegations'
 import * as Delegations from '../../../state/ducks/Delegations'
@@ -137,12 +138,13 @@ class CreateDelegation extends React.Component<Props, State> {
       })
       .catch(error => {
         blockUi.remove()
-        errorService.logWithNotification({
+        errorService.log({
           error,
           message: `${isPCR ? 'PCR member' : 'Delegation'} creation failed.`,
           origin: 'CreateDelegation.createDelegation()',
           type: 'ERROR.FETCH.POST',
         })
+        notifyError(error)
       })
   }
 
