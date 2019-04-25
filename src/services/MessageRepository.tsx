@@ -1,19 +1,18 @@
-import * as sdk from '@kiltprotocol/prototype-sdk';
-import cloneDeep from 'lodash/cloneDeep';
-import * as React from 'react';
-import { InteractionProps } from 'react-json-view';
-import Code from '../components/Code/Code';
-import { ModalType } from '../components/Modal/Modal';
-import * as UiState from '../state/ducks/UiState';
-import * as Wallet from '../state/ducks/Wallet';
-import PersistentStore from '../state/PersistentStore';
-import { Contact, MyIdentity } from '../types/Contact';
-import { BlockingNotification, NotificationType } from '../types/UserFeedback';
-import { BaseDeleteParams, BasePostParams } from './BaseRepository';
-import ContactRepository from './ContactRepository';
-import errorService from './ErrorService';
-import FeedbackService, { notifySuccess } from './FeedbackService';
-
+import * as sdk from '@kiltprotocol/prototype-sdk'
+import cloneDeep from 'lodash/cloneDeep'
+import * as React from 'react'
+import { InteractionProps } from 'react-json-view'
+import Code from '../components/Code/Code'
+import { ModalType } from '../components/Modal/Modal'
+import * as UiState from '../state/ducks/UiState'
+import * as Wallet from '../state/ducks/Wallet'
+import PersistentStore from '../state/PersistentStore'
+import { Contact, MyIdentity } from '../types/Contact'
+import { BlockingNotification, NotificationType } from '../types/UserFeedback'
+import { BaseDeleteParams, BasePostParams } from './BaseRepository'
+import ContactRepository from './ContactRepository'
+import errorService from './ErrorService'
+import FeedbackService, { notifySuccess } from './FeedbackService'
 
 export interface MessageOutput extends sdk.IMessage {
   encryptedMessage: sdk.IEncryptedMessage

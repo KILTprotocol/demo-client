@@ -1,11 +1,10 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-import { MyIdentity, Contact } from '../types/Contact'
-import BlockchainService from './BlockchainService'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
-import MessageRepository from './MessageRepository'
+import { Contact, MyIdentity } from '../types/Contact'
+import BlockchainService from './BlockchainService'
 import ContactRepository from './ContactRepository'
-import { IURLResolver } from '@kiltprotocol/prototype-sdk/build/identity/PublicIdentity'
+import MessageRepository from './MessageRepository'
 
 export class DidService {
   public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
@@ -76,5 +75,5 @@ export class DidService {
         })
         .then(response => response.json())
     },
-  } as IURLResolver
+  } as sdk.IURLResolver
 }
