@@ -8,6 +8,10 @@ import ErrorService from './ErrorService'
 // (for other tests)
 
 class ContactRepository {
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/contacts`
+
   public static async findAll(): Promise<Contact[]> {
     return fetch(`${ContactRepository.URL}`)
       .then(response => {
@@ -98,10 +102,6 @@ class ContactRepository {
 
     return contact
   }
-
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/contacts`
 }
 
 export default ContactRepository

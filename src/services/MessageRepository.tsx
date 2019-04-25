@@ -1,21 +1,18 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-import * as React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
+import * as React from 'react'
 import { InteractionProps } from 'react-json-view'
-
+import Code from '../components/Code/Code'
 import { ModalType } from '../components/Modal/Modal'
+import * as UiState from '../state/ducks/UiState'
+import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
 import { BlockingNotification, NotificationType } from '../types/UserFeedback'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
-import { clientVersionHelper } from './ClientVersionHelper'
 import ContactRepository from './ContactRepository'
 import errorService from './ErrorService'
-import FeedbackService from './FeedbackService'
-import { notifySuccess } from './FeedbackService'
-import * as UiState from '../state/ducks/UiState'
-import * as Wallet from '../state/ducks/Wallet'
-import Code from '../components/Code/Code'
+import FeedbackService, { notifySuccess } from './FeedbackService'
 
 export interface MessageOutput extends sdk.IMessage {
   encryptedMessage: sdk.IEncryptedMessage
@@ -26,6 +23,10 @@ export interface MessageOutput extends sdk.IMessage {
 // (for other tests)
 
 class MessageRepository {
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/messaging`
+
   /**
    * takes contact or list of contacts
    * and send a message to every contact in list
@@ -56,7 +57,7 @@ class MessageRepository {
    * @param receiverAddresses
    * @param messageBody
    */
-  public static sendToAddresses(
+  public static async sendToAddresses(
     receiverAddresses: Array<Contact['publicIdentity']['address']>,
     messageBody: sdk.MessageBody
   ): Promise<void> {
@@ -206,13 +207,9 @@ class MessageRepository {
         }'`,
         origin: 'MessageRepository.singleSend()',
       })
-      throw error
+      return Promise.reject()
     }
   }
-
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/messaging`
 
   private static async handleDebugMode(
     message: sdk.Message
@@ -240,10 +237,10 @@ class MessageRepository {
             /* tslint:enable:jsx-no-lambda */
           ),
           modalType: ModalType.CONFIRM,
-          okButtonLabel: 'Send',
+          okButtonLabel: 'Send manipulated Message',
           onCancel: (notification: BlockingNotification) => {
             notification.remove()
-            return resolve()
+            return resolve(message)
           },
           onConfirm: (notification: BlockingNotification) => {
             notification.remove()

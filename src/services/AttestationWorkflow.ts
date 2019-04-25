@@ -129,20 +129,23 @@ class AttestationWorkflow {
     requestForAttestation: sdk.IRequestForAttestation,
     claimerAddress: Contact['publicIdentity']['address']
   ): Promise<void> {
-    const claimer: Contact | void = await ContactRepository.findByAddress(claimerAddress)
-    const attestedClaim: sdk.AttestedClaim = await AttestationService.attestClaim(requestForAttestation)
-
+    const claimer: Contact | void = await ContactRepository.findByAddress(
+      claimerAddress
+    )
     if (!claimer) {
       throw new Error('claimer not found')
     }
+    const attestedClaim: sdk.AttestedClaim = await AttestationService.attestClaim(
+      requestForAttestation
+    )
 
     // store attestation locally
     AttestationService.saveInStore({
       attestation: attestedClaim.attestation,
-      created: Date.now(),
       cTypeHash: attestedClaim.request.claim.cType,
       claimerAddress: attestedClaim.request.claim.owner,
       claimerAlias: claimer.metaData.name,
+      created: Date.now(),
     } as Attestations.Entry)
 
     // build 'claim attested' message and send to claimer

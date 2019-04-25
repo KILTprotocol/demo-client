@@ -1,18 +1,20 @@
-import * as sdk from '@kiltprotocol/prototype-sdk';
-import * as React from 'react';
-import { connect } from 'react-redux';
-import { RouteComponentProps, withRouter } from 'react-router';
-import CTypeEditor from '../../components/CtypeEditor/CtypeEditor';
-import BlockchainService from '../../services/BlockchainService';
-import CTypeRepository from '../../services/CtypeRepository';
-import errorService from '../../services/ErrorService';
-import FeedbackService, { notifyError, notifySuccess } from '../../services/FeedbackService';
-import * as Wallet from '../../state/ducks/Wallet';
-import { State as ReduxState } from '../../state/PersistentStore';
-import { ICType } from '../../types/Ctype';
-import { BlockUi } from '../../types/UserFeedback';
-import './CtypeCreate.scss';
-
+import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
+import CTypeEditor from '../../components/CtypeEditor/CtypeEditor'
+import BlockchainService from '../../services/BlockchainService'
+import CTypeRepository from '../../services/CtypeRepository'
+import errorService from '../../services/ErrorService'
+import FeedbackService, {
+  notifyError,
+  notifySuccess,
+} from '../../services/FeedbackService'
+import * as Wallet from '../../state/ducks/Wallet'
+import { State as ReduxState } from '../../state/PersistentStore'
+import { ICType } from '../../types/Ctype'
+import { BlockUi } from '../../types/UserFeedback'
+import './CtypeCreate.scss'
 
 type Props = RouteComponentProps<{}> & {
   selectedIdentity?: Wallet.Entry
