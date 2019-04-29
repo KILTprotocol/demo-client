@@ -57,13 +57,13 @@ class MyClaimCreateView extends Component<Props, State> {
       headline: 'Fetching CTYPE',
     })
 
-    CTypeRepository.findByHash(cTypeHash).then(
-      (dbCtype: ICType) => {
+    CTypeRepository.findByHash(cTypeHash)
+      .then((dbCtype: ICType) => {
         const cType = new sdk.CType(dbCtype.cType)
         this.setState({ cType })
         blockUi.remove()
-      },
-      error => {
+      })
+      .catch(error => {
         errorService.log({
           error,
           message: `could not retrieve CTYPE with key ${cTypeHash}`,
@@ -71,8 +71,7 @@ class MyClaimCreateView extends Component<Props, State> {
           type: 'ERROR.FETCH.GET',
         })
         blockUi.remove()
-      }
-    )
+      })
   }
 
   public render() {

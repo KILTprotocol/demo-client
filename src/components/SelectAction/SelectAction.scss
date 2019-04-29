@@ -8,4 +8,17 @@
       @include react-select-minimal-inverted;
     }
   }
+
+  @for $i from 1 through 20 {
+
+    &.groupAt-#{$i} {
+
+      & .react-select__option {
+
+        &:nth-child(#{$i + 1}){
+          border-top: $base-border;
+        }
+      }
+    }
+  }
 }

@@ -1,7 +1,19 @@
 .SubmitLegitimations {
 
   & .selectLegitimations,
-  & .selectDelegation {
+  & .selectDelegation,
+  & .prefillClaim {
     @include labeledCard;
+
+    & h2 {
+
+      &.optional {
+
+        &:after {
+          content: ' (optional)';
+          font-size: 0.6em;
+        }
+      }
+    }
   }
 }

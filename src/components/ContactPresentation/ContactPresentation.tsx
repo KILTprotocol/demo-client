@@ -4,6 +4,7 @@ import _ from 'lodash'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
+import { SubmitLegitimationsProps } from '../../containers/Tasks/SubmitLegitimations/SubmitLegitimations'
 
 import ContactRepository from '../../services/ContactRepository'
 import * as Contacts from '../../state/ducks/Contacts'
@@ -141,14 +142,14 @@ class ContactPresentation extends React.Component<Props, State> {
       callback: () => {
         PersistentStore.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
-            objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
+            objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
             props: {
               receiverAddresses: [address],
             },
           })
         )
       },
-      label: 'Submit Claims',
+      label: 'Request claims',
     })
 
     actions.push({
@@ -163,6 +164,34 @@ class ContactPresentation extends React.Component<Props, State> {
         )
       },
       label: 'Request legitimations',
+    })
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
+            props: {
+              receiverAddresses: [address],
+            },
+          })
+        )
+      },
+      label: 'Submit claims',
+    })
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
+            props: {
+              receiverAddresses: [address],
+            } as SubmitLegitimationsProps,
+          })
+        )
+      },
+      label: 'Submit legitimations',
     })
 
     return actions

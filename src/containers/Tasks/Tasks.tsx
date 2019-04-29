@@ -13,6 +13,9 @@ import { ICType } from '../../types/Ctype'
 import RequestAttestation, {
   RequestAttestationProps,
 } from './RequestAttestation/RequestAttestation'
+import RequestClaimsForCType, {
+  RequestClaimsForCTypeProps,
+} from './RequestClaimsForCType/RequestClaimsForCType'
 import RequestLegitimation, {
   RequestLegitimationsProps,
 } from './RequestLegitimation/RequestLegitimation'
@@ -45,6 +48,10 @@ export type TaskProps =
   | {
       objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
       props: Partial<SubmitClaimsForCTypeProps>
+    }
+  | {
+      objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE
+      props: Partial<RequestClaimsForCTypeProps>
     }
 
 type Props = {
@@ -99,6 +106,7 @@ class Tasks extends React.Component<Props, State> {
     }
 
     const { selectedCTypes, selectedReceivers } = this.state
+
     const selectedReceiverAddresses = selectedReceivers.map(
       (receiver: Contact) => receiver.publicIdentity.address
     )
@@ -128,15 +136,24 @@ class Tasks extends React.Component<Props, State> {
       }
       case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS: {
         const props = currentTask.props as SubmitLegitimationsProps
+        const cTypeHash = props.claim ? [props.claim.cType] : undefined
         return this.getModal(
           'Submit legitimations',
           <>
-            <SubmitLegitimations
-              {...props}
-              receiverAddresses={selectedReceiverAddresses}
-              onFinished={this.onTaskFinished}
-            />
-          </>
+            {this.getCTypeSelect(false, cTypeHash)}
+            {!!selectedCTypes.length &&
+              selectedCTypes[0].cType.hash &&
+              !!selectedReceivers.length && (
+                <SubmitLegitimations
+                  {...props}
+                  claim={{ cType: selectedCTypes[0].cType.hash }}
+                  receiverAddresses={selectedReceiverAddresses}
+                  withPreFilledClaim={true}
+                  onFinished={this.onTaskFinished}
+                />
+              )}
+          </>,
+          props.receiverAddresses
         )
       }
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM: {
@@ -169,6 +186,24 @@ class Tasks extends React.Component<Props, State> {
                   onFinished={this.onTaskFinished}
                 />
               </section>
+            )}
+          </>,
+          props.receiverAddresses
+        )
+      }
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE: {
+        const props = currentTask.props as Partial<RequestClaimsForCTypeProps>
+
+        return this.getModal(
+          'Request claims for cType',
+          <>
+            {this.getCTypeSelect(false, [props.cTypeHash])}
+            {!!selectedCTypes.length && !!selectedReceivers.length && (
+              <RequestClaimsForCType
+                cTypeHash={selectedCTypes[0].cType.hash}
+                receiverAddresses={selectedReceiverAddresses}
+                onFinished={this.onTaskFinished}
+              />
             )}
           </>,
           props.receiverAddresses

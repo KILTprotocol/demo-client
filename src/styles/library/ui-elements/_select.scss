@@ -36,6 +36,7 @@
       background: $color-white !important;
       color: $color-font !important;
       cursor: pointer;
+      white-space: nowrap;
 
       &--is-selected {
         background: transparentize($color-primary, 0.8) !important;

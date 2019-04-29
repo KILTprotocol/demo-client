@@ -4,8 +4,10 @@ import _ from 'lodash'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
+import { RequestClaimsForCTypeProps } from '../../containers/Tasks/RequestClaimsForCType/RequestClaimsForCType'
 import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
 import { SubmitClaimsForCTypeProps } from '../../containers/Tasks/SubmitClaimsForCType/SubmitClaimsForCType'
+import { SubmitLegitimationsProps } from '../../containers/Tasks/SubmitLegitimations/SubmitLegitimations'
 
 import CTypeRepository from '../../services/CtypeRepository'
 import * as UiState from '../../state/ducks/UiState'
@@ -135,6 +137,17 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           PersistentStore.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
+              objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
+              props: { cTypeHash } as RequestClaimsForCTypeProps,
+            })
+          )
+        },
+        label: 'Request claims',
+      },
+      {
+        callback: () => {
+          PersistentStore.store.dispatch(
+            UiState.Store.updateCurrentTaskAction({
               objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
               props: {
                 cTypeHash,
@@ -153,7 +166,20 @@ class CTypePresentation extends React.Component<Props, State> {
             })
           )
         },
-        label: 'Submit Claims',
+        label: 'Submit claims',
+      },
+      {
+        callback: () => {
+          PersistentStore.store.dispatch(
+            UiState.Store.updateCurrentTaskAction({
+              objective: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
+              props: {
+                claim: { cType: cTypeHash },
+              } as SubmitLegitimationsProps,
+            })
+          )
+        },
+        label: 'Submit legitimations',
       },
     ]
     return actions

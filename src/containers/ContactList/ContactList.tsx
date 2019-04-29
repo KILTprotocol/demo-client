@@ -1,4 +1,3 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 
@@ -8,11 +7,9 @@ import MyDelegationsInviteModal from '../../components/MyDelegationsInviteModal/
 import SelectAction from '../../components/SelectAction/SelectAction'
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
-import MessageRepository from '../../services/MessageRepository'
 import * as Contacts from '../../state/ducks/Contacts'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { Contact } from '../../types/Contact'
-import { ICType } from '../../types/Ctype'
 
 import './ContactList.scss'
 
@@ -53,11 +50,7 @@ class ContactList extends React.Component<Props, State> {
     this.state = {
       allContacts: [],
     }
-    this.onCancelRequestClaim = this.onCancelRequestClaim.bind(this)
-    this.onFinishRequestClaim = this.onFinishRequestClaim.bind(this)
-    this.onRequestClaimForVerification = this.onRequestClaimForVerification.bind(
-      this
-    )
+
     this.toggleContacts = this.toggleContacts.bind(this)
     this.fetchAllContacts = this.fetchAllContacts.bind(this)
     this.inviteToDelegation.cancel = this.inviteToDelegation.cancel.bind(this)
@@ -101,7 +94,6 @@ class ContactList extends React.Component<Props, State> {
           <thead>
             <tr>
               <th className="name">Name</th>
-              {/*<th className="address">Address</th>*/}
               <th className="actionTd" />
             </tr>
           </thead>
@@ -116,14 +108,6 @@ class ContactList extends React.Component<Props, State> {
           </tbody>
         </table>
 
-        <SelectCTypesModal
-          ref={el => {
-            this.selectCTypesModal = el
-          }}
-          placeholder="Select cType#{multi}…"
-          onCancel={this.onCancelRequestClaim}
-          onConfirm={this.onFinishRequestClaim}
-        />
         {contactForDelegationInvite && (
           <MyDelegationsInviteModal
             isPCR={isPCR}
@@ -149,20 +133,10 @@ class ContactList extends React.Component<Props, State> {
             fullSizeActions={true}
           />
         </td>
-        {/*<td className="address" title={address}>*/}
-        {/*{address}*/}
-        {/*</td>*/}
         <td className="actionsTd">
           <div>
             <SelectAction
               actions={[
-                {
-                  callback: this.onRequestClaimForVerification.bind(
-                    this,
-                    contact
-                  ),
-                  label: 'Request claim(s)',
-                },
                 {
                   callback: this.inviteToDelegation.request.bind(
                     this,
@@ -210,28 +184,6 @@ class ContactList extends React.Component<Props, State> {
           type: 'ERROR.FETCH.GET',
         })
       })
-  }
-
-  private onCancelRequestClaim() {
-    this.selectedContact = undefined
-  }
-
-  private onFinishRequestClaim(selectedCTypes: ICType[]) {
-    if (this.selectedContact && selectedCTypes) {
-      const messageBody: sdk.IRequestClaimsForCtype = {
-        content: selectedCTypes[0].cType.hash,
-        type: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
-      }
-
-      MessageRepository.send([this.selectedContact], messageBody)
-    }
-  }
-
-  private onRequestClaimForVerification = (contact?: Contact) => {
-    this.selectedContact = contact
-    if (this.selectCTypesModal) {
-      this.selectCTypesModal.show()
-    }
   }
 }
 
