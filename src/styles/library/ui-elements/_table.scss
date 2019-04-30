@@ -26,9 +26,18 @@
   & td {
     position: relative;
     padding: $cell-padding-v $cell-padding-h;
+    border: {
+      right: $base-border;
+    }
     background: $color-grey-light;
     text-align: left;
     vertical-align: top;
+
+    &:last-child {
+      border: {
+        right: none;
+      }
+    }
 
     &:after {
       @include background-image(linear-gradient(to right, transparent, $color-grey-light));

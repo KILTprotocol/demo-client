@@ -19,6 +19,7 @@ export type SubmitClaimsForCTypeProps = {
   autoStart?: true
 
   onFinished?: () => void
+  onCancel?: () => void
 }
 
 type Props = InjectedSelectProps & SubmitClaimsForCTypeProps
@@ -32,6 +33,7 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
     super(props)
 
     this.sendClaim = this.sendClaim.bind(this)
+    this.onCancel = this.onCancel.bind(this)
   }
 
   public render() {
@@ -56,12 +58,13 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
           </div>
         )}
         {_workFlowStarted && (
-          <div className="selectAttestedClaims">
-            <h4>Select attested claim(s)</h4>
+          <section className="selectAttestedClaims">
+            <h2>Select attested claim(s)</h2>
 
             <SelectAttestedClaims cTypeHash={cTypeHash} onChange={onChange} />
 
             <div className="actions">
+              <button onClick={this.onCancel}>Cancel</button>
               <button
                 disabled={!Object.keys(claimSelectionData).length}
                 onClick={this.sendClaim}
@@ -69,7 +72,7 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
                 Send attested claims
               </button>
             </div>
-          </div>
+          </section>
         )}
       </section>
     )
@@ -86,6 +89,13 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
         onFinished()
       }
     })
+  }
+
+  private onCancel() {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
   }
 }
 

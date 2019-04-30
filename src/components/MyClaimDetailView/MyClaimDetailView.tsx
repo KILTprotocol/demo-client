@@ -10,9 +10,9 @@ type Props = {
   cancelable?: boolean
   claimEntry: Claims.Entry
   hideAttestedClaims?: boolean
-  onRemoveClaim?: (claimId: Claims.Entry['id']) => void
-  onRequestAttestation?: (claimId: Claims.Entry['id']) => void
-  onRequestLegitimation?: (claimId: Claims.Entry['id']) => void
+  onRemoveClaim?: (claimEntry: Claims.Entry) => void
+  onRequestAttestation?: (claimEntry: Claims.Entry) => void
+  onRequestLegitimation?: (claimEntry: Claims.Entry) => void
 }
 
 type State = {
@@ -72,7 +72,7 @@ class MyClaimDetailView extends Component<Props, State> {
             onClick={this.requestLegitimation}
             title="Request legitimation for attestation of this claim from attester"
           >
-            Get Legitimation
+            Request Legitimation
           </button>
         )}
         {onRequestAttestation && (
@@ -81,7 +81,7 @@ class MyClaimDetailView extends Component<Props, State> {
             onClick={this.requestAttestation}
             title="Request attestation of this claim from attester"
           >
-            Get Attestation
+            Request Attestation
           </button>
         )}
       </div>
@@ -91,21 +91,21 @@ class MyClaimDetailView extends Component<Props, State> {
   private handleDelete() {
     const { claimEntry, onRemoveClaim }: Props = this.props
     if (claimEntry && onRemoveClaim) {
-      onRemoveClaim(claimEntry.id)
+      onRemoveClaim(claimEntry)
     }
   }
 
   private requestAttestation() {
     const { claimEntry, onRequestAttestation }: Props = this.props
     if (claimEntry && onRequestAttestation) {
-      onRequestAttestation(claimEntry.id)
+      onRequestAttestation(claimEntry)
     }
   }
 
   private requestLegitimation() {
     const { claimEntry, onRequestLegitimation }: Props = this.props
     if (claimEntry && onRequestLegitimation) {
-      onRequestLegitimation(claimEntry.id)
+      onRequestLegitimation(claimEntry)
     }
   }
 }

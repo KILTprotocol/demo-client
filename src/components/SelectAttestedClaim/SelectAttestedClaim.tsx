@@ -222,7 +222,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
       </React.Fragment>
     ) : (
       <div className="no-attestations">
-        <span>{labels.text.noAttestationFound}</span>
+        <span>{labels.text.noAttestationFound} </span>
         <Link to={`/claim/${claimEntry.id}`}>
           {labels.buttons.requestAttestation}
         </Link>

@@ -1,7 +1,36 @@
 .Tasks {
+  counter-reset: section;
 
   & .selectCType,
   & .selectReceiver {
     @include labeledCard;
+  }
+
+  & h2 {
+
+    &:before {
+      counter-increment: section;
+      content: counter(section) ". ";
+    }
+  }
+
+  & .MyClaimDetailView {
+    @include labeledCard;
+
+    & h1 {
+      width: auto;
+    }
+
+    & .ClaimDetailView {
+      @include removeLabeledCard;
+      
+      & h2 {
+        display: none;
+      }
+      
+      & .actions {
+        display: none;
+      }
+    }
   }
 }

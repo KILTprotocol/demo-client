@@ -10,6 +10,9 @@ import * as UiState from '../../state/ducks/UiState'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { Contact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
+import RequestAcceptDelegation, {
+  RequestAcceptDelegationProps,
+} from './RequestAcceptDelegation/RequestAcceptDelegation'
 import RequestAttestation, {
   RequestAttestationProps,
 } from './RequestAttestation/RequestAttestation'
@@ -53,6 +56,10 @@ export type TaskProps =
       objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE
       props: Partial<RequestClaimsForCTypeProps>
     }
+  | {
+      objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION
+      props: Partial<RequestAcceptDelegationProps>
+    }
 
 type Props = {
   // mapStateToProps
@@ -83,6 +90,7 @@ class Tasks extends React.Component<Props, State> {
     this.onMenuOpen = this.onMenuOpen.bind(this)
     this.onMenuClose = this.onMenuClose.bind(this)
     this.onTaskFinished = this.onTaskFinished.bind(this)
+    this.onCancel = this.onCancel.bind(this)
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -122,13 +130,16 @@ class Tasks extends React.Component<Props, State> {
           'Request legitimations',
           <>
             {this.getCTypeSelect(false, [props.cTypeHash])}
-            {!!cTypeHash && (
+            {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestLegitimation
                 {...props}
                 cTypeHash={cTypeHash}
                 receiverAddresses={selectedReceiverAddresses}
                 onFinished={this.onTaskFinished}
+                onCancel={this.onCancel}
               />
+            ) : (
+              this.getMessageElement(true)
             )}
           </>,
           props.receiverAddresses
@@ -142,16 +153,19 @@ class Tasks extends React.Component<Props, State> {
           <>
             {this.getCTypeSelect(false, cTypeHash)}
             {!!selectedCTypes.length &&
-              selectedCTypes[0].cType.hash &&
-              !!selectedReceivers.length && (
-                <SubmitLegitimations
-                  {...props}
-                  claim={{ cType: selectedCTypes[0].cType.hash }}
-                  receiverAddresses={selectedReceiverAddresses}
-                  withPreFilledClaim={true}
-                  onFinished={this.onTaskFinished}
-                />
-              )}
+            selectedCTypes[0].cType.hash &&
+            !!selectedReceivers.length ? (
+              <SubmitLegitimations
+                {...props}
+                claim={{ cType: selectedCTypes[0].cType.hash }}
+                receiverAddresses={selectedReceiverAddresses}
+                enablePreFilledClaim={true}
+                onFinished={this.onTaskFinished}
+                onCancel={this.onCancel}
+              />
+            ) : (
+              this.getMessageElement(true)
+            )}
           </>,
           props.receiverAddresses
         )
@@ -159,13 +173,18 @@ class Tasks extends React.Component<Props, State> {
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM: {
         const props = currentTask.props as RequestAttestationProps
         return this.getModal(
-          'Request Attestation for claim',
+          'Request attestation for claim',
           <>
-            <RequestAttestation
-              {...props}
-              receiverAddresses={selectedReceiverAddresses}
-              onFinished={this.onTaskFinished}
-            />
+            {!!selectedReceivers.length ? (
+              <RequestAttestation
+                {...props}
+                receiverAddresses={selectedReceiverAddresses}
+                onFinished={this.onTaskFinished}
+                onCancel={this.onCancel}
+              />
+            ) : (
+              this.getMessageElement()
+            )}
           </>
         )
       }
@@ -176,16 +195,16 @@ class Tasks extends React.Component<Props, State> {
           'Submit claims for cType',
           <>
             {this.getCTypeSelect(false, [props.cTypeHash])}
-            {!!selectedCTypes.length && !!selectedReceivers.length && (
-              <section className="selectCType">
-                <h2>…and now the claims</h2>
-                <SubmitClaimsForCType
-                  autoStart={true}
-                  cTypeHash={selectedCTypes[0].cType.hash}
-                  receiverAddresses={selectedReceiverAddresses}
-                  onFinished={this.onTaskFinished}
-                />
-              </section>
+            {!!selectedCTypes.length && !!selectedReceivers.length ? (
+              <SubmitClaimsForCType
+                autoStart={true}
+                cTypeHash={selectedCTypes[0].cType.hash}
+                receiverAddresses={selectedReceiverAddresses}
+                onFinished={this.onTaskFinished}
+                onCancel={this.onCancel}
+              />
+            ) : (
+              this.getMessageElement(true)
             )}
           </>,
           props.receiverAddresses
@@ -198,12 +217,39 @@ class Tasks extends React.Component<Props, State> {
           'Request claims for cType',
           <>
             {this.getCTypeSelect(false, [props.cTypeHash])}
-            {!!selectedCTypes.length && !!selectedReceivers.length && (
+            {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestClaimsForCType
                 cTypeHash={selectedCTypes[0].cType.hash}
                 receiverAddresses={selectedReceiverAddresses}
                 onFinished={this.onTaskFinished}
+                onCancel={this.onCancel}
               />
+            ) : (
+              this.getMessageElement(true)
+            )}
+          </>,
+          props.receiverAddresses
+        )
+      }
+      case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION: {
+        const props = currentTask.props as Partial<RequestAcceptDelegationProps>
+        return this.getModal(
+          `Invite to ${props.isPCR ? 'PCR(s)' : 'delegation(s)'}`,
+          <>
+            {this.getCTypeSelect(false, [props.cTypeHash])}
+            {!!selectedCTypes.length && !!selectedReceivers.length ? (
+              <RequestAcceptDelegation
+                isPCR={!!props.isPCR}
+                cTypeHash={selectedCTypes[0].cType.hash}
+                receiverAddresses={selectedReceiverAddresses}
+                selectedDelegations={props.selectedDelegations}
+                onFinished={this.onTaskFinished}
+                onCancel={this.onCancel}
+                onMenuOpen={this.onMenuOpen}
+                onMenuClose={this.onMenuClose}
+              />
+            ) : (
+              this.getMessageElement(true)
             )}
           </>,
           props.receiverAddresses
@@ -231,11 +277,27 @@ class Tasks extends React.Component<Props, State> {
         preventCloseOnConfirm={true}
         type={ModalType.BLANK}
         showOnInit={true}
-        onCancel={this.onTaskFinished}
+        onCancel={this.onCancel}
       >
         {this.getReceiverSelect(preselectedReceiverAddresses)}
         {content}
       </Modal>
+    )
+  }
+
+  private getMessageElement(withCType?: boolean) {
+    const mandatorySelects: string[] = ['receivers(s)']
+    if (withCType) {
+      mandatorySelects.push('cType(s)')
+    }
+
+    return (
+      <div className="actions">
+        <button onClick={this.onCancel}>Cancel</button>
+        <button disabled={true}>
+          Please select {mandatorySelects.join(', ')} first
+        </button>
+      </div>
     )
   }
 
@@ -260,7 +322,7 @@ class Tasks extends React.Component<Props, State> {
   ) {
     return (
       <section className="selectReceiver">
-        <h2>Select receivers …</h2>
+        <h2>Select receiver(s)</h2>
         <SelectContacts
           isMulti={true}
           preSelectedAddresses={preSelectedAddresses}
@@ -282,7 +344,7 @@ class Tasks extends React.Component<Props, State> {
   ) {
     return (
       <section className="selectCType">
-        <h2>… cType{isMulti ? 's' : ''} …</h2>
+        <h2>Select cType{isMulti ? '(s)' : ''}</h2>
         <SelectCTypes
           preSelectedCTypeHashes={preSelectedCTypeHashes}
           isMulti={isMulti}
@@ -302,6 +364,10 @@ class Tasks extends React.Component<Props, State> {
     const { finishCurrentTask } = this.props
     finishCurrentTask()
     this.setState(initialState)
+  }
+
+  private onCancel() {
+    this.onTaskFinished()
   }
 }
 

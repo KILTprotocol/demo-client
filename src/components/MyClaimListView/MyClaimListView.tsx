@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+import { RequestAttestationProps } from '../../containers/Tasks/RequestAttestation/RequestAttestation'
 import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
 
 import * as Claims from '../../state/ducks/Claims'
@@ -17,9 +18,9 @@ type Props = {
   claimStore: Claims.Entry[]
 
   onCreateClaimFromCType: (selectedCTypes: ICType[]) => void
-  onRemoveClaim: (claimId: Claims.Entry['id']) => void
-  onRequestAttestation: (claimId: Claims.Entry['id']) => void
-  onRequestLegitimation: (claimId: Claims.Entry['id']) => void
+  onRemoveClaim: (claimEntry: Claims.Entry) => void
+  onRequestAttestation: (claimEntry: Claims.Entry) => void
+  onRequestLegitimation: (claimEntry: Claims.Entry) => void
 }
 
 type State = {}
@@ -79,33 +80,52 @@ class MyClaimListView extends React.Component<Props, State> {
                     <div>
                       <SelectAction
                         actions={[
+                          // {
+                          //   callback: () => {
+                          //     PersistentStore.store.dispatch(
+                          //       UiState.Store.updateCurrentTaskAction({
+                          //         objective:
+                          //           sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+                          //         props: {
+                          //           cTypeHash: claimEntry.claim.cType,
+                          //           preSelectedClaimEntries: [claimEntry],
+                          //         } as RequestLegitimationsProps,
+                          //       })
+                          //     )
+                          //   },
+                          //   label: 'Request legitimations',
+                          // },
+                          // {
+                          //   callback: () => {
+                          //     PersistentStore.store.dispatch(
+                          //       UiState.Store.updateCurrentTaskAction({
+                          //         objective:
+                          //           sdk.MessageBodyType
+                          //             .REQUEST_ATTESTATION_FOR_CLAIM,
+                          //         props: {
+                          //           claim: claimEntry.claim,
+                          //         } as RequestAttestationProps,
+                          //       })
+                          //     )
+                          //   },
+                          //   label: 'Request Attestation',
+                          // },
                           {
-                            callback: () => {
-                              PersistentStore.store.dispatch(
-                                UiState.Store.updateCurrentTaskAction({
-                                  objective:
-                                    sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
-                                  props: {
-                                    cTypeHash: claimEntry.claim.cType,
-                                    preSelectedClaimEntries: [claimEntry],
-                                  } as RequestLegitimationsProps,
-                                })
-                              )
-                            },
+                            callback: this.requestLegitimation.bind(
+                              this,
+                              claimEntry
+                            ),
                             label: 'Request legitimations',
                           },
                           {
                             callback: this.requestAttestation.bind(
                               this,
-                              claimEntry.id
+                              claimEntry
                             ),
-                            label: 'Get Attestation',
+                            label: 'Request attestation',
                           },
                           {
-                            callback: this.handleDelete.bind(
-                              this,
-                              claimEntry.id
-                            ),
+                            callback: this.handleDelete.bind(this, claimEntry),
                             label: 'Delete',
                           },
                         ]}
@@ -131,19 +151,19 @@ class MyClaimListView extends React.Component<Props, State> {
     )
   }
 
-  private handleDelete(claimId: Claims.Entry['id']) {
+  private handleDelete(claimEntry: Claims.Entry) {
     const { onRemoveClaim } = this.props
-    onRemoveClaim(claimId)
+    onRemoveClaim(claimEntry)
   }
 
-  private requestAttestation(claimId: Claims.Entry['id']) {
+  private requestAttestation(claimEntry: Claims.Entry) {
     const { onRequestAttestation } = this.props
-    onRequestAttestation(claimId)
+    onRequestAttestation(claimEntry)
   }
 
-  private requestLegitimation(claimId: Claims.Entry['id']) {
+  private requestLegitimation(claimEntry: Claims.Entry) {
     const { onRequestLegitimation } = this.props
-    onRequestLegitimation(claimId)
+    onRequestLegitimation(claimEntry)
   }
 
   private openCTypeModal() {

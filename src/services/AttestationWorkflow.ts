@@ -86,14 +86,14 @@ class AttestationWorkflow {
    * Creates the request for claim attestation and sends it to the attester.
    *
    * @param claim - the claim to attest
-   * @param attesters - the attesters to send the request to
+   * @param attesterAddresses - the addresses of attesters
    * @param [legitimations] - the legitimations the claimer requested
    *   beforehand from attester
    * @param [delegationId] - the delegation the attester added as legitimation
    */
   public static async requestAttestationForClaim(
     claim: sdk.IClaim,
-    attesters: Contact[],
+    attesterAddresses: Array<Contact['publicIdentity']['address']>,
     legitimations: sdk.AttestedClaim[] = [],
     delegationId?: sdk.IDelegationNode['id']
   ): Promise<void> {
@@ -111,7 +111,7 @@ class AttestationWorkflow {
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     } as IRequestAttestationForClaim
 
-    return MessageRepository.send(attesters, messageBody)
+    return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
   }
 
   /**

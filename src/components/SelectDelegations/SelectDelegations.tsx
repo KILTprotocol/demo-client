@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import Select, { createFilter } from 'react-select'
@@ -49,46 +50,19 @@ class SelectDelegations extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      delegations: props.delegations || [],
+      delegations: [],
     }
 
     this.onChange = this.onChange.bind(this)
   }
 
   public componentDidMount() {
-    const { filter } = this.props
-    const { delegations } = this.state
+    this.setDelegations()
+  }
 
-    if (!delegations.length) {
-      const { type } = this.props
-      let _delegations
-
-      switch (type) {
-        case DelegationType.Root:
-          _delegations = Delegations.getRootDelegations(
-            PersistentStore.store.getState()
-          )
-          break
-        case DelegationType.Node:
-          _delegations = Delegations.getDelegations(
-            PersistentStore.store.getState()
-          )
-          break
-        default:
-          _delegations = Delegations.getAllDelegations(
-            PersistentStore.store.getState()
-          )
-      }
-
-      if (filter) {
-        _delegations = _delegations.filter((delegation: MyDelegation) =>
-          filter(delegation)
-        )
-      }
-
-      this.setState({
-        delegations: _delegations,
-      })
+  public componentDidUpdate(prevProps: Props) {
+    if (!isEqual(prevProps.delegations, this.props.delegations)) {
+      this.setDelegations()
     }
   }
 
@@ -138,6 +112,43 @@ class SelectDelegations extends React.Component<Props, State> {
     ) : (
       <div>No eligible delegations found.</div>
     )
+  }
+
+  private setDelegations() {
+    const { filter } = this.props
+    const { delegations } = this.props
+
+    let _delegations = delegations
+    if (!_delegations) {
+      const { type } = this.props
+
+      switch (type) {
+        case DelegationType.Root:
+          _delegations = Delegations.getRootDelegations(
+            PersistentStore.store.getState()
+          )
+          break
+        case DelegationType.Node:
+          _delegations = Delegations.getDelegations(
+            PersistentStore.store.getState()
+          )
+          break
+        default:
+          _delegations = Delegations.getAllDelegations(
+            PersistentStore.store.getState()
+          )
+      }
+
+      if (filter) {
+        _delegations = _delegations.filter((delegation: MyDelegation) =>
+          filter(delegation)
+        )
+      }
+    }
+
+    this.setState({
+      delegations: _delegations,
+    })
   }
 
   private getOption(delegation: MyDelegation): SelectOption {

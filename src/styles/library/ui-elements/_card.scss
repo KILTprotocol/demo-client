@@ -95,6 +95,14 @@ $labeledCardActions-padding-inner: $base-padding/2;
     &:first-child {
       @include cardLabel($labeledCardActionsButtons);
     }
+
+    &.optional {
+
+      &:after {
+        content: ' (optional)';
+        font-size: 0.6em;
+      }
+    }
   }
 
   & .container-actions {

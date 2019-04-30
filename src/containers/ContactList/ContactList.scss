@@ -31,12 +31,7 @@
   }
 
   & .toggleContacts {
-    @include button-icon-only($icon-star);
-    @include favorite;
-
-    &.all {
-      color: $color-grey-light;
-    }
+    @include button-primary;
   }
 
   & .refresh {

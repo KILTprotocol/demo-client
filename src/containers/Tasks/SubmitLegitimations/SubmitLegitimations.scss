@@ -2,18 +2,14 @@
 
   & .selectLegitimations,
   & .selectDelegation,
-  & .prefillClaim {
+  & .preFillClaim {
     @include labeledCard;
+  }
 
-    & h2 {
+  & .container-actions {
 
-      &.optional {
-
-        &:after {
-          content: ' (optional)';
-          font-size: 0.6em;
-        }
-      }
+    & button {
+      @include button-secondary;
     }
   }
 }

@@ -4,6 +4,7 @@ import _ from 'lodash'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
+import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 import { RequestClaimsForCTypeProps } from '../../containers/Tasks/RequestClaimsForCType/RequestClaimsForCType'
 import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
 import { SubmitClaimsForCTypeProps } from '../../containers/Tasks/SubmitClaimsForCType/SubmitClaimsForCType'
@@ -180,6 +181,34 @@ class CTypePresentation extends React.Component<Props, State> {
           )
         },
         label: 'Submit legitimations',
+      },
+      {
+        callback: () => {
+          PersistentStore.store.dispatch(
+            UiState.Store.updateCurrentTaskAction({
+              objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+              props: {
+                cTypeHash,
+                isPCR: false,
+              } as RequestAcceptDelegationProps,
+            })
+          )
+        },
+        label: 'Invite to delegation(s)',
+      },
+      {
+        callback: () => {
+          PersistentStore.store.dispatch(
+            UiState.Store.updateCurrentTaskAction({
+              objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+              props: {
+                cTypeHash,
+                isPCR: true,
+              } as RequestAcceptDelegationProps,
+            })
+          )
+        },
+        label: 'Invite to PCR(s)',
       },
     ]
     return actions

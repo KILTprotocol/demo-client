@@ -26,7 +26,7 @@
 @mixin label {
   @include baseFont-bold;
 
-  color: $color-primary;
+  color: $color-font;
   text-align: left;
 }
 
@@ -148,6 +148,10 @@
     margin: {
       left: $base-padding/2;
       bottom: $base-padding/2;
+    }
+
+    &:first-child {
+      margin-left: 0;
     }
   }
 }

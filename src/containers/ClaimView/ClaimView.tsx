@@ -9,13 +9,17 @@ import MyClaimListView from '../../components/MyClaimListView/MyClaimListView'
 import attestationWorkflow from '../../services/AttestationWorkflow'
 import { notifyFailure, safeDelete } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
+import * as UiState from '../../state/ducks/UiState'
 import * as Wallet from '../../state/ducks/Wallet'
+import PersistentStore from '../../state/PersistentStore'
 import { State as ReduxState } from '../../state/PersistentStore'
 
 import { Contact, MyIdentity } from '../../types/Contact'
 
 import './ClaimView.scss'
 import { ICType } from '../../types/Ctype'
+import { RequestAttestationProps } from '../Tasks/RequestAttestation/RequestAttestation'
+import { RequestLegitimationsProps } from '../Tasks/RequestLegitimation/RequestLegitimation'
 
 type Props = RouteComponentProps<{ claimId: Claims.Entry['id'] }> & {
   removeClaim: (claimId: Claims.Entry['id']) => void
@@ -129,33 +133,36 @@ class ClaimView extends React.Component<Props, State> {
     return claimEntries.find((claimEntry: Claims.Entry) => claimEntry.id === id)
   }
 
-  private deleteClaim(claimId: Claims.Entry['id']) {
-    const { removeClaim, claimEntries } = this.props
+  private deleteClaim(claimEntry: Claims.Entry) {
+    const { removeClaim } = this.props
 
-    const claim = claimEntries.find(
-      (claimEntry: Claims.Entry) => claimEntry.id === claimId
-    )
-
-    safeDelete(`claim '${claim ? claim.meta.alias : claimId}'`, () => {
-      removeClaim(claimId)
+    safeDelete(`claim '${claimEntry.meta.alias}'`, () => {
+      removeClaim(claimEntry.id)
       this.props.history.push('/claim')
     })
   }
 
-  private requestLegitimation(claimId: Claims.Entry['id']) {
-    if (this.selectAttestersModal) {
-      this.claimIdToLegitimate = claimId
-      delete this.claimIdToAttest
-      this.selectAttestersModal.show()
-    }
+  private requestLegitimation(claimEntry: Claims.Entry) {
+    PersistentStore.store.dispatch(
+      UiState.Store.updateCurrentTaskAction({
+        objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+        props: {
+          cTypeHash: claimEntry.claim.cType,
+          preSelectedClaimEntries: [claimEntry],
+        } as RequestLegitimationsProps,
+      })
+    )
   }
 
-  private requestAttestation(claimId: Claims.Entry['id']) {
-    if (this.selectAttestersModal) {
-      delete this.claimIdToLegitimate
-      this.claimIdToAttest = claimId
-      this.selectAttestersModal.show()
-    }
+  private requestAttestation(claimEntry: Claims.Entry) {
+    PersistentStore.store.dispatch(
+      UiState.Store.updateCurrentTaskAction({
+        objective: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+        props: {
+          claim: claimEntry.claim,
+        } as RequestAttestationProps,
+      })
+    )
   }
 
   private cancelSelectAttesters() {
@@ -177,7 +184,12 @@ class ClaimView extends React.Component<Props, State> {
           )
         )
       } else if (this.claimIdToAttest) {
-        attestationWorkflow.requestAttestationForClaim(claim, selectedAttesters)
+        attestationWorkflow.requestAttestationForClaim(
+          claim,
+          selectedAttesters.map(
+            (contact: Contact) => contact.publicIdentity.address
+          )
+        )
       }
     } else {
       notifyFailure(`Could not resolve Claim`)

@@ -1,13 +1,19 @@
+import {
+  ISubmitAttestationForClaim,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import cloneDeep from 'lodash/cloneDeep'
 import * as React from 'react'
 import { InteractionProps } from 'react-json-view'
 import Code from '../components/Code/Code'
+import CTypePresentation from '../components/CTypePresentation/CTypePresentation'
 import { ModalType } from '../components/Modal/Modal'
 import * as UiState from '../state/ducks/UiState'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
+import { ICType } from '../types/Ctype'
 import { BlockingNotification, NotificationType } from '../types/UserFeedback'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import ContactRepository from './ContactRepository'
@@ -206,6 +212,51 @@ class MessageRepository {
         origin: 'MessageRepository.singleSend()',
       })
       return Promise.reject()
+    }
+  }
+
+  public static getCTypeHash(message: MessageOutput): ICType['cType']['hash'] {
+    const { body } = message
+    const { type } = body
+
+    switch (type) {
+      case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
+        return (message.body as sdk.IRequestLegitimations).content.cType
+      case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
+        return (message.body as sdk.ISubmitLegitimations).content.claim.cType
+      case sdk.MessageBodyType.REJECT_LEGITIMATIONS:
+        return (message.body as sdk.IRejectLegitimations).content.claim.cType
+
+      case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
+        return (message.body as sdk.IRequestAttestationForClaim).content.claim
+          .cType
+      case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
+        return (message.body as ISubmitAttestationForClaim).content.request
+          .claim.cType
+      case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
+        return (message.body as sdk.IRejectAttestationForClaim).content.claim
+          .cType
+
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
+        return (message.body as sdk.IRequestClaimsForCtype).content
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
+        return (message.body as sdk.ISubmitClaimsForCtype).content[0].request
+          .claim.cType
+      case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPE:
+        return (message.body as sdk.IAcceptClaimsForCtype).content[0].request
+          .hash
+      case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPE:
+        return (message.body as sdk.IRejectClaimsForCtype).content[0].request
+          .hash
+
+      case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:
+      case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION:
+      case sdk.MessageBodyType.REJECT_ACCEPT_DELEGATION:
+      case sdk.MessageBodyType.INFORM_CREATE_DELEGATION:
+        return undefined
+
+      default:
+        return undefined
     }
   }
 

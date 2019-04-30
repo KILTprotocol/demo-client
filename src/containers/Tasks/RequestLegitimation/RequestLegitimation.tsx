@@ -14,6 +14,7 @@ export type RequestLegitimationsProps = {
   preSelectedClaimEntries?: Claims.Entry[]
 
   onFinished?: () => void
+  onCancel?: () => void
 }
 
 type State = {
@@ -28,6 +29,7 @@ class RequestLegitimation extends React.Component<
     super(props)
     this.state = {}
 
+    this.onCancel = this.onCancel.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.onSelectClaimEntry = this.onSelectClaimEntry.bind(this)
   }
@@ -37,9 +39,7 @@ class RequestLegitimation extends React.Component<
     return (
       <section className="RequestLegitimation">
         <section className="selectClaims">
-          <h2>
-            …and the claim <small>(optional)</small>
-          </h2>
+          <h2 className="optional">Select claim</h2>
           <SelectClaims
             preSelectedClaimEntries={preSelectedClaimEntries}
             cTypeHash={cTypeHash}
@@ -47,6 +47,7 @@ class RequestLegitimation extends React.Component<
           />
         </section>
         <div className="actions">
+          <button onClick={this.onCancel}>Cancel</button>
           <button
             className="requestLegitimation"
             disabled={!receiverAddresses.length}
@@ -77,6 +78,13 @@ class RequestLegitimation extends React.Component<
             onFinished()
           }
         })
+    }
+  }
+
+  private onCancel() {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
     }
   }
 }

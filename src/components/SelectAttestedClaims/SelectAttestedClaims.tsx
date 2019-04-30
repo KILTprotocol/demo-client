@@ -107,6 +107,15 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     }
   }
 
+  public componentDidUpdate(prevProps: Props) {
+    const { cTypeHash } = this.props
+    if (prevProps.cTypeHash !== cTypeHash) {
+      CTypeRepository.findByHash(cTypeHash).then((cType: ICType) => {
+        this.setState({ cType: CType.fromObject(cType) })
+      })
+    }
+  }
+
   public render() {
     const { cTypeHash } = this.props
 
@@ -162,7 +171,9 @@ class SelectAttestedClaims extends React.Component<Props, State> {
           CType <CTypePresentation cTypeHash={cTypeHash} inline={true} />
         </h4>
         {relevantClaimEntries[cTypeHash].map((claimEntry: Claims.Entry) =>
-          this.getSelectAttestedClaim(claimEntry)
+          claimEntry.attestations.length
+            ? this.getSelectAttestedClaim(claimEntry)
+            : ''
         )}
       </div>
     )
@@ -170,7 +181,6 @@ class SelectAttestedClaims extends React.Component<Props, State> {
 
   private getSelectAttestedClaim(claimEntry: Claims.Entry) {
     const { cTypeHash } = this.props
-
     return (
       <SelectAttestedClaim
         key={claimEntry.id}

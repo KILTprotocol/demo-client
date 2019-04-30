@@ -1,8 +1,12 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
+import * as UiState from '../../state/ducks/UiState'
+import PersistentStore from '../../state/PersistentStore'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Permissions from '../Permissions/Permissions'
 import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
@@ -13,7 +17,6 @@ type Props = {
   onCreateDelegation: () => void
   delegationEntries: MyDelegation[]
   onRemoveDelegation: (delegation: MyDelegation) => void
-  onRequestInviteContacts: (delegation: MyDelegation) => void
 
   isPCR: boolean
 }
@@ -124,7 +127,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
                     <div>
                       <SelectDelegationAction
                         delegation={delegationEntry}
-                        onInvite={this.requestInviteContacts.bind(
+                        onInvite={this.inviteContactsTo.bind(
                           this,
                           delegationEntry
                         )}
@@ -148,12 +151,17 @@ class MyDelegationsListView extends React.Component<Props, State> {
     }
   }
 
-  private requestInviteContacts(delegationEntry: MyDelegation) {
-    const { onRequestInviteContacts } = this.props
-
-    if (onRequestInviteContacts) {
-      onRequestInviteContacts(delegationEntry)
-    }
+  private inviteContactsTo(delegation: MyDelegation) {
+    PersistentStore.store.dispatch(
+      UiState.Store.updateCurrentTaskAction({
+        objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+        props: {
+          cTypeHash: delegation.cTypeHash,
+          isPCR: !!delegation.isPCR,
+          selectedDelegations: [delegation],
+        } as RequestAcceptDelegationProps,
+      })
+    )
   }
 
   private handleDelete = (delegation: MyDelegation) => {

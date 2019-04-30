@@ -3,6 +3,7 @@ import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
 import { SubmitLegitimationsProps } from '../../containers/Tasks/SubmitLegitimations/SubmitLegitimations'
 
@@ -194,6 +195,36 @@ class ContactPresentation extends React.Component<Props, State> {
       label: 'Submit legitimations',
     })
 
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+            props: {
+              isPCR: false,
+              receiverAddresses: [address],
+            } as RequestAcceptDelegationProps,
+          })
+        )
+      },
+      label: 'Invite to delegation(s)',
+    })
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+            props: {
+              isPCR: true,
+              receiverAddresses: [address],
+            } as RequestAcceptDelegationProps,
+          })
+        )
+      },
+      label: 'Invite to PCR(s)',
+    })
+
     return actions
   }
 
@@ -215,9 +246,7 @@ class ContactPresentation extends React.Component<Props, State> {
       address
     )
 
-    this.setState({
-      myIdentity,
-    })
+    this.setState({ myIdentity })
   }
 
   private import() {

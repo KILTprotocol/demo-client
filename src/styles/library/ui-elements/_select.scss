@@ -16,6 +16,10 @@
     &__menu {
       width: auto;
       display: inline-block;
+
+      &-list {
+        max-height: 400px;
+      }
     }
 
     &__single-value {

@@ -2,7 +2,6 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 
 import AttestationService from '../../services/AttestationService'
-import ContactRepository from '../../services/ContactRepository'
 import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
@@ -266,9 +265,11 @@ class AttestedClaimsListView extends React.Component<Props, State> {
 
   private verifyAttestations(): void {
     const { attestedClaims } = this.props
-    attestedClaims.forEach(attestedClaim => {
-      this.verifyAttestation(attestedClaim)
-    })
+    if (attestedClaims) {
+      attestedClaims.forEach(attestedClaim => {
+        this.verifyAttestation(attestedClaim)
+      })
+    }
   }
 
   private verifyAttestation(attestedClaim: sdk.IAttestedClaim) {

@@ -21,6 +21,7 @@ export type RequestAttestationProps = {
   delegationId?: sdk.IDelegationNode['id']
 
   onFinished?: () => void
+  onCancel?: () => void
 }
 
 type State = {
@@ -36,6 +37,7 @@ class RequestAttestation extends React.Component<
     this.state = {}
     this.handleCreateClaim = this.handleCreateClaim.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.onCancel = this.onCancel.bind(this)
   }
 
   public componentDidMount() {
@@ -64,14 +66,18 @@ class RequestAttestation extends React.Component<
           />
         )}
 
-        <AttestedClaimsListView
-          attestedClaims={legitimations}
-          delegationId={delegationId}
-          context="legitimations"
-          currentDelegationViewType={ViewType.Present}
-        />
+        {(!!legitimations && !!legitimations.length) ||
+          (!!delegationId && (
+            <AttestedClaimsListView
+              attestedClaims={legitimations}
+              delegationId={delegationId}
+              context="legitimations"
+              currentDelegationViewType={ViewType.Present}
+            />
+          ))}
 
         <div className="actions">
+          <button onClick={this.onCancel}>Cancel</button>
           <button
             className="request-attestation"
             disabled={!savedClaimEntry}
@@ -93,6 +99,13 @@ class RequestAttestation extends React.Component<
     })
   }
 
+  private onCancel() {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
+  }
+
   private handleSubmit() {
     const {
       receiverAddresses,
@@ -103,24 +116,20 @@ class RequestAttestation extends React.Component<
     const { savedClaimEntry } = this.state
 
     if (savedClaimEntry) {
-      ContactRepository.findByAddress(receiverAddresses[0]).then(
-        (attester: Contact) => {
-          attestationWorkflow
-            .requestAttestationForClaim(
-              savedClaimEntry.claim,
-              [attester],
-              legitimations.map((legitimation: sdk.IAttestedClaim) =>
-                sdk.AttestedClaim.fromObject(legitimation)
-              ),
-              delegationId
-            )
-            .then(() => {
-              if (onFinished) {
-                onFinished()
-              }
-            })
-        }
-      )
+      attestationWorkflow
+        .requestAttestationForClaim(
+          savedClaimEntry.claim,
+          receiverAddresses,
+          (legitimations || []).map((legitimation: sdk.IAttestedClaim) =>
+            sdk.AttestedClaim.fromObject(legitimation)
+          ),
+          delegationId
+        )
+        .then(() => {
+          if (onFinished) {
+            onFinished()
+          }
+        })
     }
   }
 }

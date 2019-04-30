@@ -33,7 +33,6 @@ type State = {
   delegationEntries: MyDelegation[]
 
   currentDelegation?: MyDelegation
-  inviteDelegation?: MyDelegation
   invitePermissions?: sdk.Permission[]
   selectedContacts?: Contact[]
   redirect?: string
@@ -52,9 +51,6 @@ class DelegationsView extends React.Component<Props, State> {
     this.createDelegation = this.createDelegation.bind(this)
     this.onSelectCType = this.onSelectCType.bind(this)
     this.selectContact = this.selectContact.bind(this)
-    this.requestInviteContact = this.requestInviteContact.bind(this)
-    this.cancelInvite = this.cancelInvite.bind(this)
-    this.confirmInvite = this.confirmInvite.bind(this)
   }
 
   public componentDidMount() {
@@ -104,12 +100,7 @@ class DelegationsView extends React.Component<Props, State> {
   public render() {
     const { isPCR } = this.props
     const { delegationId } = this.props.match.params
-    const {
-      delegationEntries,
-      currentDelegation,
-      inviteDelegation,
-      redirect,
-    } = this.state
+    const { delegationEntries, currentDelegation, redirect } = this.state
 
     if (redirect) {
       return <Redirect to={redirect} />
@@ -124,7 +115,6 @@ class DelegationsView extends React.Component<Props, State> {
             delegationEntries={delegationEntries}
             onRemoveDelegation={this.deleteDelegation}
             onCreateDelegation={this.createDelegation}
-            onRequestInviteContacts={this.requestInviteContact}
             isPCR={isPCR}
           />
         )}
@@ -134,14 +124,6 @@ class DelegationsView extends React.Component<Props, State> {
             isPCR={isPCR}
             editable={true}
             viewType={ViewType.Present}
-          />
-        )}
-        {inviteDelegation && (
-          <MyDelegationsInviteModal
-            delegationsSelected={[inviteDelegation]}
-            onCancel={this.cancelInvite}
-            onConfirm={this.confirmInvite}
-            isPCR={isPCR}
           />
         )}
         <SelectCTypesModal
@@ -155,20 +137,8 @@ class DelegationsView extends React.Component<Props, State> {
     )
   }
 
-  private requestInviteContact(inviteDelegation: MyDelegation) {
-    this.setState({ inviteDelegation })
-  }
-
   private selectContact(selectedContacts: Contact[]) {
     this.setState({ selectedContacts })
-  }
-
-  private cancelInvite() {
-    this.setState({ inviteDelegation: undefined })
-  }
-
-  private confirmInvite() {
-    this.setState({ inviteDelegation: undefined })
   }
 
   private deleteDelegation(delegation: MyDelegation) {
