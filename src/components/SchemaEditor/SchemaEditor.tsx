@@ -10,13 +10,13 @@ type Props = {
   updateValue: (value: common.ValueType, _isValid: boolean) => void
 }
 
-const SchemaEditor = (props: Props) => {
+const SchemaEditor = ({ schema, initialValue, updateValue }: Props) => {
   return (
     <div className="schema-based-json-editor">
       <JSONEditor
-        schema={props.schema}
-        initialValue={props.initialValue}
-        updateValue={props.updateValue}
+        schema={schema}
+        initialValue={initialValue}
+        updateValue={updateValue}
         icon="fontawesome5"
       />
     </div>
