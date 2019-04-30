@@ -46,10 +46,10 @@ class SchemaEditor extends React.Component<Props> {
         schema.properties[prop].format === 'time' &&
         // not empty
         contents[prop] &&
-        // Only, if not already ending in 00+00:00 (where 0 can be any digit)
-        !contents[prop].match(/\d{2}\+\d{2}:\d{2}$/)
+        // Only, if format is 00:00 (where 0 can be any digit), add another :00
+        contents[prop].match(/^\d{2}:\d{2}$/)
       ) {
-        contents[prop] = `${contents[prop]}:00+00:00`
+        contents[prop] = `${contents[prop]}:00`
       }
     }
 
