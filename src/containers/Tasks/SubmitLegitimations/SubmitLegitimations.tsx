@@ -67,7 +67,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
       onChange,
     } = this.props
 
-    const { claim, cType, selectedDelegation } = this.state
+    const { cType, selectedDelegation } = this.state
 
     return (
       <section className="SubmitLegitimations">
@@ -82,7 +82,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
         <>
           <div className="selectLegitimations">
             <h2>Select legitimation(s)…</h2>
-            <SelectAttestedClaims cTypeHash={claim.cType} onChange={onChange} />
+            <SelectAttestedClaims onChange={onChange} />
           </div>
 
           <div className="selectDelegation">
@@ -167,15 +167,22 @@ class SubmitLegitimations extends React.Component<Props, State> {
   }
 
   private sendClaim() {
-    const { getAttestedClaims, receiverAddresses, onFinished } = this.props
+    const {
+      getAttestedClaims,
+      enablePreFilledClaim,
+      receiverAddresses,
+      onFinished,
+    } = this.props
     const { claim, selectedDelegation, withPreFilledClaim } = this.state
 
-    if (!withPreFilledClaim) {
-      delete claim.contents
+    const _claim: sdk.IPartialClaim = claim
+
+    if (enablePreFilledClaim && !withPreFilledClaim) {
+      delete _claim.contents
     }
 
     AttestationWorkflow.submitLegitimations(
-      claim,
+      _claim,
       getAttestedClaims(),
       receiverAddresses[0],
       selectedDelegation

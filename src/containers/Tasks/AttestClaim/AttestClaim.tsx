@@ -11,6 +11,8 @@ import { BlockUi } from '../../../types/UserFeedback'
 type Props = {
   claimerAddresses: Array<Contact['publicIdentity']['address']>
   requestForAttestation: sdk.IRequestForAttestation
+
+  onCancel?: () => void
   onFinished?: () => void
 }
 
@@ -21,6 +23,7 @@ class AttestClaim extends React.Component<Props, State> {
     super(props)
     this.state = {}
 
+    this.onCancel = this.onCancel.bind(this)
     this.attestClaim = this.attestClaim.bind(this)
   }
 
@@ -37,10 +40,18 @@ class AttestClaim extends React.Component<Props, State> {
         />
 
         <div className="actions">
+          <button onClick={this.onCancel}>Cancel</button>
           <button onClick={this.attestClaim}>Attest Claim</button>
         </div>
       </section>
     )
+  }
+
+  private onCancel() {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
   }
 
   private attestClaim() {

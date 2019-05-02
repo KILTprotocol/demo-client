@@ -1,19 +1,14 @@
 .ImportDelegation {
 
   & .Delegation-base {
-    @include card;
+    @include labeledCard;
 
-    & > div {
-      @include label_input_combo;
-
-      margin: {
-        bottom: -$base-border-width;
-      }
-      padding: $base-padding;
+    & input {
+      width: 100%;
     }
   }
 
   & .DelegationDetailView {
-    @include detailViewInMessage;
+    @include labeledCard;
   }
 }

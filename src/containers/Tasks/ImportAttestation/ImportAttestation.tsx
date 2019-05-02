@@ -10,6 +10,8 @@ import * as Claims from '../../../state/ducks/Claims'
 type Props = {
   addAttestationToClaim: (attestation: sdk.IAttestedClaim) => void
   attestedClaim: sdk.IAttestedClaim
+
+  onCancel?: () => void
   onFinished?: () => void
 }
 
@@ -19,6 +21,8 @@ class ImportAttestation extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {}
+
+    this.onCancel = this.onCancel.bind(this)
     this.importAttestation = this.importAttestation.bind(this)
   }
 
@@ -35,10 +39,18 @@ class ImportAttestation extends React.Component<Props, State> {
         />
 
         <div className="actions">
+          <button onClick={this.onCancel}>Cancel</button>
           <button onClick={this.importAttestation}>Import Attestation</button>
         </div>
       </section>
     )
+  }
+
+  private onCancel() {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
   }
 
   private importAttestation() {

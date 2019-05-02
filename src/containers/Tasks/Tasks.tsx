@@ -197,7 +197,6 @@ class Tasks extends React.Component<Props, State> {
             {this.getCTypeSelect(false, [props.cTypeHash])}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <SubmitClaimsForCType
-                autoStart={true}
                 cTypeHash={selectedCTypes[0].cType.hash}
                 receiverAddresses={selectedReceiverAddresses}
                 onFinished={this.onTaskFinished}

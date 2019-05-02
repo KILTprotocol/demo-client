@@ -2,7 +2,65 @@
 
   & .ClaimCreate,
   & .ClaimDetailView,
-  & .delegation {
+  & .delegation,
+  & .MyClaimCreateView,
+  & .MyClaimDetailView,
+  & .chooseAction,
+  & .selectClaim {
     @include labeledCard;
+  }
+
+  & .MyClaimCreateView,
+  & .MyClaimDetailView {
+    @include labeledCard;
+
+    & h1 {
+      width: auto;
+      height: auto;
+
+      &:before {
+        display: none;
+      }
+    }
+  }
+
+  & .MyClaimDetailView {
+    @include labeledCard;
+
+    & h1 {
+      width: auto;
+      height: auto;
+
+      &:before {
+        display: none;
+      }
+    }
+
+    & .actions {
+      display: none;
+    }
+  }
+
+  & .ClaimDetailView {
+    @include removeLabeledCard;
+
+    & h2 {
+      display: none !important;
+    }
+  }
+
+  & .chooseAction {
+
+    & div {
+      text-align: right;
+    }
+
+    & button {
+      @include button-primary;
+
+      margin:{
+        left: $base-padding/2;
+      }
+    }
   }
 }

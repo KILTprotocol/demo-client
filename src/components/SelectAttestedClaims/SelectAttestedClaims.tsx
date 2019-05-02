@@ -202,7 +202,10 @@ class SelectAttestedClaims extends React.Component<Props, State> {
       : claimEntries
 
     return groupBy(
-      relevantClaimEntries,
+      relevantClaimEntries.filter(
+        (claimEntry: Claims.Entry) =>
+          claimEntry.attestations && claimEntry.attestations.length
+      ),
       (claimEntry: Claims.Entry) => claimEntry.claim.cType
     )
   }

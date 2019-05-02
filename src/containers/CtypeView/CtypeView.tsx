@@ -125,7 +125,7 @@ class CtypeView extends React.Component<Props, State> {
   private finishSelectAttesters(selectedAttesters: Contact[]) {
     if (this.cTypeToLegitimate.cType.hash) {
       attestationWorkflow.requestLegitimations(
-        { cType: this.cTypeToLegitimate.cType.hash },
+        [{ cType: this.cTypeToLegitimate.cType.hash }],
         selectedAttesters.map(
           (contact: Contact) => contact.publicIdentity.address
         )

@@ -16,8 +16,6 @@ export type SubmitClaimsForCTypeProps = {
   cTypeHash: sdk.ICType['hash']
   receiverAddresses: Array<Contact['publicIdentity']['address']>
 
-  autoStart?: true
-
   onFinished?: () => void
   onCancel?: () => void
 }
@@ -39,41 +37,28 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
   public render() {
     const {
       cTypeHash,
-      workflowStarted,
       claimSelectionData,
 
-      autoStart,
-
-      onStartWorkflow,
       onChange,
     } = this.props
 
-    const _workFlowStarted = autoStart || workflowStarted
-
     return (
       <section className="SubmitClaimsForCType">
-        {!_workFlowStarted && (
+        <section className="selectAttestedClaims">
+          <h2>Select attested claim(s)</h2>
+
+          <SelectAttestedClaims cTypeHash={cTypeHash} onChange={onChange} />
+
           <div className="actions">
-            <button onClick={onStartWorkflow}>Select attested claim(s)</button>
+            <button onClick={this.onCancel}>Cancel</button>
+            <button
+              disabled={!Object.keys(claimSelectionData).length}
+              onClick={this.sendClaim}
+            >
+              Send attested claims
+            </button>
           </div>
-        )}
-        {_workFlowStarted && (
-          <section className="selectAttestedClaims">
-            <h2>Select attested claim(s)</h2>
-
-            <SelectAttestedClaims cTypeHash={cTypeHash} onChange={onChange} />
-
-            <div className="actions">
-              <button onClick={this.onCancel}>Cancel</button>
-              <button
-                disabled={!Object.keys(claimSelectionData).length}
-                onClick={this.sendClaim}
-              >
-                Send attested claims
-              </button>
-            </div>
-          </section>
-        )}
+        </section>
       </section>
     )
   }

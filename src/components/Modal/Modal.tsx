@@ -56,7 +56,10 @@ class Modal extends React.Component<Props, State> {
         <section className={classes.join(' ')}>
           <div className="backdrop" onClick={this.handleBackdropClick} />
           <div className="container">
-            <header>{header}</header>
+            <header>
+              {header}
+              <button className="close" onClick={this.handleCancel} />
+            </header>
             <div className="body">{children}</div>
             {type !== ModalType.BLANK && (
               <footer>

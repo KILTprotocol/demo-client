@@ -7,6 +7,7 @@ import SelectPermissions from '../../../components/SelectPermissions/SelectPermi
 import MessageRepository from '../../../services/MessageRepository'
 import * as Delegations from '../../../state/ducks/Delegations'
 import { MyDelegation } from '../../../state/ducks/Delegations'
+import * as UiState from '../../../state/ducks/UiState'
 import * as Wallet from '../../../state/ducks/Wallet'
 import { State as ReduxState } from '../../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../../types/Contact'
@@ -47,6 +48,7 @@ export type RequestAcceptDelegationProps = {
 
 type Props = RequestAcceptDelegationProps & {
   // redux
+  debugMode: boolean
   myDelegations: MyDelegation[]
   selectedIdentity: MyIdentity
 }
@@ -80,36 +82,26 @@ class RequestAcceptDelegation extends React.Component<Props, State> {
   }
 
   public render() {
-    const {
-      cTypeHash,
-      isPCR,
-      selectedDelegations: preSelectedDelegations,
-      myDelegations,
-    } = this.props
+    const { isPCR, selectedDelegations: preSelectedDelegations } = this.props
     const { permissions } = this.state
 
-    const delegations = myDelegations.filter(
-      (myDelegation: MyDelegation) =>
-        myDelegation.cTypeHash === cTypeHash && !!myDelegation.isPCR === isPCR
-    )
+    const delegations = this.filterDelegations()
 
     return (
       <section className="RequestAcceptDelegation">
         <section className="selectDelegations">
           <h2>{this.labels.h2}</h2>
-          {!!delegations && !!delegations.length && (
-            <SelectDelegations
-              delegations={delegations}
-              name="selectDelegationsForInvite"
-              defaultValues={preSelectedDelegations}
-              isMulti={true}
-              closeMenuOnSelect={true}
-              placeholder={this.labels.placeholder}
-              onChange={this.changeDelegations}
-              onMenuClose={this.onMenuClose}
-              onMenuOpen={this.onMenuOpen}
-            />
-          )}
+          <SelectDelegations
+            delegations={delegations}
+            name="selectDelegationsForInvite"
+            defaultValues={preSelectedDelegations}
+            isMulti={true}
+            closeMenuOnSelect={true}
+            placeholder={this.labels.placeholder}
+            onChange={this.changeDelegations}
+            onMenuClose={this.onMenuClose}
+            onMenuOpen={this.onMenuOpen}
+          />
         </section>
         {!isPCR && (
           <SelectPermissions
@@ -130,6 +122,24 @@ class RequestAcceptDelegation extends React.Component<Props, State> {
           </button>
         </div>
       </section>
+    )
+  }
+
+  private filterDelegations() {
+    const { cTypeHash, isPCR, myDelegations, debugMode } = this.props
+
+    if (debugMode) {
+      return myDelegations
+    }
+
+    return myDelegations.filter(
+      (myDelegation: MyDelegation) =>
+        myDelegation.cTypeHash === cTypeHash &&
+        !!myDelegation.isPCR === isPCR &&
+        !myDelegation.revoked &&
+        (!myDelegation.permissions ||
+          (myDelegation.permissions &&
+            myDelegation.permissions.indexOf(sdk.Permission.DELEGATE) !== -1))
     )
   }
 
@@ -237,6 +247,7 @@ class RequestAcceptDelegation extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: ReduxState) => ({
+  debugMode: UiState.getDebugMode(state),
   myDelegations: Delegations.getAllDelegations(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

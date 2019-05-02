@@ -5,6 +5,7 @@ import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 
 import MyClaimCreateView from '../../../components/MyClaimCreateView/MyClaimCreateView'
 import MyClaimDetailView from '../../../components/MyClaimDetailView/MyClaimDetailView'
+import SelectClaims from '../../../components/SelectClaims/SelectClaims'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import ContactRepository from '../../../services/ContactRepository'
 import * as Claims from '../../../state/ducks/Claims'
@@ -20,12 +21,13 @@ export type RequestAttestationProps = {
 
   delegationId?: sdk.IDelegationNode['id']
 
-  onFinished?: () => void
   onCancel?: () => void
+  onFinished?: () => void
 }
 
 type State = {
   savedClaimEntry?: Claims.Entry
+  createNewClaim?: boolean
 }
 
 class RequestAttestation extends React.Component<
@@ -38,6 +40,7 @@ class RequestAttestation extends React.Component<
     this.handleCreateClaim = this.handleCreateClaim.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.onCancel = this.onCancel.bind(this)
+    this.onSelectClaims = this.onSelectClaims.bind(this)
   }
 
   public componentDidMount() {
@@ -50,7 +53,7 @@ class RequestAttestation extends React.Component<
 
   public render() {
     const { claim, legitimations, delegationId } = this.props
-    const { savedClaimEntry } = this.state
+    const { createNewClaim, savedClaimEntry } = this.state
 
     return (
       <section className="RequestAttestation">
@@ -60,21 +63,17 @@ class RequestAttestation extends React.Component<
             hideAttestedClaims={true}
           />
         ) : (
-          <MyClaimCreateView
-            partialClaim={claim}
-            onCreate={this.handleCreateClaim}
-          />
+          this.getCreateOrUseExisting()
         )}
 
-        {(!!legitimations && !!legitimations.length) ||
-          (!!delegationId && (
-            <AttestedClaimsListView
-              attestedClaims={legitimations}
-              delegationId={delegationId}
-              context="legitimations"
-              currentDelegationViewType={ViewType.Present}
-            />
-          ))}
+        {((!!legitimations && !!legitimations.length) || !!delegationId) && (
+          <AttestedClaimsListView
+            attestedClaims={legitimations}
+            delegationId={delegationId}
+            context="legitimations"
+            currentDelegationViewType={ViewType.Present}
+          />
+        )}
 
         <div className="actions">
           <button onClick={this.onCancel}>Cancel</button>
@@ -88,6 +87,69 @@ class RequestAttestation extends React.Component<
         </div>
       </section>
     )
+  }
+
+  private getCreateOrUseExisting() {
+    const { claim, legitimations, delegationId } = this.props
+    const { createNewClaim, savedClaimEntry } = this.state
+
+    const myClaims = Claims.getClaimsByCTypeHash(
+      PersistentStore.store.getState(),
+      claim.cType
+    )
+
+    if (!myClaims || !myClaims.length) {
+      return (
+        <MyClaimCreateView
+          partialClaim={claim}
+          onCreate={this.handleCreateClaim}
+        />
+      )
+    }
+
+    if (createNewClaim == null) {
+      return (
+        <section className="chooseAction">
+          <h2>Choose action</h2>
+          <div>
+            <button onClick={this.setCreateNewClaim.bind(this, false)}>
+              Select claim
+            </button>
+            <button onClick={this.setCreateNewClaim.bind(this, true)}>
+              Create new claim
+            </button>
+          </div>
+        </section>
+      )
+    } else if (createNewClaim) {
+      return (
+        <MyClaimCreateView
+          partialClaim={claim}
+          onCreate={this.handleCreateClaim}
+        />
+      )
+    } else {
+      return (
+        <section className="selectClaim">
+          <h2>Select claim</h2>
+          <SelectClaims
+            cTypeHash={claim.cType}
+            onChange={this.onSelectClaims}
+            isMulti={false}
+          />
+        </section>
+      )
+    }
+  }
+
+  private setCreateNewClaim(createNewClaim: boolean) {
+    this.setState({ createNewClaim })
+  }
+
+  private onSelectClaims(selectedClaims: Claims.Entry[]) {
+    this.setState({
+      savedClaimEntry: selectedClaims[0],
+    })
   }
 
   private handleCreateClaim(currentClaim: sdk.IPartialClaim) {

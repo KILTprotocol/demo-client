@@ -13,24 +13,4 @@
       content: counter(section) ". ";
     }
   }
-
-  & .MyClaimDetailView {
-    @include labeledCard;
-
-    & h1 {
-      width: auto;
-    }
-
-    & .ClaimDetailView {
-      @include removeLabeledCard;
-      
-      & h2 {
-        display: none;
-      }
-      
-      & .actions {
-        display: none;
-      }
-    }
-  }
 }

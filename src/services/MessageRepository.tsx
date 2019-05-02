@@ -90,6 +90,23 @@ class MessageRepository {
       })
   }
 
+  public static async multiSendToAddresses(
+    receiverAddresses: Array<Contact['publicIdentity']['address']>,
+    messageBodies: sdk.MessageBody[]
+  ): Promise<void> {
+    const arrayOfPromises = messageBodies.map(
+      (messageBody: sdk.MessageBody) => {
+        return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
+      }
+    )
+
+    return Promise.all(arrayOfPromises)
+      .catch(() => {
+        return arrayOfPromises
+      })
+      .then(() => undefined)
+  }
+
   public static async deleteByMessageId(messageId: string) {
     return fetch(`${MessageRepository.URL}/${messageId}`, {
       ...BaseDeleteParams,

@@ -28,6 +28,7 @@ type Props = {
   inviterAddress: Contact['publicIdentity']['address']
   signatures: sdk.ISubmitAcceptDelegation['content']['signatures']
 
+  onCancel?: () => void
   onFinished?: () => void
 
   // redux
@@ -43,6 +44,7 @@ class CreateDelegation extends React.Component<Props, State> {
     super(props)
     this.state = {}
 
+    this.onCancel = this.onCancel.bind(this)
     this.createDelegation = this.createDelegation.bind(this)
   }
 
@@ -80,6 +82,7 @@ class CreateDelegation extends React.Component<Props, State> {
             <DelegationDetailView id={delegationData.parentId} isPCR={isPCR} />
 
             <div className="actions">
+              <button onClick={this.onCancel}>Cancel</button>
               <button onClick={this.createDelegation}>
                 Create {isPCR ? 'PCR member' : 'delegation'}
               </button>
@@ -97,6 +100,13 @@ class CreateDelegation extends React.Component<Props, State> {
         )}
       </section>
     )
+  }
+
+  private onCancel() {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
   }
 
   private async createDelegation() {

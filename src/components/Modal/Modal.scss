@@ -35,6 +35,7 @@
   & header {
     @include baseFont-bold;
 
+    position: relative;
     padding: $base-padding/2 $base-padding;
     border: {
       bottom: $base-border;
@@ -46,6 +47,16 @@
       flex-direction: row;
       justify-content: left;
       align-items: center;
+    }
+
+    & .close {
+      @include button-icon-only($icon-times);
+
+      position: absolute;
+      top: 0;
+      right: 0;
+      border: none;
+      color: $color-font;
     }
   }
 

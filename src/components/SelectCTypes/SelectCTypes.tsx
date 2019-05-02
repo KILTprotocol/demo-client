@@ -145,7 +145,6 @@ class SelectCTypes extends React.Component<Props, State> {
     )
 
     if (onChange) {
-      console.log('selectedCTypes', selectedCTypes)
       onChange(selectedCTypes)
     }
   }

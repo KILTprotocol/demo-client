@@ -10,7 +10,9 @@ import SubmitLegitimations from '../../containers/Tasks/SubmitLegitimations/Subm
 import RequestAttestation from '../../containers/Tasks/RequestAttestation/RequestAttestation'
 import VerifyClaim from '../../containers/Tasks/VerifyClaim/VerifyClaim'
 import { MessageOutput } from '../../services/MessageRepository'
+import ClaimDetailView from '../ClaimDetailView/ClaimDetailView'
 import Code from '../Code/Code'
+import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import MessageSubject from '../MessageSubject/MessageSubject'
 import ImportDelegation from '../../containers/Tasks/ImportDelegation/ImportDelegation'
 
@@ -23,8 +25,9 @@ type Props = {
 }
 
 type State = {
-  showCode: boolean
   selectedCode: 'encrypted' | 'decrypted'
+  showCode: boolean
+  showTask: boolean
 }
 
 class MessageDetailView extends React.Component<Props, State> {
@@ -33,15 +36,17 @@ class MessageDetailView extends React.Component<Props, State> {
     this.state = {
       selectedCode: 'decrypted',
       showCode: true,
+      showTask: false,
     }
     this.handleDelete = this.handleDelete.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
     this.toggleShowCode = this.toggleShowCode.bind(this)
+    this.toggleShowTask = this.toggleShowTask.bind(this)
     this.selectCode = this.selectCode.bind(this)
   }
 
   public render() {
-    const { message, children } = this.props
+    const { message } = this.props
     return (
       <section className="MessageDetailView">
         <h4>
@@ -53,23 +58,14 @@ class MessageDetailView extends React.Component<Props, State> {
           )}
         </h4>
         {this.canDisplayContentAsCode(message) && this.getCode(message)}
-        <div className="workflow">{this.getWorkflow(message)}</div>
-        <footer>
-          {children}
-          <button className="cancel" onClick={this.handleCancel}>
-            Cancel
-          </button>
-          <button className="delete" onClick={this.handleDelete}>
-            Delete
-          </button>
-        </footer>
+        <section className="Task">{this.getTask(message)}</section>
       </section>
     )
   }
 
   private getCode(message: MessageOutput) {
     const { selectedCode, showCode } = this.state
-    const { sender, encryptedMessage, ...decryptedMessage } = message
+    const { encryptedMessage, ...decryptedMessage } = message
     return (
       showCode && (
         <div className={`code ${selectedCode}`}>
@@ -100,7 +96,7 @@ class MessageDetailView extends React.Component<Props, State> {
     })
   }
 
-  private getWorkflow(message: MessageOutput): ReactNode | undefined {
+  private getTask(message: MessageOutput): ReactNode | undefined {
     if (!message || !message.body || !message.body.content) {
       return undefined
     }
@@ -110,15 +106,32 @@ class MessageDetailView extends React.Component<Props, State> {
       | undefined = this.getMessageBodyType(message)
 
     switch (messageBodyType) {
-      case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
+      case sdk.MessageBodyType.REQUEST_LEGITIMATIONS: {
+        const { showTask } = this.state
+
         return (
-          <SubmitLegitimations
-            receiverAddresses={[message.senderAddress]}
-            claim={(message.body as sdk.IRequestLegitimations).content}
-            onFinished={this.handleDelete}
-          />
+          <>
+            <ClaimDetailView
+              claim={(message.body as sdk.IRequestLegitimations).content}
+            />
+            {showTask ? (
+              <SubmitLegitimations
+                receiverAddresses={[message.senderAddress]}
+                claim={(message.body as sdk.IRequestLegitimations).content}
+                onCancel={this.handleCancel}
+                onFinished={this.handleDelete}
+              />
+            ) : (
+              <div className="actions">
+                <button onClick={this.toggleShowTask}>
+                  Select legitimation(s)
+                </button>
+              </div>
+            )}
+          </>
         )
-      case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
+      }
+      case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS: {
         return (
           <RequestAttestation
             claim={(message.body as sdk.ISubmitLegitimations).content.claim}
@@ -129,42 +142,51 @@ class MessageDetailView extends React.Component<Props, State> {
               (message.body as sdk.ISubmitLegitimations).content.delegationId
             }
             receiverAddresses={[message.senderAddress]}
+            onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />
         )
-      case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
+      }
+      case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM: {
         return (
           <AttestClaim
             claimerAddresses={[message.senderAddress]}
             requestForAttestation={
               (message.body as sdk.IRequestAttestationForClaim).content
             }
+            onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />
         )
-      case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
+      }
+      case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM: {
         return (
           <ImportAttestation
             attestedClaim={
               (message.body as sdk.ISubmitAttestationForClaim).content
             }
+            onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />
         )
-      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
+      }
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE: {
         return (
           <SubmitClaimsForCType
             receiverAddresses={[message.senderAddress]}
             cTypeHash={(message.body as sdk.IRequestClaimsForCtype).content}
+            onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />
         )
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
+      }
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE: {
         return (
           <VerifyClaim
             attestedClaims={(message.body as sdk.ISubmitClaimsForCtype).content}
           />
         )
+      }
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION: {
         const messageContent = (message.body as sdk.IRequestAcceptDelegation)
           .content
@@ -174,6 +196,7 @@ class MessageDetailView extends React.Component<Props, State> {
             signatures={messageContent.signatures}
             inviterAddress={message.senderAddress}
             metaData={messageContent.metaData}
+            onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />
         )
@@ -187,6 +210,7 @@ class MessageDetailView extends React.Component<Props, State> {
             signatures={messageContent.signatures}
             inviteeAddress={message.senderAddress}
             inviterAddress={message.receiverAddress}
+            onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />
         )
@@ -200,6 +224,7 @@ class MessageDetailView extends React.Component<Props, State> {
           <ImportDelegation
             delegationId={delegationId}
             isPCR={isPCR}
+            onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />
         )
@@ -229,6 +254,13 @@ class MessageDetailView extends React.Component<Props, State> {
     const { showCode } = this.state
     this.setState({
       showCode: !showCode,
+    })
+  }
+
+  private toggleShowTask() {
+    const { showTask } = this.state
+    this.setState({
+      showTask: !showTask,
     })
   }
 

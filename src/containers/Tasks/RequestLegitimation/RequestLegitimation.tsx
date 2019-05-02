@@ -18,7 +18,7 @@ export type RequestLegitimationsProps = {
 }
 
 type State = {
-  claim?: sdk.IPartialClaim
+  selectedClaimEntries?: Claims.Entry[]
 }
 
 class RequestLegitimation extends React.Component<
@@ -27,7 +27,9 @@ class RequestLegitimation extends React.Component<
 > {
   constructor(props: RequestLegitimationsProps) {
     super(props)
-    this.state = {}
+    this.state = {
+      selectedClaimEntries: props.preSelectedClaimEntries,
+    }
 
     this.onCancel = this.onCancel.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -60,25 +62,41 @@ class RequestLegitimation extends React.Component<
     )
   }
 
-  private onSelectClaimEntry(claimEntries: Claims.Entry[]) {
-    const claim =
-      claimEntries && claimEntries[0] ? claimEntries[0].claim : undefined
-    this.setState({ claim })
+  private onSelectClaimEntry(selectedClaimEntries: Claims.Entry[]) {
+    this.setState({ selectedClaimEntries })
   }
 
   private handleSubmit() {
-    const { receiverAddresses, onFinished } = this.props
-    const { claim } = this.state
+    const { cTypeHash, receiverAddresses, onFinished } = this.props
+    const { selectedClaimEntries } = this.state
+    let claims: sdk.IPartialClaim[] = [
+      { cType: cTypeHash } as sdk.IPartialClaim,
+    ]
 
-    if (claim && receiverAddresses) {
+    if (selectedClaimEntries && selectedClaimEntries.length) {
+      claims = selectedClaimEntries.map(
+        (claimEntry: Claims.Entry) => claimEntry.claim
+      )
+    }
+
+    if (this.isValid()) {
       attestationWorkflow
-        .requestLegitimations(claim, receiverAddresses)
+        .requestLegitimations(claims, receiverAddresses)
         .then(() => {
           if (onFinished) {
             onFinished()
           }
         })
     }
+  }
+
+  private isValid() {
+    const { receiverAddresses } = this.props
+    const { selectedClaimEntries } = this.state
+
+    // selectedClaimEntries && selectedClaimEntries.length &&
+
+    return receiverAddresses && receiverAddresses.length
   }
 
   private onCancel() {

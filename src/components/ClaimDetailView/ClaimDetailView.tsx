@@ -8,7 +8,7 @@ import './ClaimDetailView.scss'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
-  claim: sdk.IClaim
+  claim: sdk.IPartialClaim
 }
 
 type State = {}
