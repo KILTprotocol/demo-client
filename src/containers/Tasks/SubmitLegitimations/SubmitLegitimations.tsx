@@ -184,7 +184,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
     AttestationWorkflow.submitLegitimations(
       _claim,
       getAttestedClaims(),
-      receiverAddresses[0],
+      receiverAddresses,
       selectedDelegation
     ).then(() => {
       if (onFinished) {

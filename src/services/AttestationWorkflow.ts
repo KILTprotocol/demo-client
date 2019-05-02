@@ -48,13 +48,13 @@ class AttestationWorkflow {
    * @param claim the (partial) claim to attest
    * @param legitimations the list of legitimations to be included in the
    *   attestation
-   * @param receiverAddress claimers address who requested the legitimation
+   * @param receiverAddresses  list of contact addresses who will receive the legitimation
    * @param delegation delegation to add to legitimations
    */
   public static async submitLegitimations(
     claim: IPartialClaim,
     legitimations: sdk.IAttestedClaim[],
-    receiverAddress: Contact['publicIdentity']['address'],
+    receiverAddresses: Array<Contact['publicIdentity']['address']>,
     delegation?: MyDelegation
   ): Promise<void> {
     const messageBody: sdk.ISubmitLegitimations = {
@@ -66,7 +66,7 @@ class AttestationWorkflow {
       messageBody.content.delegationId = delegation.id
     }
 
-    return MessageRepository.sendToAddresses([receiverAddress], messageBody)
+    return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
   }
 
   /**
@@ -74,18 +74,18 @@ class AttestationWorkflow {
    *
    * @param attestedClaims the list of attested claims to be included in the
    *   attestation
-   * @param receiverAddress verifiers address who requested the attested claims
+   * @param receiverAddresses  list of contact addresses who will receive the attested claims
    */
   public static async submitClaimsForCtype(
     attestedClaims: sdk.IAttestedClaim[],
-    receiverAddress: Contact['publicIdentity']['address']
+    receiverAddresses: Array<Contact['publicIdentity']['address']>
   ): Promise<void> {
     const messageBody: sdk.ISubmitClaimsForCtype = {
       content: attestedClaims,
       type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
     }
 
-    return MessageRepository.sendToAddresses([receiverAddress], messageBody)
+    return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
   }
 
   /**

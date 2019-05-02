@@ -68,7 +68,7 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
 
     AttestationWorkflow.submitClaimsForCtype(
       getAttestedClaims(),
-      receiverAddresses[0]
+      receiverAddresses
     ).then(() => {
       if (onFinished) {
         onFinished()
