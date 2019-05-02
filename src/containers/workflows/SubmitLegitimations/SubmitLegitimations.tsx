@@ -57,7 +57,6 @@ class SubmitLegitimations extends React.Component<Props, State> {
             <div className="selectLegitimations">
               <h4>Select legitimation(s)</h4>
               <SelectAttestedClaims
-                cTypeHash={sentClaim.cType}
                 onChange={onChange}
               />
             </div>
