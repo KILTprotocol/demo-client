@@ -9,6 +9,7 @@ import CTypeRepository from '../../services/CtypeRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { CType, ICType } from '../../types/Ctype'
+import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import { SelectAttestedClaimsLabels } from '../SelectAttestedClaims/SelectAttestedClaims'
 
@@ -206,11 +207,8 @@ class SelectAttestedClaim extends React.Component<Props, State> {
                 disabled={allAttestedClaimsSelected}
                 onChange={this.selectAttestation.bind(this, attestedClaim)}
               />
-              <span
-                className={
-                  attestedClaim.attestation.revoked ? 'unapproved' : 'approved'
-                }
-              >
+              <span>
+                <AttestationStatus attestedClaim={attestedClaim} />
                 <ContactPresentation
                   address={attestedClaim.attestation.owner}
                   interactive={true}

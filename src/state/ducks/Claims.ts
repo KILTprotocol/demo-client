@@ -7,7 +7,6 @@ import KiltAction from '../../types/Action'
 import { MyIdentity } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
 import { State as ReduxState } from '../PersistentStore'
-import { MyDelegation } from './Delegations'
 import * as Wallet from './Wallet'
 
 function hash(claim: sdk.IPartialClaim): string {

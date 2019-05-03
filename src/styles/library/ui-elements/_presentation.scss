@@ -54,12 +54,12 @@
     $fullSizeActionWidth: 170px;
 
     position: relative;
-    margin: {
+    padding: {
       right: $base-button-height;
     }
 
     & .label {
-      padding:{
+      padding: {
         right: 0;
       }
     }
@@ -69,7 +69,7 @@
       @include react-select-min-width;
 
       position: absolute;
-      right: -$base-button-height;
+      right: 0;
 
       &.fullSize {
         width: $fullSizeActionWidth;
