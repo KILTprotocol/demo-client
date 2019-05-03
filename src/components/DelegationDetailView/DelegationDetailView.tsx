@@ -43,7 +43,7 @@ class DelegationDetailView extends React.Component<Props, State> {
     const { id } = this.props
 
     this.getNode(id)
-      .then(async (delegationNode: sdk.IDelegationNode) => {
+      .then(async (delegationNode: sdk.DelegationNode) => {
         const treeNode: DelegationsTreeNode = {
           childNodes: [],
           delegation: delegationNode,
@@ -131,9 +131,9 @@ class DelegationDetailView extends React.Component<Props, State> {
 
   private async getNode(
     id: sdk.IDelegationBaseNode['id']
-  ): Promise<sdk.IDelegationBaseNode> {
+  ): Promise<sdk.DelegationBaseNode> {
     let node:
-      | sdk.IDelegationBaseNode
+      | sdk.DelegationBaseNode
       | undefined = await DelegationsService.lookupNodeById(id)
     if (!node) {
       node = await DelegationsService.lookupRootNodeById(id)
