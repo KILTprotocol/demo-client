@@ -248,7 +248,9 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   private verifyAttestations(): void {
-    PersistentStore.store.dispatch(UiState.Store.refreshAttestationStatusAction())
+    PersistentStore.store.dispatch(
+      UiState.Store.refreshAttestationStatusAction()
+    )
   }
 }
 

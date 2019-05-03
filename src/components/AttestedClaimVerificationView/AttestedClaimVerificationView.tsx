@@ -51,8 +51,10 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     )
   }
 
-  private verifyAttestatedClaim(){
-    PersistentStore.store.dispatch(UiState.Store.refreshAttestationStatusAction())
+  private verifyAttestatedClaim() {
+    PersistentStore.store.dispatch(
+      UiState.Store.refreshAttestationStatusAction()
+    )
   }
 
   private getHeadline() {

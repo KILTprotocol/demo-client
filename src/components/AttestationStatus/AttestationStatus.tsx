@@ -3,8 +3,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import AttestationService from '../../services/AttestationService'
+import * as Claims from '../../state/ducks/Claims'
 import * as UiState from '../../state/ducks/UiState'
-import { State as ReduxState } from '../../state/PersistentStore'
+import PersistentStore, {
+  State as ReduxState,
+} from '../../state/PersistentStore'
 import Spinner from '../Spinner/Spinner'
 
 import './AttestationStatus.scss'
@@ -29,15 +32,27 @@ type State = {
 class AttestationStatus extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    this.state = {}
+    this.state = {
+      status: props.attestedClaim.attestation.revoked
+        ? STATUS.UNVERIFIED
+        : undefined,
+    }
   }
 
-  public componentDidMount(){
-    this.verifyAttestation()
+  public componentDidMount() {
+    const { status } = this.state
+    if (status !== STATUS.UNVERIFIED) {
+      this.verifyAttestation()
+    }
   }
 
-  public componentDidUpdate(prevProps: Props){
-    if(prevProps.attestationStatusCycle !== this.props.attestationStatusCycle){
+  public componentDidUpdate(prevProps: Props) {
+    const { status } = this.state
+    if (
+      prevProps.attestationStatusCycle !== this.props.attestationStatusCycle &&
+      status !== STATUS.UNVERIFIED &&
+      status !== STATUS.PENDING
+    ) {
       this.verifyAttestation()
     }
   }
@@ -45,17 +60,15 @@ class AttestationStatus extends React.Component<Props, State> {
   public render() {
     const { status } = this.state
 
-    return <section className={`AttestationStatus ${status}`}>
-      {status === STATUS.PENDING && (
-        <Spinner size={20} color="#ef5a28" strength={3} />
-      )}
-      {status === STATUS.ATTESTED && (
-        <div className="attested" />
-      )}
-      {status === STATUS.UNVERIFIED && (
-        <div className="unverified" />
-      )}
-    </section>
+    return (
+      <section className={`AttestationStatus ${status}`}>
+        {status === STATUS.PENDING && (
+          <Spinner size={20} color="#ef5a28" strength={3} />
+        )}
+        {status === STATUS.ATTESTED && <div className="attested" />}
+        {status === STATUS.UNVERIFIED && <div className="unverified" />}
+      </section>
+    )
   }
 
   private verifyAttestation() {
@@ -73,15 +86,17 @@ class AttestationStatus extends React.Component<Props, State> {
 
     AttestationService.verifyAttestatedClaim(attestedClaim).then(
       (verified: boolean) => {
-
         if (verified) {
           this.setState({
-            status: STATUS.ATTESTED
+            status: STATUS.ATTESTED,
           })
         } else {
           this.setState({
-            status: STATUS.UNVERIFIED
+            status: STATUS.UNVERIFIED,
           })
+          PersistentStore.store.dispatch(
+            Claims.Store.revokeAttestation(attestedClaim.request.hash)
+          )
         }
       }
     )

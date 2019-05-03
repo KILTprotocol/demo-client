@@ -94,9 +94,10 @@ type State = {
     BlockingNotification
   >
   blockUis: Immutable.Map<BlockUi['id'], BlockUi>
+
+  attestationStatusCycle: number
   currentTask: Immutable.List<TaskProps>
   debugMode: boolean
-  attestationStatusCycle: number
 }
 
 type ImmutableState = Immutable.Record<State>
@@ -274,9 +275,9 @@ class Store {
       >(),
       notifications: Immutable.Map<Notification['id'], Notification>(),
 
+      attestationStatusCycle: 0,
       currentTask: Immutable.List<TaskProps>(),
       debugMode: false,
-      attestationStatusCycle: 0,
     } as State)(obj)
   }
 
@@ -289,9 +290,9 @@ class Store {
     NOTIFICATION_ADD: 'client/uiState/NOTIFICATION_ADD',
     NOTIFICATION_REMOVE: 'client/uiState/NOTIFICATION_REMOVE',
 
+    ATTESTATION_STATUS_REFRESH: 'client/uiState/ATTESTATION_STATUS_REFRESH',
     CURRENT_TASK_UPDATE: 'client/uiState/CURRENT_TASK_UPDATE',
     SET_DEBUG_MODE: 'client/uiState/SET_DEBUG_MODE',
-    ATTESTATION_STATUS_REFRESH: 'client/uiState/ATTESTATION_STATUS_REFRESH',
   }
 }
 
