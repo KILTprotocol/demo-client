@@ -1,20 +1,32 @@
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
+import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
+import { RequestClaimsForCTypeProps } from '../../containers/Tasks/RequestClaimsForCType/RequestClaimsForCType'
+import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
+import { SubmitClaimsForCTypeProps } from '../../containers/Tasks/SubmitClaimsForCType/SubmitClaimsForCType'
+import { SubmitLegitimationsProps } from '../../containers/Tasks/SubmitLegitimations/SubmitLegitimations'
 
 import CTypeRepository from '../../services/CtypeRepository'
+import * as UiState from '../../state/ducks/UiState'
+import PersistentStore from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
+import SelectAction, { Action } from '../SelectAction/SelectAction'
 
 import './CTypePresentation.scss'
 
-type Props = {
-  cType?: ICType
-  cTypeHash?: ICType['cType']['hash']
+type Props = RouteComponentProps<{}> & {
+  cTypeHash: ICType['cType']['hash']
+
   inline?: true
   size?: number
-  linked?: false
+  linked?: true
+  interactive?: boolean
+  fullSizeActions?: true
+  right?: true
 }
 
 type State = {
@@ -24,10 +36,6 @@ type State = {
 const DEFAULT_SIZE = 24
 
 class CTypePresentation extends React.Component<Props, State> {
-  private static defaultProps = {
-    linked: true,
-  }
-
   constructor(props: Props) {
     super(props)
     this.state = {}
@@ -44,51 +52,167 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   public render() {
-    const { inline, size } = this.props
+    const { inline, interactive, fullSizeActions, right, size } = this.props
     const { cType } = this.state
 
-    const classes = ['CTypePresentation', inline ? 'inline' : '']
+    let actions: Action[] = []
+
+    if (interactive) {
+      actions = this.getActions()
+    }
+
+    const classes = [
+      'CTypePresentation',
+      inline ? 'inline' : '',
+      actions.length ? 'withActions' : '',
+      fullSizeActions ? 'fullSizeActions' : 'minimal',
+      right ? 'alignRight' : '',
+    ]
 
     return (
       <div className={classes.join(' ')}>
-        {cType &&
-          cType.cType &&
-          this.wrapInLink(
-            <React.Fragment>
-              <Identicon
-                value={cType.cType.hash}
-                size={size || DEFAULT_SIZE}
-                theme="polkadot"
-              />
-              <span className="label">
-                {cType.cType.metadata.title.default}
-              </span>
-            </React.Fragment>
-          )}
+        {cType && cType.cType && (
+          <>
+            <Identicon
+              value={cType.cType.hash}
+              size={size || DEFAULT_SIZE}
+              theme="polkadot"
+            />
+            {this.getLabel(cType.cType.metadata.title.default)}
+          </>
+        )}
+        {!!actions.length && (
+          <SelectAction
+            className={fullSizeActions ? 'fullSize' : 'minimal'}
+            actions={actions}
+          />
+        )}
       </div>
     )
   }
 
-  private wrapInLink(content: ReactNode) {
+  private getLabel(label: string) {
     const { linked } = this.props
     const { cType } = this.state
-    if (!linked || !cType) {
-      return <span>{content}</span>
+    let _label: string | ReactNode = label
+    if (linked && cType) {
+      _label = <Link to={`/ctype/${cType.cType.hash}`}>{_label}</Link>
     }
-    return <Link to={`/ctype/${cType.cType.hash}`}>{content}</Link>
+    return (
+      <span className="label" title={label}>
+        {_label}
+      </span>
+    )
   }
 
-  private setCType() {
-    const { cType, cTypeHash } = this.props
+  private async setCType() {
+    const { cTypeHash } = this.props
 
-    if (cType) {
-      this.setState({ cType })
-    } else {
-      CTypeRepository.findByHash(cTypeHash).then((_cType: ICType) => {
-        this.setState({ cType: _cType })
-      })
-    }
+    CTypeRepository.findByHash(cTypeHash).then((_cType: ICType) => {
+      this.setState({ cType: _cType })
+    })
+  }
+
+  private getActions(): Action[] {
+    const { cTypeHash } = this.props
+    const actions: Action[] = [
+      {
+        callback: () => {
+          this.props.history.push(`/claim/new/${cTypeHash}`)
+        },
+        label: 'Create claim',
+      },
+      {
+        callback: () => {
+          this.props.history.push(`/delegations/new/${cTypeHash}`)
+        },
+        label: 'Create delegation',
+      },
+      {
+        callback: () => {
+          this.props.history.push(`/pcrs/new/${cTypeHash}`)
+        },
+        label: 'Create PCR',
+      },
+      {
+        callback: () => {
+          PersistentStore.store.dispatch(
+            UiState.Store.updateCurrentTaskAction({
+              objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
+              props: { cTypeHash } as RequestClaimsForCTypeProps,
+            })
+          )
+        },
+        label: 'Request claims',
+      },
+      {
+        callback: () => {
+          PersistentStore.store.dispatch(
+            UiState.Store.updateCurrentTaskAction({
+              objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+              props: {
+                cTypeHash,
+              } as RequestLegitimationsProps,
+            })
+          )
+        },
+        label: 'Request legitimations',
+      },
+      {
+        callback: () => {
+          PersistentStore.store.dispatch(
+            UiState.Store.updateCurrentTaskAction({
+              objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
+              props: { cTypeHash } as SubmitClaimsForCTypeProps,
+            })
+          )
+        },
+        label: 'Submit claims',
+      },
+      {
+        callback: () => {
+          PersistentStore.store.dispatch(
+            UiState.Store.updateCurrentTaskAction({
+              objective: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
+              props: {
+                claim: { cType: cTypeHash },
+              } as SubmitLegitimationsProps,
+            })
+          )
+        },
+        label: 'Submit legitimations',
+      },
+      {
+        callback: () => {
+          PersistentStore.store.dispatch(
+            UiState.Store.updateCurrentTaskAction({
+              objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+              props: {
+                cTypeHash,
+                isPCR: false,
+              } as RequestAcceptDelegationProps,
+            })
+          )
+        },
+        label: 'Invite to delegation(s)',
+      },
+      {
+        callback: () => {
+          PersistentStore.store.dispatch(
+            UiState.Store.updateCurrentTaskAction({
+              objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+              props: {
+                cTypeHash,
+                isPCR: true,
+              } as RequestAcceptDelegationProps,
+            })
+          )
+        },
+        label: 'Invite to PCR(s)',
+      },
+    ]
+    return actions
   }
 }
 
-export default CTypePresentation
+export default withRouter(CTypePresentation)

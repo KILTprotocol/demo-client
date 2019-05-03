@@ -8,25 +8,11 @@
     @include table;
     @include responsiveTable(
         (
-          phone: ('*', false,  120px),
-          tablet: ('*', '**',  170px),
-          desktop: ('*', '**', 270px),
+          phone: ('*', 120px),
+          tablet: ('*', 170px),
+          desktop: ('*', 270px),
         )
     );
-
-    & .name {
-      padding: {
-        top: $cell-padding-h;
-      }
-    }
-
-    & .address {
-      word-break: break-word;
-    }
-
-    & .requestClaimBtn {
-      @include button-icon-only($icon-wpforms);
-    }
   }
 
   & .contactActions{
@@ -45,12 +31,7 @@
   }
 
   & .toggleContacts {
-    @include button-icon-only($icon-star);
-    @include favorite;
-
-    &.all {
-      color: $color-grey-light;
-    }
+    @include button-primary;
   }
 
   & .refresh {

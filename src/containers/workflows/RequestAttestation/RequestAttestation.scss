@@ -1,8 +1,0 @@
-.RequestAttestation {
-
-  & .ClaimCreate,
-  & .ClaimDetailView,
-  & .delegation {
-    @include labeledCard;
-  }
-}

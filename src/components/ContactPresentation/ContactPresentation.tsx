@@ -3,10 +3,14 @@ import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
+import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
+import { SubmitLegitimationsProps } from '../../containers/Tasks/SubmitLegitimations/SubmitLegitimations'
 
 import ContactRepository from '../../services/ContactRepository'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
+import * as UiState from '../../state/ducks/UiState'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
@@ -22,6 +26,8 @@ type Props = {
   inline?: true
   interactive?: true
   size?: number
+  fullSizeActions?: true
+  right?: true
 
   // mapStateToProps
   contacts: Contact[]
@@ -56,7 +62,15 @@ class ContactPresentation extends React.Component<Props, State> {
   }
 
   public render() {
-    const { address, inline, interactive, iconOnly, size } = this.props
+    const {
+      address,
+      inline,
+      interactive,
+      iconOnly,
+      fullSizeActions,
+      right,
+      size,
+    } = this.props
     const { contact, myIdentity } = this.state
 
     const name =
@@ -79,6 +93,8 @@ class ContactPresentation extends React.Component<Props, State> {
       inline ? 'inline' : '',
       contact ? (!contact.metaData.addedAt ? 'external' : 'internal') : '',
       actions.length ? 'withActions' : '',
+      fullSizeActions ? 'fullSizeActions' : 'minimal',
+      right ? 'alignRight' : '',
     ]
 
     return (
@@ -95,13 +111,17 @@ class ContactPresentation extends React.Component<Props, State> {
           </span>
         )}
         {!!actions.length && (
-          <SelectAction className="minimal" actions={actions} />
+          <SelectAction
+            className={fullSizeActions ? 'fullSize' : 'minimal'}
+            actions={actions}
+          />
         )}
       </div>
     )
   }
 
   private getActions(): Action[] {
+    const { address } = this.props
     const { contact } = this.state
     const actions: Action[] = []
 
@@ -118,6 +138,92 @@ class ContactPresentation extends React.Component<Props, State> {
         label: 'Unfavorize',
       })
     }
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
+            props: {
+              receiverAddresses: [address],
+            },
+          })
+        )
+      },
+      label: 'Request claims',
+    })
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+            props: {
+              receiverAddresses: [address],
+            } as RequestLegitimationsProps,
+          })
+        )
+      },
+      label: 'Request legitimations',
+    })
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
+            props: {
+              receiverAddresses: [address],
+            },
+          })
+        )
+      },
+      label: 'Submit claims',
+    })
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
+            props: {
+              receiverAddresses: [address],
+            } as SubmitLegitimationsProps,
+          })
+        )
+      },
+      label: 'Submit legitimations',
+    })
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+            props: {
+              isPCR: false,
+              receiverAddresses: [address],
+            } as RequestAcceptDelegationProps,
+          })
+        )
+      },
+      label: 'Invite to delegation(s)',
+    })
+
+    actions.push({
+      callback: () => {
+        PersistentStore.store.dispatch(
+          UiState.Store.updateCurrentTaskAction({
+            objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+            props: {
+              isPCR: true,
+              receiverAddresses: [address],
+            } as RequestAcceptDelegationProps,
+          })
+        )
+      },
+      label: 'Invite to PCR(s)',
+    })
 
     return actions
   }
@@ -140,9 +246,7 @@ class ContactPresentation extends React.Component<Props, State> {
       address
     )
 
-    this.setState({
-      myIdentity,
-    })
+    this.setState({ myIdentity })
   }
 
   private import() {

@@ -1,0 +1,10 @@
+.RequestLegitimation {
+
+  & .requestLegitimation {
+    @include button-primary;
+  }
+
+  & .selectClaims {
+    @include labeledCard;
+  }
+}

@@ -75,6 +75,7 @@ class MessageView extends React.Component<Props, State> {
                 Message from{' '}
                 <ContactPresentation
                   address={currentMessage.senderAddress}
+                  interactive={true}
                   inline={true}
                 />
               </div>

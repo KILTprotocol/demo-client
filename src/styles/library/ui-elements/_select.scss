@@ -16,6 +16,10 @@
     &__menu {
       width: auto;
       display: inline-block;
+
+      &-list {
+        max-height: 400px;
+      }
     }
 
     &__single-value {
@@ -36,6 +40,7 @@
       background: $color-white !important;
       color: $color-font !important;
       cursor: pointer;
+      white-space: nowrap;
 
       &--is-selected {
         background: transparentize($color-primary, 0.8) !important;
@@ -51,6 +56,7 @@
     &__multi-value{
 
       &__remove {
+        color: $color-primary;
 
         &:hover {
           background-color: $color-primary !important;

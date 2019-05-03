@@ -11,6 +11,7 @@ type Props = {
   delegationId: sdk.IDelegationBaseNode['id']
   isPCR: boolean
 
+  onCancel?: () => void
   onFinished?: () => void
 }
 
@@ -24,6 +25,8 @@ class ImportDelegation extends React.Component<Props, State> {
     this.state = {
       alias: '',
     }
+
+    this.onCancel = this.onCancel.bind(this)
     this.importDelegation = this.importDelegation.bind(this)
     this.handleAliasChange = this.handleAliasChange.bind(this)
   }
@@ -34,16 +37,17 @@ class ImportDelegation extends React.Component<Props, State> {
 
     return (
       <section className="ImportDelegation">
-        <div className="Delegation-base">
+        <section className="Delegation-base">
+          <h2>Name your {isPCR ? 'PCR member' : 'delegation'}</h2>
           <div>
-            <label>Name your {isPCR ? 'PCR member' : 'delegation'}</label>
             <input type="text" onChange={this.handleAliasChange} />
           </div>
-        </div>
+        </section>
 
         <DelegationDetailView id={delegationId} isPCR={isPCR} />
 
         <div className="actions">
+          <button onClick={this.onCancel}>Cancel</button>
           <button onClick={this.importDelegation} disabled={!alias}>
             Import {isPCR ? 'PCR member' : 'delegation'}
           </button>
@@ -56,6 +60,13 @@ class ImportDelegation extends React.Component<Props, State> {
     this.setState({
       alias: e.target.value.trim(),
     })
+  }
+
+  private onCancel() {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
   }
 
   private importDelegation() {

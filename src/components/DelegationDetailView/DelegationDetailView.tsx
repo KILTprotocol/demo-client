@@ -2,7 +2,6 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import BlockchainService from '../../services/BlockchainService'
 import DelegationsService from '../../services/DelegationsService'
 import { notifyFailure } from '../../services/FeedbackService'
 import { MyDelegation } from '../../state/ducks/Delegations'
@@ -87,6 +86,8 @@ class DelegationDetailView extends React.Component<Props, State> {
                   <span>CType: </span>
                   <CTypePresentation
                     cTypeHash={rootNode.cTypeHash}
+                    interactive={true}
+                    linked={true}
                     inline={true}
                   />
                 </h2>

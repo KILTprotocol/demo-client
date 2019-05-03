@@ -8,7 +8,7 @@ import './ClaimDetailView.scss'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
-  claim: sdk.IClaim
+  claim: sdk.IPartialClaim
 }
 
 type State = {}
@@ -23,14 +23,18 @@ class ClaimDetailView extends Component<Props, State> {
         <div>
           <label>Ctype</label>
           <div>
-            <CTypePresentation cTypeHash={claim.cType} />
+            <CTypePresentation
+              cTypeHash={claim.cType}
+              linked={true}
+              interactive={true}
+            />
           </div>
         </div>
         {claim.owner && (
           <div>
             <label>Owner</label>
             <div>
-              <ContactPresentation address={claim.owner} />
+              <ContactPresentation address={claim.owner} interactive={true} />
             </div>
           </div>
         )}

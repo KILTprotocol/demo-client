@@ -4,9 +4,9 @@
     @include table;
     @include responsiveTable(
         (
-          phone: (30%, 30%, false, 30px, 120px),
-          tablet: (30%, 30%, false, 100px, 170px),
-          desktop: (30%, 30%, '*', 100px, 270px),
+          phone: (100%, 100%, 30px, 120px),
+          tablet: (100%, 100%, 100px, 170px),
+          desktop: (100%, 100%, 100px, 270px),
         )
     );
   }

@@ -13,6 +13,7 @@ import CtypeView from '../containers/CtypeView/CtypeView'
 import MessageList from '../containers/MessageView/MessageView'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
 import WalletView from '../containers/WalletView/WalletView'
+import onAfterRouting from './onAfterRouting'
 import requiresIdentity from './RequiresIdentity'
 import CheckClientVersion from '../components/CheckClientVersion/CheckClientVersion'
 import DelegationCreate from '../containers/DelegationCreate/DelegationCreate'
@@ -22,7 +23,7 @@ const Routes: React.FunctionComponent<{}> = props => {
 
   return (
     <React.Fragment>
-      <Route path={'/'} component={CheckClientVersion} />
+      <Route path={'/'} component={onAfterRouting(CheckClientVersion)} />
       <Switch>
         <Route path={'/dashboard'} component={requiresIdentity(Dashboard)} />
 

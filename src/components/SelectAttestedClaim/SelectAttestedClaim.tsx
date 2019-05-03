@@ -213,6 +213,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
               >
                 <ContactPresentation
                   address={attestedClaim.attestation.owner}
+                  interactive={true}
                   inline={true}
                 />
               </span>
@@ -222,7 +223,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
       </React.Fragment>
     ) : (
       <div className="no-attestations">
-        <span>{labels.text.noAttestationFound}</span>
+        <span>{labels.text.noAttestationFound} </span>
         <Link to={`/claim/${claimEntry.id}`}>
           {labels.buttons.requestAttestation}
         </Link>

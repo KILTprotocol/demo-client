@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import { Blockchain } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
+import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 
 import BlockchainService from '../../services/BlockchainService'
 import DelegationsService from '../../services/DelegationsService'
@@ -13,6 +14,7 @@ import FeedbackService, {
 } from '../../services/FeedbackService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { MyDelegation } from '../../state/ducks/Delegations'
+import * as UiState from '../../state/ducks/UiState'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 import {
@@ -58,7 +60,6 @@ type State = {
   node: DelegationsTreeNode
 
   attestationHashes: string[]
-  delegationForInvite?: MyDelegation
   editable?: boolean
   focusedNode?: boolean
   gettingChildren?: boolean
@@ -78,8 +79,6 @@ class DelegationNode extends React.Component<Props, State> {
 
     this.getChildren = this.getChildren.bind(this)
     this.getSiblings = this.getSiblings.bind(this)
-    this.cancelInvite = this.cancelInvite.bind(this)
-    this.confirmInvite = this.confirmInvite.bind(this)
     this.revokeAttestations = this.revokeAttestations.bind(this)
     this.revokeDelegation = this.revokeDelegation.bind(this)
   }
@@ -120,7 +119,6 @@ class DelegationNode extends React.Component<Props, State> {
     } = this.props
     const {
       attestationHashes,
-      delegationForInvite,
       focusedNode,
       gettingChildren,
       gotChildren,
@@ -154,7 +152,7 @@ class DelegationNode extends React.Component<Props, State> {
                 className={`minimal ${focusedNode ? 'inverted' : ''}`}
                 delegation={node.delegation}
                 isMyChild={isMyChild}
-                onInvite={this.inviteTo.bind(this, myDelegation)}
+                onInvite={this.inviteContactsTo.bind(this, myDelegation)}
                 onRevokeAttestations={this.revokeAttestations}
                 onRevokeDelegation={this.revokeDelegation}
               />
@@ -198,14 +196,6 @@ class DelegationNode extends React.Component<Props, State> {
             onGetChildren={this.getChildren}
           />
         ))}
-        {editable && viewType === ViewType.Present && delegationForInvite && (
-          <MyDelegationsInviteModal
-            delegationsSelected={[delegationForInvite]}
-            isPCR={!!delegationForInvite.isPCR}
-            onCancel={this.cancelInvite}
-            onConfirm={this.confirmInvite}
-          />
-        )}
       </section>
     )
   }
@@ -271,28 +261,23 @@ class DelegationNode extends React.Component<Props, State> {
     }
   }
 
-  private inviteTo(delegationForInvite: State['delegationForInvite']) {
-    this.setState({
-      delegationForInvite,
-    })
-  }
-
-  private cancelInvite() {
-    this.setState({
-      delegationForInvite: undefined,
-    })
-  }
-
-  private confirmInvite() {
-    this.setState({
-      delegationForInvite: undefined,
-    })
+  private inviteContactsTo(delegation: MyDelegation) {
+    PersistentStore.store.dispatch(
+      UiState.Store.updateCurrentTaskAction({
+        objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+        props: {
+          cTypeHash: delegation.cTypeHash,
+          isPCR: !!delegation.isPCR,
+          selectedDelegations: [delegation],
+        } as RequestAcceptDelegationProps,
+      })
+    )
   }
 
   private async revokeAttestations() {
     const {
-      selectedIdentity,
       node: { delegation },
+      selectedIdentity,
     } = this.props
 
     const { myDelegation } = this.state
@@ -352,7 +337,6 @@ class DelegationNode extends React.Component<Props, State> {
       onCancel: (notification: BlockingNotification) => notification.remove(),
       onConfirm: async (notification: BlockingNotification) => {
         notification.remove()
-        const blockchain = await BlockchainService.connect()
         const blockUi = FeedbackService.addBlockUi({
           headline: 'Revoking delegation',
         })

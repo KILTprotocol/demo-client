@@ -30,8 +30,8 @@
     @include responsiveTable(
         (
           phone: ('*', false, '*', false, 50px, getActionTdWidth(2)),
-          tablet: ('*', false, '*', 100px, 100px, getActionTdWidth(2)),
-          desktop: (40%, '*', 100px, 100px, 100px, getActionTdWidth(2)),
+          tablet: ('*', false, '*', 100px, 50px, getActionTdWidth(2)),
+          desktop: ('*', 200px, '*', 100px, 80px, getActionTdWidth(2)),
         )
     );
   }

@@ -20,21 +20,24 @@ class AttestationWorkflow {
   /**
    * Sends a legitimation request for attesting claims to attesters
    *
-   * @param claim the partial claim we request legitimation for
-   * @param attesters the attesters to send the legitimation request to
+   * @param claims the list of partial claims we request legitimation for
+   * @param receiverAddresses the list of attester addresses to send the legitimation request to
    */
   public static async requestLegitimations(
-    claim: IPartialClaim,
-    attesters: Contact[]
+    claims: IPartialClaim[],
+    receiverAddresses: Array<Contact['publicIdentity']['address']>
   ): Promise<void> {
-    const messageBody = {
-      content: claim,
-      type: MessageBodyType.REQUEST_LEGITIMATIONS,
-    } as IRequestLegitimations
+    const messageBodies = claims.map(
+      (claim: IPartialClaim) =>
+        ({
+          content: claim,
+          type: MessageBodyType.REQUEST_LEGITIMATIONS,
+        } as IRequestLegitimations)
+    )
 
-    return MessageRepository.sendToAddresses(
-      attesters.map((attester: Contact) => attester.publicIdentity.address),
-      messageBody
+    return MessageRepository.multiSendToAddresses(
+      receiverAddresses,
+      messageBodies
     )
   }
 
@@ -45,13 +48,13 @@ class AttestationWorkflow {
    * @param claim the (partial) claim to attest
    * @param legitimations the list of legitimations to be included in the
    *   attestation
-   * @param receiverAddress claimers address who requested the legitimation
+   * @param receiverAddresses  list of contact addresses who will receive the legitimation
    * @param delegation delegation to add to legitimations
    */
   public static async submitLegitimations(
     claim: IPartialClaim,
     legitimations: sdk.IAttestedClaim[],
-    receiverAddress: Contact['publicIdentity']['address'],
+    receiverAddresses: Array<Contact['publicIdentity']['address']>,
     delegation?: MyDelegation
   ): Promise<void> {
     const messageBody: sdk.ISubmitLegitimations = {
@@ -63,7 +66,7 @@ class AttestationWorkflow {
       messageBody.content.delegationId = delegation.id
     }
 
-    return MessageRepository.sendToAddresses([receiverAddress], messageBody)
+    return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
   }
 
   /**
@@ -71,32 +74,32 @@ class AttestationWorkflow {
    *
    * @param attestedClaims the list of attested claims to be included in the
    *   attestation
-   * @param receiverAddress verifiers address who requested the attested claims
+   * @param receiverAddresses  list of contact addresses who will receive the attested claims
    */
   public static async submitClaimsForCtype(
     attestedClaims: sdk.IAttestedClaim[],
-    receiverAddress: Contact['publicIdentity']['address']
+    receiverAddresses: Array<Contact['publicIdentity']['address']>
   ): Promise<void> {
     const messageBody: sdk.ISubmitClaimsForCtype = {
       content: attestedClaims,
       type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
     }
 
-    return MessageRepository.sendToAddresses([receiverAddress], messageBody)
+    return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
   }
 
   /**
    * Creates the request for claim attestation and sends it to the attester.
    *
    * @param claim - the claim to attest
-   * @param attesters - the attesters to send the request to
+   * @param attesterAddresses - the addresses of attesters
    * @param [legitimations] - the legitimations the claimer requested
    *   beforehand from attester
    * @param [delegationId] - the delegation the attester added as legitimation
    */
   public static async requestAttestationForClaim(
     claim: sdk.IClaim,
-    attesters: Contact[],
+    attesterAddresses: Array<Contact['publicIdentity']['address']>,
     legitimations: sdk.AttestedClaim[] = [],
     delegationId?: sdk.IDelegationNode['id']
   ): Promise<void> {
@@ -114,7 +117,7 @@ class AttestationWorkflow {
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     } as IRequestAttestationForClaim
 
-    return MessageRepository.send(attesters, messageBody)
+    return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
   }
 
   /**
