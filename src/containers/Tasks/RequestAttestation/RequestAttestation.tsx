@@ -117,7 +117,6 @@ class RequestAttestation extends React.Component<
 
     switch (true) {
       case !myClaims || !myClaims.length:
-        console.log('case 1')
         return (
           <MyClaimCreateView
             partialClaim={claim}
@@ -126,7 +125,6 @@ class RequestAttestation extends React.Component<
         )
       case createNewClaim:
       case createNewClaim == null && withPreFilledClaim:
-        console.log('case 2')
         return (
           <>
             <MyClaimCreateView
@@ -139,7 +137,6 @@ class RequestAttestation extends React.Component<
           </>
         )
       case createNewClaim === false:
-        console.log('case 3')
         return (
           <section className="selectClaim">
             <h2>Select claim</h2>
@@ -152,7 +149,6 @@ class RequestAttestation extends React.Component<
           </section>
         )
       default:
-        console.log('default')
         return (
           <section className="chooseAction">
             <h2>Choose action</h2>
