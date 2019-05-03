@@ -86,6 +86,8 @@ class DelegationDetailView extends React.Component<Props, State> {
                   <span>CType: </span>
                   <CTypePresentation
                     cTypeHash={rootNode.cTypeHash}
+                    interactive={true}
+                    linked={true}
                     inline={true}
                   />
                 </h2>

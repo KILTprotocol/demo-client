@@ -61,7 +61,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
               </th>
               <th className="alias">Alias</th>
               <th className="type">Type</th>
-              <th className="cType">CTYPE</th>
+              <th className="cType">CType</th>
               <th className="permissions">Permissions</th>
               <th className="id">ID</th>
               <th />
@@ -81,7 +81,11 @@ class MyDelegationsListView extends React.Component<Props, State> {
                       {delegationEntry.metaData.alias}
                     </Link>
                     {cTypeHash ? (
-                      <CTypePresentation cTypeHash={cTypeHash} />
+                      <CTypePresentation
+                        cTypeHash={cTypeHash}
+                        linked={true}
+                        interactive={true}
+                      />
                     ) : (
                       ''
                     )}
@@ -102,7 +106,11 @@ class MyDelegationsListView extends React.Component<Props, State> {
                   </td>
                   <td className="cType">
                     {cTypeHash ? (
-                      <CTypePresentation cTypeHash={cTypeHash} />
+                      <CTypePresentation
+                        cTypeHash={cTypeHash}
+                        linked={true}
+                        interactive={true}
+                      />
                     ) : (
                       ''
                     )}

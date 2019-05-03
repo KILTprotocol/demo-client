@@ -45,9 +45,9 @@
   }
 
   &.inline {
-    display: inline-block;
+    display: inline-flex;
     margin-left: $base-padding/2;
-    vertical-align: 2px;
+    vertical-align: middle;
   }
 
   &.withActions {

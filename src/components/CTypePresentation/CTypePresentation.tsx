@@ -14,10 +14,9 @@ import CTypeRepository from '../../services/CtypeRepository'
 import * as UiState from '../../state/ducks/UiState'
 import PersistentStore from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
+import SelectAction, { Action } from '../SelectAction/SelectAction'
 
 import './CTypePresentation.scss'
-import SelectAction from '../SelectAction/SelectAction'
-import { Action } from '../SelectAction/SelectAction'
 
 type Props = RouteComponentProps<{}> & {
   cTypeHash: ICType['cType']['hash']
@@ -72,20 +71,16 @@ class CTypePresentation extends React.Component<Props, State> {
 
     return (
       <div className={classes.join(' ')}>
-        {cType &&
-          cType.cType &&
-          this.wrapInLink(
-            <>
-              <Identicon
-                value={cType.cType.hash}
-                size={size || DEFAULT_SIZE}
-                theme="polkadot"
-              />
-              <span className="label">
-                {cType.cType.metadata.title.default}
-              </span>
-            </>
-          )}
+        {cType && cType.cType && (
+          <>
+            <Identicon
+              value={cType.cType.hash}
+              size={size || DEFAULT_SIZE}
+              theme="polkadot"
+            />
+            {this.getLabel(cType.cType.metadata.title.default)}
+          </>
+        )}
         {!!actions.length && (
           <SelectAction
             className={fullSizeActions ? 'fullSize' : 'minimal'}
@@ -96,13 +91,18 @@ class CTypePresentation extends React.Component<Props, State> {
     )
   }
 
-  private wrapInLink(content: ReactNode) {
+  private getLabel(label: string) {
     const { linked } = this.props
     const { cType } = this.state
-    if (!linked || !cType) {
-      return <span>{content}</span>
+    let _label: string | ReactNode = label
+    if (linked && cType) {
+      _label = <Link to={`/ctype/${cType.cType.hash}`}>{_label}</Link>
     }
-    return <Link to={`/ctype/${cType.cType.hash}`}>{content}</Link>
+    return (
+      <span className="label" title={label}>
+        {_label}
+      </span>
+    )
   }
 
   private async setCType() {

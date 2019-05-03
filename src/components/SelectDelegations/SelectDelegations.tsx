@@ -1,7 +1,6 @@
 import isEqual from 'lodash/isEqual'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
@@ -122,7 +121,6 @@ class SelectDelegations extends React.Component<Props, State> {
     let _delegations = delegations
     if (!_delegations) {
       const { type } = this.props
-
       switch (type) {
         case DelegationType.Root:
           _delegations = Delegations.getRootDelegations(

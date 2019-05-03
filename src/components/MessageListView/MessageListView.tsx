@@ -136,6 +136,7 @@ class MessageListView extends React.Component<Props, State> {
                         <CTypePresentation
                           cTypeHash={cTypeHash}
                           interactive={true}
+                          linked={true}
                         />
                       )}
                       <div title="created">{created}</div>
@@ -155,6 +156,7 @@ class MessageListView extends React.Component<Props, State> {
                         <CTypePresentation
                           cTypeHash={cTypeHash}
                           interactive={true}
+                          linked={true}
                         />
                       )}
                     </td>
@@ -174,6 +176,7 @@ class MessageListView extends React.Component<Props, State> {
                         <CTypePresentation
                           cTypeHash={cTypeHash}
                           interactive={true}
+                          linked={true}
                         />
                       )}
                     </td>

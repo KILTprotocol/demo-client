@@ -168,7 +168,13 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     return (
       <div className="cType-container" key={cTypeHash}>
         <h4>
-          CType <CTypePresentation cTypeHash={cTypeHash} inline={true} />
+          CType{' '}
+          <CTypePresentation
+            cTypeHash={cTypeHash}
+            inline={true}
+            interactive={true}
+            linked={true}
+          />
         </h4>
         {relevantClaimEntries[cTypeHash].map((claimEntry: Claims.Entry) =>
           claimEntry.attestations.length

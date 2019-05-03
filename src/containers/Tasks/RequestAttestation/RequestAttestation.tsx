@@ -7,10 +7,8 @@ import MyClaimCreateView from '../../../components/MyClaimCreateView/MyClaimCrea
 import MyClaimDetailView from '../../../components/MyClaimDetailView/MyClaimDetailView'
 import SelectClaims from '../../../components/SelectClaims/SelectClaims'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
-import ContactRepository from '../../../services/ContactRepository'
 import * as Claims from '../../../state/ducks/Claims'
 import PersistentStore from '../../../state/PersistentStore'
-import { Contact } from '../../../types/Contact'
 
 import './RequestAttestation.scss'
 
@@ -52,8 +50,8 @@ class RequestAttestation extends React.Component<
   }
 
   public render() {
-    const { claim, legitimations, delegationId } = this.props
-    const { createNewClaim, savedClaimEntry } = this.state
+    const { legitimations, delegationId } = this.props
+    const { savedClaimEntry } = this.state
 
     return (
       <section className="RequestAttestation">
@@ -63,7 +61,7 @@ class RequestAttestation extends React.Component<
             hideAttestedClaims={true}
           />
         ) : (
-          this.getCreateOrUseExisting()
+          this.getCreateOrSelect()
         )}
 
         {((!!legitimations && !!legitimations.length) || !!delegationId) && (
@@ -89,56 +87,82 @@ class RequestAttestation extends React.Component<
     )
   }
 
-  private getCreateOrUseExisting() {
-    const { claim, legitimations, delegationId } = this.props
-    const { createNewClaim, savedClaimEntry } = this.state
+  private getCreateOrSelect() {
+    const { claim } = this.props
+    const { createNewClaim } = this.state
+
+    const button = {
+      create: (
+        <button onClick={this.setCreateNewClaim.bind(this, true)}>
+          Create new claim
+        </button>
+      ),
+      select: (
+        <button onClick={this.setCreateNewClaim.bind(this, false)}>
+          Select claim
+        </button>
+      ),
+    }
 
     const myClaims = Claims.getClaimsByCTypeHash(
       PersistentStore.store.getState(),
       claim.cType
     )
 
-    if (!myClaims || !myClaims.length) {
-      return (
-        <MyClaimCreateView
-          partialClaim={claim}
-          onCreate={this.handleCreateClaim}
-        />
-      )
-    }
+    const withPreFilledClaim = !!(
+      claim &&
+      claim.contents &&
+      Object.keys(claim.contents).length
+    )
 
-    if (createNewClaim == null) {
-      return (
-        <section className="chooseAction">
-          <h2>Choose action</h2>
-          <div>
-            <button onClick={this.setCreateNewClaim.bind(this, false)}>
-              Select claim
-            </button>
-            <button onClick={this.setCreateNewClaim.bind(this, true)}>
-              Create new claim
-            </button>
-          </div>
-        </section>
-      )
-    } else if (createNewClaim) {
-      return (
-        <MyClaimCreateView
-          partialClaim={claim}
-          onCreate={this.handleCreateClaim}
-        />
-      )
-    } else {
-      return (
-        <section className="selectClaim">
-          <h2>Select claim</h2>
-          <SelectClaims
-            cTypeHash={claim.cType}
-            onChange={this.onSelectClaims}
-            isMulti={false}
+    switch (true) {
+      case !myClaims || !myClaims.length:
+        console.log('case 1')
+        return (
+          <MyClaimCreateView
+            partialClaim={claim}
+            onCreate={this.handleCreateClaim}
           />
-        </section>
-      )
+        )
+      case createNewClaim:
+      case createNewClaim == null && withPreFilledClaim:
+        console.log('case 2')
+        return (
+          <>
+            <MyClaimCreateView
+              partialClaim={claim}
+              onCreate={this.handleCreateClaim}
+            />
+            {myClaims && !!myClaims.length && (
+              <div className="container-actions">…or{button.select}</div>
+            )}
+          </>
+        )
+      case createNewClaim === false:
+        console.log('case 3')
+        return (
+          <section className="selectClaim">
+            <h2>Select claim</h2>
+            <SelectClaims
+              cTypeHash={claim.cType}
+              onChange={this.onSelectClaims}
+              isMulti={false}
+            />
+            <div className="container-actions">…or{button.create}</div>
+          </section>
+        )
+      default:
+        console.log('default')
+        return (
+          <section className="chooseAction">
+            <h2>Choose action</h2>
+            <div>
+              {button.select}
+              or
+              {button.create}
+            </div>
+          </section>
+        )
     }
   }
 

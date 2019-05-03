@@ -80,13 +80,20 @@ class DelegationCreate extends React.Component<Props, State> {
               <div>
                 <label>CTYPE</label>
                 <div>
-                  <CTypePresentation cTypeHash={ctypeHash} />
+                  <CTypePresentation
+                    cTypeHash={ctypeHash}
+                    interactive={true}
+                    linked={true}
+                  />
                 </div>
               </div>
               <div>
                 <label>Account</label>
                 <div>
-                  <ContactPresentation address={delegation.account} />
+                  <ContactPresentation
+                    address={delegation.account}
+                    interactive={true}
+                  />
                 </div>
               </div>
             </div>

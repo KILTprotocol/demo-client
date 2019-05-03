@@ -92,10 +92,6 @@ class RequestLegitimation extends React.Component<
 
   private isValid() {
     const { receiverAddresses } = this.props
-    const { selectedClaimEntries } = this.state
-
-    // selectedClaimEntries && selectedClaimEntries.length &&
-
     return receiverAddresses && receiverAddresses.length
   }
 

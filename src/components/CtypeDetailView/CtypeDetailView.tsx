@@ -25,7 +25,10 @@ const CtypeDetailView = ({ cType }: Props) => {
             <div>
               <label>Author</label>
               <div>
-                <ContactPresentation address={cType.metaData.author} />
+                <ContactPresentation
+                  address={cType.metaData.author}
+                  interactive={true}
+                />
               </div>
             </div>
             <div>

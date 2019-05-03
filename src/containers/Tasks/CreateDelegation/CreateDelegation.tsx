@@ -68,7 +68,10 @@ class CreateDelegation extends React.Component<Props, State> {
               <div>
                 <label>Invitee</label>
                 <div>
-                  <ContactPresentation address={inviteeAddress} />
+                  <ContactPresentation
+                    address={inviteeAddress}
+                    interactive={true}
+                  />
                 </div>
               </div>
               <div>

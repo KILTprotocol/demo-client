@@ -76,16 +76,23 @@ class AttestationsView extends React.Component<Props, State> {
             {attestations.map((attestation: AttestationListModel) => (
               <tr key={attestation.attestation.claimHash}>
                 <td className="claimerAlias">
-                  <ContactPresentation address={attestation.claimerAddress} />
+                  <ContactPresentation
+                    address={attestation.claimerAddress}
+                    interactive={true}
+                  />
                 </td>
                 <td
                   className="claimHash"
                   title={attestation.attestation.claimHash}
                 >
-                  {attestation.attestation.claimHash}
+                  <ShortHash>{attestation.attestation.claimHash}</ShortHash>
                 </td>
                 <td className="cType" title={attestation.cTypeHash}>
-                  <CTypePresentation cTypeHash={attestation.cTypeHash} />
+                  <CTypePresentation
+                    cTypeHash={attestation.cTypeHash}
+                    interactive={true}
+                    linked={true}
+                  />
                 </td>
                 <td className="created">
                   <DateTime timestamp={attestation.created} />

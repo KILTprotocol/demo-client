@@ -213,6 +213,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
               >
                 <ContactPresentation
                   address={attestedClaim.attestation.owner}
+                  interactive={true}
                   inline={true}
                 />
               </span>

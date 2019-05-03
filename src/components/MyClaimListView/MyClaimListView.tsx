@@ -1,12 +1,8 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { RequestAttestationProps } from '../../containers/Tasks/RequestAttestation/RequestAttestation'
-import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
 
 import * as Claims from '../../state/ducks/Claims'
-import * as UiState from '../../state/ducks/UiState'
-import PersistentStore from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import SelectCTypesModal from '../Modal/SelectCTypesModal'
@@ -78,58 +74,7 @@ class MyClaimListView extends React.Component<Props, State> {
                   />
                   <td className="actionsTd">
                     <div>
-                      <SelectAction
-                        actions={[
-                          // {
-                          //   callback: () => {
-                          //     PersistentStore.store.dispatch(
-                          //       UiState.Store.updateCurrentTaskAction({
-                          //         objective:
-                          //           sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
-                          //         props: {
-                          //           cTypeHash: claimEntry.claim.cType,
-                          //           preSelectedClaimEntries: [claimEntry],
-                          //         } as RequestLegitimationsProps,
-                          //       })
-                          //     )
-                          //   },
-                          //   label: 'Request legitimations',
-                          // },
-                          // {
-                          //   callback: () => {
-                          //     PersistentStore.store.dispatch(
-                          //       UiState.Store.updateCurrentTaskAction({
-                          //         objective:
-                          //           sdk.MessageBodyType
-                          //             .REQUEST_ATTESTATION_FOR_CLAIM,
-                          //         props: {
-                          //           claim: claimEntry.claim,
-                          //         } as RequestAttestationProps,
-                          //       })
-                          //     )
-                          //   },
-                          //   label: 'Request Attestation',
-                          // },
-                          {
-                            callback: this.requestLegitimation.bind(
-                              this,
-                              claimEntry
-                            ),
-                            label: 'Request legitimations',
-                          },
-                          {
-                            callback: this.requestAttestation.bind(
-                              this,
-                              claimEntry
-                            ),
-                            label: 'Request attestation',
-                          },
-                          {
-                            callback: this.handleDelete.bind(this, claimEntry),
-                            label: 'Delete',
-                          },
-                        ]}
-                      />
+                      <SelectAction actions={this.getActions(claimEntry)} />
                     </div>
                   </td>
                 </tr>
@@ -149,6 +94,23 @@ class MyClaimListView extends React.Component<Props, State> {
         />
       </section>
     )
+  }
+
+  private getActions(claimEntry: Claims.Entry) {
+    return [
+      {
+        callback: this.requestLegitimation.bind(this, claimEntry),
+        label: 'Request legitimations',
+      },
+      {
+        callback: this.requestAttestation.bind(this, claimEntry),
+        label: 'Request attestation',
+      },
+      {
+        callback: this.handleDelete.bind(this, claimEntry),
+        label: 'Delete',
+      },
+    ]
   }
 
   private handleDelete(claimEntry: Claims.Entry) {

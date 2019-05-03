@@ -71,7 +71,6 @@ class SubmitLegitimations extends React.Component<Props, State> {
 
     return (
       <section className="SubmitLegitimations">
-
         {enablePreFilledClaim && cType && (
           <section className="preFillClaim">
             <h2 className="optional">Prefill claim</h2>
@@ -90,7 +89,6 @@ class SubmitLegitimations extends React.Component<Props, State> {
             <SelectDelegations
               isMulti={false}
               onChange={this.changeDelegation}
-              type={DelegationType.Node}
             />
           </div>
 

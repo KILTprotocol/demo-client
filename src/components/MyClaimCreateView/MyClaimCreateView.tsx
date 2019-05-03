@@ -88,7 +88,7 @@ class MyClaimCreateView extends Component<Props, State> {
               <div>
                 <label>CType</label>
                 <div>
-                  <CTypePresentation cTypeHash={cType.hash} />
+                  <CTypePresentation cTypeHash={cType.hash} linked={true} />
                 </div>
               </div>
               <div>

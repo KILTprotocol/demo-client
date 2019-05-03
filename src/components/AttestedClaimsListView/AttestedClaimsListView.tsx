@@ -170,6 +170,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                       <CTypePresentation
                         cTypeHash={attestedClaim.attestation.cTypeHash}
                         interactive={true}
+                        linked={true}
                       />
                     </td>
                     <td className={`status ${attestationStatus[owner]}`}>

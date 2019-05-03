@@ -69,10 +69,13 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
         {_context && <span>{_context}</span>}
         <ContactPresentation
           address={attestedClaim.attestation.owner}
+          interactive={true}
           inline={true}
         />
         <CTypePresentation
           cTypeHash={attestedClaim.request.claim.cType}
+          interactive={true}
+          linked={true}
           inline={true}
         />
         {this.getAttestationStatusView()}
