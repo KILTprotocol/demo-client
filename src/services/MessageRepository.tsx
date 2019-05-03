@@ -232,7 +232,9 @@ class MessageRepository {
     }
   }
 
-  public static getCTypeHash(message: MessageOutput): ICType['cType']['hash'] {
+  public static getCTypeHash(
+    message: MessageOutput
+  ): ICType['cType']['hash'] | undefined {
     const { body } = message
     const { type } = body
 

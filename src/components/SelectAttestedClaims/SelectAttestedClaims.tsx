@@ -109,7 +109,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
 
   public componentDidUpdate(prevProps: Props) {
     const { cTypeHash } = this.props
-    if (prevProps.cTypeHash !== cTypeHash) {
+    if (cTypeHash && prevProps.cTypeHash !== cTypeHash) {
       CTypeRepository.findByHash(cTypeHash).then((cType: ICType) => {
         this.setState({ cType: CType.fromObject(cType) })
       })
