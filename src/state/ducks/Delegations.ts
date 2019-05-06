@@ -22,7 +22,7 @@ export interface MyDelegation {
   rootId?: sdk.IDelegationNode['rootId']
   permissions?: sdk.IDelegationNode['permissions']
   parentId?: sdk.IDelegationNode['parentId']
-  cTypeHash?: sdk.IDelegationRootNode['cTypeHash']
+  cTypeHash: sdk.IDelegationRootNode['cTypeHash']
   revoked: sdk.IDelegationBaseNode['revoked']
   isPCR?: boolean
 }

@@ -121,7 +121,7 @@ class Tasks extends React.Component<Props, State> {
 
     switch (currentTask.objective) {
       case sdk.MessageBodyType.REQUEST_LEGITIMATIONS: {
-        const props = currentTask.props as RequestLegitimationsProps
+        const props = currentTask.props
         const cTypeHash =
           selectedCTypes && selectedCTypes[0]
             ? selectedCTypes[0].cType.hash
@@ -129,7 +129,7 @@ class Tasks extends React.Component<Props, State> {
         return this.getModal(
           'Request legitimations',
           <>
-            {this.getCTypeSelect(false, [props.cTypeHash])}
+            {this.getCTypeSelect(false, props.cTypeHash)}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestLegitimation
                 {...props}
@@ -146,8 +146,8 @@ class Tasks extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS: {
-        const props = currentTask.props as SubmitLegitimationsProps
-        const cTypeHash = props.claim ? [props.claim.cType] : undefined
+        const props = currentTask.props
+        const cTypeHash = props.claim ? props.claim.cType : undefined
         return this.getModal(
           'Submit legitimations',
           <>
@@ -171,7 +171,7 @@ class Tasks extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM: {
-        const props = currentTask.props as RequestAttestationProps
+        const props = currentTask.props
         return this.getModal(
           'Request attestation for claim',
           <>
@@ -189,12 +189,12 @@ class Tasks extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE: {
-        const props = currentTask.props as Partial<SubmitClaimsForCTypeProps>
+        const props = currentTask.props
 
         return this.getModal(
           'Submit claims for cType',
           <>
-            {this.getCTypeSelect(false, [props.cTypeHash])}
+            {this.getCTypeSelect(false, props.cTypeHash)}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <SubmitClaimsForCType
                 cTypeHash={selectedCTypes[0].cType.hash}
@@ -210,12 +210,12 @@ class Tasks extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE: {
-        const props = currentTask.props as Partial<RequestClaimsForCTypeProps>
+        const props = currentTask.props
 
         return this.getModal(
           'Request claims for cType',
           <>
-            {this.getCTypeSelect(false, [props.cTypeHash])}
+            {this.getCTypeSelect(false, props.cTypeHash)}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestClaimsForCType
                 cTypeHash={selectedCTypes[0].cType.hash}
@@ -231,11 +231,11 @@ class Tasks extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION: {
-        const props = currentTask.props as Partial<RequestAcceptDelegationProps>
+        const props = currentTask.props
         return this.getModal(
           `Invite to ${props.isPCR ? 'PCR(s)' : 'delegation(s)'}`,
           <>
-            {this.getCTypeSelect(false, [props.cTypeHash])}
+            {this.getCTypeSelect(false, props.cTypeHash)}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestAcceptDelegation
                 isPCR={!!props.isPCR}
@@ -339,13 +339,16 @@ class Tasks extends React.Component<Props, State> {
 
   private getCTypeSelect(
     isMulti: boolean,
-    preSelectedCTypeHashes: Array<ICType['cType']['hash']> = []
+    preSelectedCTypeHash?: ICType['cType']['hash']
   ) {
+    const preselected = preSelectedCTypeHash
+      ? [preSelectedCTypeHash]
+      : undefined
     return (
       <section className="selectCType">
         <h2>Select cType{isMulti ? '(s)' : ''}</h2>
         <SelectCTypes
-          preSelectedCTypeHashes={preSelectedCTypeHashes}
+          preSelectedCTypeHashes={preselected}
           isMulti={isMulti}
           onChange={this.onSelectCTypes}
           onMenuOpen={this.onMenuOpen}

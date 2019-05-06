@@ -54,7 +54,7 @@ class DelegationsService {
    */
   public static async lookupNodeById(
     delegationNodeId: string
-  ): Promise<sdk.IDelegationNode | undefined> {
+  ): Promise<sdk.DelegationNode | undefined> {
     const blockchain = await BlockchainService.connect()
     return sdk.DelegationNode.query(blockchain, delegationNodeId)
   }
@@ -66,7 +66,7 @@ class DelegationsService {
    */
   public static async lookupRootNodeById(
     rootNodeId: sdk.IDelegationRootNode['id']
-  ): Promise<sdk.IDelegationRootNode | undefined> {
+  ): Promise<sdk.DelegationRootNode | undefined> {
     const blockchain = await BlockchainService.connect()
     return await sdk.DelegationRootNode.query(blockchain, rootNodeId)
   }
@@ -78,11 +78,9 @@ class DelegationsService {
    */
   public static async findRootNode(
     delegationNodeId: sdk.IDelegationNode['id']
-  ): Promise<sdk.IDelegationRootNode | undefined> {
+  ): Promise<sdk.DelegationRootNode | undefined> {
     const blockchain = await BlockchainService.connect()
-    const node:
-      | sdk.IDelegationNode
-      | undefined = await sdk.DelegationNode.query(blockchain, delegationNodeId)
+    const node = await sdk.DelegationNode.query(blockchain, delegationNodeId)
     if (node) {
       return await node.getRoot(blockchain)
     }
@@ -96,16 +94,12 @@ class DelegationsService {
   ): Promise<MyDelegation | undefined> {
     return new Promise<MyDelegation | undefined>(async (resolve, reject) => {
       try {
-        const delegation:
-          | sdk.IDelegationNode
-          | undefined = await DelegationsService.lookupNodeById(
+        const delegation = await DelegationsService.lookupNodeById(
           delegationNodeId
         )
         if (delegation) {
           const blockchain = await BlockchainService.connect()
-          const root:
-            | sdk.IDelegationRootNode
-            | undefined = await delegation.getRoot(blockchain)
+          const root = await delegation.getRoot(blockchain)
           const myDelegation: Delegations.MyDelegation = {
             account: delegation.account,
             cTypeHash: root && root.cTypeHash,
@@ -130,7 +124,7 @@ class DelegationsService {
   }
 
   public static async revoke(
-    node: sdk.IDelegationBaseNode,
+    node: sdk.DelegationBaseNode,
     identity: sdk.Identity
   ) {
     const blockchain = await BlockchainService.connect()

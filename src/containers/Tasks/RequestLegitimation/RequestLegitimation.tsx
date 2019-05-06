@@ -9,7 +9,7 @@ import { ICType } from '../../../types/Ctype'
 import './RequestLegitimation.scss'
 
 export type RequestLegitimationsProps = {
-  cTypeHash: ICType['cType']['hash']
+  cTypeHash?: ICType['cType']['hash']
   receiverAddresses: Array<sdk.PublicIdentity['address']>
   preSelectedClaimEntries?: Claims.Entry[]
 

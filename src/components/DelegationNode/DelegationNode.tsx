@@ -37,7 +37,7 @@ export enum ViewType {
 }
 
 export type DelegationsTreeNode = {
-  delegation: sdk.IDelegationNode | sdk.IDelegationRootNode
+  delegation: sdk.DelegationNode | sdk.DelegationRootNode
   childNodes: DelegationsTreeNode[]
 }
 
@@ -376,7 +376,7 @@ class DelegationNode extends React.Component<Props, State> {
       gettingChildren: false,
       gotChildren: true,
       node: {
-        childNodes: children.map((childNode: sdk.IDelegationNode) => {
+        childNodes: children.map((childNode: sdk.DelegationNode) => {
           return {
             childNodes: [],
             delegation: childNode,
