@@ -54,7 +54,14 @@ class BsIdentity {
 
     return blockchain
       .makeTransfer(alice, identity.address, 1000)
-      .then((result: any) => {
+      .catch(error => {
+        errorService.log({
+          error,
+          message: 'failed to transfer initial tokens to identity',
+          origin: 'WalletAdd.addIdentity()',
+        })
+      })
+      .then(() => {
         const { address, boxPublicKeyAsHex } = identity
         const newContact: Contact = {
           metaData: {
@@ -62,10 +69,7 @@ class BsIdentity {
           },
           publicIdentity: { address, boxPublicKeyAsHex },
         }
-
         PersistentStore.store.dispatch(Contacts.Store.addContact(newContact))
-
-        return Promise.all([Promise.resolve(newContact)])
       })
       .then(
         () => {
@@ -100,13 +104,6 @@ class BsIdentity {
           })
         }
       )
-      .catch(error => {
-        errorService.log({
-          error,
-          message: 'failed to transfer initial tokens to identity',
-          origin: 'WalletAdd.addIdentity()',
-        })
-      })
   }
 
   public static async getByKey(
