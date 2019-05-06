@@ -1,8 +1,10 @@
 import * as Contacts from '../state/ducks/Contacts'
+import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
 import { BasePostParams } from './BaseRepository'
 import ErrorService from './ErrorService'
+import { notifyFailure } from './FeedbackService'
 
 // TODO: add tests, create interface for this class to be implemented as mock
 // (for other tests)
@@ -59,8 +61,12 @@ class ContactRepository {
         return contact
       })
       .catch(() => {
-        // since we dont register identities automatically in services anymore
-        // this is not an actual error case anymore
+        if (!Wallet.getIdentity(PersistentStore.store.getState(), address)) {
+          notifyFailure(
+            `Could not resolve contact for address ${address}!`,
+            false
+          )
+        }
       })
   }
 

@@ -56,7 +56,14 @@ class BsIdentity {
 
     return blockchain
       .makeTransfer(selectedIdentity.identity, identity.address, ENDOWMENT)
-      .then((result: any) => {
+      .catch(error => {
+        errorService.log({
+          error,
+          message: 'failed to transfer initial tokens to identity',
+          origin: 'WalletAdd.addIdentity()',
+        })
+      })
+      .then(() => {
         const { address, boxPublicKeyAsHex } = identity
         const newContact: Contact = {
           metaData: {
@@ -64,10 +71,7 @@ class BsIdentity {
           },
           publicIdentity: { address, boxPublicKeyAsHex },
         }
-
         PersistentStore.store.dispatch(Contacts.Store.addContact(newContact))
-
-        return Promise.all([Promise.resolve(newContact)])
       })
       .then(
         () => {
@@ -92,23 +96,8 @@ class BsIdentity {
           notifySuccess(`Identity ${alias} successfully created.`)
 
           return newIdentity
-        },
-        error => {
-          errorService.log({
-            error,
-            message: 'failed to POST new identity',
-            origin: 'WalletAdd.addIdentity()',
-            type: 'ERROR.FETCH.POST',
-          })
         }
       )
-      .catch(error => {
-        errorService.log({
-          error,
-          message: 'failed to transfer initial tokens to identity',
-          origin: 'WalletAdd.addIdentity()',
-        })
-      })
   }
 
   public static async getByKey(

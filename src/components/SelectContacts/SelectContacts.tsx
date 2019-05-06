@@ -193,15 +193,10 @@ class SelectContacts extends React.Component<Props, State> {
       }
     )
 
-    return Promise.all(arrayOfPromises)
-      .catch(() => {
-        return arrayOfPromises
+    return Promise.any(arrayOfPromises)
+      .then(result => {
+        return result.successes
       })
-      .then((preSelectedContacts: Contact[]) =>
-        preSelectedContacts.filter(
-          (preSelectedContact: Contact) => preSelectedContact
-        )
-      )
       .then((preSelectedContacts: Contact[]) => {
         this.setState({ preSelectedContacts }, () => {
           if (onChange) {
