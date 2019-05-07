@@ -50,10 +50,18 @@ class BsIdentity {
     alias: string
   ): Promise<void | MyIdentity> {
     const blockchain: Blockchain = await BlockchainService.connect()
-    const alice = Identity.buildFromURI('//Alice')
+    const selectedIdentity: MyIdentity = Wallet.getSelectedIdentity(
+      PersistentStore.store.getState()
+    )
+    const ONE_KILT = 1000000
+    const DEFAULT_BALANCE = ONE_KILT * 10
 
     return blockchain
-      .makeTransfer(alice, identity.address, 1000)
+      .makeTransfer(
+        selectedIdentity.identity,
+        identity.address,
+        DEFAULT_BALANCE
+      )
       .then((result: any) => {
         const { address, boxPublicKeyAsHex } = identity
         const newContact: Contact = {

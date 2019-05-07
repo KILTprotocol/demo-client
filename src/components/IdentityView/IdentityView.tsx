@@ -36,6 +36,7 @@ class IdentityView extends React.Component<Props, State> {
 
     this.registerContact = this.registerContact.bind(this)
     this.toggleContacts = this.toggleContacts.bind(this)
+    this.requestKiltTokens = this.requestKiltTokens.bind(this)
   }
 
   public render() {
@@ -149,6 +150,14 @@ class IdentityView extends React.Component<Props, State> {
             }
           />
 
+          <button
+            className="requestTokens"
+            onClick={this.requestKiltTokens}
+            title="Request Tokens"
+          >
+            Request Tokens
+          </button>
+
           {(!contact || (contact && contact.metaData.unregistered)) && (
             <button onClick={this.registerContact}>Register</button>
           )}
@@ -182,6 +191,26 @@ class IdentityView extends React.Component<Props, State> {
         })
       }
     )
+  }
+
+  private requestKiltTokens() {
+    const { myIdentity } = this.props
+    const kiltTokenRequestEmail = `${
+      process.env.REACT_APP_KILT_TOKEN_REQUEST_EMAIL
+    }`
+    const subject = `Kilt token request for ${myIdentity.identity.address}`
+    const body = `
+Dear Kilt people,
+%0A%0A
+I want to play with the Kilt demo.%0A
+Please send me some Kilt tokens for my address%0A
+%0A
+${myIdentity.identity.address}
+%0A%0A
+Thank you!
+`
+    // @ts-ignore
+    window.location = `mailto:${kiltTokenRequestEmail}?subject=${subject}&body=${body}`
   }
 
   private toggleContacts() {

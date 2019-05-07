@@ -26,12 +26,13 @@ class ClientVersionHelper {
           PersistentStore.store.getState()
         )
         if (selectedIdentity) {
-          const balance: number = await BalanceUtilities.getMyBalance(
-            selectedIdentity
-          )
-          if (balance <= 0) {
-            resetCause.accountInvalid = true
-          }
+          // [ap] disable balance check since we have zero-balanced accounts initially.
+          // const balance: number = await BalanceUtilities.getMyBalance(
+          //   selectedIdentity
+          // )
+          // if (balance <= 0) {
+          //   resetCause.accountInvalid = true
+          // }
         }
       }
       resolve(resetCause)

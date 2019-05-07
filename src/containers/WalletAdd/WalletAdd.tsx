@@ -6,7 +6,6 @@ import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 
 import Input from '../../components/Input/Input'
-import BlockchainService from '../../services/BlockchainService'
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import { notify, notifySuccess } from '../../services/FeedbackService'
@@ -149,35 +148,22 @@ class WalletAdd extends React.Component<Props, State> {
     notify(`Creation of identity '${alias}' initiated.`)
     this.props.history.push('/wallet')
 
-    const blockchain: Blockchain = await BlockchainService.connect()
-    const alice = Identity.buildFromURI('//Alice')
-    blockchain
-      .makeTransfer(alice, identity.address, 1000000000)
-      .then(() => {
-        const newIdentity: MyIdentity = {
-          identity,
-          metaData: {
-            name: alias,
-          },
-          phrase,
-        }
-        this.props.saveIdentity(newIdentity)
-        PersistentStore.store.dispatch(
-          Contacts.Store.addContact(
-            ContactRepository.getContactFromIdentity(newIdentity, {
-              unregistered: true,
-            })
-          )
-        )
-        notifySuccess(`New identity '${alias}' successfully created`)
-      })
-      .catch(error => {
-        errorService.log({
-          error,
-          message: `Failed to transfer initial tokens to identity '${alias}'`,
-          origin: 'WalletAdd.addIdentity()',
+    const newIdentity: MyIdentity = {
+      identity,
+      metaData: {
+        name: alias,
+      },
+      phrase,
+    }
+    this.props.saveIdentity(newIdentity)
+    PersistentStore.store.dispatch(
+      Contacts.Store.addContact(
+        ContactRepository.getContactFromIdentity(newIdentity, {
+          unregistered: true,
         })
-      })
+      )
+    )
+    notifySuccess(`New identity '${alias}' successfully created`)
   }
 
   private createRandomPhrase = () => {
