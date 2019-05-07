@@ -24,6 +24,7 @@ type Props = {
 
   metaData?: sdk.IRequestAcceptDelegation['content']['metaData']
 
+  onCancel?: () => void
   onFinished?: () => void
 }
 
@@ -36,6 +37,7 @@ class AcceptDelegation extends React.Component<Props, State> {
     super(props)
     this.state = {}
 
+    this.onCancel = this.onCancel.bind(this)
     this.signAndReply = this.signAndReply.bind(this)
   }
 
@@ -72,6 +74,7 @@ class AcceptDelegation extends React.Component<Props, State> {
             />
 
             <div className="actions">
+              <button onClick={this.onCancel}>Cancel</button>
               <button onClick={this.signAndReply}>Accept Invitation</button>
             </div>
           </>
@@ -117,6 +120,13 @@ class AcceptDelegation extends React.Component<Props, State> {
         }
       }
     )
+  }
+
+  private onCancel() {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
   }
 
   private async signNewDelegationNode(

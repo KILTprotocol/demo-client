@@ -1,10 +1,31 @@
+@mixin defaultScheme {
+
+  & > td {
+    background: $color-grey-light;
+
+    &:after {
+      @include background-image(linear-gradient(to right, transparent, $color-grey-light));
+    }
+  }
+}
+
+@mixin contrastScheme {
+
+  & > td {
+    background: $color-white;
+
+    &:after {
+      @include background-image(linear-gradient(to right, transparent, $color-white));
+    }
+  }
+}
+
 @mixin table {
   position: relative;
   table-layout: fixed;
   width: 100%;
-  //border: 1px solid $color-grey; // causes artifacts
 
-  &:before{
+  &:before {
     content: '';
     position: absolute;
     border: 1px solid $color-grey;
@@ -25,14 +46,25 @@
   & th,
   & td {
     position: relative;
-    padding: $cell-padding-v $cell-padding-h;
-    background: $color-grey-light;
+    padding: {
+      top: $cell-padding-v;
+      bottom: $cell-padding-v;
+      right: $cell-padding-h;
+      left: $cell-padding-h;
+    }
+    border: {
+      right: $base-border;
+    }
     text-align: left;
     vertical-align: top;
 
-    &:after {
-      @include background-image(linear-gradient(to right, transparent, $color-grey-light));
+    &:last-child {
+      border: {
+        right: none;
+      }
+    }
 
+    &:after {
       content: '';
       position: absolute;
       top: 0;
@@ -56,17 +88,37 @@
     vertical-align: middle;
   }
 
-  & tbody {
+  & > tbody {
 
-    & tr {
+    & > tr {
+      @include defaultScheme;
 
       &:nth-child(odd) {
+        @include contrastScheme;
+      }
+    }
 
-        & td {
-          background: $color-white;
+    &:nth-child(odd) {
 
-          &:after {
-            @include background-image(linear-gradient(to right, transparent, $color-white));
+      & > tr {
+        @include contrastScheme;
+
+        &:nth-child(odd) {
+          @include defaultScheme;
+        }
+      }
+    }
+
+    &.opened {
+
+      &:nth-child(odd),
+      &:nth-child(even) {
+
+        & > tr {
+          @include contrastScheme;
+
+          &:nth-child(odd) {
+            @include defaultScheme;
           }
         }
       }

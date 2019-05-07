@@ -142,6 +142,11 @@ class IdentityView extends React.Component<Props, State> {
                 : 'isNotMyContact'
             }`}
             onClick={this.toggleContacts}
+            title={
+              contact && contact.metaData.addedAt
+                ? 'Remove from my contacts'
+                : 'Add to my contacts'
+            }
           />
 
           {(!contact || (contact && contact.metaData.unregistered)) && (

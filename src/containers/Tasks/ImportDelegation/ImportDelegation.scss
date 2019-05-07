@@ -1,0 +1,14 @@
+.ImportDelegation {
+
+  & .Delegation-base {
+    @include labeledCard;
+
+    & input {
+      width: 100%;
+    }
+  }
+
+  & .DelegationDetailView {
+    @include labeledCard;
+  }
+}

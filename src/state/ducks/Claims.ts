@@ -5,6 +5,7 @@ import { createSelector } from 'reselect'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 import { MyIdentity } from '../../types/Contact'
+import { ICType } from '../../types/Ctype'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 
@@ -33,7 +34,17 @@ interface AddAttestationAction extends KiltAction {
   }
 }
 
-type Action = SaveAction | RemoveAction | AddAttestationAction
+interface RevokeAttestationAction extends KiltAction {
+  payload: {
+    revokedHash: sdk.IAttestedClaim['request']['hash']
+  }
+}
+
+type Action =
+  | SaveAction
+  | RemoveAction
+  | AddAttestationAction
+  | RevokeAttestationAction
 
 type Entry = {
   id: string
@@ -120,7 +131,7 @@ class Store {
     action: Action
   ): ImmutableState {
     switch (action.type) {
-      case Store.ACTIONS.SAVE_CLAIM: {
+      case Store.ACTIONS.CLAIM_SAVE: {
         const { claimId, claim, meta } = (action as SaveAction).payload
 
         return state.setIn(['claims', claimId], {
@@ -130,10 +141,10 @@ class Store {
           meta,
         } as Entry)
       }
-      case Store.ACTIONS.REMOVE_CLAIM: {
+      case Store.ACTIONS.CLAIM_REMOVE: {
         return state.deleteIn(['claims', (action as RemoveAction).payload])
       }
-      case Store.ACTIONS.ADD_ATTESTATION: {
+      case Store.ACTIONS.ATTESTATION_ADD: {
         const {
           claimId,
           attestation,
@@ -151,6 +162,35 @@ class Store {
           [...attestations, attestation]
         )
       }
+      case Store.ACTIONS.ATTESTATION_REVOKE: {
+        const { revokedHash } = (action as RevokeAttestationAction).payload
+        const setIns: Array<Iterable<any>> = []
+
+        let claims = state.get('claims')
+
+        claims.map((myClaim: Entry, myClaimHash: string) => {
+          if (myClaim.attestations && myClaim.attestations.length) {
+            myClaim.attestations.forEach(
+              (attestedClaim: sdk.IAttestedClaim, index: number) => {
+                if (attestedClaim.request.hash === revokedHash) {
+                  // avoid changing claims while iterating
+                  setIns.push([
+                    myClaimHash,
+                    'attestations',
+                    index,
+                    'attestation',
+                    'revoked',
+                  ])
+                }
+              }
+            )
+          }
+        })
+        setIns.forEach((keyPath: Iterable<any>) => {
+          claims = claims.setIn(keyPath, true)
+        })
+        return state.setIn(['claims'], claims)
+      }
       default:
         return state
     }
@@ -163,14 +203,14 @@ class Store {
         claimId: hash(claim),
         meta,
       },
-      type: Store.ACTIONS.SAVE_CLAIM,
+      type: Store.ACTIONS.CLAIM_SAVE,
     }
   }
 
   public static removeAction(claimId: Entry['id']): RemoveAction {
     return {
       payload: claimId,
-      type: Store.ACTIONS.REMOVE_CLAIM,
+      type: Store.ACTIONS.CLAIM_REMOVE,
     }
   }
 
@@ -179,7 +219,16 @@ class Store {
   ): AddAttestationAction {
     return {
       payload: { claimId: hash(attestation.request.claim), attestation },
-      type: Store.ACTIONS.ADD_ATTESTATION,
+      type: Store.ACTIONS.ATTESTATION_ADD,
+    }
+  }
+
+  public static revokeAttestation(
+    revokedHash: sdk.IAttestedClaim['request']['hash']
+  ): RevokeAttestationAction {
+    return {
+      payload: { revokedHash },
+      type: Store.ACTIONS.ATTESTATION_REVOKE,
     }
   }
 
@@ -190,9 +239,10 @@ class Store {
   }
 
   private static ACTIONS = {
-    ADD_ATTESTATION: 'client/claims/ADD_ATTESTATION',
-    REMOVE_CLAIM: 'client/claims/REMOVE_CLAIM',
-    SAVE_CLAIM: 'client/claims/SAVE_CLAIM',
+    ATTESTATION_ADD: 'client/claims/ATTESTATION_ADD',
+    ATTESTATION_REVOKE: 'client/claims/ATTESTATION_REVOKE',
+    CLAIM_REMOVE: 'client/claims/CLAIM_REMOVE',
+    CLAIM_SAVE: 'client/claims/CLAIM_SAVE',
   }
 
   private static areAttestationsEqual(
@@ -228,9 +278,19 @@ const getClaims = createSelector(
   }
 )
 
-const _getClaimHash = (state: ReduxState, claim: sdk.IPartialClaim): string => {
-  return hash(claim)
-}
+const _getCTypeHash = (
+  state: ReduxState,
+  cTypeHash: ICType['cType']['hash']
+): ICType['cType']['hash'] => cTypeHash
+
+const getClaimsByCTypeHash = createSelector(
+  [getClaims, _getCTypeHash],
+  (entries: Entry[], cTypeHash: ICType['cType']['hash']) =>
+    entries.filter((entry: Entry) => entry.claim.cType === cTypeHash)
+)
+
+const _getClaimHash = (state: ReduxState, claim: sdk.IPartialClaim): string =>
+  hash(claim)
 
 const getClaim = createSelector(
   [_getClaimHash, getClaims],
@@ -246,6 +306,7 @@ export {
   Entry,
   Action,
   getClaims,
+  getClaimsByCTypeHash,
   getClaim,
   hash,
 }

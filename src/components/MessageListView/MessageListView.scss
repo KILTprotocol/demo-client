@@ -4,17 +4,15 @@
     @include table;
     @include responsiveTable(
       (
-        phone: ('*', false, false, false, false, false, false, getActionTdWidth(2)),
-        tablet: (false, '*', false, false, false, false, 130px, getActionTdWidth(2)),
-        desktop: (false, false, 40%, '*', 120px, 120px, false, getActionTdWidth(2)),
+        phone: ('*', false, false, false, false, false, false, false, getActionTdWidth(2)),
+        tablet: (false, '*', false, false, false, false, false, 100px, getActionTdWidth(2)),
+        desktop: (false, false, 40%, '*', 40%, 100px, 100px, false, getActionTdWidth(2)),
       )
     );
   }
 
   & th,
   & td {
-    @extend %ellipsis;
-
     text-align: left;
   }
 

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
+import Select from 'react-select'
 import CTypeRepository from '../../services/CtypeRepository'
 
 import ErrorService from '../../services/ErrorService'
@@ -13,6 +14,8 @@ type Props = {
   name?: string
   placeholder?: string
   closeMenuOnSelect?: boolean
+  showOnInit?: boolean
+
   onCancel?: () => void
   onConfirm: (selectedCTypes: ICType[]) => void
 }
@@ -24,11 +27,8 @@ type State = {
 }
 
 class SelectCTypesModal extends React.Component<Props, State> {
-  private static defaultProps: Partial<Props> = {
-    closeMenuOnSelect: true,
-    isMulti: false,
-    name: 'selectCTypes',
-    placeholder: `Select cType#{multi}…`,
+  public static defaultProps = {
+    placeholder: `Select cType#{multi}`,
   }
 
   private modal: Modal | null
@@ -42,38 +42,15 @@ class SelectCTypesModal extends React.Component<Props, State> {
     this.onSelectCTypes = this.onSelectCTypes.bind(this)
   }
 
-  public componentDidMount() {
-    CTypeRepository.findAll()
-      .then((cTypes: ICType[]) => {
-        this.setState({ cTypes })
-      })
-      .catch(error => {
-        ErrorService.logWithNotification({
-          error,
-          message: 'Could not fetch cTypes',
-          origin: 'SelectCTypesModal.componentDidMount()',
-          type: 'ERROR.FETCH.GET',
-        })
-      })
-  }
-
   public render() {
-    const { cTypes } = this.state
-
-    if (!!cTypes && !!cTypes.length) {
-      return this.getModalElement()
-    } else {
-      return ''
-    }
-  }
-
-  public getModalElement() {
     const {
+      closeMenuOnSelect,
       header,
       isMulti,
       name,
       placeholder,
-      closeMenuOnSelect,
+      showOnInit,
+
       onCancel,
       onConfirm,
     } = this.props
@@ -101,9 +78,10 @@ class SelectCTypesModal extends React.Component<Props, State> {
         className="small"
         type={ModalType.CONFIRM}
         header={finalHeader}
+        catchBackdropClick={isSelectCTypesOpen}
+        showOnInit={showOnInit}
         onCancel={onCancel}
         onConfirm={onConfirm.bind(this, selectedCTypes)}
-        catchBackdropClick={isSelectCTypesOpen}
       >
         <div>
           <SelectCTypes

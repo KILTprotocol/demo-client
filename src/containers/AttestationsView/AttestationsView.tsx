@@ -8,7 +8,10 @@ import CTypePresentation from '../../components/CTypePresentation/CTypePresentat
 import DateTime from '../../components/DateTime/DateTime'
 import ShortHash from '../../components/ShortHash/ShortHash'
 import AttestationService from '../../services/AttestationService'
-import FeedbackService, { safeDelete, notifyError } from '../../services/FeedbackService'
+import FeedbackService, {
+  safeDelete,
+  notifyError,
+} from '../../services/FeedbackService'
 import * as Attestations from '../../state/ducks/Attestations'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { BlockUi } from '../../types/UserFeedback'
@@ -73,16 +76,23 @@ class AttestationsView extends React.Component<Props, State> {
             {attestations.map((attestation: AttestationListModel) => (
               <tr key={attestation.attestation.claimHash}>
                 <td className="claimerAlias">
-                  <ContactPresentation address={attestation.claimerAddress} />
+                  <ContactPresentation
+                    address={attestation.claimerAddress}
+                    interactive={true}
+                  />
                 </td>
                 <td
                   className="claimHash"
                   title={attestation.attestation.claimHash}
                 >
-                  {attestation.attestation.claimHash}
+                  <ShortHash>{attestation.attestation.claimHash}</ShortHash>
                 </td>
                 <td className="cType" title={attestation.cTypeHash}>
-                  <CTypePresentation cTypeHash={attestation.cTypeHash} />
+                  <CTypePresentation
+                    cTypeHash={attestation.cTypeHash}
+                    interactive={true}
+                    linked={true}
+                  />
                 </td>
                 <td className="created">
                   <DateTime timestamp={attestation.created} />
@@ -170,14 +180,15 @@ class AttestationsView extends React.Component<Props, State> {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Revoking attestation',
       })
-      AttestationService.revokeByClaimHash(claimHashToRevoke).then(() => {
-        blockUi.remove()
-        this.setState({ claimHashToRevoke: '' })
-      })
-      .catch(error => {
-        blockUi.remove()
-        notifyError(error)
-      })
+      AttestationService.revokeByClaimHash(claimHashToRevoke)
+        .then(() => {
+          blockUi.remove()
+          this.setState({ claimHashToRevoke: '' })
+        })
+        .catch(error => {
+          blockUi.remove()
+          notifyError(error)
+        })
     }
   }
 }

@@ -1,0 +1,15 @@
+.SubmitLegitimations {
+
+  & .selectLegitimations,
+  & .selectDelegation,
+  & .preFillClaim {
+    @include labeledCard;
+  }
+
+  & .container-actions {
+
+    & button {
+      @include button-secondary;
+    }
+  }
+}

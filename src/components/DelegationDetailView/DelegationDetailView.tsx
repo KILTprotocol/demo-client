@@ -2,7 +2,6 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import BlockchainService from '../../services/BlockchainService'
 import DelegationsService from '../../services/DelegationsService'
 import { notifyFailure } from '../../services/FeedbackService'
 import { MyDelegation } from '../../state/ducks/Delegations'
@@ -44,7 +43,7 @@ class DelegationDetailView extends React.Component<Props, State> {
     const { id } = this.props
 
     this.getNode(id)
-      .then(async (delegationNode: sdk.IDelegationNode) => {
+      .then(async (delegationNode: sdk.DelegationNode) => {
         const treeNode: DelegationsTreeNode = {
           childNodes: [],
           delegation: delegationNode,
@@ -87,6 +86,8 @@ class DelegationDetailView extends React.Component<Props, State> {
                   <span>CType: </span>
                   <CTypePresentation
                     cTypeHash={rootNode.cTypeHash}
+                    interactive={true}
+                    linked={true}
                     inline={true}
                   />
                 </h2>
@@ -130,9 +131,9 @@ class DelegationDetailView extends React.Component<Props, State> {
 
   private async getNode(
     id: sdk.IDelegationBaseNode['id']
-  ): Promise<sdk.IDelegationBaseNode> {
+  ): Promise<sdk.DelegationBaseNode> {
     let node:
-      | sdk.IDelegationBaseNode
+      | sdk.DelegationBaseNode
       | undefined = await DelegationsService.lookupNodeById(id)
     if (!node) {
       node = await DelegationsService.lookupRootNodeById(id)

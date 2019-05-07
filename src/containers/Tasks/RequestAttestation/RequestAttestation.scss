@@ -1,0 +1,86 @@
+.RequestAttestation {
+  position: relative;
+
+  & .ClaimCreate,
+  & .ClaimDetailView,
+  & .delegation,
+  & .MyClaimCreateView,
+  & .MyClaimDetailView,
+  & .chooseAction,
+  & .selectClaim {
+    @include labeledCard;
+  }
+
+  & .MyClaimCreateView,
+  & .MyClaimDetailView {
+
+    & h1 {
+      width: auto;
+      height: auto;
+
+      &:before {
+        display: none;
+      }
+    }
+  }
+
+  & .MyClaimDetailView {
+    @include labeledCard;
+
+    & h1 {
+      width: auto;
+      height: auto;
+
+      &:before {
+        display: none;
+      }
+    }
+
+    & .actions {
+      display: none;
+    }
+  }
+
+  & .ClaimDetailView {
+    @include removeLabeledCard;
+
+    & h2 {
+      display: none !important;
+    }
+  }
+
+  & .chooseAction {
+
+    & div {
+      text-align: right;
+    }
+
+    & button {
+      @include button-primary;
+
+      margin:{
+        left: $base-padding/2;
+        right: $base-padding/2;
+      }
+
+      &:last-child {
+        margin:{
+          right: 0;
+        }
+      }
+    }
+  }
+
+  & .container-actions {
+    @include labeledCardActions;
+
+    & button {
+      @include button-secondary;
+
+      margin: {
+        left: $base-padding/2;
+      }
+      vertical-align: middle;
+    }
+  }
+}

@@ -1,14 +1,14 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 
-import AttestationService from '../../services/AttestationService'
-import ContactRepository from '../../services/ContactRepository'
+import PersistentStore from '../../state/PersistentStore'
+import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import DelegationDetailView from '../DelegationDetailView/DelegationDetailView'
 import { ViewType } from '../DelegationNode/DelegationNode'
-import Spinner from '../Spinner/Spinner'
+import * as UiState from '../../state/ducks/UiState'
 
 import './AttestedClaimsListView.scss'
 
@@ -30,16 +30,6 @@ const LABELS: Labels = {
   },
 }
 
-const enum STATUS {
-  PENDING = 'pending',
-  UNVERIFIED = 'unverified',
-  ATTESTED = 'attested',
-}
-
-type AttestationStatus = {
-  [owner: string]: STATUS
-}
-
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
 
@@ -51,7 +41,6 @@ type Props = {
 }
 
 type State = {
-  attestationStatus: AttestationStatus
   labels: { [key: string]: string }
 
   closeOpenedChild?: () => void
@@ -61,23 +50,16 @@ type State = {
 class AttestedClaimsListView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    this.verifyAttestation = this.verifyAttestation.bind(this)
-    this.verifyAttestations = this.verifyAttestations.bind(this)
 
     const context =
       props.context && LABELS[props.context] ? props.context : 'default'
 
     this.state = {
-      attestationStatus: {},
       labels: LABELS[context],
     }
 
     this.toggleChildOpen = this.toggleChildOpen.bind(this)
     this.closeOpenedChild = this.closeOpenedChild.bind(this)
-
-    setTimeout(() => {
-      this.verifyAttestations()
-    }, 500)
   }
 
   public render() {
@@ -118,7 +100,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   private getAttestations(attestations: sdk.IAttestedClaim[]) {
-    const { attestationStatus, labels, openedAttestedClaim } = this.state
+    const { openedAttestedClaim } = this.state
     return (
       <section className="attestations">
         {openedAttestedClaim ? (
@@ -164,17 +146,18 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                     <td className="attester">
                       <ContactPresentation
                         address={attestedClaim.attestation.owner}
+                        interactive={true}
                       />
                     </td>
                     <td className="cType">
                       <CTypePresentation
                         cTypeHash={attestedClaim.attestation.cTypeHash}
+                        interactive={true}
+                        linked={true}
                       />
                     </td>
-                    <td className={`status ${attestationStatus[owner]}`}>
-                      {attestationStatus[owner] === STATUS.PENDING && (
-                        <Spinner size={20} color="#ef5a28" strength={3} />
-                      )}
+                    <td>
+                      <AttestationStatus attestedClaim={attestedClaim} />
                     </td>
                     <td className="actionsTd">
                       <div>
@@ -265,39 +248,8 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   }
 
   private verifyAttestations(): void {
-    const { attestedClaims } = this.props
-    attestedClaims.forEach(attestedClaim => {
-      this.verifyAttestation(attestedClaim)
-    })
-  }
-
-  private verifyAttestation(attestedClaim: sdk.IAttestedClaim) {
-    const { attestationStatus } = this.state
-    const { owner } = attestedClaim.attestation
-
-    // if we are currently already fetching - cancel
-    if (attestationStatus[owner] === STATUS.PENDING) {
-      return
-    }
-
-    attestationStatus[owner] = STATUS.PENDING
-
-    this.setState({
-      attestationStatus,
-    })
-
-    AttestationService.verifyAttestatedClaim(attestedClaim).then(
-      (verified: boolean) => {
-        if (verified) {
-          attestationStatus[owner] = STATUS.ATTESTED
-        } else {
-          attestationStatus[owner] = STATUS.UNVERIFIED
-        }
-
-        this.setState({
-          attestationStatus,
-        })
-      }
+    PersistentStore.store.dispatch(
+      UiState.Store.refreshAttestationStatusAction()
     )
   }
 }

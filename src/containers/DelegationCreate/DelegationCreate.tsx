@@ -29,7 +29,6 @@ type Props = RouteComponentProps<{
 }
 
 type State = {
-  cType?: ICType
   alias: string
   delegation?: sdk.DelegationRootNode
 }
@@ -39,7 +38,6 @@ class DelegationCreate extends React.Component<Props, State> {
     super(props)
     this.state = {
       alias: '',
-      cType: undefined,
     }
     this.handleNameChange = this.handleNameChange.bind(this)
     this.submit = this.submit.bind(this)
@@ -49,24 +47,22 @@ class DelegationCreate extends React.Component<Props, State> {
     const ctypeHash = this.props.match.params.cTypeHash
     const { selectedIdentity } = this.props
     const { alias } = this.state
-    CTypeRepository.findByHash(ctypeHash).then((cType: ICType) => {
-      if (selectedIdentity) {
-        this.setState({
-          alias,
-          cType,
-          delegation: new sdk.DelegationRootNode(
-            sdk.UUID.generate(),
-            ctypeHash,
-            selectedIdentity.identity.address
-          ),
-        })
-      }
-    })
+    if (selectedIdentity) {
+      this.setState({
+        alias,
+        delegation: new sdk.DelegationRootNode(
+          sdk.UUID.generate(),
+          ctypeHash,
+          selectedIdentity.identity.address
+        ),
+      })
+    }
   }
 
   public render() {
     const { isPCR } = this.props
-    const { cType, alias, delegation } = this.state
+    const ctypeHash = this.props.match.params.cTypeHash
+    const { alias, delegation } = this.state
     return (
       <section className="DelegationCreate">
         <h1>{isPCR ? `New Root PCR` : `New Root Delegation`}</h1>
@@ -84,13 +80,20 @@ class DelegationCreate extends React.Component<Props, State> {
               <div>
                 <label>CTYPE</label>
                 <div>
-                  <CTypePresentation cType={cType} />
+                  <CTypePresentation
+                    cTypeHash={ctypeHash}
+                    interactive={true}
+                    linked={true}
+                  />
                 </div>
               </div>
               <div>
                 <label>Account</label>
                 <div>
-                  <ContactPresentation address={delegation.account} />
+                  <ContactPresentation
+                    address={delegation.account}
+                    interactive={true}
+                  />
                 </div>
               </div>
             </div>

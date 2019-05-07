@@ -36,12 +36,22 @@
 
     & .schema-based-json-editor {
 
-      &--row {
-        @include label_input_combo;
-      }
-
+      &--row,
       &--error-row {
         @include label_input_combo;
+
+        margin-top: $base-padding;
+
+        &:first-child{
+          margin-top: 0;
+        }
+
+        & label {
+
+          & > .schema-based-json-editor--button-group {
+            @include baseFont;
+          }
+        }
       }
 
       &--description {

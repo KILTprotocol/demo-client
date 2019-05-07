@@ -1,0 +1,37 @@
+.RequestAcceptDelegation {
+
+  & .permissions,
+  & .selectDelegations {
+    @include labeledCard;
+  }
+
+  & .selectDelegations {
+    margin: {
+      bottom: $base-padding !important;
+    }
+  }
+
+  & .permissions {
+
+    & label {
+      @include checkbox;
+
+      display: block;
+      margin: {
+        top: $base-padding/2;
+      }
+
+      &:first-child {
+        margin: 0;
+      }
+    }
+  }
+
+  & button {
+
+    &.invite {
+      @include button-primary;
+    }
+  }
+
+}

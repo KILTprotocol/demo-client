@@ -1,21 +1,24 @@
+import {
+  ISubmitAttestationForClaim,
+  MessageBodyType,
+} from '@kiltprotocol/prototype-sdk'
 import * as sdk from '@kiltprotocol/prototype-sdk'
-import * as React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
+import * as React from 'react'
 import { InteractionProps } from 'react-json-view'
-
+import Code from '../components/Code/Code'
+import CTypePresentation from '../components/CTypePresentation/CTypePresentation'
 import { ModalType } from '../components/Modal/Modal'
-import PersistentStore from '../state/PersistentStore'
-import { Contact, MyIdentity } from '../types/Contact'
-import { BlockingNotification, NotificationType } from '../types/UserFeedback'
-import { BaseDeleteParams, BasePostParams } from './BaseRepository'
-import { clientVersionHelper } from './ClientVersionHelper'
-import ContactRepository from './ContactRepository'
-import errorService from './ErrorService'
-import FeedbackService from './FeedbackService'
-import { notifySuccess } from './FeedbackService'
 import * as UiState from '../state/ducks/UiState'
 import * as Wallet from '../state/ducks/Wallet'
-import Code from '../components/Code/Code'
+import PersistentStore from '../state/PersistentStore'
+import { Contact, MyIdentity } from '../types/Contact'
+import { ICType } from '../types/Ctype'
+import { BlockingNotification, NotificationType } from '../types/UserFeedback'
+import { BaseDeleteParams, BasePostParams } from './BaseRepository'
+import ContactRepository from './ContactRepository'
+import errorService from './ErrorService'
+import FeedbackService, { notifySuccess } from './FeedbackService'
 
 export interface MessageOutput extends sdk.IMessage {
   encryptedMessage: sdk.IEncryptedMessage
@@ -26,6 +29,10 @@ export interface MessageOutput extends sdk.IMessage {
 // (for other tests)
 
 class MessageRepository {
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
+    process.env.REACT_APP_SERVICE_PORT
+  }/messaging`
+
   /**
    * takes contact or list of contacts
    * and send a message to every contact in list
@@ -56,7 +63,7 @@ class MessageRepository {
    * @param receiverAddresses
    * @param messageBody
    */
-  public static sendToAddresses(
+  public static async sendToAddresses(
     receiverAddresses: Array<Contact['publicIdentity']['address']>,
     messageBody: sdk.MessageBody
   ): Promise<void> {
@@ -72,17 +79,32 @@ class MessageRepository {
     )
 
     return Promise.all(arrayOfPromises)
-      .catch(error => {
+      .catch(() => {
         return arrayOfPromises
       })
+      .then((receiverContacts: Contact[]) =>
+        receiverContacts.filter((receiverContact: Contact) => receiverContact)
+      )
       .then((receiverContacts: Contact[]) => {
-        return MessageRepository.send(
-          receiverContacts.filter(
-            (receiverContact: Contact) => receiverContact
-          ),
-          messageBody
-        )
+        return MessageRepository.send(receiverContacts, messageBody)
       })
+  }
+
+  public static async multiSendToAddresses(
+    receiverAddresses: Array<Contact['publicIdentity']['address']>,
+    messageBodies: sdk.MessageBody[]
+  ): Promise<void> {
+    const arrayOfPromises = messageBodies.map(
+      (messageBody: sdk.MessageBody) => {
+        return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
+      }
+    )
+
+    return Promise.all(arrayOfPromises)
+      .catch(() => {
+        return arrayOfPromises
+      })
+      .then(() => undefined)
   }
 
   public static async deleteByMessageId(messageId: string) {
@@ -206,13 +228,56 @@ class MessageRepository {
         }'`,
         origin: 'MessageRepository.singleSend()',
       })
-      throw error
+      return Promise.reject()
     }
   }
 
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/messaging`
+  public static getCTypeHash(
+    message: MessageOutput
+  ): ICType['cType']['hash'] | undefined {
+    const { body } = message
+    const { type } = body
+
+    switch (type) {
+      case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
+        return (message.body as sdk.IRequestLegitimations).content.cType
+      case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
+        return (message.body as sdk.ISubmitLegitimations).content.claim.cType
+      case sdk.MessageBodyType.REJECT_LEGITIMATIONS:
+        return (message.body as sdk.IRejectLegitimations).content.claim.cType
+
+      case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
+        return (message.body as sdk.IRequestAttestationForClaim).content.claim
+          .cType
+      case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
+        return (message.body as ISubmitAttestationForClaim).content.request
+          .claim.cType
+      case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
+        return (message.body as sdk.IRejectAttestationForClaim).content.claim
+          .cType
+
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
+        return (message.body as sdk.IRequestClaimsForCtype).content
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
+        return (message.body as sdk.ISubmitClaimsForCtype).content[0].request
+          .claim.cType
+      case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPE:
+        return (message.body as sdk.IAcceptClaimsForCtype).content[0].request
+          .hash
+      case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPE:
+        return (message.body as sdk.IRejectClaimsForCtype).content[0].request
+          .hash
+
+      case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:
+      case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION:
+      case sdk.MessageBodyType.REJECT_ACCEPT_DELEGATION:
+      case sdk.MessageBodyType.INFORM_CREATE_DELEGATION:
+        return undefined
+
+      default:
+        return undefined
+    }
+  }
 
   private static async handleDebugMode(
     message: sdk.Message
@@ -240,10 +305,10 @@ class MessageRepository {
             /* tslint:enable:jsx-no-lambda */
           ),
           modalType: ModalType.CONFIRM,
-          okButtonLabel: 'Send',
+          okButtonLabel: 'Send manipulated Message',
           onCancel: (notification: BlockingNotification) => {
             notification.remove()
-            return resolve()
+            return resolve(message)
           },
           onConfirm: (notification: BlockingNotification) => {
             notification.remove()

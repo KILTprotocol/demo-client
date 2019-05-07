@@ -45,13 +45,11 @@ $labeledCardActions-padding-inner: $base-padding/2;
   font-size: 24px;
 
   & > * {
+    margin: 0;
 
     &:not(:last-child){
       margin: {
-        top: 0;
         right: $base-padding;
-        bottom: 0;
-        left: 0;
       }
     }
   }
@@ -91,9 +89,26 @@ $labeledCardActions-padding-inner: $base-padding/2;
   & > h4,
   & > h5,
   & > h6 {
+    width: auto;
+    height: auto;
 
     &:first-child {
       @include cardLabel($labeledCardActionsButtons);
+    }
+
+    &.optional {
+
+      &:after {
+        content: ' (optional)';
+        font-size: 0.6em;
+      }
+    }
+  }
+
+  & > h1 {
+
+    &:before {
+      display: none;
     }
   }
 

@@ -14,9 +14,9 @@ type Props = {
   claimStore: Claims.Entry[]
 
   onCreateClaimFromCType: (selectedCTypes: ICType[]) => void
-  onRemoveClaim: (claimId: Claims.Entry['id']) => void
-  onRequestAttestation: (claimId: Claims.Entry['id']) => void
-  onRequestLegitimation: (claimId: Claims.Entry['id']) => void
+  onRemoveClaim: (claimEntry: Claims.Entry) => void
+  onRequestAttestation: (claimEntry: Claims.Entry) => void
+  onRequestLegitimation: (claimEntry: Claims.Entry) => void
 }
 
 type State = {}
@@ -42,7 +42,6 @@ class MyClaimListView extends React.Component<Props, State> {
               <tr>
                 <th className="alias">Alias</th>
                 <th className="cType">CType</th>
-                <th className="content">Content</th>
                 <th className="status">Attested?</th>
                 <th className="actionsTd" />
               </tr>
@@ -56,10 +55,11 @@ class MyClaimListView extends React.Component<Props, State> {
                     </Link>
                   </td>
                   <td className="cType">
-                    <CTypePresentation cTypeHash={claimEntry.claim.cType} />
-                  </td>
-                  <td className="content">
-                    {JSON.stringify(claimEntry.claim.contents)}
+                    <CTypePresentation
+                      cTypeHash={claimEntry.claim.cType}
+                      interactive={true}
+                      linked={true}
+                    />
                   </td>
                   <td
                     className={
@@ -74,31 +74,7 @@ class MyClaimListView extends React.Component<Props, State> {
                   />
                   <td className="actionsTd">
                     <div>
-                      <SelectAction
-                        actions={[
-                          {
-                            callback: this.requestLegitimation.bind(
-                              this,
-                              claimEntry.id
-                            ),
-                            label: 'Get Legitimation',
-                          },
-                          {
-                            callback: this.requestAttestation.bind(
-                              this,
-                              claimEntry.id
-                            ),
-                            label: 'Get Attestation',
-                          },
-                          {
-                            callback: this.handleDelete.bind(
-                              this,
-                              claimEntry.id
-                            ),
-                            label: 'Delete',
-                          },
-                        ]}
-                      />
+                      <SelectAction actions={this.getActions(claimEntry)} />
                     </div>
                   </td>
                 </tr>
@@ -120,19 +96,36 @@ class MyClaimListView extends React.Component<Props, State> {
     )
   }
 
-  private handleDelete(claimId: Claims.Entry['id']) {
+  private getActions(claimEntry: Claims.Entry) {
+    return [
+      {
+        callback: this.requestLegitimation.bind(this, claimEntry),
+        label: 'Request legitimations',
+      },
+      {
+        callback: this.requestAttestation.bind(this, claimEntry),
+        label: 'Request attestation',
+      },
+      {
+        callback: this.handleDelete.bind(this, claimEntry),
+        label: 'Delete',
+      },
+    ]
+  }
+
+  private handleDelete(claimEntry: Claims.Entry) {
     const { onRemoveClaim } = this.props
-    onRemoveClaim(claimId)
+    onRemoveClaim(claimEntry)
   }
 
-  private requestAttestation(claimId: Claims.Entry['id']) {
+  private requestAttestation(claimEntry: Claims.Entry) {
     const { onRequestAttestation } = this.props
-    onRequestAttestation(claimId)
+    onRequestAttestation(claimEntry)
   }
 
-  private requestLegitimation(claimId: Claims.Entry['id']) {
+  private requestLegitimation(claimEntry: Claims.Entry) {
     const { onRequestLegitimation } = this.props
-    onRequestLegitimation(claimId)
+    onRequestLegitimation(claimEntry)
   }
 
   private openCTypeModal() {

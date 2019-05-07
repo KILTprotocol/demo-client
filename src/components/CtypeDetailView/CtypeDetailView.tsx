@@ -25,7 +25,10 @@ const CtypeDetailView = ({ cType }: Props) => {
             <div>
               <label>Author</label>
               <div>
-                <ContactPresentation address={cType.metaData.author} />
+                <ContactPresentation
+                  address={cType.metaData.author}
+                  interactive={true}
+                />
               </div>
             </div>
             <div>
@@ -34,7 +37,7 @@ const CtypeDetailView = ({ cType }: Props) => {
                 <Code>{cType.cType}</Code>
               </div>
             </div>
-            <CTypePresentation cType={cType} size={50} />
+            <CTypePresentation cTypeHash={cType.cType.hash} size={50} />
           </div>
           <div className="actions">
             <Link to="/cType">Cancel</Link>

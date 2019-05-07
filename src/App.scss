@@ -134,6 +134,16 @@ table {
   }
 }
 
+a[href]{
+  color: $color-primary;
+  text-decoration: none;
+
+  &:hover,
+  &:active {
+    text-decoration: underline;
+  }
+}
+
 .kilt-token {
   @include colored-kilt-token;
 }

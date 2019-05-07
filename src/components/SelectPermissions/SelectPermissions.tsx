@@ -15,7 +15,7 @@ class SelectPermissions extends React.Component<Props> {
   public render() {
     return (
       <div className="permissions">
-        <h2>Permissions</h2>
+        <h2>Select permissions</h2>
         <div>
           {Object.keys(sdk.Permission)
             .filter(

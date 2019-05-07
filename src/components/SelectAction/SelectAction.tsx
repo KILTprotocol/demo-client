@@ -28,13 +28,28 @@ class SelectAction extends React.Component<Props> {
 
   public render() {
     const { actions, className } = this.props
-    const selectActionOptions = actions.map((action: Action) => ({
-      label: action.label,
-      value: action.label,
-    }))
+    const classes = ['SelectAction', className]
+    const selectActionOptions: SelectActionOption[] = actions.map(
+      (action: Action, index: number) => {
+        if (
+          index &&
+          action.label.substr(0, action.label.indexOf(' ')) !==
+            actions[index - 1].label.substr(
+              0,
+              actions[index - 1].label.indexOf(' ')
+            )
+        ) {
+          classes.push(`groupAt-${index}`)
+        }
+        return {
+          label: action.label,
+          value: action.label,
+        }
+      }
+    )
 
     return (
-      <section className={`SelectAction ${className}`}>
+      <section className={classes.join(' ')}>
         <Select
           className="react-select-container"
           classNamePrefix="react-select"

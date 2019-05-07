@@ -1,0 +1,16 @@
+.Tasks {
+  counter-reset: section;
+
+  & .selectCType,
+  & .selectReceiver {
+    @include labeledCard;
+  }
+
+  & h2 {
+
+    &:before {
+      counter-increment: section;
+      content: counter(section) ". ";
+    }
+  }
+}
