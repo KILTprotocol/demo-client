@@ -8,7 +8,7 @@ import { BsDelegation, BsDelegationsPool } from './DevTools.delegations'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore from '../../state/PersistentStore'
-import { MyIdentity } from 'src/types/Contact'
+import { MyIdentity } from '../../types/Contact'
 
 type WithMessages = {
   label: string
