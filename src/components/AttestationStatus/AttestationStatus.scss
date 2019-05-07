@@ -1,0 +1,21 @@
+.AttestationStatus {
+  text-align: center;
+
+  & .unverified {
+
+    &:before {
+      @include icon($icon-times);
+
+      color: $color-danger;
+    }
+  }
+
+  & .attested {
+
+    &:before {
+      @include icon($icon-check);
+
+      color: $color-success;
+    }
+  }
+}

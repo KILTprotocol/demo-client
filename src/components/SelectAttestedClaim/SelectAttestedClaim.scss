@@ -20,7 +20,7 @@
     }
 
     & h4 {
-      margin:{
+      margin: {
         top: $base-padding;
       }
 
@@ -40,28 +40,33 @@
     }
   }
 
-  & .attestations {
-
-    & label {
-
-      & .approved {
-        color: $color-success;
-      }
-
-      & .unapproved {
-        color: $color-danger;
-        text-decoration: line-through;
-      }
-    }
-  }
-
-    & .actions {
+  & .actions {
     margin: {
       top: $base-padding;
     }
 
     & button {
       @include button-primary;
+    }
+  }
+
+  & .AttestationStatus {
+    display: inline-block;
+    width: 30px;
+
+    &.unverified {
+
+      & + .ContactPresentation {
+        color: $color-danger;
+        text-decoration: line-through;
+      }
+    }
+
+    &.attested {
+
+      & + .ContactPresentation {
+        color: $color-success;
+      }
     }
   }
 }

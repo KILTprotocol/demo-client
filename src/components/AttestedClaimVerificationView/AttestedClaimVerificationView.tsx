@@ -1,8 +1,11 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import AttestationService from '../../services/AttestationService'
+import * as UiState from '../../state/ducks/UiState'
+import PersistentStore from '../../state/PersistentStore'
 
 import { CType } from '../../types/Ctype'
+import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Spinner from '../Spinner/Spinner'
@@ -15,29 +18,18 @@ type Props = {
   cType?: CType
 }
 
-type State = {
-  verificationPending: boolean
-  verificationSucceeded: boolean
-}
+type State = {}
 
 class AttestedClaimVerificationView extends React.Component<Props, State> {
   private static readonly BLOCK_CHAR: string = '\u2588'
 
   constructor(props: Props) {
     super(props)
-    this.verifyAttestatedClaim = this.verifyAttestatedClaim.bind(this)
-    this.state = {
-      verificationPending: true,
-      verificationSucceeded: false,
-    }
-    setTimeout(() => {
-      this.verifyAttestatedClaim()
-    }, 500)
+    this.state = {}
   }
 
   public render() {
-    const { attestedClaim, context }: Props = this.props
-    const { verificationPending } = this.state
+    const { attestedClaim }: Props = this.props
 
     return (
       <section className="AttestedClaimVerificationView">
@@ -48,7 +40,6 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
               <button
                 className="refresh"
                 onClick={this.verifyAttestatedClaim}
-                disabled={verificationPending}
               />
             </div>
             {this.buildClaimPropertiesView(attestedClaim)}
@@ -57,6 +48,12 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
           <div>Claim not found</div>
         )}
       </section>
+    )
+  }
+
+  private verifyAttestatedClaim() {
+    PersistentStore.store.dispatch(
+      UiState.Store.refreshAttestationStatusAction()
     )
   }
 
@@ -78,7 +75,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
           linked={true}
           inline={true}
         />
-        {this.getAttestationStatusView()}
+        <AttestationStatus attestedClaim={attestedClaim} />
       </h2>
     )
   }
@@ -106,36 +103,9 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     )
   }
 
-  private getAttestationStatusView() {
-    const { verificationPending, verificationSucceeded } = this.state
-    return verificationPending ? (
-      <Spinner size={20} color="#ef5a28" strength={3} />
-    ) : (
-      <span
-        className={
-          'status ' + (verificationSucceeded ? 'verified' : 'unverified')
-        }
-      />
-    )
-  }
-
   private getCtypePropertyTitle(propertyName: string): string {
     const { cType } = this.props
     return cType ? cType.getPropertyTitle(propertyName) : propertyName
-  }
-
-  private verifyAttestatedClaim() {
-    const { attestedClaim } = this.props
-    this.setState({
-      verificationPending: true,
-      verificationSucceeded: false,
-    })
-    AttestationService.verifyAttestatedClaim(attestedClaim).then(verified => {
-      this.setState({
-        verificationPending: false,
-        verificationSucceeded: verified,
-      })
-    })
   }
 }
 

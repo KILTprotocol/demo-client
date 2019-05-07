@@ -89,34 +89,6 @@
         }
       }
     }
-
-    & .attesterName {
-      width: 60%;
-    }
-
-    & .status {
-      height: 30px;
-      width: 20%;
-      text-align: center;
-
-      &.unverified {
-
-        &:before {
-          @include icon($icon-times);
-
-          color: $color-danger;
-        }
-      }
-
-      &.approved {
-
-        &:before {
-          @include icon($icon-check);
-
-          color: $color-success;
-        }
-      }
-    }
   }
 
   & .container-actions {

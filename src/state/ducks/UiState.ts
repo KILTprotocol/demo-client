@@ -1,9 +1,7 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
-import { TaskProps } from '../../containers/Tasks/Tasks'
 
-import { MessageOutput } from '../../services/MessageRepository'
+import { TaskProps } from '../../containers/Tasks/Tasks'
 import KiltAction from '../../types/Action'
 import {
   BlockingNotification,
@@ -72,6 +70,13 @@ interface SetDebugModeAction extends KiltAction {
 }
 
 /**
+ * debug state
+ */
+interface RefreshAttestationStatusAction extends KiltAction {
+  payload: undefined
+}
+
+/**
  *
  */
 type Action =
@@ -80,6 +85,7 @@ type Action =
   | BlockUiActions
   | SetDebugModeAction
   | UpdateCurrentTaskAction
+  | RefreshAttestationStatusAction
 
 type State = {
   notifications: Immutable.Map<Notification['id'], Notification>
@@ -88,6 +94,8 @@ type State = {
     BlockingNotification
   >
   blockUis: Immutable.Map<BlockUi['id'], BlockUi>
+
+  attestationStatusCycle: number
   currentTask: Immutable.List<TaskProps>
   debugMode: boolean
 }
@@ -159,10 +167,16 @@ class Store {
         const debugMode = (action as SetDebugModeAction).payload
         return state.setIn(['debugMode'], debugMode)
       }
+      // current task
       case Store.ACTIONS.CURRENT_TASK_UPDATE: {
         const { objective, props } = (action as UpdateCurrentTaskAction)
           .payload as TaskProps
         return state.setIn(['currentTask'], [{ objective, props }])
+      }
+      // attestation status
+      case Store.ACTIONS.ATTESTATION_STATUS_REFRESH: {
+        const cycle = state.getIn(['attestationStatusCycle'])
+        return state.setIn(['attestationStatusCycle'], cycle + 1)
       }
       default:
         return state
@@ -245,6 +259,13 @@ class Store {
     }
   }
 
+  public static refreshAttestationStatusAction(): RefreshAttestationStatusAction {
+    return {
+      payload: undefined,
+      type: Store.ACTIONS.ATTESTATION_STATUS_REFRESH,
+    }
+  }
+
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
       blockUis: Immutable.Map<BlockUi['id'], BlockUi>(),
@@ -252,10 +273,11 @@ class Store {
         BlockingNotification['id'],
         BlockingNotification
       >(),
-      debugMode: false,
       notifications: Immutable.Map<Notification['id'], Notification>(),
 
+      attestationStatusCycle: 0,
       currentTask: Immutable.List<TaskProps>(),
+      debugMode: false,
     } as State)(obj)
   }
 
@@ -268,6 +290,7 @@ class Store {
     NOTIFICATION_ADD: 'client/uiState/NOTIFICATION_ADD',
     NOTIFICATION_REMOVE: 'client/uiState/NOTIFICATION_REMOVE',
 
+    ATTESTATION_STATUS_REFRESH: 'client/uiState/ATTESTATION_STATUS_REFRESH',
     CURRENT_TASK_UPDATE: 'client/uiState/CURRENT_TASK_UPDATE',
     SET_DEBUG_MODE: 'client/uiState/SET_DEBUG_MODE',
   }
@@ -325,6 +348,14 @@ const getDebugMode = createSelector(
   (debugMode: boolean) => debugMode
 )
 
+const _getAttestationStatusCycle = (state: ReduxState): number =>
+  state.uiState.get('attestationStatusCycle')
+
+const getAttestationStatusCycle = createSelector(
+  [_getAttestationStatusCycle],
+  (cycle: number) => cycle
+)
+
 export {
   Store,
   ImmutableState,
@@ -335,4 +366,5 @@ export {
   getBlockingNotifications,
   getCurrentTask,
   getDebugMode,
+  getAttestationStatusCycle,
 }
