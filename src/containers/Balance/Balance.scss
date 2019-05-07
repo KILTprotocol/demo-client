@@ -18,11 +18,12 @@
   & input {
     @include input;
 
-    width: 150px;
+    width: 180px;
   }
 
   & button {
     @include button-primary;
+
     margin-left: $base-padding/2;
   }
 }

@@ -2,6 +2,7 @@ import Immutable from 'immutable'
 import React, { ChangeEvent, ReactNode } from 'react'
 import { connect } from 'react-redux'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
+import KiltToken from '../../components/KiltToken/KiltToken'
 import { ModalType } from '../../components/Modal/Modal'
 import SelectContactsModal from '../../components/Modal/SelectContactsModal'
 import Spinner from '../../components/Spinner/Spinner'
@@ -58,7 +59,7 @@ class Balance extends React.Component<Props, State> {
           {myBalance == null && (
             <Spinner size={20} color="#ef5a28" strength={3} />
           )}
-          {myBalance != null && <div className="kilt-token">{myBalance}</div>}
+          {myBalance != null && <KiltToken amount={myBalance} />}
         </div>
         {myBalance != null && (
           <div className="transfer-tokens">
@@ -79,7 +80,7 @@ class Balance extends React.Component<Props, State> {
     if (balance === undefined) {
       return undefined
     }
-    if (balance <= 0) {
+    if (balance < BalanceUtilities.transactionFee) {
       return <span>No sufficient funds to enable transfer.</span>
     }
 
@@ -91,6 +92,7 @@ class Balance extends React.Component<Props, State> {
           type="text"
           onChange={this.setTransferTokens}
           value={transferTokens}
+          placeholder="Whole numbers"
         />
         <button
           disabled={!transferTokens || !isFinite(Number(transferTokens))}
@@ -104,8 +106,7 @@ class Balance extends React.Component<Props, State> {
           }}
           header={
             <span>
-              Select receiver for{' '}
-              <span className="kilt-token">{transferTokens}</span>
+              Select receiver for <KiltToken amount={Number(transferTokens)} />
             </span>
           }
           placeholder="Select receiver…"
@@ -141,11 +142,13 @@ class Balance extends React.Component<Props, State> {
 
   private setTransferTokens(event: ChangeEvent<HTMLInputElement>) {
     const { value: amount } = event.target
-    const myBalance = this.getMyBalance()
+    let myBalance = this.getMyBalance()
 
-    if (!myBalance) {
+    if (!myBalance || amount.indexOf('.') !== -1) {
       return
     }
+
+    myBalance = BalanceUtilities.convertTokenForExternal(myBalance)
 
     const amountNumber = Number(amount)
 
@@ -173,7 +176,7 @@ class Balance extends React.Component<Props, State> {
         message: (
           <div>
             <span>You are trying so transfer </span>
-            <span className="kilt-token" />
+            <KiltToken />
             <span> from your identity </span>
             <ContactPresentation
               address={myIdentity.identity.address}
@@ -207,7 +210,7 @@ class Balance extends React.Component<Props, State> {
     BalanceUtilities.makeTransfer(
       myIdentity,
       receiver.publicIdentity.address,
-      Number(transferTokens)
+      BalanceUtilities.convertTokenForInternal(Number(transferTokens))
     )
   }
 }

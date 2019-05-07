@@ -1,0 +1,37 @@
+.KiltToken {
+  display: inline-block;
+
+  @include baseFont-bold;
+
+  &:after {
+    $font-size: 0.8em;
+    $size: 1.6;
+
+    @include border-radius(50%);
+
+    content: 'K';
+    display: inline-block;
+    width: #{$size}em;
+    height: #{$size}em;
+    margin:{
+      left: 0.5em;
+    }
+    border: 1px solid $color-primary;
+    font-size: $font-size;
+    line-height: $size;
+    text-align: center;
+    vertical-align: bottom;
+    color: $color-primary;
+  }
+
+  &.colored {
+
+    &.decreased {
+      color: $color-danger;
+    }
+    &.increased {
+
+      color: $color-success;
+    }
+  }
+}

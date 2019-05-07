@@ -144,10 +144,6 @@ a[href]{
   }
 }
 
-.kilt-token {
-  @include colored-kilt-token;
-}
-
 .date-time {
   $time-size: 0.8em;
   $line-height: 1.2;
