@@ -19,7 +19,7 @@ const ENDOWMENT = 100 * KILT
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
-  public static displayTokenRatio = 1000000
+  public static tokenFraction = 1000000
   public static transactionFee = 1000000
   public static tokenThreshold = 1000000
 
@@ -101,11 +101,11 @@ class BalanceUtilities {
   }
 
   public static convertTokenForExternal(bigNumber: number): number {
-    return bigNumber / BalanceUtilities.displayTokenRatio
+    return bigNumber / BalanceUtilities.tokenFraction
   }
 
   public static convertTokenForInternal(smallNumber: number): number {
-    return smallNumber * BalanceUtilities.displayTokenRatio
+    return smallNumber * BalanceUtilities.tokenFraction
   }
 
   private static async listener(
