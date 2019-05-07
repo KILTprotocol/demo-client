@@ -108,13 +108,8 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
 
     if (!contents.hasOwnProperty(propertyName)) {
       return AttestedClaimVerificationView.BLOCK_CHAR.repeat(12)
-    } else if (
-      typeof contents[propertyName] === 'boolean' ||
-      contents[propertyName] == null
-    ) {
-      return String(contents[propertyName])
     } else {
-      return contents[propertyName]
+      return contents[propertyName] + ''
     }
   }
 
