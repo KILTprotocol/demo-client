@@ -92,15 +92,30 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
           return (
             <div key={propertyName}>
               <label>{propertyTitle}</label>
-              <div>
-                {attestedClaim.request.claim.contents[propertyName] ||
-                  AttestedClaimVerificationView.BLOCK_CHAR.repeat(12)}
-              </div>
+              <div>{this.getPropertyValue(attestedClaim, propertyName)}</div>
             </div>
           )
         })}
       </div>
     )
+  }
+
+  private getPropertyValue(
+    attestedClaim: sdk.IAttestedClaim,
+    propertyName: string
+  ) {
+    const { contents } = attestedClaim.request.claim
+
+    if (!contents.hasOwnProperty(propertyName)) {
+      return AttestedClaimVerificationView.BLOCK_CHAR.repeat(12)
+    } else if (
+      typeof contents[propertyName] === 'boolean' ||
+      contents[propertyName] == null
+    ) {
+      return String(contents[propertyName])
+    } else {
+      return contents[propertyName]
+    }
   }
 
   private getCtypePropertyTitle(propertyName: string): string {

@@ -45,6 +45,13 @@
         &:first-child{
           margin-top: 0;
         }
+
+        & label {
+
+          & > .schema-based-json-editor--button-group {
+            @include baseFont;
+          }
+        }
       }
 
       &--description {
