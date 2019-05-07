@@ -10,6 +10,13 @@ interface SaveAction extends KiltAction {
   payload: MyIdentity
 }
 
+interface UpdateAction extends KiltAction {
+  payload: {
+    address: MyIdentity['identity']['address']
+    partialMyIdentity: Partial<MyIdentity>
+  }
+}
+
 interface RemoveAction extends KiltAction {
   payload: MyIdentity['identity']['address']
 }
@@ -18,7 +25,7 @@ interface SelectAction extends KiltAction {
   payload: MyIdentity['identity']['address']
 }
 
-type Action = SaveAction | RemoveAction | SelectAction
+type Action = SaveAction | UpdateAction | RemoveAction | SelectAction
 
 type Entry = MyIdentity
 
@@ -111,19 +118,33 @@ class Store {
     action: Action
   ): ImmutableState {
     switch (action.type) {
-      case Store.ACTIONS.SAVE_IDENTITY:
+      case Store.ACTIONS.SAVE_IDENTITY: {
         const myIdentity = (action as SaveAction).payload
         return state.setIn(['identities', myIdentity.identity.address], {
           ...myIdentity,
           createdAt: Date.now(),
         })
-      case Store.ACTIONS.REMOVE_IDENTITY:
+      }
+      case Store.ACTIONS.UPDATE_IDENTITY: {
+        const { address, partialMyIdentity } = (action as UpdateAction).payload
+        const myIdentity = state.getIn(['identities', address])
+
+        const updatedIdentity = {
+          ...myIdentity,
+          ...partialMyIdentity,
+        }
+
+        return state.setIn(['identities', address], updatedIdentity)
+      }
+      case Store.ACTIONS.REMOVE_IDENTITY: {
         const removeAddress = (action as RemoveAction).payload
         return state.deleteIn(['identities', removeAddress])
-      case Store.ACTIONS.SELECT_IDENTITY:
+      }
+      case Store.ACTIONS.SELECT_IDENTITY: {
         const selectAddress = (action as SelectAction).payload
         const selectedIdentity = state.getIn(['identities', selectAddress])
         return state.set('selectedIdentity', selectedIdentity)
+      }
       default:
         return state
     }
@@ -133,6 +154,16 @@ class Store {
     return {
       payload: myIdentity,
       type: Store.ACTIONS.SAVE_IDENTITY,
+    }
+  }
+
+  public static updateIdentityAction(
+    address: MyIdentity['identity']['address'],
+    partialMyIdentity: Partial<MyIdentity>
+  ): UpdateAction {
+    return {
+      payload: { address, partialMyIdentity },
+      type: Store.ACTIONS.UPDATE_IDENTITY,
     }
   }
 
@@ -168,6 +199,7 @@ class Store {
     REMOVE_IDENTITY: 'client/wallet/REMOVE_IDENTITY',
     SAVE_IDENTITY: 'client/wallet/SAVE_IDENTITY',
     SELECT_IDENTITY: 'client/wallet/SELECT_IDENTITY',
+    UPDATE_IDENTITY: 'client/wallet/UPDATE_IDENTITY',
   }
 }
 

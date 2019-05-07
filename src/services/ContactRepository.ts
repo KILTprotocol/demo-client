@@ -1,8 +1,10 @@
 import * as Contacts from '../state/ducks/Contacts'
+import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
 import { BasePostParams } from './BaseRepository'
 import ErrorService from './ErrorService'
+import { notifyFailure } from './FeedbackService'
 
 // TODO: add tests, create interface for this class to be implemented as mock
 // (for other tests)
@@ -101,6 +103,42 @@ class ContactRepository {
     }
 
     return contact
+  }
+
+  public static async importViaDID(
+    didAddress: string,
+    alias: string
+  ): Promise<void | Contact> {
+    return fetch(`${ContactRepository.URL}/did/${didAddress}`)
+      .then(response => {
+        if (!response.ok) {
+          throw Error(response.statusText)
+        }
+        return response
+      })
+      .then(response => response.json())
+      .then((contact: Contact) => {
+        const selectedIdentity = Wallet.getSelectedIdentity(
+          PersistentStore.store.getState()
+        )
+        PersistentStore.store.dispatch(
+          Contacts.Store.addContact({
+            ...contact,
+            did: { address: didAddress },
+            metaData: {
+              ...contact.metaData,
+              addedAt: Date.now(),
+              addedBy: selectedIdentity.identity.address,
+              name: alias,
+            },
+          })
+        )
+        return contact
+      })
+      .catch(error => {
+        notifyFailure(`Could not import contact with DID '${didAddress}'`)
+        throw error
+      })
   }
 }
 

@@ -47,5 +47,16 @@
       @include button-secondary;
     }
   }
+  & .importViaDID {
+    @include labeledCard;
+
+    & > div:not(.actions) {
+      @include label_input_combo;
+
+      & input {
+        width: 100%;
+      }
+    }
+  }
 }
   

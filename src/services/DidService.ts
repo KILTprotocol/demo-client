@@ -46,8 +46,12 @@ export class DidService {
         `Error creating DID for identity ${myIdentity.metaData.name}`
       )
     }
-    myIdentity.did = did.identifier
-    persistentStore.store.dispatch(Wallet.Store.saveIdentityAction(myIdentity))
+
+    persistentStore.store.dispatch(
+      Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
+        did: did.identifier,
+      })
+    )
     return did
   }
 
@@ -59,9 +63,11 @@ export class DidService {
         `Error deleting DID for identity ${myIdentity.metaData.name}`
       )
     }
-    // TODO: remove from service
-    myIdentity.did = undefined
-    persistentStore.store.dispatch(Wallet.Store.saveIdentityAction(myIdentity))
+    persistentStore.store.dispatch(
+      Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
+        did: undefined,
+      })
+    )
   }
 
   private static readonly URL_RESOLVER = {
