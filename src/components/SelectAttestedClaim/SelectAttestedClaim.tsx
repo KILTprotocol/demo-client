@@ -208,7 +208,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
                 onChange={this.selectAttestation.bind(this, attestedClaim)}
               />
               <span>
-                <AttestationStatus attestedClaim={attestedClaim} />
+                <AttestationStatus attestation={attestedClaim} />
                 <ContactPresentation
                   address={attestedClaim.attestation.owner}
                   interactive={true}

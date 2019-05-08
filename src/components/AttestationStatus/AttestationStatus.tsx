@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import AttestationService from '../../services/AttestationService'
 import * as Claims from '../../state/ducks/Claims'
 import * as UiState from '../../state/ducks/UiState'
+import * as Attestations from '../../state/ducks/Attestations'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
@@ -18,8 +19,12 @@ const enum STATUS {
   ATTESTED = 'attested',
 }
 
+function isAttestedClaim(arg: any): arg is sdk.IAttestedClaim {
+  return arg.request !== undefined
+}
+
 type Props = {
-  attestedClaim: sdk.IAttestedClaim
+  attestation: sdk.IAttestedClaim | sdk.IAttestation
 
   // redux
   attestationStatusCycle: number
@@ -32,17 +37,20 @@ type State = {
 class AttestationStatus extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
+
+    const _attestation = isAttestedClaim(props.attestation)
+      ? props.attestation.attestation
+      : props.attestation
+
     this.state = {
-      status: props.attestedClaim.attestation.revoked
-        ? STATUS.UNVERIFIED
-        : undefined,
+      status: _attestation.revoked ? STATUS.UNVERIFIED : undefined,
     }
   }
 
   public componentDidMount() {
     const { status } = this.state
     if (status !== STATUS.UNVERIFIED) {
-      this.verifyAttestation()
+      this.verifyAttestedClaim()
     }
   }
 
@@ -53,7 +61,7 @@ class AttestationStatus extends React.Component<Props, State> {
       status !== STATUS.UNVERIFIED &&
       status !== STATUS.PENDING
     ) {
-      this.verifyAttestation()
+      this.verifyAttestedClaim()
     }
   }
 
@@ -71,8 +79,8 @@ class AttestationStatus extends React.Component<Props, State> {
     )
   }
 
-  private verifyAttestation() {
-    const { attestedClaim } = this.props
+  private verifyAttestedClaim() {
+    const { attestation } = this.props
     const { status } = this.state
 
     // if we are currently already fetching - cancel
@@ -84,22 +92,30 @@ class AttestationStatus extends React.Component<Props, State> {
       status: STATUS.PENDING,
     })
 
-    AttestationService.verifyAttestatedClaim(attestedClaim).then(
-      (verified: boolean) => {
-        if (verified) {
-          this.setState({
-            status: STATUS.ATTESTED,
-          })
-        } else {
-          this.setState({
-            status: STATUS.UNVERIFIED,
-          })
+    const isAttested = isAttestedClaim(attestation)
+      ? AttestationService.verifyAttestatedClaim(attestation)
+      : AttestationService.verifyAttestation(attestation)
+
+    isAttested.then((verified: boolean) => {
+      if (verified) {
+        this.setState({
+          status: STATUS.ATTESTED,
+        })
+      } else {
+        this.setState({
+          status: STATUS.UNVERIFIED,
+        })
+        if (isAttestedClaim(attestation)) {
           PersistentStore.store.dispatch(
-            Claims.Store.revokeAttestation(attestedClaim.request.hash)
+            Claims.Store.revokeAttestation(attestation.request.hash)
+          )
+        } else {
+          PersistentStore.store.dispatch(
+            Attestations.Store.revokeAttestation(attestation.claimHash)
           )
         }
       }
-    )
+    })
   }
 }
 

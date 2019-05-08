@@ -2,19 +2,24 @@ declare global {
   interface PromiseConstructor {
     any<T>(
       arrayOfPromises: Array<T | PromiseLike<T>>
-    ): Promise<PromiseAnyResult>
+    ): Promise<PromiseCollectedResults>
+
+    chain<T>(
+      arrayOfPromiseMethods: Array<() => Promise<any>>,
+      continueOnError?: boolean
+    ): Promise<PromiseCollectedResults>
   }
 }
 
-type PromiseAnyResult = {
+type PromiseCollectedResults = {
   errors: Error[]
   successes: any[]
 }
 
 Promise.any = (
   arrayOfPromises: Array<Promise<any>>
-): Promise<PromiseAnyResult> => {
-  const result: PromiseAnyResult = {
+): Promise<PromiseCollectedResults> => {
+  const result: PromiseCollectedResults = {
     errors: [],
     successes: [],
   }
@@ -34,6 +39,33 @@ Promise.any = (
   ).then(() => {
     return result
   })
+}
+
+Promise.chain = (
+  arrayOfPromiseMethods: Array<() => Promise<any>>,
+  continueOnError = false
+): Promise<PromiseCollectedResults> => {
+  const result: PromiseCollectedResults = {
+    errors: [],
+    successes: [],
+  }
+
+  return arrayOfPromiseMethods
+    .reduce(async (previousPromise, nextPromiseMethod: () => Promise<any>) => {
+      await previousPromise
+      if (continueOnError || !result.errors.length) {
+        return nextPromiseMethod()
+          .then((success: any) => {
+            result.successes.push(success)
+          })
+          .catch(error => {
+            result.errors.push(error)
+          })
+      } else {
+        return Promise.resolve()
+      }
+    }, Promise.resolve())
+    .then(() => result)
 }
 
 export default { Promise }

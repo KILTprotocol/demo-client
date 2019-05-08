@@ -296,17 +296,24 @@ class DelegationNode extends React.Component<Props, State> {
       <span>Start revoking Attestations for Delegation: {delegationTitle}</span>
     )
 
-    Promise.any(
-      hashes.map(hash =>
-        sdk.Attestation.revoke(blockchain, hash, selectedIdentity.identity)
-      )
+    Promise.chain(
+      hashes.map((hash: string) => () => {
+        return sdk.Attestation.revoke(
+          blockchain,
+          hash,
+          selectedIdentity.identity
+        ).catch(error => {
+          throw { hash, error }
+        })
+      }),
+      true
     ).then(result => {
       if (result.successes.length) {
         notifySuccess(
           <span>
-            Successfully revoked {result.successes.length} attestation
-            {result.successes.length > 1 ? 's' : ''} for Delegation:{' '}
-            {delegationTitle}
+            Successfully revoked {result.successes.length}
+            {result.successes.length > 1 ? ' attestations ' : ' attestation '}
+            for Delegation: {delegationTitle}
           </span>,
           false
         )
@@ -314,13 +321,14 @@ class DelegationNode extends React.Component<Props, State> {
       if (result.errors.length) {
         notifyFailure(
           <span>
-            Could not revoke {result.successes.length} attestation
-            {result.successes.length > 1 ? 's' : ''} for Delegation:{' '}
-            {delegationTitle}. For details refer to console.
+            Could not revoke {result.errors.length}
+            {result.errors.length > 1 ? ' attestations ' : ' attestation '}
+            for Delegation: {delegationTitle}. Maybe they were already revoked.
+            For details refer to console.
           </span>,
           false
         )
-        console.error('result.errors', result.errors)
+        console.error('revocation errors', result.errors)
       }
     })
   }

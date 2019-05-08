@@ -38,7 +38,10 @@ class ContactRepository {
       })
   }
 
-  public static async findByAddress(address: string): Promise<void | Contact> {
+  public static async findByAddress(
+    address: string,
+    propagateError = false
+  ): Promise<void | Contact> {
     const persistedContact = Contacts.getContact(
       PersistentStore.store.getState(),
       address
@@ -51,7 +54,7 @@ class ContactRepository {
     return fetch(`${ContactRepository.URL}/${address}`)
       .then(response => {
         if (!response.ok) {
-          throw Error(response.statusText)
+          throw Error(address)
         }
         return response
       })
@@ -60,12 +63,15 @@ class ContactRepository {
         PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
         return contact
       })
-      .catch(() => {
+      .catch(error => {
         if (!Wallet.getIdentity(PersistentStore.store.getState(), address)) {
           notifyFailure(
             `Could not resolve contact for address ${address}!`,
             false
           )
+        }
+        if (propagateError) {
+          throw error
         }
       })
   }
