@@ -73,31 +73,29 @@ class BsIdentity {
         }
         PersistentStore.store.dispatch(Contacts.Store.addContact(newContact))
       })
-      .then(
-        () => {
-          const newIdentity = {
-            identity,
-            metaData: {
-              name: alias,
-            },
-            phrase,
-          } as MyIdentity
-          PersistentStore.store.dispatch(
-            Wallet.Store.saveIdentityAction(newIdentity)
+      .then(() => {
+        const newIdentity = {
+          identity,
+          metaData: {
+            name: alias,
+          },
+          phrase,
+        } as MyIdentity
+        PersistentStore.store.dispatch(
+          Wallet.Store.saveIdentityAction(newIdentity)
+        )
+        PersistentStore.store.dispatch(
+          Contacts.Store.addContact(
+            ContactRepository.getContactFromIdentity(newIdentity, {
+              unregistered: true,
+            })
           )
-          PersistentStore.store.dispatch(
-            Contacts.Store.addContact(
-              ContactRepository.getContactFromIdentity(newIdentity, {
-                unregistered: true,
-              })
-            )
-          )
-          BalanceUtilities.connect(newIdentity)
-          notifySuccess(`Identity ${alias} successfully created.`)
+        )
+        BalanceUtilities.connect(newIdentity)
+        notifySuccess(`Identity ${alias} successfully created.`)
 
-          return newIdentity
-        }
-      )
+        return newIdentity
+      })
   }
 
   public static async getByKey(

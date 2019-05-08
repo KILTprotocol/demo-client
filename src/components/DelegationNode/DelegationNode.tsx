@@ -19,6 +19,7 @@ import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 import {
   BlockingNotification,
+  BlockUi,
   NotificationType,
 } from '../../types/UserFeedback'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -292,12 +293,18 @@ class DelegationNode extends React.Component<Props, State> {
         <ShortHash>{delegation.id}</ShortHash>
       </span>
     )
-    notify(
-      <span>Start revoking Attestations for Delegation: {delegationTitle}</span>
-    )
+
+    const blockUi: BlockUi = FeedbackService.addBlockUi({
+      headline: `Revoking Attestations for Delegation \n'${
+        myDelegation
+          ? myDelegation.metaData.alias
+          : delegation.id.substr(0, 10) + '…'
+      }'`,
+    })
 
     Promise.chain(
-      hashes.map((hash: string) => () => {
+      hashes.map((hash: string, index: number) => () => {
+        blockUi.updateMessage(`Revoking ${index + 1} / ${hashes.length}`)
         return sdk.Attestation.revoke(
           blockchain,
           hash,
@@ -308,6 +315,7 @@ class DelegationNode extends React.Component<Props, State> {
       }),
       true
     ).then(result => {
+      blockUi.remove()
       if (result.successes.length) {
         notifySuccess(
           <span>
