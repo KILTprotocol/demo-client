@@ -1,7 +1,7 @@
 import { Blockchain, Identity } from '@kiltprotocol/prototype-sdk'
 import { mnemonicGenerate } from '@polkadot/util-crypto/mnemonic'
 
-import BalanceUtilities from '../../services/BalanceUtilities'
+import { BalanceUtilities, ENDOWMENT } from '../../services/BalanceUtilities'
 import BlockchainService from '../../services/BlockchainService'
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
@@ -53,15 +53,9 @@ class BsIdentity {
     const selectedIdentity: MyIdentity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     )
-    const ONE_KILT = 1000000
-    const DEFAULT_BALANCE = ONE_KILT * 10
 
     return blockchain
-      .makeTransfer(
-        selectedIdentity.identity,
-        identity.address,
-        DEFAULT_BALANCE
-      )
+      .makeTransfer(selectedIdentity.identity, identity.address, ENDOWMENT)
       .then((result: any) => {
         const { address, boxPublicKeyAsHex } = identity
         const newContact: Contact = {

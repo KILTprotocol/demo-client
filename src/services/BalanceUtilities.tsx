@@ -10,6 +10,12 @@ import { Contact, MyIdentity } from '../types/Contact'
 import BlockchainService from './BlockchainService'
 import { notify, notifySuccess } from './FeedbackService'
 
+// the amount of tokens that make up 1 (one) Kilt
+const KILT = 1_000_000
+
+// initial endowment for automatically created accounts
+const ENDOWMENT = 100 * KILT
+
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
   public static async connect(myIdentity: MyIdentity) {
@@ -109,4 +115,4 @@ class BalanceUtilities {
   }
 }
 
-export default BalanceUtilities
+export { BalanceUtilities, KILT, ENDOWMENT }

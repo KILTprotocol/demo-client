@@ -6,6 +6,7 @@ import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
+import * as Balances from '../../state/ducks/Balances'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
@@ -51,10 +52,18 @@ class IdentityView extends React.Component<Props, State> {
       onDeleteDid,
     } = this.props
 
-    const contact = contacts.find(
+    const contact: Contact | undefined = contacts.find(
       (myContact: Contact) =>
         myContact.publicIdentity.address === myIdentity.identity.address
     )
+
+    let balance: number = 0
+    if (contact) {
+      balance = Balances.getBalance(
+        PersistentStore.store.getState(),
+        contact.publicIdentity.address
+      )
+    }
 
     const classes = ['IdentityView', selected ? 'selected' : '']
 
@@ -150,13 +159,15 @@ class IdentityView extends React.Component<Props, State> {
             }
           />
 
-          <button
-            className="requestTokens"
-            onClick={this.requestKiltTokens}
-            title="Request Tokens"
-          >
-            Request Tokens
-          </button>
+          {!(balance > 0) && (
+            <button
+              className="requestTokens"
+              onClick={this.requestKiltTokens}
+              title="Request Tokens"
+            >
+              Request Tokens
+            </button>
+          )}
 
           {(!contact || (contact && contact.metaData.unregistered)) && (
             <button onClick={this.registerContact}>Register</button>

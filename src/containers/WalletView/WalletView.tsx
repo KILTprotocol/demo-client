@@ -8,6 +8,7 @@ import FeedbackService, {
   safeDelete,
   notifyFailure,
   notifySuccess,
+  notifyError,
 } from '../../services/FeedbackService'
 
 import * as Wallet from '../../state/ducks/Wallet'
@@ -92,7 +93,7 @@ class WalletView extends React.Component<Props, State> {
         blockUi.remove()
       })
       .catch(err => {
-        notifyFailure(err)
+        notifyError(err)
         blockUi.remove()
       })
   }
@@ -110,7 +111,7 @@ class WalletView extends React.Component<Props, State> {
           blockUi.remove()
         })
         .catch(err => {
-          notifyFailure(err)
+          notifyError(err)
           blockUi.remove()
         })
     })

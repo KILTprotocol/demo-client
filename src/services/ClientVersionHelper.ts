@@ -3,7 +3,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import PersistentStore from '../state/PersistentStore'
 import * as Parameters from '../state/ducks/Parameters'
 import * as Wallet from '../state/ducks/Wallet'
-import BalanceUtilities from './BalanceUtilities'
+import { BalanceUtilities } from './BalanceUtilities'
 import BlockchainService from './BlockchainService'
 
 type CheckResult = {

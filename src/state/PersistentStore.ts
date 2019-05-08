@@ -1,5 +1,5 @@
 import { combineReducers, createStore, Store } from 'redux'
-import BalanceUtilities from '../services/BalanceUtilities'
+import { BalanceUtilities } from '../services/BalanceUtilities'
 
 import * as Attestations from './ducks/Attestations'
 import * as Balances from './ducks/Balances'

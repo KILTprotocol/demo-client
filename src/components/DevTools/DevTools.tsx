@@ -7,6 +7,7 @@ import { BsCType, BsCTypesPool } from './DevTools.ctypes'
 import { BsDelegation, BsDelegationsPool } from './DevTools.delegations'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 import * as Wallet from '../../state/ducks/Wallet'
+import * as Balances from '../../state/ducks/Balances'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 
@@ -28,10 +29,16 @@ class DevTools extends React.Component<Props> {
       PersistentStore.store.getState()
     )
 
+    const balance: number = selectedIdentity
+      ? Balances.getBalance(
+          PersistentStore.store.getState(),
+          selectedIdentity.identity.address
+        )
+      : 0
     return (
       <section className="DevTools">
         <h2>Dev Tools</h2>
-        {selectedIdentity ? (
+        {selectedIdentity && balance > 0 ? (
           <div>
             <div>
               <h4>Auto Bootstrap</h4>
@@ -67,7 +74,7 @@ class DevTools extends React.Component<Props> {
             ))}
           </div>
         ) : (
-          <p>Please select an identity first</p>
+          <p>Please select an identity and make sure it has enough funds.</p>
         )}
       </section>
     )
