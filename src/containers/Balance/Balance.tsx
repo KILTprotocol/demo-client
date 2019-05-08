@@ -5,7 +5,7 @@ import ContactPresentation from '../../components/ContactPresentation/ContactPre
 import { ModalType } from '../../components/Modal/Modal'
 import SelectContactsModal from '../../components/Modal/SelectContactsModal'
 import Spinner from '../../components/Spinner/Spinner'
-import BalanceUtilities from '../../services/BalanceUtilities'
+import { BalanceUtilities } from '../../services/BalanceUtilities'
 import FeedbackService from '../../services/FeedbackService'
 
 import * as Balances from '../../state/ducks/Balances'

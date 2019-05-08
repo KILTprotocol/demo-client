@@ -1,7 +1,7 @@
 import { Blockchain, Identity } from '@kiltprotocol/prototype-sdk'
 import { mnemonicGenerate } from '@polkadot/util-crypto/mnemonic'
 
-import BalanceUtilities from '../../services/BalanceUtilities'
+import { BalanceUtilities, ENDOWMENT } from '../../services/BalanceUtilities'
 import BlockchainService from '../../services/BlockchainService'
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
@@ -50,10 +50,12 @@ class BsIdentity {
     alias: string
   ): Promise<void | MyIdentity> {
     const blockchain: Blockchain = await BlockchainService.connect()
-    const alice = Identity.buildFromURI('//Alice')
+    const selectedIdentity: MyIdentity = Wallet.getSelectedIdentity(
+      PersistentStore.store.getState()
+    )
 
     return blockchain
-      .makeTransfer(alice, identity.address, 1000)
+      .makeTransfer(selectedIdentity.identity, identity.address, ENDOWMENT)
       .then((result: any) => {
         const { address, boxPublicKeyAsHex } = identity
         const newContact: Contact = {

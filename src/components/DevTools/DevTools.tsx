@@ -6,6 +6,10 @@ import { BsClaim, BsClaimsPool } from './DevTools.claims'
 import { BsCType, BsCTypesPool } from './DevTools.ctypes'
 import { BsDelegation, BsDelegationsPool } from './DevTools.delegations'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
+import * as Wallet from '../../state/ducks/Wallet'
+import * as Balances from '../../state/ducks/Balances'
+import PersistentStore from '../../state/PersistentStore'
+import { MyIdentity } from '../../types/Contact'
 
 type WithMessages = {
   label: string
@@ -21,44 +25,57 @@ class DevTools extends React.Component<Props> {
       { label: 'With messages', with: true },
     ]
 
+    const selectedIdentity: MyIdentity = Wallet.getSelectedIdentity(
+      PersistentStore.store.getState()
+    )
+
+    const balance: number = selectedIdentity
+      ? Balances.getBalance(
+          PersistentStore.store.getState(),
+          selectedIdentity.identity.address
+        )
+      : 0
     return (
       <section className="DevTools">
         <h2>Dev Tools</h2>
-
-        <div>
+        {selectedIdentity && balance > 0 ? (
           <div>
-            <h4>Auto Bootstrap</h4>
+            <div>
+              <h4>Auto Bootstrap</h4>
+              {withMessages.map((messages: WithMessages) => (
+                <button
+                  key={messages.label}
+                  onClick={this.bootstrapAll.bind(this, messages.with)}
+                >
+                  {messages.label}
+                </button>
+              ))}
+            </div>
             {withMessages.map((messages: WithMessages) => (
-              <button
-                key={messages.label}
-                onClick={this.bootstrapAll.bind(this, messages.with)}
-              >
-                {messages.label}
-              </button>
+              <div key={messages.label}>
+                <h4>{`Manual Bootstrap ${messages.label}`}</h4>
+                <button onClick={this.bootstrapIdentities}>Identities</button>
+                <button onClick={this.bootstrapCTypes}>CTypes</button>
+                <button onClick={this.bootstrapClaims}>Claims</button>
+                <button
+                  onClick={this.bootstrapDelegations.bind(this, messages.with)}
+                >
+                  Delegations
+                </button>
+                <button onClick={this.bootstrapPCRs.bind(this, messages.with)}>
+                  PCRs
+                </button>
+                <button
+                  onClick={this.bootstrapAttestations.bind(this, messages.with)}
+                >
+                  Attestations
+                </button>
+              </div>
             ))}
           </div>
-          {withMessages.map((messages: WithMessages) => (
-            <div key={messages.label}>
-              <h4>{`Manual Bootstrap ${messages.label}`}</h4>
-              <button onClick={this.bootstrapIdentities}>Identities</button>
-              <button onClick={this.bootstrapCTypes}>CTypes</button>
-              <button onClick={this.bootstrapClaims}>Claims</button>
-              <button
-                onClick={this.bootstrapDelegations.bind(this, messages.with)}
-              >
-                Delegations
-              </button>
-              <button onClick={this.bootstrapPCRs.bind(this, messages.with)}>
-                PCRs
-              </button>
-              <button
-                onClick={this.bootstrapAttestations.bind(this, messages.with)}
-              >
-                Attestations
-              </button>
-            </div>
-          ))}
-        </div>
+        ) : (
+          <p>Please select an identity and make sure it has enough funds.</p>
+        )}
       </section>
     )
   }
