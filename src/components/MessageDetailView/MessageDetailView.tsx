@@ -174,7 +174,7 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <SubmitClaimsForCType
             receiverAddresses={[message.senderAddress]}
-            cTypeHash={(message.body as sdk.IRequestClaimsForCtype).content}
+            cTypeHashes={(message.body as sdk.IRequestClaimsForCtype).content}
             onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />

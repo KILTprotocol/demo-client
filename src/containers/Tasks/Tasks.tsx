@@ -129,7 +129,7 @@ class Tasks extends React.Component<Props, State> {
         return this.getModal(
           'Request legitimations',
           <>
-            {this.getCTypeSelect(false, props.cTypeHash)}
+            {this.getCTypeSelect(false, [props.cTypeHash])}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestLegitimation
                 {...props}
@@ -151,7 +151,7 @@ class Tasks extends React.Component<Props, State> {
         return this.getModal(
           'Submit legitimations',
           <>
-            {this.getCTypeSelect(false, cTypeHash)}
+            {this.getCTypeSelect(false, [cTypeHash])}
             {!!selectedCTypes.length &&
             selectedCTypes[0].cType.hash &&
             !!selectedReceivers.length ? (
@@ -194,10 +194,12 @@ class Tasks extends React.Component<Props, State> {
         return this.getModal(
           'Submit claims for cType',
           <>
-            {this.getCTypeSelect(false, props.cTypeHash)}
+            {this.getCTypeSelect(false, props.cTypeHashes)}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <SubmitClaimsForCType
-                cTypeHash={selectedCTypes[0].cType.hash}
+                cTypeHashes={selectedCTypes.map(
+                  (cType: ICType) => cType.cType.hash
+                )}
                 receiverAddresses={selectedReceiverAddresses}
                 onFinished={this.onTaskFinished}
                 onCancel={this.onCancel}
@@ -215,10 +217,12 @@ class Tasks extends React.Component<Props, State> {
         return this.getModal(
           'Request claims for cType',
           <>
-            {this.getCTypeSelect(false, props.cTypeHash)}
+            {this.getCTypeSelect(true, props.cTypeHashes)}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestClaimsForCType
-                cTypeHash={selectedCTypes[0].cType.hash}
+                cTypeHashes={selectedCTypes.map(
+                  (cType: ICType) => cType.cType.hash
+                )}
                 receiverAddresses={selectedReceiverAddresses}
                 onFinished={this.onTaskFinished}
                 onCancel={this.onCancel}
@@ -235,7 +239,7 @@ class Tasks extends React.Component<Props, State> {
         return this.getModal(
           `Invite to ${props.isPCR ? 'PCR(s)' : 'delegation(s)'}`,
           <>
-            {this.getCTypeSelect(false, props.cTypeHash)}
+            {this.getCTypeSelect(false, [props.cTypeHash])}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestAcceptDelegation
                 isPCR={!!props.isPCR}
@@ -339,16 +343,13 @@ class Tasks extends React.Component<Props, State> {
 
   private getCTypeSelect(
     isMulti: boolean,
-    preSelectedCTypeHash?: ICType['cType']['hash']
+    preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | undefined>
   ) {
-    const preselected = preSelectedCTypeHash
-      ? [preSelectedCTypeHash]
-      : undefined
     return (
       <section className="selectCType">
         <h2>Select cType{isMulti ? '(s)' : ''}</h2>
         <SelectCTypes
-          preSelectedCTypeHashes={preselected}
+          preSelectedCTypeHashes={preSelectedCTypeHashes}
           isMulti={isMulti}
           onChange={this.onSelectCTypes}
           onMenuOpen={this.onMenuOpen}

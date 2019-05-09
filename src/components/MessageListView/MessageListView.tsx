@@ -117,9 +117,9 @@ class MessageListView extends React.Component<Props, State> {
                   message.receivedAt,
                   createReceiveErrors.receivedAt
                 )
-                const cTypeHash:
-                  | ICType['cType']['hash']
-                  | undefined = MessageRepository.getCTypeHash(message)
+                const cTypeHashes: Array<
+                  ICType['cType']['hash']
+                > = MessageRepository.getCTypeHashes(message)
                 return (
                   <tr key={message.messageId}>
                     <td className="sender-subject-created-received">
@@ -132,13 +132,7 @@ class MessageListView extends React.Component<Props, State> {
                       <div onClick={this.openMessage.bind(this, message)}>
                         <MessageSubject message={message} />
                       </div>
-                      {!!cTypeHash && (
-                        <CTypePresentation
-                          cTypeHash={cTypeHash}
-                          interactive={true}
-                          linked={true}
-                        />
-                      )}
+                      {this.getCTypePresentations(message)}
                       <div title="created">{created}</div>
                       <div title="received">{received}</div>
                     </td>
@@ -152,13 +146,7 @@ class MessageListView extends React.Component<Props, State> {
                       <div onClick={this.openMessage.bind(this, message)}>
                         <MessageSubject message={message} />
                       </div>
-                      {!!cTypeHash && (
-                        <CTypePresentation
-                          cTypeHash={cTypeHash}
-                          interactive={true}
-                          linked={true}
-                        />
-                      )}
+                      {this.getCTypePresentations(message)}
                     </td>
                     <td className="sender">
                       <ContactPresentation
@@ -172,13 +160,7 @@ class MessageListView extends React.Component<Props, State> {
                       </div>
                     </td>
                     <td className="cType">
-                      {!!cTypeHash && (
-                        <CTypePresentation
-                          cTypeHash={cTypeHash}
-                          interactive={true}
-                          linked={true}
-                        />
-                      )}
+                      {this.getCTypePresentations(message)}
                     </td>
                     <td className="created">{created}</td>
                     <td className="received">{received}</td>
@@ -206,6 +188,20 @@ class MessageListView extends React.Component<Props, State> {
         )}
       </section>
     )
+  }
+
+  private getCTypePresentations(message: MessageOutput) {
+    const cTypeHashes: Array<
+      ICType['cType']['hash']
+    > = MessageRepository.getCTypeHashes(message)
+    return cTypeHashes.map((cTypeHash: ICType['cType']['hash']) => (
+      <CTypePresentation
+        key={cTypeHash}
+        cTypeHash={cTypeHash}
+        interactive={true}
+        linked={true}
+      />
+    ))
   }
 
   private handleDelete(message: IMessage) {

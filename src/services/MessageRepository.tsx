@@ -1,4 +1,5 @@
 import {
+  IAttestedClaim,
   ISubmitAttestationForClaim,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
@@ -222,50 +223,66 @@ class MessageRepository {
     }
   }
 
-  public static getCTypeHash(
+  public static getCTypeHashes(
     message: MessageOutput
-  ): ICType['cType']['hash'] | undefined {
+  ): Array<ICType['cType']['hash']> {
     const { body } = message
     const { type } = body
 
     switch (type) {
       case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
-        return (message.body as sdk.IRequestLegitimations).content.cType
+        return [(message.body as sdk.IRequestLegitimations).content.cType]
       case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
-        return (message.body as sdk.ISubmitLegitimations).content.claim.cType
+        return [(message.body as sdk.ISubmitLegitimations).content.claim.cType]
       case sdk.MessageBodyType.REJECT_LEGITIMATIONS:
-        return (message.body as sdk.IRejectLegitimations).content.claim.cType
+        return [(message.body as sdk.IRejectLegitimations).content.claim.cType]
 
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
-        return (message.body as sdk.IRequestAttestationForClaim).content.claim
-          .cType
+        return [
+          (message.body as sdk.IRequestAttestationForClaim).content.claim.cType,
+        ]
       case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
-        return (message.body as ISubmitAttestationForClaim).content.request
-          .claim.cType
+        return [
+          (message.body as ISubmitAttestationForClaim).content.request.claim
+            .cType,
+        ]
       case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
-        return (message.body as sdk.IRejectAttestationForClaim).content.claim
-          .cType
+        return [
+          (message.body as sdk.IRejectAttestationForClaim).content.claim.cType,
+        ]
 
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
         return (message.body as sdk.IRequestClaimsForCtype).content
       case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
-        return (message.body as sdk.ISubmitClaimsForCtype).content[0].request
-          .claim.cType
+        const cTypeHashes: Array<
+          ICType['cType']['hash']
+        > = (message.body as sdk.ISubmitClaimsForCtype).content.map(
+          (attestedClaim: IAttestedClaim) => attestedClaim.request.claim.cType
+        )
+        const uniqueCTypeHashes: Array<
+          ICType['cType']['hash']
+        > = cTypeHashes.filter(
+          (cTypeHash: ICType['cType']['hash'], index: number) =>
+            cTypeHashes.indexOf(cTypeHash) === index
+        )
+        return uniqueCTypeHashes
       case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPE:
-        return (message.body as sdk.IAcceptClaimsForCtype).content[0].request
-          .hash
+        return [
+          (message.body as sdk.IAcceptClaimsForCtype).content[0].request.hash,
+        ]
       case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPE:
-        return (message.body as sdk.IRejectClaimsForCtype).content[0].request
-          .hash
+        return [
+          (message.body as sdk.IRejectClaimsForCtype).content[0].request.hash,
+        ]
 
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.REJECT_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.INFORM_CREATE_DELEGATION:
-        return undefined
+        return []
 
       default:
-        return undefined
+        return []
     }
   }
 

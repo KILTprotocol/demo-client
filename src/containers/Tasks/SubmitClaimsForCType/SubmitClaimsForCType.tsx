@@ -13,7 +13,7 @@ import { Contact } from '../../../types/Contact'
 import './SubmitClaimsForCType.scss'
 
 export type SubmitClaimsForCTypeProps = {
-  cTypeHash: sdk.ICType['hash']
+  cTypeHashes: Array<sdk.ICType['hash']>
   receiverAddresses: Array<Contact['publicIdentity']['address']>
 
   onFinished?: () => void
@@ -36,7 +36,7 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
 
   public render() {
     const {
-      cTypeHash,
+      cTypeHashes,
       claimSelectionData,
 
       onChange,
@@ -47,7 +47,7 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
         <section className="selectAttestedClaims">
           <h2>Select attested claim(s)</h2>
 
-          <SelectAttestedClaims cTypeHash={cTypeHash} onChange={onChange} />
+          <SelectAttestedClaims cTypeHashes={cTypeHashes} onChange={onChange} />
 
           <div className="actions">
             <button onClick={this.onCancel}>Cancel</button>
