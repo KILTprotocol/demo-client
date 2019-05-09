@@ -6,7 +6,10 @@ import KiltToken from '../../components/KiltToken/KiltToken'
 import { ModalType } from '../../components/Modal/Modal'
 import SelectContactsModal from '../../components/Modal/SelectContactsModal'
 import Spinner from '../../components/Spinner/Spinner'
-import { BalanceUtilities } from '../../services/BalanceUtilities'
+import {
+  BalanceUtilities,
+  TRANSACTION_FEE,
+} from '../../services/BalanceUtilities'
 import FeedbackService from '../../services/FeedbackService'
 
 import * as Balances from '../../state/ducks/Balances'
@@ -80,7 +83,7 @@ class Balance extends React.Component<Props, State> {
     if (balance === undefined) {
       return undefined
     }
-    if (balance < BalanceUtilities.transactionFee) {
+    if (balance < TRANSACTION_FEE) {
       return <span>No sufficient funds to enable transfer.</span>
     }
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { BalanceUtilities } from '../../services/BalanceUtilities'
 
 import './KiltToken.scss'
-import BalanceUtilities from '../../services/BalanceUtilities'
 
 type Props = {
   amount?: number
