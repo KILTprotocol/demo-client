@@ -109,7 +109,9 @@ class Utilities extends React.Component<Props, State> {
         <div>You will lose all your local data!</div>
       </div>,
       () => {
-        clientVersionHelper.resetAndReloadClient()
+        setTimeout(() => {
+          clientVersionHelper.resetAndReloadClient()
+        }, 500)
       }
     )
   }
