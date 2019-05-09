@@ -8,7 +8,7 @@
     @include card;
 
     & > div {
-      @include label_input_combo;
+      @include label-input-combo;
 
       margin: {
         bottom: -$base-border-width;

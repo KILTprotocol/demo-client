@@ -30,12 +30,12 @@
   text-align: left;
 }
 
-@mixin label_input_combo {
+@mixin label-input-combo {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: flex-start;
-  padding: 0 $base-padding;
+  padding: 0;
 
   & > label {
     $breakpoint: 600px;
@@ -73,6 +73,23 @@
 
       & + * {
         width: $input-width;
+      }
+    }
+  }
+}
+
+@mixin label-input-combo-list {
+
+  & > * {
+    @include label-input-combo;
+
+    margin: {
+      bottom: $base-padding;
+    }
+
+    &:last-child {
+      margin: {
+        bottom: 0;
       }
     }
   }

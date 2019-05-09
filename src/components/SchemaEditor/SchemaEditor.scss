@@ -38,7 +38,7 @@
 
       &--row,
       &--error-row {
-        @include label_input_combo;
+        @include label-input-combo;
 
         margin-top: $base-padding;
 

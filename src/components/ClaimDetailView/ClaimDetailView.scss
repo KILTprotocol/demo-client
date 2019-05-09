@@ -2,6 +2,6 @@
   @include labeledCard;
 
   & > div {
-    @include label_input_combo;
+    @include label-input-combo;
   }
 }
