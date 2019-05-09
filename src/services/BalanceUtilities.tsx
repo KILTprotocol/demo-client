@@ -3,6 +3,7 @@ import React from 'react'
 import { Store } from 'redux'
 
 import ContactPresentation from '../components/ContactPresentation/ContactPresentation'
+import KiltToken from '../components/KiltToken/KiltToken'
 import * as Balances from '../state/ducks/Balances'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
@@ -18,6 +19,10 @@ const ENDOWMENT = 100 * KILT
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
+  public static tokenFraction = 1000000
+  public static transactionFee = 1000000
+  public static tokenThreshold = 1000000
+
   public static async connect(myIdentity: MyIdentity) {
     const blockchain = await BlockchainService.connect()
 
@@ -73,7 +78,7 @@ class BalanceUtilities {
         notifySuccess(
           <div>
             <span>Successfully transfered </span>
-            <span className="kilt-token">{amount}</span>
+            <KiltToken amount={amount} />
             <span> to </span>
             <ContactPresentation address={receiverAddress} inline={true} />.
           </div>
@@ -86,13 +91,21 @@ class BalanceUtilities {
         notify(
           <div>
             <span>Transfer of </span>
-            <span className="kilt-token">{amount}</span>
+            <KiltToken amount={amount} />
             <span> to </span>
             <ContactPresentation address={receiverAddress} inline={true} />
             <span> initiated.</span>
           </div>
         )
       })
+  }
+
+  public static convertTokenForExternal(bigNumber: number): number {
+    return bigNumber / BalanceUtilities.tokenFraction
+  }
+
+  public static convertTokenForInternal(smallNumber: number): number {
+    return smallNumber * BalanceUtilities.tokenFraction
   }
 
   private static async listener(
@@ -105,7 +118,7 @@ class BalanceUtilities {
       notify(
         <div>
           Balance of <ContactPresentation address={account} /> {inDeCreased} by{' '}
-          <span className={`kilt-token ${inDeCreased}`}>{change}</span>.
+          <KiltToken amount={change} colored={true} />.
         </div>
       )
     }
