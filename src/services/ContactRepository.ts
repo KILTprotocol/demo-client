@@ -115,7 +115,7 @@ class ContactRepository {
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
 
     const publicIdentity = await sdk.PublicIdentity.resolveFromDid(
-      identifier,
+      identifier.trim(),
       blockchain,
       {
         resolve: (url: string) => {
