@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
+import BN from 'bn.js'
 import React from 'react'
 import { Store } from 'redux'
-
 import ContactPresentation from '../components/ContactPresentation/ContactPresentation'
 import KiltToken from '../components/KiltToken/KiltToken'
 import * as Balances from '../state/ducks/Balances'
@@ -11,17 +11,17 @@ import { Contact, MyIdentity } from '../types/Contact'
 import BlockchainService from './BlockchainService'
 import { notify, notifySuccess } from './FeedbackService'
 
-// the amount of tokens that make up 1 (one) Kilt
-const KILT = 1_000_000
+const KILT_COIN = 1
+const KILT_MICRO_CENTS = 1_000_000
 
 // cost of a chain transaction
-const TRANSACTION_FEE = KILT
+const TRANSACTION_FEE = 1 * KILT_COIN
 
 // any balance below this will we purged
-const MIN_BALANCE = KILT
+const MIN_BALANCE = 1 * KILT_COIN
 
 // initial endowment for automatically created accounts
-const ENDOWMENT = 100 * KILT
+const ENDOWMENT = 100 * KILT_COIN
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
@@ -55,7 +55,8 @@ class BalanceUtilities {
 
   public static async getMyBalance(identity: MyIdentity): Promise<number> {
     const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    return blockchain.getBalance(identity.identity.address)
+    const balance: BN = await blockchain.getBalance(identity.identity.address)
+    return BalanceUtilities.asKiltCoin(balance)
   }
 
   public static connectMyIdentities(store: Store = PersistentStore.store) {
@@ -74,8 +75,9 @@ class BalanceUtilities {
   ) {
     const blockchain = await BlockchainService.connect()
 
+    const transferAmount: BN = BalanceUtilities.asMicroKilt(amount)
     blockchain
-      .makeTransfer(myIdentity.identity, receiverAddress, amount)
+      .makeTransfer(myIdentity.identity, receiverAddress, transferAmount)
       .then((result: any) => {
         notifySuccess(
           <div>
@@ -102,32 +104,40 @@ class BalanceUtilities {
       })
   }
 
-  public static convertTokenForExternal(bigNumber: number): number {
-    return bigNumber / KILT
-  }
-
-  public static convertTokenForInternal(smallNumber: number): number {
-    return smallNumber * KILT
-  }
-
   private static async listener(
     account: sdk.PublicIdentity['address'],
-    balance: number,
-    change: number
+    balance: BN,
+    change: BN
   ) {
-    if (change !== 0) {
-      const inDeCreased = `${change > 0 ? 'in' : 'de'}creased`
+    if (!change.isZero()) {
+      const inDeCreased = `${change.isOdd() ? 'in' : 'de'}creased`
+
       notify(
         <div>
           Balance of <ContactPresentation address={account} /> {inDeCreased} by{' '}
-          <KiltToken amount={change} colored={true} />.
+          <KiltToken
+            amount={BalanceUtilities.asKiltCoin(change)}
+            colored={true}
+          />
+          .
         </div>
       )
     }
     PersistentStore.store.dispatch(
-      Balances.Store.updateBalance(account, balance)
+      Balances.Store.updateBalance(
+        account,
+        BalanceUtilities.asKiltCoin(balance)
+      )
     )
+  }
+
+  private static asKiltCoin(balance: BN): number {
+    return balance.divn(KILT_MICRO_CENTS).toNumber()
+  }
+
+  private static asMicroKilt(balance: number): BN {
+    return new BN(balance).muln(KILT_MICRO_CENTS)
   }
 }
 
-export { BalanceUtilities, KILT, ENDOWMENT, TRANSACTION_FEE, MIN_BALANCE }
+export { BalanceUtilities, ENDOWMENT, TRANSACTION_FEE, MIN_BALANCE }
