@@ -1,21 +1,10 @@
-import {
-  IMessage,
-  IRequestAttestationForClaim,
-  IRequestClaimsForCtype,
-  IRequestLegitimations,
-  ISubmitAttestationForClaim,
-  ISubmitClaimsForCtype,
-  ISubmitLegitimations,
-  MessageBodyType,
-} from '@kiltprotocol/prototype-sdk'
-import { ReactNode } from 'react'
+import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 
 import './MessageSubject.scss'
-import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
-  message: IMessage
+  message: sdk.IMessage
 }
 
 const MessageSubject = (props: Props) => {

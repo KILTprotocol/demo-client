@@ -252,11 +252,11 @@ class MessageRepository {
         ]
 
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
-        return (message.body as sdk.IRequestClaimsForCtype).content
+        return (message.body as sdk.IRequestClaimsForCTypes).content
       case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
         const cTypeHashes: Array<
           ICType['cType']['hash']
-        > = (message.body as sdk.ISubmitClaimsForCtype).content.map(
+        > = (message.body as sdk.ISubmitClaimsForCTypes).content.map(
           (attestedClaim: IAttestedClaim) => attestedClaim.request.claim.cType
         )
         const uniqueCTypeHashes: Array<
@@ -268,11 +268,11 @@ class MessageRepository {
         return uniqueCTypeHashes
       case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPE:
         return [
-          (message.body as sdk.IAcceptClaimsForCtype).content[0].request.hash,
+          (message.body as sdk.IAcceptClaimsForCTypes).content[0].request.hash,
         ]
       case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPE:
         return [
-          (message.body as sdk.IRejectClaimsForCtype).content[0].request.hash,
+          (message.body as sdk.IRejectClaimsForCTypes).content[0].request.hash,
         ]
 
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:

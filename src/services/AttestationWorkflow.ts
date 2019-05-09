@@ -76,11 +76,11 @@ class AttestationWorkflow {
    *   attestation
    * @param receiverAddresses  list of contact addresses who will receive the attested claims
    */
-  public static async submitClaimsForCtype(
+  public static async submitClaimsForCTypes(
     attestedClaims: sdk.IAttestedClaim[],
     receiverAddresses: Array<Contact['publicIdentity']['address']>
   ): Promise<void> {
-    const messageBody: sdk.ISubmitClaimsForCtype = {
+    const messageBody: sdk.ISubmitClaimsForCTypes = {
       content: attestedClaims,
       type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE,
     }

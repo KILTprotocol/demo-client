@@ -174,7 +174,7 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <SubmitClaimsForCType
             receiverAddresses={[message.senderAddress]}
-            cTypeHashes={(message.body as sdk.IRequestClaimsForCtype).content}
+            cTypeHashes={(message.body as sdk.IRequestClaimsForCTypes).content}
             onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />
@@ -183,7 +183,7 @@ class MessageDetailView extends React.Component<Props, State> {
       case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE: {
         return (
           <VerifyClaim
-            attestedClaims={(message.body as sdk.ISubmitClaimsForCtype).content}
+            attestedClaims={(message.body as sdk.ISubmitClaimsForCTypes).content}
           />
         )
       }
