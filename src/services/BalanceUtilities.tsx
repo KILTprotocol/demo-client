@@ -14,15 +14,17 @@ import { notify, notifySuccess } from './FeedbackService'
 // the amount of tokens that make up 1 (one) Kilt
 const KILT = 1_000_000
 
+// cost of a chain transaction
+const TRANSACTION_FEE = KILT
+
+// any balance below this will we purged
+const MIN_BALANCE = KILT
+
 // initial endowment for automatically created accounts
 const ENDOWMENT = 100 * KILT
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
-  public static tokenFraction = 1000000
-  public static transactionFee = 1000000
-  public static tokenThreshold = 1000000
-
   public static async connect(myIdentity: MyIdentity) {
     const blockchain = await BlockchainService.connect()
 
@@ -101,11 +103,11 @@ class BalanceUtilities {
   }
 
   public static convertTokenForExternal(bigNumber: number): number {
-    return bigNumber / BalanceUtilities.tokenFraction
+    return bigNumber / KILT
   }
 
   public static convertTokenForInternal(smallNumber: number): number {
-    return smallNumber * BalanceUtilities.tokenFraction
+    return smallNumber * KILT
   }
 
   private static async listener(
@@ -128,4 +130,4 @@ class BalanceUtilities {
   }
 }
 
-export { BalanceUtilities, KILT, ENDOWMENT }
+export { BalanceUtilities, KILT, ENDOWMENT, TRANSACTION_FEE, MIN_BALANCE }
