@@ -121,6 +121,14 @@ class AttestationService {
     return _attestedClaim.verify(blockchain)
   }
 
+  public static async verifyAttestation(
+    attestation: sdk.IAttestation
+  ): Promise<boolean> {
+    const blockchain: sdk.Blockchain = await BlockchainService.connect()
+    const _attestation = sdk.Attestation.fromObject(attestation)
+    return _attestation.verify(blockchain)
+  }
+
   public static saveInStore(attestationEntry: Attestations.Entry): void {
     attestationEntry.created = Date.now()
     persistentStore.store.dispatch(

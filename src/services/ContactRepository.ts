@@ -1,8 +1,10 @@
 import * as Contacts from '../state/ducks/Contacts'
+import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
 import { BasePostParams } from './BaseRepository'
 import ErrorService from './ErrorService'
+import { notifyFailure } from './FeedbackService'
 
 // TODO: add tests, create interface for this class to be implemented as mock
 // (for other tests)
@@ -36,7 +38,10 @@ class ContactRepository {
       })
   }
 
-  public static async findByAddress(address: string): Promise<void | Contact> {
+  public static async findByAddress(
+    address: string,
+    propagateError = false
+  ): Promise<void | Contact> {
     const persistedContact = Contacts.getContact(
       PersistentStore.store.getState(),
       address
@@ -49,7 +54,7 @@ class ContactRepository {
     return fetch(`${ContactRepository.URL}/${address}`)
       .then(response => {
         if (!response.ok) {
-          throw Error(response.statusText)
+          throw Error(address)
         }
         return response
       })
@@ -58,9 +63,16 @@ class ContactRepository {
         PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
         return contact
       })
-      .catch(() => {
-        // since we dont register identities automatically in services anymore
-        // this is not an actual error case anymore
+      .catch(error => {
+        if (!Wallet.getIdentity(PersistentStore.store.getState(), address)) {
+          notifyFailure(
+            `Could not resolve contact for address ${address}!`,
+            false
+          )
+        }
+        if (propagateError) {
+          throw error
+        }
       })
   }
 

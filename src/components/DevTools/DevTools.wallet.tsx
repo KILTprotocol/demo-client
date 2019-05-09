@@ -56,7 +56,14 @@ class BsIdentity {
 
     return blockchain
       .makeTransfer(selectedIdentity.identity, identity.address, ENDOWMENT)
-      .then((result: any) => {
+      .catch(error => {
+        errorService.log({
+          error,
+          message: 'failed to transfer initial tokens to identity',
+          origin: 'WalletAdd.addIdentity()',
+        })
+      })
+      .then(() => {
         const { address, boxPublicKeyAsHex } = identity
         const newContact: Contact = {
           metaData: {
@@ -64,50 +71,30 @@ class BsIdentity {
           },
           publicIdentity: { address, boxPublicKeyAsHex },
         }
-
         PersistentStore.store.dispatch(Contacts.Store.addContact(newContact))
-
-        return Promise.all([Promise.resolve(newContact)])
       })
-      .then(
-        () => {
-          const newIdentity = {
-            identity,
-            metaData: {
-              name: alias,
-            },
-            phrase,
-          } as MyIdentity
-          PersistentStore.store.dispatch(
-            Wallet.Store.saveIdentityAction(newIdentity)
+      .then(() => {
+        const newIdentity = {
+          identity,
+          metaData: {
+            name: alias,
+          },
+          phrase,
+        } as MyIdentity
+        PersistentStore.store.dispatch(
+          Wallet.Store.saveIdentityAction(newIdentity)
+        )
+        PersistentStore.store.dispatch(
+          Contacts.Store.addContact(
+            ContactRepository.getContactFromIdentity(newIdentity, {
+              unregistered: true,
+            })
           )
-          PersistentStore.store.dispatch(
-            Contacts.Store.addContact(
-              ContactRepository.getContactFromIdentity(newIdentity, {
-                unregistered: true,
-              })
-            )
-          )
-          BalanceUtilities.connect(newIdentity)
-          notifySuccess(`Identity ${alias} successfully created.`)
+        )
+        BalanceUtilities.connect(newIdentity)
+        notifySuccess(`Identity ${alias} successfully created.`)
 
-          return newIdentity
-        },
-        error => {
-          errorService.log({
-            error,
-            message: 'failed to POST new identity',
-            origin: 'WalletAdd.addIdentity()',
-            type: 'ERROR.FETCH.POST',
-          })
-        }
-      )
-      .catch(error => {
-        errorService.log({
-          error,
-          message: 'failed to transfer initial tokens to identity',
-          origin: 'WalletAdd.addIdentity()',
-        })
+        return newIdentity
       })
   }
 

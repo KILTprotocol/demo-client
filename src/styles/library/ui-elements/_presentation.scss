@@ -2,10 +2,13 @@
 
   &,
   & > a {
+    @include baseFont;
+
     display: flex;
     justify-content: flex-start;
     align-items: center;
     flex-wrap: nowrap;
+    font-size: 16px;
   }
 
   & .container {

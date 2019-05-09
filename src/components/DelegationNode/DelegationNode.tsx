@@ -19,11 +19,11 @@ import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
 import {
   BlockingNotification,
+  BlockUi,
   NotificationType,
 } from '../../types/UserFeedback'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import { ModalType } from '../Modal/Modal'
-import MyDelegationsInviteModal from '../MyDelegationsInviteModal/MyDelegationsInviteModal'
 import Permissions from '../Permissions/Permissions'
 import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
 import ShortHash from '../ShortHash/ShortHash'
@@ -293,32 +293,52 @@ class DelegationNode extends React.Component<Props, State> {
         <ShortHash>{delegation.id}</ShortHash>
       </span>
     )
-    notify(
-      <span>Start revoking Attestations for Delegation: {delegationTitle}</span>
-    )
 
-    Promise.all(
-      hashes.map(hash =>
-        sdk.Attestation.revoke(blockchain, hash, selectedIdentity.identity)
-      )
-    )
-      .then(() => {
+    const blockUi: BlockUi = FeedbackService.addBlockUi({
+      headline: `Revoking Attestations for Delegation \n'${
+        myDelegation
+          ? myDelegation.metaData.alias
+          : delegation.id.substr(0, 10) + '…'
+      }'`,
+    })
+
+    Promise.chain(
+      hashes.map((hash: string, index: number) => () => {
+        blockUi.updateMessage(`Revoking ${index + 1} / ${hashes.length}`)
+        return sdk.Attestation.revoke(
+          blockchain,
+          hash,
+          selectedIdentity.identity
+        ).catch(error => {
+          throw { hash, error }
+        })
+      }),
+      true
+    ).then(result => {
+      blockUi.remove()
+      if (result.successes.length) {
         notifySuccess(
           <span>
-            All Attestations revoked for Delegation: {delegationTitle}
+            Successfully revoked {result.successes.length}
+            {result.successes.length > 1 ? ' attestations ' : ' attestation '}
+            for Delegation: {delegationTitle}
           </span>,
-          true
+          false
         )
-      })
-      .catch(err => {
-        errorService.log(err)
+      }
+      if (result.errors.length) {
         notifyFailure(
           <span>
-            Something went wrong, while revoking Attestations for Delegation:{' '}
-            {delegationTitle}. Please try again
-          </span>
+            Could not revoke {result.errors.length}
+            {result.errors.length > 1 ? ' attestations ' : ' attestation '}
+            for Delegation: {delegationTitle}. Maybe they were already revoked.
+            For details refer to console.
+          </span>,
+          false
         )
-      })
+        console.error('revocation errors', result.errors)
+      }
+    })
   }
 
   private async revokeDelegation() {

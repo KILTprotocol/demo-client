@@ -67,24 +67,16 @@ class MessageRepository {
     receiverAddresses: Array<Contact['publicIdentity']['address']>,
     messageBody: sdk.MessageBody
   ): Promise<void> {
-    // normalize address(es)
-    const receiverAddressArray: string[] = Array.isArray(receiverAddresses)
-      ? receiverAddresses
-      : [receiverAddresses]
-
-    const arrayOfPromises = receiverAddressArray.map(
+    const arrayOfPromises = receiverAddresses.map(
       (receiverAddress: Contact['publicIdentity']['address']) => {
         return ContactRepository.findByAddress(receiverAddress)
       }
     )
 
-    return Promise.all(arrayOfPromises)
-      .catch(() => {
-        return arrayOfPromises
+    return Promise.any(arrayOfPromises)
+      .then(result => {
+        return result.successes
       })
-      .then((receiverContacts: Contact[]) =>
-        receiverContacts.filter((receiverContact: Contact) => receiverContact)
-      )
       .then((receiverContacts: Contact[]) => {
         return MessageRepository.send(receiverContacts, messageBody)
       })
@@ -100,9 +92,9 @@ class MessageRepository {
       }
     )
 
-    return Promise.all(arrayOfPromises)
-      .catch(() => {
-        return arrayOfPromises
+    return Promise.any(arrayOfPromises)
+      .then(result => {
+        return result.successes
       })
       .then(() => undefined)
   }
@@ -141,7 +133,7 @@ class MessageRepository {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
       .then((encryptedMessages: sdk.IEncryptedMessage[]) => {
-        return Promise.all(
+        return Promise.any(
           encryptedMessages.map((encryptedMessage: sdk.IEncryptedMessage) => {
             return ContactRepository.findByAddress(
               encryptedMessage.senderAddress
@@ -170,10 +162,8 @@ class MessageRepository {
               }
             })
           })
-        ).then((messageOutputList: Array<MessageOutput | undefined>) => {
-          return messageOutputList.filter(
-            messageOutput => messageOutput
-          ) as MessageOutput[]
+        ).then(result => {
+          return result.successes
         })
       })
   }

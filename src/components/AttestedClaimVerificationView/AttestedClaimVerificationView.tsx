@@ -75,7 +75,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
           linked={true}
           inline={true}
         />
-        <AttestationStatus attestedClaim={attestedClaim} />
+        <AttestationStatus attestation={attestedClaim} />
       </h2>
     )
   }

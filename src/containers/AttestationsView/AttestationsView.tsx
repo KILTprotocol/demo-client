@@ -2,6 +2,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
+import AttestationStatus from '../../components/AttestationStatus/AttestationStatus'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
@@ -97,12 +98,9 @@ class AttestationsView extends React.Component<Props, State> {
                 <td className="created">
                   <DateTime timestamp={attestation.created} />
                 </td>
-                <td
-                  className={
-                    'status ' +
-                    (attestation.attestation.revoked ? 'revoked' : 'attested')
-                  }
-                />
+                <td className="status">
+                  <AttestationStatus attestation={attestation.attestation} />
+                </td>
                 <td className="actionsTd">
                   <div>
                     {!attestation.attestation.revoked ? (

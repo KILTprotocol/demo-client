@@ -97,8 +97,15 @@ class ContactPresentation extends React.Component<Props, State> {
       right ? 'alignRight' : '',
     ]
 
+    const dataAttributes: { [dataAttribute: string]: string } = {
+      'data-address': address,
+    }
+    if (contact && contact.metaData && contact.metaData.name) {
+      dataAttributes['data-name'] = contact.metaData.name
+    }
+
     return (
-      <div className={classes.join(' ')}>
+      <div className={classes.join(' ')} {...dataAttributes}>
         <Identicon
           value={address}
           size={size || DEFAULT_SIZE}

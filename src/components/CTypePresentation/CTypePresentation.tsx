@@ -52,7 +52,14 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   public render() {
-    const { inline, interactive, fullSizeActions, right, size } = this.props
+    const {
+      cTypeHash,
+      inline,
+      interactive,
+      fullSizeActions,
+      right,
+      size,
+    } = this.props
     const { cType } = this.state
 
     let actions: Action[] = []
@@ -69,8 +76,14 @@ class CTypePresentation extends React.Component<Props, State> {
       right ? 'alignRight' : '',
     ]
 
+    const dataAttributes: { [dataAttribute: string]: string } = {}
+
+    if (cTypeHash) {
+      dataAttributes['data-ctype-hash'] = cTypeHash
+    }
+
     return (
-      <div className={classes.join(' ')}>
+      <div className={classes.join(' ')} {...dataAttributes}>
         {cType && cType.cType && (
           <>
             <Identicon
