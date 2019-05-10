@@ -211,13 +211,16 @@ class IdentityView extends React.Component<Props, State> {
     }`
     const subject = `Kilt token request for ${myIdentity.identity.address}`
     const body = `
-Dear Kilt people,
-%0A%0A
-I want to play with the Kilt demo.%0A
-Please send me some Kilt tokens for my address%0A
+Dear KILT Support,%0A
 %0A
-${myIdentity.identity.address}
-%0A%0A
+I would like to have 1000 Mash Coins so that I could try out the Mash-net of the KILT Protocol.
+%0A
+Please send me the tokens to my address:%0A
+%0A
+${myIdentity.identity.address}%0A
+%0A
+I hereby consent, that the KILT Team at BOTLabs GmbH, Keithstr. 2-4, 10787 Berlin, Germany, may contact me occasionally via E-Mail. I understand, that BOTLabs will store my name, organisation and my E-Mail address in a database located in Germany. I can withdraw this consent at any time via E-Mail to info@botlabs.org.%0A
+%0A
 Thank you!
 `
     // @ts-ignore

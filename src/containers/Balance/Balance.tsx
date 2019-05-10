@@ -251,11 +251,7 @@ class Balance extends React.Component<Props, State> {
       return
     }
 
-    BalanceUtilities.makeTransfer(
-      myIdentity,
-      receiverAddress,
-      Number(amount)
-    )
+    BalanceUtilities.makeTransfer(myIdentity, receiverAddress, Number(amount))
       .then(() => {
         this.setState({
           transfer: {
