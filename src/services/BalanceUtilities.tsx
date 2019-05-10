@@ -12,7 +12,7 @@ import BlockchainService from './BlockchainService'
 import { notify, notifySuccess } from './FeedbackService'
 
 const KILT_COIN = 1
-const KILT_MICRO_CENTS = 1_000_000
+const KILT_MICRO_COIN = 1_000_000
 
 // cost of a chain transaction
 const TRANSACTION_FEE = 1 * KILT_COIN
@@ -110,7 +110,7 @@ class BalanceUtilities {
     change: BN
   ) {
     if (!change.isZero()) {
-      const inDeCreased = `${change.isOdd() ? 'in' : 'de'}creased`
+      const inDeCreased = `${change.gtn(0) ? 'in' : 'de'}creased`
 
       notify(
         <div>
@@ -132,11 +132,11 @@ class BalanceUtilities {
   }
 
   private static asKiltCoin(balance: BN): number {
-    return balance.divn(KILT_MICRO_CENTS).toNumber()
+    return balance.divn(KILT_MICRO_COIN).toNumber()
   }
 
   private static asMicroKilt(balance: number): BN {
-    return new BN(balance).muln(KILT_MICRO_CENTS)
+    return new BN(balance).muln(KILT_MICRO_COIN)
   }
 }
 
