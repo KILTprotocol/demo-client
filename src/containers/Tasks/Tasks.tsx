@@ -49,11 +49,11 @@ export type TaskProps =
       props: RequestAttestationProps
     }
   | {
-      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
+      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES
       props: Partial<SubmitClaimsForCTypeProps>
     }
   | {
-      objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE
+      objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES
       props: Partial<RequestClaimsForCTypeProps>
     }
   | {
@@ -129,7 +129,7 @@ class Tasks extends React.Component<Props, State> {
         return this.getModal(
           'Request legitimations',
           <>
-            {this.getCTypeSelect(false, props.cTypeHash)}
+            {this.getCTypeSelect(false, [props.cTypeHash])}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestLegitimation
                 {...props}
@@ -151,7 +151,7 @@ class Tasks extends React.Component<Props, State> {
         return this.getModal(
           'Submit legitimations',
           <>
-            {this.getCTypeSelect(false, cTypeHash)}
+            {this.getCTypeSelect(false, [cTypeHash])}
             {!!selectedCTypes.length &&
             selectedCTypes[0].cType.hash &&
             !!selectedReceivers.length ? (
@@ -188,16 +188,18 @@ class Tasks extends React.Component<Props, State> {
           </>
         )
       }
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE: {
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES: {
         const props = currentTask.props
 
         return this.getModal(
-          'Submit claims for cType',
+          'Request claims for cType',
           <>
-            {this.getCTypeSelect(false, props.cTypeHash)}
+            {this.getCTypeSelect(true, props.cTypeHashes)}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
-              <SubmitClaimsForCType
-                cTypeHash={selectedCTypes[0].cType.hash}
+              <RequestClaimsForCType
+                cTypeHashes={selectedCTypes.map(
+                  (cType: ICType) => cType.cType.hash
+                )}
                 receiverAddresses={selectedReceiverAddresses}
                 onFinished={this.onTaskFinished}
                 onCancel={this.onCancel}
@@ -209,16 +211,18 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE: {
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
         const props = currentTask.props
 
         return this.getModal(
-          'Request claims for cType',
+          'Submit claims for cTypes',
           <>
-            {this.getCTypeSelect(false, props.cTypeHash)}
+            {this.getCTypeSelect(true, props.cTypeHashes)}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
-              <RequestClaimsForCType
-                cTypeHash={selectedCTypes[0].cType.hash}
+              <SubmitClaimsForCType
+                cTypeHashes={selectedCTypes.map(
+                  (cType: ICType) => cType.cType.hash
+                )}
                 receiverAddresses={selectedReceiverAddresses}
                 onFinished={this.onTaskFinished}
                 onCancel={this.onCancel}
@@ -235,7 +239,7 @@ class Tasks extends React.Component<Props, State> {
         return this.getModal(
           `Invite to ${props.isPCR ? 'PCR(s)' : 'delegation(s)'}`,
           <>
-            {this.getCTypeSelect(false, props.cTypeHash)}
+            {this.getCTypeSelect(false, [props.cTypeHash])}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestAcceptDelegation
                 isPCR={!!props.isPCR}
@@ -339,16 +343,13 @@ class Tasks extends React.Component<Props, State> {
 
   private getCTypeSelect(
     isMulti: boolean,
-    preSelectedCTypeHash?: ICType['cType']['hash']
+    preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | undefined>
   ) {
-    const preselected = preSelectedCTypeHash
-      ? [preSelectedCTypeHash]
-      : undefined
     return (
       <section className="selectCType">
         <h2>Select cType{isMulti ? '(s)' : ''}</h2>
         <SelectCTypes
-          preSelectedCTypeHashes={preselected}
+          preSelectedCTypeHashes={preSelectedCTypeHashes}
           isMulti={isMulti}
           onChange={this.onSelectCTypes}
           onMenuOpen={this.onMenuOpen}
