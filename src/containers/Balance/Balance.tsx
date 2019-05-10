@@ -2,11 +2,15 @@ import Immutable from 'immutable'
 import React, { ChangeEvent, ReactNode } from 'react'
 import { connect } from 'react-redux'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
+import KiltToken from '../../components/KiltToken/KiltToken'
 import { ModalType } from '../../components/Modal/Modal'
-import SelectContactsModal from '../../components/Modal/SelectContactsModal'
+import SelectContacts from '../../components/SelectContacts/SelectContacts'
 import Spinner from '../../components/Spinner/Spinner'
-import BalanceUtilities from '../../services/BalanceUtilities'
-import FeedbackService from '../../services/FeedbackService'
+import {
+  BalanceUtilities,
+  TRANSACTION_FEE,
+} from '../../services/BalanceUtilities'
+import FeedbackService, { notifyFailure } from '../../services/FeedbackService'
 
 import * as Balances from '../../state/ducks/Balances'
 import * as Wallet from '../../state/ducks/Wallet'
@@ -27,24 +31,30 @@ type Props = {
 }
 
 type State = {
-  transferTokens: string // String so we can have empty input field
+  transfer: {
+    amount: string // String so we can have empty input field
+    toAddress: Contact['publicIdentity']['address']
+    toContact?: Contact
+  }
 }
 
 class Balance extends React.Component<Props, State> {
-  private selectContactsModal: SelectContactsModal | null
+  private selectContacts: SelectContacts | null
 
   constructor(props: Props) {
     super(props)
     this.state = {
-      transferTokens: '',
+      transfer: {
+        amount: '',
+        toAddress: '',
+      },
     }
 
-    this.setTransferTokens = this.setTransferTokens.bind(this)
-    this.checkTransferTokens = this.checkTransferTokens.bind(this)
-    this.showContactsModal = this.showContactsModal.bind(this)
-    this.hideContactsModal = this.hideContactsModal.bind(this)
-    this.cancelSelectContacts = this.cancelSelectContacts.bind(this)
-    this.finishSelectContacts = this.finishSelectContacts.bind(this)
+    this.onEnterTransferTokens = this.onEnterTransferTokens.bind(this)
+    this.onEnterTransferToAddress = this.onEnterTransferToAddress.bind(this)
+    this.onSelectTransferToContact = this.onSelectTransferToContact.bind(this)
+
+    this.identityCheck = this.identityCheck.bind(this)
   }
 
   public render() {
@@ -52,20 +62,20 @@ class Balance extends React.Component<Props, State> {
 
     return (
       <section className="Balance">
-        <h2>Manage Balance</h2>
-        <div className="display">
-          <label>Balance</label>
-          {myBalance == null && (
-            <Spinner size={20} color="#ef5a28" strength={3} />
-          )}
-          {myBalance != null && <div className="kilt-token">{myBalance}</div>}
-        </div>
-        {myBalance != null && (
-          <div className="transfer-tokens">
-            <label>Transfer</label>
-            <div>{this.getTokenTransferElement(myBalance)}</div>
+        <section className="myBalance">
+          <h2>My balance</h2>
+          <div className="display">
+            <label>Balance</label>
+            {myBalance == null && (
+              <Spinner size={20} color="#ef5a28" strength={3} />
+            )}
+            {myBalance != null && <KiltToken amount={myBalance} />}
           </div>
-        )}
+        </section>
+        <section className="transfer-tokens">
+          <h2>Transfer tokens</h2>
+          {this.getTokenTransferElement(myBalance)}
+        </section>
       </section>
     )
   }
@@ -76,74 +86,96 @@ class Balance extends React.Component<Props, State> {
   }
 
   private getTokenTransferElement(balance: number | undefined): ReactNode {
-    if (balance === undefined) {
-      return undefined
-    }
-    if (balance <= 0) {
-      return <span>No sufficient funds to enable transfer.</span>
+    if (balance === undefined || balance < TRANSACTION_FEE) {
+      return <div>Not available due to insufficient funds.</div>
     }
 
-    const { transferTokens } = this.state
+    const { transfer } = this.state
+    const { amount, toAddress, toContact } = transfer
 
     return (
       <>
-        <input
-          type="text"
-          onChange={this.setTransferTokens}
-          value={transferTokens}
-        />
-        <button
-          disabled={!transferTokens || !isFinite(Number(transferTokens))}
-          onClick={this.showContactsModal}
-        >
-          Transfer
-        </button>
-        <SelectContactsModal
-          ref={el => {
-            this.selectContactsModal = el
-          }}
-          header={
-            <span>
-              Select receiver for{' '}
-              <span className="kilt-token">{transferTokens}</span>
-            </span>
-          }
-          placeholder="Select receiver…"
-          isMulti={false}
-          onCancel={this.cancelSelectContacts}
-          onConfirm={this.finishSelectContacts}
-        />
+        <div className="transfer-amount">
+          <label>Transfer amount</label>
+          <div>
+            <input
+              type="text"
+              onChange={this.onEnterTransferTokens}
+              value={amount}
+              placeholder="Whole numbers"
+            />
+            <KiltToken />
+          </div>
+        </div>
+        <div className="enter-address">
+          <label>Enter address</label>
+          <input
+            type="text"
+            onChange={this.onEnterTransferToAddress}
+            value={toAddress}
+          />
+        </div>
+        <div>
+          <label>or</label>
+        </div>
+        <div className="select-contact">
+          <label>Select contact</label>
+          <SelectContacts
+            ref={el => {
+              this.selectContacts = el
+            }}
+            name={name as string}
+            isMulti={false}
+            closeMenuOnSelect={true}
+            onChange={this.onSelectTransferToContact}
+          />
+        </div>
+        <div className="actions">
+          <button
+            disabled={
+              !amount || !isFinite(Number(amount)) || (!toAddress && !toContact)
+            }
+            onClick={this.identityCheck}
+          >
+            Transfer
+          </button>
+        </div>
       </>
     )
   }
 
-  private showContactsModal() {
-    if (this.selectContactsModal) {
-      this.selectContactsModal.show()
-    }
+  private onSelectTransferToContact(selectedContacts: Contact[]) {
+    const { transfer } = this.state
+
+    this.setState({
+      transfer: {
+        ...transfer,
+        toAddress: '',
+        toContact: selectedContacts[0],
+      },
+    })
   }
 
-  private hideContactsModal() {
-    if (this.selectContactsModal) {
-      this.selectContactsModal.hide()
-    }
+  private onEnterTransferToAddress(event: ChangeEvent<HTMLInputElement>) {
+    const { value: address } = event.target
+    const { transfer } = this.state
+
+    this.setState({
+      transfer: {
+        ...transfer,
+        toAddress: address,
+        toContact: undefined,
+      },
+    })
+    this.resetContacts()
   }
 
-  private cancelSelectContacts() {
-    this.hideContactsModal()
-    this.setState({ transferTokens: '' })
-  }
-
-  private finishSelectContacts(receiver: Contact[]) {
-    this.hideContactsModal()
-    this.checkTransferTokens(receiver[0])
-  }
-
-  private setTransferTokens(event: ChangeEvent<HTMLInputElement>) {
+  private onEnterTransferTokens(event: ChangeEvent<HTMLInputElement>) {
+    const { transfer } = this.state
     const { value: amount } = event.target
     const myBalance = this.getMyBalance()
 
-    if (!myBalance) {
+    if (!myBalance || amount.indexOf('.') !== -1) {
       return
     }
 
@@ -155,11 +187,16 @@ class Balance extends React.Component<Props, State> {
         amountNumber > 0 &&
         myBalance - amountNumber >= 0)
     ) {
-      this.setState({ transferTokens: '' + amount })
+      this.setState({
+        transfer: {
+          ...transfer,
+          amount: '' + amount,
+        },
+      })
     }
   }
 
-  private checkTransferTokens(receiver: Contact) {
+  private identityCheck() {
     const { myIdentity } = this.props
     const selectedIdentity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
@@ -173,7 +210,7 @@ class Balance extends React.Component<Props, State> {
         message: (
           <div>
             <span>You are trying so transfer </span>
-            <span className="kilt-token" />
+            <KiltToken />
             <span> from your identity </span>
             <ContactPresentation
               address={myIdentity.identity.address}
@@ -188,27 +225,57 @@ class Balance extends React.Component<Props, State> {
         ),
         modalType: ModalType.CONFIRM,
         onConfirm: (notification: BlockingNotification) => {
-          this.transferTokens(receiver)
+          this.transferTokens()
           notification.remove()
         },
         type: NotificationType.INFO,
       })
     } else {
-      this.transferTokens(receiver)
+      this.transferTokens()
     }
   }
 
-  private transferTokens(receiver: Contact) {
+  private transferTokens() {
     const { myIdentity } = this.props
-    const { transferTokens } = this.state
+    const { transfer } = this.state
+    const { amount, toAddress, toContact } = transfer
 
-    this.setState({ transferTokens: '' })
+    const receiverAddress = toAddress
+      ? toAddress
+      : toContact
+      ? toContact.publicIdentity.address
+      : undefined
+
+    if (!receiverAddress) {
+      notifyFailure(`No receiver selected/entered.`)
+      return
+    }
 
     BalanceUtilities.makeTransfer(
       myIdentity,
-      receiver.publicIdentity.address,
-      Number(transferTokens)
+      receiverAddress,
+      Number(amount)
     )
+      .then(() => {
+        this.setState({
+          transfer: {
+            amount: '',
+            toAddress: '',
+            toContact: undefined,
+          },
+        })
+        this.resetContacts()
+      })
+      .catch(() => {
+        // prevent clearing input/selects
+      })
+  }
+
+  private resetContacts() {
+    const { selectContacts } = this
+    if (selectContacts) {
+      selectContacts.reset()
+    }
   }
 }
 

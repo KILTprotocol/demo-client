@@ -1,16 +1,12 @@
-import { Blockchain, Identity } from '@kiltprotocol/prototype-sdk'
+import { Identity } from '@kiltprotocol/prototype-sdk'
 import { mnemonicGenerate } from '@polkadot/util-crypto/mnemonic'
-
-import BalanceUtilities from '../../services/BalanceUtilities'
-import BlockchainService from '../../services/BlockchainService'
+import { BalanceUtilities, ENDOWMENT } from '../../services/BalanceUtilities'
 import ContactRepository from '../../services/ContactRepository'
-import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore from '../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../types/Contact'
-
 import identitiesPool from './data/identities.json'
 
 type UpdateCallback = (bsIdentityKey: keyof BsIdentitiesPool) => void
@@ -44,31 +40,30 @@ class BsIdentity {
     return BsIdentity.save(identity, randomPhrase, alias)
   }
 
-  public static async save(
+  public static save(
     identity: Identity,
     phrase: string,
     alias: string
   ): Promise<void | MyIdentity> {
-    const blockchain: Blockchain = await BlockchainService.connect()
-    const alice = Identity.buildFromURI('//Alice')
+    const selectedIdentity: MyIdentity = Wallet.getSelectedIdentity(
+      PersistentStore.store.getState()
+    )
 
-    return blockchain
-      .makeTransfer(alice, identity.address, 1000)
-      .then((result: any) => {
-        const { address, boxPublicKeyAsHex } = identity
-        const newContact: Contact = {
-          metaData: {
-            name: alias,
-          },
-          publicIdentity: { address, boxPublicKeyAsHex },
-        }
-
-        PersistentStore.store.dispatch(Contacts.Store.addContact(newContact))
-
-        return Promise.all([Promise.resolve(newContact)])
-      })
-      .then(
+    return new Promise((resolve, reject) => {
+      BalanceUtilities.makeTransfer(
+        selectedIdentity,
+        identity.address,
+        ENDOWMENT,
         () => {
+          const { address, boxPublicKeyAsHex } = identity
+          const newContact: Contact = {
+            metaData: {
+              name: alias,
+            },
+            publicIdentity: { address, boxPublicKeyAsHex },
+          }
+          PersistentStore.store.dispatch(Contacts.Store.addContact(newContact))
+
           const newIdentity = {
             identity,
             metaData: {
@@ -89,24 +84,10 @@ class BsIdentity {
           BalanceUtilities.connect(newIdentity)
           notifySuccess(`Identity ${alias} successfully created.`)
 
-          return newIdentity
-        },
-        error => {
-          errorService.log({
-            error,
-            message: 'failed to POST new identity',
-            origin: 'WalletAdd.addIdentity()',
-            type: 'ERROR.FETCH.POST',
-          })
+          resolve(newIdentity)
         }
       )
-      .catch(error => {
-        errorService.log({
-          error,
-          message: 'failed to transfer initial tokens to identity',
-          origin: 'WalletAdd.addIdentity()',
-        })
-      })
+    })
   }
 
   public static async getByKey(

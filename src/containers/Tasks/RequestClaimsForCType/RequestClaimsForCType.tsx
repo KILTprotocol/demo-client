@@ -8,7 +8,7 @@ import { Contact } from '../../../types/Contact'
 import './RequestClaimsForCType.scss'
 
 export type RequestClaimsForCTypeProps = {
-  cTypeHash: sdk.ICType['hash']
+  cTypeHashes: Array<sdk.ICType['hash']>
   receiverAddresses: Array<Contact['publicIdentity']['address']>
 
   onFinished?: () => void
@@ -28,7 +28,7 @@ class RequestClaimsForCType extends React.Component<Props, State> {
   }
 
   public render() {
-    const { cTypeHash, receiverAddresses } = this.props
+    const { cTypeHashes, receiverAddresses } = this.props
 
     return (
       <section className="RequestClaimsForCType">
@@ -36,7 +36,10 @@ class RequestClaimsForCType extends React.Component<Props, State> {
           <button onClick={this.onCancel}>Cancel</button>
           <button
             disabled={
-              !cTypeHash || !receiverAddresses || !receiverAddresses.length
+              !cTypeHashes ||
+              !cTypeHashes.length ||
+              !receiverAddresses ||
+              !receiverAddresses.length
             }
             onClick={this.sendRequest}
           >
@@ -48,11 +51,11 @@ class RequestClaimsForCType extends React.Component<Props, State> {
   }
 
   private sendRequest() {
-    const { cTypeHash, receiverAddresses, onFinished } = this.props
+    const { cTypeHashes, receiverAddresses, onFinished } = this.props
 
-    const messageBody: sdk.IRequestClaimsForCtype = {
-      content: cTypeHash,
-      type: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
+    const messageBody: sdk.IRequestClaimsForCTypes = {
+      content: cTypeHashes,
+      type: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
     }
 
     MessageRepository.sendToAddresses(receiverAddresses, messageBody).then(

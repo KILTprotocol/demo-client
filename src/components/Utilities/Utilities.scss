@@ -38,7 +38,7 @@
   & .versions {
 
     & > div {
-      @include label_input_combo;
+      @include label-input-combo;
     }
   }
 
@@ -47,5 +47,9 @@
     & > div {
       @include checkbox;
     }
+  }
+
+  & .reset {
+    margin-top: 20px
   }
 }

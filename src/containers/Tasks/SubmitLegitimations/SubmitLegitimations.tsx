@@ -120,7 +120,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
             </button>
           </div>
           <SchemaEditor
-            schema={cType.getClaimInputModel() as common.Schema}
+            schema={sdk.CTypeUtils.getClaimInputModel(cType) as common.Schema}
             initialValue={undefined}
             updateValue={this.updateClaim}
           />

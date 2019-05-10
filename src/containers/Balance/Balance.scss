@@ -1,28 +1,63 @@
 .Balance {
 
-  & .display,
+  & .myBalance,
   & .transfer-tokens {
-    @include label_input_combo;
+    @include labeledCard;
   }
 
-  & .transfer-tokens {
-    align-items: center;
+  & .display,
+  & .transfer-amount,
+  & .enter-address,
+  & .enter-address + div,
+  & .select-contact {
+    @include label-input-combo;
+  }
+
+  & .transfer-amount {
+    margin: {
+      bottom: $base-padding;
+    }
 
     & > div {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
+      position: relative;
+
+      & input {
+        width: 100%;
+      }
+
+      & .KiltToken {
+        @extend %centerV;
+
+        position: absolute;
+        right: $base-padding/2;
+      }
+    }
+  }
+
+  & .enter-address + div {
+
+    & label {
+      @include baseFont;
+
+      margin: {
+        top: 0
+      }
+      padding: {
+        left: 2*$base-padding;
+      }
+      font-size: 12px;
+    }
+  }
+  & .select-contact {
+
+    & > div {
+      margin: {
+        top: 0 !important;
+      }
     }
   }
 
   & input {
     @include input;
-
-    width: 150px;
-  }
-
-  & button {
-    @include button-primary;
-    margin-left: $base-padding/2;
   }
 }

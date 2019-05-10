@@ -32,7 +32,7 @@ class CTypeRepository {
         return cType
       })
       .catch(() => {
-        console.log(`Could not fetch CType with hash '${hash}'`)
+        console.error(`Could not fetch CType with hash '${hash}'`)
       })
   }
 

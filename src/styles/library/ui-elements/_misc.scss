@@ -30,12 +30,12 @@
   text-align: left;
 }
 
-@mixin label_input_combo {
+@mixin label-input-combo {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: flex-start;
-  padding: 0 $base-padding;
+  padding: 0;
 
   & > label {
     $breakpoint: 600px;
@@ -78,6 +78,23 @@
   }
 }
 
+@mixin label-input-combo-list {
+
+  & > * {
+    @include label-input-combo;
+
+    margin: {
+      bottom: $base-padding;
+    }
+
+    &:last-child {
+      margin: {
+        bottom: 0;
+      }
+    }
+  }
+}
+
 @mixin console-log {
 
   & .console-log {
@@ -93,45 +110,6 @@
       }
       font-size: 10px;
     }
-  }
-}
-
-@mixin kilt-token {
-  display: inline-block;
-
-  @include baseFont-bold;
-
-  &:after {
-    $font-size: 0.8em;
-    $size: 1.6;
-
-    @include border-radius(50%);
-
-    content: 'K';
-    display: inline-block;
-    width: #{$size}em;
-    height: #{$size}em;
-    margin:{
-      left: 0.5em;
-    }
-    border: 1px solid $color-primary;
-    font-size: $font-size;
-    line-height: $size;
-    text-align: center;
-    vertical-align: bottom;
-    color: $color-primary;
-  }
-}
-
-@mixin colored-kilt-token {
-  @include kilt-token;
-
-  &.decreased {
-    color: $color-danger;
-  }
-
-  &.increased {
-    color: $color-success;
   }
 }
 

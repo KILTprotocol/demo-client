@@ -2,14 +2,6 @@
 
   & .Delegation-base {
     @include card;
-
-    & > div {
-      @include label_input_combo;
-
-      margin: {
-        bottom: -$base-border-width;
-      }
-      padding: $base-padding;
-    }
+    @include label-input-combo-list;
   }
 }

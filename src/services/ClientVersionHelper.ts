@@ -3,7 +3,7 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import PersistentStore from '../state/PersistentStore'
 import * as Parameters from '../state/ducks/Parameters'
 import * as Wallet from '../state/ducks/Wallet'
-import BalanceUtilities from './BalanceUtilities'
+import { BalanceUtilities } from './BalanceUtilities'
 import BlockchainService from './BlockchainService'
 
 type CheckResult = {
@@ -26,12 +26,13 @@ class ClientVersionHelper {
           PersistentStore.store.getState()
         )
         if (selectedIdentity) {
-          const balance: number = await BalanceUtilities.getMyBalance(
-            selectedIdentity
-          )
-          if (balance <= 0) {
-            resetCause.accountInvalid = true
-          }
+          // [ap] disable balance check since we have zero-balanced accounts initially.
+          // const balance: number = await BalanceUtilities.getMyBalance(
+          //   selectedIdentity
+          // )
+          // if (balance <= 0) {
+          //   resetCause.accountInvalid = true
+          // }
         }
       }
       resolve(resetCause)
@@ -39,8 +40,8 @@ class ClientVersionHelper {
   }
 
   public async checkVersion(): Promise<boolean> {
-    const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    const chainVersion: string = (await blockchain.getStats()).nodeVersion.toString()
+    const blockchain = await BlockchainService.connect()
+    const chainVersion = (await blockchain.getStats()).nodeVersion.toString()
 
     const parameters = Parameters.getParameters(
       PersistentStore.store.getState()

@@ -1,0 +1,17 @@
+.Footer {
+  position: fixed;
+  z-index: $z-index-header;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-width: none !important;
+  border-top: $base-border;
+  padding: $base-padding/4 !important;
+  background: $color-white;
+  text-align: center;
+  font-size: 12px;
+
+  & a {
+    margin: 0 $base-padding;
+  }
+}

@@ -1,5 +1,5 @@
 import { combineReducers, createStore, Store } from 'redux'
-import BalanceUtilities from '../services/BalanceUtilities'
+import { BalanceUtilities } from '../services/BalanceUtilities'
 
 import * as Attestations from './ducks/Attestations'
 import * as Balances from './ducks/Balances'
@@ -111,8 +111,6 @@ class PersistentStore {
         PersistentStore.serialize(this._store.getState())
       )
     })
-
-    BalanceUtilities.connectMyIdentities(this.store)
   }
 
   public reset(): void {

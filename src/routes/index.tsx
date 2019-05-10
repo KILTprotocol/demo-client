@@ -2,6 +2,9 @@ import * as React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
 import Dashboard from '../components/Dashboard/Dashboard'
+import Imprint from '../components/Imprint/Imprint'
+import PrivacyPolicy from '../components/PrivacyPolicy/PrivacyPolicy'
+import TermsOfUse from '../components/TermsOfUse/TermsOfUse'
 import Utilities from '../components/Utilities/Utilities'
 import AttestationsView from '../containers/AttestationsView/AttestationsView'
 import DelegationsView from '../containers/DelegationsView/DelegationsView'
@@ -13,17 +16,16 @@ import CtypeView from '../containers/CtypeView/CtypeView'
 import MessageList from '../containers/MessageView/MessageView'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
 import WalletView from '../containers/WalletView/WalletView'
-import onAfterRouting from './onAfterRouting'
 import requiresIdentity from './RequiresIdentity'
-import CheckClientVersion from '../components/CheckClientVersion/CheckClientVersion'
 import DelegationCreate from '../containers/DelegationCreate/DelegationCreate'
+import Setup from '../containers/Setup/Setup'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
 
   return (
     <React.Fragment>
-      <Route path={'/'} component={onAfterRouting(CheckClientVersion)} />
+      <Route path={'/'} component={Setup} />
       <Switch>
         <Route path={'/dashboard'} component={requiresIdentity(Dashboard)} />
 
@@ -87,6 +89,10 @@ const Routes: React.FunctionComponent<{}> = props => {
           path={'/pcrs'}
           component={requiresIdentity(DelegationsView, { isPCR: true })}
         />
+
+        <Route path={'/imprint'} component={Imprint} />
+        <Route path={'/privacy-policy'} component={PrivacyPolicy} />
+        <Route path={'/terms-of-use'} component={TermsOfUse} />
 
         <Redirect to="/dashboard" />
       </Switch>

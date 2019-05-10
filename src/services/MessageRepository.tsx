@@ -1,4 +1,5 @@
 import {
+  IAttestedClaim,
   ISubmitAttestationForClaim,
   MessageBodyType,
 } from '@kiltprotocol/prototype-sdk'
@@ -67,24 +68,16 @@ class MessageRepository {
     receiverAddresses: Array<Contact['publicIdentity']['address']>,
     messageBody: sdk.MessageBody
   ): Promise<void> {
-    // normalize address(es)
-    const receiverAddressArray: string[] = Array.isArray(receiverAddresses)
-      ? receiverAddresses
-      : [receiverAddresses]
-
-    const arrayOfPromises = receiverAddressArray.map(
+    const arrayOfPromises = receiverAddresses.map(
       (receiverAddress: Contact['publicIdentity']['address']) => {
         return ContactRepository.findByAddress(receiverAddress)
       }
     )
 
-    return Promise.all(arrayOfPromises)
-      .catch(() => {
-        return arrayOfPromises
+    return Promise.any(arrayOfPromises)
+      .then(result => {
+        return result.successes
       })
-      .then((receiverContacts: Contact[]) =>
-        receiverContacts.filter((receiverContact: Contact) => receiverContact)
-      )
       .then((receiverContacts: Contact[]) => {
         return MessageRepository.send(receiverContacts, messageBody)
       })
@@ -100,9 +93,9 @@ class MessageRepository {
       }
     )
 
-    return Promise.all(arrayOfPromises)
-      .catch(() => {
-        return arrayOfPromises
+    return Promise.any(arrayOfPromises)
+      .then(result => {
+        return result.successes
       })
       .then(() => undefined)
   }
@@ -141,7 +134,7 @@ class MessageRepository {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
       .then((encryptedMessages: sdk.IEncryptedMessage[]) => {
-        return Promise.all(
+        return Promise.any(
           encryptedMessages.map((encryptedMessage: sdk.IEncryptedMessage) => {
             return ContactRepository.findByAddress(
               encryptedMessage.senderAddress
@@ -170,10 +163,8 @@ class MessageRepository {
               }
             })
           })
-        ).then((messageOutputList: Array<MessageOutput | undefined>) => {
-          return messageOutputList.filter(
-            messageOutput => messageOutput
-          ) as MessageOutput[]
+        ).then(result => {
+          return result.successes
         })
       })
   }
@@ -232,50 +223,66 @@ class MessageRepository {
     }
   }
 
-  public static getCTypeHash(
+  public static getCTypeHashes(
     message: MessageOutput
-  ): ICType['cType']['hash'] | undefined {
+  ): Array<ICType['cType']['hash']> {
     const { body } = message
     const { type } = body
 
     switch (type) {
       case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
-        return (message.body as sdk.IRequestLegitimations).content.cType
+        return [(message.body as sdk.IRequestLegitimations).content.cType]
       case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
-        return (message.body as sdk.ISubmitLegitimations).content.claim.cType
+        return [(message.body as sdk.ISubmitLegitimations).content.claim.cType]
       case sdk.MessageBodyType.REJECT_LEGITIMATIONS:
-        return (message.body as sdk.IRejectLegitimations).content.claim.cType
+        return [(message.body as sdk.IRejectLegitimations).content.claim.cType]
 
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
-        return (message.body as sdk.IRequestAttestationForClaim).content.claim
-          .cType
+        return [
+          (message.body as sdk.IRequestAttestationForClaim).content.claim.cType,
+        ]
       case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
-        return (message.body as ISubmitAttestationForClaim).content.request
-          .claim.cType
+        return [
+          (message.body as ISubmitAttestationForClaim).content.request.claim
+            .cType,
+        ]
       case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
-        return (message.body as sdk.IRejectAttestationForClaim).content.claim
-          .cType
+        return [
+          (message.body as sdk.IRejectAttestationForClaim).content.claim.cType,
+        ]
 
-      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
-        return (message.body as sdk.IRequestClaimsForCtype).content
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
-        return (message.body as sdk.ISubmitClaimsForCtype).content[0].request
-          .claim.cType
-      case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPE:
-        return (message.body as sdk.IAcceptClaimsForCtype).content[0].request
-          .hash
-      case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPE:
-        return (message.body as sdk.IRejectClaimsForCtype).content[0].request
-          .hash
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
+        return (message.body as sdk.IRequestClaimsForCTypes).content
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES:
+        const cTypeHashes: Array<
+          ICType['cType']['hash']
+        > = (message.body as sdk.ISubmitClaimsForCTypes).content.map(
+          (attestedClaim: IAttestedClaim) => attestedClaim.request.claim.cType
+        )
+        const uniqueCTypeHashes: Array<
+          ICType['cType']['hash']
+        > = cTypeHashes.filter(
+          (cTypeHash: ICType['cType']['hash'], index: number) =>
+            cTypeHashes.indexOf(cTypeHash) === index
+        )
+        return uniqueCTypeHashes
+      case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPES:
+        return [
+          (message.body as sdk.IAcceptClaimsForCTypes).content[0].request.hash,
+        ]
+      case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPES:
+        return [
+          (message.body as sdk.IRejectClaimsForCTypes).content[0].request.hash,
+        ]
 
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.REJECT_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.INFORM_CREATE_DELEGATION:
-        return undefined
+        return []
 
       default:
-        return undefined
+        return []
     }
   }
 

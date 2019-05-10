@@ -1,15 +1,12 @@
-import { Blockchain } from '@kiltprotocol/prototype-sdk'
+import Kilt, { IBlockchainApi } from '@kiltprotocol/prototype-sdk'
 
 class BlockchainService {
-  public static instance: Promise<Blockchain>
+  public static instance: Promise<IBlockchainApi>
 
   public static async connect(
     host: string = this.getNodeWebsocketUrl()
-  ): Promise<Blockchain> {
-    if (!BlockchainService.instance) {
-      BlockchainService.instance = Blockchain.build(host)
-    }
-    return BlockchainService.instance
+  ): Promise<IBlockchainApi> {
+    return Kilt.connect(host)
   }
 
   public static getNodeWebsocketUrl() {

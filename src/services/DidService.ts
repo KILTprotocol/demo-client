@@ -5,6 +5,7 @@ import { Contact, MyIdentity } from '../types/Contact'
 import BlockchainService from './BlockchainService'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
+import { object } from 'prop-types'
 
 export class DidService {
   public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
@@ -14,12 +15,7 @@ export class DidService {
   public static async resolveDid(
     identifier: string
   ): Promise<sdk.IPublicIdentity | undefined> {
-    const blockchain = await BlockchainService.connect()
-    return sdk.PublicIdentity.resolveFromDid(
-      identifier,
-      blockchain,
-      this.URL_RESOLVER
-    )
+    return sdk.PublicIdentity.resolveFromDid(identifier, this.URL_RESOLVER)
   }
 
   public static async createDid(myIdentity: MyIdentity): Promise<sdk.IDid> {
@@ -39,33 +35,37 @@ export class DidService {
       signature,
     } as Contact)
 
-    const blockchain = await BlockchainService.connect()
-    const status = await did.store(blockchain, myIdentity.identity)
+    const status = await did.store(myIdentity.identity)
     if (status.type !== 'Finalised') {
       throw new Error(
         `Error creating DID for identity ${myIdentity.metaData.name}`
       )
     }
-    myIdentity.did = did.identifier
-    persistentStore.store.dispatch(Wallet.Store.saveIdentityAction(myIdentity))
+
+    persistentStore.store.dispatch(
+      Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
+        did: did.identifier,
+      })
+    )
     return did
   }
 
   public static async deleteDid(myIdentity: MyIdentity) {
-    const blockchain = await BlockchainService.connect()
-    const status = await sdk.Did.remove(blockchain, myIdentity.identity)
+    const status = await sdk.Did.remove(myIdentity.identity)
     if (status.type !== 'Finalised') {
       throw new Error(
         `Error deleting DID for identity ${myIdentity.metaData.name}`
       )
     }
-    // TODO: remove from service
-    myIdentity.did = undefined
-    persistentStore.store.dispatch(Wallet.Store.saveIdentityAction(myIdentity))
+    persistentStore.store.dispatch(
+      Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
+        did: undefined,
+      })
+    )
   }
 
   private static readonly URL_RESOLVER = {
-    resolve: async (url: string): Promise<object> => {
+    resolve: async (url: string): Promise<object | undefined> => {
       return fetch(url)
         .then(response => {
           if (!response.ok) {
@@ -74,6 +74,7 @@ export class DidService {
           return response
         })
         .then(response => response.json())
+        .then(result => (typeof result === 'object' ? result : undefined))
     },
   } as sdk.IURLResolver
 }

@@ -158,10 +158,24 @@ export function notifyFailure(message: string | ReactNode, blocking = true) {
 
 export function notifyError(error: Error, blocking = true) {
   try {
-    _notify(NotificationType.FAILURE, error.message, blocking)
+    if (isInvalidTransactionError(error)) {
+      _notify(
+        NotificationType.FAILURE,
+        <p>
+          {error.message}. <p>Are you sure your account has enough funds?</p>
+        </p>,
+        blocking
+      )
+    } else {
+      _notify(NotificationType.FAILURE, error.message, blocking)
+    }
   } catch (error) {
     // ignore
   }
+}
+
+function isInvalidTransactionError(error: Error) {
+  return error.message.includes('1010: Invalid Transaction')
 }
 
 export function notify(message: string | ReactNode, blocking = false) {
@@ -174,9 +188,23 @@ export function safeDelete(
   removeNotificationInstantly = true,
   onCancel?: (notification: BlockingNotification) => void
 ) {
+  safeDestructiveAction(
+    <div>Do you want to delete {message}?</div>,
+    onConfirm,
+    removeNotificationInstantly,
+    onCancel
+  )
+}
+
+export function safeDestructiveAction(
+  message: ReactNode,
+  onConfirm: (notification: BlockingNotification) => void,
+  removeNotificationInstantly = true,
+  onCancel?: (notification: BlockingNotification) => void
+) {
   FeedbackService.addBlockingNotification({
     header: 'Are you sure?',
-    message: <div>Do you want to delete {message}?</div>,
+    message,
     modalType: ModalType.CONFIRM,
     type: NotificationType.INFO,
 

@@ -134,7 +134,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
             </thead>
 
             {attestations.map((attestedClaim: sdk.IAttestedClaim) => {
-              const { owner } = attestedClaim.attestation
               const opened = attestedClaim === openedAttestedClaim
 
               return (
@@ -157,7 +156,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                       />
                     </td>
                     <td>
-                      <AttestationStatus attestedClaim={attestedClaim} />
+                      <AttestationStatus attestation={attestedClaim} />
                     </td>
                     <td className="actionsTd">
                       <div>

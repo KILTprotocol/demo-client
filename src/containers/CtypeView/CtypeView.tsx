@@ -65,7 +65,7 @@ class CtypeView extends React.Component<Props, State> {
       !!currentCType && currentCType !== 'notFoundInList'
     return (
       <section className="CtypeView">
-        <h1>CTYPES</h1>
+        <h1>CTYPEs</h1>
         {validCurrentCType && (
           <CTypeDetailView cType={currentCType as ICType} />
         )}

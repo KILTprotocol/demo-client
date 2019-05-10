@@ -3,7 +3,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import CTypeEditor from '../../components/CtypeEditor/CtypeEditor'
-import BlockchainService from '../../services/BlockchainService'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import FeedbackService, {
@@ -27,8 +26,6 @@ type State = {
 }
 
 class CTypeCreate extends React.Component<Props, State> {
-  private blockchain: sdk.Blockchain
-
   constructor(props: Props) {
     super(props)
 
@@ -52,7 +49,6 @@ class CTypeCreate extends React.Component<Props, State> {
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Connecting to block chain',
     })
-    this.blockchain = await BlockchainService.connect()
     this.setState({ connected: true })
     blockUi.remove()
   }
@@ -67,7 +63,7 @@ class CTypeCreate extends React.Component<Props, State> {
       let cType: sdk.CType
 
       try {
-        cType = sdk.CType.fromInputModel(this.state.cType)
+        cType = sdk.CTypeUtils.fromInputModel(this.state.cType)
       } catch (error) {
         errorService.log({
           error,
@@ -82,7 +78,7 @@ class CTypeCreate extends React.Component<Props, State> {
       })
 
       cType
-        .store(this.blockchain, selectedIdentity.identity)
+        .store(selectedIdentity.identity)
         .then((value: any) => {
           blockUi.updateMessage(
             `CTYPE stored on blockchain,\nnow registering CTYPE`
