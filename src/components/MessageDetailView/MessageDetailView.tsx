@@ -170,7 +170,7 @@ class MessageDetailView extends React.Component<Props, State> {
           />
         )
       }
-      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE: {
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES: {
         return (
           <SubmitClaimsForCType
             receiverAddresses={[message.senderAddress]}
@@ -180,10 +180,12 @@ class MessageDetailView extends React.Component<Props, State> {
           />
         )
       }
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE: {
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
         return (
           <VerifyClaim
-            attestedClaims={(message.body as sdk.ISubmitClaimsForCTypes).content}
+            attestedClaims={
+              (message.body as sdk.ISubmitClaimsForCTypes).content
+            }
           />
         )
       }

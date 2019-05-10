@@ -55,7 +55,7 @@ class RequestClaimsForCType extends React.Component<Props, State> {
 
     const messageBody: sdk.IRequestClaimsForCTypes = {
       content: cTypeHashes,
-      type: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE,
+      type: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
     }
 
     MessageRepository.sendToAddresses(receiverAddresses, messageBody).then(

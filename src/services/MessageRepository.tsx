@@ -251,9 +251,9 @@ class MessageRepository {
           (message.body as sdk.IRejectAttestationForClaim).content.claim.cType,
         ]
 
-      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE:
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
         return (message.body as sdk.IRequestClaimsForCTypes).content
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE:
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES:
         const cTypeHashes: Array<
           ICType['cType']['hash']
         > = (message.body as sdk.ISubmitClaimsForCTypes).content.map(
@@ -266,11 +266,11 @@ class MessageRepository {
             cTypeHashes.indexOf(cTypeHash) === index
         )
         return uniqueCTypeHashes
-      case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPE:
+      case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPES:
         return [
           (message.body as sdk.IAcceptClaimsForCTypes).content[0].request.hash,
         ]
-      case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPE:
+      case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPES:
         return [
           (message.body as sdk.IRejectClaimsForCTypes).content[0].request.hash,
         ]

@@ -49,11 +49,11 @@ export type TaskProps =
       props: RequestAttestationProps
     }
   | {
-      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE
+      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES
       props: Partial<SubmitClaimsForCTypeProps>
     }
   | {
-      objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE
+      objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES
       props: Partial<RequestClaimsForCTypeProps>
     }
   | {
@@ -188,15 +188,15 @@ class Tasks extends React.Component<Props, State> {
           </>
         )
       }
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPE: {
+      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES: {
         const props = currentTask.props
 
         return this.getModal(
-          'Submit claims for cType',
+          'Request claims for cType',
           <>
-            {this.getCTypeSelect(false, props.cTypeHashes)}
+            {this.getCTypeSelect(true, props.cTypeHashes)}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
-              <SubmitClaimsForCType
+              <RequestClaimsForCType
                 cTypeHashes={selectedCTypes.map(
                   (cType: ICType) => cType.cType.hash
                 )}
@@ -211,15 +211,15 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPE: {
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
         const props = currentTask.props
 
         return this.getModal(
-          'Request claims for cType',
+          'Submit claims for cTypes',
           <>
             {this.getCTypeSelect(true, props.cTypeHashes)}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
-              <RequestClaimsForCType
+              <SubmitClaimsForCType
                 cTypeHashes={selectedCTypes.map(
                   (cType: ICType) => cType.cType.hash
                 )}
