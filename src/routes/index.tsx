@@ -13,17 +13,16 @@ import CtypeView from '../containers/CtypeView/CtypeView'
 import MessageList from '../containers/MessageView/MessageView'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
 import WalletView from '../containers/WalletView/WalletView'
-import onAfterRouting from './onAfterRouting'
 import requiresIdentity from './RequiresIdentity'
-import CheckClientVersion from '../components/CheckClientVersion/CheckClientVersion'
 import DelegationCreate from '../containers/DelegationCreate/DelegationCreate'
+import Setup from '../containers/Setup/Setup'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
 
   return (
     <React.Fragment>
-      <Route path={'/'} component={onAfterRouting(CheckClientVersion)} />
+      <Route path={'/'} component={Setup} />
       <Switch>
         <Route path={'/dashboard'} component={requiresIdentity(Dashboard)} />
 

@@ -1,5 +1,4 @@
 import * as sdk from '@kiltprotocol/prototype-sdk'
-import { Blockchain } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 
@@ -99,9 +98,9 @@ class DelegationNode extends React.Component<Props, State> {
       myNode: node.delegation.account === selectedIdentity.identity.address,
     })
 
-    BlockchainService.connect().then((blockchain: Blockchain) => {
+    BlockchainService.connect().then(() => {
       node.delegation
-        .getAttestationHashes(blockchain)
+        .getAttestationHashes()
         .then((attestationHashes: string[]) => {
           this.setState({ attestationHashes })
         })
@@ -282,8 +281,7 @@ class DelegationNode extends React.Component<Props, State> {
 
     const { myDelegation } = this.state
 
-    const blockchain = await BlockchainService.connect()
-    const hashes = await delegation.getAttestationHashes(blockchain)
+    const hashes = await delegation.getAttestationHashes()
 
     const delegationTitle = (
       <span>
@@ -305,13 +303,11 @@ class DelegationNode extends React.Component<Props, State> {
     Promise.chain(
       hashes.map((hash: string, index: number) => () => {
         blockUi.updateMessage(`Revoking ${index + 1} / ${hashes.length}`)
-        return sdk.Attestation.revoke(
-          blockchain,
-          hash,
-          selectedIdentity.identity
-        ).catch(error => {
-          throw { hash, error }
-        })
+        return sdk.Attestation.revoke(hash, selectedIdentity.identity).catch(
+          error => {
+            throw { hash, error }
+          }
+        )
       }),
       true
     ).then(result => {
@@ -384,13 +380,10 @@ class DelegationNode extends React.Component<Props, State> {
   private async getChildren() {
     const { node } = this.state
     const { delegation } = node
-    const blockchain = await BlockchainService.connect()
     this.setState({
       gettingChildren: true,
     })
-    const children: sdk.IDelegationNode[] = await delegation.getChildren(
-      blockchain
-    )
+    const children: sdk.IDelegationNode[] = await delegation.getChildren()
 
     this.setState({
       gettingChildren: false,

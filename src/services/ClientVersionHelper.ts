@@ -40,8 +40,8 @@ class ClientVersionHelper {
   }
 
   public async checkVersion(): Promise<boolean> {
-    const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    const chainVersion: string = (await blockchain.getStats()).nodeVersion.toString()
+    const blockchain = await BlockchainService.connect()
+    const chainVersion = (await blockchain.getStats()).nodeVersion.toString()
 
     const parameters = Parameters.getParameters(
       PersistentStore.store.getState()

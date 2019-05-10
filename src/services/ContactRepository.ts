@@ -122,11 +122,8 @@ class ContactRepository {
     identifier: string,
     alias: string
   ): Promise<void | Contact> {
-    const blockchain: sdk.Blockchain = await BlockchainService.connect()
-
     const publicIdentity = await sdk.PublicIdentity.resolveFromDid(
       identifier.trim(),
-      blockchain,
       {
         resolve: (url: string) => {
           // TODO: build/use correct resolver

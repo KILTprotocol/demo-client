@@ -31,10 +31,9 @@ class BsCType {
       ...bsCTypeData,
       owner: ownerIdentity.address,
     })
-    const blockchain: sdk.Blockchain = await BlockchainService.connect()
 
     return cType
-      .store(blockchain, ownerIdentity)
+      .store(ownerIdentity)
       .then((value: any) => {
         const cTypeWrapper: ICType = {
           cType,

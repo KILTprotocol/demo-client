@@ -33,11 +33,10 @@ class DelegationsService {
     delegation: sdk.DelegationNode,
     signature: string
   ) {
-    const blockchain = await BlockchainService.connect()
     const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
-    return delegation.store(blockchain, selectedIdentity, signature)
+    return delegation.store(selectedIdentity, signature)
   }
 
   public static store(delegation: MyDelegation) {
@@ -55,8 +54,7 @@ class DelegationsService {
   public static async lookupNodeById(
     delegationNodeId: string
   ): Promise<sdk.DelegationNode | undefined> {
-    const blockchain = await BlockchainService.connect()
-    return sdk.DelegationNode.query(blockchain, delegationNodeId)
+    return sdk.DelegationNode.query(delegationNodeId)
   }
 
   /**
@@ -67,8 +65,7 @@ class DelegationsService {
   public static async lookupRootNodeById(
     rootNodeId: sdk.IDelegationRootNode['id']
   ): Promise<sdk.DelegationRootNode | undefined> {
-    const blockchain = await BlockchainService.connect()
-    return await sdk.DelegationRootNode.query(blockchain, rootNodeId)
+    return await sdk.DelegationRootNode.query(rootNodeId)
   }
 
   /**
@@ -79,10 +76,9 @@ class DelegationsService {
   public static async findRootNode(
     delegationNodeId: sdk.IDelegationNode['id']
   ): Promise<sdk.DelegationRootNode | undefined> {
-    const blockchain = await BlockchainService.connect()
-    const node = await sdk.DelegationNode.query(blockchain, delegationNodeId)
+    const node = await sdk.DelegationNode.query(delegationNodeId)
     if (node) {
-      return await node.getRoot(blockchain)
+      return await node.getRoot()
     }
     return await DelegationsService.lookupRootNodeById(delegationNodeId)
   }
@@ -98,8 +94,7 @@ class DelegationsService {
           delegationNodeId
         )
         if (delegation) {
-          const blockchain = await BlockchainService.connect()
-          const root = await delegation.getRoot(blockchain)
+          const root = await delegation.getRoot()
           const myDelegation: Delegations.MyDelegation = {
             account: delegation.account,
             cTypeHash: root && root.cTypeHash,
@@ -127,9 +122,8 @@ class DelegationsService {
     node: sdk.DelegationBaseNode,
     identity: sdk.Identity
   ) {
-    const blockchain = await BlockchainService.connect()
     try {
-      await node.revoke(blockchain, identity)
+      await node.revoke(identity)
       PersistentStore.store.dispatch(
         Delegations.Store.revokeDelegationAction(node.id)
       )
@@ -141,10 +135,9 @@ class DelegationsService {
   public static async resolveParent(
     currentNode: DelegationsTreeNode
   ): Promise<DelegationsTreeNode> {
-    const blockchain = await BlockchainService.connect()
     const parentDelegation:
       | sdk.IDelegationBaseNode
-      | undefined = await currentNode.delegation.getParent(blockchain)
+      | undefined = await currentNode.delegation.getParent()
 
     if (!parentDelegation) {
       return currentNode
@@ -157,11 +150,10 @@ class DelegationsService {
   }
 
   private static async storeRootOnChain(delegation: sdk.DelegationRootNode) {
-    const blockchain = await BlockchainService.connect()
     const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
-    return delegation.store(blockchain, selectedIdentity)
+    return delegation.store(selectedIdentity)
   }
 }
 

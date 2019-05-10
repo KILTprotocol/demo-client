@@ -1,4 +1,10 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import Kilt, {
+  IRequestForAttestation,
+  AttestedClaim,
+  IAttestation,
+  IAttestedClaim,
+  Identity,
+} from '@kiltprotocol/prototype-sdk'
 import moment from 'moment'
 import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAttestedClaims'
 
@@ -20,23 +26,20 @@ class AttestationService {
    *   in a promise
    */
   public static async attestClaim(
-    requestForAttestation: sdk.IRequestForAttestation
-  ): Promise<sdk.AttestedClaim> {
-    const {
-      selectedIdentity,
-      blockchain,
-    } = await AttestationService.getBlockchainAndIdentity()
+    requestForAttestation: IRequestForAttestation
+  ): Promise<AttestedClaim> {
+    const selectedIdentity = await AttestationService.getIdentity()
 
     if (!selectedIdentity) {
       throw new Error('No identity selected')
     }
 
-    const attestation: sdk.Attestation = new sdk.Attestation(
+    const attestation = new Kilt.Attestation(
       requestForAttestation,
       selectedIdentity
     )
 
-    const attestedClaim: sdk.AttestedClaim = new sdk.AttestedClaim(
+    const attestedClaim = new Kilt.AttestedClaim(
       requestForAttestation,
       attestation
     )
@@ -45,7 +48,7 @@ class AttestationService {
     }
 
     try {
-      await attestation.store(blockchain, selectedIdentity)
+      await attestation.store(selectedIdentity)
     } catch (error) {
       errorService.log({
         error,
@@ -59,19 +62,16 @@ class AttestationService {
   }
 
   public static async revokeAttestation(
-    iAttestation: sdk.IAttestation
+    iAttestation: IAttestation
   ): Promise<void> {
-    const attestation = sdk.Attestation.fromObject(iAttestation)
-    const {
-      selectedIdentity,
-      blockchain,
-    } = await AttestationService.getBlockchainAndIdentity()
+    const attestation = Kilt.Attestation.fromObject(iAttestation)
+    const selectedIdentity = await AttestationService.getIdentity()
 
     if (!selectedIdentity) {
       throw new Error('No identity selected')
     }
     try {
-      await attestation.revoke(blockchain, selectedIdentity)
+      await attestation.revoke(selectedIdentity)
       notifySuccess('Attestation successfully revoked')
       persistentStore.store.dispatch(
         Attestations.Store.revokeAttestation(attestation.claimHash)
@@ -87,15 +87,10 @@ class AttestationService {
     }
   }
 
-  public static async revokeByClaimHash(
-    claimHash: sdk.IAttestation['claimHash']
-  ) {
-    const {
-      selectedIdentity,
-      blockchain,
-    } = await AttestationService.getBlockchainAndIdentity()
+  public static async revokeByClaimHash(claimHash: IAttestation['claimHash']) {
+    const selectedIdentity = await AttestationService.getIdentity()
 
-    return sdk.Attestation.revoke(blockchain, claimHash, selectedIdentity)
+    return Kilt.Attestation.revoke(claimHash, selectedIdentity)
       .then(() => {
         notifySuccess(`Attestation successfully revoked.`)
         persistentStore.store.dispatch(
@@ -114,19 +109,17 @@ class AttestationService {
   }
 
   public static async verifyAttestatedClaim(
-    attestedClaim: sdk.IAttestedClaim
+    attestedClaim: IAttestedClaim
   ): Promise<boolean> {
-    const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    const _attestedClaim = sdk.AttestedClaim.fromObject(attestedClaim)
-    return _attestedClaim.verify(blockchain)
+    const _attestedClaim = Kilt.AttestedClaim.fromObject(attestedClaim)
+    return _attestedClaim.verify()
   }
 
   public static async verifyAttestation(
-    attestation: sdk.IAttestation
+    attestation: IAttestation
   ): Promise<boolean> {
-    const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    const _attestation = sdk.Attestation.fromObject(attestation)
-    return _attestation.verify(blockchain)
+    const _attestation = Kilt.Attestation.fromObject(attestation)
+    return _attestation.verify()
   }
 
   public static saveInStore(attestationEntry: Attestations.Entry): void {
@@ -136,9 +129,7 @@ class AttestationService {
     )
   }
 
-  public static removeFromStore(
-    claimHash: sdk.IAttestation['claimHash']
-  ): void {
+  public static removeFromStore(claimHash: IAttestation['claimHash']): void {
     persistentStore.store.dispatch(
       Attestations.Store.removeAttestation(claimHash)
     )
@@ -158,16 +149,16 @@ class AttestationService {
 
   public static getAttestedClaims(
     claimSelectionData: ClaimSelectionData
-  ): sdk.IAttestedClaim[] {
+  ): IAttestedClaim[] {
     const selectedClaimEntryIds = Object.keys(claimSelectionData)
-    const attestedClaims: sdk.IAttestedClaim[] = []
+    const attestedClaims: IAttestedClaim[] = []
     selectedClaimEntryIds.forEach(
       (selectedClaimEntryId: Claims.Entry['id']) => {
         const { claimEntry, state } = claimSelectionData[selectedClaimEntryId]
         state.selectedAttestedClaims.forEach(
-          (selectedAttestedClaim: sdk.IAttestedClaim) => {
+          (selectedAttestedClaim: IAttestedClaim) => {
             attestedClaims.push(
-              sdk.AttestedClaim.fromObject(
+              Kilt.AttestedClaim.fromObject(
                 selectedAttestedClaim
               ).createPresentation(
                 AttestationService.getExcludedProperties(
@@ -183,18 +174,11 @@ class AttestationService {
     return attestedClaims
   }
 
-  private static async getBlockchainAndIdentity(): Promise<{
-    blockchain: sdk.Blockchain
-    selectedIdentity: sdk.Identity
-  }> {
-    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
+  private static async getIdentity(): Promise<Identity> {
+    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
     ).identity
-    const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    return {
-      blockchain,
-      selectedIdentity,
-    }
+    return selectedIdentity
   }
 }
 
