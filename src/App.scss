@@ -35,6 +35,9 @@ body {
 }
 
 .App {
+  padding: {
+    bottom: 26px;
+  }
 
   &,
   & > header {
@@ -134,9 +137,11 @@ table {
   }
 }
 
-a[href]{
+a[href],
+.eml {
   color: $color-primary;
   text-decoration: none;
+  cursor: pointer;
 
   &:hover,
   &:active {

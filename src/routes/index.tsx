@@ -2,6 +2,9 @@ import * as React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
 import Dashboard from '../components/Dashboard/Dashboard'
+import Imprint from '../components/Imprint/Imprint'
+import PrivacyPolicy from '../components/PrivacyPolicy/PrivacyPolicy'
+import TermsOfUse from '../components/TermsOfUse/TermsOfUse'
 import Utilities from '../components/Utilities/Utilities'
 import AttestationsView from '../containers/AttestationsView/AttestationsView'
 import DelegationsView from '../containers/DelegationsView/DelegationsView'
@@ -86,6 +89,10 @@ const Routes: React.FunctionComponent<{}> = props => {
           path={'/pcrs'}
           component={requiresIdentity(DelegationsView, { isPCR: true })}
         />
+
+        <Route path={'/imprint'} component={Imprint} />
+        <Route path={'/privacy-policy'} component={PrivacyPolicy} />
+        <Route path={'/terms-of-use'} component={TermsOfUse} />
 
         <Redirect to="/dashboard" />
       </Switch>
