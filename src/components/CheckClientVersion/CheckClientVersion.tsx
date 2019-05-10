@@ -27,6 +27,7 @@ class CheckClientVersion extends React.Component<Props, State> {
 
   public componentDidMount() {
     clientVersionHelper
+      // This connects to the blockchain
       .clientResetRequired()
       .then((checkResult: CheckResult) => {
         if (checkResult.accountInvalid || checkResult.versionMismatch) {

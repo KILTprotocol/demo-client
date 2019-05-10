@@ -26,36 +26,31 @@ const ENDOWMENT = 100 * KILT_COIN
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
   public static async connect(myIdentity: MyIdentity) {
-    const blockchain = await BlockchainService.connect()
-
     if (
       Balances.getBalance(
         PersistentStore.store.getState(),
         myIdentity.identity.address
       ) == null
     ) {
-      blockchain
-        .listenToBalanceChanges(
-          myIdentity.identity.address,
-          BalanceUtilities.listener
+      sdk.Balance.listenToBalanceChanges(
+        myIdentity.identity.address,
+        BalanceUtilities.listener
+      ).then(() => {
+        notify(
+          <div>
+            Now listening to balance changes of{' '}
+            <ContactPresentation
+              address={myIdentity.identity.address}
+              inline={true}
+            />
+          </div>
         )
-        .then(() => {
-          notify(
-            <div>
-              Now listening to balance changes of{' '}
-              <ContactPresentation
-                address={myIdentity.identity.address}
-                inline={true}
-              />
-            </div>
-          )
-        })
+      })
     }
   }
 
   public static async getMyBalance(identity: MyIdentity): Promise<number> {
-    const blockchain: sdk.Blockchain = await BlockchainService.connect()
-    const balance: BN = await blockchain.getBalance(identity.identity.address)
+    const balance: BN = await sdk.Balance.getBalance(identity.identity.address)
     return BalanceUtilities.asKiltCoin(balance)
   }
 
@@ -73,11 +68,12 @@ class BalanceUtilities {
     amount: number,
     successCallback?: () => void
   ) {
-    const blockchain = await BlockchainService.connect()
-
     const transferAmount: BN = BalanceUtilities.asMicroKilt(amount)
-    blockchain
-      .makeTransfer(myIdentity.identity, receiverAddress, transferAmount)
+    sdk.Balance.makeTransfer(
+      myIdentity.identity,
+      receiverAddress,
+      transferAmount
+    )
       .then((result: any) => {
         notifySuccess(
           <div>

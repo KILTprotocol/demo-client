@@ -1,4 +1,4 @@
-import { Blockchain } from '@kiltprotocol/prototype-sdk'
+import { IBlockchainApi } from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
@@ -15,7 +15,7 @@ type State = {
 }
 
 class ChainStats extends React.Component<Props, State> {
-  private blockchain: Blockchain
+  private blockchain: IBlockchainApi
 
   private mounted = false
 

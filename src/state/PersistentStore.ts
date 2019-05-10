@@ -111,8 +111,6 @@ class PersistentStore {
         PersistentStore.serialize(this._store.getState())
       )
     })
-
-    BalanceUtilities.connectMyIdentities(this.store)
   }
 
   public reset(): void {

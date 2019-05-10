@@ -102,7 +102,9 @@ class MyClaimCreateView extends Component<Props, State> {
               </div>
             </div>
             <SchemaEditor
-              schema={cType!.getClaimInputModel() as common.Schema}
+              schema={
+                sdk.CTypeUtils.getClaimInputModel(cType!) as common.Schema
+              }
               initialValue={contents}
               updateValue={this.updateClaim}
             />
