@@ -5,7 +5,7 @@ import { Contact, MyIdentity } from '../types/Contact'
 import BlockchainService from './BlockchainService'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
-import { object } from 'prop-types';
+import { object } from 'prop-types'
 
 export class DidService {
   public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
@@ -72,7 +72,7 @@ export class DidService {
   }
 
   private static readonly URL_RESOLVER = {
-    resolve: async (url: string): Promise<object|undefined> => {
+    resolve: async (url: string): Promise<object | undefined> => {
       return fetch(url)
         .then(response => {
           if (!response.ok) {
@@ -81,7 +81,7 @@ export class DidService {
           return response
         })
         .then(response => response.json())
-        .then(result => typeof result === 'object' ? result : undefined)
+        .then(result => (typeof result === 'object' ? result : undefined))
     },
   } as sdk.IURLResolver
 }
