@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { ChangeEvent } from 'react'
 import { connect } from 'react-redux'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
@@ -19,6 +20,10 @@ interface State {
   allContacts: Contact[]
 
   showAllContacts?: boolean
+  importViaDID: {
+    alias: string
+    didAddress: string
+  }
 }
 
 class ContactList extends React.Component<Props, State> {
@@ -26,10 +31,15 @@ class ContactList extends React.Component<Props, State> {
     super(props)
     this.state = {
       allContacts: [],
+      importViaDID: {
+        alias: '',
+        didAddress: '',
+      },
     }
 
     this.toggleContacts = this.toggleContacts.bind(this)
     this.fetchAllContacts = this.fetchAllContacts.bind(this)
+    this.importViaDID = this.importViaDID.bind(this)
   }
 
   public render() {
@@ -82,8 +92,79 @@ class ContactList extends React.Component<Props, State> {
               _contacts.map((contact: Contact) => this.getContactRow(contact))}
           </tbody>
         </table>
+        {this.getImportViaDID()}
       </section>
     )
+  }
+
+  private getImportViaDID() {
+    const { importViaDID } = this.state
+    return (
+      <section className="importViaDID">
+        <h2>Import via DID</h2>
+        <div>
+          <label>DID</label>
+          <div>
+            <input
+              type="text"
+              value={importViaDID.didAddress}
+              onChange={this.prepareImportViaDID.bind(this, 'didAddress')}
+            />
+          </div>
+        </div>
+        <div>
+          <label>Alias</label>
+          <div>
+            <input
+              type="text"
+              value={importViaDID.alias}
+              onChange={this.prepareImportViaDID.bind(this, 'alias')}
+            />
+          </div>
+        </div>
+        <div className="actions">
+          <button
+            onClick={this.importViaDID}
+            disabled={!importViaDID.didAddress || !importViaDID.alias}
+          >
+            Import
+          </button>
+        </div>
+      </section>
+    )
+  }
+
+  private prepareImportViaDID(
+    key: 'didAddress' | 'alias',
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    const { importViaDID } = this.state
+    const { value } = event.target
+    this.setState({
+      importViaDID: { ...importViaDID, [key]: value },
+    })
+  }
+
+  private importViaDID() {
+    const { importViaDID } = this.state
+
+    if (importViaDID.didAddress && importViaDID.alias) {
+      ContactRepository.importViaDID(
+        importViaDID.didAddress,
+        importViaDID.alias
+      )
+        .then(() => {
+          this.setState({
+            importViaDID: {
+              alias: '',
+              didAddress: '',
+            },
+          })
+        })
+        .catch(() => {
+          // prevent clearing of input fields
+        })
+    }
   }
 
   private getContactRow(contact: Contact) {

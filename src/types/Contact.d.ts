@@ -10,7 +10,10 @@ export interface Contact {
     addedBy?: MyIdentity['identity']['address']
     unregistered?: boolean
   }
-  did?: object
+  did?: {
+    address?: string
+    document?: object
+  }
   signature?: string
   publicIdentity: sdk.PublicIdentity
 }
