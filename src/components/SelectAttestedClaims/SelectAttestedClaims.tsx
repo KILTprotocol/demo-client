@@ -3,12 +3,9 @@ import groupBy from 'lodash/groupBy'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import isEqual from 'lodash/isEqual'
 
-import CTypeRepository from '../../services/CtypeRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { CType, ICType } from '../../types/Ctype'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import SelectAttestedClaim, {
   State as SelectAttestedClaimState,
@@ -80,7 +77,6 @@ type Props = {
 }
 
 type State = {
-  // cType?: CType
   claimSelectionData: ClaimSelectionData
 }
 
