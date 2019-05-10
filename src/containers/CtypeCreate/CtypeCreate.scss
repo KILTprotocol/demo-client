@@ -6,7 +6,7 @@
 
   & .Ctype-name {
     @include card;
-    @include label_input_combo;
+    @include label-input-combo;
 
     margin: {
       bottom: -$base-border-width;

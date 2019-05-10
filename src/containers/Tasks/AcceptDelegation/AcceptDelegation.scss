@@ -4,7 +4,7 @@
   & .delegationData {
 
     & > div {
-      @include label-input_combo;
+      @include label-input-combo;
     }
 
     & .Permissions {

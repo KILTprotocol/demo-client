@@ -34,6 +34,8 @@ type Props = {
 type State = {
   contacts: Contact[]
   preSelectedContacts: Contact[]
+
+  value?: null
 }
 
 class SelectContacts extends React.Component<Props, State> {
@@ -105,7 +107,7 @@ class SelectContacts extends React.Component<Props, State> {
       onMenuOpen,
       onMenuClose,
     } = this.props
-    const { contacts, preSelectedContacts } = this.state
+    const { contacts, preSelectedContacts, value } = this.state
 
     const options: SelectOption[] = contacts.map(contact =>
       this.getOption(contact)
@@ -135,6 +137,7 @@ class SelectContacts extends React.Component<Props, State> {
         name={name}
         options={options}
         defaultValue={defaultOptions}
+        value={value}
         onChange={this.onChange}
         onMenuOpen={onMenuOpen}
         onMenuClose={onMenuClose}
@@ -149,6 +152,12 @@ class SelectContacts extends React.Component<Props, State> {
     )
   }
 
+  public reset() {
+    this.setState({
+      value: null,
+    })
+  }
+
   private getOption(contact: Contact): SelectOption {
     return {
       baseValue: contact.publicIdentity.address,
@@ -160,6 +169,10 @@ class SelectContacts extends React.Component<Props, State> {
   private onChange(selectedOptions: SelectOption | SelectOption[]) {
     const { onChange } = this.props
     const { contacts } = this.state
+
+    this.setState({
+      value: undefined,
+    })
 
     // normalize selectedOptions to Array
     const _selectedOptions: Array<SelectOption['value']> = (Array.isArray(
