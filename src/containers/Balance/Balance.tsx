@@ -145,13 +145,11 @@ class Balance extends React.Component<Props, State> {
 
   private setTransferTokens(event: ChangeEvent<HTMLInputElement>) {
     const { value: amount } = event.target
-    let myBalance = this.getMyBalance()
+    const myBalance = this.getMyBalance()
 
     if (!myBalance || amount.indexOf('.') !== -1) {
       return
     }
-
-    myBalance = BalanceUtilities.convertTokenForExternal(myBalance)
 
     const amountNumber = Number(amount)
 
@@ -213,7 +211,7 @@ class Balance extends React.Component<Props, State> {
     BalanceUtilities.makeTransfer(
       myIdentity,
       receiver.publicIdentity.address,
-      BalanceUtilities.convertTokenForInternal(Number(transferTokens))
+      Number(transferTokens)
     )
   }
 }

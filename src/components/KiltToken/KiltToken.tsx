@@ -30,11 +30,9 @@ class KiltToken extends React.Component<Props, State> {
       amount < 0 ? 'decreased' : amount > 0 ? 'increased' : '',
     ]
 
-    const displayAmount = BalanceUtilities.convertTokenForExternal(amount)
-
     return (
-      <section className={classes.join(' ')} title={`${displayAmount}`}>
-        {displayAmount.toFixed(decimalPlaces)}
+      <section className={classes.join(' ')} title={`${amount}`}>
+        {amount.toFixed(decimalPlaces)}
       </section>
     )
   }
