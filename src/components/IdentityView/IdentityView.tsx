@@ -185,14 +185,7 @@ class IdentityView extends React.Component<Props, State> {
     const { address, boxPublicKeyAsHex } = identity
     const { name } = metaData
 
-    const contact: Contact = {
-      metaData: { name },
-      publicIdentity: { 
-        address, 
-        boxPublicKeyAsHex,
-        serviceAddress: `${MessageRepository.URL}`
-      },
-    }
+    const contact: Contact = { metaData: { name }, publicIdentity: { address, boxPublicKeyAsHex, serviceAddress: `${MessageRepository.URL}` } }
 
     ContactRepository.add(contact).then(
       () => {
