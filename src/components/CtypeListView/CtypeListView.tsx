@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
+import CTypeRepository from '../../services/CtypeRepository'
 
 import { ICType } from '../../types/Ctype'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -8,17 +9,30 @@ import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import './CtypeListView.scss'
 
 type Props = RouteComponentProps<{}> & {
-  cTypes?: ICType[]
   onRequestLegitimation: (cType: ICType) => void
 }
 
-type State = {}
+type State = {
+  cTypes?: ICType[]
+  fetched: boolean
+}
 
 class CtypeListView extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      fetched: false,
+    }
+
+    this.fetchAllCTypes = this.fetchAllCTypes.bind(this)
+  }
+
   public render() {
-    const { cTypes } = this.props
+    const { cTypes, fetched } = this.state
     return (
       <section className="CtypeListView">
+        {!fetched && <div>Please fetch cTypes manually.</div>}
+        {fetched && (!cTypes || !cTypes.length) && <div>No cTypes found.</div>}
         {cTypes && !!cTypes.length && (
           <table>
             <thead>
@@ -68,10 +82,20 @@ class CtypeListView extends React.Component<Props, State> {
           </table>
         )}
         <div className="actions">
+          <button onClick={this.fetchAllCTypes}>
+            {cTypes && !!cTypes.length ? 'Refetch' : 'Fetch'}
+            <span> CTypes</span>
+          </button>
           <Link to="/ctype/new">Create new CTYPE</Link>
         </div>
       </section>
     )
+  }
+
+  private fetchAllCTypes() {
+    CTypeRepository.findAll().then((cTypes: ICType[]) => {
+      this.setState({ cTypes, fetched: true })
+    })
   }
 }
 

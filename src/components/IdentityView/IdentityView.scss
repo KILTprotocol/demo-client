@@ -58,4 +58,26 @@
       color: $color-grey-light;
     }
   }
+
+  & .instruction {
+    margin: {
+      top: $base-padding;
+      bottom: 2*$base-padding;
+    }
+  }
+
+  & .mailContent {
+    @include label-input-combo-list;
+
+    margin: {
+      bottom: $base-padding;
+    }
+
+    & label + div {
+      @include border-radius($base-border-radius);
+
+      padding: $base-padding;
+      border: $base-border;
+    }
+  }
 }

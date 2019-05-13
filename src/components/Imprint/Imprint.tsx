@@ -19,7 +19,7 @@ const Imprint = () => {
         <br />
         Contact: Ingo Rübe
         <br />
-        <Mail localPart={'info'} domain={'botlabs'} topLevelDomain={'org'} />
+        <Mail mail={'info@botlabs.org'} />
         <br />
         <br />
         [Requirements according to § 5 TMG (Germany)]
