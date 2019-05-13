@@ -6,7 +6,6 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import IdentityView from '../../components/IdentityView/IdentityView'
 import FeedbackService, {
   safeDelete,
-  notifyFailure,
   notifySuccess,
   notifyError,
 } from '../../services/FeedbackService'

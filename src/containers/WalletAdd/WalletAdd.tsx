@@ -1,4 +1,4 @@
-import { Blockchain, Identity } from '@kiltprotocol/prototype-sdk'
+import { Identity } from '@kiltprotocol/prototype-sdk'
 import * as mnemonic from '@polkadot/util-crypto/mnemonic'
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -6,6 +6,7 @@ import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 
 import Input from '../../components/Input/Input'
+import { BalanceUtilities } from '../../services/BalanceUtilities'
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import { notify, notifySuccess } from '../../services/FeedbackService'
@@ -17,6 +18,7 @@ import { MyIdentity } from '../../types/Contact'
 import './WalletAdd.scss'
 
 type Props = RouteComponentProps<{}> & {
+  // mapDispatchToProps
   saveIdentity: (myIdentity: MyIdentity) => void
 }
 type State = {
@@ -163,6 +165,7 @@ class WalletAdd extends React.Component<Props, State> {
         })
       )
     )
+    BalanceUtilities.connect(newIdentity)
     notifySuccess(`New identity '${alias}' successfully created`)
   }
 

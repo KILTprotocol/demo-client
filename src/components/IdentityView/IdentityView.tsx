@@ -229,7 +229,7 @@ I hereby consent, that the KILT Team at BOTLabs GmbH, Keithstr. 2-4, 10787 Berli
 Thank you!
 `
     // @ts-ignore
-    window.location = `mailto:${kiltTokenRequestEmail}?subject=${subject}&body=${body}`
+    location.href = `mailto:${kiltTokenRequestEmail}?subject=${subject}&body=${body}`
   }
 
   private toggleContacts() {

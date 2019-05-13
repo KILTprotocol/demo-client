@@ -67,12 +67,6 @@ class ContactRepository {
         return contact
       })
       .catch(error => {
-        if (!Wallet.getIdentity(PersistentStore.store.getState(), address)) {
-          notifyFailure(
-            `Could not resolve contact for address ${address}!`,
-            false
-          )
-        }
         if (propagateError) {
           throw error
         }
