@@ -8,7 +8,6 @@ import * as Balances from '../state/ducks/Balances'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
-import BlockchainService from './BlockchainService'
 import { notify, notifySuccess } from './FeedbackService'
 
 const KILT_COIN = 1
@@ -69,6 +68,15 @@ class BalanceUtilities {
     successCallback?: () => void
   ) {
     const transferAmount: BN = BalanceUtilities.asMicroKilt(amount)
+    notify(
+      <div>
+        <span>Transfer of </span>
+        <KiltToken amount={amount} />
+        <span> to </span>
+        <ContactPresentation address={receiverAddress} inline={true} />{' '}
+        initiated.
+      </div>
+    )
     sdk.Balance.makeTransfer(
       myIdentity.identity,
       receiverAddress,
