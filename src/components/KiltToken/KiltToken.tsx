@@ -20,7 +20,7 @@ class KiltToken extends React.Component<Props, State> {
   public render() {
     const { amount, colored, decimalPlaces } = this.props
 
-    if (amount === undefined || !decimalPlaces) {
+    if (amount == null || !decimalPlaces) {
       return <section className="KiltToken" />
     }
 
