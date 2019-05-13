@@ -19,7 +19,10 @@ import { BlockingNotification, NotificationType } from '../types/UserFeedback'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import ContactRepository from './ContactRepository'
 import errorService from './ErrorService'
-import FeedbackService, { notifySuccess } from './FeedbackService'
+import FeedbackService, {
+  notifyFailure,
+  notifySuccess,
+} from './FeedbackService'
 
 export interface MessageOutput extends sdk.IMessage {
   encryptedMessage: sdk.IEncryptedMessage
@@ -76,6 +79,7 @@ class MessageRepository {
 
     return Promise.any(arrayOfPromises)
       .then(result => {
+        MessageRepository.handleMultiAddressErrors(result.errors)
         return result.successes
       })
       .then((receiverContacts: Contact[]) => {
@@ -95,6 +99,7 @@ class MessageRepository {
 
     return Promise.any(arrayOfPromises)
       .then(result => {
+        MessageRepository.handleMultiAddressErrors(result.errors)
         return result.successes
       })
       .then(() => undefined)
@@ -326,6 +331,17 @@ class MessageRepository {
       })
     }
     return message
+  }
+
+  private static handleMultiAddressErrors(errors: Error[]) {
+    if (errors.length) {
+      notifyFailure(
+        `Could not send message to ${
+          errors.length > 1 ? 'these addresses' : 'this address'
+        }: ${errors.join(', ')}`,
+        false
+      )
+    }
   }
 }
 

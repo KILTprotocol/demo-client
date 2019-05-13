@@ -171,8 +171,7 @@ const PrivacyPolicy = () => {
           <br />
           Phone: +49 (030) 2123 2827
           <br />
-          Email:{' '}
-          <Mail localPart={'info'} domain={'botlabs'} topLevelDomain={'org'} />
+          Email: <Mail mail={'info@botlabs.org'} />
           <br />
           Website:{' '}
           <Link to="https://demo.kilt.io/">{`https://demo.kilt.io/`}</Link>

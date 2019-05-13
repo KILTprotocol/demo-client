@@ -57,6 +57,13 @@ export class DidService {
         `Error deleting DID for identity ${myIdentity.metaData.name}`
       )
     }
+    await ContactRepository.add({
+      did: undefined,
+      metaData: {
+        name: myIdentity.metaData.name,
+      },
+      publicIdentity: myIdentity.identity.getPublicIdentity(),
+    } as Contact)
     persistentStore.store.dispatch(
       Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
         did: undefined,
