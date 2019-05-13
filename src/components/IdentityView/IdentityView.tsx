@@ -14,7 +14,7 @@ import { Contact, MyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 import './IdentityView.scss'
-import MessageRepository from 'src/services/MessageRepository';
+import MessageRepository from '../../services/MessageRepository';
 
 type Props = {
   // input
