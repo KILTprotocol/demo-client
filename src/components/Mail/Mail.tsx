@@ -14,23 +14,23 @@ const convert = (string: string) => {
 }
 
 type Props = {
-  localPart: string
-  domain: string
-  topLevelDomain: string
+  mail: string
+
+  mailTo?: boolean
 }
 
 const Mail = (props: Props) => {
-  const { localPart, domain, topLevelDomain } = props
-  const mailTo = () => {
-    location.href = `mailto:${localPart}@${domain}.${topLevelDomain}`
+  const { mail, mailTo } = props
+
+  const handleMailTo = () => {
+    location.href = `mailto:${mail}`
   }
   return (
-    <span className="eml" onClick={mailTo}>
-      <span>{convert(localPart)}</span>
-      <span>@</span>
-      <span>{convert(domain)}</span>
-      <span>.</span>
-      <span>{convert(topLevelDomain)}</span>
+    <span
+      className={`eml ${mailTo !== false ? 'linked' : ''}`}
+      onClick={handleMailTo}
+    >
+      <span>{convert(mail)}</span>
     </span>
   )
 }
