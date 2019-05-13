@@ -14,7 +14,7 @@ import { Contact, MyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 import './IdentityView.scss'
-import MessageRepository from '../../services/MessageRepository';
+import MessageRepository from '../../services/MessageRepository'
 
 type Props = {
   // input
@@ -185,7 +185,14 @@ class IdentityView extends React.Component<Props, State> {
     const { address, boxPublicKeyAsHex } = identity
     const { name } = metaData
 
-    const contact: Contact = { metaData: { name }, publicIdentity: { address, boxPublicKeyAsHex, serviceAddress: `${MessageRepository.URL}` } }
+    const contact: Contact = {
+      metaData: { name },
+      publicIdentity: {
+        address,
+        boxPublicKeyAsHex,
+        serviceAddress: `${MessageRepository.URL}`,
+      },
+    }
 
     ContactRepository.add(contact).then(
       () => {
