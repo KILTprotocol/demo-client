@@ -193,6 +193,7 @@ class IdentityView extends React.Component<Props, State> {
             showOnInit={true}
             onConfirm={this.closeRequestKiltTokensModal}
             onCancel={this.closeRequestKiltTokensModal}
+            okButtonLabel="Close"
           >
             <div className="instruction">
               To use all features of the Demo Client you will need write access
@@ -205,8 +206,10 @@ class IdentityView extends React.Component<Props, State> {
               <span>
                 {' '}
                 KILT Coins. Mash Coins have no value and are pure play money.
-                You can receive 500 Mash Coins for free by sending us an E-Mail
-                with the following content:
+                You can receive 500 Mash Coins for free by{' '}
+                <strong>
+                  sending us an E-Mail with the following content:
+                </strong>
               </span>
             </div>
             <div className="mailContent">
