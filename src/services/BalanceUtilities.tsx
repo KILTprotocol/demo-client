@@ -20,7 +20,7 @@ const TRANSACTION_FEE = 1 * KILT_COIN
 const MIN_BALANCE = 1 * KILT_COIN
 
 // initial endowment for automatically created accounts
-const ENDOWMENT = 100 * KILT_COIN
+const ENDOWMENT = 30 * KILT_COIN
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {

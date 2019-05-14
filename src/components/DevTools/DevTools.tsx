@@ -1,6 +1,12 @@
 import React from 'react'
 
+import {
+  ENDOWMENT,
+  MIN_BALANCE,
+  TRANSACTION_FEE,
+} from '../../services/BalanceUtilities'
 import FeedbackService from '../../services/FeedbackService'
+import KiltToken from '../KiltToken/KiltToken'
 import { BsAttestation, BsAttestationsPool } from './DevTools.attestations'
 import { BsClaim, BsClaimsPool } from './DevTools.claims'
 import { BsCType, BsCTypesPool } from './DevTools.ctypes'
@@ -10,6 +16,7 @@ import * as Wallet from '../../state/ducks/Wallet'
 import * as Balances from '../../state/ducks/Balances'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
+import identitiesPool from './data/identities.json'
 
 type WithMessages = {
   label: string
@@ -35,10 +42,15 @@ class DevTools extends React.Component<Props> {
           selectedIdentity.identity.address
         )
       : 0
+
+    const minBalanceForBootstrap =
+      (ENDOWMENT + TRANSACTION_FEE) * Object.keys(identitiesPool).length +
+      MIN_BALANCE
+
     return (
       <section className="DevTools">
         <h2>Dev Tools</h2>
-        {selectedIdentity && balance > 0 ? (
+        {selectedIdentity && balance > minBalanceForBootstrap ? (
           <div>
             <div>
               <h4>Auto Bootstrap</h4>
@@ -74,7 +86,10 @@ class DevTools extends React.Component<Props> {
             ))}
           </div>
         ) : (
-          <p>Please select an identity and make sure it has enough funds.</p>
+          <div>
+            To enable bootstrapping please select an identity with more than{' '}
+            <KiltToken amount={minBalanceForBootstrap} />.
+          </div>
         )}
       </section>
     )
