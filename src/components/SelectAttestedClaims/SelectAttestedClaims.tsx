@@ -123,7 +123,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
       )
     }
 
-    return (cTypeHashes || []).map(
+    return (_cTypeHashes || []).map(
       (cTypeHash: Claims.Entry['claim']['cType']) => (
         <div className="cType-container" key={cTypeHash}>
           <h4>

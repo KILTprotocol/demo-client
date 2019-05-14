@@ -10,7 +10,7 @@ import withSelectAttestedClaims, {
 } from '../../../components/withSelectAttestedClaims/withSelectAttestedClaims'
 import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import CTypeRepository from '../../../services/CtypeRepository'
-import { DelegationType, MyDelegation } from '../../../state/ducks/Delegations'
+import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
 import { ICType } from '../../../types/Ctype'
 
