@@ -1,7 +1,10 @@
 import * as React from 'react'
+import { connect } from 'react-redux'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
-import CTypeRepository from '../../services/CtypeRepository'
 
+import CTypeRepository from '../../services/CtypeRepository'
+import * as CTypes from '../../state/ducks/CTypes'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
@@ -10,10 +13,11 @@ import './CtypeListView.scss'
 
 type Props = RouteComponentProps<{}> & {
   onRequestLegitimation: (cType: ICType) => void
+  // mapStateToProps
+  cTypes?: ICType[]
 }
 
 type State = {
-  cTypes?: ICType[]
   fetched: boolean
 }
 
@@ -28,11 +32,14 @@ class CtypeListView extends React.Component<Props, State> {
   }
 
   public render() {
-    const { cTypes, fetched } = this.state
+    const { cTypes } = this.props
+    const { fetched } = this.state
     return (
       <section className="CtypeListView">
-        {!fetched && <div>Please fetch cTypes manually.</div>}
-        {fetched && (!cTypes || !cTypes.length) && <div>No cTypes found.</div>}
+        {!fetched && (!cTypes || !cTypes.length) && (
+          <div>Please fetch CTYPEs manually.</div>
+        )}
+        {fetched && (!cTypes || !cTypes.length) && <div>No CTYPEs found.</div>}
         {cTypes && !!cTypes.length && (
           <table>
             <thead>
@@ -93,10 +100,12 @@ class CtypeListView extends React.Component<Props, State> {
   }
 
   private fetchAllCTypes() {
-    CTypeRepository.findAll().then((cTypes: ICType[]) => {
-      this.setState({ cTypes, fetched: true })
-    })
+    CTypeRepository.findAll()
   }
 }
 
-export default withRouter(CtypeListView)
+const mapStateToProps = (state: ReduxState) => ({
+  cTypes: CTypes.getCTypes(state),
+})
+
+export default withRouter(connect(mapStateToProps)(CtypeListView))
