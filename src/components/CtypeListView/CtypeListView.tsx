@@ -37,9 +37,9 @@ class CtypeListView extends React.Component<Props, State> {
     return (
       <section className="CtypeListView">
         {!fetched && (!cTypes || !cTypes.length) && (
-          <div>Please fetch cTypes manually.</div>
+          <div>Please fetch CTYPEs manually.</div>
         )}
-        {fetched && (!cTypes || !cTypes.length) && <div>No cTypes found.</div>}
+        {fetched && (!cTypes || !cTypes.length) && <div>No CTYPEs found.</div>}
         {cTypes && !!cTypes.length && (
           <table>
             <thead>
