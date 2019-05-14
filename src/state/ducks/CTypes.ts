@@ -3,6 +3,7 @@ import { createSelector } from 'reselect'
 
 import KiltAction from '../../types/Action'
 import { ICType } from '../../types/Ctype'
+import PersistentStore from '../PersistentStore'
 import { State as ReduxState } from '../PersistentStore'
 
 interface AddCTypeAction extends KiltAction {
