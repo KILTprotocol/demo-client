@@ -106,7 +106,7 @@ class MyClaimCreateView extends Component<Props, State> {
                 sdk.CTypeUtils.getClaimInputModel(cType!) as common.Schema
               }
               initialValue={contents}
-              updateValue={this.updateClaim}
+              onUpdateSchema={this.updateClaim}
             />
 
             <div className="actions">
