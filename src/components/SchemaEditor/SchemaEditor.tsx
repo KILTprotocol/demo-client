@@ -5,18 +5,19 @@ import * as common from 'schema-based-json-editor'
 import './SchemaEditor.scss'
 
 type Props = {
-  schema: common.Schema
   initialValue: common.ValueType
-  updateValue: (value: common.ValueType, _isValid: boolean) => void
+  schema: common.Schema
+  // output
+  onUpdateSchema: (value: common.ValueType, isValid: boolean) => void
 }
 
-const SchemaEditor = ({ schema, initialValue, updateValue }: Props) => {
+const SchemaEditor = ({ initialValue, schema, onUpdateSchema }: Props) => {
   return (
     <div className="schema-based-json-editor">
       <JSONEditor
         schema={schema}
         initialValue={initialValue}
-        updateValue={updateValue}
+        updateValue={onUpdateSchema}
         icon="fontawesome5"
       />
     </div>

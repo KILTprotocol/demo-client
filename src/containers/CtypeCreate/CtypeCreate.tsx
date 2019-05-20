@@ -2,7 +2,10 @@ import * as sdk from '@kiltprotocol/prototype-sdk'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import CTypeEditor from '../../components/CtypeEditor/CtypeEditor'
+import * as common from 'schema-based-json-editor'
+import PlainSchemaEditor from '../../components/PlainSchemaEditor/PlainSchemaEditor'
+
+import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import FeedbackService, {
@@ -13,6 +16,7 @@ import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
+
 import './CtypeCreate.scss'
 
 type Props = RouteComponentProps<{}> & {
@@ -20,9 +24,9 @@ type Props = RouteComponentProps<{}> & {
 }
 
 type State = {
-  connected: boolean
-  cType: any
   isValid: boolean
+
+  cType?: Partial<sdk.ICType>
 }
 
 class CTypeCreate extends React.Component<Props, State> {
@@ -30,8 +34,6 @@ class CTypeCreate extends React.Component<Props, State> {
     super(props)
 
     this.state = {
-      cType: { title: '' },
-      connected: false,
       isValid: false,
     }
 
@@ -39,26 +41,34 @@ class CTypeCreate extends React.Component<Props, State> {
     this.cancel = this.cancel.bind(this)
   }
 
-  public componentDidMount() {
-    this.connect()
+  public render() {
+    return (
+      <section className="CTypeCreate">
+        <h1 className="App-title">Create CTYPE</h1>
+        <SchemaEditor
+          schema={sdk.CTypeInputModel as common.Schema}
+          initialValue={{}}
+          onUpdateSchema={this.onUpdateSchemaBySchemaEditor}
+        />
+        <PlainSchemaEditor
+          schema={JSON.stringify(sdk.CTypeInputModel)}
+          onUpdateSchema={this.onUpdateSchemaByPlainSchemaEditor}
+        />
+
+        {/*<CTypeEditor*/}
+        {/*cType={this.state.cType}*/}
+        {/*onUpdateCType={this.updateCType}*/}
+        {/*onSubmit={this.submit}*/}
+        {/*onCancel={this.cancel}*/}
+        {/*connected={this.state.connected}*/}
+        {/*isValid={this.state.isValid}*/}
+        {/*/>*/}
+      </section>
+    )
   }
 
-  public async connect() {
-    // TODO: test unmount and host change
-    // TODO: test error handling
-    const blockUi: BlockUi = FeedbackService.addBlockUi({
-      headline: 'Connecting to block chain',
-    })
-    this.setState({ connected: true })
-    blockUi.remove()
-  }
-
-  public async submit() {
-    if (
-      this.props.selectedIdentity &&
-      this.state.connected &&
-      this.state.isValid
-    ) {
+  private async submit() {
+    if (this.props.selectedIdentity && this.state.isValid) {
       const { selectedIdentity, history } = this.props
       let cType: sdk.CType
 
@@ -68,7 +78,7 @@ class CTypeCreate extends React.Component<Props, State> {
         errorService.log({
           error,
           message: 'could not create CTYPE from Input Model',
-          origin: 'CTypeCreate.submit()',
+          origin: 'CTypeCreate.onSubmit()',
         })
         return
       }
@@ -101,8 +111,8 @@ class CTypeCreate extends React.Component<Props, State> {
         .catch(error => {
           errorService.log({
             error,
-            message: 'Could not submit CTYPE',
-            origin: 'CTypeCreate.submit()',
+            message: 'Could not onSubmit CTYPE',
+            origin: 'CTypeCreate.onSubmit()',
           })
           notifyError(error)
           blockUi.remove()
@@ -110,33 +120,25 @@ class CTypeCreate extends React.Component<Props, State> {
     }
   }
 
-  public render() {
-    return (
-      <section className="CTypeCreate">
-        <h1 className="App-title">Create CTYPE</h1>
-        <CTypeEditor
-          cType={this.state.cType}
-          updateCType={this.updateCType}
-          submit={this.submit}
-          cancel={this.cancel}
-          connected={this.state.connected}
-          isValid={this.state.isValid}
-        />
-      </section>
-    )
-  }
-
   private cancel() {
     // TODO: goto CTYPE list or previous screen?
     this.props.history.push('/cType')
   }
 
-  private updateCType = (cType: string, isValid: boolean) => {
-    this.setState({
-      cType,
-      isValid,
-    })
+  private onUpdateSchemaBySchemaEditor(schema: common.ValueType) {
+    console.log('schema', schema)
   }
+
+  private onUpdateSchemaByPlainSchemaEditor(schema: string) {
+    console.log('schema', schema)
+  }
+
+  // private updateCType = (cType: string, isValid: boolean) => {
+  //   this.setState({
+  //     cType,
+  //     isValid,
+  //   })
+  // }
 }
 
 const mapStateToProps = (state: ReduxState) => ({
