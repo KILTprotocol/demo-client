@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 import * as React from 'react'
 import DelegationDetailView from '../../../components/DelegationDetailView/DelegationDetailView'
 import DelegationsService from '../../../services/DelegationsService'

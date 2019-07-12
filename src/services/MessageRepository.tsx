@@ -2,8 +2,8 @@ import {
   IAttestedClaim,
   ISubmitAttestationForClaim,
   MessageBodyType,
-} from '@kiltprotocol/prototype-sdk'
-import * as sdk from '@kiltprotocol/prototype-sdk'
+} from '@kiltprotocol/sdk-js'
+import * as sdk from '@kiltprotocol/sdk-js'
 import cloneDeep from 'lodash/cloneDeep'
 import * as React from 'react'
 import { InteractionProps } from 'react-json-view'
@@ -124,11 +124,7 @@ class MessageRepository {
       .then(message => {
         return ContactRepository.findByAddress(message.senderAddress).then(
           (sender: Contact) =>
-            sdk.Message.createFromEncryptedMessage(
-              message,
-              sender.publicIdentity,
-              myIdentity
-            )
+            sdk.Message.createFromEncryptedMessage(message, myIdentity)
         )
       })
   }
@@ -147,7 +143,6 @@ class MessageRepository {
               try {
                 const m: sdk.IMessage = sdk.Message.createFromEncryptedMessage(
                   encryptedMessage,
-                  sender.publicIdentity,
                   myIdentity
                 )
                 sdk.Message.ensureOwnerIsSender(m)

@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 import React, { ReactNode } from 'react'
 
 import AcceptDelegation from '../../containers/Tasks/AcceptDelegation/AcceptDelegation'

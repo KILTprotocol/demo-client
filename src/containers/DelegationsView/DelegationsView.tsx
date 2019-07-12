@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 import isEqual from 'lodash/isEqual'
 import * as React from 'react'
 import { connect } from 'react-redux'

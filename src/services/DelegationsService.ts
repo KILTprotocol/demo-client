@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 
 import { DelegationsTreeNode } from '../components/DelegationNode/DelegationNode'
 import { MyDelegation } from '../state/ducks/Delegations'

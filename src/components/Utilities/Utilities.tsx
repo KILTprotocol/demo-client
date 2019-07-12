@@ -14,7 +14,7 @@ import TestUserFeedback from '../TestUserFeedback/TestUserFeedback'
 import DevTools from '../DevTools/DevTools'
 import { clientVersionHelper } from '../../services/ClientVersionHelper'
 
-import sdkPackage from '@kiltprotocol/prototype-sdk/package.json'
+import sdkPackage from '@kiltprotocol/sdk-js/package.json'
 import clientPackage from '../../../package.json'
 import { safeDestructiveAction } from '../../services/FeedbackService'
 import { MyIdentity } from '../../types/Contact'
