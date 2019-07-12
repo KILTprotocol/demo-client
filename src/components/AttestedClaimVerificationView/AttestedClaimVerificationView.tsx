@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
 import AttestationService from '../../services/AttestationService'
 import * as UiState from '../../state/ducks/UiState'

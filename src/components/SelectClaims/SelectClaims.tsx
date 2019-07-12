@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'

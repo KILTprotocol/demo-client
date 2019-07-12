@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'

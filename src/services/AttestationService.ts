@@ -4,7 +4,7 @@ import Kilt, {
   IAttestation,
   IAttestedClaim,
   Identity,
-} from '@kiltprotocol/prototype-sdk'
+} from '@kiltprotocol/sdk-js'
 import moment from 'moment'
 import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAttestedClaims'
 

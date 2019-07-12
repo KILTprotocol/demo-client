@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 import BN from 'bn.js'
 import React from 'react'
 import { Store } from 'redux'

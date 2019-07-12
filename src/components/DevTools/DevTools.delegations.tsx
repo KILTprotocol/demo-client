@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 import ContactRepository from '../../services/ContactRepository'
 
 import DelegationsService from '../../services/DelegationsService'

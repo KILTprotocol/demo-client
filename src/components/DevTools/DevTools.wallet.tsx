@@ -1,4 +1,4 @@
-import { Identity } from '@kiltprotocol/prototype-sdk'
+import { Identity } from '@kiltprotocol/sdk-js'
 import { mnemonicGenerate } from '@polkadot/util-crypto/mnemonic'
 import { BalanceUtilities, ENDOWMENT } from '../../services/BalanceUtilities'
 import ContactRepository from '../../services/ContactRepository'

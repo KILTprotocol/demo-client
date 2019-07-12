@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 
 import PersistentStore from '../state/PersistentStore'
 import * as Parameters from '../state/ducks/Parameters'

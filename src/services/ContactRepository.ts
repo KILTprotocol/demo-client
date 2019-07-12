@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 
 import * as Contacts from '../state/ducks/Contacts'
 import * as Wallet from '../state/ducks/Wallet'

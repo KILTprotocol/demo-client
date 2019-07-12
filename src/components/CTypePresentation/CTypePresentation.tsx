@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
 import * as React from 'react'

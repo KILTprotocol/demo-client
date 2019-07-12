@@ -1,39 +1,26 @@
+![](https://user-images.githubusercontent.com/1248214/57789522-600fcc00-7739-11e9-86d9-73d7032f40fc.png)
+
 # KILT client
 
-## Installation
-You might have to configure yarn to use the npm registry to access the private repositories there.
-Execute 
-```
-yarn config set @kiltprotocol:registry https://registry.npmjs.org
-``` 
-and either
+The KILT demo client demonstrates the functionality of the KILT SDK and acts as a playground for KILT use cases.
 
-* login to npm with `npm login`, or
-* place a file `.npmrc` in the root directory of this repo and paste a valid auth token for the NPM registry in there:
-
-```
-//registry.npmjs.org/:_authToken=xxx
-```
-
-Then install
+## Installation for local development
+To use the demo client locally, you have to install all dependencies with yarn.
 ```
 yarn install
 ```
 
-## Build and Run
-
-This project is using semantic UI. Source code in /semantic will be build by `yarn start` and places within /src/dist.
-
-If you are likely to adapt the theme or anything regarding semantic UI, use `yarn run watch-semantic`. This will push new code automatically to /src/dist, which triggers a reload of the app (by previous `yarn start`)
-
+## Run
+To build it and launch a dev server, run
+```
+yarn start
+```
 
 ## Run in docker container
 
 ### Build docker image
-You need to provide the auth token to access the NPM registry (for the sdk) as an environment variable. So when building the docker image pass `--build-arg $KILT_NPM_AUTH_TOKEN` to the command line.
-
 ```
-docker build --build-arg KILT_NPM_AUTH_TOKEN=xxx -t kilt/prototype-client .
+docker build -t kilt/prototype-client .
 ```
 
 ### Run docker image

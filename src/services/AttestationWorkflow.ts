@@ -1,11 +1,11 @@
-import * as sdk from '@kiltprotocol/prototype-sdk'
+import * as sdk from '@kiltprotocol/sdk-js'
 import {
   IPartialClaim,
   IRequestAttestationForClaim,
   IRequestLegitimations,
   ISubmitAttestationForClaim,
   MessageBodyType,
-} from '@kiltprotocol/prototype-sdk'
+} from '@kiltprotocol/sdk-js'
 
 import AttestationService from '../services/AttestationService'
 import * as Attestations from '../state/ducks/Attestations'

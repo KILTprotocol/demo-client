@@ -1,4 +1,4 @@
-import { Identity } from '@kiltprotocol/prototype-sdk'
+import { Identity } from '@kiltprotocol/sdk-js'
 import * as mnemonic from '@polkadot/util-crypto/mnemonic'
 import * as React from 'react'
 import { connect } from 'react-redux'
