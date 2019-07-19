@@ -12,8 +12,6 @@ import PersistentStore, {
 } from '../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
-import Mail from '../Mail/Mail'
-import Modal, { ModalType } from '../Modal/Modal'
 
 import './IdentityView.scss'
 import MessageRepository from '../../services/MessageRepository'
@@ -35,19 +33,15 @@ type State = {
   requestKiltTokens: boolean
 }
 
+const FAUCET_URL = 'https://faucet.kilt.io'
+
 class IdentityView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    this.state = {
-      requestKiltTokens: false,
-    }
 
     this.registerContact = this.registerContact.bind(this)
     this.toggleContacts = this.toggleContacts.bind(this)
-    this.openRequestKiltTokensModal = this.openRequestKiltTokensModal.bind(this)
-    this.closeRequestKiltTokensModal = this.closeRequestKiltTokensModal.bind(
-      this
-    )
+    this.openKiltFaucet = this.openKiltFaucet.bind(this)
   }
 
   public render() {
@@ -61,7 +55,6 @@ class IdentityView extends React.Component<Props, State> {
       onCreateDid,
       onDeleteDid,
     } = this.props
-    const { requestKiltTokens } = this.state
 
     const contact: Contact | undefined = contacts.find(
       (myContact: Contact) =>
@@ -173,7 +166,7 @@ class IdentityView extends React.Component<Props, State> {
           {!(balance > 0) && (
             <button
               className="requestTokens"
-              onClick={this.openRequestKiltTokensModal}
+              onClick={this.openKiltFaucet}
               title="Request Tokens"
             >
               Request Tokens
@@ -185,78 +178,6 @@ class IdentityView extends React.Component<Props, State> {
           )}
           <span />
         </div>
-
-        {!(balance > 0) && requestKiltTokens && (
-          <Modal
-            type={ModalType.ALERT}
-            header={`Request tokens`}
-            showOnInit={true}
-            onConfirm={this.closeRequestKiltTokensModal}
-            onCancel={this.closeRequestKiltTokensModal}
-            okButtonLabel="Close"
-          >
-            <div className="instruction">
-              To use all features of the Demo Client you will need write access
-              to the Testnet (Mash Net Blockchain). For this you will need Mash
-              Coins.
-              <br />
-              <strong>Please note:</strong>
-              <span> the Mash Coins are </span>
-              <strong>NOT</strong>
-              <span>
-                {' '}
-                KILT Coins. Mash Coins have no value and are pure play money.
-                You can receive 500 Mash Coins for free by{' '}
-                <strong>
-                  sending us an E-Mail with the following content:
-                </strong>
-              </span>
-            </div>
-            <div className="mailContent">
-              <div className="receiver">
-                <label>Receiver:</label>
-                <div>
-                  <Mail
-                    mail={
-                      process.env.REACT_APP_KILT_TOKEN_REQUEST_EMAIL as string
-                    }
-                  />
-                </div>
-              </div>
-              <div className="subject">
-                <label>Subject:</label>
-                <div>Kilt token request for {myIdentity.identity.address}</div>
-              </div>
-              <div className="body">
-                <label>Body:</label>
-                <div>
-                  Dear KILT Support,
-                  <br />
-                  <br />
-                  I would like to have 500 Mash Coins so that I could try out
-                  the Mash-net of the KILT Protocol.
-                  <br />
-                  <br />
-                  Please send me the tokens to my address:
-                  <br />
-                  <br />
-                  {myIdentity.identity.address}
-                  <br />
-                  <br />I hereby consent, that the KILT Team at BOTLabs GmbH,
-                  Keithstr. 2-4, 10787 Berlin, Germany, may contact me
-                  occasionally via E-Mail. I understand, that BOTLabs will store
-                  my name, organisation and my E-Mail address in a database
-                  located in Germany. I can withdraw this consent at any time
-                  via E-Mail to{' '}
-                  <Mail mail={'info@botlabs.org'} mailTo={false} />.
-                  <br />
-                  <br />
-                  Thank you!
-                </div>
-              </div>
-            </div>
-          </Modal>
-        )}
       </section>
     )
   }
@@ -291,16 +212,8 @@ class IdentityView extends React.Component<Props, State> {
     )
   }
 
-  private openRequestKiltTokensModal() {
-    this.setState({
-      requestKiltTokens: true,
-    })
-  }
-
-  private closeRequestKiltTokensModal() {
-    this.setState({
-      requestKiltTokens: false,
-    })
+  private openKiltFaucet() {
+    window.open(FAUCET_URL, '_blank')
   }
 
   private toggleContacts() {
