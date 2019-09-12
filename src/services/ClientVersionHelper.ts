@@ -48,9 +48,9 @@ class ClientVersionHelper {
     const versionNumber = (await blockchain.getStats()).nodeVersion.toString()
     const blockHash = (await blockchain.api.rpc.chain.getBlockHash(1)).toHex()
 
-    return this.isHashDifferent(blockHash, versionNumber)
+    return this.isHashMatching(blockHash, versionNumber)
   }
-  public async isHashDifferent(chainHash: string, versionNumber: string) {
+  public async isHashMatching(chainHash: string, versionNumber: string) {
     let differentChain = false
     const parameters = Parameters.getParameters(
       PersistentStore.store.getState()
