@@ -30,7 +30,7 @@ class CheckClientVersion extends React.Component<Props, State> {
       // This connects to the blockchain
       .clientResetRequired()
       .then((checkResult: CheckResult) => {
-        if (checkResult.accountInvalid || checkResult.blockPurged) {
+        if (checkResult.accountInvalid || checkResult.firstBlockHashChanged) {
           this.openResetModal()
         } else {
           this.setState({ valid: true })

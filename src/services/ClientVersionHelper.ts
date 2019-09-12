@@ -7,7 +7,7 @@ import { BalanceUtilities } from './BalanceUtilities'
 import BlockchainService from './BlockchainService'
 
 type CheckResult = {
-  blockPurged: boolean
+  firstBlockHashChanged: boolean
   accountInvalid: boolean
 }
 
@@ -15,12 +15,12 @@ class ClientVersionHelper {
   public async clientResetRequired(): Promise<CheckResult> {
     const resetCause: CheckResult = {
       accountInvalid: false,
-      blockPurged: false,
+      firstBlockHashChanged: false,
     }
     return new Promise<CheckResult>(async (resolve, reject) => {
       const blockCheck: boolean = await this.checkHash()
       if (!blockCheck) {
-        resetCause.blockPurged = true
+        resetCause.firstBlockHashChanged = true
       } else {
         const selectedIdentity: Wallet.Entry = Wallet.getSelectedIdentity(
           PersistentStore.store.getState()
@@ -41,22 +41,22 @@ class ClientVersionHelper {
 
   /**
    * @description (PUBLIC) (ASYNC) checks whether the stored blockhash matches the chain blockhash at Index 1
-   * @returns boolean check whether hashes match
+   * @returns check whether hashes match
    */
   public async checkHash(): Promise<boolean> {
     const blockchain = await BlockchainService.connect()
-    const versionNumber = (await blockchain.getStats()).nodeVersion.toString()
     const blockHash = (await blockchain.api.rpc.chain.getBlockHash(1)).toHex()
 
-    return this.isHashMatching(blockHash, versionNumber)
+    return this.isHashMatching(blockHash)
   }
-  public async isHashMatching(chainHash: string, versionNumber: string) {
+
+  public async isHashMatching(chainHash: string) {
     let differentChain = false
     const parameters = Parameters.getParameters(
       PersistentStore.store.getState()
     )
     if (parameters.blockHash === Parameters.DEFAULT_BLOCK_HASH) {
-      this.updateBlockNumber(chainHash, versionNumber)
+      this.updateBlockNumber(chainHash)
     } else if (parameters.blockHash !== chainHash) {
       differentChain = true
     }
@@ -69,14 +69,11 @@ class ClientVersionHelper {
     }
     return !differentChain
   }
-  public async updateBlockNumber(
-    newBlockHashCheck: string,
-    newVersionCheck: string
-  ) {
+
+  public async updateBlockNumber(newBlockHashCheck: string) {
     PersistentStore.store.dispatch(
       Parameters.Store.updateParameters({
         blockHash: newBlockHashCheck,
-        chainVersion: newVersionCheck,
       })
     )
   }
