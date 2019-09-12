@@ -5,12 +5,10 @@ import KiltAction from '../../types/Action'
 import { State as ReduxState } from '../PersistentStore'
 
 const DEFAULT_CHAIN_VERSION: string = '0.0.0'
-const DEFAULT_BLOCK_NUMBER: number = 0
 const DEFAULT_BLOCK_HASH: string = ''
 
 interface Parameters {
   chainVersion: string
-  blockNumber: number
   blockHash: string
 }
 
@@ -85,7 +83,6 @@ class Store {
   private static getDefaults(): Parameters {
     return {
       blockHash: DEFAULT_BLOCK_HASH,
-      blockNumber: DEFAULT_BLOCK_NUMBER,
       chainVersion: DEFAULT_CHAIN_VERSION,
     } as Parameters
   }
@@ -107,6 +104,5 @@ export {
   Action,
   getParameters,
   DEFAULT_CHAIN_VERSION,
-  DEFAULT_BLOCK_NUMBER,
   DEFAULT_BLOCK_HASH,
 }

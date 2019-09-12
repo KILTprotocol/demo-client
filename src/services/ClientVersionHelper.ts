@@ -5,7 +5,6 @@ import * as Parameters from '../state/ducks/Parameters'
 import * as Wallet from '../state/ducks/Wallet'
 import { BalanceUtilities } from './BalanceUtilities'
 import BlockchainService from './BlockchainService'
-import { u8aToHex } from '@polkadot/util'
 
 type CheckResult = {
   blockPurged: boolean
@@ -19,7 +18,7 @@ class ClientVersionHelper {
       blockPurged: false,
     }
     return new Promise<CheckResult>(async (resolve, reject) => {
-      const blockCheck: boolean = await this.checkBlock()
+      const blockCheck: boolean = await this.checkHash()
       if (!blockCheck) {
         resetCause.blockPurged = true
       } else {
@@ -40,56 +39,44 @@ class ClientVersionHelper {
     })
   }
 
-  public async checkBlock(): Promise<boolean> {
+  /**
+   * @description (PUBLIC) (ASYNC) checks whether the stored blockhash matches the chain blockhash at Index 1
+   * @returns boolean check whether hashes match
+   */
+  public async checkHash(): Promise<boolean> {
     const blockchain = await BlockchainService.connect()
     const versionNumber = (await blockchain.getStats()).nodeVersion.toString()
-    const lastBlock = parseInt(await blockchain.listenToLastBlock(), 10)
+    const blockHash = (await blockchain.api.rpc.chain.getBlockHash(1)).toHex()
+
+    return this.isHashDifferent(blockHash, versionNumber)
+  }
+  public async isHashDifferent(chainHash: string, versionNumber: string) {
+    let differentChain = false
     const parameters = Parameters.getParameters(
       PersistentStore.store.getState()
     )
-    if (parameters.blockNumber === Parameters.DEFAULT_BLOCK_NUMBER) {
-      this.updateBlockNumber(lastBlock, versionNumber)
-      return true
-    }
-    const chainBlockHash = await blockchain.api.rpc.chain
-      .getBlockHash(parameters.blockNumber)
-      .then(block => {
-        return block.toHex()
-      })
-    let differentChain = false
-    const differentBlockState = lastBlock < parameters.blockNumber
-    if (!differentBlockState) {
-      const differentHash = chainBlockHash !== parameters.blockHash
-      if (differentHash) {
-        differentChain = true
-      }
-    } else {
+    if (parameters.blockHash === Parameters.DEFAULT_BLOCK_HASH) {
+      this.updateBlockNumber(chainHash, versionNumber)
+    } else if (parameters.blockHash !== chainHash) {
       differentChain = true
     }
     if (differentChain) {
       console.log(
-        `Block Progression Mismatch, stored best Block Number: ${parameters.blockNumber} stored Hash of best Block : ${parameters.blockHash} actual chain best Block Number: ${lastBlock} actual chain Hash of Block at Index of stored Block : ${chainBlockHash}`
+        `Block Progression Mismatch, stored Blockhash at Index 1: ${
+          parameters.blockHash
+        } actual chain Blockhash at Index 1: ${chainHash}`
       )
     }
     return !differentChain
   }
-
   public async updateBlockNumber(
-    newCheckBlockNumber: number,
-    newVersion: string
+    newBlockHashCheck: string,
+    newVersionCheck: string
   ) {
-    const blockchain = await BlockchainService.connect()
-    const newBlockHashCheck = await blockchain.api.rpc.chain
-      .getBlockHash(newCheckBlockNumber)
-      .then(block => {
-        return block.toHex()
-      })
-
     PersistentStore.store.dispatch(
       Parameters.Store.updateParameters({
         blockHash: newBlockHashCheck,
-        blockNumber: newCheckBlockNumber,
-        chainVersion: newVersion,
+        chainVersion: newVersionCheck,
       })
     )
   }
