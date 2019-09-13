@@ -55,7 +55,10 @@ class ClientVersionHelper {
     const parameters = Parameters.getParameters(
       PersistentStore.store.getState()
     )
-    if (parameters.blockHash === Parameters.DEFAULT_BLOCK_HASH) {
+    if (
+      !parameters.blockHash ||
+      parameters.blockHash === Parameters.DEFAULT_BLOCK_HASH
+    ) {
       this.updateBlockNumber(chainHash)
     } else if (parameters.blockHash !== chainHash) {
       differentChain = true
