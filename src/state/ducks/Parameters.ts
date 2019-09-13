@@ -4,10 +4,10 @@ import { createSelector } from 'reselect'
 import KiltAction from '../../types/Action'
 import { State as ReduxState } from '../PersistentStore'
 
-const DEFAULT_CHAIN_VERSION: string = '0.0.0'
+const DEFAULT_BLOCK_HASH: string = ''
 
 interface Parameters {
-  chainVersion: string
+  blockHash: string
 }
 
 interface UpdateAction extends KiltAction {
@@ -80,7 +80,7 @@ class Store {
 
   private static getDefaults(): Parameters {
     return {
-      chainVersion: DEFAULT_CHAIN_VERSION,
+      blockHash: DEFAULT_BLOCK_HASH,
     } as Parameters
   }
 }
@@ -100,5 +100,5 @@ export {
   SerializedState,
   Action,
   getParameters,
-  DEFAULT_CHAIN_VERSION,
+  DEFAULT_BLOCK_HASH,
 }

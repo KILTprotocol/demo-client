@@ -7,7 +7,7 @@ import { BalanceUtilities } from './BalanceUtilities'
 import BlockchainService from './BlockchainService'
 
 type CheckResult = {
-  versionMismatch: boolean
+  firstBlockHashChanged: boolean
   accountInvalid: boolean
 }
 
@@ -15,12 +15,12 @@ class ClientVersionHelper {
   public async clientResetRequired(): Promise<CheckResult> {
     const resetCause: CheckResult = {
       accountInvalid: false,
-      versionMismatch: false,
+      firstBlockHashChanged: false,
     }
     return new Promise<CheckResult>(async (resolve, reject) => {
-      const versionMatches: boolean = await this.checkVersion()
-      if (!versionMatches) {
-        resetCause.versionMismatch = true
+      const blockCheck: boolean = await this.checkHash()
+      if (!blockCheck) {
+        resetCause.firstBlockHashChanged = true
       } else {
         const selectedIdentity: Wallet.Entry = Wallet.getSelectedIdentity(
           PersistentStore.store.getState()
@@ -39,31 +39,45 @@ class ClientVersionHelper {
     })
   }
 
-  public async checkVersion(): Promise<boolean> {
+  /**
+   * @description (PUBLIC) (ASYNC) checks whether the stored blockhash matches the chain blockhash at Index 1
+   * @returns check whether hashes match
+   */
+  public async checkHash(): Promise<boolean> {
     const blockchain = await BlockchainService.connect()
-    const chainVersion = (await blockchain.getStats()).nodeVersion.toString()
+    const blockHash = (await blockchain.api.rpc.chain.getBlockHash(1)).toHex()
 
+    return this.isHashMatching(blockHash)
+  }
+
+  public async isHashMatching(chainHash: string) {
+    let differentChain = false
     const parameters = Parameters.getParameters(
       PersistentStore.store.getState()
     )
-    const storedChainVersion = parameters.chainVersion
-
-    if (storedChainVersion === Parameters.DEFAULT_CHAIN_VERSION) {
-      this.updateVersion(chainVersion)
-      return true
+    if (
+      !parameters.blockHash ||
+      parameters.blockHash === Parameters.DEFAULT_BLOCK_HASH
+    ) {
+      this.updateBlockNumber(chainHash)
+    } else if (parameters.blockHash !== chainHash) {
+      differentChain = true
     }
-    const versionsMatching = chainVersion === storedChainVersion
-    if (!versionsMatching) {
+    if (differentChain) {
       console.log(
-        `version mismatch detected: chain version=${chainVersion}, client chain version=${storedChainVersion}`
+        `Block Progression Mismatch, stored Blockhash at Index 1: ${
+          parameters.blockHash
+        } actual chain Blockhash at Index 1: ${chainHash}`
       )
     }
-    return versionsMatching
+    return !differentChain
   }
 
-  public updateVersion(newVersion: string): void {
+  public async updateBlockNumber(newBlockHashCheck: string) {
     PersistentStore.store.dispatch(
-      Parameters.Store.updateParameters({ chainVersion: newVersion })
+      Parameters.Store.updateParameters({
+        blockHash: newBlockHashCheck,
+      })
     )
   }
 
