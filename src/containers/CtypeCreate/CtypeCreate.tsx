@@ -14,7 +14,7 @@ import { State as ReduxState } from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
-import * as CTypeUtils from '../../services/CtypeUtils'
+import { fromInputModel } from '../../services/CtypeUtils'
 
 type Props = RouteComponentProps<{}> & {
   selectedIdentity?: Wallet.Entry
@@ -64,7 +64,7 @@ class CTypeCreate extends React.Component<Props, State> {
       let cType: sdk.CType
 
       try {
-        cType = CTypeUtils.fromInputModel(this.state.cType)
+        cType = fromInputModel(this.state.cType)
       } catch (error) {
         errorService.log({
           error,

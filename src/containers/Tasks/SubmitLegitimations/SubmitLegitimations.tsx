@@ -13,7 +13,7 @@ import CTypeRepository from '../../../services/CtypeRepository'
 import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
 import { ICType } from '../../../types/Ctype'
-import * as CTypeUtils from '../../../services/CtypeUtils'
+import { getClaimInputModel } from '../../../services/CtypeUtils'
 
 import './SubmitLegitimations.scss'
 
@@ -121,7 +121,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
             </button>
           </div>
           <SchemaEditor
-            schema={CTypeUtils.getClaimInputModel(cType) as common.Schema}
+            schema={getClaimInputModel(cType) as common.Schema}
             initialValue={undefined}
             updateValue={this.updateClaim}
           />
