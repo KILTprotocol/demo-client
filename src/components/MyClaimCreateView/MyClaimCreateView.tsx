@@ -13,12 +13,12 @@ import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
-import { getClaimInputModel } from '../../services/CtypeUtils'
+import CTypeUtils from '../../services/CtypeUtils'
 
 import './MyClaimCreateView.scss'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Input from '../Input/Input'
-
+const CTypeUtils = new CTypeUtils()
 type Props = {
   onCancel?: () => void
   onCreate: (claim: sdk.Claim) => void
@@ -103,7 +103,7 @@ class MyClaimCreateView extends Component<Props, State> {
               </div>
             </div>
             <SchemaEditor
-              schema={getClaimInputModel(cType!) as common.Schema}
+              schema={CTypeUtils.getClaimInputModel(cType!) as common.Schema}
               initialValue={contents}
               updateValue={this.updateClaim}
             />
