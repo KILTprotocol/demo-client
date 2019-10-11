@@ -13,7 +13,7 @@ import CTypeRepository from '../../../services/CtypeRepository'
 import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
 import { ICType } from '../../../types/Ctype'
-import * as CTypeUtils from '../../../components/Utilities/CtypeUtils'
+import * as CTypeUtils from '../../../services/CtypeUtils'
 
 import './SubmitLegitimations.scss'
 

@@ -14,7 +14,7 @@ import { State as ReduxState } from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
-import * as CTypeUtils from '../../components/Utilities/CtypeUtils'
+import * as CTypeUtils from '../../services/CtypeUtils'
 
 type Props = RouteComponentProps<{}> & {
   selectedIdentity?: Wallet.Entry
