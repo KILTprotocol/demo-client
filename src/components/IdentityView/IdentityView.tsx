@@ -86,7 +86,7 @@ class IdentityView extends React.Component<Props, State> {
             <div>{myIdentity.phrase}</div>
           </div>
           <div>
-            <label>Address</label>
+            <label>KILT Address</label>
             <div>{myIdentity.identity.address}</div>
           </div>
           <div>
