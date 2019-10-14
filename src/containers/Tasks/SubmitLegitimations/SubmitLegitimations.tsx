@@ -12,8 +12,8 @@ import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import CTypeRepository from '../../../services/CtypeRepository'
 import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
-import { ICType, IClaimInput } from '../../../types/Ctype'
-import CTypeUtils from '../../../services/CtypeUtils'
+import { ICType } from '../../../types/Ctype'
+import { getClaimInputModel } from '../../../services/CtypeUtils'
 
 import './SubmitLegitimations.scss'
 
@@ -48,7 +48,6 @@ class SubmitLegitimations extends React.Component<Props, State> {
     this.sendClaim = this.sendClaim.bind(this)
     this.updateClaim = this.updateClaim.bind(this)
     this.toggleWithPreFilledClaim = this.toggleWithPreFilledClaim.bind(this)
-    this.claimInputModel = this.claimInputModel.bind(this)
   }
 
   public componentDidMount() {
@@ -122,7 +121,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
             </button>
           </div>
           <SchemaEditor
-            schema={this.claimInputModel(cType) as common.Schema}
+            schema={getClaimInputModel(cType) as common.Schema}
             initialValue={undefined}
             updateValue={this.updateClaim}
           />
@@ -191,9 +190,6 @@ class SubmitLegitimations extends React.Component<Props, State> {
         onFinished()
       }
     })
-  }
-  private claimInputModel(cType: sdk.ICType, lang?: string): IClaimInput {
-    return CTypeUtils.getClaimInputModel(cType, lang)
   }
 
   private changeDelegation(selectedDelegations: MyDelegation[]) {
