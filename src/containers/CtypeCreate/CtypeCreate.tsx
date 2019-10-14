@@ -11,10 +11,10 @@ import FeedbackService, {
 } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType, ICTypeInput } from '../../types/Ctype'
+import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
-import CTypeUtils from '../../services/CtypeUtils'
+import { fromInputModel } from '../../services/CtypeUtils'
 
 type Props = RouteComponentProps<{}> & {
   selectedIdentity?: Wallet.Entry
@@ -35,7 +35,6 @@ class CTypeCreate extends React.Component<Props, State> {
       connected: false,
       isValid: false,
     }
-    this.inputModel = this.inputModel.bind(this)
     this.submit = this.submit.bind(this)
     this.cancel = this.cancel.bind(this)
   }
@@ -64,7 +63,7 @@ class CTypeCreate extends React.Component<Props, State> {
       let cType: sdk.CType
 
       try {
-        cType = this.inputModel(this.state.cType)
+        cType = fromInputModel(this.state.cType)
       } catch (error) {
         errorService.log({
           error,
@@ -137,10 +136,6 @@ class CTypeCreate extends React.Component<Props, State> {
       cType,
       isValid,
     })
-  }
-
-  private inputModel(ctypeInput: ICTypeInput): sdk.CType {
-    return CTypeUtils.fromInputModel(ctypeInput)
   }
 }
 

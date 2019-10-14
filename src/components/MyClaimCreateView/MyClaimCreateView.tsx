@@ -11,9 +11,9 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType, IClaimInput } from '../../types/Ctype'
+import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
-import CTypeUtils from '../../services/CtypeUtils'
+import { getClaimInputModel } from '../../services/CtypeUtils'
 
 import './MyClaimCreateView.scss'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
@@ -41,7 +41,6 @@ class MyClaimCreateView extends Component<Props, State> {
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleNameChange = this.handleNameChange.bind(this)
     this.updateClaim = this.updateClaim.bind(this)
-    this.claimInputModel = this.claimInputModel.bind(this)
     this.state = {
       isValid: false,
       name: '',
@@ -102,7 +101,7 @@ class MyClaimCreateView extends Component<Props, State> {
               </div>
             </div>
             <SchemaEditor
-              schema={this.claimInputModel(cType!) as common.Schema}
+              schema={getClaimInputModel(cType!) as common.Schema}
               initialValue={contents}
               updateValue={this.updateClaim}
             />
@@ -163,10 +162,6 @@ class MyClaimCreateView extends Component<Props, State> {
 
   private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ name: e.target.value })
-  }
-
-  private claimInputModel(cType: sdk.ICType, lang?: string): IClaimInput {
-    return CTypeUtils.getClaimInputModel(cType, lang)
   }
 }
 
