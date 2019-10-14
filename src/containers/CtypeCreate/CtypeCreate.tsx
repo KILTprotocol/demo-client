@@ -11,7 +11,7 @@ import FeedbackService, {
 } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType } from '../../types/Ctype'
+import { ICType, ICTypeInput } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
 import CTypeUtils from '../../services/CtypeUtils'
@@ -139,7 +139,7 @@ class CTypeCreate extends React.Component<Props, State> {
     })
   }
 
-  private inputModel(ctypeInput: any): any {
+  private inputModel(ctypeInput: ICTypeInput): sdk.CType {
     return CTypeUtils.fromInputModel(ctypeInput)
   }
 }
