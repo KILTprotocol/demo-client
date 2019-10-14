@@ -8,8 +8,27 @@ import * as sdk from '@kiltprotocol/sdk-js'
  * @returns The CTYPE for the input model.
  */
 
+export interface ICTypeInput {
+  $id: string
+  $schema: string
+  properties: object[] // TO DO: need to refine what properties are
+  required: string[]
+  title: string
+  description?: string
+  type: string
+}
+
+export interface IClaimInput {
+  $id: string
+  $schema: string
+  properties: object
+  required: string[]
+  title: string
+  description?: string
+  type: string
+}
 class CTypeUtils {
-  public fromInputModel(ctypeInput: any): sdk.CType {
+  public static fromInputModel(ctypeInput: ICTypeInput): sdk.CType {
     if (!sdk.CTypeUtils.verifySchema(ctypeInput, sdk.CTypeInputModel)) {
       throw new Error('CType input does not correspond to input model schema')
     }
@@ -42,10 +61,10 @@ class CTypeUtils {
       }
     })
     ctype.schema.properties = properties
-    return new sdk.CType(ctype as sdk.ICType)
+    return new sdk.CType(ctype as sdk.ICType) // Changes from Leon will require this to be changed to return CType.fromObject(ctype as ICType)
   }
 
-  public getLocalized(o: any, lang?: string): any {
+  public static getLocalized(o: any, lang?: string): string {
     if (lang == null || !o[lang]) {
       return o.default
     }
@@ -59,19 +78,19 @@ class CTypeUtils {
    * into the input model. This is the reverse function of CType.fromInputModel(...).
    * @returns The CTYPE input model.
    */
-  public getCTypeInputModel(ctype: sdk.CType): any {
+  public static getCTypeInputModel(ctype: sdk.CType): any {
     // create clone
     const result = JSON.parse(JSON.stringify(ctype.schema))
     result.$schema = sdk.CTypeInputModel.$id
-    result.title = getLocalized(ctype.metadata.title)
-    result.description = getLocalized(ctype.metadata.description)
+    result.title = this.getLocalized(ctype.metadata.title)
+    result.description = this.getLocalized(ctype.metadata.description)
     result.required = []
     result.properties = []
 
     Object.entries(ctype.schema.properties as object).forEach(
       ([key, value]) => {
         result.properties.push({
-          title: getLocalized(ctype.metadata.properties[key].title),
+          title: this.getLocalized(ctype.metadata.properties[key].title),
           $id: key,
           type: value.type,
         })
@@ -88,15 +107,18 @@ class CTypeUtils {
    * @param {string} lang the language to choose translations for
    * @returns {any} The claim input model
    */
-  public getClaimInputModel(ctype: sdk.ICType, lang?: string): any {
+  public static getClaimInputModel(
+    ctype: sdk.ICType,
+    lang?: string
+  ): IClaimInput {
     // create clone
     const result = JSON.parse(JSON.stringify(ctype.schema))
-    result.title = getLocalized(ctype.metadata.title, lang)
-    result.description = getLocalized(ctype.metadata.description, lang)
+    result.title = this.getLocalized(ctype.metadata.title, lang)
+    result.description = this.getLocalized(ctype.metadata.description, lang)
     result.required = []
     Object.entries(ctype.metadata.properties as object).forEach(
       ([key, value]) => {
-        result.properties[key].title = getLocalized(value.title, lang)
+        result.properties[key].title = this.getLocalized(value.title, lang)
         result.required.push(key)
       }
     )

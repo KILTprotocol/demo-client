@@ -18,7 +18,6 @@ import CTypeUtils from '../../services/CtypeUtils'
 import './MyClaimCreateView.scss'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Input from '../Input/Input'
-const CTypeUtils = new CTypeUtils()
 type Props = {
   onCancel?: () => void
   onCreate: (claim: sdk.Claim) => void
@@ -42,7 +41,7 @@ class MyClaimCreateView extends Component<Props, State> {
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleNameChange = this.handleNameChange.bind(this)
     this.updateClaim = this.updateClaim.bind(this)
-
+    this.claimInputModel = this.claimInputModel.bind(this)
     this.state = {
       isValid: false,
       name: '',
@@ -103,7 +102,7 @@ class MyClaimCreateView extends Component<Props, State> {
               </div>
             </div>
             <SchemaEditor
-              schema={CTypeUtils.getClaimInputModel(cType!) as common.Schema}
+              schema={this.claimInputModel(cType!) as common.Schema}
               initialValue={contents}
               updateValue={this.updateClaim}
             />
@@ -164,6 +163,10 @@ class MyClaimCreateView extends Component<Props, State> {
 
   private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ name: e.target.value })
+  }
+
+  private claimInputModel(cType: any, lang?: string): any {
+    return CTypeUtils.getClaimInputModel(cType, lang)
   }
 }
 

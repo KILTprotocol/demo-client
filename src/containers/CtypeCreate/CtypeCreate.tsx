@@ -35,7 +35,7 @@ class CTypeCreate extends React.Component<Props, State> {
       connected: false,
       isValid: false,
     }
-
+    this.inputModel = this.inputModel.bind(this)
     this.submit = this.submit.bind(this)
     this.cancel = this.cancel.bind(this)
   }
@@ -64,7 +64,7 @@ class CTypeCreate extends React.Component<Props, State> {
       let cType: sdk.CType
 
       try {
-        cType = CTypeUtils.fromInputModel(this.state.cType)
+        cType = this.inputModel(this.state.cType)
       } catch (error) {
         errorService.log({
           error,
@@ -137,6 +137,10 @@ class CTypeCreate extends React.Component<Props, State> {
       cType,
       isValid,
     })
+  }
+
+  private inputModel(ctypeInput: any): any {
+    return CTypeUtils.fromInputModel(ctypeInput)
   }
 }
 
