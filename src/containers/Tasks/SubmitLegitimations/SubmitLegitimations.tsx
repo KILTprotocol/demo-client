@@ -48,6 +48,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
     this.sendClaim = this.sendClaim.bind(this)
     this.updateClaim = this.updateClaim.bind(this)
     this.toggleWithPreFilledClaim = this.toggleWithPreFilledClaim.bind(this)
+    this.claimInputModel = this.claimInputModel.bind(this)
   }
 
   public componentDidMount() {
@@ -121,7 +122,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
             </button>
           </div>
           <SchemaEditor
-            schema={CTypeUtils.getClaimInputModel(cType) as common.Schema}
+            schema={this.claimInputModel(cType) as common.Schema}
             initialValue={undefined}
             updateValue={this.updateClaim}
           />
@@ -190,6 +191,9 @@ class SubmitLegitimations extends React.Component<Props, State> {
         onFinished()
       }
     })
+  }
+  private claimInputModel(cType: any, lang?: string): any {
+    return CTypeUtils.getClaimInputModel(cType, lang)
   }
 
   private changeDelegation(selectedDelegations: MyDelegation[]) {
