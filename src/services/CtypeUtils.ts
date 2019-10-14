@@ -1,4 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
+
+import { ICTypeInput, IClaimInput } from '../types/Ctype'
 /**
  * Create the CTYPE model from a CTYPE input model (used in CTYPE editing components).
  * This is necessary because component editors rely on editing arrays of properties instead of
@@ -8,25 +10,6 @@ import * as sdk from '@kiltprotocol/sdk-js'
  * @returns The CTYPE for the input model.
  */
 
-export interface ICTypeInput {
-  $id: string
-  $schema: string
-  properties: object[] // TO DO: need to refine what properties are
-  required: string[]
-  title: string
-  description?: string
-  type: string
-}
-
-export interface IClaimInput {
-  $id: string
-  $schema: string
-  properties: object
-  required: string[]
-  title: string
-  description?: string
-  type: string
-}
 class CTypeUtils {
   public static fromInputModel(ctypeInput: ICTypeInput): sdk.CType {
     if (!sdk.CTypeUtils.verifySchema(ctypeInput, sdk.CTypeInputModel)) {
@@ -78,7 +61,7 @@ class CTypeUtils {
    * into the input model. This is the reverse function of CType.fromInputModel(...).
    * @returns The CTYPE input model.
    */
-  public static getCTypeInputModel(ctype: sdk.CType): any {
+  public static getCTypeInputModel(ctype: sdk.CType): ICTypeInput {
     // create clone
     const result = JSON.parse(JSON.stringify(ctype.schema))
     result.$schema = sdk.CTypeInputModel.$id

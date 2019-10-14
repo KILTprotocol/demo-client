@@ -12,7 +12,7 @@ import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import CTypeRepository from '../../../services/CtypeRepository'
 import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
-import { ICType } from '../../../types/Ctype'
+import { ICType, IClaimInput } from '../../../types/Ctype'
 import CTypeUtils from '../../../services/CtypeUtils'
 
 import './SubmitLegitimations.scss'
@@ -192,7 +192,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
       }
     })
   }
-  private claimInputModel(cType: any, lang?: string): any {
+  private claimInputModel(cType: sdk.ICType, lang?: string): IClaimInput {
     return CTypeUtils.getClaimInputModel(cType, lang)
   }
 
