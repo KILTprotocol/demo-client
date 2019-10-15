@@ -167,10 +167,7 @@ class IdentityView extends React.Component<Props, State> {
           {!(balance > 0) && (
             <button
               className="requestTokens"
-              onClick={this.openKiltFaucet.bind(
-                this,
-                myIdentity.identity.address
-              )}
+              onClick={this.openKiltFaucet(myIdentity.identity.address)}
               title="Request Tokens"
             >
               Request Tokens
@@ -217,7 +214,9 @@ class IdentityView extends React.Component<Props, State> {
   }
 
   private openKiltFaucet(address: Identity['address']) {
-    window.open(FAUCET_URL + '?' + address, '_blank')
+    return () => {
+      window.open(FAUCET_URL + '?' + address, '_blank')
+    }
   }
 
   private toggleContacts() {
