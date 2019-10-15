@@ -13,7 +13,7 @@ import CTypeRepository from '../../../services/CtypeRepository'
 import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
 import { ICType } from '../../../types/Ctype'
-import { getClaimInputModel } from '../../../services/CtypeUtils'
+import { getClaimInputModel } from '../../../utils/CtypeUtils'
 
 import './SubmitLegitimations.scss'
 
