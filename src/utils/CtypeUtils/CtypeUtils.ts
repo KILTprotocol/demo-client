@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
-import { ICTypeInput, IClaimInput } from '../types/Ctype'
+import { ICTypeInput, IClaimInput } from '../../types/Ctype'
 /**
  * Create the CTYPE model from a CTYPE input model (used in CTYPE editing components).
  * This is necessary because component editors rely on editing arrays of properties instead of
