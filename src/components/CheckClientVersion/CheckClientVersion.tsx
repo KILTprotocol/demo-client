@@ -30,7 +30,7 @@ class CheckClientVersion extends React.Component<Props, State> {
       // This connects to the blockchain
       .clientResetRequired()
       .then((checkResult: CheckResult) => {
-        if (checkResult.accountInvalid || checkResult.versionMismatch) {
+        if (checkResult.accountInvalid || checkResult.firstBlockHashChanged) {
           this.openResetModal()
         } else {
           this.setState({ valid: true })
@@ -55,10 +55,11 @@ class CheckClientVersion extends React.Component<Props, State> {
 
   private openResetModal() {
     FeedbackService.addBlockingNotification({
-      header: 'Client version mismatch detected',
+      header: 'Blockchain mismatch detected',
       message: (
         <div>
-          Your client version differs from the current blockchain version.
+          Your client was previously connected to another blockchain, or the
+          blockchain it was connected to restarted from scratch.
         </div>
       ),
       modalType: ModalType.CONFIRM,
