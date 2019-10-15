@@ -13,7 +13,7 @@ import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { ICType } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
-import { getClaimInputModel } from '../../services/CtypeUtils'
+import { getClaimInputModel } from '../../utils/CtypeUtils'
 
 import './MyClaimCreateView.scss'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
