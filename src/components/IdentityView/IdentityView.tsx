@@ -15,6 +15,7 @@ import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 import './IdentityView.scss'
 import MessageRepository from '../../services/MessageRepository'
+import { Identity } from '@kiltprotocol/sdk-js'
 
 type Props = {
   // input
@@ -85,7 +86,7 @@ class IdentityView extends React.Component<Props, State> {
             <div>{myIdentity.phrase}</div>
           </div>
           <div>
-            <label>Address</label>
+            <label>KILT Address</label>
             <div>{myIdentity.identity.address}</div>
           </div>
           <div>
@@ -166,7 +167,7 @@ class IdentityView extends React.Component<Props, State> {
           {!(balance > 0) && (
             <button
               className="requestTokens"
-              onClick={this.openKiltFaucet}
+              onClick={this.openKiltFaucet(myIdentity.identity.address)}
               title="Request Tokens"
             >
               Request Tokens
@@ -212,8 +213,10 @@ class IdentityView extends React.Component<Props, State> {
     )
   }
 
-  private openKiltFaucet() {
-    window.open(FAUCET_URL, '_blank')
+  private openKiltFaucet(address: Identity['address']) {
+    return () => {
+      window.open(FAUCET_URL + '?' + address, '_blank')
+    }
   }
 
   private toggleContacts() {
