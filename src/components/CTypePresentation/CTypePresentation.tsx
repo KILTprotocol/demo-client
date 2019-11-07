@@ -91,7 +91,7 @@ class CTypePresentation extends React.Component<Props, State> {
               size={size || DEFAULT_SIZE}
               theme="polkadot"
             />
-            {this.getLabel(cType.cType.metadata.title.default)}
+            {this.getLabel(cType.cType.schema.$id)}
           </>
         )}
         {!!actions.length && (

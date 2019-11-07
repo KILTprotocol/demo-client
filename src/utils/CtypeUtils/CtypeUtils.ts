@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
-import { ICTypeInput, IClaimInput } from '../../types/Ctype'
+import { ICTypeInput, IClaimInput, CType, ICType } from '../../types/Ctype'
+import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetedata'
 /**
  * Create the CTYPE model from a CTYPE input model (used in CTYPE editing components).
  * This is necessary because component editors rely on editing arrays of properties instead of
@@ -10,7 +11,7 @@ import { ICTypeInput, IClaimInput } from '../../types/Ctype'
  * @returns The CTYPE for the input model.
  */
 
-export const fromInputModel = (ctypeInput: ICTypeInput): sdk.CType => {
+export const fromInputModel = (ctypeInput: ICTypeInput): any => {
   if (!sdk.CTypeUtils.verifySchema(ctypeInput, sdk.CTypeInputModel)) {
     throw new Error('CType input does not correspond to input model schema')
   }
@@ -21,29 +22,38 @@ export const fromInputModel = (ctypeInput: ICTypeInput): sdk.CType => {
       properties: {},
       type: 'object',
     },
-    metadata: {
-      title: {
-        default: ctypeInput.title,
-      },
-      description: {
-        default: ctypeInput.description,
-      },
-      properties: {},
-    },
+    owner: ctypeInput.owner,
   }
+
+  const sdkMetadata = {
+    title: {
+      type: ctypeInput.title,
+    },
+    description: {
+      type: ctypeInput.description,
+    },
+    properties: {},
+    type: 'object',
+  } as IMetadata
 
   const properties = {}
   ctypeInput.properties.forEach((p: any) => {
-    const { title, $id, ...rest } = p
+    const { title, $id, description, ...rest } = p
     properties[$id] = rest
-    ctype.metadata.properties[$id] = {
+    sdkMetadata.properties[$id] = {
       title: {
-        default: title,
+        type: title,
+      },
+      description: {
+        type: description,
       },
     }
   })
   ctype.schema.properties = properties
-  return new sdk.CType(ctype as sdk.ICType) // Changes from Leon will require this to be changed to return CType.fromObject(ctype as ICType)
+
+  const sdkCType = new sdk.CType(ctype as sdk.CType)
+  const combined = { sdkCType, sdkMetadata }
+  return combined
 }
 
 export const getLocalized = (o: any, lang?: string): string => {
@@ -61,23 +71,25 @@ export const getLocalized = (o: any, lang?: string): string => {
  * @returns The CTYPE input model.
  */
 
-export const getCTypeInputModel = (ctype: sdk.CType): ICTypeInput => {
+export const getCTypeInputModel = (ctype: CType): ICTypeInput => {
   // create clone
-  const result = JSON.parse(JSON.stringify(ctype.schema))
+  const result = JSON.parse(JSON.stringify(ctype.cType.schema))
   result.$schema = sdk.CTypeInputModel.$id
   result.title = getLocalized(ctype.metadata.title)
   result.description = getLocalized(ctype.metadata.description)
   result.required = []
   result.properties = []
 
-  Object.entries(ctype.schema.properties as object).forEach(([key, value]) => {
-    result.properties.push({
-      title: getLocalized(ctype.metadata.properties[key].title),
-      $id: key,
-      type: value.type,
-    })
-    result.required.push(key)
-  })
+  Object.entries(ctype.cType.schema.properties as object).forEach(
+    ([key, value]) => {
+      result.properties.push({
+        title: getLocalized(ctype.metadata.properties[key].title),
+        $id: key,
+        type: value.type,
+      })
+      result.required.push(key)
+    }
+  )
 
   return result
 }
@@ -89,19 +101,12 @@ export const getCTypeInputModel = (ctype: sdk.CType): ICTypeInput => {
  * @returns {any} The claim input model
  */
 export const getClaimInputModel = (
-  ctype: sdk.ICType,
+  ctype: sdk.CType,
   lang?: string
 ): IClaimInput => {
   // create clone
   const result = JSON.parse(JSON.stringify(ctype.schema))
-  result.title = getLocalized(ctype.metadata.title, lang)
-  result.description = getLocalized(ctype.metadata.description, lang)
   result.required = []
-  Object.entries(ctype.metadata.properties as object).forEach(
-    ([key, value]) => {
-      result.properties[key].title = getLocalized(value.title, lang)
-      result.required.push(key)
-    }
-  )
+
   return result
 }
