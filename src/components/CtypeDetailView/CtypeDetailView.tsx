@@ -41,7 +41,7 @@ class CtypeDetailView extends React.Component<Props, State> {
             <div className="attributes">
               <div>
                 <label>Title</label>
-                <div>{cType.cType.metadata.title.default}</div>
+                <div>{cType.cType.schema.$id}</div>
               </div>
               <div>
                 <label>Author</label>

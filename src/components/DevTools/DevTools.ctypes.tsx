@@ -4,7 +4,7 @@ import BlockchainService from '../../services/BlockchainService'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
-import { ICType } from '../../types/Ctype'
+import { ICType, CType, CTypeMetadata } from '../../types/Ctype'
 import { BsIdentity } from './DevTools.wallet'
 
 import cTypesPool from './data/cTypes.json'
@@ -35,7 +35,7 @@ class BsCType {
     return cType
       .store(ownerIdentity)
       .then((value: any) => {
-        const cTypeWrapper: ICType = {
+        const cTypeWrapper: any = {
           cType,
           metaData: {
             author: ownerIdentity.address,
@@ -45,9 +45,7 @@ class BsCType {
         return CTypeRepository.register(cTypeWrapper)
       })
       .then(() => {
-        notifySuccess(
-          `CTYPE ${cType.metadata.title.default} successfully created.`
-        )
+        notifySuccess(`CTYPE ${cType.schema.$id} successfully created.`)
       })
       .catch(error => {
         errorService.log({

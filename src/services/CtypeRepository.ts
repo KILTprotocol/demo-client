@@ -2,7 +2,7 @@ import * as sdk from '@kiltprotocol/sdk-js'
 
 import * as CTypes from '../state/ducks/CTypes'
 import PersistentStore from '../state/PersistentStore'
-import { ICType } from '../types/Ctype'
+import { ICType, CTypeMetadata } from '../types/Ctype'
 
 import { BasePostParams } from './BaseRepository'
 
@@ -45,7 +45,7 @@ class CTypeRepository {
       })
   }
 
-  public static async register(cType: ICType): Promise<Response> {
+  public static async register(cType: CTypeMetadata): Promise<Response> {
     return fetch(CTypeRepository.URL, {
       ...BasePostParams,
       body: JSON.stringify(cType),

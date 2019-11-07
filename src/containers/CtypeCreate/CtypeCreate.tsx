@@ -11,7 +11,7 @@ import FeedbackService, {
 } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType } from '../../types/Ctype'
+import { ICType, CType, CTypeMetadata } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
 import { fromInputModel } from '../../utils/CtypeUtils'
@@ -61,9 +61,10 @@ class CTypeCreate extends React.Component<Props, State> {
     ) {
       const { selectedIdentity, history } = this.props
       let cType: sdk.CType
-
+      let metadata: CType['metadata']
       try {
-        cType = fromInputModel(this.state.cType)
+        cType = fromInputModel(this.state.cType).sdkCType
+        metadata = fromInputModel(this.state.cType).sdkMetadata
       } catch (error) {
         errorService.log({
           error,
@@ -83,18 +84,22 @@ class CTypeCreate extends React.Component<Props, State> {
           blockUi.updateMessage(
             `CTYPE stored on blockchain,\nnow registering CTYPE`
           )
-          const cTypeWrapper: ICType = {
-            cType,
+          const cTypeWrapper: CTypeMetadata = {
+            cType: {
+              schema: cType.schema,
+              metadata: metadata,
+              owner: selectedIdentity.identity.address,
+              hash: cType.hash,
+            },
             metaData: {
               author: selectedIdentity.identity.address,
             },
           }
+
           // TODO: add onrejected when sdk provides error handling
           CTypeRepository.register(cTypeWrapper).then(() => {
             blockUi.remove()
-            notifySuccess(
-              `CTYPE ${cType.metadata.title.default} successfully created.`
-            )
+            notifySuccess(`CTYPE ${metadata.title.type} successfully created.`) // something better?
             history.push('/cType')
           })
         })
