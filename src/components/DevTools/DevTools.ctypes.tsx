@@ -69,7 +69,9 @@ class BsCType {
     return requests
   }
 
-  public static async getByHash(hash: sdk.ICType['hash']): Promise<ICType> {
+  public static async getByHash(
+    hash: sdk.ICType['hash']
+  ): Promise<CTypeMetadata> {
     const cType = await CTypeRepository.findByHash(hash)
     if (cType) {
       return cType
@@ -77,13 +79,15 @@ class BsCType {
     throw new Error(`Could not find cType with hash '${hash}'`)
   }
 
-  public static async get(bsCType: BsCTypesPoolElement): Promise<ICType> {
+  public static async get(
+    bsCType: BsCTypesPoolElement
+  ): Promise<CTypeMetadata> {
     return BsCType.getByHash(bsCType.hash)
   }
 
   public static async getByKey(
     bsCTypeKey: keyof BsCTypesPool
-  ): Promise<ICType> {
+  ): Promise<CTypeMetadata> {
     const { hash } = BsCType.pool[bsCTypeKey]
     return BsCType.getByHash(hash)
   }

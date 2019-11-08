@@ -17,7 +17,7 @@ import { State as ReduxState } from '../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../types/Contact'
 
 import './ClaimView.scss'
-import { ICType } from '../../types/Ctype'
+import { CTypeMetadata } from '../../types/Ctype'
 import { RequestAttestationProps } from '../Tasks/RequestAttestation/RequestAttestation'
 import { RequestLegitimationsProps } from '../Tasks/RequestLegitimation/RequestLegitimation'
 
@@ -210,7 +210,7 @@ class ClaimView extends React.Component<Props, State> {
     }
   }
 
-  private createClaimFromCType(selectedCTypes: ICType[]) {
+  private createClaimFromCType(selectedCTypes: CTypeMetadata[]) {
     this.props.history.push(`/claim/new/${selectedCTypes[0].cType.hash}`)
   }
 }
