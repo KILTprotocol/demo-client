@@ -5,16 +5,16 @@ import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import CTypeRepository from '../../services/CtypeRepository'
 import * as CTypes from '../../state/ducks/CTypes'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType } from '../../types/Ctype'
+import { ICType, CTypeMetadata } from '../../types/Ctype'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 import './CtypeListView.scss'
 
 type Props = RouteComponentProps<{}> & {
-  onRequestLegitimation: (cType: ICType) => void
+  onRequestLegitimation: (cType: CTypeMetadata) => void
   // mapStateToProps
-  cTypes?: ICType[]
+  cTypes?: CTypeMetadata[]
 }
 
 type State = {

@@ -12,7 +12,7 @@ import { BasePostParams } from './BaseRepository'
 class CTypeRepository {
   public static async findByHash(
     hash: sdk.ICType['hash']
-  ): Promise<void | ICType> {
+  ): Promise<void | CTypeMetadata> {
     const storedCType = CTypes.getCType(PersistentStore.store.getState(), hash)
 
     if (storedCType) {
@@ -27,7 +27,7 @@ class CTypeRepository {
         return response
       })
       .then(response => response.json())
-      .then((cType: ICType) => {
+      .then((cType: CTypeMetadata) => {
         PersistentStore.store.dispatch(CTypes.Store.addCType(cType))
         return cType
       })
@@ -36,10 +36,10 @@ class CTypeRepository {
       })
   }
 
-  public static async findAll(): Promise<ICType[]> {
+  public static async findAll(): Promise<CTypeMetadata[]> {
     return fetch(`${CTypeRepository.URL}`)
       .then(response => response.json())
-      .then((cTypes: ICType[]) => {
+      .then((cTypes: CTypeMetadata[]) => {
         PersistentStore.store.dispatch(CTypes.Store.addCTypes(cTypes))
         return CTypes.getCTypes(PersistentStore.store.getState())
       })

@@ -13,7 +13,7 @@ import { SubmitLegitimationsProps } from '../../containers/Tasks/SubmitLegitimat
 import CTypeRepository from '../../services/CtypeRepository'
 import * as UiState from '../../state/ducks/UiState'
 import PersistentStore from '../../state/PersistentStore'
-import { ICType } from '../../types/Ctype'
+import { CTypeMetadata, ICType } from '../../types/Ctype'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
 
 import './CTypePresentation.scss'
@@ -30,7 +30,7 @@ type Props = RouteComponentProps<{}> & {
 }
 
 type State = {
-  cType?: ICType
+  cType?: CTypeMetadata
 }
 
 const DEFAULT_SIZE = 24
@@ -121,7 +121,7 @@ class CTypePresentation extends React.Component<Props, State> {
   private async setCType() {
     const { cTypeHash } = this.props
 
-    CTypeRepository.findByHash(cTypeHash).then((_cType: ICType) => {
+    CTypeRepository.findByHash(cTypeHash).then((_cType: CTypeMetadata) => {
       this.setState({ cType: _cType })
     })
   }

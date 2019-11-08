@@ -8,7 +8,7 @@ import * as Attestations from '../../state/ducks/Attestations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
-import { ICType } from '../../types/Ctype'
+import { ICType, CTypeMetadata } from '../../types/Ctype'
 import { BsClaim, BsClaimsPool, BsClaimsPoolElement } from './DevTools.claims'
 import { BsCType } from './DevTools.ctypes'
 import { BsDelegation, BsDelegationsPool } from './DevTools.delegations'
@@ -240,7 +240,7 @@ class BsAttestation {
     const { attesterKey } = attest
 
     const attesterIdentity: MyIdentity = await BsIdentity.getByKey(attesterKey)
-    const cType: ICType = await BsCType.getByKey(bsClaim.cTypeKey)
+    const cType: CTypeMetadata = await BsCType.getByKey(bsClaim.cTypeKey)
 
     const partialClaim = {
       cType: cType.cType.hash as string,
