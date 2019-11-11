@@ -54,6 +54,6 @@ export class CType implements ICType {
   public metadata: sdk.CTypeMetadata['metadata']
   public ctypeHash: sdk.ICType['hash']
   public getPropertyTitle(propertyName: string) {
-    return this.metadata.properties[propertyName].title.default
+    return propertyName // Need to fix. I need to take the value of the key.
   }
 }
