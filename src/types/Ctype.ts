@@ -7,6 +7,26 @@ export interface ICType {
   }
 }
 
+export interface ICTypeInput {
+  $id: string
+  $schema: string
+  properties: object[] // TO DO: need to refine what properties are
+  required: string[]
+  title: string
+  description?: string
+  type: string
+}
+
+export interface IClaimInput {
+  $id: string
+  $schema: string
+  properties: object
+  required: string[]
+  title: string
+  description?: string
+  type: string
+}
+
 export class CType implements ICType {
   public static fromObject(obj: ICType): CType {
     const newCtype = Object.create(CType.prototype)
