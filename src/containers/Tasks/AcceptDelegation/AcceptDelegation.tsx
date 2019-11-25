@@ -135,9 +135,9 @@ class AcceptDelegation extends React.Component<Props, State> {
     const { selectedIdentity } = this.props
     const { account, id, parentId, permissions } = delegationData
 
-    const rootNode:
-      | sdk.IDelegationRootNode
-      | undefined = await DelegationsService.findRootNode(parentId)
+    const rootNode: sdk.IDelegationRootNode | null = await DelegationsService.findRootNode(
+      parentId
+    )
     if (!rootNode) {
       notifyFailure('Cannot sign: unable to find root node')
       throw new Error(`Root node not found for node ${parentId}`)
