@@ -142,7 +142,7 @@ module.exports = {
           },
           {
             test: /\.(js|jsx|mjs)$/,
-            include: paths.appSrc,
+            include: [paths.appSrc, paths.appNodeModules +  '/@polkadot/util/node_modules/chalk/source/'],
             loader: require.resolve('babel-loader'),
             options: {
               

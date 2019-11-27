@@ -70,8 +70,8 @@ describe('CType', () => {
 
     const ctypeFromInput = fromInputModel(ctypeInput)
     const ctypeFromModel = new sdk.CType(ctypeModel)
-    expect(JSON.stringify(ctypeFromInput.getModel())).toEqual(
-      JSON.stringify(ctypeFromModel.getModel())
+    expect(JSON.stringify(ctypeFromInput)).toEqual(
+      JSON.stringify(ctypeFromModel)
     )
     expect(JSON.stringify(getClaimInputModel(ctypeFromInput, 'en'))).toEqual(
       JSON.stringify(claimInput)

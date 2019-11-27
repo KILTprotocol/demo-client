@@ -58,7 +58,7 @@ class AttestationWorkflow {
     delegation?: MyDelegation
   ): Promise<void> {
     const messageBody: sdk.ISubmitLegitimations = {
-      content: { claim, legitimations },
+      content: { claim, legitimations, delegationId: null },
       type: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
     }
 
@@ -101,7 +101,7 @@ class AttestationWorkflow {
     claim: sdk.IClaim,
     attesterAddresses: Array<Contact['publicIdentity']['address']>,
     legitimations: sdk.AttestedClaim[] = [],
-    delegationId?: sdk.IDelegationNode['id']
+    delegationId: sdk.IDelegationNode['id'] | null = null
   ): Promise<void> {
     const identity: sdk.Identity = Wallet.getSelectedIdentity(
       persistentStore.store.getState()

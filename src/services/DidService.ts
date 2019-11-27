@@ -14,7 +14,7 @@ export class DidService {
 
   public static async resolveDid(
     identifier: string
-  ): Promise<sdk.IPublicIdentity | undefined> {
+  ): Promise<sdk.IPublicIdentity | null> {
     return sdk.PublicIdentity.resolveFromDid(identifier, this.URL_RESOLVER)
   }
 

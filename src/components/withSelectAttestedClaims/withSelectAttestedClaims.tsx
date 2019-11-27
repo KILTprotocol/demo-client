@@ -36,7 +36,7 @@ const withSelectAttestedClaims = <P extends InjectedProps>(
 
       return (
         <WrappedComponent
-          {...this.props as HocProps}
+          {...this.props as P}
           claimSelectionData={claimSelectionData}
           onChange={this.changeClaimSelectionData}
           getAttestedClaims={this.getAttestedClaims}

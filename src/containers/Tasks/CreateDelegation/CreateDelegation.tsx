@@ -120,9 +120,9 @@ class CreateDelegation extends React.Component<Props, State> {
       headline: `Creating ${isPCR ? 'PCR member' : 'delegation'}`,
     })
 
-    const rootNode:
-      | sdk.IDelegationRootNode
-      | undefined = await DelegationService.findRootNode(parentId)
+    const rootNode: sdk.IDelegationRootNode | null = await DelegationService.findRootNode(
+      parentId
+    )
     if (!rootNode) {
       notifyFailure(`${isPCR ? 'PCR root' : 'Root delegation'} not found`)
       return
