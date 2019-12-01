@@ -74,7 +74,7 @@ class ImportDelegation extends React.Component<Props, State> {
     const { alias } = this.state
 
     DelegationsService.importDelegation(delegationId, alias, isPCR)
-      .then((myDelegation: Delegations.MyDelegation | undefined) => {
+      .then((myDelegation: Delegations.MyDelegation | null) => {
         if (myDelegation) {
           notifySuccess(
             `${isPCR ? 'PCR member' : 'Delegation'} successfully imported.`

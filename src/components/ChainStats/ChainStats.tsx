@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 import If from '../../common/If'
 import BlockchainService from '../../services/BlockchainService'
+import { Text } from '@polkadot/types'
 
 type Props = RouteComponentProps<{
   host: string
@@ -38,9 +39,9 @@ class ChainStats extends React.Component<Props, State> {
     this.blockchain = await BlockchainService.connect()
 
     const [name, version, type] = await Promise.all([
-      this.blockchain.api.rpc.system.name(),
-      this.blockchain.api.rpc.system.version(),
-      this.blockchain.api.rpc.system.chain(),
+      this.blockchain.api.rpc.system.name<Text>(),
+      this.blockchain.api.rpc.system.version<Text>(),
+      this.blockchain.api.rpc.system.chain<Text>(),
     ])
 
     if (this.mounted) {

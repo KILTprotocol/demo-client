@@ -32,9 +32,8 @@ const LABELS: Labels = {
 
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
-
   context?: 'legitimations'
-  delegationId?: sdk.IDelegationNode['id']
+  delegationId: sdk.IDelegationNode['id'] | null
   currentDelegationViewType?: ViewType
 
   onToggleChildOpen?: (closeCallback?: () => void | undefined) => void
@@ -48,6 +47,7 @@ type State = {
 }
 
 class AttestedClaimsListView extends React.Component<Props, State> {
+  static defaultProps: { delegationId: null }
   constructor(props: Props) {
     super(props)
 

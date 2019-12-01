@@ -16,8 +16,7 @@ export type RequestAttestationProps = {
   claim: sdk.IPartialClaim
   legitimations: sdk.IAttestedClaim[]
   receiverAddresses: Array<sdk.PublicIdentity['address']>
-
-  delegationId?: sdk.IDelegationNode['id']
+  delegationId: sdk.IDelegationNode['id'] | null
 
   onCancel?: () => void
   onFinished?: () => void

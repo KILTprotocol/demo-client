@@ -5,7 +5,6 @@ import { MyDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
-import BlockchainService from './BlockchainService'
 
 class DelegationsService {
   public static async storeRoot(
@@ -53,7 +52,7 @@ class DelegationsService {
    */
   public static async lookupNodeById(
     delegationNodeId: string
-  ): Promise<sdk.DelegationNode | undefined> {
+  ): Promise<sdk.DelegationNode | null> {
     return sdk.DelegationNode.query(delegationNodeId)
   }
 
@@ -64,7 +63,7 @@ class DelegationsService {
    */
   public static async lookupRootNodeById(
     rootNodeId: sdk.IDelegationRootNode['id']
-  ): Promise<sdk.DelegationRootNode | undefined> {
+  ): Promise<sdk.DelegationRootNode | null> {
     return await sdk.DelegationRootNode.query(rootNodeId)
   }
 
@@ -75,7 +74,7 @@ class DelegationsService {
    */
   public static async findRootNode(
     delegationNodeId: sdk.IDelegationNode['id']
-  ): Promise<sdk.DelegationRootNode | undefined> {
+  ): Promise<sdk.DelegationRootNode | null> {
     const node = await sdk.DelegationNode.query(delegationNodeId)
     if (node) {
       return await node.getRoot()
@@ -87,8 +86,8 @@ class DelegationsService {
     delegationNodeId: sdk.IDelegationBaseNode['id'],
     alias: string,
     isPCR?: boolean
-  ): Promise<MyDelegation | undefined> {
-    return new Promise<MyDelegation | undefined>(async (resolve, reject) => {
+  ): Promise<MyDelegation | null> {
+    return new Promise<MyDelegation | null>(async (resolve, reject) => {
       try {
         const delegation = await DelegationsService.lookupNodeById(
           delegationNodeId
@@ -135,9 +134,7 @@ class DelegationsService {
   public static async resolveParent(
     currentNode: DelegationsTreeNode
   ): Promise<DelegationsTreeNode> {
-    const parentDelegation:
-      | sdk.IDelegationBaseNode
-      | undefined = await currentNode.delegation.getParent()
+    const parentDelegation: sdk.IDelegationBaseNode | null = await currentNode.delegation.getParent()
 
     if (!parentDelegation) {
       return currentNode

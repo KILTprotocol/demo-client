@@ -3,8 +3,8 @@ import * as sdk from '@kiltprotocol/sdk-js'
 import PersistentStore from '../state/PersistentStore'
 import * as Parameters from '../state/ducks/Parameters'
 import * as Wallet from '../state/ducks/Wallet'
-import { BalanceUtilities } from './BalanceUtilities'
 import BlockchainService from './BlockchainService'
+import { Hash } from '@polkadot/types/interfaces'
 
 type CheckResult = {
   firstBlockHashChanged: boolean
@@ -45,7 +45,9 @@ class ClientVersionHelper {
    */
   public async checkHash(): Promise<boolean> {
     const blockchain = await BlockchainService.connect()
-    const blockHash = (await blockchain.api.rpc.chain.getBlockHash(1)).toHex()
+    const blockHash = (await blockchain.api.rpc.chain.getBlockHash<Hash>(
+      1
+    )).toHex()
 
     return this.isHashMatching(blockHash)
   }

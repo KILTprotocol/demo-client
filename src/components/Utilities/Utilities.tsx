@@ -15,7 +15,7 @@ import DevTools from '../DevTools/DevTools'
 import { clientVersionHelper } from '../../services/ClientVersionHelper'
 
 import sdkPackage from '@kiltprotocol/sdk-js/package.json'
-import clientPackage from '../../../package.json'
+const clientPackage = require('../../../package.json')
 import { safeDestructiveAction } from '../../services/FeedbackService'
 import { MyIdentity } from '../../types/Contact'
 
