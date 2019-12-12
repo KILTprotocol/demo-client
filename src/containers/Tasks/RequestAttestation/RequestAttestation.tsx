@@ -105,7 +105,7 @@ class RequestAttestation extends React.Component<
 
     const myClaims = Claims.getClaimsByCTypeHash(
       PersistentStore.store.getState(),
-      claim.cType
+      claim.cTypeHash
     )
 
     const withPreFilledClaim = !!(
@@ -140,7 +140,7 @@ class RequestAttestation extends React.Component<
           <section className="selectClaim">
             <h2>Select claim</h2>
             <SelectClaims
-              cTypeHash={claim.cType}
+              cTypeHash={claim.cTypeHash}
               onChange={this.onSelectClaims}
               isMulti={false}
             />
@@ -202,7 +202,7 @@ class RequestAttestation extends React.Component<
           savedClaimEntry.claim,
           receiverAddresses,
           (legitimations || []).map((legitimation: sdk.IAttestedClaim) =>
-            sdk.AttestedClaim.fromObject(legitimation)
+            sdk.AttestedClaim.fromAttestedClaim(legitimation)
           ),
           delegationId
         )

@@ -34,12 +34,13 @@ class AttestationService {
       throw new Error('No identity selected')
     }
 
-    const attestation = new Kilt.Attestation(
+    const attestation = Kilt.Attestation.fromRequestAndPublicIdentity(
       requestForAttestation,
-      selectedIdentity
+      selectedIdentity,
+      null
     )
 
-    const attestedClaim = new Kilt.AttestedClaim(
+    const attestedClaim = Kilt.AttestedClaim.fromRequestAndAttestation(
       requestForAttestation,
       attestation
     )
@@ -64,7 +65,7 @@ class AttestationService {
   public static async revokeAttestation(
     iAttestation: IAttestation
   ): Promise<void> {
-    const attestation = Kilt.Attestation.fromObject(iAttestation)
+    const attestation = Kilt.Attestation.fromAttestation(iAttestation)
     const selectedIdentity = await AttestationService.getIdentity()
 
     if (!selectedIdentity) {
@@ -111,14 +112,14 @@ class AttestationService {
   public static async verifyAttestatedClaim(
     attestedClaim: IAttestedClaim
   ): Promise<boolean> {
-    const _attestedClaim = Kilt.AttestedClaim.fromObject(attestedClaim)
+    const _attestedClaim = Kilt.AttestedClaim.fromAttestedClaim(attestedClaim)
     return _attestedClaim.verify()
   }
 
   public static async verifyAttestation(
     attestation: IAttestation
   ): Promise<boolean> {
-    const _attestation = Kilt.Attestation.fromObject(attestation)
+    const _attestation = Kilt.Attestation.fromAttestation(attestation)
     return _attestation.verify()
   }
 
@@ -158,7 +159,7 @@ class AttestationService {
         state.selectedAttestedClaims.forEach(
           (selectedAttestedClaim: IAttestedClaim) => {
             attestedClaims.push(
-              Kilt.AttestedClaim.fromObject(
+              Kilt.AttestedClaim.fromAttestedClaim(
                 selectedAttestedClaim
               ).createPresentation(
                 AttestationService.getExcludedProperties(
