@@ -106,10 +106,10 @@ class AttestationWorkflow {
     const identity: sdk.Identity = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
     ).identity
-    const requestForAttestation: sdk.IRequestForAttestation = new sdk.RequestForAttestation(
+    const requestForAttestation: sdk.IRequestForAttestation = sdk.RequestForAttestation.fromClaimAndIdentity(
       claim,
-      legitimations,
       identity,
+      legitimations,
       delegationId
     )
     const messageBody = {
@@ -145,7 +145,7 @@ class AttestationWorkflow {
     // store attestation locally
     AttestationService.saveInStore({
       attestation: attestedClaim.attestation,
-      cTypeHash: attestedClaim.request.claim.cType,
+      cTypeHash: attestedClaim.request.claim.cTypeHash,
       claimerAddress: attestedClaim.request.claim.owner,
       claimerAlias: claimer.metaData.name,
       created: Date.now(),

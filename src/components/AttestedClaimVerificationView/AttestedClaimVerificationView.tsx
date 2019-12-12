@@ -70,7 +70,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
           inline={true}
         />
         <CTypePresentation
-          cTypeHash={attestedClaim.request.claim.cType}
+          cTypeHash={attestedClaim.request.claim.cTypeHash}
           interactive={true}
           linked={true}
           inline={true}
