@@ -79,16 +79,19 @@ class CTypeCreate extends React.Component<Props, State> {
 
       cType
         .store(selectedIdentity.identity)
-        .then((value: any) => {
+        .then(({ payload }) => {
           blockUi.updateMessage(
             `CTYPE stored on blockchain,\nnow registering CTYPE`
           )
           const cTypeWrapper: ICType = {
-            cType,
+            cType: payload,
             metaData: {
               author: selectedIdentity.identity.address,
             },
           }
+
+          console.log(cTypeWrapper)
+
           // TODO: add onrejected when sdk provides error handling
           CTypeRepository.register(cTypeWrapper).then(() => {
             blockUi.remove()
