@@ -63,7 +63,7 @@ class CTypeCreate extends React.Component<Props, State> {
       let cType: sdk.CType
 
       try {
-        cType = fromInputModel(this.state.cType)
+        cType = fromInputModel(this.state.cType, selectedIdentity.identity.address)
       } catch (error) {
         errorService.log({
           error,
