@@ -44,7 +44,7 @@ export const fromInputModel = (ctypeInput: ICTypeInput): sdk.CType => {
     }
   })
   ctype.schema.properties = properties
-  return sdk.CType.fromCType(ctype as sdk.ICType) // Changes from Leon will require this to be changed to return CType.fromObject(ctype as ICType)
+  return sdk.CType.fromCType(ctype as sdk.ICType)
 }
 
 export const getLocalized = (o: any, lang?: string): string => {
