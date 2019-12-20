@@ -179,11 +179,11 @@ class BsAttestation {
       )
     }
 
-    return new sdk.RequestForAttestation(
+    return sdk.RequestForAttestation.fromClaimAndIdentity(
       claimToAttest.claim,
-      _legitimations,
       claimerIdentity.identity,
-      delegation ? delegation.id : undefined
+      _legitimations,
+      delegation ? delegation.id : null
     )
   }
 
@@ -220,7 +220,7 @@ class BsAttestation {
     // store attestation locally
     AttestationService.saveInStore({
       attestation: attestedClaim.attestation,
-      cTypeHash: attestedClaim.request.claim.cType,
+      cTypeHash: attestedClaim.request.claim.cTypeHash,
       claimerAddress: claimerIdentity.identity.address,
       claimerAlias: claimerIdentity.metaData.name,
       created: Date.now(),
@@ -243,15 +243,15 @@ class BsAttestation {
     const cType: ICType = await BsCType.getByKey(bsClaim.cTypeKey)
 
     const partialClaim = {
-      cType: cType.cType.hash as string,
+      cTypeHash: cType.cType.hash,
       contents: bsClaim.data,
       owner: claimerIdentity.identity.address,
     }
 
     // send request for legitimation from claimer to attester
-    const requestAcceptDelegation: sdk.IRequestLegitimations = {
+    const requestAcceptDelegation: sdk.IRequestTerms = {
       content: partialClaim,
-      type: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+      type: sdk.MessageBodyType.REQUEST_TERMS,
     }
     await MessageRepository.singleSend(
       requestAcceptDelegation,
@@ -260,13 +260,13 @@ class BsAttestation {
     )
 
     // send legitimations from attester to claimer
-    const submitLegitimations: sdk.ISubmitLegitimations = {
+    const submitLegitimations: sdk.ISubmitTerms = {
       content: {
         claim: partialClaim,
-        delegationId: attestedClaim.request.delegationId,
+        delegationId: attestedClaim.request.delegationId || undefined,
         legitimations: attestedClaim.request.legitimations,
       },
-      type: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
+      type: sdk.MessageBodyType.SUBMIT_TERMS,
     }
     await MessageRepository.singleSend(
       submitLegitimations,
@@ -276,7 +276,7 @@ class BsAttestation {
 
     // send signed legitmations from claimer to attester
     const requestAttestationForClaim: sdk.IRequestAttestationForClaim = {
-      content: requestForAttestation,
+      content: { requestForAttestation },
       type: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
     await MessageRepository.singleSend(
