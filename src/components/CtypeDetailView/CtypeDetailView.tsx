@@ -47,7 +47,7 @@ class CtypeDetailView extends React.Component<Props, State> {
                 <label>Author</label>
                 <div>
                   <ContactPresentation
-                    address={cType.metaData.author}
+                    address={cType.cType.owner!}
                     interactive={true}
                   />
                 </div>

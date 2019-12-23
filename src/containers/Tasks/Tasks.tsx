@@ -147,7 +147,7 @@ class Tasks extends React.Component<Props, State> {
       }
       case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS: {
         const props = currentTask.props
-        const cTypeHash = props.claim ? props.claim.cType : undefined
+        const cTypeHash = props.claim ? props.claim.cTypeHash : undefined
         return this.getModal(
           'Submit legitimations',
           <>
@@ -157,7 +157,7 @@ class Tasks extends React.Component<Props, State> {
             !!selectedReceivers.length ? (
               <SubmitLegitimations
                 {...props}
-                claim={{ cType: selectedCTypes[0].cType.hash }}
+                claim={{ cTypeHash: selectedCTypes[0].cType.hash }}
                 receiverAddresses={selectedReceiverAddresses}
                 enablePreFilledClaim={true}
                 onFinished={this.onTaskFinished}

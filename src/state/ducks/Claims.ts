@@ -36,7 +36,7 @@ interface AddAttestationAction extends KiltAction {
 
 interface RevokeAttestationAction extends KiltAction {
   payload: {
-    revokedHash: sdk.IAttestedClaim['request']['hash']
+    revokedHash: sdk.IAttestedClaim['request']['rootHash']
   }
 }
 
@@ -172,7 +172,7 @@ class Store {
           if (myClaim.attestations && myClaim.attestations.length) {
             myClaim.attestations.forEach(
               (attestedClaim: sdk.IAttestedClaim, index: number) => {
-                if (attestedClaim.request.hash === revokedHash) {
+                if (attestedClaim.request.rootHash === revokedHash) {
                   // avoid changing claims while iterating
                   setIns.push([
                     myClaimHash,
@@ -224,7 +224,7 @@ class Store {
   }
 
   public static revokeAttestation(
-    revokedHash: sdk.IAttestedClaim['request']['hash']
+    revokedHash: sdk.IAttestedClaim['request']['rootHash']
   ): RevokeAttestationAction {
     return {
       payload: { revokedHash },
@@ -286,7 +286,7 @@ const _getCTypeHash = (
 const getClaimsByCTypeHash = createSelector(
   [getClaims, _getCTypeHash],
   (entries: Entry[], cTypeHash: ICType['cType']['hash']) =>
-    entries.filter((entry: Entry) => entry.claim.cType === cTypeHash)
+    entries.filter((entry: Entry) => entry.claim.cTypeHash === cTypeHash)
 )
 
 const _getClaimHash = (state: ReduxState, claim: sdk.IPartialClaim): string =>

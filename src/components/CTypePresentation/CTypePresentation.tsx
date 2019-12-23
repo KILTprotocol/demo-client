@@ -188,7 +188,7 @@ class CTypePresentation extends React.Component<Props, State> {
             UiState.Store.updateCurrentTaskAction({
               objective: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
               props: {
-                claim: { cType: cTypeHash },
+                claim: { cTypeHash: cTypeHash },
               } as SubmitLegitimationsProps,
             })
           )

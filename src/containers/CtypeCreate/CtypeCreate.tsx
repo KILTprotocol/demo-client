@@ -11,10 +11,11 @@ import FeedbackService, {
 } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType, CType, CTypeMetadata } from '../../types/Ctype'
+import { ICType, CType, CTypeMetadata, CTypeMetadataChain } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
 import { fromInputModel } from '../../utils/CtypeUtils'
+import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetedata'
 
 type Props = RouteComponentProps<{}> & {
   selectedIdentity?: Wallet.Entry
@@ -60,11 +61,12 @@ class CTypeCreate extends React.Component<Props, State> {
       this.state.isValid
     ) {
       const { selectedIdentity, history } = this.props
-      let cType: sdk.CType
-      let metadata: CType['metadata']
+      let cType : sdk.CType
+      let metadata : sdk.ICTypeMetadata
       try {
-        cType = fromInputModel(this.state.cType).sdkCType
-        metadata = fromInputModel(this.state.cType).sdkMetadata
+       const inputCTypeWithMetadata: CTypeMetadataChain = fromInputModel(this.state.cType)
+       cType = inputCTypeWithMetadata.cType
+       metadata = inputCTypeWithMetadata.metaData
       } catch (error) {
         errorService.log({
           error,
@@ -73,44 +75,46 @@ class CTypeCreate extends React.Component<Props, State> {
         })
         return
       }
-
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Creating CTYPE',
       })
-
+      const cTypeWrapper: CTypeMetadata = {
+        cType: {
+          schema: cType.schema,
+          owner: selectedIdentity.identity.address,
+          hash: cType.hash,
+        },
+        metaData: metadata
+      }
       cType
         .store(selectedIdentity.identity)
         .then((value: any) => {
           blockUi.updateMessage(
             `CTYPE stored on blockchain,\nnow registering CTYPE`
-          )
-          const cTypeWrapper: CTypeMetadata = {
-            cType: {
-              schema: cType.schema,
-              metadata: metadata,
-              owner: selectedIdentity.identity.address,
-              hash: cType.hash,
-            },
-            metaData: {
-              author: selectedIdentity.identity.address,
-            },
-          }
-
-          // TODO: add onrejected when sdk provides error handling
-          CTypeRepository.register(cTypeWrapper).then(() => {
-            blockUi.remove()
-            notifySuccess(`CTYPE ${metadata.title.type} successfully created.`) // something better?
-            history.push('/cType')
-          })
+          ) // TODO: add onrejected when sdk provides error handling
         })
         .catch(error => {
           errorService.log({
             error,
-            message: 'Could not submit CTYPE',
-            origin: 'CTypeCreate.submit()',
+            message: 'Could not submit CTYPE to the Blockchain',
+            origin: 'CType.store()',
           })
           notifyError(error)
           blockUi.remove()
+        }).then(() => {
+          return CTypeRepository.register(cTypeWrapper).then(() => {
+            blockUi.remove()
+            notifySuccess(`CTYPE ${metadata.metadata.title.default} successfully created.`) // something better?
+            history.push('/cType')
+          }).catch(error => {
+            errorService.log({
+              error,
+              message: 'Could not submit CTYPE to the Registry',
+              origin: 'CTypeRepository.register()',
+            })
+            notifyError(error)
+            blockUi.remove()
+          })
         })
     }
   }

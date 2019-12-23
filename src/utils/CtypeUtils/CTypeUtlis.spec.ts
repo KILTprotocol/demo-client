@@ -4,6 +4,7 @@ import {
   getCTypeInputModel,
 } from './CtypeUtils'
 import * as sdk from '@kiltprotocol/sdk-js'
+import { ICType, ICTypeInput } from 'src/types/Ctype'
 
 describe('CType', () => {
   const ctypeModel = {
@@ -19,7 +20,7 @@ describe('CType', () => {
   } as sdk.ICType
 
   it('verify model transformations', () => {
-    const ctypeInput = {
+    const ctypeInput: ICTypeInput = {
       $id: 'http://example.com/ctype-1',
       $schema: 'http://kilt-protocol.org/draft-01/ctype-input#',
       properties: [
@@ -37,6 +38,8 @@ describe('CType', () => {
       type: 'object',
       title: 'CType Title',
       required: ['first-property', 'second-property'],
+      description: '',
+      owner: null
     }
 
     const claimInput = {
@@ -59,23 +62,20 @@ describe('CType', () => {
       'second-property': '12',
       'third-property': true,
     }
-
     const ctypeFromInput = fromInputModel(ctypeInput)
-    const ctypeFromModel = new sdk.CType(ctypeModel)
+    const ctypeFromModel = sdk.CType.fromCType(ctypeModel)
     expect(JSON.stringify(ctypeFromInput)).toEqual(
       JSON.stringify(ctypeFromModel))
-    expect(JSON.stringify(ctypeFromInput.getModel())).toEqual(
-      JSON.stringify(ctypeFromModel.getModel())
-    )
-    expect(JSON.stringify(getClaimInputModel(ctypeFromInput, 'en'))).toEqual(
+
+    expect(JSON.stringify(getClaimInputModel(ctypeFromInput.cType, 'en'))).toEqual(
       JSON.stringify(claimInput)
     )
     expect(JSON.stringify(getCTypeInputModel(ctypeFromInput))).toEqual(
       JSON.stringify(ctypeInput)
     )
 
-    expect(ctypeFromInput.verifyClaimStructure(goodClaim)).toBeTruthy()
-    expect(ctypeFromInput.verifyClaimStructure(badClaim)).toBeFalsy()
+    expect(ctypeFromInput.cType.verifyClaimStructure(goodClaim)).toBeTruthy()
+    expect(ctypeFromInput.cType.verifyClaimStructure(badClaim)).toBeFalsy()
 
     expect(() => {
       // @ts-ignore

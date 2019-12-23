@@ -24,7 +24,7 @@ class ClaimDetailView extends Component<Props, State> {
           <label>Ctype</label>
           <div>
             <CTypePresentation
-              cTypeHash={claim.cType}
+              cTypeHash={claim.cTypeHash}
               linked={true}
               interactive={true}
             />

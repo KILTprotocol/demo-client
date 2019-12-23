@@ -124,7 +124,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     }
 
     return (_cTypeHashes || []).map(
-      (cTypeHash: Claims.Entry['claim']['cType']) => (
+      (cTypeHash: Claims.Entry['claim']['cTypeHash']) => (
         <div className="cType-container" key={cTypeHash}>
           <h4>
             CType{' '}
@@ -154,7 +154,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
 
   private getSelectAttestedClaim(
     claimEntry: Claims.Entry,
-    cTypeHash?: Claims.Entry['claim']['cType']
+    cTypeHash?: Claims.Entry['claim']['cTypeHash']
   ) {
     return (
       <SelectAttestedClaim
@@ -174,7 +174,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
       cTypeHashes && cTypeHashes.length
         ? claimEntries.filter(
             (claimEntry: Claims.Entry) =>
-              cTypeHashes.indexOf(claimEntry.claim.cType) !== -1
+              cTypeHashes.indexOf(claimEntry.claim.cTypeHash) !== -1
           )
         : claimEntries
 
@@ -183,7 +183,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
         (claimEntry: Claims.Entry) =>
           claimEntry.attestations && claimEntry.attestations.length
       ),
-      (claimEntry: Claims.Entry) => claimEntry.claim.cType
+      (claimEntry: Claims.Entry) => claimEntry.claim.cTypeHash
     )
   }
 

@@ -56,7 +56,7 @@ class MyClaimListView extends React.Component<Props, State> {
                   </td>
                   <td className="cType">
                     <CTypePresentation
-                      cTypeHash={claimEntry.claim.cType}
+                      cTypeHash={claimEntry.claim.cTypeHash}
                       interactive={true}
                       linked={true}
                     />

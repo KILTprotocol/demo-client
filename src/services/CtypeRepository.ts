@@ -2,7 +2,7 @@ import * as sdk from '@kiltprotocol/sdk-js'
 
 import * as CTypes from '../state/ducks/CTypes'
 import PersistentStore from '../state/PersistentStore'
-import { ICType, CTypeMetadata } from '../types/Ctype'
+import { CTypeMetadata } from '../types/Ctype'
 
 import { BasePostParams } from './BaseRepository'
 

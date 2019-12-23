@@ -50,7 +50,7 @@ class MyClaimCreateView extends Component<Props, State> {
 
   public componentDidMount() {
     const { partialClaim } = this.state
-    const { cType: cTypeHash } = partialClaim
+    const { cTypeHash: cTypeHash } = partialClaim
 
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Fetching CTYPE',
@@ -149,10 +149,10 @@ class MyClaimCreateView extends Component<Props, State> {
     const { contents } = partialClaim
 
     if (cType && selectedIdentity) {
-      const newClaim: sdk.IClaim = new sdk.Claim(
+      const newClaim: sdk.IClaim = sdk.Claim.fromCTypeAndClaimContents(
         cType,
         contents || {},
-        selectedIdentity.identity
+        selectedIdentity.identity.address
       )
       saveClaim(newClaim, { alias: name })
       notifySuccess(`Claim ${name} successfully created & saved.`)

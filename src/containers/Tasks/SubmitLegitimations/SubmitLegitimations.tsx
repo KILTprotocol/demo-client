@@ -53,9 +53,9 @@ class SubmitLegitimations extends React.Component<Props, State> {
   public componentDidMount() {
     const { claim } = this.state
 
-    CTypeRepository.findByHash(claim.cType).then((cType: CTypeMetadata) => {
+    CTypeRepository.findByHash(claim.cTypeHash).then((cType: CTypeMetadata) => {
       this.setState({
-        cType: sdk.CType.fromObject(cType.cType),
+        cType: sdk.CType.fromCType(cType.cType),
       })
     })
   }

@@ -27,7 +27,7 @@ class BsCType {
     const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
       .identity
 
-    const cType = sdk.CType.fromObject({
+    const cType = sdk.CType.fromCType({
       ...bsCTypeData,
       owner: ownerIdentity.address,
     })

@@ -64,7 +64,7 @@ class CtypeListView extends React.Component<Props, State> {
                       right={true}
                     />
                     <ContactPresentation
-                      address={cType.metaData.author}
+                      address={cType.cType.owner!}
                       interactive={true}
                       right={true}
                     />
@@ -78,7 +78,7 @@ class CtypeListView extends React.Component<Props, State> {
                   </td>
                   <td className="author">
                     <ContactPresentation
-                      address={cType.metaData.author}
+                      address={cType.cType.owner!}
                       interactive={true}
                       right={true}
                     />
