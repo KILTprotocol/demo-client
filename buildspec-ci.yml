@@ -1,8 +1,25 @@
 version: 0.2
 
 phases:
+  pre_build:
+      commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --region eu-central-1 --no-include-email)
+      - REPOSITORY_URI=348099934012.dkr.ecr.eu-central-1.amazonaws.com/kilt/protoype-client
+      - IMAGE_TAG=latest-devnet
+      - docker pull $REPOSITORY_URI:latest-devnet || true
   build:
     commands:
     - echo Run 'build / lint / test'
-    - docker build --build-arg KILT_NPM_AUTH_TOKEN=$KILT_NPM_AUTH_TOKEN -t prototype-client .
-    - echo 'build / lint / test' successful!  
+    - docker build -f Dockerfile.devnet --cache-from $REPOSITORY_URI:latest-devnet -t demo-client .
+    - echo 'build / lint / test' successful!
+    - docker tag demo-client $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+    - echo Pushing the Docker images...
+    - docker push $REPOSITORY_URI:$IMAGE_TAG
+    - echo Writing image definitions file...
+    - printf '[{"name":"prototype-client","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+artifacts:
+  files: imagedefinitions.json
