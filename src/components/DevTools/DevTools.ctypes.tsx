@@ -42,7 +42,6 @@ class BsCType {
           message: 'Could not submit CTYPE to the Blockchain',
           origin: 'CType.store()',
         })
-        notifyError(error)
       }).then(() => {
         const cTypeWrapper: CTypeMetadata = {
           cType,
@@ -57,10 +56,9 @@ class BsCType {
           .catch(error => {
             errorService.log({
               error,
-              message: 'Could not submit CTYPE',
-              origin: 'CTypeCreate.submit()',
+              message: 'Could not submit CTYPE to the Registry',
+              origin: 'CTypeRepository.register()',
             })
-            notifyError(error)
           })
       })
   }
