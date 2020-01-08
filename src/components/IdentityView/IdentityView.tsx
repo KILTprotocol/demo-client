@@ -34,7 +34,7 @@ type State = {
   requestKiltTokens: boolean
 }
 
-const FAUCET_URL = 'https://faucet.kilt.io'
+const FAUCET_URL = process.env.REACT_APP_FAUCET_URL
 
 class IdentityView extends React.Component<Props, State> {
   constructor(props: Props) {
