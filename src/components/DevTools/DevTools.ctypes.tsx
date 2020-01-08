@@ -35,34 +35,34 @@ class BsCType {
     })
 
     cType
-    .store(ownerIdentity)
-    .catch(error => {
-      errorService.log({
-        error,
-        message: 'Could not submit CTYPE to the Blockchain',
-        origin: 'CType.store()',
-      })
-      notifyError(error)
-    }).then(() => {
-      const cTypeWrapper: CTypeMetadata = {
-        cType,
-        metaData: {
-          metadata: bsCTypeData.metadata,
-          ctypeHash: cType.hash
-        },
-      }
-      return CTypeRepository.register(cTypeWrapper).then(() => {
-        notifySuccess(`CTYPE ${cType.schema.$id} successfully created.`)
-      })
+      .store(ownerIdentity)
       .catch(error => {
         errorService.log({
           error,
-          message: 'Could not submit CTYPE',
-          origin: 'CTypeCreate.submit()',
+          message: 'Could not submit CTYPE to the Blockchain',
+          origin: 'CType.store()',
         })
         notifyError(error)
+      }).then(() => {
+        const cTypeWrapper: CTypeMetadata = {
+          cType,
+          metaData: {
+            metadata: bsCTypeData.metadata,
+            ctypeHash: cType.hash
+          },
+        }
+        return CTypeRepository.register(cTypeWrapper).then(() => {
+          notifySuccess(`CTYPE ${cType.schema.$id} successfully created.`)
+        })
+          .catch(error => {
+            errorService.log({
+              error,
+              message: 'Could not submit CTYPE',
+              origin: 'CTypeCreate.submit()',
+            })
+            notifyError(error)
+          })
       })
-    })
   }
 
   public static async savePool(updateCallback?: UpdateCallback): Promise<void> {
