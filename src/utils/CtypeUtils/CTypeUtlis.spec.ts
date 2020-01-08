@@ -69,7 +69,7 @@ describe('CType', () => {
     }
 
     const ctypeFromInput = fromInputModel(ctypeInput)
-    const ctypeFromModel = new sdk.CType(ctypeModel)
+    const ctypeFromModel = sdk.CType.fromCType(ctypeModel)
     expect(JSON.stringify(ctypeFromInput)).toEqual(
       JSON.stringify(ctypeFromModel)
     )

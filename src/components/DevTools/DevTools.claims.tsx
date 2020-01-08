@@ -28,10 +28,10 @@ class BsClaim {
   ): Promise<void | sdk.Claim> {
     const identity = await BsIdentity.getByKey(BS_claimData.claimerKey)
     const cType = (await BsCType.getByKey(BS_claimData.cTypeKey)).cType
-    const claim = new sdk.Claim(
-      sdk.CType.fromObject(cType),
+    const claim = sdk.Claim.fromCTypeAndClaimContents(
+      sdk.CType.fromCType(cType),
       BS_claimData.data,
-      identity.identity
+      identity.identity.address
     )
 
     PersistentStore.store.dispatch(

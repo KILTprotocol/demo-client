@@ -70,7 +70,7 @@ class RequestLegitimation extends React.Component<
     const { cTypeHash, receiverAddresses, onFinished } = this.props
     const { selectedClaimEntries } = this.state
     let claims: sdk.IPartialClaim[] = [
-      { cType: cTypeHash } as sdk.IPartialClaim,
+      { cTypeHash: cTypeHash } as sdk.IPartialClaim,
     ]
 
     if (selectedClaimEntries && selectedClaimEntries.length) {

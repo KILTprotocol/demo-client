@@ -107,7 +107,7 @@ class AttestationStatus extends React.Component<Props, State> {
         })
         if (isAttestedClaim(attestation)) {
           PersistentStore.store.dispatch(
-            Claims.Store.revokeAttestation(attestation.request.hash)
+            Claims.Store.revokeAttestation(attestation.request.rootHash)
           )
         } else {
           PersistentStore.store.dispatch(
