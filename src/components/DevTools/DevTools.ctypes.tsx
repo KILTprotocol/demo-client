@@ -3,8 +3,8 @@ import * as sdk from '@kiltprotocol/sdk-js'
 import BlockchainService from '../../services/BlockchainService'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
-import { notifySuccess } from '../../services/FeedbackService'
-import { ICType, CType, CTypeMetadata } from '../../types/Ctype'
+import { notifySuccess, notifyError } from '../../services/FeedbackService'
+import { CTypeMetadata } from '../../types/Ctype'
 import { BsIdentity } from './DevTools.wallet'
 
 import cTypesPool from './data/cTypes.json'
@@ -13,6 +13,7 @@ type UpdateCallback = (bsCTypeKey: keyof BsCTypesPool) => void
 
 interface BsCTypesPoolElement extends sdk.ICType {
   owner: string
+  metadata: sdk.ICTypeMetadata['metadata']
 }
 
 type BsCTypesPool = {
@@ -28,23 +29,29 @@ class BsCType {
       .identity
 
     const cType = sdk.CType.fromCType({
-      ...bsCTypeData,
-      owner: ownerIdentity.address,
+      schema: bsCTypeData.schema,
+      hash: bsCTypeData.hash,
+      owner: ownerIdentity.address
     })
 
-    return cType
-      .store(ownerIdentity)
-      .then((value: any) => {
-        const cTypeWrapper: any = {
-          cType,
-          metaData: {
-            author: ownerIdentity.address,
-          },
-        }
-        // TODO: add onrejected when sdk provides error handling
-        return CTypeRepository.register(cTypeWrapper)
+    cType
+    .store(ownerIdentity)
+    .catch(error => {
+      errorService.log({
+        error,
+        message: 'Could not submit CTYPE to the Blockchain',
+        origin: 'CType.store()',
       })
-      .then(() => {
+      notifyError(error)
+    }).then(() => {
+      const cTypeWrapper: CTypeMetadata = {
+        cType,
+        metaData: {
+          metadata: bsCTypeData.metadata,
+          ctypeHash: cType.hash
+        },
+      }
+      return CTypeRepository.register(cTypeWrapper).then(() => {
         notifySuccess(`CTYPE ${cType.schema.$id} successfully created.`)
       })
       .catch(error => {
@@ -53,7 +60,9 @@ class BsCType {
           message: 'Could not submit CTYPE',
           origin: 'CTypeCreate.submit()',
         })
+        notifyError(error)
       })
+    })
   }
 
   public static async savePool(updateCallback?: UpdateCallback): Promise<void> {

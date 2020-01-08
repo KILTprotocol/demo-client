@@ -11,11 +11,10 @@ import FeedbackService, {
 } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType, CType, CTypeMetadata, CTypeMetadataChain } from '../../types/Ctype'
+import { CTypeMetadata, CTypeMetadataChain } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
 import { fromInputModel } from '../../utils/CtypeUtils'
-import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetedata'
 
 type Props = RouteComponentProps<{}> & {
   selectedIdentity?: Wallet.Entry
