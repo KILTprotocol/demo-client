@@ -11,10 +11,11 @@ import { ICTypeInput, IClaimInput } from '../../types/Ctype'
  * @returns The CTYPE for the input model.
  */
 
-export const fromInputModel = (ctypeInput: ICTypeInput): sdk.CType => {
+export const fromInputModel = (ctypeInput: ICTypeInput, creator?: sdk.Identity["address"]): sdk.CType => {
   if (!sdk.CTypeUtils.verifySchema(ctypeInput, sdk.CTypeInputModel)) {
     throw new Error('CType input does not correspond to input model schema')
   }
+  const cTypeOwner = !creator ? null : creator
   const ctype = {
     schema: {
       $id: ctypeInput.$id,
@@ -31,6 +32,7 @@ export const fromInputModel = (ctypeInput: ICTypeInput): sdk.CType => {
       },
       properties: {},
     },
+    owner: cTypeOwner,
   }
 
   const properties = {}
@@ -44,7 +46,7 @@ export const fromInputModel = (ctypeInput: ICTypeInput): sdk.CType => {
     }
   })
   ctype.schema.properties = properties
-  return new sdk.CType(ctype as sdk.ICType) // Changes from Leon will require this to be changed to return CType.fromObject(ctype as ICType)
+  return sdk.CType.fromCType(ctype as sdk.ICType)
 }
 
 export const getLocalized = (o: any, lang?: string): string => {

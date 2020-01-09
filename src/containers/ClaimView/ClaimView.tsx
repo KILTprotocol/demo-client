@@ -147,7 +147,7 @@ class ClaimView extends React.Component<Props, State> {
       UiState.Store.updateCurrentTaskAction({
         objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
         props: {
-          cTypeHash: claimEntry.claim.cType,
+          cTypeHash: claimEntry.claim.cTypeHash,
           preSelectedClaimEntries: [claimEntry],
         } as RequestLegitimationsProps,
       })
