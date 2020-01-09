@@ -8,7 +8,7 @@ import isEqual from 'lodash/isEqual'
 import CTypeRepository from '../../services/CtypeRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { CType, CTypeMetadata } from '../../types/Ctype'
+import { ICType, CTypeWithMetadata } from '../../types/Ctype'
 import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import { SelectAttestedClaimsLabels } from '../SelectAttestedClaims/SelectAttestedClaims'
@@ -25,7 +25,7 @@ type Props = {
 export type State = {
   allAttestedClaimsSelected?: boolean
   allClaimPropertiesSelected?: boolean
-  cType?: CType
+  cType?: ICType
   isSelected: boolean
   selectedAttestedClaims: sdk.IAttestedClaim[]
   selectedClaimProperties: string[]
@@ -47,8 +47,13 @@ class SelectAttestedClaim extends React.Component<Props, State> {
   public componentDidMount() {
     const { cTypeHash } = this.props
     if (cTypeHash) {
-      CTypeRepository.findByHash(cTypeHash).then((cType: CTypeMetadata) => {
-        this.setState({ cType: CType.fromObject(cType) })
+      CTypeRepository.findByHash(cTypeHash).then((cType: CTypeWithMetadata) => {
+        const cTypeReference: ICType = {
+          cType: cType.cType,
+          metadata: cType.metaData.metadata,
+          ctypeHash: cType.cType.hash,
+        }
+        this.setState({ cType: cTypeReference })
       })
     }
   }
@@ -148,7 +153,9 @@ class SelectAttestedClaim extends React.Component<Props, State> {
 
   private getCtypePropertyTitle(propertyName: string): string {
     const { cType } = this.state
-    return cType ? cType.getPropertyTitle(propertyName) : propertyName
+    return cType && cType.metadata.properties[propertyName].title.default
+      ? cType.metadata.properties[propertyName].title.default
+      : propertyName
   }
 
   private selectClaimProperty(

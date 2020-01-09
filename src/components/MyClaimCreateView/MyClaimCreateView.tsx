@@ -11,7 +11,7 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { CTypeMetadata } from '../../types/Ctype'
+import { CTypeWithMetadata } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import { getClaimInputModel } from '../../utils/CtypeUtils'
 
@@ -57,7 +57,7 @@ class MyClaimCreateView extends Component<Props, State> {
     })
 
     CTypeRepository.findByHash(cTypeHash)
-      .then((dbCtype: CTypeMetadata) => {
+      .then((dbCtype: CTypeWithMetadata) => {
         const cType = new sdk.CType(dbCtype.cType)
         this.setState({ cType })
         blockUi.remove()

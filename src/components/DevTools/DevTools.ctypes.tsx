@@ -4,7 +4,7 @@ import BlockchainService from '../../services/BlockchainService'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess, notifyError } from '../../services/FeedbackService'
-import { CTypeMetadata } from '../../types/Ctype'
+import { CTypeWithMetadata } from '../../types/Ctype'
 import { BsIdentity } from './DevTools.wallet'
 
 import cTypesPool from './data/cTypes.json'
@@ -31,35 +31,33 @@ class BsCType {
     const cType = sdk.CType.fromCType({
       schema: bsCTypeData.schema,
       hash: bsCTypeData.hash,
-      owner: ownerIdentity.address
+      owner: ownerIdentity.address,
     })
 
-    cType
+    return cType
       .store(ownerIdentity)
-      .catch(error => {
-        errorService.log({
-          error,
-          message: 'Could not submit CTYPE to the Blockchain',
-          origin: 'CType.store()',
-        })
-      }).then(() => {
-        const cTypeWrapper: CTypeMetadata = {
+      .then((value: any) => {
+        const cTypeWrapper: CTypeWithMetadata = {
           cType,
           metaData: {
             metadata: bsCTypeData.metadata,
-            ctypeHash: cType.hash
+            ctypeHash: cType.hash,
           },
         }
-        return CTypeRepository.register(cTypeWrapper).then(() => {
-          notifySuccess(`CTYPE ${cType.schema.$id} successfully created.`)
+        // TODO: add onrejected when sdk provides error handling
+        return CTypeRepository.register(cTypeWrapper)
+      })
+      .then(() => {
+        notifySuccess(
+          `CTYPE ${bsCTypeData.metadata.title.default} successfully created.`
+        )
+      })
+      .catch(error => {
+        errorService.log({
+          error,
+          message: 'Could not submit CTYPE',
+          origin: 'DevTools.ctypes.tsx.BsCType.save()',
         })
-          .catch(error => {
-            errorService.log({
-              error,
-              message: 'Could not submit CTYPE to the Registry',
-              origin: 'CTypeRepository.register()',
-            })
-          })
       })
   }
 
@@ -78,7 +76,7 @@ class BsCType {
 
   public static async getByHash(
     hash: sdk.ICType['hash']
-  ): Promise<CTypeMetadata> {
+  ): Promise<CTypeWithMetadata> {
     const cType = await CTypeRepository.findByHash(hash)
     if (cType) {
       return cType
@@ -88,13 +86,13 @@ class BsCType {
 
   public static async get(
     bsCType: BsCTypesPoolElement
-  ): Promise<CTypeMetadata> {
+  ): Promise<CTypeWithMetadata> {
     return BsCType.getByHash(bsCType.hash)
   }
 
   public static async getByKey(
     bsCTypeKey: keyof BsCTypesPool
-  ): Promise<CTypeMetadata> {
+  ): Promise<CTypeWithMetadata> {
     const { hash } = BsCType.pool[bsCTypeKey]
     return BsCType.getByHash(hash)
   }

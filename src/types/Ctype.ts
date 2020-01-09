@@ -1,17 +1,12 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import ICTypeMetadata, { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetedata'
 
 export interface ICType extends sdk.ICTypeMetadata {
   cType: sdk.ICType
 }
 
-export interface CTypeMetadataChain {
-  cType: sdk.CType
-  metaData: ICTypeMetadata
-}
-export interface CTypeMetadata {
+export interface CTypeWithMetadata {
   cType: sdk.ICType
-  metaData: sdk.ICTypeMetadata,
+  metaData: sdk.ICTypeMetadata
 }
 
 export interface ICTypeInput {
@@ -34,18 +29,4 @@ export interface IClaimInput {
   description?: string
   type: string
   owner?: string
-}
-
-export class CType implements ICType {
-  public static fromObject(obj: CTypeMetadata): CType {
-    const newCtype = Object.create(CType.prototype)
-    return Object.assign(newCtype, obj)
-  }
-
-  public readonly cType: sdk.ICType
-  public metadata: IMetadata
-  public ctypeHash: sdk.ICType['hash']
-  public getPropertyTitle(propertyName: string) {
-    return propertyName // Need to fix. I need to take the value of the key.
-  }
 }

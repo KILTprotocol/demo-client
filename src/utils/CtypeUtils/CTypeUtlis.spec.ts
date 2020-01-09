@@ -39,7 +39,7 @@ describe('CType', () => {
       title: 'CType Title',
       required: ['first-property', 'second-property'],
       description: '',
-      owner: null
+      owner: null,
     }
 
     const claimInput = {
@@ -65,17 +65,22 @@ describe('CType', () => {
     const ctypeFromInput = fromInputModel(ctypeInput)
     const ctypeFromModel = sdk.CType.fromCType(ctypeModel)
     expect(JSON.stringify(ctypeFromInput)).toEqual(
-      JSON.stringify(ctypeFromModel))
-
-    expect(JSON.stringify(getClaimInputModel(ctypeFromInput.cType, 'en'))).toEqual(
-      JSON.stringify(claimInput)
+      JSON.stringify(ctypeFromModel)
     )
+
+    expect(
+      JSON.stringify(getClaimInputModel(ctypeFromInput.cType, 'en'))
+    ).toEqual(JSON.stringify(claimInput))
     expect(JSON.stringify(getCTypeInputModel(ctypeFromInput))).toEqual(
       JSON.stringify(ctypeInput)
     )
 
-    expect(ctypeFromInput.cType.verifyClaimStructure(goodClaim)).toBeTruthy()
-    expect(ctypeFromInput.cType.verifyClaimStructure(badClaim)).toBeFalsy()
+    expect(
+      sdk.CType.fromCType(ctypeFromInput.cType).verifyClaimStructure(goodClaim)
+    ).toBeTruthy()
+    expect(
+      sdk.CType.fromCType(ctypeFromInput.cType).verifyClaimStructure(badClaim)
+    ).toBeFalsy()
 
     expect(() => {
       // @ts-ignore

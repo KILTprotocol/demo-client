@@ -4,7 +4,7 @@ import Select from 'react-select'
 import CTypeRepository from '../../services/CtypeRepository'
 
 import ErrorService from '../../services/ErrorService'
-import { CTypeMetadata } from '../../types/Ctype'
+import { CTypeWithMetadata } from '../../types/Ctype'
 import SelectCTypes from '../SelectCTypes/SelectCTypes'
 import Modal, { ModalType } from './Modal'
 
@@ -17,13 +17,13 @@ type Props = {
   showOnInit?: boolean
 
   onCancel?: () => void
-  onConfirm: (selectedCTypes: CTypeMetadata[]) => void
+  onConfirm: (selectedCTypes: CTypeWithMetadata[]) => void
 }
 
 type State = {
-  cTypes?: CTypeMetadata[]
+  cTypes?: CTypeWithMetadata[]
   isSelectCTypesOpen: boolean
-  selectedCTypes: CTypeMetadata[]
+  selectedCTypes: CTypeWithMetadata[]
 }
 
 class SelectCTypesModal extends React.Component<Props, State> {
@@ -85,7 +85,7 @@ class SelectCTypesModal extends React.Component<Props, State> {
       >
         <div>
           <SelectCTypes
-            cTypes={cTypes as CTypeMetadata[]}
+            cTypes={cTypes as CTypeWithMetadata[]}
             name={name as string}
             isMulti={isMulti}
             closeMenuOnSelect={closeMenuOnSelect}
@@ -111,7 +111,7 @@ class SelectCTypesModal extends React.Component<Props, State> {
     }
   }
 
-  private onSelectCTypes(selectedCTypes: CTypeMetadata[]) {
+  private onSelectCTypes(selectedCTypes: CTypeWithMetadata[]) {
     this.setState({ selectedCTypes })
   }
 

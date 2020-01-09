@@ -11,7 +11,7 @@ import FeedbackService, {
 } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { CTypeMetadata, CTypeMetadataChain } from '../../types/Ctype'
+import { CTypeWithMetadata } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
 import { fromInputModel } from '../../utils/CtypeUtils'
@@ -60,12 +60,14 @@ class CTypeCreate extends React.Component<Props, State> {
       this.state.isValid
     ) {
       const { selectedIdentity, history } = this.props
-      let cType : sdk.CType
-      let metadata : sdk.ICTypeMetadata
+      let cType: sdk.CType
+      let metadata: sdk.ICTypeMetadata
       try {
-       const inputCTypeWithMetadata: CTypeMetadataChain = fromInputModel(this.state.cType)
-       cType = inputCTypeWithMetadata.cType
-       metadata = inputCTypeWithMetadata.metaData
+        const inputCTypeWithMetadata: CTypeWithMetadata = fromInputModel(
+          this.state.cType
+        )
+        cType = sdk.CType.fromCType(inputCTypeWithMetadata.cType)
+        metadata = inputCTypeWithMetadata.metaData
       } catch (error) {
         errorService.log({
           error,
@@ -77,13 +79,13 @@ class CTypeCreate extends React.Component<Props, State> {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Creating CTYPE',
       })
-      const cTypeWrapper: CTypeMetadata = {
+      const cTypeWrapper: CTypeWithMetadata = {
         cType: {
           schema: cType.schema,
           owner: selectedIdentity.identity.address,
           hash: cType.hash,
         },
-        metaData: metadata
+        metaData: metadata,
       }
       cType
         .store(selectedIdentity.identity)
@@ -100,20 +102,25 @@ class CTypeCreate extends React.Component<Props, State> {
           })
           notifyError(error)
           blockUi.remove()
-        }).then(() => {
-          return CTypeRepository.register(cTypeWrapper).then(() => {
-            blockUi.remove()
-            notifySuccess(`CTYPE ${metadata.metadata.title.default} successfully created.`) // something better?
-            history.push('/cType')
-          }).catch(error => {
-            errorService.log({
-              error,
-              message: 'Could not submit CTYPE to the Registry',
-              origin: 'CTypeRepository.register()',
+        })
+        .then(() => {
+          return CTypeRepository.register(cTypeWrapper)
+            .then(() => {
+              blockUi.remove()
+              notifySuccess(
+                `CTYPE ${metadata.metadata.title.default} successfully created.`
+              ) // something better?
+              history.push('/cType')
             })
-            notifyError(error)
-            blockUi.remove()
-          })
+            .catch(error => {
+              errorService.log({
+                error,
+                message: 'Could not submit CTYPE to the Registry',
+                origin: 'CTypeRepository.register()',
+              })
+              notifyError(error)
+              blockUi.remove()
+            })
         })
     }
   }

@@ -8,7 +8,7 @@ import attestationWorkflow from '../../services/AttestationWorkflow'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { Contact } from '../../types/Contact'
-import { CTypeMetadata } from '../../types/Ctype'
+import { CTypeWithMetadata } from '../../types/Ctype'
 
 import './CtypeView.scss'
 
@@ -18,7 +18,7 @@ type State = {}
 
 class CtypeView extends React.Component<Props, State> {
   private selectAttestersModal: SelectContactsModal | null
-  private cTypeToLegitimate: CTypeMetadata
+  private cTypeToLegitimate: CTypeWithMetadata
 
   constructor(props: Props) {
     super(props)
@@ -50,7 +50,7 @@ class CtypeView extends React.Component<Props, State> {
     )
   }
 
-  private requestLegitimation(cType: CTypeMetadata) {
+  private requestLegitimation(cType: CTypeWithMetadata) {
     if (cType && this.selectAttestersModal) {
       this.cTypeToLegitimate = cType
       this.selectAttestersModal.show()

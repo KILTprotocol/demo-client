@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
-import { ICTypeInput, IClaimInput, CType, CTypeMetadata, CTypeMetadataChain } from '../../types/Ctype'
+import { ICTypeInput, IClaimInput, CTypeWithMetadata } from '../../types/Ctype'
 import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetedata'
 import { ICTypeSchema } from '@kiltprotocol/sdk-js/build/types/CType'
 /**
@@ -12,13 +12,13 @@ import { ICTypeSchema } from '@kiltprotocol/sdk-js/build/types/CType'
  * @returns The CTYPE for the input model.
  */
 
-export const fromInputModel = (ctypeInput: ICTypeInput): CTypeMetadataChain => {
+export const fromInputModel = (ctypeInput: ICTypeInput): CTypeWithMetadata => {
   if (!sdk.CTypeUtils.verifySchema(ctypeInput, sdk.CTypeInputModel)) {
     throw new Error('CType input does not correspond to input model schema')
   }
   const schema: ICTypeSchema = {
     $id: ctypeInput.$id,
-    $schema: ctypeInput.$schema,
+    $schema: sdk.CTypeModel.properties.$schema.default,
     properties: {},
     type: 'object',
   }
@@ -30,9 +30,9 @@ export const fromInputModel = (ctypeInput: ICTypeInput): CTypeMetadataChain => {
     description: {
       default: ctypeInput.description,
     },
-    properties: {}
+    properties: {},
   }
-  
+
   const properties = {}
   ctypeInput.properties.forEach((p: any) => {
     const { title, $id, description, ...rest } = p
@@ -51,11 +51,11 @@ export const fromInputModel = (ctypeInput: ICTypeInput): CTypeMetadataChain => {
   const ctype: sdk.ICType = {
     schema,
     owner: ctypeInput.owner,
-    hash: sdk.CTypeUtils.getHashForSchema(schema)
+    hash: sdk.CTypeUtils.getHashForSchema(schema),
   }
   const sdkCTypeMetadata: sdk.ICTypeMetadata = {
     metadata: sdkMetadata,
-    ctypeHash: ctype.hash
+    ctypeHash: ctype.hash,
   }
 
   const sdkCType = sdk.CType.fromCType(ctype)
@@ -77,9 +77,8 @@ export const getLocalized = (o: any, lang?: string): string => {
  * @returns The CTYPE input model.
  */
 
-export const getCTypeInputModel = (ctype: CTypeMetadataChain): ICTypeInput => {
+export const getCTypeInputModel = (ctype: CTypeWithMetadata): ICTypeInput => {
   // create clone
-  ctype.metaData.metadata.title
   const result = JSON.parse(JSON.stringify(ctype.cType.schema))
   result.$schema = sdk.CTypeInputModel.$id
   result.title = getLocalized(ctype.metaData.metadata.title)
@@ -108,7 +107,7 @@ export const getCTypeInputModel = (ctype: CTypeMetadataChain): ICTypeInput => {
  * @returns {any} The claim input model
  */
 export const getClaimInputModel = (
-  ctype: sdk.CType,
+  ctype: sdk.ICType,
   lang?: string
 ): IClaimInput => {
   // create clone

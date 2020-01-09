@@ -233,13 +233,18 @@ class MessageRepository {
       case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
         return [(message.body as sdk.IRequestLegitimations).content.cTypeHash]
       case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
-        return [(message.body as sdk.ISubmitLegitimations).content.claim.cTypeHash]
+        return [
+          (message.body as sdk.ISubmitLegitimations).content.claim.cTypeHash,
+        ]
       case sdk.MessageBodyType.REJECT_LEGITIMATIONS:
-        return [(message.body as sdk.IRejectLegitimations).content.claim.cTypeHash]
+        return [
+          (message.body as sdk.IRejectLegitimations).content.claim.cTypeHash,
+        ]
 
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return [
-          (message.body as sdk.IRequestAttestationForClaim).content.claim.cTypeHash,
+          (message.body as sdk.IRequestAttestationForClaim).content.claim
+            .cTypeHash,
         ]
       case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
         return [
@@ -248,7 +253,8 @@ class MessageRepository {
         ]
       case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
         return [
-          (message.body as sdk.IRejectAttestationForClaim).content.claim.cTypeHash,
+          (message.body as sdk.IRejectAttestationForClaim).content.claim
+            .cTypeHash,
         ]
 
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
@@ -257,7 +263,8 @@ class MessageRepository {
         const cTypeHashes: Array<
           ICType['cType']['hash']
         > = (message.body as sdk.ISubmitClaimsForCTypes).content.map(
-          (attestedClaim: IAttestedClaim) => attestedClaim.request.claim.cTypeHash
+          (attestedClaim: IAttestedClaim) =>
+            attestedClaim.request.claim.cTypeHash
         )
         const uniqueCTypeHashes: Array<
           ICType['cType']['hash']
@@ -268,11 +275,13 @@ class MessageRepository {
         return uniqueCTypeHashes
       case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPES:
         return [
-          (message.body as sdk.IAcceptClaimsForCTypes).content[0].request.rootHash,
+          (message.body as sdk.IAcceptClaimsForCTypes).content[0].request
+            .rootHash,
         ]
       case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPES:
         return [
-          (message.body as sdk.IRejectClaimsForCTypes).content[0].request.rootHash,
+          (message.body as sdk.IRejectClaimsForCTypes).content[0].request
+            .rootHash,
         ]
 
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:

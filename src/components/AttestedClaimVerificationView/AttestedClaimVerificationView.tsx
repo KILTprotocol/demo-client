@@ -4,7 +4,7 @@ import AttestationService from '../../services/AttestationService'
 import * as UiState from '../../state/ducks/UiState'
 import PersistentStore from '../../state/PersistentStore'
 
-import { CType } from '../../types/Ctype'
+import { ICType } from '../../types/Ctype'
 import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
@@ -15,14 +15,13 @@ import './AttestedClaimVerificationView.scss'
 type Props = {
   attestedClaim: sdk.IAttestedClaim
   context?: string
-  cType?: CType
+  cType?: ICType
 }
 
 type State = {}
 
 class AttestedClaimVerificationView extends React.Component<Props, State> {
   private static readonly BLOCK_CHAR: string = '\u2588'
-
   constructor(props: Props) {
     super(props)
     this.state = {}
@@ -115,7 +114,10 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
 
   private getCtypePropertyTitle(propertyName: string): string {
     const { cType } = this.props
-    return cType ? cType.getPropertyTitle(propertyName) : propertyName
+
+    return cType && cType.metadata.properties[propertyName].title.default
+      ? cType.metadata.properties[propertyName].title.default
+      : propertyName
   }
 }
 

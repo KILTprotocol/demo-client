@@ -12,7 +12,7 @@ import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import CTypeRepository from '../../../services/CtypeRepository'
 import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
-import { CTypeMetadata } from '../../../types/Ctype'
+import { CTypeWithMetadata } from '../../../types/Ctype'
 import { getClaimInputModel } from '../../../utils/CtypeUtils'
 
 import './SubmitLegitimations.scss'
@@ -53,11 +53,13 @@ class SubmitLegitimations extends React.Component<Props, State> {
   public componentDidMount() {
     const { claim } = this.state
 
-    CTypeRepository.findByHash(claim.cTypeHash).then((cType: CTypeMetadata) => {
-      this.setState({
-        cType: sdk.CType.fromCType(cType.cType),
-      })
-    })
+    CTypeRepository.findByHash(claim.cTypeHash).then(
+      (cType: CTypeWithMetadata) => {
+        this.setState({
+          cType: sdk.CType.fromCType(cType.cType),
+        })
+      }
+    )
   }
 
   public render() {

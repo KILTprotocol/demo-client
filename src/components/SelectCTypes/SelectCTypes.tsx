@@ -5,7 +5,7 @@ import { Config } from 'react-select/lib/filters'
 import CTypeRepository from '../../services/CtypeRepository'
 import ErrorService from '../../services/ErrorService'
 
-import { ICType, CTypeMetadata } from '../../types/Ctype'
+import { ICType, CTypeWithMetadata } from '../../types/Ctype'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type SelectOption = {
@@ -16,19 +16,19 @@ type SelectOption = {
 
 type Props = {
   closeMenuOnSelect?: boolean
-  cTypes?: CTypeMetadata[]
+  cTypes?: CTypeWithMetadata[]
   isMulti?: boolean
   name?: string
   placeholder?: string
   preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | undefined>
 
-  onChange?: (selectedCTypes: CTypeMetadata[]) => void
+  onChange?: (selectedCTypes: CTypeWithMetadata[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
 }
 
 type State = {
-  cTypes: CTypeMetadata[]
+  cTypes: CTypeWithMetadata[]
 }
 
 class SelectCTypes extends React.Component<Props, State> {
@@ -60,7 +60,7 @@ class SelectCTypes extends React.Component<Props, State> {
 
     if (!cTypes.length) {
       CTypeRepository.findAll()
-        .then((fetchedCTypes: CTypeMetadata[]) => {
+        .then((fetchedCTypes: CTypeWithMetadata[]) => {
           this.setState({ cTypes: fetchedCTypes })
           this.initPreSelection()
         })
@@ -93,7 +93,7 @@ class SelectCTypes extends React.Component<Props, State> {
     )
 
     const options: SelectOption[] = cTypes.map(
-      (cType: CTypeMetadata): SelectOption => this.getOption(cType)
+      (cType: CTypeWithMetadata): SelectOption => this.getOption(cType)
     )
 
     const defaultOptions = options.filter(
@@ -123,7 +123,7 @@ class SelectCTypes extends React.Component<Props, State> {
     )
   }
 
-  private getOption(cType: CTypeMetadata): SelectOption {
+  private getOption(cType: CTypeWithMetadata): SelectOption {
     return {
       baseValue: `${cType.cType.hash}`,
       label: <CTypePresentation cTypeHash={cType.cType.hash} />,
@@ -143,8 +143,8 @@ class SelectCTypes extends React.Component<Props, State> {
       : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.baseValue)
 
-    const selectedCTypes: CTypeMetadata[] = cTypes.filter(
-      (cType: CTypeMetadata) =>
+    const selectedCTypes: CTypeWithMetadata[] = cTypes.filter(
+      (cType: CTypeWithMetadata) =>
         _selectedOptions.indexOf(`${cType.cType.hash}`) !== -1
     )
 
@@ -160,7 +160,7 @@ class SelectCTypes extends React.Component<Props, State> {
     if (preSelectedCTypeHashes && preSelectedCTypeHashes.length && onChange) {
       onChange(
         cTypes.filter(
-          (cType: CTypeMetadata) =>
+          (cType: CTypeWithMetadata) =>
             preSelectedCTypeHashes.indexOf(cType.cType.hash) !== -1
         )
       )
