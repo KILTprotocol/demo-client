@@ -14,6 +14,7 @@ import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import { SelectAttestedClaimsLabels } from '../SelectAttestedClaims/SelectAttestedClaims'
 
 import './SelectAttestedClaim.scss'
+import { getCtypePropertyTitle } from '../../utils/CtypeUtils'
 
 type Props = {
   claimEntry: Claims.Entry
@@ -131,7 +132,9 @@ class SelectAttestedClaim extends React.Component<Props, State> {
             </label>
           </h4>
           {propertyNames.map((propertyName: string) => {
-            const propertyTitle = this.getCtypePropertyTitle(propertyName)
+            const propertyTitle = this.state.cType
+              ? getCtypePropertyTitle(propertyName, this.state.cType)
+              : propertyName
             return (
               <label
                 key={propertyName}
@@ -149,13 +152,6 @@ class SelectAttestedClaim extends React.Component<Props, State> {
         </div>
       )
     )
-  }
-
-  private getCtypePropertyTitle(propertyName: string): string {
-    const { cType } = this.state
-    return cType && cType.metadata.properties[propertyName].title.default
-      ? cType.metadata.properties[propertyName].title.default
-      : propertyName
   }
 
   private selectClaimProperty(

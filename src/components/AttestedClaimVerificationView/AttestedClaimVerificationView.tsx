@@ -9,7 +9,7 @@ import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Spinner from '../Spinner/Spinner'
-
+import { getCtypePropertyTitle } from '../../utils/CtypeUtils'
 import './AttestedClaimVerificationView.scss'
 
 type Props = {
@@ -87,7 +87,9 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     return (
       <div className="attributes">
         {propertyNames.map((propertyName: string) => {
-          const propertyTitle = this.getCtypePropertyTitle(propertyName)
+          const propertyTitle = this.props.cType
+            ? getCtypePropertyTitle(propertyName, this.props.cType)
+            : propertyName
           return (
             <div key={propertyName}>
               <label>{propertyTitle}</label>
@@ -110,14 +112,6 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     } else {
       return contents[propertyName] + ''
     }
-  }
-
-  private getCtypePropertyTitle(propertyName: string): string {
-    const { cType } = this.props
-
-    return cType && cType.metadata.properties[propertyName].title.default
-      ? cType.metadata.properties[propertyName].title.default
-      : propertyName
   }
 }
 

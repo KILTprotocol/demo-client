@@ -1,6 +1,11 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
-import { ICTypeInput, IClaimInput, CTypeWithMetadata } from '../../types/Ctype'
+import {
+  ICTypeInput,
+  IClaimInput,
+  CTypeWithMetadata,
+  ICType,
+} from '../../types/Ctype'
 import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetedata'
 import { ICTypeSchema } from '@kiltprotocol/sdk-js/build/types/CType'
 /**
@@ -61,7 +66,20 @@ export const fromInputModel = (ctypeInput: ICTypeInput): CTypeWithMetadata => {
   const sdkCType = sdk.CType.fromCType(ctype)
   return { cType: sdkCType, metaData: sdkCTypeMetadata }
 }
-
+/**
+ * This method returns the default title of the given property of the supplied CType
+ * @param propertyName the property for which to get the title for
+ * @param cType CType containing the property
+ * @returns {string} default title of the supplied property
+ */
+export const getCtypePropertyTitle = (
+  propertyName: string,
+  cType: ICType
+): string => {
+  const metadataDefaultTitle =
+    cType.metadata.properties[propertyName].title.default
+  return metadataDefaultTitle || propertyName
+}
 export const getLocalized = (o: any, lang?: string): string => {
   if (lang == null || !o[lang]) {
     return o.default
