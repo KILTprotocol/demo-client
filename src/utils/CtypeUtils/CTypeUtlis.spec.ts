@@ -53,14 +53,22 @@ describe('CType', () => {
       title: 'CType Title',
       required: ['first-property', 'second-property'],
     }
-    const goodClaim = {
-      'first-property': 10,
-      'second-property': '12',
+    const goodClaim: sdk.IClaim = {
+      owner: '',
+      contents: {
+        'first-property': 10,
+        'second-property': '12',
+      },
+      cTypeHash: '',
     }
     const badClaim = {
-      'first-property': '1',
-      'second-property': '12',
-      'third-property': true,
+      owner: '',
+      contents: {
+        'first-property': 10,
+        'second-property': '12',
+        'third-property': true,
+      },
+      cTypeHash: '',
     }
     const ctypeFromInput = fromInputModel(ctypeInput)
     const ctypeFromModel = sdk.CType.fromCType(ctypeModel)
