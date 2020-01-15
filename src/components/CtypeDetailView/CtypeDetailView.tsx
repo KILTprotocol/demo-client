@@ -58,6 +58,12 @@ class CtypeDetailView extends React.Component<Props, State> {
                   <Code>{cType.cType}</Code>
                 </div>
               </div>
+              <div>
+                <label>Metadata</label>
+                <div>
+                  <Code>{cType.metaData.metadata}</Code>
+                </div>
+              </div>
               <CTypePresentation cTypeHash={cTypeHash} size={50} />
             </div>
             <div className="actions">
