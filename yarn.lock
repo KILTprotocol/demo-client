@@ -240,10 +240,10 @@
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.2.tgz#63985d3d8b02530e0869962f4da09142ee8e200e"
 
-"@kiltprotocol/sdk-js@^0.x":
-  version "0.16.2"
-  resolved "https://registry.yarnpkg.com/@kiltprotocol/sdk-js/-/sdk-js-0.16.2.tgz#6d5340dff756ee7e3532a625092a6db011fcd337"
-  integrity sha512-qpvarAuW25CBymjYekvW5zvud5jUp0kC8CnaHJ5tPI5VN4X0hIJWIWBKS0IEv4CvgHtJNTO3SIQlVqwXxIpwNg==
+"@kiltprotocol/sdk-js@^0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@kiltprotocol/sdk-js/-/sdk-js-0.17.0.tgz#9af16539859219c988aaa69e3642d7cdb94537fe"
+  integrity sha512-O+imN6Z2h854iD891EaJO276oVDWVvZzrC+keOB1YByZYplyyk7etVv+Ekr2PAsWGAtVCKI6as2QX4m0BLLwFQ==
   dependencies:
     "@polkadot/api" "^0.96.1"
     "@polkadot/keyring" "^1.7.0-beta.5"
@@ -254,7 +254,6 @@
     ajv "^6.6.1"
     bn.js "^4.11.8"
     jsonabc "^2.3.1"
-    lodash "^4.17.11"
     typescript-logging "^0.6.3"
     uuid "^3.3.2"
 

@@ -6,8 +6,6 @@ import {
   CTypeWithMetadata,
   ICType,
 } from '../../types/Ctype'
-import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetedata'
-import { ICTypeSchema } from '@kiltprotocol/sdk-js/build/types/CType'
 /**
  * Create the CTYPE model from a CTYPE input model (used in CTYPE editing components).
  * This is necessary because component editors rely on editing arrays of properties instead of
@@ -21,14 +19,14 @@ export const fromInputModel = (ctypeInput: ICTypeInput): CTypeWithMetadata => {
   if (!sdk.CTypeUtils.verifySchema(ctypeInput, sdk.CTypeInputModel)) {
     throw new Error('CType input does not correspond to input model schema')
   }
-  const schema: ICTypeSchema = {
+  const schema: sdk.ICType['schema'] = {
     $id: ctypeInput.$id,
     $schema: sdk.CTypeModel.properties.$schema.default,
     properties: {},
     type: 'object',
   }
 
-  const sdkMetadata: IMetadata = {
+  const sdkMetadata: sdk.ICTypeMetadata['metadata'] = {
     title: {
       default: ctypeInput.title,
     },
