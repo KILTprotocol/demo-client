@@ -76,9 +76,9 @@ describe('CType', () => {
       JSON.stringify(ctypeFromModel)
     )
 
-    expect(
-      JSON.stringify(getClaimInputModel(ctypeFromInput.cType, 'en'))
-    ).toEqual(JSON.stringify(claimInput))
+    expect(JSON.stringify(getClaimInputModel(ctypeFromInput, 'en'))).toEqual(
+      JSON.stringify(claimInput)
+    )
     expect(JSON.stringify(getCTypeInputModel(ctypeFromInput))).toEqual(
       JSON.stringify(ctypeInput)
     )

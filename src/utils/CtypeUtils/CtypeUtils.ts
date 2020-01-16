@@ -123,12 +123,19 @@ export const getCTypeInputModel = (ctype: CTypeWithMetadata): ICTypeInput => {
  * @returns {any} The claim input model
  */
 export const getClaimInputModel = (
-  ctype: sdk.ICType,
+  ctype: CTypeWithMetadata,
   lang?: string
 ): IClaimInput => {
   // create clone
-  const result = JSON.parse(JSON.stringify(ctype.schema))
+  const result = JSON.parse(JSON.stringify(ctype.cType.schema))
+  result.title = getLocalized(ctype.metaData.metadata.title, lang)
+  result.description = getLocalized(ctype.metaData.metadata.description, lang)
   result.required = []
-
+  Object.entries(ctype.metaData.metadata.properties as object).forEach(
+    ([key, value]) => {
+      result.properties[key].title = getLocalized(value.title, lang)
+      result.required.push(key)
+    }
+  )
   return result
 }

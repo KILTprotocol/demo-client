@@ -30,7 +30,7 @@ type State = {
   partialClaim: sdk.IPartialClaim
   name: string
   isValid: boolean
-  cType?: sdk.CType
+  cType?: CTypeWithMetadata
 }
 
 class MyClaimCreateView extends Component<Props, State> {
@@ -58,8 +58,7 @@ class MyClaimCreateView extends Component<Props, State> {
 
     CTypeRepository.findByHash(cTypeHash)
       .then((dbCtype: CTypeWithMetadata) => {
-        const cType = new sdk.CType(dbCtype.cType)
-        this.setState({ cType })
+        this.setState({ cType: dbCtype })
         blockUi.remove()
       })
       .catch(error => {
@@ -87,7 +86,10 @@ class MyClaimCreateView extends Component<Props, State> {
               <div>
                 <label>CType</label>
                 <div>
-                  <CTypePresentation cTypeHash={cType.hash} linked={true} />
+                  <CTypePresentation
+                    cTypeHash={cType.cType.hash}
+                    linked={true}
+                  />
                 </div>
               </div>
               <div>
@@ -150,7 +152,7 @@ class MyClaimCreateView extends Component<Props, State> {
 
     if (cType && selectedIdentity) {
       const newClaim: sdk.IClaim = sdk.Claim.fromCTypeAndClaimContents(
-        cType,
+        sdk.CType.fromCType(cType.cType),
         contents || {},
         selectedIdentity.identity.address
       )

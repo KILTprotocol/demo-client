@@ -31,7 +31,7 @@ type Props = InjectedSelectProps & SubmitLegitimationsProps
 
 type State = {
   claim: sdk.IPartialClaim
-  cType?: sdk.CType
+  cType?: CTypeWithMetadata
   selectedDelegation?: MyDelegation
   withPreFilledClaim?: boolean
 }
@@ -56,7 +56,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
     CTypeRepository.findByHash(claim.cTypeHash).then(
       (cType: CTypeWithMetadata) => {
         this.setState({
-          cType: sdk.CType.fromCType(cType.cType),
+          cType,
         })
       }
     )
