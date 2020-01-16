@@ -127,7 +127,7 @@ class SelectCTypes extends React.Component<Props, State> {
     return {
       baseValue: `${cType.cType.hash}`,
       label: <CTypePresentation cTypeHash={cType.cType.hash} />,
-      value: `${cType.cType.schema.$id} ${cType.cType.hash}`,
+      value: `${cType.metaData.metadata.title.default} ${cType.cType.hash}`,
     }
   }
 
