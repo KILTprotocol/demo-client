@@ -2,7 +2,7 @@ import * as sdk from '@kiltprotocol/sdk-js'
 
 import * as CTypes from '../state/ducks/CTypes'
 import PersistentStore from '../state/PersistentStore'
-import { CTypeWithMetadata } from '../types/Ctype'
+import { ICTypeWithMetadata } from '../types/Ctype'
 
 import { BasePostParams } from './BaseRepository'
 
@@ -12,7 +12,7 @@ import { BasePostParams } from './BaseRepository'
 class CTypeRepository {
   public static async findByHash(
     hash: sdk.ICType['hash']
-  ): Promise<void | CTypeWithMetadata> {
+  ): Promise<void | ICTypeWithMetadata> {
     const storedCType = CTypes.getCType(PersistentStore.store.getState(), hash)
 
     if (storedCType) {
@@ -27,7 +27,7 @@ class CTypeRepository {
         return response
       })
       .then(response => response.json())
-      .then((cType: CTypeWithMetadata) => {
+      .then((cType: ICTypeWithMetadata) => {
         PersistentStore.store.dispatch(CTypes.Store.addCType(cType))
         return cType
       })
@@ -36,16 +36,16 @@ class CTypeRepository {
       })
   }
 
-  public static async findAll(): Promise<CTypeWithMetadata[]> {
+  public static async findAll(): Promise<ICTypeWithMetadata[]> {
     return fetch(`${CTypeRepository.URL}`)
       .then(response => response.json())
-      .then((cTypes: CTypeWithMetadata[]) => {
+      .then((cTypes: ICTypeWithMetadata[]) => {
         PersistentStore.store.dispatch(CTypes.Store.addCTypes(cTypes))
         return CTypes.getCTypes(PersistentStore.store.getState())
       })
   }
 
-  public static async register(cType: CTypeWithMetadata): Promise<Response> {
+  public static async register(cType: ICTypeWithMetadata): Promise<Response> {
     return fetch(CTypeRepository.URL, {
       ...BasePostParams,
       body: JSON.stringify(cType),

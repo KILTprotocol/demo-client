@@ -3,7 +3,7 @@ import * as sdk from '@kiltprotocol/sdk-js'
 import {
   ICTypeInput,
   IClaimInput,
-  CTypeWithMetadata,
+  ICTypeWithMetadata,
   ICType,
 } from '../../types/Ctype'
 /**
@@ -15,7 +15,7 @@ import {
  * @returns The CTYPE for the input model.
  */
 
-export const fromInputModel = (ctypeInput: ICTypeInput): CTypeWithMetadata => {
+export const fromInputModel = (ctypeInput: ICTypeInput): ICTypeWithMetadata => {
   if (!sdk.CTypeUtils.verifySchema(ctypeInput, sdk.CTypeInputModel)) {
     throw new Error('CType input does not correspond to input model schema')
   }
@@ -93,7 +93,7 @@ export const getLocalized = (o: any, lang?: string): string => {
  * @returns The CTYPE input model.
  */
 
-export const getCTypeInputModel = (ctype: CTypeWithMetadata): ICTypeInput => {
+export const getCTypeInputModel = (ctype: ICTypeWithMetadata): ICTypeInput => {
   // create clone
   const result = JSON.parse(JSON.stringify(ctype.cType.schema))
   result.$schema = sdk.CTypeInputModel.$id
@@ -123,7 +123,7 @@ export const getCTypeInputModel = (ctype: CTypeWithMetadata): ICTypeInput => {
  * @returns {any} The claim input model
  */
 export const getClaimInputModel = (
-  ctype: CTypeWithMetadata,
+  ctype: ICTypeWithMetadata,
   lang?: string
 ): IClaimInput => {
   // create clone

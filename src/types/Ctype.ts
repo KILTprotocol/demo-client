@@ -4,7 +4,7 @@ export interface ICType extends sdk.ICTypeMetadata {
   cType: sdk.ICType
 }
 
-export interface CTypeWithMetadata {
+export interface ICTypeWithMetadata {
   cType: sdk.ICType
   metaData: sdk.ICTypeMetadata
 }

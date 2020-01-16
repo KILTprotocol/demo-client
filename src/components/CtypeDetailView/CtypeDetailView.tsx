@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import CTypeRepository from '../../services/CtypeRepository'
 
-import { ICType, CTypeWithMetadata } from '../../types/Ctype'
+import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import Code from '../Code/Code'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
@@ -14,7 +14,7 @@ type Props = {
 }
 
 type State = {
-  cType?: CTypeWithMetadata
+  cType?: ICTypeWithMetadata
 }
 
 class CtypeDetailView extends React.Component<Props, State> {
@@ -25,7 +25,7 @@ class CtypeDetailView extends React.Component<Props, State> {
 
   public componentDidMount() {
     const { cTypeHash } = this.props
-    CTypeRepository.findByHash(cTypeHash).then((_cType: CTypeWithMetadata) => {
+    CTypeRepository.findByHash(cTypeHash).then((_cType: ICTypeWithMetadata) => {
       this.setState({ cType: _cType })
     })
   }

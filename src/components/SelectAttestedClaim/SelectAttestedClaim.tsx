@@ -8,7 +8,7 @@ import isEqual from 'lodash/isEqual'
 import CTypeRepository from '../../services/CtypeRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType, CTypeWithMetadata } from '../../types/Ctype'
+import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import { SelectAttestedClaimsLabels } from '../SelectAttestedClaims/SelectAttestedClaims'
@@ -48,7 +48,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
   public componentDidMount() {
     const { cTypeHash } = this.props
     if (cTypeHash) {
-      CTypeRepository.findByHash(cTypeHash).then((cType: CTypeWithMetadata) => {
+      CTypeRepository.findByHash(cTypeHash).then((cType: ICTypeWithMetadata) => {
         const cTypeReference: ICType = {
           cType: cType.cType,
           metadata: cType.metaData.metadata,

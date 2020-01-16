@@ -4,7 +4,7 @@ import BlockchainService from '../../services/BlockchainService'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess, notifyError } from '../../services/FeedbackService'
-import { CTypeWithMetadata } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BsIdentity } from './DevTools.wallet'
 
 import cTypesPool from './data/cTypes.json'
@@ -37,7 +37,7 @@ class BsCType {
     return cType
       .store(ownerIdentity)
       .then((value: any) => {
-        const cTypeWrapper: CTypeWithMetadata = {
+        const cTypeWrapper: ICTypeWithMetadata = {
           cType,
           metaData: {
             metadata: bsCTypeData.metadata,
@@ -76,7 +76,7 @@ class BsCType {
 
   public static async getByHash(
     hash: sdk.ICType['hash']
-  ): Promise<CTypeWithMetadata> {
+  ): Promise<ICTypeWithMetadata> {
     const cType = await CTypeRepository.findByHash(hash)
     if (cType) {
       return cType
@@ -86,13 +86,13 @@ class BsCType {
 
   public static async get(
     bsCType: BsCTypesPoolElement
-  ): Promise<CTypeWithMetadata> {
+  ): Promise<ICTypeWithMetadata> {
     return BsCType.getByHash(bsCType.hash)
   }
 
   public static async getByKey(
     bsCTypeKey: keyof BsCTypesPool
-  ): Promise<CTypeWithMetadata> {
+  ): Promise<ICTypeWithMetadata> {
     const { hash } = BsCType.pool[bsCTypeKey]
     return BsCType.getByHash(hash)
   }

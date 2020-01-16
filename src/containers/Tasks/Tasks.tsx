@@ -9,7 +9,7 @@ import SelectCTypes from '../../components/SelectCTypes/SelectCTypes'
 import * as UiState from '../../state/ducks/UiState'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { Contact } from '../../types/Contact'
-import { ICType, CTypeWithMetadata } from '../../types/Ctype'
+import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import RequestAcceptDelegation, {
   RequestAcceptDelegationProps,
 } from './RequestAcceptDelegation/RequestAcceptDelegation'
@@ -71,7 +71,7 @@ type Props = {
 type State = {
   openMenus: number
   selectedReceivers: Contact[]
-  selectedCTypes: CTypeWithMetadata[]
+  selectedCTypes: ICTypeWithMetadata[]
 }
 
 const initialState: State = {
@@ -198,7 +198,7 @@ class Tasks extends React.Component<Props, State> {
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <RequestClaimsForCType
                 cTypeHashes={selectedCTypes.map(
-                  (cType: CTypeWithMetadata) => cType.cType.hash
+                  (cType: ICTypeWithMetadata) => cType.cType.hash
                 )}
                 receiverAddresses={selectedReceiverAddresses}
                 onFinished={this.onTaskFinished}
@@ -221,7 +221,7 @@ class Tasks extends React.Component<Props, State> {
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
               <SubmitClaimsForCType
                 cTypeHashes={selectedCTypes.map(
-                  (cType: CTypeWithMetadata) => cType.cType.hash
+                  (cType: ICTypeWithMetadata) => cType.cType.hash
                 )}
                 receiverAddresses={selectedReceiverAddresses}
                 onFinished={this.onTaskFinished}
@@ -359,7 +359,7 @@ class Tasks extends React.Component<Props, State> {
     )
   }
 
-  private onSelectCTypes(selectedCTypes: CTypeWithMetadata[]) {
+  private onSelectCTypes(selectedCTypes: ICTypeWithMetadata[]) {
     this.setState({ selectedCTypes })
   }
 

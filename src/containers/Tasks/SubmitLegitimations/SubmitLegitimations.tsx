@@ -12,7 +12,7 @@ import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import CTypeRepository from '../../../services/CtypeRepository'
 import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
-import { CTypeWithMetadata } from '../../../types/Ctype'
+import { ICTypeWithMetadata } from '../../../types/Ctype'
 import { getClaimInputModel } from '../../../utils/CtypeUtils'
 
 import './SubmitLegitimations.scss'
@@ -31,7 +31,7 @@ type Props = InjectedSelectProps & SubmitLegitimationsProps
 
 type State = {
   claim: sdk.IPartialClaim
-  cType?: CTypeWithMetadata
+  cType?: ICTypeWithMetadata
   selectedDelegation?: MyDelegation
   withPreFilledClaim?: boolean
 }
@@ -54,7 +54,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
     const { claim } = this.state
 
     CTypeRepository.findByHash(claim.cTypeHash).then(
-      (cType: CTypeWithMetadata) => {
+      (cType: ICTypeWithMetadata) => {
         this.setState({
           cType,
         })

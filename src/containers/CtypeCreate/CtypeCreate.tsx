@@ -11,7 +11,7 @@ import FeedbackService, {
 } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { CTypeWithMetadata } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
 import { fromInputModel } from '../../utils/CtypeUtils'
@@ -63,11 +63,11 @@ class CTypeCreate extends React.Component<Props, State> {
       let cType: sdk.CType
       let metadata: sdk.ICTypeMetadata
       try {
-        const inputCTypeWithMetadata: CTypeWithMetadata = fromInputModel(
+        const inputICTypeWithMetadata: ICTypeWithMetadata = fromInputModel(
           this.state.cType
         )
-        cType = sdk.CType.fromCType(inputCTypeWithMetadata.cType)
-        metadata = inputCTypeWithMetadata.metaData
+        cType = sdk.CType.fromCType(inputICTypeWithMetadata.cType)
+        metadata = inputICTypeWithMetadata.metaData
       } catch (error) {
         errorService.log({
           error,
@@ -79,7 +79,7 @@ class CTypeCreate extends React.Component<Props, State> {
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Creating CTYPE',
       })
-      const cTypeWrapper: CTypeWithMetadata = {
+      const cTypeWrapper: ICTypeWithMetadata = {
         cType: {
           schema: cType.schema,
           owner: selectedIdentity.identity.address,

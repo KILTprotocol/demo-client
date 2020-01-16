@@ -11,7 +11,7 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { CTypeWithMetadata } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import { getClaimInputModel } from '../../utils/CtypeUtils'
 
@@ -30,7 +30,7 @@ type State = {
   partialClaim: sdk.IPartialClaim
   name: string
   isValid: boolean
-  cType?: CTypeWithMetadata
+  cType?: ICTypeWithMetadata
 }
 
 class MyClaimCreateView extends Component<Props, State> {
@@ -57,7 +57,7 @@ class MyClaimCreateView extends Component<Props, State> {
     })
 
     CTypeRepository.findByHash(cTypeHash)
-      .then((dbCtype: CTypeWithMetadata) => {
+      .then((dbCtype: ICTypeWithMetadata) => {
         this.setState({ cType: dbCtype })
         blockUi.remove()
       })

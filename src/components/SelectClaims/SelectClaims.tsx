@@ -8,7 +8,7 @@ import { Config } from 'react-select/lib/filters'
 import * as Claims from '../../state/ducks/Claims'
 import * as UiState from '../../state/ducks/UiState'
 import PersistentStore from '../../state/PersistentStore'
-import { ICType, CTypeWithMetadata } from '../../types/Ctype'
+import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import SelectCTypesModal from '../Modal/SelectCTypesModal'
 
 type SelectOption = {
@@ -178,7 +178,7 @@ class SelectClaims extends React.Component<Props, State> {
     }
   }
 
-  private onSelectCType(selectedCtypes: CTypeWithMetadata[]) {
+  private onSelectCType(selectedCtypes: ICTypeWithMetadata[]) {
     this.goToClaimCreate(selectedCtypes[0].cType.hash)
   }
 
