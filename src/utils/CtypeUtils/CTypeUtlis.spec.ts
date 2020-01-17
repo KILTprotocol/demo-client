@@ -17,6 +17,7 @@ describe('CType', () => {
       },
       type: 'object',
     },
+    owner: ''
   } as sdk.ICType
 
   it('verify model transformations', () => {
@@ -37,9 +38,9 @@ describe('CType', () => {
       ],
       type: 'object',
       title: 'CType Title',
-      required: ['first-property', 'second-property'],
       description: '',
-      owner: null,
+      owner: '',
+      required: ['first-property', 'second-property'],
     }
 
     const claimInput = {
@@ -51,6 +52,7 @@ describe('CType', () => {
       },
       type: 'object',
       title: 'CType Title',
+      description: '',
       required: ['first-property', 'second-property'],
     }
     const goodClaim: sdk.IClaim = {
@@ -65,14 +67,14 @@ describe('CType', () => {
       owner: '',
       contents: {
         'first-property': 10,
-        'second-property': '12',
+        'second-property': 12,
         'third-property': true,
       },
       cTypeHash: '',
     }
     const ctypeFromInput = fromInputModel(ctypeInput)
     const ctypeFromModel = sdk.CType.fromCType(ctypeModel)
-    expect(JSON.stringify(ctypeFromInput)).toEqual(
+    expect(JSON.stringify(ctypeFromInput.cType)).toEqual(
       JSON.stringify(ctypeFromModel)
     )
 
@@ -92,7 +94,7 @@ describe('CType', () => {
 
     expect(() => {
       // @ts-ignore
-      new CType(goodClaim).verifyClaimStructure(goodClaim)
+      sdk.CType.fromCType(goodClaim)
     }).toThrow(new Error('CType does not correspond to schema'))
     expect(() => {
       ctypeInput.$schema = 'object'

@@ -99,6 +99,7 @@ export const getCTypeInputModel = (ctype: ICTypeWithMetadata): ICTypeInput => {
   result.$schema = sdk.CTypeInputModel.$id
   result.title = getLocalized(ctype.metaData.metadata.title)
   result.description = getLocalized(ctype.metaData.metadata.description)
+  result.owner = ctype.cType.owner
   result.required = []
   result.properties = []
 
