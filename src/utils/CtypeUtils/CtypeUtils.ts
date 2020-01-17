@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
 import { ICTypeInput, IClaimInput } from '../../types/Ctype'
+import { CTypeInputModel } from './CtypeInputSchema'
 
 /**
  * Create the CTYPE model from a CTYPE input model (used in CTYPE editing components).
@@ -11,8 +12,11 @@ import { ICTypeInput, IClaimInput } from '../../types/Ctype'
  * @returns The CTYPE for the input model.
  */
 
-export const fromInputModel = (ctypeInput: ICTypeInput, creator?: sdk.Identity["address"]): sdk.CType => {
-  if (!sdk.CTypeUtils.verifySchema(ctypeInput, sdk.CTypeInputModel)) {
+export const fromInputModel = (
+  ctypeInput: ICTypeInput,
+  creator?: sdk.Identity['address']
+): sdk.CType => {
+  if (!sdk.CTypeUtils.verifySchema(ctypeInput, CTypeInputModel)) {
     throw new Error('CType input does not correspond to input model schema')
   }
   const cTypeOwner = !creator ? null : creator
@@ -33,6 +37,7 @@ export const fromInputModel = (ctypeInput: ICTypeInput, creator?: sdk.Identity["
       properties: {},
     },
     owner: cTypeOwner,
+    hash: '',
   }
 
   const properties = {}
@@ -67,7 +72,7 @@ export const getLocalized = (o: any, lang?: string): string => {
 export const getCTypeInputModel = (ctype: sdk.CType): ICTypeInput => {
   // create clone
   const result = JSON.parse(JSON.stringify(ctype.schema))
-  result.$schema = sdk.CTypeInputModel.$id
+  result.$schema = CTypeInputModel.$id
   result.title = getLocalized(ctype.metadata.title)
   result.description = getLocalized(ctype.metadata.description)
   result.required = []

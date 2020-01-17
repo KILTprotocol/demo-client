@@ -4,49 +4,29 @@ import {
   getCTypeInputModel,
 } from './CtypeUtils'
 import * as sdk from '@kiltprotocol/sdk-js'
+import { CTypeInputModel } from './CtypeInputSchema'
 
 describe('CType', () => {
-  const ctypeModel = {
-    schema: {
-      $id: 'http://example.com/ctype-1',
-      $schema: 'http://kilt-protocol.org/draft-01/ctype#',
-      properties: {
-        'first-property': { type: 'integer' },
-        'second-property': { type: 'string' },
+  const ctypeInput = {
+    $id: 'http://example.com/ctype-1',
+    $schema: 'http://kilt-protocol.org/draft-01/ctype-input#',
+    properties: [
+      {
+        title: 'First Property',
+        $id: 'first-property',
+        type: 'integer',
       },
-      type: 'object',
-    },
-    metadata: {
-      title: { default: 'CType Title' },
-      description: {},
-      properties: {
-        'first-property': { title: { default: 'First Property' } },
-        'second-property': { title: { default: 'Second Property' } },
+      {
+        title: 'Second Property',
+        $id: 'second-property',
+        type: 'string',
       },
-    },
-  } as sdk.ICType
-
+    ],
+    type: 'object',
+    title: 'CType Title',
+    required: ['first-property', 'second-property'],
+  }
   it('verify model transformations', () => {
-    const ctypeInput = {
-      $id: 'http://example.com/ctype-1',
-      $schema: 'http://kilt-protocol.org/draft-01/ctype-input#',
-      properties: [
-        {
-          title: 'First Property',
-          $id: 'first-property',
-          type: 'integer',
-        },
-        {
-          title: 'Second Property',
-          $id: 'second-property',
-          type: 'string',
-        },
-      ],
-      type: 'object',
-      title: 'CType Title',
-      required: ['first-property', 'second-property'],
-    }
-
     const claimInput = {
       $id: 'http://example.com/ctype-1',
       $schema: 'http://kilt-protocol.org/draft-01/ctype#',
@@ -62,26 +42,15 @@ describe('CType', () => {
       'first-property': 10,
       'second-property': '12',
     }
-    const badClaim = {
-      'first-property': '1',
-      'second-property': '12',
-      'third-property': true,
-    }
 
     const ctypeFromInput = fromInputModel(ctypeInput)
-    const ctypeFromModel = sdk.CType.fromCType(ctypeModel)
-    expect(JSON.stringify(ctypeFromInput)).toEqual(
-      JSON.stringify(ctypeFromModel)
-    )
+
     expect(JSON.stringify(getClaimInputModel(ctypeFromInput, 'en'))).toEqual(
       JSON.stringify(claimInput)
     )
     expect(JSON.stringify(getCTypeInputModel(ctypeFromInput))).toEqual(
       JSON.stringify(ctypeInput)
     )
-
-    expect(ctypeFromInput.verifyClaimStructure(goodClaim)).toBeTruthy()
-    expect(ctypeFromInput.verifyClaimStructure(badClaim)).toBeFalsy()
 
     expect(() => {
       // @ts-ignore
@@ -93,5 +62,38 @@ describe('CType', () => {
     }).toThrow(
       new Error('CType input does not correspond to input model schema')
     )
+  })
+
+  it('verifies CType Input Model', () => {
+    const ctypeWrapperModel: sdk.ICType['schema'] = {
+      $id: 'http://example.com/ctype-1',
+      $schema: 'http://kilt-protocol.org/draft-01/ctype#',
+      properties: {
+        'first-property': { type: 'integer' },
+        'second-property': { type: 'string' },
+      },
+      type: 'object',
+    }
+    expect(
+      sdk.CTypeUtils.verifySchema(ctypeInput, CTypeInputModel)
+    ).toBeTruthy()
+    expect(
+      sdk.CTypeUtils.verifySchema(ctypeWrapperModel, CTypeInputModel)
+    ).toBeFalsy()
+    expect(
+      sdk.CTypeUtils.verifySchema(ctypeWrapperModel, CTypeInputModel)
+    ).toBeFalsy()
+    expect(
+      sdk.CTypeUtils.verifySchema(
+        {
+          $id: 'http://example.com/ctype-1',
+          $schema: 'http://kilt-protocol.org/draft-01/ctype-input#',
+          properties: [],
+          type: 'object',
+          title: '',
+        },
+        CTypeInputModel
+      )
+    ).toBeFalsy()
   })
 })
