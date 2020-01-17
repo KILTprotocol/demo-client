@@ -160,7 +160,7 @@
     ],
     "globals": {
       "ts-jest": {
-        "tsConfigFile": "/Users/mwoywode/Documents/workspace/KILT/prototype-client/tsconfig.test.json"
+        "tsConfigFile": "tsconfig.test.json"
       }
     }
   },
