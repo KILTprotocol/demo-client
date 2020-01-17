@@ -13,13 +13,13 @@ import { SubmitLegitimationsProps } from '../../containers/Tasks/SubmitLegitimat
 import CTypeRepository from '../../services/CtypeRepository'
 import * as UiState from '../../state/ducks/UiState'
 import PersistentStore from '../../state/PersistentStore'
-import { ICType } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
 
 import './CTypePresentation.scss'
 
 type Props = RouteComponentProps<{}> & {
-  cTypeHash: ICType['cType']['hash']
+  cTypeHash: ICTypeWithMetadata['cType']['hash']
 
   inline?: true
   size?: number
@@ -30,7 +30,7 @@ type Props = RouteComponentProps<{}> & {
 }
 
 type State = {
-  cType?: ICType
+  cType?: ICTypeWithMetadata
 }
 
 const DEFAULT_SIZE = 24
@@ -91,7 +91,7 @@ class CTypePresentation extends React.Component<Props, State> {
               size={size || DEFAULT_SIZE}
               theme="polkadot"
             />
-            {this.getLabel(cType.cType.metadata.title.default)}
+            {this.getLabel(cType.metaData.metadata.title.default)}
           </>
         )}
         {!!actions.length && (
@@ -121,7 +121,7 @@ class CTypePresentation extends React.Component<Props, State> {
   private async setCType() {
     const { cTypeHash } = this.props
 
-    CTypeRepository.findByHash(cTypeHash).then((_cType: ICType) => {
+    CTypeRepository.findByHash(cTypeHash).then((_cType: ICTypeWithMetadata) => {
       this.setState({ cType: _cType })
     })
   }
@@ -188,7 +188,7 @@ class CTypePresentation extends React.Component<Props, State> {
             UiState.Store.updateCurrentTaskAction({
               objective: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
               props: {
-                claim: { cTypeHash: cTypeHash },
+                claim: { cTypeHash },
               } as SubmitLegitimationsProps,
             })
           )

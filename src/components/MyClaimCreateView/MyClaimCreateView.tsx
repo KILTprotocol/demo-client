@@ -11,7 +11,7 @@ import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import { getClaimInputModel } from '../../utils/CtypeUtils'
 
@@ -30,7 +30,7 @@ type State = {
   partialClaim: sdk.IPartialClaim
   name: string
   isValid: boolean
-  cType?: sdk.CType
+  cType?: ICTypeWithMetadata
 }
 
 class MyClaimCreateView extends Component<Props, State> {
@@ -57,9 +57,8 @@ class MyClaimCreateView extends Component<Props, State> {
     })
 
     CTypeRepository.findByHash(cTypeHash)
-      .then((dbCtype: ICType) => {
-        const cType = sdk.CType.fromCType(dbCtype.cType)
-        this.setState({ cType })
+      .then((dbCtype: ICTypeWithMetadata) => {
+        this.setState({ cType: dbCtype })
         blockUi.remove()
       })
       .catch(error => {
@@ -87,7 +86,10 @@ class MyClaimCreateView extends Component<Props, State> {
               <div>
                 <label>CType</label>
                 <div>
-                  <CTypePresentation cTypeHash={cType.hash} linked={true} />
+                  <CTypePresentation
+                    cTypeHash={cType.cType.hash}
+                    linked={true}
+                  />
                 </div>
               </div>
               <div>
@@ -150,7 +152,7 @@ class MyClaimCreateView extends Component<Props, State> {
 
     if (cType && selectedIdentity) {
       const newClaim: sdk.IClaim = sdk.Claim.fromCTypeAndClaimContents(
-        cType,
+        sdk.CType.fromCType(cType.cType),
         contents || {},
         selectedIdentity.identity.address
       )

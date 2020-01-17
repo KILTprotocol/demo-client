@@ -24,7 +24,7 @@ class ClaimCreate extends Component<Props, State> {
     return (
       cTypeHash && (
         <MyClaimCreateView
-          partialClaim={{ cTypeHash: cTypeHash }}
+          partialClaim={{ cTypeHash }}
           onCreate={this.claimCreated}
           onCancel={this.handleCancel}
         />

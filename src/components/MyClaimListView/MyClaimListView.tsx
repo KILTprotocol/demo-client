@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import * as Claims from '../../state/ducks/Claims'
-import { ICType } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import SelectCTypesModal from '../Modal/SelectCTypesModal'
 import SelectAction from '../SelectAction/SelectAction'
@@ -13,7 +13,7 @@ import './MyClaimListView.scss'
 type Props = {
   claimStore: Claims.Entry[]
 
-  onCreateClaimFromCType: (selectedCTypes: ICType[]) => void
+  onCreateClaimFromCType: (selectedCTypes: ICTypeWithMetadata[]) => void
   onRemoveClaim: (claimEntry: Claims.Entry) => void
   onRequestAttestation: (claimEntry: Claims.Entry) => void
   onRequestLegitimation: (claimEntry: Claims.Entry) => void
@@ -134,7 +134,7 @@ class MyClaimListView extends React.Component<Props, State> {
     }
   }
 
-  private createClaimFromCType(selectedCTypes: ICType[]) {
+  private createClaimFromCType(selectedCTypes: ICTypeWithMetadata[]) {
     const { onCreateClaimFromCType } = this.props
     onCreateClaimFromCType(selectedCTypes)
   }

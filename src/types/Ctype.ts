@@ -1,10 +1,12 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
-export interface ICType {
+export interface ICType extends sdk.ICTypeMetadata {
   cType: sdk.ICType
-  metaData: {
-    author: string
-  }
+}
+
+export interface ICTypeWithMetadata {
+  cType: sdk.ICType
+  metaData: sdk.ICTypeMetadata
 }
 
 export interface ICTypeInput {
@@ -13,8 +15,9 @@ export interface ICTypeInput {
   properties: object[] // TO DO: need to refine what properties are
   required: string[]
   title: string
-  description?: string
+  description: string
   type: string
+  owner: string | null
 }
 
 export interface IClaimInput {
@@ -25,20 +28,5 @@ export interface IClaimInput {
   title: string
   description?: string
   type: string
-}
-
-export class CType implements ICType {
-  public static fromObject(obj: ICType): CType {
-    const newCtype = Object.create(CType.prototype)
-    return Object.assign(newCtype, obj)
-  }
-
-  public metaData: {
-    author: string
-  }
-  public readonly cType: sdk.ICType
-
-  public getPropertyTitle(propertyName: string) {
-    return this.cType.metadata.properties[propertyName].title.default
-  }
+  owner?: string
 }

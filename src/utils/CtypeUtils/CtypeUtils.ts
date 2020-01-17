@@ -1,7 +1,11 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
-import { ICTypeInput, IClaimInput } from '../../types/Ctype'
-
+import {
+  ICTypeInput,
+  IClaimInput,
+  ICTypeWithMetadata,
+  ICType,
+} from '../../types/Ctype'
 /**
  * Create the CTYPE model from a CTYPE input model (used in CTYPE editing components).
  * This is necessary because component editors rely on editing arrays of properties instead of
@@ -11,44 +15,69 @@ import { ICTypeInput, IClaimInput } from '../../types/Ctype'
  * @returns The CTYPE for the input model.
  */
 
-export const fromInputModel = (ctypeInput: ICTypeInput, creator?: sdk.Identity["address"]): sdk.CType => {
+export const fromInputModel = (ctypeInput: ICTypeInput): ICTypeWithMetadata => {
   if (!sdk.CTypeUtils.verifySchema(ctypeInput, sdk.CTypeInputModel)) {
     throw new Error('CType input does not correspond to input model schema')
   }
-  const cTypeOwner = !creator ? null : creator
-  const ctype = {
-    schema: {
-      $id: ctypeInput.$id,
-      $schema: sdk.CTypeModel.properties.$schema.default,
-      properties: {},
-      type: 'object',
+  const schema: sdk.ICType['schema'] = {
+    $id: ctypeInput.$id,
+    $schema: sdk.CTypeModel.properties.$schema.default,
+    properties: {},
+    type: 'object',
+  }
+
+  const sdkMetadata: sdk.ICTypeMetadata['metadata'] = {
+    title: {
+      default: ctypeInput.title,
     },
-    metadata: {
-      title: {
-        default: ctypeInput.title,
-      },
-      description: {
-        default: ctypeInput.description,
-      },
-      properties: {},
+    description: {
+      default: ctypeInput.description,
     },
-    owner: cTypeOwner,
+    properties: {},
   }
 
   const properties = {}
   ctypeInput.properties.forEach((p: any) => {
-    const { title, $id, ...rest } = p
+    const { title, $id, description, ...rest } = p
     properties[$id] = rest
-    ctype.metadata.properties[$id] = {
+    sdkMetadata.properties[$id] = {
       title: {
         default: title,
       },
+      description: {
+        default: description,
+      },
     }
   })
-  ctype.schema.properties = properties
-  return sdk.CType.fromCType(ctype as sdk.ICType)
-}
+  schema.properties = properties
 
+  const ctype: sdk.ICType = {
+    schema,
+    owner: ctypeInput.owner,
+    hash: sdk.CTypeUtils.getHashForSchema(schema),
+  }
+  const sdkCTypeMetadata: sdk.ICTypeMetadata = {
+    metadata: sdkMetadata,
+    ctypeHash: ctype.hash,
+  }
+
+  const sdkCType = sdk.CType.fromCType(ctype)
+  return { cType: sdkCType, metaData: sdkCTypeMetadata }
+}
+/**
+ * This method returns the default title of the given property of the supplied CType
+ * @param propertyName the property for which to get the title for
+ * @param cType CType containing the property
+ * @returns {string} default title of the supplied property
+ */
+export const getCtypePropertyTitle = (
+  propertyName: string,
+  cType: ICType
+): string => {
+  const metadataDefaultTitle =
+    cType.metadata.properties[propertyName].title.default
+  return metadataDefaultTitle || propertyName
+}
 export const getLocalized = (o: any, lang?: string): string => {
   if (lang == null || !o[lang]) {
     return o.default
@@ -64,23 +93,26 @@ export const getLocalized = (o: any, lang?: string): string => {
  * @returns The CTYPE input model.
  */
 
-export const getCTypeInputModel = (ctype: sdk.CType): ICTypeInput => {
+export const getCTypeInputModel = (ctype: ICTypeWithMetadata): ICTypeInput => {
   // create clone
-  const result = JSON.parse(JSON.stringify(ctype.schema))
+  const result = JSON.parse(JSON.stringify(ctype.cType.schema))
   result.$schema = sdk.CTypeInputModel.$id
-  result.title = getLocalized(ctype.metadata.title)
-  result.description = getLocalized(ctype.metadata.description)
+  result.title = getLocalized(ctype.metaData.metadata.title)
+  result.description = getLocalized(ctype.metaData.metadata.description)
+  result.owner = ctype.cType.owner
   result.required = []
   result.properties = []
 
-  Object.entries(ctype.schema.properties as object).forEach(([key, value]) => {
-    result.properties.push({
-      title: getLocalized(ctype.metadata.properties[key].title),
-      $id: key,
-      type: value.type,
-    })
-    result.required.push(key)
-  })
+  Object.entries(ctype.cType.schema.properties as object).forEach(
+    ([key, value]) => {
+      result.properties.push({
+        title: getLocalized(ctype.metaData.metadata.properties[key].title),
+        $id: key,
+        type: value.type,
+      })
+      result.required.push(key)
+    }
+  )
 
   return result
 }
@@ -92,15 +124,15 @@ export const getCTypeInputModel = (ctype: sdk.CType): ICTypeInput => {
  * @returns {any} The claim input model
  */
 export const getClaimInputModel = (
-  ctype: sdk.ICType,
+  ctype: ICTypeWithMetadata,
   lang?: string
 ): IClaimInput => {
   // create clone
-  const result = JSON.parse(JSON.stringify(ctype.schema))
-  result.title = getLocalized(ctype.metadata.title, lang)
-  result.description = getLocalized(ctype.metadata.description, lang)
+  const result = JSON.parse(JSON.stringify(ctype.cType.schema))
+  result.title = getLocalized(ctype.metaData.metadata.title, lang)
+  result.description = getLocalized(ctype.metaData.metadata.description, lang)
   result.required = []
-  Object.entries(ctype.metadata.properties as object).forEach(
+  Object.entries(ctype.metaData.metadata.properties as object).forEach(
     ([key, value]) => {
       result.properties[key].title = getLocalized(value.title, lang)
       result.required.push(key)

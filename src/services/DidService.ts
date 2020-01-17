@@ -23,7 +23,7 @@ export class DidService {
       ContactRepository.URL
     }/${myIdentity.identity.address}`
     const did = sdk.Did.fromIdentity(myIdentity.identity, documentStore)
-    const didDocument = did.getDefaultDocument(`${MessageRepository.URL}`)
+    const didDocument = did.createDefaultDidDocument(`${MessageRepository.URL}`)
     const hash = sdk.Crypto.hashStr(JSON.stringify(didDocument))
     const signature = myIdentity.identity.signStr(hash)
     await ContactRepository.add({

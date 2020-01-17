@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import CTypeRepository from '../../services/CtypeRepository'
 
-import { ICType } from '../../types/Ctype'
+import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import Code from '../Code/Code'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
@@ -14,7 +14,7 @@ type Props = {
 }
 
 type State = {
-  cType?: ICType
+  cType?: ICTypeWithMetadata
 }
 
 class CtypeDetailView extends React.Component<Props, State> {
@@ -25,7 +25,7 @@ class CtypeDetailView extends React.Component<Props, State> {
 
   public componentDidMount() {
     const { cTypeHash } = this.props
-    CTypeRepository.findByHash(cTypeHash).then((_cType: ICType) => {
+    CTypeRepository.findByHash(cTypeHash).then((_cType: ICTypeWithMetadata) => {
       this.setState({ cType: _cType })
     })
   }
@@ -41,13 +41,13 @@ class CtypeDetailView extends React.Component<Props, State> {
             <div className="attributes">
               <div>
                 <label>Title</label>
-                <div>{cType.cType.metadata.title.default}</div>
+                <div>{cType.metaData.metadata.title.default}</div>
               </div>
               <div>
                 <label>Author</label>
                 <div>
                   <ContactPresentation
-                    address={cType.metaData.author}
+                    address={cType.cType.owner!}
                     interactive={true}
                   />
                 </div>
@@ -56,6 +56,12 @@ class CtypeDetailView extends React.Component<Props, State> {
                 <label>Definition</label>
                 <div>
                   <Code>{cType.cType}</Code>
+                </div>
+              </div>
+              <div>
+                <label>Metadata</label>
+                <div>
+                  <Code>{cType.metaData.metadata}</Code>
                 </div>
               </div>
               <CTypePresentation cTypeHash={cTypeHash} size={50} />

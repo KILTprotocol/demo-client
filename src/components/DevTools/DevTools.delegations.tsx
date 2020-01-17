@@ -7,7 +7,7 @@ import * as Delegations from '../../state/ducks/Delegations'
 import { DelegationType, MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
-import { ICType } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BsCType, BsCTypesPool } from './DevTools.ctypes'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 
@@ -172,7 +172,7 @@ class BsDelegation {
     }
     const ownerIdentity: MyIdentity = await BsIdentity.getByKey(ownerKey)
     await BsIdentity.selectIdentity(ownerIdentity)
-    const cType: ICType = await BsCType.getByKey(cTypeKey)
+    const cType: ICTypeWithMetadata = await BsCType.getByKey(cTypeKey)
 
     if (updateCallback) {
       updateCallback(bsDelegationKey)
