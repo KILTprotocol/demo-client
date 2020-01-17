@@ -19,11 +19,9 @@ export const CTypeInputModel = {
       readonly: true,
       className: 'hidden',
     },
-    title: {
-      title: 'Title',
-      type: 'string',
-      minLength: 1,
-    },
+    title: { title: 'Title', type: 'string', minLength: 1 },
+    description: { type: 'string' },
+    owner: { type: 'string' },
     properties: {
       title: 'Data',
       type: 'array',

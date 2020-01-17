@@ -5,9 +5,10 @@ import {
 } from './CtypeUtils'
 import * as sdk from '@kiltprotocol/sdk-js'
 import { CTypeInputModel } from './CtypeInputSchema'
+import { ICTypeInput, IClaimInput } from 'src/types/Ctype'
 
 describe('CType', () => {
-  const ctypeInput = {
+  const ctypeInput: ICTypeInput = {
     $id: 'http://example.com/ctype-1',
     $schema: 'http://kilt-protocol.org/draft-01/ctype-input#',
     properties: [
@@ -24,46 +25,10 @@ describe('CType', () => {
     ],
     type: 'object',
     title: 'CType Title',
+    description: '',
+    owner: '',
     required: ['first-property', 'second-property'],
   }
-  it('verify model transformations', () => {
-    const claimInput = {
-      $id: 'http://example.com/ctype-1',
-      $schema: 'http://kilt-protocol.org/draft-01/ctype#',
-      properties: {
-        'first-property': { type: 'integer', title: 'First Property' },
-        'second-property': { type: 'string', title: 'Second Property' },
-      },
-      type: 'object',
-      title: 'CType Title',
-      required: ['first-property', 'second-property'],
-    }
-    const goodClaim = {
-      'first-property': 10,
-      'second-property': '12',
-    }
-
-    const ctypeFromInput = fromInputModel(ctypeInput)
-
-    expect(JSON.stringify(getClaimInputModel(ctypeFromInput, 'en'))).toEqual(
-      JSON.stringify(claimInput)
-    )
-    expect(JSON.stringify(getCTypeInputModel(ctypeFromInput))).toEqual(
-      JSON.stringify(ctypeInput)
-    )
-
-    expect(() => {
-      // @ts-ignore
-      new CType(goodClaim).verifyClaimStructure(goodClaim)
-    }).toThrow(new Error('CType does not correspond to schema'))
-    expect(() => {
-      ctypeInput.$schema = 'object'
-      fromInputModel(ctypeInput)
-    }).toThrow(
-      new Error('CType input does not correspond to input model schema')
-    )
-  })
-
   it('verifies CType Input Model', () => {
     const ctypeWrapperModel: sdk.ICType['schema'] = {
       $id: 'http://example.com/ctype-1',
@@ -95,5 +60,48 @@ describe('CType', () => {
         CTypeInputModel
       )
     ).toBeFalsy()
+  })
+
+  it('verify model transformations', () => {
+    const claimInput: IClaimInput = {
+      $id: 'http://example.com/ctype-1',
+      $schema: 'http://kilt-protocol.org/draft-01/ctype#',
+      properties: {
+        'first-property': { type: 'integer', title: 'First Property' },
+        'second-property': { type: 'string', title: 'Second Property' },
+      },
+      type: 'object',
+      title: 'CType Title',
+      description: '',
+      required: ['first-property', 'second-property'],
+    }
+    const goodClaim: sdk.IClaim = {
+      owner: '',
+      contents: {
+        'first-property': 10,
+        'second-property': '12',
+      },
+      cTypeHash: '',
+    }
+
+    const ctypeFromInput = fromInputModel(ctypeInput)
+
+    expect(JSON.stringify(getClaimInputModel(ctypeFromInput, 'en'))).toEqual(
+      JSON.stringify(claimInput)
+    )
+    expect(JSON.stringify(getCTypeInputModel(ctypeFromInput))).toEqual(
+      JSON.stringify(ctypeInput)
+    )
+
+    expect(() => {
+      // @ts-ignore
+      sdk.CType.fromCType(goodClaim)
+    }).toThrow(new Error('CType does not correspond to schema'))
+    expect(() => {
+      ctypeInput.$schema = 'object'
+      fromInputModel(ctypeInput)
+    }).toThrow(
+      new Error('CType input does not correspond to input model schema')
+    )
   })
 })
