@@ -6,6 +6,8 @@ import {
   ICTypeWithMetadata,
   ICType,
 } from '../../types/Ctype'
+
+import { CTypeInputModel } from './CtypeInputSchema'
 /**
  * Create the CTYPE model from a CTYPE input model (used in CTYPE editing components).
  * This is necessary because component editors rely on editing arrays of properties instead of
@@ -16,7 +18,7 @@ import {
  */
 
 export const fromInputModel = (ctypeInput: ICTypeInput): ICTypeWithMetadata => {
-  if (!sdk.CTypeUtils.verifySchema(ctypeInput, sdk.CTypeInputModel)) {
+  if (!sdk.CTypeUtils.verifySchema(ctypeInput, CTypeInputModel)) {
     throw new Error('CType input does not correspond to input model schema')
   }
   const schema: sdk.ICType['schema'] = {
@@ -96,7 +98,7 @@ export const getLocalized = (o: any, lang?: string): string => {
 export const getCTypeInputModel = (ctype: ICTypeWithMetadata): ICTypeInput => {
   // create clone
   const result = JSON.parse(JSON.stringify(ctype.cType.schema))
-  result.$schema = sdk.CTypeInputModel.$id
+  result.$schema = CTypeInputModel.$id
   result.title = getLocalized(ctype.metaData.metadata.title)
   result.description = getLocalized(ctype.metaData.metadata.description)
   result.owner = ctype.cType.owner
