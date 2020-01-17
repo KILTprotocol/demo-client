@@ -48,14 +48,16 @@ class SelectAttestedClaim extends React.Component<Props, State> {
   public componentDidMount() {
     const { cTypeHash } = this.props
     if (cTypeHash) {
-      CTypeRepository.findByHash(cTypeHash).then((cType: ICTypeWithMetadata) => {
-        const cTypeReference: ICType = {
-          cType: cType.cType,
-          metadata: cType.metaData.metadata,
-          ctypeHash: cType.cType.hash,
+      CTypeRepository.findByHash(cTypeHash).then(
+        (cType: ICTypeWithMetadata) => {
+          const cTypeReference: ICType = {
+            cType: cType.cType,
+            metadata: cType.metaData.metadata,
+            ctypeHash: cType.cType.hash,
+          }
+          this.setState({ cType: cTypeReference })
         }
-        this.setState({ cType: cTypeReference })
-      })
+      )
     }
   }
 
