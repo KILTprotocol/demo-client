@@ -65,7 +65,7 @@ class Store {
     switch (action.type) {
       case Store.ACTIONS.ADD_CONTACT: {
         const contact = (action as AddContactAction).payload
-        const { publicIdentity } = contact
+        const { publicIdentity, did } = contact
         return state.setIn(['contacts', publicIdentity.address], contact)
       }
       case Store.ACTIONS.ADD_CONTACTS: {
@@ -78,10 +78,8 @@ class Store {
 
         const contact = state.getIn(['contacts', address])
         const { metaData, publicIdentity } = contact
-
         delete metaData.addedAt
         delete metaData.addedBy
-
         return state.setIn(['contacts', address], {
           metaData: { ...metaData },
           publicIdentity,

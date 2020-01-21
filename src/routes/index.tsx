@@ -19,6 +19,7 @@ import WalletView from '../containers/WalletView/WalletView'
 import requiresIdentity from './RequiresIdentity'
 import DelegationCreate from '../containers/DelegationCreate/DelegationCreate'
 import Setup from '../containers/Setup/Setup'
+import DidView from '../containers/DidView/DidView'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
@@ -28,6 +29,8 @@ const Routes: React.FunctionComponent<{}> = props => {
       <Route path={'/'} component={Setup} />
       <Switch>
         <Route path={'/dashboard'} component={requiresIdentity(Dashboard)} />
+
+        <Route path={'/did'} component={requiresIdentity(DidView)} />
 
         <Route path={'/contacts'} component={requiresIdentity(ContactList)} />
 
@@ -87,7 +90,9 @@ const Routes: React.FunctionComponent<{}> = props => {
         />
         <Route
           path={'/pcrs'}
-          component={requiresIdentity(DelegationsView, { isPCR: true })}
+          component={requiresIdentity(DelegationsView, {
+            isPCR: true,
+          })}
         />
 
         <Route path={'/imprint'} component={Imprint} />

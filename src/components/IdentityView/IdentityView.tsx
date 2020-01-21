@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
+import { Link } from 'react-router-dom'
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
@@ -105,7 +106,11 @@ class IdentityView extends React.Component<Props, State> {
             <label>DID</label>
             <div>
               {myIdentity.did ? (
-                <span className="did">{myIdentity.did}</span>
+                <span className="did">
+                  <Link to={`/did/${myIdentity.identity.address}`}>
+                    {myIdentity.did}
+                  </Link>
+                </span>
               ) : (
                 ''
               )}

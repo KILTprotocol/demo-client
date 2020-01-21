@@ -53,7 +53,6 @@ class ContactRepository {
     if (persistedContact) {
       return persistedContact
     }
-
     return fetch(`${ContactRepository.URL}/${address}`)
       .then(response => {
         if (!response.ok) {
@@ -63,8 +62,16 @@ class ContactRepository {
       })
       .then(response => response.json())
       .then((contact: Contact) => {
+        const dID = contact.did
+
         PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
-        return contact
+
+        return {
+          metaData: contact.metaData,
+          did: dID,
+          publicIdentity: contact.publicIdentity,
+          signature: contact.signature,
+        }
       })
       .catch(error => {
         if (propagateError) {

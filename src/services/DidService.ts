@@ -6,6 +6,7 @@ import BlockchainService from './BlockchainService'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
 import { object } from 'prop-types'
+import PersistentStore from '../state/PersistentStore'
 
 export class DidService {
   public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
@@ -22,6 +23,7 @@ export class DidService {
     const documentStore: sdk.IDid['documentStore'] = `${
       ContactRepository.URL
     }/${myIdentity.identity.address}`
+
     const did = sdk.Did.fromIdentity(myIdentity.identity, documentStore)
     const didDocument = did.createDefaultDidDocument(`${MessageRepository.URL}`)
     const hash = sdk.Crypto.hashStr(JSON.stringify(didDocument))
@@ -36,7 +38,7 @@ export class DidService {
     } as Contact)
 
     const status = await did.store(myIdentity.identity)
-    if (status.type !== 'Finalised') {
+    if (status.type !== 'Finalized') {
       throw new Error(
         `Error creating DID for identity ${myIdentity.metaData.name}`
       )
@@ -52,7 +54,7 @@ export class DidService {
 
   public static async deleteDid(myIdentity: MyIdentity) {
     const status = await sdk.Did.remove(myIdentity.identity)
-    if (status.type !== 'Finalised') {
+    if (status.type !== 'Finalized') {
       throw new Error(
         `Error deleting DID for identity ${myIdentity.metaData.name}`
       )
