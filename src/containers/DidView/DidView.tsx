@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import _ from 'lodash'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 import Code from '../../components/Code/Code'
@@ -27,17 +28,18 @@ class DidView extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    const identity = this.props.selectedIdentity
-    ContactRepository.findByAddress(identity.identity.address).then(
-      (contact: Contact) => {
-        this.setState({ did: contact.did })
-      }
-    )
+    this.setDid()
+  }
+
+  public componentDidUpdate(prevProps: Props) {
+    if (!_.isEqual(this.props, prevProps)) {
+      this.setDid()
+    }
   }
 
   public render() {
     const identity = this.props.selectedIdentity
-    const did = this.state.did
+    const { did } = this.state
     return (
       <section className="DidView">
         <h1>DID DOCUMENT</h1>
@@ -63,6 +65,16 @@ class DidView extends React.Component<Props, State> {
           <div>Given Identity doesn't have a DID.</div>
         )}
       </section>
+    )
+  }
+
+  private setDid() {
+    const { selectedIdentity } = this.props
+
+    ContactRepository.findByAddress(selectedIdentity.identity.address).then(
+      (contact: Contact) => {
+        this.setState({ did: contact.did })
+      }
     )
   }
 }

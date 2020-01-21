@@ -65,7 +65,7 @@ class Store {
     switch (action.type) {
       case Store.ACTIONS.ADD_CONTACT: {
         const contact = (action as AddContactAction).payload
-        const { publicIdentity, did } = contact
+        const { publicIdentity } = contact
         return state.setIn(['contacts', publicIdentity.address], contact)
       }
       case Store.ACTIONS.ADD_CONTACTS: {
