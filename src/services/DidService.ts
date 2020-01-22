@@ -2,11 +2,8 @@ import * as sdk from '@kiltprotocol/sdk-js'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import { Contact, MyIdentity } from '../types/Contact'
-import BlockchainService from './BlockchainService'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
-import { object } from 'prop-types'
-import PersistentStore from '../state/PersistentStore'
 
 export class DidService {
   public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
