@@ -27,11 +27,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: yarn install, lint and test
+    - name: yarn install, lint and build
       run: |
         yarn install --frozen-lockfile
         yarn lint
         # tests are not fully supported atm
         # yarn testCI
-      env:
-        CI: true
+        yarn build
