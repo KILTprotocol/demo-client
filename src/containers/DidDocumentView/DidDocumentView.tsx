@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Contact } from '../../types/Contact'
-import './DidView.scss'
+import './DidDocumentView.scss'
 import Code from '../../components/Code/Code'
 
 type Props = {
@@ -8,16 +8,17 @@ type Props = {
   children: any
 }
 
-const DidView = (did: Props) => {
+const DidDocumentView = (props: Props) => {
+  const { did } = props
   return (
     <>
       <div className="attributes">
         <div>
-          <Code>{did.did}</Code>{' '}
+          <Code>{did?.document}</Code>{' '}
         </div>
       </div>
     </>
   )
 }
 
-export default DidView
+export default DidDocumentView

@@ -2,11 +2,10 @@
   position: relative;
   padding: $base-padding;
   margin: {
-    bottom: 2*$base-padding;
+    bottom: 2 * $base-padding;
   }
 
   & .attributes {
-
     & > div {
       @include label-input-combo;
     }
@@ -24,9 +23,7 @@
     @include detailPresentation;
 
     &.internal {
-
       & .ui--IdentityIcon {
-
         &:after {
           font-size: 16px;
           margin: {
@@ -38,31 +35,14 @@
     }
   }
 
-  & .didDelete {
-    @include button-icon-only-inline($icon-trash-o);
-  }
-
-  & .didCreate {
-    @include button-icon-only-inline($icon-plus);
-  }
-
   & .did {
     margin-right: 10px;
-  }
-
-  & .toggleContacts {
-    @include button-icon-only($icon-star);
-    @include favorite;
-
-    &.isMyContact {
-      color: $color-grey-light;
-    }
   }
 
   & .instruction {
     margin: {
       top: $base-padding;
-      bottom: 2*$base-padding;
+      bottom: 2 * $base-padding;
     }
   }
 

@@ -19,7 +19,6 @@ import WalletView from '../containers/WalletView/WalletView'
 import requiresIdentity from './RequiresIdentity'
 import DelegationCreate from '../containers/DelegationCreate/DelegationCreate'
 import Setup from '../containers/Setup/Setup'
-import DidView from '../containers/DidView/DidView'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')

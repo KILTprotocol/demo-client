@@ -8,6 +8,7 @@ import { notifySuccess } from '../../services/FeedbackService'
 import * as Balances from '../../state/ducks/Balances'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
+import DidDocumentView from '../../containers/DidDocumentView/DidDocumentView'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
@@ -17,7 +18,6 @@ import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import './IdentityView.scss'
 import MessageRepository from '../../services/MessageRepository'
 import { Identity } from '@kiltprotocol/sdk-js'
-import DidView from 'src/containers/DidView/DidView'
 
 type Props = {
   // input
@@ -73,11 +73,10 @@ class IdentityView extends React.Component<Props, State> {
     }
 
     const classes = ['IdentityView', selected ? 'selected' : '']
-
     return (
       <section className={classes.join(' ')}>
         {selected && <h2>Active identity</h2>}
-        <ContactPresentation address={myIdentity.identity.address} size={50} />
+        <ContactPresentation address={identity.address} size={50} />
         <div className="attributes">
           <div>
             <label>Alias</label>
@@ -104,35 +103,61 @@ class IdentityView extends React.Component<Props, State> {
             <div>{identity.boxPublicKeyAsHex}</div>
           </div>
           <div>
-            <label>DID</label>
+            <label>{myIdentity.did ? 'DID Document' : 'DID'}</label>
             <div>
               {did ? (
                 <span className="did">
-                  <DidView did={did.document}>{did.address}</DidView>
+                  <DidDocumentView did={did}>{did.address}</DidDocumentView>
                 </span>
               ) : (
                 <>
-                  <div>Identity doesn't own a DID.</div>
+                  <div>No DID is attached to this identity.</div>
                 </>
               )}
-              <span className="didActions">
-                {onCreateDid && !did && (
-                  <button
-                    title="Generate DID..."
-                    className="didCreate"
-                    onClick={onCreateDid.bind(this, myIdentity)}
-                  />
-                )}
-                {onDeleteDid && did && (
-                  <button
-                    title="Delete DID"
-                    className="didDelete"
-                    onClick={onDeleteDid.bind(this, myIdentity)}
-                  />
-                )}
-              </span>
             </div>
           </div>
+        </div>
+        <span className="actions" />
+        <div className="actions">
+          {onCreateDid && !did && (
+            <button
+              title="Generate DID..."
+              onClick={onCreateDid.bind(this, myIdentity)}
+            >
+              Register DID
+            </button>
+          )}
+          {onDeleteDid && did && (
+            <button
+              title="Delete DID"
+              onClick={onDeleteDid.bind(this, myIdentity)}
+            >
+              Delete DID
+            </button>
+          )}
+          {(!contact || (contact && contact.metaData.unregistered)) && (
+            <button onClick={this.registerContact}>
+              Register Global Contact
+            </button>
+          )}
+          <button
+            className={`toggleContacts ${
+              contact && contact.metaData.addedAt
+                ? 'isMyContact'
+                : 'isNotMyContact'
+            }`}
+            onClick={this.toggleContacts}
+            title={
+              contact && contact.metaData.addedAt
+                ? 'Remove from Favourite Contact'
+                : 'Add to Favourite Contact'
+            }
+          >
+            {contact && contact.metaData.addedAt
+              ? 'Unfavourize Contact'
+              : 'Favourize Contact'}
+          </button>
+          <span />
         </div>
         <div className="actions">
           {!selected && (
@@ -156,20 +181,6 @@ class IdentityView extends React.Component<Props, State> {
             </>
           )}
 
-          <button
-            className={`toggleContacts ${
-              contact && contact.metaData.addedAt
-                ? 'isMyContact'
-                : 'isNotMyContact'
-            }`}
-            onClick={this.toggleContacts}
-            title={
-              contact && contact.metaData.addedAt
-                ? 'Remove from my contacts'
-                : 'Add to my contacts'
-            }
-          />
-
           {!(balance > 0) && (
             <button
               className="requestTokens"
@@ -179,11 +190,6 @@ class IdentityView extends React.Component<Props, State> {
               Request Tokens
             </button>
           )}
-
-          {(!contact || (contact && contact.metaData.unregistered)) && (
-            <button onClick={this.registerContact}>Register</button>
-          )}
-          <span />
         </div>
       </section>
     )
@@ -227,7 +233,7 @@ class IdentityView extends React.Component<Props, State> {
 
   private toggleContacts() {
     const { contacts, myIdentity } = this.props
-
+    let title = 'Add Contact Favourites'
     let contact = contacts.find(
       (myContact: Contact) =>
         myContact.publicIdentity.address === myIdentity.identity.address

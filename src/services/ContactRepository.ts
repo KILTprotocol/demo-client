@@ -64,12 +64,7 @@ class ContactRepository {
       .then((contact: Contact) => {
         PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
 
-        return {
-          metaData: contact.metaData,
-          did: contact.did,
-          publicIdentity: contact.publicIdentity,
-          signature: contact.signature,
-        }
+        return contact
       })
       .catch(error => {
         if (propagateError) {
@@ -132,7 +127,6 @@ class ContactRepository {
         },
       }
     )
-    // When importing a DID do you think we should be creating the document here as well?
 
     if (publicIdentity) {
       const selectedIdentity = Wallet.getSelectedIdentity(
