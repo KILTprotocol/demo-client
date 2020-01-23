@@ -2,6 +2,7 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 
 import './Modal.scss'
+import { Ok } from '../../utils/Consts'
 
 export enum ModalType {
   ALERT = 'alert',
@@ -69,7 +70,7 @@ class Modal extends React.Component<Props, State> {
                   </button>
                 )}
                 <button className="confirm" onClick={this.handleConfirm}>
-                  {okButtonLabel == null ? 'OK' : okButtonLabel}
+                  {okButtonLabel == null ? Ok : okButtonLabel}
                 </button>
               </footer>
             )}
