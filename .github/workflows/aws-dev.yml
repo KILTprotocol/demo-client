@@ -56,7 +56,7 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: kilt/prototype-client
+        ECR_REPOSITORY: kilt/demo-client
         IMAGE_TAG: latest-develop
       run: |
         # Build a docker container and
