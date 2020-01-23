@@ -17,6 +17,7 @@ import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import './IdentityView.scss'
 import MessageRepository from '../../services/MessageRepository'
 import { Identity } from '@kiltprotocol/sdk-js'
+import DidView from 'src/containers/DidView/DidView'
 
 type Props = {
   // input
@@ -107,12 +108,14 @@ class IdentityView extends React.Component<Props, State> {
             <div>
               {myIdentity.did ? (
                 <span className="did">
-                  <Link to={`/did/${myIdentity.identity.address}`}>
-                    {myIdentity.did}
-                  </Link>
+                  <DidView did={myIdentity.did.document}>
+                    {myIdentity.did.address}
+                  </DidView>
                 </span>
               ) : (
-                ''
+                <>
+                  <div>Given Identity doesn't own a DID.</div>
+                </>
               )}
               <span className="didActions">
                 {onCreateDid && !myIdentity.did && (
@@ -253,6 +256,7 @@ class IdentityView extends React.Component<Props, State> {
             .identity.address,
         },
         publicIdentity,
+        did: contact.did,
       } as Contact
 
       PersistentStore.store.dispatch(Contacts.Store.addContact(myContact))

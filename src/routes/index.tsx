@@ -30,8 +30,6 @@ const Routes: React.FunctionComponent<{}> = props => {
       <Switch>
         <Route path={'/dashboard'} component={requiresIdentity(Dashboard)} />
 
-        <Route path={'/did'} component={requiresIdentity(DidView)} />
-
         <Route path={'/contacts'} component={requiresIdentity(ContactList)} />
 
         <Route path={'/messages'} component={requiresIdentity(MessageList)} />

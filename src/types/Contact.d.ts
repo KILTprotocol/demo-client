@@ -28,6 +28,6 @@ export interface MyIdentity {
   }
   phrase: string
 
-  did?: sdk.IDid['identifier']
+  did?: Contact['did']
   createdAt?: number
 }

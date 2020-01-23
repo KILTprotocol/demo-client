@@ -1,38 +1,22 @@
 import * as React from 'react'
-
-import { Link } from 'react-router-dom'
-
+import { Contact } from '../../types/Contact'
 import './DidView.scss'
+import Code from '../../components/Code/Code'
 
-const DidView = (props: any) => {
+type Props = {
+  did: Contact['did']
+  children: any
+}
+
+const DidView = (did: Props) => {
   return (
-    <section className="DidView">
-      <h1>DID DOCUMENT</h1>
-      {props ? (
-        <>
-          <div className="attributes">
-            <div>
-              <label>Title</label>
-              <div />
-            </div>
-            <div>
-              <label>DID Document</label>
-              <div>{/* <Code>{props}</Code> */}</div>
-            </div>
-          </div>
-          <div className="actions">
-            <Link to="/dashboard">Cancel</Link>
-          </div>
-        </>
-      ) : (
-        <>
-          <div>Given Identity doesn't own a DID.</div>
-          <div className="actions">
-            <Link to="/dashboard">Cancel</Link>
-          </div>
-        </>
-      )}
-    </section>
+    <>
+      <div className="attributes">
+        <div>
+          <Code>{did.did}</Code>{' '}
+        </div>
+      </div>
+    </>
   )
 }
 
