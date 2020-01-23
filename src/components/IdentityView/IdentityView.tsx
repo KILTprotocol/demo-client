@@ -58,7 +58,7 @@ class IdentityView extends React.Component<Props, State> {
       onCreateDid,
       onDeleteDid,
     } = this.props
-
+    const { metaData, phrase, did, identity } = myIdentity
     const contact: Contact | undefined = contacts.find(
       (myContact: Contact) =>
         myContact.publicIdentity.address === myIdentity.identity.address
@@ -81,51 +81,49 @@ class IdentityView extends React.Component<Props, State> {
         <div className="attributes">
           <div>
             <label>Alias</label>
-            <div>{myIdentity.metaData.name}</div>
+            <div>{metaData.name}</div>
           </div>
           <div>
             <label>Phrase</label>
-            <div>{myIdentity.phrase}</div>
+            <div>{phrase}</div>
           </div>
           <div>
             <label>KILT Address</label>
-            <div>{myIdentity.identity.address}</div>
+            <div>{identity.address}</div>
           </div>
           <div>
             <label>Seed (as hex)</label>
-            <div>{myIdentity.identity.seedAsHex}</div>
+            <div>{identity.seedAsHex}</div>
           </div>
           <div>
             <label>Public Key</label>
-            <div>{myIdentity.identity.signPublicKeyAsHex}</div>
+            <div>{identity.signPublicKeyAsHex}</div>
           </div>
           <div>
             <label>Encryption Public Key</label>
-            <div>{myIdentity.identity.boxPublicKeyAsHex}</div>
+            <div>{identity.boxPublicKeyAsHex}</div>
           </div>
           <div>
             <label>DID</label>
             <div>
-              {myIdentity.did ? (
+              {did ? (
                 <span className="did">
-                  <DidView did={myIdentity.did.document}>
-                    {myIdentity.did.address}
-                  </DidView>
+                  <DidView did={did.document}>{did.address}</DidView>
                 </span>
               ) : (
                 <>
-                  <div>Given Identity doesn't own a DID.</div>
+                  <div>Identity doesn't own a DID.</div>
                 </>
               )}
               <span className="didActions">
-                {onCreateDid && !myIdentity.did && (
+                {onCreateDid && !did && (
                   <button
                     title="Generate DID..."
                     className="didCreate"
                     onClick={onCreateDid.bind(this, myIdentity)}
                   />
                 )}
-                {onDeleteDid && myIdentity.did && (
+                {onDeleteDid && did && (
                   <button
                     title="Delete DID"
                     className="didDelete"

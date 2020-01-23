@@ -1,14 +1,12 @@
 .DidView {
-  & h1 {
+  &h1 {
     @include h1('Wallet');
   }
 
-  & table {
+  &table {
     $label-width: 30%;
-
     width: 100%;
-
-    & td {
+    &td {
       &:first-child {
         width: $label-width;
       }
@@ -18,9 +16,9 @@
       }
     }
 
-    & tr {
+    &tr {
       &:first-child {
-        & td {
+        &td {
           &:last-child {
             @include baseFont-bold;
           }
@@ -29,11 +27,10 @@
     }
   }
 
-  & .IdentityView {
+  &.IdentityView {
     &.selected {
       border: 3px solid $color-primary;
-
-      & h2 {
+      &h2 {
         color: $color-primary;
       }
     }
