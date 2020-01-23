@@ -4,7 +4,7 @@
   "executionRoleArn": "arn:aws:iam::348099934012:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "prototype-client",
+      "name": "demo-client",
       "image": "348099934012.dkr.ecr.eu-central-1.amazonaws.com/kilt/protoype-client:latest-devnet",
       "logConfiguration": {
         "logDriver": "awslogs",
