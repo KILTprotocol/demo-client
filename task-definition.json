@@ -22,7 +22,7 @@
           "containerPort": 80
         }
       ],
-      "essential": true,
+      "essential": true
     }
   ],
   "cpu": "512",
@@ -30,5 +30,5 @@
   "requiresCompatibilities": [
     "FARGATE"
   ],
-  "networkMode": "awsvpc",
+  "networkMode": "awsvpc"
 }
