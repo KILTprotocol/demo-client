@@ -1,7 +1,5 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-
-import { Link } from 'react-router-dom'
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
@@ -105,9 +103,11 @@ class IdentityView extends React.Component<Props, State> {
           <div>
             <label>{myIdentity.did ? 'DID Document' : 'DID'}</label>
             <div>
-              {did ? (
+              {did?.document ? (
                 <span className="did">
-                  <DidDocumentView did={did}>{did.address}</DidDocumentView>
+                  <DidDocumentView didDocument={did.document}>
+                    {did.address}
+                  </DidDocumentView>
                 </span>
               ) : (
                 <>
@@ -233,7 +233,6 @@ class IdentityView extends React.Component<Props, State> {
 
   private toggleContacts() {
     const { contacts, myIdentity } = this.props
-    let title = 'Add Contact Favourites'
     let contact = contacts.find(
       (myContact: Contact) =>
         myContact.publicIdentity.address === myIdentity.identity.address

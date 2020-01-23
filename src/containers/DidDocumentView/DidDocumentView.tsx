@@ -4,17 +4,17 @@ import './DidDocumentView.scss'
 import Code from '../../components/Code/Code'
 
 type Props = {
-  did: Contact['did']
+  didDocument: object
   children: any
 }
 
 const DidDocumentView = (props: Props) => {
-  const { did } = props
+  const { didDocument } = props
   return (
     <>
       <div className="attributes">
         <div>
-          <Code>{did?.document}</Code>{' '}
+          <Code>{didDocument}</Code>
         </div>
       </div>
     </>

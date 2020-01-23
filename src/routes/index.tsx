@@ -87,9 +87,7 @@ const Routes: React.FunctionComponent<{}> = props => {
         />
         <Route
           path={'/pcrs'}
-          component={requiresIdentity(DelegationsView, {
-            isPCR: true,
-          })}
+          component={requiresIdentity(DelegationsView, { isPCR: true })}
         />
 
         <Route path={'/imprint'} component={Imprint} />

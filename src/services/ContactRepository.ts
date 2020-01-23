@@ -53,6 +53,7 @@ class ContactRepository {
     if (persistedContact) {
       return persistedContact
     }
+
     return fetch(`${ContactRepository.URL}/${address}`)
       .then(response => {
         if (!response.ok) {
@@ -63,7 +64,6 @@ class ContactRepository {
       .then(response => response.json())
       .then((contact: Contact) => {
         PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
-
         return contact
       })
       .catch(error => {

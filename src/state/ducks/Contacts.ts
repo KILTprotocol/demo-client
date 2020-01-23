@@ -78,8 +78,10 @@ class Store {
 
         const contact = state.getIn(['contacts', address])
         const { metaData, publicIdentity } = contact
+
         delete metaData.addedAt
         delete metaData.addedBy
+
         return state.setIn(['contacts', address], {
           metaData: { ...metaData },
           publicIdentity,
