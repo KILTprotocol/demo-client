@@ -12,9 +12,7 @@ const DidDocumentView = (props: Props) => {
   const { didDocument } = props
   return (
     <div className="attributes">
-      <div>
-        <Code>{didDocument}</Code>
-      </div>
+      <Code>{didDocument}</Code>
     </div>
   )
 }
