@@ -11,13 +11,11 @@ type Props = {
 const DidDocumentView = (props: Props) => {
   const { didDocument } = props
   return (
-    <>
-      <div className="attributes">
-        <div>
-          <Code>{didDocument}</Code>
-        </div>
+    <div className="attributes">
+      <div>
+        <Code>{didDocument}</Code>
       </div>
-    </>
+    </div>
   )
 }
 

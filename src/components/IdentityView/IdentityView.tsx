@@ -106,7 +106,7 @@ class IdentityView extends React.Component<Props, State> {
               {did?.document ? (
                 <span className="did">
                   <DidDocumentView didDocument={did.document}>
-                    {did.address}
+                    {did.identifier}
                   </DidDocumentView>
                 </span>
               ) : (
@@ -259,7 +259,6 @@ class IdentityView extends React.Component<Props, State> {
             .identity.address,
         },
         publicIdentity,
-        did: contact.did,
       } as Contact
 
       PersistentStore.store.dispatch(Contacts.Store.addContact(myContact))

@@ -43,7 +43,7 @@ export class DidService {
 
     persistentStore.store.dispatch(
       Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
-        did: { address: did.identifier, document: didDocument },
+        did: { identifier: did.identifier, document: didDocument },
       })
     )
     return did

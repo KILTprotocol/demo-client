@@ -11,7 +11,7 @@ export interface Contact {
     unregistered?: boolean
   }
   did?: {
-    address?: string
+    identifier?: string
     document?: object
   }
   signature?: string
