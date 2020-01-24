@@ -133,7 +133,7 @@ class ContactRepository {
         PersistentStore.store.getState()
       )
       const contact = {
-        did: { identifier: identifier },
+        did: { identifier },
         metaData: {
           addedAt: Date.now(),
           addedBy: selectedIdentity.identity.address,
