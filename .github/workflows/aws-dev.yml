@@ -28,7 +28,6 @@ on:
   push:
     branches:
       - develop
-      - tw-use-github-actions
 
 name: Deploy to Amazon ECS
 
