@@ -3,6 +3,27 @@
   "version": "0.16.0",
   "license": "BSD-4-Clause",
   "private": true,
+  "scripts": {
+    "start": "PORT=3001 node scripts/start.js",
+    "build": "node scripts/build.js",
+    "build:devnet": "env-cmd -f .env.devnet node scripts/build.js",
+    "test": "node scripts/test.js --env=jsdom",
+    "testCI": "CI=true node scripts/test.js --env=jsdom",
+    "format": "prettier --write 'src/**/*.tsx' 'src/**/*.ts'",
+    "lint": "tslint 'src/**/*.tsx' 'src/**/*.ts'",
+    "commit": "git-cz"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
   "dependencies": {
     "@kiltprotocol/sdk-js": "^0.x",
     "@polkadot/ui-identicon": "^0.33.1",
@@ -57,27 +78,6 @@
     "url-loader": "0.6.2",
     "utility-types": "^3.4.1",
     "whatwg-fetch": "2.0.3"
-  },
-  "scripts": {
-    "start": "PORT=3001 node scripts/start.js",
-    "build": "node scripts/build.js",
-    "build:devnet": "env-cmd -f .env.devnet node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom",
-    "testCI": "CI=true node scripts/test.js --env=jsdom",
-    "format": "prettier --write 'src/**/*.tsx' 'src/**/*.ts'",
-    "lint": "tslint 'src/**/*.tsx' 'src/**/*.ts'",
-    "commit": "git-cz"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
   },
   "devDependencies": {
     "@commitlint/cli": "^7.2.1",

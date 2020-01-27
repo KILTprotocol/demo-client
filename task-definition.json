@@ -1,0 +1,33 @@
+{
+  "family": "devnet-demo-client",
+  "taskRoleArn": "arn:aws:iam::348099934012:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::348099934012:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "prototype-client",
+      "image": "348099934012.dkr.ecr.eu-central-1.amazonaws.com/kilt/demo-client:latest-develop",
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/protype-client-taskdef",
+          "awslogs-region": "eu-central-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "protocol": "tcp",
+          "containerPort": 80
+        }
+      ],
+      "essential": true
+    }
+  ],
+  "cpu": "512",
+  "memory": "1024",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "networkMode": "awsvpc"
+}
