@@ -11,7 +11,7 @@ export interface Contact {
     unregistered?: boolean
   }
   did?: {
-    address?: string
+    identifier?: string
     document?: object
   }
   signature?: string
@@ -28,6 +28,6 @@ export interface MyIdentity {
   }
   phrase: string
 
-  did?: sdk.IDid['identifier']
+  did?: Contact['did']
   createdAt?: number
 }
