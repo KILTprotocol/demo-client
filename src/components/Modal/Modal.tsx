@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-
+import * as sdk from '@kiltprotocol/sdk-js'
 import './Modal.scss'
-import { Ok } from '../../utils/Consts'
 
 export enum ModalType {
   ALERT = 'alert',
@@ -70,7 +69,7 @@ class Modal extends React.Component<Props, State> {
                   </button>
                 )}
                 <button className="confirm" onClick={this.handleConfirm}>
-                  {okButtonLabel == null ? Ok : okButtonLabel}
+                  {okButtonLabel == null ? sdk.Constants.TxStatus.OK : okButtonLabel}
                 </button>
               </footer>
             )}
