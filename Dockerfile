@@ -2,9 +2,10 @@ FROM node:10-alpine as builder
 
 WORKDIR /app
 
-COPY . ./
-
+COPY package.json yarn.lock ./
 RUN yarn install
+
+COPY . ./
 RUN yarn lint
 #RUN yarn testCI
 RUN yarn build
