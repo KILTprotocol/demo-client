@@ -8,7 +8,7 @@ import attestationWorkflow from '../../services/AttestationWorkflow'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { Contact } from '../../types/Contact'
-import { ICType } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 
 import './CtypeView.scss'
 
@@ -18,7 +18,7 @@ type State = {}
 
 class CtypeView extends React.Component<Props, State> {
   private selectAttestersModal: SelectContactsModal | null
-  private cTypeToLegitimate: ICType
+  private cTypeToLegitimate: ICTypeWithMetadata
 
   constructor(props: Props) {
     super(props)
@@ -50,7 +50,7 @@ class CtypeView extends React.Component<Props, State> {
     )
   }
 
-  private requestLegitimation(cType: ICType) {
+  private requestLegitimation(cType: ICTypeWithMetadata) {
     if (cType && this.selectAttestersModal) {
       this.cTypeToLegitimate = cType
       this.selectAttestersModal.show()
@@ -67,7 +67,7 @@ class CtypeView extends React.Component<Props, State> {
   private finishSelectAttesters(selectedAttesters: Contact[]) {
     if (this.cTypeToLegitimate.cType.hash) {
       attestationWorkflow.requestLegitimations(
-        [{ cType: this.cTypeToLegitimate.cType.hash }],
+        [{ cTypeHash: this.cTypeToLegitimate.cType.hash }],
         selectedAttesters.map(
           (contact: Contact) => contact.publicIdentity.address
         )

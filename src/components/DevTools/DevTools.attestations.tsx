@@ -8,13 +8,14 @@ import * as Attestations from '../../state/ducks/Attestations'
 import { MyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import { MyIdentity } from '../../types/Contact'
-import { ICType } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BsClaim, BsClaimsPool, BsClaimsPoolElement } from './DevTools.claims'
 import { BsCType } from './DevTools.ctypes'
 import { BsDelegation, BsDelegationsPool } from './DevTools.delegations'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 
 import attestationsPool from './data/attestations.json'
+import { IPartialClaim } from '@kiltprotocol/sdk-js'
 
 type UpdateCallback = (bsAttestationKey: keyof BsAttestationsPool) => void
 
@@ -179,11 +180,11 @@ class BsAttestation {
       )
     }
 
-    return new sdk.RequestForAttestation(
+    return sdk.RequestForAttestation.fromClaimAndIdentity(
       claimToAttest.claim,
-      _legitimations,
       claimerIdentity.identity,
-      delegation ? delegation.id : undefined
+      _legitimations,
+      delegation ? delegation.id : null
     )
   }
 
@@ -220,7 +221,7 @@ class BsAttestation {
     // store attestation locally
     AttestationService.saveInStore({
       attestation: attestedClaim.attestation,
-      cTypeHash: attestedClaim.request.claim.cType,
+      cTypeHash: attestedClaim.request.claim.cTypeHash,
       claimerAddress: claimerIdentity.identity.address,
       claimerAlias: claimerIdentity.metaData.name,
       created: Date.now(),
@@ -240,10 +241,10 @@ class BsAttestation {
     const { attesterKey } = attest
 
     const attesterIdentity: MyIdentity = await BsIdentity.getByKey(attesterKey)
-    const cType: ICType = await BsCType.getByKey(bsClaim.cTypeKey)
+    const cType: ICTypeWithMetadata = await BsCType.getByKey(bsClaim.cTypeKey)
 
-    const partialClaim = {
-      cType: cType.cType.hash as string,
+    const partialClaim: IPartialClaim = {
+      cTypeHash: cType.cType.hash as string,
       contents: bsClaim.data,
       owner: claimerIdentity.identity.address,
     }

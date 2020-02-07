@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
 import * as Balances from '../../state/ducks/Balances'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
+import DidDocumentView from '../../containers/DidDocumentView/DidDocumentView'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
@@ -34,7 +34,7 @@ type State = {
   requestKiltTokens: boolean
 }
 
-const FAUCET_URL = 'https://faucet.kilt.io'
+const FAUCET_URL = process.env.REACT_APP_FAUCET_URL
 
 class IdentityView extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -56,7 +56,7 @@ class IdentityView extends React.Component<Props, State> {
       onCreateDid,
       onDeleteDid,
     } = this.props
-
+    const { metaData, phrase, did, identity } = myIdentity
     const contact: Contact | undefined = contacts.find(
       (myContact: Contact) =>
         myContact.publicIdentity.address === myIdentity.identity.address
@@ -71,62 +71,93 @@ class IdentityView extends React.Component<Props, State> {
     }
 
     const classes = ['IdentityView', selected ? 'selected' : '']
-
     return (
       <section className={classes.join(' ')}>
         {selected && <h2>Active identity</h2>}
-        <ContactPresentation address={myIdentity.identity.address} size={50} />
+        <ContactPresentation address={identity.address} size={50} />
         <div className="attributes">
           <div>
             <label>Alias</label>
-            <div>{myIdentity.metaData.name}</div>
+            <div>{metaData.name}</div>
           </div>
           <div>
             <label>Phrase</label>
-            <div>{myIdentity.phrase}</div>
+            <div>{phrase}</div>
           </div>
           <div>
             <label>KILT Address</label>
-            <div>{myIdentity.identity.address}</div>
+            <div>{identity.address}</div>
           </div>
           <div>
             <label>Seed (as hex)</label>
-            <div>{myIdentity.identity.seedAsHex}</div>
+            <div>{identity.seedAsHex}</div>
           </div>
           <div>
             <label>Public Key</label>
-            <div>{myIdentity.identity.signPublicKeyAsHex}</div>
+            <div>{identity.signPublicKeyAsHex}</div>
           </div>
           <div>
             <label>Encryption Public Key</label>
-            <div>{myIdentity.identity.boxPublicKeyAsHex}</div>
+            <div>{identity.boxPublicKeyAsHex}</div>
           </div>
           <div>
-            <label>DID</label>
+            <label>{myIdentity.did ? 'DID Document' : 'DID'}</label>
             <div>
-              {myIdentity.did ? (
-                <span className="did">{myIdentity.did}</span>
+              {did?.document ? (
+                <span className="did">
+                  <DidDocumentView didDocument={did.document}>
+                    {did.identifier}
+                  </DidDocumentView>
+                </span>
               ) : (
-                ''
+                <>
+                  <div>No DID is attached to this identity.</div>
+                </>
               )}
-              <span className="didActions">
-                {onCreateDid && !myIdentity.did && (
-                  <button
-                    title="Generate DID..."
-                    className="didCreate"
-                    onClick={onCreateDid.bind(this, myIdentity)}
-                  />
-                )}
-                {onDeleteDid && myIdentity.did && (
-                  <button
-                    title="Delete DID"
-                    className="didDelete"
-                    onClick={onDeleteDid.bind(this, myIdentity)}
-                  />
-                )}
-              </span>
             </div>
           </div>
+        </div>
+        <span className="actions" />
+        <div className="actions">
+          {onCreateDid && !did && (
+            <button
+              title="Generate DID..."
+              onClick={onCreateDid.bind(this, myIdentity)}
+            >
+              Register DID
+            </button>
+          )}
+          {onDeleteDid && did && (
+            <button
+              title="Delete DID"
+              onClick={onDeleteDid.bind(this, myIdentity)}
+            >
+              Delete DID
+            </button>
+          )}
+          {(!contact || (contact && contact.metaData.unregistered)) && (
+            <button onClick={this.registerContact}>
+              Register Global Contact
+            </button>
+          )}
+          <button
+            className={`toggleContacts ${
+              contact && contact.metaData.addedAt
+                ? 'isMyContact'
+                : 'isNotMyContact'
+            }`}
+            onClick={this.toggleContacts}
+            title={
+              contact && contact.metaData.addedAt
+                ? 'Remove from Favourite Contact'
+                : 'Add to Favourite Contact'
+            }
+          >
+            {contact && contact.metaData.addedAt
+              ? 'Unfavourize Contact'
+              : 'Favourize Contact'}
+          </button>
+          <span />
         </div>
         <div className="actions">
           {!selected && (
@@ -150,20 +181,6 @@ class IdentityView extends React.Component<Props, State> {
             </>
           )}
 
-          <button
-            className={`toggleContacts ${
-              contact && contact.metaData.addedAt
-                ? 'isMyContact'
-                : 'isNotMyContact'
-            }`}
-            onClick={this.toggleContacts}
-            title={
-              contact && contact.metaData.addedAt
-                ? 'Remove from my contacts'
-                : 'Add to my contacts'
-            }
-          />
-
           {!(balance > 0) && (
             <button
               className="requestTokens"
@@ -173,11 +190,6 @@ class IdentityView extends React.Component<Props, State> {
               Request Tokens
             </button>
           )}
-
-          {(!contact || (contact && contact.metaData.unregistered)) && (
-            <button onClick={this.registerContact}>Register</button>
-          )}
-          <span />
         </div>
       </section>
     )
@@ -221,7 +233,6 @@ class IdentityView extends React.Component<Props, State> {
 
   private toggleContacts() {
     const { contacts, myIdentity } = this.props
-
     let contact = contacts.find(
       (myContact: Contact) =>
         myContact.publicIdentity.address === myIdentity.identity.address

@@ -11,7 +11,7 @@ import FeedbackService, {
 } from '../../services/FeedbackService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
 import { fromInputModel } from '../../utils/CtypeUtils'
@@ -61,9 +61,13 @@ class CTypeCreate extends React.Component<Props, State> {
     ) {
       const { selectedIdentity, history } = this.props
       let cType: sdk.CType
-
+      let metadata: sdk.ICTypeMetadata
       try {
-        cType = fromInputModel(this.state.cType)
+        const inputICTypeWithMetadata: ICTypeWithMetadata = fromInputModel(
+          this.state.cType
+        )
+        cType = sdk.CType.fromCType(inputICTypeWithMetadata.cType)
+        metadata = inputICTypeWithMetadata.metaData
       } catch (error) {
         errorService.log({
           error,
@@ -72,40 +76,51 @@ class CTypeCreate extends React.Component<Props, State> {
         })
         return
       }
-
       const blockUi: BlockUi = FeedbackService.addBlockUi({
         headline: 'Creating CTYPE',
       })
-
+      const cTypeWrapper: ICTypeWithMetadata = {
+        cType: {
+          schema: cType.schema,
+          owner: selectedIdentity.identity.address,
+          hash: cType.hash,
+        },
+        metaData: metadata,
+      }
       cType
         .store(selectedIdentity.identity)
         .then((value: any) => {
           blockUi.updateMessage(
             `CTYPE stored on blockchain,\nnow registering CTYPE`
-          )
-          const cTypeWrapper: ICType = {
-            cType,
-            metaData: {
-              author: selectedIdentity.identity.address,
-            },
-          }
-          // TODO: add onrejected when sdk provides error handling
-          CTypeRepository.register(cTypeWrapper).then(() => {
-            blockUi.remove()
-            notifySuccess(
-              `CTYPE ${cType.metadata.title.default} successfully created.`
-            )
-            history.push('/cType')
-          })
+          ) // TODO: add onrejected when sdk provides error handling
         })
         .catch(error => {
           errorService.log({
             error,
-            message: 'Could not submit CTYPE',
-            origin: 'CTypeCreate.submit()',
+            message: 'Could not submit CTYPE to the Blockchain',
+            origin: 'CType.store()',
           })
           notifyError(error)
           blockUi.remove()
+        })
+        .then(() => {
+          return CTypeRepository.register(cTypeWrapper)
+            .then(() => {
+              blockUi.remove()
+              notifySuccess(
+                `CTYPE ${metadata.metadata.title.default} successfully created.`
+              ) // something better?
+              history.push('/cType')
+            })
+            .catch(error => {
+              errorService.log({
+                error,
+                message: 'Could not submit CTYPE to the Registry',
+                origin: 'CTypeRepository.register()',
+              })
+              notifyError(error)
+              blockUi.remove()
+            })
         })
     }
   }

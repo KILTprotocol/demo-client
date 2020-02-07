@@ -15,7 +15,7 @@ import { MyDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { Contact, MyIdentity } from '../../types/Contact'
-import { ICType } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 
 import './DelegationsView.scss'
 
@@ -170,7 +170,7 @@ class DelegationsView extends React.Component<Props, State> {
     }
   }
 
-  private onSelectCType(selectedCTypes: ICType[]) {
+  private onSelectCType(selectedCTypes: ICTypeWithMetadata[]) {
     if (selectedCTypes && selectedCTypes.length === 1) {
       const { isPCR } = this.props
       this.props.history.push(

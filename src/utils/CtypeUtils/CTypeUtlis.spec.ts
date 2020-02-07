@@ -4,6 +4,7 @@ import {
   getCTypeInputModel,
 } from './CtypeUtils'
 import * as sdk from '@kiltprotocol/sdk-js'
+import { ICType, ICTypeInput } from '../../types/Ctype'
 
 describe('CType', () => {
   const ctypeModel = {
@@ -16,18 +17,11 @@ describe('CType', () => {
       },
       type: 'object',
     },
-    metadata: {
-      title: { default: 'CType Title' },
-      description: {},
-      properties: {
-        'first-property': { title: { default: 'First Property' } },
-        'second-property': { title: { default: 'Second Property' } },
-      },
-    },
+    owner: '',
   } as sdk.ICType
 
   it('verify model transformations', () => {
-    const ctypeInput = {
+    const ctypeInput: ICTypeInput = {
       $id: 'http://example.com/ctype-1',
       $schema: 'http://kilt-protocol.org/draft-01/ctype-input#',
       properties: [
@@ -44,6 +38,8 @@ describe('CType', () => {
       ],
       type: 'object',
       title: 'CType Title',
+      description: '',
+      owner: '',
       required: ['first-property', 'second-property'],
     }
 
@@ -56,23 +52,32 @@ describe('CType', () => {
       },
       type: 'object',
       title: 'CType Title',
+      description: '',
       required: ['first-property', 'second-property'],
     }
-    const goodClaim = {
-      'first-property': 10,
-      'second-property': '12',
+    const goodClaim: sdk.IClaim = {
+      owner: '',
+      contents: {
+        'first-property': 10,
+        'second-property': '12',
+      },
+      cTypeHash: '',
     }
     const badClaim = {
-      'first-property': '1',
-      'second-property': '12',
-      'third-property': true,
+      owner: '',
+      contents: {
+        'first-property': 10,
+        'second-property': 12,
+        'third-property': true,
+      },
+      cTypeHash: '',
     }
-
     const ctypeFromInput = fromInputModel(ctypeInput)
-    const ctypeFromModel = new sdk.CType(ctypeModel)
-    expect(JSON.stringify(ctypeFromInput)).toEqual(
+    const ctypeFromModel = sdk.CType.fromCType(ctypeModel)
+    expect(JSON.stringify(ctypeFromInput.cType)).toEqual(
       JSON.stringify(ctypeFromModel)
     )
+
     expect(JSON.stringify(getClaimInputModel(ctypeFromInput, 'en'))).toEqual(
       JSON.stringify(claimInput)
     )
@@ -80,12 +85,16 @@ describe('CType', () => {
       JSON.stringify(ctypeInput)
     )
 
-    expect(ctypeFromInput.verifyClaimStructure(goodClaim)).toBeTruthy()
-    expect(ctypeFromInput.verifyClaimStructure(badClaim)).toBeFalsy()
+    expect(
+      sdk.CType.fromCType(ctypeFromInput.cType).verifyClaimStructure(goodClaim)
+    ).toBeTruthy()
+    expect(
+      sdk.CType.fromCType(ctypeFromInput.cType).verifyClaimStructure(badClaim)
+    ).toBeFalsy()
 
     expect(() => {
       // @ts-ignore
-      new CType(goodClaim).verifyClaimStructure(goodClaim)
+      sdk.CType.fromCType(goodClaim)
     }).toThrow(new Error('CType does not correspond to schema'))
     expect(() => {
       ctypeInput.$schema = 'object'

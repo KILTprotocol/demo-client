@@ -8,12 +8,13 @@ import isEqual from 'lodash/isEqual'
 import CTypeRepository from '../../services/CtypeRepository'
 import * as Claims from '../../state/ducks/Claims'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { CType, ICType } from '../../types/Ctype'
+import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import { SelectAttestedClaimsLabels } from '../SelectAttestedClaims/SelectAttestedClaims'
 
 import './SelectAttestedClaim.scss'
+import { getCtypePropertyTitle } from '../../utils/CtypeUtils'
 
 type Props = {
   claimEntry: Claims.Entry
@@ -25,7 +26,7 @@ type Props = {
 export type State = {
   allAttestedClaimsSelected?: boolean
   allClaimPropertiesSelected?: boolean
-  cType?: CType
+  cType?: ICType
   isSelected: boolean
   selectedAttestedClaims: sdk.IAttestedClaim[]
   selectedClaimProperties: string[]
@@ -47,9 +48,16 @@ class SelectAttestedClaim extends React.Component<Props, State> {
   public componentDidMount() {
     const { cTypeHash } = this.props
     if (cTypeHash) {
-      CTypeRepository.findByHash(cTypeHash).then((cType: ICType) => {
-        this.setState({ cType: CType.fromObject(cType) })
-      })
+      CTypeRepository.findByHash(cTypeHash).then(
+        (cType: ICTypeWithMetadata) => {
+          const cTypeReference: ICType = {
+            cType: cType.cType,
+            metadata: cType.metaData.metadata,
+            ctypeHash: cType.cType.hash,
+          }
+          this.setState({ cType: cTypeReference })
+        }
+      )
     }
   }
 
@@ -126,7 +134,9 @@ class SelectAttestedClaim extends React.Component<Props, State> {
             </label>
           </h4>
           {propertyNames.map((propertyName: string) => {
-            const propertyTitle = this.getCtypePropertyTitle(propertyName)
+            const propertyTitle = this.state.cType
+              ? getCtypePropertyTitle(propertyName, this.state.cType)
+              : propertyName
             return (
               <label
                 key={propertyName}
@@ -144,11 +154,6 @@ class SelectAttestedClaim extends React.Component<Props, State> {
         </div>
       )
     )
-  }
-
-  private getCtypePropertyTitle(propertyName: string): string {
-    const { cType } = this.state
-    return cType ? cType.getPropertyTitle(propertyName) : propertyName
   }
 
   private selectClaimProperty(

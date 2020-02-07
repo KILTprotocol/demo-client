@@ -69,9 +69,7 @@ class RequestLegitimation extends React.Component<
   private handleSubmit() {
     const { cTypeHash, receiverAddresses, onFinished } = this.props
     const { selectedClaimEntries } = this.state
-    let claims: sdk.IPartialClaim[] = [
-      { cType: cTypeHash } as sdk.IPartialClaim,
-    ]
+    let claims: sdk.IPartialClaim[] = [{ cTypeHash } as sdk.IPartialClaim]
 
     if (selectedClaimEntries && selectedClaimEntries.length) {
       claims = selectedClaimEntries.map(

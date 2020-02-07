@@ -3,8 +3,8 @@ import * as sdk from '@kiltprotocol/sdk-js'
 import BlockchainService from '../../services/BlockchainService'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
-import { notifySuccess } from '../../services/FeedbackService'
-import { ICType } from '../../types/Ctype'
+import { notifySuccess, notifyError } from '../../services/FeedbackService'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BsIdentity } from './DevTools.wallet'
 
 import cTypesPool from './data/cTypes.json'
@@ -13,6 +13,7 @@ type UpdateCallback = (bsCTypeKey: keyof BsCTypesPool) => void
 
 interface BsCTypesPoolElement extends sdk.ICType {
   owner: string
+  metadata: sdk.ICTypeMetadata['metadata']
 }
 
 type BsCTypesPool = {
@@ -27,18 +28,20 @@ class BsCType {
     const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
       .identity
 
-    const cType = sdk.CType.fromObject({
-      ...bsCTypeData,
+    const cType = sdk.CType.fromCType({
+      schema: bsCTypeData.schema,
+      hash: bsCTypeData.hash,
       owner: ownerIdentity.address,
     })
 
     return cType
       .store(ownerIdentity)
       .then((value: any) => {
-        const cTypeWrapper: ICType = {
+        const cTypeWrapper: ICTypeWithMetadata = {
           cType,
           metaData: {
-            author: ownerIdentity.address,
+            metadata: bsCTypeData.metadata,
+            ctypeHash: cType.hash,
           },
         }
         // TODO: add onrejected when sdk provides error handling
@@ -46,14 +49,14 @@ class BsCType {
       })
       .then(() => {
         notifySuccess(
-          `CTYPE ${cType.metadata.title.default} successfully created.`
+          `CTYPE ${bsCTypeData.metadata.title.default} successfully created.`
         )
       })
       .catch(error => {
         errorService.log({
           error,
           message: 'Could not submit CTYPE',
-          origin: 'CTypeCreate.submit()',
+          origin: 'DevTools.ctypes.tsx.BsCType.save()',
         })
       })
   }
@@ -71,7 +74,9 @@ class BsCType {
     return requests
   }
 
-  public static async getByHash(hash: sdk.ICType['hash']): Promise<ICType> {
+  public static async getByHash(
+    hash: sdk.ICType['hash']
+  ): Promise<ICTypeWithMetadata> {
     const cType = await CTypeRepository.findByHash(hash)
     if (cType) {
       return cType
@@ -79,13 +84,15 @@ class BsCType {
     throw new Error(`Could not find cType with hash '${hash}'`)
   }
 
-  public static async get(bsCType: BsCTypesPoolElement): Promise<ICType> {
+  public static async get(
+    bsCType: BsCTypesPoolElement
+  ): Promise<ICTypeWithMetadata> {
     return BsCType.getByHash(bsCType.hash)
   }
 
   public static async getByKey(
     bsCTypeKey: keyof BsCTypesPool
-  ): Promise<ICType> {
+  ): Promise<ICTypeWithMetadata> {
     const { hash } = BsCType.pool[bsCTypeKey]
     return BsCType.getByHash(hash)
   }

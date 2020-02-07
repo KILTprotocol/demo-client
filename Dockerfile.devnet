@@ -8,7 +8,7 @@ RUN yarn install
 COPY . ./
 RUN yarn lint
 #RUN yarn testCI
-RUN yarn build
+RUN yarn build:devnet
 
 FROM nginx:alpine
 COPY --from=builder /app/build/ /usr/share/nginx/html/

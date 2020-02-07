@@ -5,16 +5,16 @@ import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import CTypeRepository from '../../services/CtypeRepository'
 import * as CTypes from '../../state/ducks/CTypes'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType } from '../../types/Ctype'
+import { ICTypeWithMetadata } from '../../types/Ctype'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 import './CtypeListView.scss'
 
 type Props = RouteComponentProps<{}> & {
-  onRequestLegitimation: (cType: ICType) => void
+  onRequestLegitimation: (cType: ICTypeWithMetadata) => void
   // mapStateToProps
-  cTypes?: ICType[]
+  cTypes?: ICTypeWithMetadata[]
 }
 
 type State = {
@@ -64,7 +64,7 @@ class CtypeListView extends React.Component<Props, State> {
                       right={true}
                     />
                     <ContactPresentation
-                      address={cType.metaData.author}
+                      address={cType.cType.owner!}
                       interactive={true}
                       right={true}
                     />
@@ -78,7 +78,7 @@ class CtypeListView extends React.Component<Props, State> {
                   </td>
                   <td className="author">
                     <ContactPresentation
-                      address={cType.metaData.author}
+                      address={cType.cType.owner!}
                       interactive={true}
                       right={true}
                     />
