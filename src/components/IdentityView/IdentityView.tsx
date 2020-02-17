@@ -16,6 +16,7 @@ import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import './IdentityView.scss'
 import MessageRepository from '../../services/MessageRepository'
 import { Identity } from '@kiltprotocol/sdk-js'
+import QRCodePublicIdentity from '../QRCodePublicIdentity/QRCodePublicIdentity'
 
 type Props = {
   // input
@@ -71,6 +72,7 @@ class IdentityView extends React.Component<Props, State> {
     }
 
     const classes = ['IdentityView', selected ? 'selected' : '']
+    const publicIdentityWithServiceAddress = {...identity.getPublicIdentity(), serviceAddress: MessageRepository.URL}
     return (
       <section className={classes.join(' ')}>
         {selected && <h2>Active identity</h2>}
@@ -99,6 +101,12 @@ class IdentityView extends React.Component<Props, State> {
           <div>
             <label>Encryption Public Key</label>
             <div>{identity.boxPublicKeyAsHex}</div>
+          </div>
+          <div>
+            <label>Public identity (scan to send a message)</label>
+            <div>
+            <QRCodePublicIdentity publicIdentity={publicIdentityWithServiceAddress}/>
+            </div>
           </div>
           <div>
             <label>{myIdentity.did ? 'DID Document' : 'DID'}</label>
