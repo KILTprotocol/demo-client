@@ -17,10 +17,10 @@ const QRCodePublicIdentity: React.FunctionComponent<Props> = ({
   return (
     // the public identity needs to be encoded in order to fit in a scannable QR Code
     <QRCode
-      size={170}
+      size={200}
       logoImage={logo}
-      logoWidth={50}
-      logoHeight={50}
+      logoWidth={44}
+      logoHeight={44}
       fgColor="#751869"
       quietZone={4}
       qrStyle="dots"
