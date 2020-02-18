@@ -36,8 +36,7 @@ class AttestationService {
 
     const attestation = Kilt.Attestation.fromRequestAndPublicIdentity(
       requestForAttestation,
-      selectedIdentity,
-      null
+      selectedIdentity
     )
 
     const attestedClaim = Kilt.AttestedClaim.fromRequestAndAttestation(
