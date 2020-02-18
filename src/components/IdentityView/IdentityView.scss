@@ -69,7 +69,7 @@
 
   & .QRCode {
     animation: appear $base-transition-time;
-    padding-top: 8px;
+    margin-top: $base-padding;
   }
 
   @keyframes appear {
