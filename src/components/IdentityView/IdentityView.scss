@@ -60,4 +60,20 @@
       border: $base-border;
     }
   }
+
+  & button {
+    &.QRCodeToggle {
+      @include button-secondary;
+    }
+  }
+
+  & .QRCode {
+    animation: appear $base-transition-time;
+    margin-top: $base-padding;
+  }
+
+  @keyframes appear {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+  }
 }
