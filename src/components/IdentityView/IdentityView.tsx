@@ -32,18 +32,29 @@ type Props = {
 }
 
 type State = {
-  requestKiltTokens: boolean
+  showPublicIdentityQRCode: boolean
 }
 
 const FAUCET_URL = process.env.REACT_APP_FAUCET_URL
 
 class IdentityView extends React.Component<Props, State> {
+
   constructor(props: Props) {
     super(props)
-
     this.registerContact = this.registerContact.bind(this)
     this.toggleContacts = this.toggleContacts.bind(this)
     this.openKiltFaucet = this.openKiltFaucet.bind(this)
+    this.state = {
+      showPublicIdentityQRCode: false
+    }
+    this.togglePublicIdentityQRCode = this.togglePublicIdentityQRCode.bind(this)
+  }
+
+  private togglePublicIdentityQRCode() {
+    const { showPublicIdentityQRCode } = this.state
+    this.setState({
+      showPublicIdentityQRCode: !showPublicIdentityQRCode,
+    })
   }
 
   public render() {
@@ -51,12 +62,12 @@ class IdentityView extends React.Component<Props, State> {
       contacts,
       myIdentity,
       selected,
-
       onDelete,
       onSelect,
       onCreateDid,
       onDeleteDid,
     } = this.props
+    const { showPublicIdentityQRCode } = this.state
     const { metaData, phrase, did, identity } = myIdentity
     const contact: Contact | undefined = contacts.find(
       (myContact: Contact) =>
@@ -70,9 +81,9 @@ class IdentityView extends React.Component<Props, State> {
         contact.publicIdentity.address
       )
     }
-
     const classes = ['IdentityView', selected ? 'selected' : '']
     const publicIdentityWithServiceAddress = {...identity.getPublicIdentity(), serviceAddress: MessageRepository.URL}
+    const togglePublicIdentityQRCodeButtonTxt = `${showPublicIdentityQRCode ? "Hide" : "Show"} QR Code`
     return (
       <section className={classes.join(' ')}>
         {selected && <h2>Active identity</h2>}
@@ -105,7 +116,17 @@ class IdentityView extends React.Component<Props, State> {
           <div>
             <label>Public identity (scan to send a message)</label>
             <div>
-            <QRCodePublicIdentity publicIdentity={publicIdentityWithServiceAddress}/>
+              <div>
+                <button className="QRCodeToggle" onClick={this.togglePublicIdentityQRCode}>
+                  {togglePublicIdentityQRCodeButtonTxt}
+                </button>
+                {
+                  showPublicIdentityQRCode &&
+                  <div className="QRCode">
+                    <QRCodePublicIdentity publicIdentity={publicIdentityWithServiceAddress}/>
+                  </div>
+                }
+              </div>
             </div>
           </div>
           <div>
