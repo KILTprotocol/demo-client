@@ -22,8 +22,9 @@ export const fromInputModel = (ctypeInput: ICTypeInput): ICTypeWithMetadata => {
     throw new Error('CType input does not correspond to input model schema')
   }
   const schema: sdk.ICType['schema'] = {
-    $id: ctypeInput.$id,
-    $schema: sdk.CTypeModel.properties.$schema.default,
+    $id: 'kilt:ctype:0x1',
+    $schema: CTypeInputModel.properties.$schema.default,
+    title: ctypeInput.$id,
     properties: {},
     type: 'object',
   }
