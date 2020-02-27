@@ -1,9 +1,8 @@
 {
   "DRIVERS_LICENSE": {
     "schema": {
-      "$id": "kilt:ctype:0x1",
+      "$id": "DriversLicense",
       "$schema": "http://kilt-protocol.org/draft-01/ctype#",
-      "title": "DriversLicense",
       "properties": {
         "name": {
           "type": "string"
@@ -39,9 +38,8 @@
   },
   "IS_OFFICIAL": {
     "schema": {
-      "$id": "kilt:ctype:0x2",
+      "$id": "IsOfficial",
       "$schema": "http://kilt-protocol.org/draft-01/ctype#",
-      "title": "Official ID",
       "properties": {},
       "type": "object"
     },
