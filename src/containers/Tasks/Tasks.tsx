@@ -37,11 +37,11 @@ export type TaskProps =
       props: undefined
     }
   | {
-      objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS
+      objective: sdk.MessageBodyType.REQUEST_TERMS
       props: RequestLegitimationsProps
     }
   | {
-      objective: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS
+      objective: sdk.MessageBodyType.SUBMIT_TERMS
       props: SubmitLegitimationsProps
     }
   | {
@@ -120,7 +120,7 @@ class Tasks extends React.Component<Props, State> {
     )
 
     switch (currentTask.objective) {
-      case sdk.MessageBodyType.REQUEST_LEGITIMATIONS: {
+      case sdk.MessageBodyType.REQUEST_TERMS: {
         const props = currentTask.props
         const cTypeHash =
           selectedCTypes && selectedCTypes[0]
@@ -145,7 +145,7 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS: {
+      case sdk.MessageBodyType.SUBMIT_TERMS: {
         const props = currentTask.props
         const cTypeHash = props.claim ? props.claim.cTypeHash : undefined
         return this.getModal(

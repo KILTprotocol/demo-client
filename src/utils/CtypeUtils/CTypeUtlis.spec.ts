@@ -4,7 +4,7 @@ import {
   getCTypeInputModel,
 } from './CtypeUtils'
 import * as sdk from '@kiltprotocol/sdk-js'
-import { ICType, ICTypeInput } from '../../types/Ctype'
+import { ICTypeInput } from '../../types/Ctype'
 
 describe('CType', () => {
   const ctypeModel = {

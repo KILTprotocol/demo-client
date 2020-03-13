@@ -1,4 +1,4 @@
-import { CTypeInputModel } from '@kiltprotocol/sdk-js'
+import { CTypeInputModel } from '../../utils/CtypeUtils/CtypeInputSchema'
 import * as React from 'react'
 
 import * as common from 'schema-based-json-editor'

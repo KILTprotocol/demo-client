@@ -106,18 +106,18 @@ class MessageDetailView extends React.Component<Props, State> {
       | undefined = this.getMessageBodyType(message)
 
     switch (messageBodyType) {
-      case sdk.MessageBodyType.REQUEST_LEGITIMATIONS: {
+      case sdk.MessageBodyType.REQUEST_TERMS: {
         const { showTask } = this.state
 
         return (
           <>
             <ClaimDetailView
-              claim={(message.body as sdk.IRequestLegitimations).content}
+              claim={(message.body as sdk.IRequestTerms).content}
             />
             {showTask ? (
               <SubmitLegitimations
                 receiverAddresses={[message.senderAddress]}
-                claim={(message.body as sdk.IRequestLegitimations).content}
+                claim={(message.body as sdk.IRequestTerms).content}
                 onCancel={this.handleCancel}
                 onFinished={this.handleDelete}
               />
@@ -131,15 +131,15 @@ class MessageDetailView extends React.Component<Props, State> {
           </>
         )
       }
-      case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS: {
+      case sdk.MessageBodyType.SUBMIT_TERMS: {
         return (
           <RequestAttestation
-            claim={(message.body as sdk.ISubmitLegitimations).content.claim}
+            claim={(message.body as sdk.ISubmitTerms).content.claim}
             legitimations={
-              (message.body as sdk.ISubmitLegitimations).content.legitimations
+              (message.body as sdk.ISubmitTerms).content.legitimations
             }
             delegationId={
-              (message.body as sdk.ISubmitLegitimations).content.delegationId
+              (message.body as sdk.ISubmitTerms).content.delegationId || null
             }
             receiverAddresses={[message.senderAddress]}
             onCancel={this.handleCancel}
@@ -152,7 +152,7 @@ class MessageDetailView extends React.Component<Props, State> {
           <AttestClaim
             claimerAddresses={[message.senderAddress]}
             requestForAttestation={
-              (message.body as sdk.IRequestAttestationForClaim).content
+              (message.body as sdk.IRequestAttestationForClaim).content.requestForAttestation
             }
             onCancel={this.handleCancel}
             onFinished={this.handleDelete}
