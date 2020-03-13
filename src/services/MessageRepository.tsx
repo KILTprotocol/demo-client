@@ -230,21 +230,17 @@ class MessageRepository {
     const { type } = body
 
     switch (type) {
-      case sdk.MessageBodyType.REQUEST_LEGITIMATIONS:
-        return [(message.body as sdk.IRequestLegitimations).content.cTypeHash]
-      case sdk.MessageBodyType.SUBMIT_LEGITIMATIONS:
-        return [
-          (message.body as sdk.ISubmitLegitimations).content.claim.cTypeHash,
-        ]
-      case sdk.MessageBodyType.REJECT_LEGITIMATIONS:
-        return [
-          (message.body as sdk.IRejectLegitimations).content.claim.cTypeHash,
-        ]
+      case sdk.MessageBodyType.REQUEST_TERMS:
+        return [(message.body as sdk.IRequestTerms).content.cTypeHash]
+      case sdk.MessageBodyType.SUBMIT_TERMS:
+        return [(message.body as sdk.ISubmitTerms).content.claim.cTypeHash]
+      case sdk.MessageBodyType.REJECT_TERMS:
+        return [(message.body as sdk.IRejectTerms).content.claim.cTypeHash]
 
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return [
-          (message.body as sdk.IRequestAttestationForClaim).content.claim
-            .cTypeHash,
+          (message.body as sdk.IRequestAttestationForClaim).content
+            .requestForAttestation.claim.cTypeHash,
         ]
       case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
         return [
