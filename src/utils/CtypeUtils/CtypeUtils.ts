@@ -5,6 +5,7 @@ import {
   IClaimInput,
   ICTypeWithMetadata,
   ICType,
+  ICTypeInputProperty,
 } from '../../types/Ctype'
 
 import { CTypeInputModel } from './CtypeInputSchema'
@@ -40,15 +41,12 @@ export const fromInputModel = (ctypeInput: ICTypeInput): ICTypeWithMetadata => {
   }
 
   const properties = {}
-  ctypeInput.properties.forEach((p: any) => {
-    const { title, $id, description, ...rest } = p
+  ctypeInput.properties.forEach((p: ICTypeInputProperty) => {
+    const { title, $id, ...rest } = p
     properties[$id] = rest
     sdkMetadata.properties[$id] = {
       title: {
         default: title,
-      },
-      description: {
-        default: description,
       },
     }
   })

@@ -13,7 +13,7 @@ type BsClaimsPoolElement = {
   alias: string
   claimerKey: keyof BsIdentitiesPool
   cTypeKey: keyof BsCTypesPool
-  data: object
+  data: sdk.IClaim['contents']
 }
 
 type BsClaimsPool = {

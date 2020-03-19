@@ -204,7 +204,7 @@ class ClaimView extends React.Component<Props, State> {
     )
     if (claimToAttest) {
       const { claim } = claimToAttest
-      return claim
+      return new sdk.Claim(claim)
     } else {
       return undefined
     }

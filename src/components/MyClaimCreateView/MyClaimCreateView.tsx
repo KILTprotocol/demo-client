@@ -158,7 +158,7 @@ class MyClaimCreateView extends Component<Props, State> {
       )
       saveClaim(newClaim, { alias: name })
       notifySuccess(`Claim ${name} successfully created & saved.`)
-      onCreate(newClaim)
+      onCreate(new sdk.Claim(newClaim))
     }
   }
 
