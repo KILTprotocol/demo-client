@@ -1,0 +1,17 @@
+{
+  "quote": {
+    "attesterAddress": "5GoNkf6WdbxCFnPdAnYYQyCjAKPJgLNxXwPjwTh6DGg6gN3E",
+    "cTypeHash": "0x12345678",
+    "cost": { "gross": 233, "net": 23.3, "tax": { "vat": 3.3 } },
+    "currency": "Euro",
+    "timeframe": "2020-12-03T23:00:00.000Z",
+    "termsAndConditions": "Lots of these",
+    "attesterSignature": "0xb0cad0a4decf13bbb68e8cd1362b453209062985c87f5f32415c7407cf165031ed0ca3b2cd766bf8e914b5f17fbe042c9f4c667feee4385f3f1bf964ec48f508",
+    "rootHash": "0xaee4672d4eba2314bb1a0c50fc3ff50637b9054dc1818e9c13ced55a16256d2f",
+    "claimerSignature": "0x0677c2c09b41d0b0ddf0218d87543367698c6adea017fafbdfae12e95b03f867ba6f1d48d4f0d50aa81391dacf6946cdece294b78654fba4b38bd7907a046c0f"
+  },
+  "quoteMetadata": {
+    "title": "quote",
+    "owner": "Bob"
+  }
+}

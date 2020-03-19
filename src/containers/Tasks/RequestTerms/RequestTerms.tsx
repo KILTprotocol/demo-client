@@ -6,13 +6,12 @@ import attestationWorkflow from '../../../services/AttestationWorkflow'
 import * as Claims from '../../../state/ducks/Claims'
 import { ICType } from '../../../types/Ctype'
 
-import './RequestLegitimation.scss'
+import './RequestTerms.scss'
 
-export type RequestLegitimationsProps = {
+export type RequestTermsProps = {
   cTypeHash?: ICType['cType']['hash']
   receiverAddresses: Array<sdk.PublicIdentity['address']>
   preSelectedClaimEntries?: Claims.Entry[]
-
   onFinished?: () => void
   onCancel?: () => void
 }
@@ -21,11 +20,8 @@ type State = {
   selectedClaimEntries?: Claims.Entry[]
 }
 
-class RequestLegitimation extends React.Component<
-  RequestLegitimationsProps,
-  State
-> {
-  constructor(props: RequestLegitimationsProps) {
+class RequestTerms extends React.Component<RequestTermsProps, State> {
+  constructor(props: RequestTermsProps) {
     super(props)
     this.state = {
       selectedClaimEntries: props.preSelectedClaimEntries,
@@ -37,9 +33,13 @@ class RequestLegitimation extends React.Component<
   }
 
   public render() {
-    const { cTypeHash, preSelectedClaimEntries, receiverAddresses } = this.props
+    const {
+      cTypeHash,
+      preSelectedClaimEntries,
+      receiverAddresses,
+    } = this.props
     return (
-      <section className="RequestLegitimation">
+      <section className="RequestTerms">
         <section className="selectClaims">
           <h2 className="optional">Select claim</h2>
           <SelectClaims
@@ -51,11 +51,11 @@ class RequestLegitimation extends React.Component<
         <div className="actions">
           <button onClick={this.onCancel}>Cancel</button>
           <button
-            className="requestLegitimation"
+            className="requestTerms"
             disabled={!receiverAddresses.length}
             onClick={this.handleSubmit}
           >
-            Request Legitimation
+            Request Terms
           </button>
         </div>
       </section>
@@ -78,15 +78,14 @@ class RequestLegitimation extends React.Component<
     }
 
     if (this.isValid()) {
-      attestationWorkflow
-        .requestLegitimations(claims, receiverAddresses)
-        .then(() => {
-          if (onFinished) {
-            onFinished()
-          }
-        })
+      attestationWorkflow.requestTerms(claims, receiverAddresses).then(() => {
+        if (onFinished) {
+          onFinished()
+        }
+      })
     }
   }
+
 
   private isValid() {
     const { receiverAddresses } = this.props
@@ -101,4 +100,4 @@ class RequestLegitimation extends React.Component<
   }
 }
 
-export default RequestLegitimation
+export default RequestTerms

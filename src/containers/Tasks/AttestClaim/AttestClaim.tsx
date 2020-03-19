@@ -36,7 +36,7 @@ class AttestClaim extends React.Component<Props, State> {
         <AttestedClaimsListView
           attestedClaims={requestForAttestation.legitimations}
           delegationId={requestForAttestation.delegationId}
-          context="legitimations"
+          context="terms"
         />
 
         <div className="actions">

@@ -5,8 +5,6 @@ import CTypeDetailView from '../../components/CtypeDetailView/CtypeDetailView'
 import CTypeListView from '../../components/CtypeListView/CtypeListView'
 import SelectContactsModal from '../../components/Modal/SelectContactsModal'
 import attestationWorkflow from '../../services/AttestationWorkflow'
-import CTypeRepository from '../../services/CtypeRepository'
-import errorService from '../../services/ErrorService'
 import { Contact } from '../../types/Contact'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 
@@ -22,7 +20,7 @@ class CtypeView extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
-    this.requestLegitimation = this.requestLegitimation.bind(this)
+    this.requestTerm = this.requestTerm.bind(this)
 
     this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
     this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
@@ -36,7 +34,7 @@ class CtypeView extends React.Component<Props, State> {
         <h1>CTYPEs</h1>
         {cTypeHash && <CTypeDetailView cTypeHash={cTypeHash} />}
         {!cTypeHash && (
-          <CTypeListView onRequestLegitimation={this.requestLegitimation} />
+          <CTypeListView onRequestTerm={this.requestTerm} />
         )}
         <SelectContactsModal
           ref={el => {
@@ -50,7 +48,7 @@ class CtypeView extends React.Component<Props, State> {
     )
   }
 
-  private requestLegitimation(cType: ICTypeWithMetadata) {
+  private requestTerm(cType: ICTypeWithMetadata) {
     if (cType && this.selectAttestersModal) {
       this.cTypeToLegitimate = cType
       this.selectAttestersModal.show()
@@ -66,7 +64,7 @@ class CtypeView extends React.Component<Props, State> {
 
   private finishSelectAttesters(selectedAttesters: Contact[]) {
     if (this.cTypeToLegitimate.cType.hash) {
-      attestationWorkflow.requestLegitimations(
+      attestationWorkflow.requestTerms(
         [{ cTypeHash: this.cTypeToLegitimate.cType.hash }],
         selectedAttesters.map(
           (contact: Contact) => contact.publicIdentity.address

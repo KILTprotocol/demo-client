@@ -19,7 +19,7 @@ import { Contact, MyIdentity } from '../../types/Contact'
 import './ClaimView.scss'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 import { RequestAttestationProps } from '../Tasks/RequestAttestation/RequestAttestation'
-import { RequestLegitimationsProps } from '../Tasks/RequestLegitimation/RequestLegitimation'
+import { RequestTermsProps } from '../Tasks/RequestTerms/RequestTerms'
 
 type Props = RouteComponentProps<{ claimId: Claims.Entry['id'] }> & {
   removeClaim: (claimId: Claims.Entry['id']) => void
@@ -45,7 +45,7 @@ class ClaimView extends React.Component<Props, State> {
       isSelectAttestersOpen: false,
     }
     this.deleteClaim = this.deleteClaim.bind(this)
-    this.requestLegitimation = this.requestLegitimation.bind(this)
+    this.requestTerm = this.requestTerm.bind(this)
     this.requestAttestation = this.requestAttestation.bind(this)
 
     this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
@@ -96,7 +96,7 @@ class ClaimView extends React.Component<Props, State> {
             claimEntry={currentClaimEntry as Claims.Entry}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={this.requestAttestation}
-            onRequestLegitimation={this.requestLegitimation}
+            onRequestTerm={this.requestTerm}
           />
         )}
         {!isDetailView && (
@@ -105,7 +105,7 @@ class ClaimView extends React.Component<Props, State> {
             onCreateClaimFromCType={this.createClaimFromCType}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={this.requestAttestation}
-            onRequestLegitimation={this.requestLegitimation}
+            onRequestTerm={this.requestTerm}
           />
         )}
         {}
@@ -142,14 +142,14 @@ class ClaimView extends React.Component<Props, State> {
     })
   }
 
-  private requestLegitimation(claimEntry: Claims.Entry) {
+  private requestTerm(claimEntry: Claims.Entry) {
     PersistentStore.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
         objective: sdk.MessageBodyType.REQUEST_TERMS,
         props: {
           cTypeHash: claimEntry.claim.cTypeHash,
           preSelectedClaimEntries: [claimEntry],
-        } as RequestLegitimationsProps,
+        } as RequestTermsProps,
       })
     )
   }
@@ -177,7 +177,8 @@ class ClaimView extends React.Component<Props, State> {
 
     if (claim) {
       if (this.claimIdToLegitimate) {
-        attestationWorkflow.requestLegitimations(
+        attestationWorkflow.requestTerms
+(
           [claim],
           selectedAttesters.map(
             (contact: Contact) => contact.publicIdentity.address

@@ -14,6 +14,7 @@ import ContactList from '../containers/ContactList/ContactList'
 import CTypeCreate from '../containers/CtypeCreate/CtypeCreate'
 import CtypeView from '../containers/CtypeView/CtypeView'
 import QuoteView from '../containers/QuoteView/QuoteView'
+import QuoteCreate from '../containers/QuoteCreate/QuoteCreate'
 import MessageList from '../containers/MessageView/MessageView'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
 import WalletView from '../containers/WalletView/WalletView'
@@ -34,6 +35,8 @@ const Routes: React.FunctionComponent<{}> = props => {
 
         <Route path={'/messages'} component={requiresIdentity(MessageList)} />
         <Route path={'/quote'} component={requiresIdentity(QuoteView)} />
+
+        <Route path={'/quote/new'} component={requiresIdentity(QuoteCreate)} />
 
         <Route
           path={'/messages/:messageId'}

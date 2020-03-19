@@ -16,7 +16,7 @@ type Props = {
   onCreateClaimFromCType: (selectedCTypes: ICTypeWithMetadata[]) => void
   onRemoveClaim: (claimEntry: Claims.Entry) => void
   onRequestAttestation: (claimEntry: Claims.Entry) => void
-  onRequestLegitimation: (claimEntry: Claims.Entry) => void
+  onRequestTerm: (claimEntry: Claims.Entry) => void
 }
 
 type State = {}
@@ -99,8 +99,8 @@ class MyClaimListView extends React.Component<Props, State> {
   private getActions(claimEntry: Claims.Entry) {
     return [
       {
-        callback: this.requestLegitimation.bind(this, claimEntry),
-        label: 'Request legitimations',
+        callback: this.requestTerm.bind(this, claimEntry),
+        label: 'Request terms',
       },
       {
         callback: this.requestAttestation.bind(this, claimEntry),
@@ -123,9 +123,9 @@ class MyClaimListView extends React.Component<Props, State> {
     onRequestAttestation(claimEntry)
   }
 
-  private requestLegitimation(claimEntry: Claims.Entry) {
-    const { onRequestLegitimation } = this.props
-    onRequestLegitimation(claimEntry)
+  private requestTerm(claimEntry: Claims.Entry) {
+    const { onRequestTerm } = this.props
+    onRequestTerm(claimEntry)
   }
 
   private openCTypeModal() {

@@ -12,7 +12,7 @@ import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import './CtypeListView.scss'
 
 type Props = RouteComponentProps<{}> & {
-  onRequestLegitimation: (cType: ICTypeWithMetadata) => void
+  onRequestTerm: (cType: ICTypeWithMetadata) => void
   // mapStateToProps
   cTypes?: ICTypeWithMetadata[]
 }

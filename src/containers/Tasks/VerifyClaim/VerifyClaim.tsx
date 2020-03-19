@@ -5,7 +5,7 @@ import AttestedClaimsListView from '../../../components/AttestedClaimsListView/A
 
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
-  context?: 'legitimation'
+  context?: 'term'
 }
 
 type State = {}

@@ -12,7 +12,7 @@ type Props = {
   hideAttestedClaims?: boolean
   onRemoveClaim?: (claimEntry: Claims.Entry) => void
   onRequestAttestation?: (claimEntry: Claims.Entry) => void
-  onRequestLegitimation?: (claimEntry: Claims.Entry) => void
+  onRequestTerm?: (claimEntry: Claims.Entry) => void
 }
 
 type State = {
@@ -24,7 +24,7 @@ class MyClaimDetailView extends Component<Props, State> {
     super(props)
     this.handleDelete = this.handleDelete.bind(this)
     this.requestAttestation = this.requestAttestation.bind(this)
-    this.requestLegitimation = this.requestLegitimation.bind(this)
+    this.requestTerm = this.requestTerm.bind(this)
   }
 
   public render() {
@@ -54,7 +54,7 @@ class MyClaimDetailView extends Component<Props, State> {
       cancelable,
       onRemoveClaim,
       onRequestAttestation,
-      onRequestLegitimation,
+      onRequestTerm,
     }: Props = this.props
     return (
       <div className="actions">
@@ -66,13 +66,13 @@ class MyClaimDetailView extends Component<Props, State> {
         {onRemoveClaim && (
           <button className="deleteClaim" onClick={this.handleDelete} />
         )}
-        {onRequestLegitimation && (
+        {onRequestTerm && (
           <button
-            className="requestLegitimation"
-            onClick={this.requestLegitimation}
-            title="Request legitimation for attestation of this claim from attester"
+            className="requestTerm"
+            onClick={this.requestTerm}
+            title="Request term for attestation of this claim from attester"
           >
-            Request Legitimation
+            Request Term
           </button>
         )}
         {onRequestAttestation && (
@@ -102,10 +102,10 @@ class MyClaimDetailView extends Component<Props, State> {
     }
   }
 
-  private requestLegitimation() {
-    const { claimEntry, onRequestLegitimation }: Props = this.props
-    if (claimEntry && onRequestLegitimation) {
-      onRequestLegitimation(claimEntry)
+  private requestTerm() {
+    const { claimEntry, onRequestTerm }: Props = this.props
+    if (claimEntry && onRequestTerm) {
+      onRequestTerm(claimEntry)
     }
   }
 }

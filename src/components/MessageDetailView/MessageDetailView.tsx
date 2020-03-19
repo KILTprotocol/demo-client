@@ -6,13 +6,13 @@ import AttestClaim from '../../containers/Tasks/AttestClaim/AttestClaim'
 import CreateDelegation from '../../containers/Tasks/CreateDelegation/CreateDelegation'
 import ImportAttestation from '../../containers/Tasks/ImportAttestation/ImportAttestation'
 import SubmitClaimsForCType from '../../containers/Tasks/SubmitClaimsForCType/SubmitClaimsForCType'
-import SubmitLegitimations from '../../containers/Tasks/SubmitLegitimations/SubmitLegitimations'
+import SubmitTerms from '../../containers/Tasks/SubmitTerms/SubmitTerms'
 import RequestAttestation from '../../containers/Tasks/RequestAttestation/RequestAttestation'
 import VerifyClaim from '../../containers/Tasks/VerifyClaim/VerifyClaim'
 import { MessageOutput } from '../../services/MessageRepository'
 import ClaimDetailView from '../ClaimDetailView/ClaimDetailView'
 import Code from '../Code/Code'
-import CTypePresentation from '../CTypePresentation/CTypePresentation'
+
 import MessageSubject from '../MessageSubject/MessageSubject'
 import ImportDelegation from '../../containers/Tasks/ImportDelegation/ImportDelegation'
 
@@ -115,7 +115,7 @@ class MessageDetailView extends React.Component<Props, State> {
               claim={(message.body as sdk.IRequestTerms).content}
             />
             {showTask ? (
-              <SubmitLegitimations
+              <SubmitTerms
                 receiverAddresses={[message.senderAddress]}
                 claim={(message.body as sdk.IRequestTerms).content}
                 onCancel={this.handleCancel}
@@ -123,9 +123,7 @@ class MessageDetailView extends React.Component<Props, State> {
               />
             ) : (
               <div className="actions">
-                <button onClick={this.toggleShowTask}>
-                  Select legitimation(s)
-                </button>
+                <button onClick={this.toggleShowTask}>Select term(s)</button>
               </div>
             )}
           </>
@@ -135,9 +133,7 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <RequestAttestation
             claim={(message.body as sdk.ISubmitTerms).content.claim}
-            legitimations={
-              (message.body as sdk.ISubmitTerms).content.legitimations
-            }
+            terms={(message.body as sdk.ISubmitTerms).content.legitimations}
             delegationId={
               (message.body as sdk.ISubmitTerms).content.delegationId || null
             }
@@ -152,7 +148,8 @@ class MessageDetailView extends React.Component<Props, State> {
           <AttestClaim
             claimerAddresses={[message.senderAddress]}
             requestForAttestation={
-              (message.body as sdk.IRequestAttestationForClaim).content.requestForAttestation
+              (message.body as sdk.IRequestAttestationForClaim).content
+                .requestForAttestation
             }
             onCancel={this.handleCancel}
             onFinished={this.handleDelete}

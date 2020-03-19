@@ -14,7 +14,7 @@ import './AttestedClaimsListView.scss'
 
 type Labels = {
   default: { [key: string]: string }
-  legitimations: { [key: string]: string }
+  terms: { [key: string]: string }
 }
 
 const LABELS: Labels = {
@@ -23,16 +23,16 @@ const LABELS: Labels = {
     h2_multi: 'Attested claims',
     h2_single: 'Attested claim',
   },
-  legitimations: {
-    emptyList: 'No legitimations found.',
-    h2_multi: 'Legitimations',
-    h2_single: 'Legitimation',
+  terms: {
+    emptyList: 'No terms found.',
+    h2_multi: 'Terms',
+    h2_single: 'Term',
   },
 }
 
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
-  context?: 'legitimations'
+  context?: 'terms'
   delegationId: sdk.IDelegationNode['id'] | null
   currentDelegationViewType?: ViewType
 
@@ -174,7 +174,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                         <AttestedClaimsListView
                           attestedClaims={attestedClaim.request.legitimations}
                           delegationId={attestedClaim.request.delegationId}
-                          context="legitimations"
+                          context="terms"
                           onToggleChildOpen={this.toggleChildOpen}
                         />
 

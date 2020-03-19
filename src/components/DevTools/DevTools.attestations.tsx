@@ -22,7 +22,7 @@ type UpdateCallback = (bsAttestationKey: keyof BsAttestationsPool) => void
 type BsAttestationsPoolElement = {
   attest: {
     attesterKey: keyof BsIdentitiesPool
-    legitimations?: Array<keyof BsAttestationsPool>
+    terms?: Array<keyof BsAttestationsPool>
     delegationKey?: keyof BsDelegationsPool
   }
   claimKey: keyof BsClaimsPool
@@ -152,7 +152,7 @@ class BsAttestation {
     claimerIdentity: MyIdentity
   ): Promise<sdk.RequestForAttestation> {
     const { attest } = bsAttestationData
-    const { delegationKey, legitimations } = attest
+    const { delegationKey, terms } = attest
 
     // resolve delegation
     let delegation: MyDelegation | undefined
@@ -160,11 +160,11 @@ class BsAttestation {
       delegation = await BsDelegation.getDelegationByKey(delegationKey)
     }
 
-    // get legitimations of attester
-    let _legitimations: sdk.AttestedClaim[] = []
-    if (legitimations && Array.isArray(legitimations) && legitimations.length) {
-      _legitimations = await Promise.all(
-        (legitimations || []).map(
+    // get terms of attester
+    let _terms: sdk.AttestedClaim[] = []
+    if (terms && Array.isArray(terms) && terms.length) {
+      _terms = await Promise.all(
+        (terms || []).map(
           (
             _bsAttestationKey: keyof BsAttestationsPool
           ): Promise<sdk.AttestedClaim> => {
@@ -183,7 +183,7 @@ class BsAttestation {
     return sdk.RequestForAttestation.fromClaimAndIdentity(
       claimToAttest.claim,
       claimerIdentity.identity,
-      _legitimations,
+      _terms,
       delegation ? delegation.id : null
     )
   }
@@ -249,7 +249,7 @@ class BsAttestation {
       owner: claimerIdentity.identity.address,
     }
 
-    // send request for legitimation from claimer to attester
+    // send request for term from claimer to attester
     const requestAcceptDelegation: sdk.IRequestTerms = {
       content: partialClaim,
       type: sdk.MessageBodyType.REQUEST_TERMS,
@@ -260,17 +260,18 @@ class BsAttestation {
       ContactRepository.getContactFromIdentity(attesterIdentity)
     )
 
-    // send legitimations from attester to claimer
-    const submitLegitimations: sdk.ISubmitTerms = {
+    // send terms from attester to claimer
+    const submitTerms: sdk.ISubmitTerms = {
       content: {
         claim: partialClaim,
         delegationId: attestedClaim.request.delegationId || undefined,
         legitimations: attestedClaim.request.legitimations,
+        quote: undefined
       },
       type: sdk.MessageBodyType.SUBMIT_TERMS,
     }
     await MessageRepository.singleSend(
-      submitLegitimations,
+      submitTerms,
       attesterIdentity,
       ContactRepository.getContactFromIdentity(claimerIdentity)
     )

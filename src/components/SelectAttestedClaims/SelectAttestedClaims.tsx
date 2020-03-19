@@ -25,7 +25,7 @@ export type SelectAttestedClaimsLabels = {
 
 type AllLabels = {
   default: SelectAttestedClaimsLabels
-  legitimation: SelectAttestedClaimsLabels
+  term: SelectAttestedClaimsLabels
 }
 
 const LABELS: AllLabels = {
@@ -42,18 +42,18 @@ const LABELS: AllLabels = {
       noClaimsFound: `No claims found.`,
     },
   },
-  legitimation: {
+  term: {
     buttons: {
-      createClaim: 'Create legitimation',
+      createClaim: 'Create Terms',
       requestAttestation: 'Request attestation(s)',
     },
     text: {
       attestationsHeadline: 'Select attestation(s)',
       includePropertiesHeadline:
-        'Select property(s) to include in Legitimation',
+        'Select property(s) to include in Terms',
       noAttestationFound: 'No attestation found.',
       noClaimsForCTypeFound: `No attested claims found for CTYPE. `,
-      noClaimsFound: `No legitimations found.`,
+      noClaimsFound: `No terms found.`,
     },
   },
 }
@@ -72,7 +72,7 @@ export type ClaimSelectionData = {
 type Props = {
   claimEntries: Claims.Entry[] // redux
   cTypeHashes?: Array<sdk.ICType['hash']>
-  context?: 'default' | 'legitimation'
+  context?: 'default' | 'terms'
   onChange: (claimSelectionData: ClaimSelectionData) => void
 }
 

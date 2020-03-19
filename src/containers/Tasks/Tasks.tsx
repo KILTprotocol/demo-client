@@ -19,15 +19,15 @@ import RequestAttestation, {
 import RequestClaimsForCType, {
   RequestClaimsForCTypeProps,
 } from './RequestClaimsForCType/RequestClaimsForCType'
-import RequestLegitimation, {
-  RequestLegitimationsProps,
-} from './RequestLegitimation/RequestLegitimation'
+import RequestTerm, {
+  RequestTermsProps,
+} from './RequestTerms/RequestTerms'
 import SubmitClaimsForCType, {
   SubmitClaimsForCTypeProps,
 } from './SubmitClaimsForCType/SubmitClaimsForCType'
-import SubmitLegitimations, {
-  SubmitLegitimationsProps,
-} from './SubmitLegitimations/SubmitLegitimations'
+import SubmitTerms, {
+  SubmitTermsProps,
+} from './SubmitTerms/SubmitTerms'
 
 import './Tasks.scss'
 
@@ -38,11 +38,11 @@ export type TaskProps =
     }
   | {
       objective: sdk.MessageBodyType.REQUEST_TERMS
-      props: RequestLegitimationsProps
+      props: RequestTermsProps
     }
   | {
       objective: sdk.MessageBodyType.SUBMIT_TERMS
-      props: SubmitLegitimationsProps
+      props: SubmitTermsProps
     }
   | {
       objective: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
@@ -127,11 +127,11 @@ class Tasks extends React.Component<Props, State> {
             ? selectedCTypes[0].cType.hash
             : undefined
         return this.getModal(
-          'Request legitimations',
+          'Request Terms',
           <>
             {this.getCTypeSelect(false, [props.cTypeHash])}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
-              <RequestLegitimation
+              <RequestTerm
                 {...props}
                 cTypeHash={cTypeHash}
                 receiverAddresses={selectedReceiverAddresses}
@@ -149,13 +149,13 @@ class Tasks extends React.Component<Props, State> {
         const props = currentTask.props
         const cTypeHash = props.claim ? props.claim.cTypeHash : undefined
         return this.getModal(
-          'Submit legitimations',
+          'Submit Terms',
           <>
             {this.getCTypeSelect(false, [cTypeHash])}
             {!!selectedCTypes.length &&
             selectedCTypes[0].cType.hash &&
             !!selectedReceivers.length ? (
-              <SubmitLegitimations
+              <SubmitTerms
                 {...props}
                 claim={{ cTypeHash: selectedCTypes[0].cType.hash }}
                 receiverAddresses={selectedReceiverAddresses}

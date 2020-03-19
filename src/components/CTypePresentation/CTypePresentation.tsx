@@ -6,9 +6,9 @@ import { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 import { RequestClaimsForCTypeProps } from '../../containers/Tasks/RequestClaimsForCType/RequestClaimsForCType'
-import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
+import { RequestTermsProps } from '../../containers/Tasks/RequestTerms/RequestTerms'
 import { SubmitClaimsForCTypeProps } from '../../containers/Tasks/SubmitClaimsForCType/SubmitClaimsForCType'
-import { SubmitLegitimationsProps } from '../../containers/Tasks/SubmitLegitimations/SubmitLegitimations'
+import { SubmitTermsProps } from '../../containers/Tasks/SubmitTerms/SubmitTerms'
 
 import CTypeRepository from '../../services/CtypeRepository'
 import * as UiState from '../../state/ducks/UiState'
@@ -165,11 +165,11 @@ class CTypePresentation extends React.Component<Props, State> {
               objective: sdk.MessageBodyType.REQUEST_TERMS,
               props: {
                 cTypeHash,
-              } as RequestLegitimationsProps,
+              } as RequestTermsProps,
             })
           )
         },
-        label: 'Request legitimations',
+        label: 'Request Terms',
       },
       {
         callback: () => {
@@ -189,11 +189,11 @@ class CTypePresentation extends React.Component<Props, State> {
               objective: sdk.MessageBodyType.SUBMIT_TERMS,
               props: {
                 claim: { cTypeHash },
-              } as SubmitLegitimationsProps,
+              } as SubmitTermsProps,
             })
           )
         },
-        label: 'Submit legitimations',
+        label: 'Submit Terms',
       },
       {
         callback: () => {

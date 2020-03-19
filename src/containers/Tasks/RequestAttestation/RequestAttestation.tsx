@@ -14,10 +14,10 @@ import './RequestAttestation.scss'
 
 export type RequestAttestationProps = {
   claim: sdk.IPartialClaim
-  legitimations: sdk.IAttestedClaim[]
+  terms: sdk.IAttestedClaim[]
+  quoteAgreement?: sdk.IQuoteAttesterSigned
   receiverAddresses: Array<sdk.PublicIdentity['address']>
   delegationId: sdk.IDelegationNode['id'] | null
-
   onCancel?: () => void
   onFinished?: () => void
 }
@@ -25,6 +25,7 @@ export type RequestAttestationProps = {
 type State = {
   savedClaimEntry?: Claims.Entry
   createNewClaim?: boolean
+  quote?: sdk.IQuoteAttesterSigned
 }
 
 class RequestAttestation extends React.Component<
@@ -49,7 +50,7 @@ class RequestAttestation extends React.Component<
   }
 
   public render() {
-    const { legitimations, delegationId } = this.props
+    const { terms, delegationId } = this.props
     const { savedClaimEntry } = this.state
 
     return (
@@ -63,17 +64,18 @@ class RequestAttestation extends React.Component<
           this.getCreateOrSelect()
         )}
 
-        {((!!legitimations && !!legitimations.length) || !!delegationId) && (
+        {((!!terms && !!terms.length) || !!delegationId) && (
           <AttestedClaimsListView
-            attestedClaims={legitimations}
+            attestedClaims={terms}
             delegationId={delegationId}
-            context="legitimations"
+            context="terms"
             currentDelegationViewType={ViewType.Present}
           />
         )}
 
         <div className="actions">
           <button onClick={this.onCancel}>Cancel</button>
+
           <button
             className="request-attestation"
             disabled={!savedClaimEntry}
@@ -188,12 +190,7 @@ class RequestAttestation extends React.Component<
   }
 
   private handleSubmit() {
-    const {
-      receiverAddresses,
-      legitimations,
-      delegationId,
-      onFinished,
-    } = this.props
+    const { receiverAddresses, terms, delegationId, onFinished } = this.props
     const { savedClaimEntry } = this.state
 
     if (savedClaimEntry) {
@@ -201,7 +198,7 @@ class RequestAttestation extends React.Component<
         .requestAttestationForClaim(
           savedClaimEntry.claim,
           receiverAddresses,
-          (legitimations || []).map((legitimation: sdk.IAttestedClaim) =>
+          (terms || []).map((legitimation: sdk.IAttestedClaim) =>
             sdk.AttestedClaim.fromAttestedClaim(legitimation)
           ),
           delegationId
