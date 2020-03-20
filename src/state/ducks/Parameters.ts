@@ -4,30 +4,30 @@ import { createSelector } from 'reselect'
 import KiltAction from '../../types/Action'
 import { State as ReduxState } from '../PersistentStore'
 
-const DEFAULT_BLOCK_HASH: string = ''
+const DEFAULT_BLOCK_HASH = ''
 
-interface Parameters {
+interface IParameters {
   blockHash: string
 }
 
-interface UpdateAction extends KiltAction {
-  payload: Parameters
+interface IUpdateAction extends KiltAction {
+  payload: IParameters
 }
 
-type Action = UpdateAction
+export type Action = IUpdateAction
 
 type State = {
-  parameters: Parameters
+  parameters: IParameters
 }
 
-type ImmutableState = Immutable.Record<State>
+export type ImmutableState = Immutable.Record<State>
 
-type SerializedState = {
-  parameters: Partial<Parameters>
+export type SerializedState = {
+  parameters: Partial<IParameters>
 }
 
 class Store {
-  public static serialize(state: ImmutableState) {
+  public static serialize(state: ImmutableState): SerializedState {
     const serialized: SerializedState = {
       parameters: {},
     }
@@ -44,7 +44,7 @@ class Store {
     }
 
     return Store.createState({
-      parameters: parameters.parameters as Parameters,
+      parameters: parameters.parameters as IParameters,
     })
   }
 
@@ -54,14 +54,14 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.UPDATE_PARAMETERS: {
-        return state.setIn(['parameters'], (action as UpdateAction).payload)
+        return state.setIn(['parameters'], action.payload)
       }
       default:
         return state
     }
   }
 
-  public static updateParameters(parameters: Parameters): UpdateAction {
+  public static updateParameters(parameters: IParameters): IUpdateAction {
     return {
       payload: parameters,
       type: Store.ACTIONS.UPDATE_PARAMETERS,
@@ -78,27 +78,20 @@ class Store {
     UPDATE_PARAMETERS: 'parameters/UPDATE_PARAMETERS',
   }
 
-  private static getDefaults(): Parameters {
+  private static getDefaults(): IParameters {
     return {
       blockHash: DEFAULT_BLOCK_HASH,
-    } as Parameters
+    } as IParameters
   }
 }
 
-const _getParameters = (state: ReduxState) => {
+const getStateParameters = (state: ReduxState): IParameters => {
   return state.parameters.get('parameters')
 }
 
 const getParameters = createSelector(
-  [_getParameters],
-  (parameters: Parameters) => parameters
+  [getStateParameters],
+  (parameters: IParameters) => parameters
 )
 
-export {
-  Store,
-  ImmutableState,
-  SerializedState,
-  Action,
-  getParameters,
-  DEFAULT_BLOCK_HASH,
-}
+export { Store, getParameters, DEFAULT_BLOCK_HASH }

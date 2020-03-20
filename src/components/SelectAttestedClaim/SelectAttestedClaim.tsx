@@ -1,13 +1,10 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
-import { ChangeEvent } from 'react'
-import { connect } from 'react-redux'
+import React, { ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
 import isEqual from 'lodash/isEqual'
 
 import CTypeRepository from '../../services/CtypeRepository'
 import * as Claims from '../../state/ducks/Claims'
-import { State as ReduxState } from '../../state/PersistentStore'
 import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -45,7 +42,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
     this.selectAllProperties = this.selectAllProperties.bind(this)
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     const { cTypeHash } = this.props
     if (cTypeHash) {
       CTypeRepository.findByHash(cTypeHash).then(
@@ -61,18 +58,111 @@ class SelectAttestedClaim extends React.Component<Props, State> {
     }
   }
 
-  public render() {
-    const { isSelected } = this.state
+  private getClaimSelect(): JSX.Element {
+    const { claimEntry } = this.props
+
     return (
-      <section className="SelectAttestedClaim">
-        {this.getClaimSelect()}
-        {isSelected && this.getClaimPropertySelect()}
-        {isSelected && this.getAttestionsSelect()}
-      </section>
+      <div className="select-claim">
+        <label key={claimEntry.id}>
+          <input type="checkbox" onChange={this.selectClaimEntry} />
+          <span>{claimEntry.meta.alias}</span>
+        </label>
+      </div>
     )
   }
 
-  public selectionsChanged() {
+  private getClaimPropertySelect(): false | JSX.Element {
+    const { labels, claimEntry } = this.props
+    const { allClaimPropertiesSelected, cType } = this.state
+
+    const propertyNames: string[] = Object.keys(claimEntry.claim.contents)
+
+    return (
+      propertyNames.length > 0 && (
+        <div className="properties">
+          <h4>
+            {labels.text.includePropertiesHeadline}
+            <label>
+              <input type="checkbox" onChange={this.selectAllProperties} />
+              <span>All</span>
+            </label>
+          </h4>
+          {propertyNames.map((propertyName: string) => {
+            const propertyTitle = cType
+              ? getCtypePropertyTitle(propertyName, cType)
+              : propertyName
+            return (
+              <label
+                key={propertyName}
+                className={allClaimPropertiesSelected ? 'selected-all' : ''}
+              >
+                <input
+                  type="checkbox"
+                  disabled={allClaimPropertiesSelected}
+                  onChange={this.selectClaimProperty.bind(this, propertyName)}
+                />
+                <span>{propertyTitle}</span>
+              </label>
+            )
+          })}
+        </div>
+      )
+    )
+  }
+
+  private getAttestionsSelect(): '' | JSX.Element {
+    const { labels, claimEntry } = this.props
+    const { allAttestedClaimsSelected } = this.state
+    const { attestations } = claimEntry
+
+    if (!attestations || !attestations.length) {
+      return ''
+    }
+    // TODO: should we check the attestations against chain here?
+
+    return attestations && attestations.length ? (
+      <>
+        <div className="attestations">
+          <h4>
+            {labels.text.attestationsHeadline}
+            <label>
+              <input type="checkbox" onChange={this.selectAllAttestations} />
+              <span>All</span>
+            </label>
+          </h4>
+          {attestations.map((attestedClaim: sdk.IAttestedClaim) => (
+            <label
+              key={`${attestedClaim.attestation.claimHash}-${attestedClaim.attestation.owner}`}
+              className={allAttestedClaimsSelected ? 'selected-all' : ''}
+            >
+              <input
+                type="checkbox"
+                disabled={allAttestedClaimsSelected}
+                onChange={this.selectAttestation.bind(this, attestedClaim)}
+              />
+              <span>
+                <AttestationStatus attestation={attestedClaim} />
+                <ContactPresentation
+                  address={attestedClaim.attestation.owner}
+                  interactive
+                  inline
+                />
+              </span>
+            </label>
+          ))}
+        </div>
+      </>
+    ) : (
+      <div className="no-attestations">
+        <span>{labels.text.noAttestationFound} </span>
+        <Link to={`/claim/${claimEntry.id}`}>
+          {labels.buttons.requestAttestation}
+        </Link>
+      </div>
+    )
+  }
+
+  public selectionsChanged(): void {
     const { claimEntry, onChangeSelections } = this.props
     const {
       allAttestedClaimsSelected,
@@ -95,20 +185,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
     })
   }
 
-  private getClaimSelect() {
-    const { claimEntry } = this.props
-
-    return (
-      <div className="select-claim">
-        <label key={claimEntry.id}>
-          <input type="checkbox" onChange={this.selectClaimEntry} />
-          <span>{claimEntry.meta.alias}</span>
-        </label>
-      </div>
-    )
-  }
-
-  private selectClaimEntry(event: ChangeEvent<HTMLInputElement>) {
+  private selectClaimEntry(event: ChangeEvent<HTMLInputElement>): void {
     this.setState(
       {
         isSelected: event.target.checked,
@@ -117,49 +194,10 @@ class SelectAttestedClaim extends React.Component<Props, State> {
     )
   }
 
-  private getClaimPropertySelect() {
-    const { labels, claimEntry } = this.props
-    const { allClaimPropertiesSelected } = this.state
-
-    const propertyNames: string[] = Object.keys(claimEntry.claim.contents)
-
-    return (
-      propertyNames.length > 0 && (
-        <div className="properties">
-          <h4>
-            {labels.text.includePropertiesHeadline}
-            <label>
-              <input type="checkbox" onChange={this.selectAllProperties} />
-              <span>All</span>
-            </label>
-          </h4>
-          {propertyNames.map((propertyName: string) => {
-            const propertyTitle = this.state.cType
-              ? getCtypePropertyTitle(propertyName, this.state.cType)
-              : propertyName
-            return (
-              <label
-                key={propertyName}
-                className={allClaimPropertiesSelected ? 'selected-all' : ''}
-              >
-                <input
-                  type="checkbox"
-                  disabled={allClaimPropertiesSelected}
-                  onChange={this.selectClaimProperty.bind(this, propertyName)}
-                />
-                <span>{propertyTitle}</span>
-              </label>
-            )
-          })}
-        </div>
-      )
-    )
-  }
-
   private selectClaimProperty(
     propertyName: string,
     event: ChangeEvent<HTMLInputElement>
-  ) {
+  ): void {
     const { checked } = event.target
     let { selectedClaimProperties } = this.state
 
@@ -180,61 +218,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
     )
   }
 
-  private getAttestionsSelect() {
-    const { labels, claimEntry } = this.props
-    const { allAttestedClaimsSelected } = this.state
-    const { attestations } = claimEntry
-
-    if (!attestations || !attestations.length) {
-      return ''
-    }
-    // TODO: should we check the attestations against chain here?
-
-    return attestations && attestations.length ? (
-      <React.Fragment>
-        <div className="attestations">
-          <h4>
-            {labels.text.attestationsHeadline}
-            <label>
-              <input type="checkbox" onChange={this.selectAllAttestations} />
-              <span>All</span>
-            </label>
-          </h4>
-          {attestations.map((attestedClaim: sdk.IAttestedClaim) => (
-            <label
-              key={`${attestedClaim.attestation.claimHash}-${
-                attestedClaim.attestation.owner
-              }`}
-              className={allAttestedClaimsSelected ? 'selected-all' : ''}
-            >
-              <input
-                type="checkbox"
-                disabled={allAttestedClaimsSelected}
-                onChange={this.selectAttestation.bind(this, attestedClaim)}
-              />
-              <span>
-                <AttestationStatus attestation={attestedClaim} />
-                <ContactPresentation
-                  address={attestedClaim.attestation.owner}
-                  interactive={true}
-                  inline={true}
-                />
-              </span>
-            </label>
-          ))}
-        </div>
-      </React.Fragment>
-    ) : (
-      <div className="no-attestations">
-        <span>{labels.text.noAttestationFound} </span>
-        <Link to={`/claim/${claimEntry.id}`}>
-          {labels.buttons.requestAttestation}
-        </Link>
-      </div>
-    )
-  }
-
-  private selectAllAttestations(event: ChangeEvent<HTMLInputElement>) {
+  private selectAllAttestations(event: ChangeEvent<HTMLInputElement>): void {
     const { checked } = event.target
 
     this.setState(
@@ -247,7 +231,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
     )
   }
 
-  private selectAllProperties(event: ChangeEvent<HTMLInputElement>) {
+  private selectAllProperties(event: ChangeEvent<HTMLInputElement>): void {
     const { checked } = event.target
 
     this.setState(
@@ -263,7 +247,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
   private selectAttestation(
     attestedClaim: sdk.IAttestedClaim,
     event: ChangeEvent<HTMLInputElement>
-  ) {
+  ): void {
     const { checked } = event.target
     const { selectedAttestedClaims } = this.state
 
@@ -292,10 +276,17 @@ class SelectAttestedClaim extends React.Component<Props, State> {
       )
     }
   }
+
+  public render(): JSX.Element {
+    const { isSelected } = this.state
+    return (
+      <section className="SelectAttestedClaim">
+        {this.getClaimSelect()}
+        {isSelected && this.getClaimPropertySelect()}
+        {isSelected && this.getAttestionsSelect()}
+      </section>
+    )
+  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
-  claimEntries: Claims.getClaims(state),
-})
-
-export default connect(mapStateToProps)(SelectAttestedClaim)
+export default SelectAttestedClaim

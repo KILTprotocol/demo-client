@@ -3,49 +3,49 @@ import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 
 import KiltAction from '../../types/Action'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
 
-interface SaveAction extends KiltAction {
-  payload: MyIdentity
+interface ISaveAction extends KiltAction {
+  payload: IMyIdentity
 }
 
-interface UpdateAction extends KiltAction {
+interface IUpdateAction extends KiltAction {
   payload: {
-    address: MyIdentity['identity']['address']
-    partialMyIdentity: Partial<MyIdentity>
+    address: IMyIdentity['identity']['address']
+    partialMyIdentity: Partial<IMyIdentity>
   }
 }
 
-interface RemoveAction extends KiltAction {
-  payload: MyIdentity['identity']['address']
+interface IRemoveAction extends KiltAction {
+  payload: IMyIdentity['identity']['address']
 }
 
-interface SelectAction extends KiltAction {
-  payload: MyIdentity['identity']['address']
+interface ISelectAction extends KiltAction {
+  payload: IMyIdentity['identity']['address']
 }
 
-type Action = SaveAction | UpdateAction | RemoveAction | SelectAction
+export type Action = ISaveAction | IUpdateAction | IRemoveAction | ISelectAction
 
-type Entry = MyIdentity
+export type Entry = IMyIdentity
 
 type State = {
-  identities: Immutable.Map<MyIdentity['identity']['address'], MyIdentity>
+  identities: Immutable.Map<IMyIdentity['identity']['address'], IMyIdentity>
   selectedIdentity: Entry | null
 }
 
-type ImmutableState = Immutable.Record<State>
+export type ImmutableState = Immutable.Record<State>
 
 type SerializedIdentity = {
-  did?: MyIdentity['did']
-  name: MyIdentity['metaData']['name']
-  phrase: MyIdentity['phrase']
-  createdAt?: MyIdentity['createdAt']
+  did?: IMyIdentity['did']
+  name: IMyIdentity['metaData']['name']
+  phrase: IMyIdentity['phrase']
+  createdAt?: IMyIdentity['createdAt']
 }
 
-type SerializedState = {
+export type SerializedState = {
   identities: SerializedIdentity[]
-  selectedAddress?: MyIdentity['identity']['address']
+  selectedAddress?: IMyIdentity['identity']['address']
 }
 
 class Store {
@@ -57,7 +57,7 @@ class Store {
     wallet.identities = state
       .get('identities')
       .toList()
-      .map((myIdentity: MyIdentity) => ({
+      .map((myIdentity: IMyIdentity) => ({
         createdAt: myIdentity.createdAt,
         did: myIdentity.did,
         name: myIdentity.metaData.name,
@@ -65,7 +65,7 @@ class Store {
       }))
       .toArray()
 
-    const selectedIdentity: MyIdentity | null = state.get('selectedIdentity')
+    const selectedIdentity: IMyIdentity | null = state.get('selectedIdentity')
     if (selectedIdentity) {
       wallet.selectedAddress = selectedIdentity.identity.address
     }
@@ -80,7 +80,7 @@ class Store {
       Array.isArray(serializedState.identities)
         ? serializedState.identities
         : []
-    const identities: { [key: string]: MyIdentity } = {}
+    const identities: { [key: string]: IMyIdentity } = {}
 
     serializedIdentities.forEach((serializedIdentity: SerializedIdentity) => {
       const { did, name, phrase, createdAt } = serializedIdentity
@@ -88,7 +88,7 @@ class Store {
       // TODO: use real wallet later instead of stored phrase
 
       const identity = sdk.Identity.buildFromMnemonic(phrase)
-      const myIdentity: MyIdentity = {
+      const myIdentity: IMyIdentity = {
         createdAt,
         did,
         identity,
@@ -119,14 +119,14 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.SAVE_IDENTITY: {
-        const myIdentity = (action as SaveAction).payload
+        const myIdentity = (action as ISaveAction).payload
         return state.setIn(['identities', myIdentity.identity.address], {
           ...myIdentity,
           createdAt: Date.now(),
         })
       }
       case Store.ACTIONS.UPDATE_IDENTITY: {
-        const { address, partialMyIdentity } = (action as UpdateAction).payload
+        const { address, partialMyIdentity } = (action as IUpdateAction).payload
         const myIdentity = state.getIn(['identities', address])
 
         const updatedIdentity = {
@@ -137,11 +137,11 @@ class Store {
         return state.setIn(['identities', address], updatedIdentity)
       }
       case Store.ACTIONS.REMOVE_IDENTITY: {
-        const removeAddress = (action as RemoveAction).payload
+        const removeAddress = (action as IRemoveAction).payload
         return state.deleteIn(['identities', removeAddress])
       }
       case Store.ACTIONS.SELECT_IDENTITY: {
-        const selectAddress = (action as SelectAction).payload
+        const selectAddress = (action as ISelectAction).payload
         const selectedIdentity = state.getIn(['identities', selectAddress])
         return state.set('selectedIdentity', selectedIdentity)
       }
@@ -150,7 +150,7 @@ class Store {
     }
   }
 
-  public static saveIdentityAction(myIdentity: MyIdentity): SaveAction {
+  public static saveIdentityAction(myIdentity: IMyIdentity): ISaveAction {
     return {
       payload: myIdentity,
       type: Store.ACTIONS.SAVE_IDENTITY,
@@ -158,9 +158,9 @@ class Store {
   }
 
   public static updateIdentityAction(
-    address: MyIdentity['identity']['address'],
-    partialMyIdentity: Partial<MyIdentity>
-  ): UpdateAction {
+    address: IMyIdentity['identity']['address'],
+    partialMyIdentity: Partial<IMyIdentity>
+  ): IUpdateAction {
     return {
       payload: { address, partialMyIdentity },
       type: Store.ACTIONS.UPDATE_IDENTITY,
@@ -168,8 +168,8 @@ class Store {
   }
 
   public static removeIdentityAction(
-    address: MyIdentity['identity']['address']
-  ): RemoveAction {
+    address: IMyIdentity['identity']['address']
+  ): IRemoveAction {
     return {
       payload: address,
       type: Store.ACTIONS.REMOVE_IDENTITY,
@@ -177,8 +177,8 @@ class Store {
   }
 
   public static selectIdentityAction(
-    address: MyIdentity['identity']['address']
-  ): SelectAction {
+    address: IMyIdentity['identity']['address']
+  ): ISelectAction {
     return {
       payload: address,
       type: Store.ACTIONS.SELECT_IDENTITY,
@@ -188,8 +188,8 @@ class Store {
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
       identities: Immutable.Map<
-        MyIdentity['identity']['address'],
-        MyIdentity
+        IMyIdentity['identity']['address'],
+        IMyIdentity
       >(),
       selectedIdentity: null,
     } as State)(obj)
@@ -203,53 +203,42 @@ class Store {
   }
 }
 
-const _getSelectedIdentity = (state: ReduxState) =>
+const getStateSelectedIdentity = (state: ReduxState) =>
   state.wallet.get('selectedIdentity')
 
 const getSelectedIdentity = createSelector(
-  [_getSelectedIdentity],
-  (selectedIdentity: MyIdentity) => selectedIdentity
+  [getStateSelectedIdentity],
+  (selectedIdentity: IMyIdentity) => selectedIdentity
 )
 
-const _getAllIdentities = (state: ReduxState) =>
+const getStateAllIdentities = (state: ReduxState) =>
   state.wallet
     .get('identities')
     .toList()
     .toArray()
 
 const getAllIdentities = createSelector(
-  [_getAllIdentities],
+  [getStateAllIdentities],
   (entries: Entry[]) =>
     entries.sort((a, b) => {
       if (!a.createdAt && !b.createdAt) {
         return 0
-      } else if (!a.createdAt) {
-        return 1
-      } else if (!b.createdAt) {
-        return -1
-      } else {
-        return a.createdAt - b.createdAt
       }
+      if (!a.createdAt) {
+        return 1
+      }
+      if (!b.createdAt) {
+        return -1
+      }
+      return a.createdAt - b.createdAt
     })
 )
 
-const _getIdentity = (
+const getStateIdentity = (
   state: ReduxState,
   address: sdk.PublicIdentity['address']
-) => state.wallet.get('identities').get(address)
+): IMyIdentity | undefined => state.wallet.get('identities').get(address)
 
-const getIdentity = createSelector(
-  [_getIdentity],
-  (entry: Entry) => entry
-)
+const getIdentity = createSelector([getStateIdentity], (entry: Entry) => entry)
 
-export {
-  Store,
-  ImmutableState,
-  SerializedState,
-  Entry,
-  Action,
-  getSelectedIdentity,
-  getAllIdentities,
-  getIdentity,
-}
+export { Store, getSelectedIdentity, getAllIdentities, getIdentity }

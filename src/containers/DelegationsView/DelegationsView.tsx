@@ -1,40 +1,46 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import isEqual from 'lodash/isEqual'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
 import { Redirect, RouteComponentProps, withRouter } from 'react-router'
 
 import { ViewType } from '../../components/DelegationNode/DelegationNode'
 import DelegationDetailView from '../../components/DelegationDetailView/DelegationDetailView'
 import SelectCTypesModal from '../../components/Modal/SelectCTypesModal'
-import MyDelegationsInviteModal from '../../components/MyDelegationsInviteModal/MyDelegationsInviteModal'
 import MyDelegationsListView from '../../components/MyDelegationsListView/MyDelegationsListView'
 import { safeDelete } from '../../services/FeedbackService'
 import * as Delegations from '../../state/ducks/Delegations'
-import { MyDelegation } from '../../state/ducks/Delegations'
+import { IMyDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { Contact, MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 
 import './DelegationsView.scss'
 
-type Props = RouteComponentProps<{ delegationId: string }> & {
-  isPCR: boolean
-
-  // mapStateToProps
-  delegationEntries: MyDelegation[]
-  selectedIdentity: MyIdentity
-  // mapDispatchToProps
-  removeDelegation: (delegation: MyDelegation) => void
+type StateProps = {
+  delegationEntries: IMyDelegation[]
+  selectedIdentity: IMyIdentity
 }
 
-type State = {
-  delegationEntries: MyDelegation[]
+type DispatchProps = {
+  removeDelegation: (delegation: IMyDelegation) => void
+}
 
-  currentDelegation?: MyDelegation
+type OwnProps = {
+  isPCR: boolean
+}
+
+type Props = StateProps &
+  DispatchProps &
+  OwnProps &
+  RouteComponentProps<{ delegationId: string }>
+
+type State = {
+  delegationEntries: IMyDelegation[]
+
+  currentDelegation?: IMyDelegation
   invitePermissions?: sdk.Permission[]
-  selectedContacts?: Contact[]
   redirect?: string
 }
 
@@ -50,13 +56,12 @@ class DelegationsView extends React.Component<Props, State> {
     this.deleteDelegation = this.deleteDelegation.bind(this)
     this.createDelegation = this.createDelegation.bind(this)
     this.onSelectCType = this.onSelectCType.bind(this)
-    this.selectContact = this.selectContact.bind(this)
   }
 
-  public componentDidMount() {
-    const { params, url } = this.props.match
+  public componentDidMount(): void {
+    const { delegationEntries, isPCR, match } = this.props
+    const { params, url } = match
     const { delegationId } = params
-    const { delegationEntries, isPCR } = this.props
 
     this.filterDelegationEntries(delegationEntries, () => {
       if (delegationId) {
@@ -82,24 +87,77 @@ class DelegationsView extends React.Component<Props, State> {
     })
   }
 
-  public componentDidUpdate(prevProps: Props) {
-    const { isPCR } = this.props
+  public componentDidUpdate(prevProps: Props): void {
+    const { delegationEntries, isPCR, selectedIdentity } = this.props
     if (
       prevProps.selectedIdentity.identity.address !==
-      this.props.selectedIdentity.identity.address
+      selectedIdentity.identity.address
     ) {
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({
         redirect: isPCR ? '/pcrs' : '/delegations',
       })
     }
-    if (!isEqual(prevProps.delegationEntries, this.props.delegationEntries)) {
-      this.filterDelegationEntries(this.props.delegationEntries)
+    if (!isEqual(prevProps.delegationEntries, delegationEntries)) {
+      this.filterDelegationEntries(delegationEntries)
     }
   }
 
-  public render() {
+  private onSelectCType(selectedCTypes: ICTypeWithMetadata[]): void {
+    if (selectedCTypes && selectedCTypes.length === 1) {
+      const { history, isPCR } = this.props
+      history.push(
+        `/${isPCR ? 'pcrs' : 'delegations'}/new/${selectedCTypes[0].cType.hash}`
+      )
+    }
+  }
+
+  private filterDelegationEntries(
+    allDelegationEntries: IMyDelegation[],
+    callback?: () => void
+  ): void {
     const { isPCR } = this.props
-    const { delegationId } = this.props.match.params
+
+    // the ! check also checks older delegationEntries without isPCR
+    const delegationEntries = allDelegationEntries.filter(
+      (delegationEntry: IMyDelegation) => !delegationEntry.isPCR === !isPCR
+    )
+
+    this.setState({ delegationEntries }, callback)
+  }
+
+  private deleteDelegation(delegation: IMyDelegation): void {
+    const { removeDelegation, isPCR } = this.props
+    if (removeDelegation) {
+      safeDelete(
+        `${isPCR ? 'PCR' : 'delegation'} '${delegation.metaData.alias ||
+          delegation.id}'`,
+        () => {
+          removeDelegation(delegation)
+        }
+      )
+    }
+  }
+
+  private loadDelegationForId(
+    delegationId: Delegations.IMyDelegation['id']
+  ): Delegations.IMyDelegation | undefined {
+    const { delegationEntries } = this.state
+
+    return delegationEntries.find(
+      (delegationEntry: IMyDelegation) => delegationEntry.id === delegationId
+    )
+  }
+
+  private createDelegation(): void {
+    if (this.selectCTypesModal) {
+      this.selectCTypesModal.show()
+    }
+  }
+
+  public render(): JSX.Element {
+    const { isPCR, match } = this.props
+    const { delegationId } = match.params
     const { delegationEntries, currentDelegation, redirect } = this.state
 
     if (redirect) {
@@ -122,7 +180,7 @@ class DelegationsView extends React.Component<Props, State> {
           <DelegationDetailView
             id={delegationId}
             isPCR={isPCR}
-            editable={true}
+            editable
             viewType={ViewType.Present}
           />
         )}
@@ -136,78 +194,29 @@ class DelegationsView extends React.Component<Props, State> {
       </section>
     )
   }
-
-  private selectContact(selectedContacts: Contact[]) {
-    this.setState({ selectedContacts })
-  }
-
-  private deleteDelegation(delegation: MyDelegation) {
-    const { removeDelegation, isPCR } = this.props
-    if (removeDelegation) {
-      safeDelete(
-        `${isPCR ? 'PCR' : 'delegation'} '${delegation.metaData.alias ||
-          delegation.id}'`,
-        () => {
-          removeDelegation(delegation)
-        }
-      )
-    }
-  }
-
-  private loadDelegationForId(
-    delegationId: Delegations.MyDelegation['id']
-  ): Delegations.MyDelegation | undefined {
-    const { delegationEntries } = this.state
-
-    return delegationEntries.find(
-      (delegationEntry: MyDelegation) => delegationEntry.id === delegationId
-    )
-  }
-
-  private createDelegation(): void {
-    if (this.selectCTypesModal) {
-      this.selectCTypesModal.show()
-    }
-  }
-
-  private onSelectCType(selectedCTypes: ICTypeWithMetadata[]) {
-    if (selectedCTypes && selectedCTypes.length === 1) {
-      const { isPCR } = this.props
-      this.props.history.push(
-        `/${isPCR ? 'pcrs' : 'delegations'}/new/${selectedCTypes[0].cType.hash}`
-      )
-    }
-  }
-
-  private filterDelegationEntries(
-    allDelegationEntries: MyDelegation[],
-    callback?: () => void
-  ) {
-    const { isPCR } = this.props
-
-    // the ! check also checks older delegationEntries without isPCR
-    const delegationEntries = allDelegationEntries.filter(
-      (delegationEntry: MyDelegation) => !delegationEntry.isPCR === !isPCR
-    )
-
-    this.setState({ delegationEntries }, callback)
-  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   delegationEntries: Delegations.getAllDelegations(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps = (dispatch: (action: Delegations.Action) => void) => {
+const mapDispatchToProps: MapDispatchToProps<
+  DispatchProps,
+  OwnProps
+> = dispatch => {
   return {
-    removeDelegation: (delegation: MyDelegation) => {
+    removeDelegation: (delegation: IMyDelegation) => {
       dispatch(Delegations.Store.removeDelegationAction(delegation))
     },
   }
 }
 
-export default connect(
+export default connect<StateProps, DispatchProps, OwnProps>(
   mapStateToProps,
   mapDispatchToProps
 )(withRouter(DelegationsView))

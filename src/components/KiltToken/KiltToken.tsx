@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { BalanceUtilities } from '../../services/BalanceUtilities'
+import React from 'react'
 
 import './KiltToken.scss'
 
@@ -9,33 +8,26 @@ type Props = {
   decimalPlaces?: number
 }
 
-type State = {}
-
-class KiltToken extends React.Component<Props, State> {
-  public static defaultProps = {
-    colored: false,
-    decimalPlaces: 2,
+const KiltToken: React.FC<Props> = ({
+  amount,
+  colored = false,
+  decimalPlaces = 2,
+}) => {
+  if (amount == null || !decimalPlaces) {
+    return <section className="KiltToken" />
   }
 
-  public render() {
-    const { amount, colored, decimalPlaces } = this.props
+  let changeIndicator = ''
+  if (amount < 0) changeIndicator = 'decreased'
+  if (amount > 0) changeIndicator = 'increased'
 
-    if (amount == null || !decimalPlaces) {
-      return <section className="KiltToken" />
-    }
+  const classes = ['KiltToken', colored ? 'colored' : '', changeIndicator]
 
-    const classes = [
-      'KiltToken',
-      colored ? 'colored' : '',
-      amount < 0 ? 'decreased' : amount > 0 ? 'increased' : '',
-    ]
-
-    return (
-      <section className={classes.join(' ')} title={`${amount}`}>
-        {amount.toFixed(decimalPlaces)}
-      </section>
-    )
-  }
+  return (
+    <section className={classes.join(' ')} title={`${amount}`}>
+      {amount.toFixed(decimalPlaces)}
+    </section>
+  )
 }
 
 export default KiltToken

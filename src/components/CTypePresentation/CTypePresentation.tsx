@@ -1,8 +1,7 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
-import * as React from 'react'
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 import { RequestClaimsForCTypeProps } from '../../containers/Tasks/RequestClaimsForCType/RequestClaimsForCType'
@@ -41,84 +40,31 @@ class CTypePresentation extends React.Component<Props, State> {
     this.state = {}
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     this.setCType()
   }
 
-  public componentDidUpdate(prevProps: Props) {
+  public componentDidUpdate(prevProps: Props): void {
     if (!_.isEqual(this.props, prevProps)) {
       this.setCType()
     }
   }
 
-  public render() {
-    const {
-      cTypeHash,
-      inline,
-      interactive,
-      fullSizeActions,
-      right,
-      size,
-    } = this.props
-    const { cType } = this.state
-
-    let actions: Action[] = []
-
-    if (interactive) {
-      actions = this.getActions()
-    }
-
-    const classes = [
-      'CTypePresentation',
-      inline ? 'inline' : '',
-      actions.length ? 'withActions' : '',
-      fullSizeActions ? 'fullSizeActions' : 'minimal',
-      right ? 'alignRight' : '',
-    ]
-
-    const dataAttributes: { [dataAttribute: string]: string } = {}
-
-    if (cTypeHash) {
-      dataAttributes['data-ctype-hash'] = cTypeHash
-    }
-
-    return (
-      <div className={classes.join(' ')} {...dataAttributes}>
-        {cType && cType.cType && (
-          <>
-            <Identicon
-              value={cType.cType.hash}
-              size={size || DEFAULT_SIZE}
-              theme="polkadot"
-            />
-            {this.getLabel(cType.metaData.metadata.title.default)}
-          </>
-        )}
-        {!!actions.length && (
-          <SelectAction
-            className={fullSizeActions ? 'fullSize' : 'minimal'}
-            actions={actions}
-          />
-        )}
-      </div>
-    )
-  }
-
-  private getLabel(label: string) {
+  private getLabel(label: string): JSX.Element {
     const { linked } = this.props
     const { cType } = this.state
-    let _label: string | ReactNode = label
+    let localLabel: string | ReactNode = label
     if (linked && cType) {
-      _label = <Link to={`/ctype/${cType.cType.hash}`}>{_label}</Link>
+      localLabel = <Link to={`/ctype/${cType.cType.hash}`}>{label}</Link>
     }
     return (
       <span className="label" title={label}>
-        {_label}
+        {localLabel}
       </span>
     )
   }
 
-  private async setCType() {
+  private setCType(): void {
     const { cTypeHash } = this.props
 
     CTypeRepository.findByHash(cTypeHash).then((_cType: ICTypeWithMetadata) => {
@@ -127,23 +73,23 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   private getActions(): Action[] {
-    const { cTypeHash } = this.props
+    const { cTypeHash, history } = this.props
     const actions: Action[] = [
       {
         callback: () => {
-          this.props.history.push(`/claim/new/${cTypeHash}`)
+          history.push(`/claim/new/${cTypeHash}`)
         },
         label: 'Create claim',
       },
       {
         callback: () => {
-          this.props.history.push(`/delegations/new/${cTypeHash}`)
+          history.push(`/delegations/new/${cTypeHash}`)
         },
         label: 'Create delegation',
       },
       {
         callback: () => {
-          this.props.history.push(`/pcrs/new/${cTypeHash}`)
+          history.push(`/pcrs/new/${cTypeHash}`)
         },
         label: 'Create PCR',
       },
@@ -225,6 +171,59 @@ class CTypePresentation extends React.Component<Props, State> {
       },
     ]
     return actions
+  }
+
+  public render(): JSX.Element {
+    const {
+      cTypeHash,
+      inline,
+      interactive,
+      fullSizeActions,
+      right,
+      size,
+    } = this.props
+    const { cType } = this.state
+
+    let actions: Action[] = []
+
+    if (interactive) {
+      actions = this.getActions()
+    }
+
+    const classes = [
+      'CTypePresentation',
+      inline ? 'inline' : '',
+      actions.length ? 'withActions' : '',
+      fullSizeActions ? 'fullSizeActions' : 'minimal',
+      right ? 'alignRight' : '',
+    ]
+
+    const dataAttributes: { [dataAttribute: string]: string } = {}
+
+    if (cTypeHash) {
+      dataAttributes['data-ctype-hash'] = cTypeHash
+    }
+
+    return (
+      <div className={classes.join(' ')} {...dataAttributes}>
+        {cType && cType.cType && (
+          <>
+            <Identicon
+              value={cType.cType.hash}
+              size={size || DEFAULT_SIZE}
+              theme="polkadot"
+            />
+            {this.getLabel(cType.metaData.metadata.title.default)}
+          </>
+        )}
+        {!!actions.length && (
+          <SelectAction
+            className={fullSizeActions ? 'fullSize' : 'minimal'}
+            actions={actions}
+          />
+        )}
+      </div>
+    )
   }
 }
 

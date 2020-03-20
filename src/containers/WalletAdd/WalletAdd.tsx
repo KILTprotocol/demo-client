@@ -1,7 +1,7 @@
 import { Identity } from '@kiltprotocol/sdk-js'
 import * as mnemonic from '@polkadot/util-crypto/mnemonic'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapDispatchToProps } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 
@@ -13,14 +13,16 @@ import { notify, notifySuccess } from '../../services/FeedbackService'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore from '../../state/PersistentStore'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 
 import './WalletAdd.scss'
 
-type Props = RouteComponentProps<{}> & {
-  // mapDispatchToProps
-  saveIdentity: (myIdentity: MyIdentity) => void
+type DispatchProps = {
+  saveIdentity: (myIdentity: IMyIdentity) => void
 }
+
+type Props = DispatchProps & RouteComponentProps<{}>
+
 type State = {
   alias: string
   pendingAdd: boolean
@@ -43,7 +45,65 @@ class WalletAdd extends React.Component<Props, State> {
     this.addIdentity = this.addIdentity.bind(this)
   }
 
-  public render() {
+  private setMyPhrase = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    this.setState({ myPhrase: e.currentTarget.value })
+  }
+
+  private setAlias = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    this.setState({ alias: e.currentTarget.value })
+  }
+
+  private createRandomPhrase = (): void => {
+    this.setState({ randomPhrase: mnemonic.mnemonicGenerate() })
+  }
+
+  private togglePhrase(): void {
+    const { useMyPhrase } = this.state
+    this.setState({
+      useMyPhrase: !useMyPhrase,
+    })
+  }
+
+  private addIdentity(): void {
+    const { alias, myPhrase, randomPhrase, useMyPhrase } = this.state
+    const { history, saveIdentity } = this.props
+
+    let identity: Identity
+    const phrase = useMyPhrase ? myPhrase : randomPhrase
+    try {
+      identity = Identity.buildFromMnemonic(phrase)
+    } catch (error) {
+      errorService.log({
+        error,
+        message: `failed to create identity from phrase '${phrase}'`,
+        origin: 'WalletAdd.addIdentity()',
+      })
+      return
+    }
+
+    notify(`Creation of identity '${alias}' initiated.`)
+    history.push('/wallet')
+
+    const newIdentity: IMyIdentity = {
+      identity,
+      metaData: {
+        name: alias,
+      },
+      phrase,
+    }
+    saveIdentity(newIdentity)
+    PersistentStore.store.dispatch(
+      Contacts.Store.addContact(
+        ContactRepository.getContactFromIdentity(newIdentity, {
+          unregistered: true,
+        })
+      )
+    )
+    BalanceUtilities.connect(newIdentity)
+    notifySuccess(`New identity '${alias}' successfully created`)
+  }
+
+  public render(): JSX.Element {
     const {
       alias,
       randomPhrase,
@@ -61,8 +121,8 @@ class WalletAdd extends React.Component<Props, State> {
             <div>
               <Input
                 type="text"
-                value={this.state.alias}
-                autoFocus={true}
+                value={alias}
+                autoFocus
                 onChange={this.setAlias}
                 onSubmit={this.addIdentity}
               />
@@ -74,6 +134,7 @@ class WalletAdd extends React.Component<Props, State> {
               <div>
                 <label>Seed Phrase</label>
                 <button
+                  type="button"
                   onClick={this.createRandomPhrase}
                   title="Create random phrase"
                 />
@@ -108,6 +169,7 @@ class WalletAdd extends React.Component<Props, State> {
             Cancel
           </Link>
           <button
+            type="button"
             className="add"
             onClick={this.addIdentity}
             disabled={
@@ -123,76 +185,14 @@ class WalletAdd extends React.Component<Props, State> {
       </section>
     )
   }
-
-  private togglePhrase() {
-    const { useMyPhrase } = this.state
-    this.setState({
-      useMyPhrase: !useMyPhrase,
-    })
-  }
-
-  private async addIdentity() {
-    const { alias, myPhrase, randomPhrase, useMyPhrase } = this.state
-
-    let identity: Identity
-    const phrase = useMyPhrase ? myPhrase : randomPhrase
-    try {
-      identity = Identity.buildFromMnemonic(phrase)
-    } catch (error) {
-      errorService.log({
-        error,
-        message: `failed to create identity from phrase '${phrase}'`,
-        origin: 'WalletAdd.addIdentity()',
-      })
-      return
-    }
-
-    notify(`Creation of identity '${alias}' initiated.`)
-    this.props.history.push('/wallet')
-
-    const newIdentity: MyIdentity = {
-      identity,
-      metaData: {
-        name: alias,
-      },
-      phrase,
-    }
-    this.props.saveIdentity(newIdentity)
-    PersistentStore.store.dispatch(
-      Contacts.Store.addContact(
-        ContactRepository.getContactFromIdentity(newIdentity, {
-          unregistered: true,
-        })
-      )
-    )
-    BalanceUtilities.connect(newIdentity)
-    notifySuccess(`New identity '${alias}' successfully created`)
-  }
-
-  private createRandomPhrase = () => {
-    this.setState({ randomPhrase: mnemonic.mnemonicGenerate() })
-  }
-
-  private setMyPhrase = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ myPhrase: e.currentTarget.value })
-  }
-
-  private setAlias = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ alias: e.currentTarget.value })
-  }
 }
 
-const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
+const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = dispatch => {
   return {
-    saveIdentity: (myIdentity: MyIdentity) => {
+    saveIdentity: (myIdentity: IMyIdentity) => {
       dispatch(Wallet.Store.saveIdentityAction(myIdentity))
     },
   }
 }
 
-export default withRouter(
-  connect(
-    null,
-    mapDispatchToProps
-  )(WalletAdd)
-)
+export default withRouter(connect(null, mapDispatchToProps)(WalletAdd))

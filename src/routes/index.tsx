@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
 import Dashboard from '../components/Dashboard/Dashboard'
@@ -20,83 +20,80 @@ import requiresIdentity from './RequiresIdentity'
 import DelegationCreate from '../containers/DelegationCreate/DelegationCreate'
 import Setup from '../containers/Setup/Setup'
 
-const Routes: React.FunctionComponent<{}> = props => {
+const Routes: React.FC = () => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
 
   return (
-    <React.Fragment>
-      <Route path={'/'} component={Setup} />
+    <>
+      <Route path="/" component={Setup} />
       <Switch>
-        <Route path={'/dashboard'} component={requiresIdentity(Dashboard)} />
+        <Route path="/dashboard" component={requiresIdentity(Dashboard)} />
 
-        <Route path={'/contacts'} component={requiresIdentity(ContactList)} />
+        <Route path="/contacts" component={requiresIdentity(ContactList)} />
 
-        <Route path={'/messages'} component={requiresIdentity(MessageList)} />
+        <Route path="/messages" component={requiresIdentity(MessageList)} />
         <Route
-          path={'/messages/:messageId'}
+          path="/messages/:messageId"
           component={requiresIdentity(MessageList)}
         />
 
-        <Route path={'/wallet/add'} component={WalletAdd} />
-        <Route path={'/wallet'} component={WalletView} />
+        <Route path="/wallet/add" component={WalletAdd} />
+        <Route path="/wallet" component={WalletView} />
 
-        <Route path={'/ctype/new'} component={requiresIdentity(CTypeCreate)} />
+        <Route path="/ctype/new" component={requiresIdentity(CTypeCreate)} />
         <Route
-          path={'/ctype/:cTypeHash'}
+          path="/ctype/:cTypeHash"
           component={requiresIdentity(CtypeView)}
         />
-        <Route path={'/ctype'} component={requiresIdentity(CtypeView)} />
+        <Route path="/ctype" component={requiresIdentity(CtypeView)} />
 
         <Route
-          path={'/claim/new/:cTypeHash'}
+          path="/claim/new/:cTypeHash"
           component={requiresIdentity(ClaimCreate)}
         />
-        <Route
-          path={'/claim/:claimId'}
-          component={requiresIdentity(ClaimView)}
-        />
-        <Route path={'/claim'} component={requiresIdentity(ClaimView)} />
+        <Route path="/claim/:claimId" component={requiresIdentity(ClaimView)} />
+        <Route path="/claim" component={requiresIdentity(ClaimView)} />
 
-        <Route path={'/utilities'} component={Utilities} />
+        <Route path="/utilities" component={Utilities} />
 
         <Route
-          path={'/attestations'}
+          path="/attestations"
           component={requiresIdentity(AttestationsView)}
         />
 
         <Route
-          path={'/delegations/new/:cTypeHash'}
+          path="/delegations/new/:cTypeHash"
           component={requiresIdentity(DelegationCreate, { isPCR: false })}
         />
         <Route
-          path={'/delegations/:delegationId'}
+          path="/delegations/:delegationId"
           component={requiresIdentity(DelegationsView, { isPCR: false })}
         />
         <Route
-          path={'/delegations'}
+          path="/delegations"
           component={requiresIdentity(DelegationsView, { isPCR: false })}
         />
 
         <Route
-          path={'/pcrs/new/:cTypeHash'}
+          path="/pcrs/new/:cTypeHash"
           component={requiresIdentity(DelegationCreate, { isPCR: true })}
         />
         <Route
-          path={'/pcrs/:delegationId'}
+          path="/pcrs/:delegationId"
           component={requiresIdentity(DelegationsView, { isPCR: true })}
         />
         <Route
-          path={'/pcrs'}
+          path="/pcrs"
           component={requiresIdentity(DelegationsView, { isPCR: true })}
         />
 
-        <Route path={'/imprint'} component={Imprint} />
-        <Route path={'/privacy-policy'} component={PrivacyPolicy} />
-        <Route path={'/terms-of-use'} component={TermsOfUse} />
+        <Route path="/imprint" component={Imprint} />
+        <Route path="/privacy-policy" component={PrivacyPolicy} />
+        <Route path="/terms-of-use" component={TermsOfUse} />
 
         <Redirect to="/dashboard" />
       </Switch>
-    </React.Fragment>
+    </>
   )
 }
 

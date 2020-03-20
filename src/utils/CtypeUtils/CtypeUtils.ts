@@ -7,7 +7,7 @@ import {
   ICType,
 } from '../../types/Ctype'
 
-import { CTypeInputModel } from './CtypeInputSchema'
+import CTypeInputModel from './CtypeInputSchema'
 /**
  * Create the CTYPE model from a CTYPE input model (used in CTYPE editing components).
  * This is necessary because component editors rely on editing arrays of properties instead of
@@ -134,11 +134,9 @@ export const getClaimInputModel = (
   result.title = getLocalized(ctype.metaData.metadata.title, lang)
   result.description = getLocalized(ctype.metaData.metadata.description, lang)
   result.required = []
-  Object.entries(ctype.metaData.metadata.properties as object).forEach(
-    ([key, value]) => {
-      result.properties[key].title = getLocalized(value.title, lang)
-      result.required.push(key)
-    }
-  )
+  Object.entries(ctype.metaData.metadata.properties).forEach(([key, value]) => {
+    result.properties[key].title = getLocalized(value.title, lang)
+    result.required.push(key)
+  })
   return result
 }

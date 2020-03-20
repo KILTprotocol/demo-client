@@ -3,9 +3,8 @@ import * as sdk from '@kiltprotocol/sdk-js'
 import * as Contacts from '../state/ducks/Contacts'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
-import { Contact, MyIdentity } from '../types/Contact'
+import { IContact, IMyIdentity } from '../types/Contact'
 import { BasePostParams } from './BaseRepository'
-import BlockchainService from './BlockchainService'
 import ErrorService from './ErrorService'
 import { notifyFailure } from './FeedbackService'
 
@@ -13,11 +12,9 @@ import { notifyFailure } from './FeedbackService'
 // (for other tests)
 
 class ContactRepository {
-  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/contacts`
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${process.env.REACT_APP_SERVICE_PORT}/contacts`
 
-  public static async findAll(): Promise<Contact[]> {
+  public static async findAll(): Promise<IContact[]> {
     return fetch(`${ContactRepository.URL}`)
       .then(response => {
         if (!response.ok) {
@@ -26,7 +23,7 @@ class ContactRepository {
         return response
       })
       .then(response => response.json())
-      .then((contacts: Contact[]) => {
+      .then((contacts: IContact[]) => {
         PersistentStore.store.dispatch(Contacts.Store.addContacts(contacts))
         return Contacts.getContacts(PersistentStore.store.getState())
       })
@@ -44,7 +41,7 @@ class ContactRepository {
   public static async findByAddress(
     address: string,
     propagateError = false
-  ): Promise<void | Contact> {
+  ): Promise<void | IContact> {
     const persistedContact = Contacts.getContact(
       PersistentStore.store.getState(),
       address
@@ -62,7 +59,7 @@ class ContactRepository {
         return response
       })
       .then(response => response.json())
-      .then((contact: Contact) => {
+      .then((contact: IContact) => {
         PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
         return contact
       })
@@ -73,7 +70,7 @@ class ContactRepository {
       })
   }
 
-  public static async add(contact: Contact): Promise<void> {
+  public static async add(contact: IContact): Promise<void> {
     return fetch(`${ContactRepository.URL}`, {
       ...BasePostParams,
       body: JSON.stringify(contact),
@@ -98,13 +95,13 @@ class ContactRepository {
   }
 
   public static getContactFromIdentity(
-    myIdentity: MyIdentity,
-    mergeMetaData?: Partial<Contact['metaData']>
-  ) {
+    myIdentity: IMyIdentity,
+    mergeMetaData?: Partial<IContact['metaData']>
+  ): IContact {
     const { identity, metaData } = myIdentity
     const { address, boxPublicKeyAsHex } = identity
 
-    const contact: Contact = {
+    const contact: IContact = {
       metaData: { ...metaData, ...mergeMetaData },
       publicIdentity: { address, boxPublicKeyAsHex },
     }
@@ -115,7 +112,7 @@ class ContactRepository {
   public static async importViaDID(
     identifier: string,
     alias: string
-  ): Promise<void | Contact> {
+  ): Promise<void | IContact> {
     const publicIdentity = await sdk.PublicIdentity.resolveFromDid(
       identifier.trim(),
       {
@@ -143,10 +140,9 @@ class ContactRepository {
       }
       PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
       return contact
-    } else {
-      notifyFailure(`No contact for DID '${identifier}' found.`)
-      return Promise.reject()
     }
+    notifyFailure(`No contact for DID '${identifier}' found.`)
+    return Promise.reject()
   }
 }
 

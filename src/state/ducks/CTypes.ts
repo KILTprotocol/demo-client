@@ -3,24 +3,36 @@ import { createSelector } from 'reselect'
 
 import KiltAction from '../../types/Action'
 import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
-import PersistentStore from '../PersistentStore'
 import { State as ReduxState } from '../PersistentStore'
 
-interface AddCTypeAction extends KiltAction {
+interface IAddCTypeAction extends KiltAction {
   payload: ICTypeWithMetadata
 }
 
-interface AddCTypesAction extends KiltAction {
+interface IAddCTypesAction extends KiltAction {
   payload: ICTypeWithMetadata[]
 }
 
-type Action = AddCTypeAction | AddCTypesAction
+export type Action = IAddCTypeAction | IAddCTypesAction
 
 type State = {
   cTypes: Immutable.Map<ICType['cType']['hash'], ICTypeWithMetadata>
 }
 
-type ImmutableState = Immutable.Record<State>
+export type ImmutableState = Immutable.Record<State>
+
+const arrayToMap = (
+  cTypeArray: ICTypeWithMetadata[]
+): Immutable.Map<ICType['cType']['hash'], ICTypeWithMetadata> => {
+  const cTypes: { [hash: string]: ICTypeWithMetadata } = {}
+  cTypeArray.forEach((cType: ICTypeWithMetadata) => {
+    const { hash } = cType.cType
+    if (hash) {
+      cTypes[hash] = cType
+    }
+  })
+  return Immutable.Map(cTypes)
+}
 
 class Store {
   public static reducer(
@@ -29,12 +41,12 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.ADD_CTYPE: {
-        const cType = (action as AddCTypeAction).payload
+        const cType = (action as IAddCTypeAction).payload
         const { hash } = cType.cType
         return state.setIn(['cTypes', hash], cType)
       }
       case Store.ACTIONS.ADD_CTYPES: {
-        const cTypes = arrayToMap((action as AddCTypesAction).payload)
+        const cTypes = arrayToMap((action as IAddCTypesAction).payload)
         const currentCTypes = state.getIn(['cTypes'])
         return state.setIn(['cTypes'], currentCTypes.mergeDeep(cTypes))
       }
@@ -43,14 +55,14 @@ class Store {
     }
   }
 
-  public static addCType(cType: ICTypeWithMetadata): AddCTypeAction {
+  public static addCType(cType: ICTypeWithMetadata): IAddCTypeAction {
     return {
       payload: cType,
       type: Store.ACTIONS.ADD_CTYPE,
     }
   }
 
-  public static addCTypes(cTypes: ICTypeWithMetadata[]): AddCTypesAction {
+  public static addCTypes(cTypes: ICTypeWithMetadata[]): IAddCTypesAction {
     return {
       payload: cTypes,
       type: Store.ACTIONS.ADD_CTYPES,
@@ -69,20 +81,7 @@ class Store {
   }
 }
 
-const arrayToMap = (
-  cTypeArray: ICTypeWithMetadata[]
-): Immutable.Map<ICType['cType']['hash'], ICTypeWithMetadata> => {
-  const cTypes: { [hash: string]: ICTypeWithMetadata } = {}
-  cTypeArray.forEach((cType: ICTypeWithMetadata) => {
-    const { hash } = cType.cType
-    if (hash) {
-      cTypes[hash] = cType
-    }
-  })
-  return Immutable.Map(cTypes)
-}
-
-const _getCTypes = (state: ReduxState) => {
+const getStateCTypes = (state: ReduxState): ICTypeWithMetadata[] => {
   return state.cTypes
     .get('cTypes')
     .toList()
@@ -90,16 +89,18 @@ const _getCTypes = (state: ReduxState) => {
 }
 
 const getCTypes = createSelector(
-  [_getCTypes],
+  [getStateCTypes],
   (cTypes: ICTypeWithMetadata[]) => cTypes
 )
 
-const _getCType = (state: ReduxState, address: ICType['cType']['hash']) =>
-  state.cTypes.get('cTypes').get(address)
+const getStateCType = (
+  state: ReduxState,
+  address: ICType['cType']['hash']
+): ICTypeWithMetadata | undefined => state.cTypes.get('cTypes').get(address)
 
 const getCType = createSelector(
-  [_getCType],
+  [getStateCType],
   (cType: ICTypeWithMetadata) => cType
 )
 
-export { Store, ImmutableState, Action, getCTypes, getCType }
+export { Store, getCTypes, getCType }

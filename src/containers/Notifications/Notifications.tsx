@@ -1,37 +1,21 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 
 import * as UiState from '../../state/ducks/UiState'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { Notification, NotificationType } from '../../types/UserFeedback'
+import { INotification, NotificationType } from '../../types/UserFeedback'
 
 import './Notifications.scss'
 
-type Props = {
-  notifications: Notification[]
+type StateProps = {
+  notifications: INotification[]
 }
+type Props = StateProps
 
-type State = {}
-
-class Notifications extends Component<Props, State> {
-  private static readonly DISPLAY_TIME = 4000 // ms
-
-  constructor(props: Props) {
-    super(props)
-  }
-
-  public render() {
-    const { notifications } = this.props
-    return (
-      <section className="Notifications">
-        {notifications.map((notification: Notification) =>
-          this.getNotification(notification)
-        )}
-      </section>
-    )
-  }
-
-  private getNotification(notification: Notification) {
+class Notifications extends Component<Props> {
+  private static getNotification(
+    notification: INotification
+  ): '' | JSX.Element {
     const now = Date.now()
     if (now - notification.created >= Notifications.DISPLAY_TIME) {
       if (notification.remove) {
@@ -41,13 +25,13 @@ class Notifications extends Component<Props, State> {
         })
       }
       return ''
-    } else {
-      setTimeout(() => {
-        if (notification.remove) {
-          notification.remove()
-        }
-      }, Notifications.DISPLAY_TIME)
     }
+
+    setTimeout(() => {
+      if (notification.remove) {
+        notification.remove()
+      }
+    }, Notifications.DISPLAY_TIME)
 
     return (
       <div
@@ -65,13 +49,26 @@ class Notifications extends Component<Props, State> {
           {notification.message}
           <div className="console-log">( for details refer to console )</div>
         </div>
-        <button onClick={notification.remove} className="close" />
+        <button type="button" onClick={notification.remove} className="close" />
       </div>
+    )
+  }
+
+  private static readonly DISPLAY_TIME = 4000 // ms
+
+  public render(): JSX.Element {
+    const { notifications } = this.props
+    return (
+      <section className="Notifications">
+        {notifications.map((notification: INotification) =>
+          Notifications.getNotification(notification)
+        )}
+      </section>
     )
   }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   notifications: UiState.getNotifications(state),
 })
 

@@ -16,7 +16,7 @@ export type BlockUi = {
   updateMessage: (message: string) => void
 }
 
-export interface Notification {
+export interface INotification {
   id: string
   className?: string
   created: number
@@ -25,11 +25,11 @@ export interface Notification {
   type: NotificationType
 }
 
-export interface BlockingNotification extends Notification {
+export interface IBlockingNotification extends INotification {
   header?: string
   modalType?: ModalType
-  onConfirm?: (notification: BlockingNotification) => void
-  onCancel?: (notification: BlockingNotification) => void
+  onConfirm?: (notification: IBlockingNotification) => void
+  onCancel?: (notification: IBlockingNotification) => void
   okButtonLabel?: string
   cancelButtonLabel?: string
 }

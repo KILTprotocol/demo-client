@@ -1,23 +1,26 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapDispatchToProps } from 'react-redux'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
 
 import { notifySuccess } from '../../../services/FeedbackService'
 import * as Claims from '../../../state/ducks/Claims'
 
-type Props = {
+type DispatchProps = {
   addAttestationToClaim: (attestation: sdk.IAttestedClaim) => void
+}
+
+type OwnProps = {
   attestedClaim: sdk.IAttestedClaim
 
   onCancel?: () => void
   onFinished?: () => void
 }
 
-type State = {}
+type Props = DispatchProps & OwnProps
 
-class ImportAttestation extends React.Component<Props, State> {
+class ImportAttestation extends React.Component<Props> {
   constructor(props: Props) {
     super(props)
     this.state = {}
@@ -26,7 +29,23 @@ class ImportAttestation extends React.Component<Props, State> {
     this.importAttestation = this.importAttestation.bind(this)
   }
 
-  public render() {
+  private onCancel(): void {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
+  }
+
+  private importAttestation(): void {
+    const { addAttestationToClaim, attestedClaim, onFinished } = this.props
+    addAttestationToClaim(attestedClaim)
+    notifySuccess('Attested claim successfully imported.')
+    if (onFinished) {
+      onFinished()
+    }
+  }
+
+  public render(): JSX.Element {
     const { attestedClaim } = this.props
     return (
       <section className="ImportAttestation">
@@ -39,35 +58,22 @@ class ImportAttestation extends React.Component<Props, State> {
         />
 
         <div className="actions">
-          <button onClick={this.onCancel}>Cancel</button>
-          <button onClick={this.importAttestation}>Import Attestation</button>
+          <button type="button" onClick={this.onCancel}>
+            Cancel
+          </button>
+          <button type="button" onClick={this.importAttestation}>
+            Import Attestation
+          </button>
         </div>
       </section>
     )
   }
-
-  private onCancel() {
-    const { onCancel } = this.props
-    if (onCancel) {
-      onCancel()
-    }
-  }
-
-  private importAttestation() {
-    const { addAttestationToClaim, attestedClaim, onFinished } = this.props
-    addAttestationToClaim(attestedClaim)
-    notifySuccess('Attested claim successfully imported.')
-    if (onFinished) {
-      onFinished()
-    }
-  }
 }
 
-const mapStateToProps = () => {
-  return {}
-}
-
-const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
+const mapDispatchToProps: MapDispatchToProps<
+  DispatchProps,
+  OwnProps
+> = dispatch => {
   return {
     addAttestationToClaim: (attestation: sdk.IAttestedClaim) => {
       dispatch(Claims.Store.addAttestation(attestation))
@@ -75,7 +81,4 @@ const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ImportAttestation)
+export default connect(null, mapDispatchToProps)(ImportAttestation)

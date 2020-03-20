@@ -1,5 +1,5 @@
 import { CTypeInputModel } from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 
 import * as common from 'schema-based-json-editor'
 import SchemaEditor from '../SchemaEditor/SchemaEditor'
@@ -17,9 +17,14 @@ type Props = {
   updateCType: (cType: any, isValid: boolean) => void
 }
 
-const CTypeEditor = (props: Props) => {
-  const { cancel, connected, isValid, submit, cType, updateCType } = props
-
+const CTypeEditor: React.FC<Props> = ({
+  cancel,
+  connected,
+  isValid,
+  submit,
+  cType,
+  updateCType,
+}) => {
   return (
     <section className="CTypeEditor">
       <SchemaEditor
@@ -28,10 +33,11 @@ const CTypeEditor = (props: Props) => {
         updateValue={updateCType}
       />
       <div className="actions">
-        <button className="cancel-cType" onClick={cancel}>
+        <button type="button" className="cancel-cType" onClick={cancel}>
           Cancel
         </button>
         <button
+          type="button"
           className="submit-cType"
           disabled={!connected || !isValid}
           onClick={submit}

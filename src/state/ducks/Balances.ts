@@ -1,27 +1,27 @@
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 import KiltAction from '../../types/Action'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
 
-interface UpdateAction extends KiltAction {
+interface IUpdateAction extends KiltAction {
   payload: {
-    address: MyIdentity['identity']['address']
+    address: IMyIdentity['identity']['address']
     balance: number
   }
 }
 
-interface RemoveAction extends KiltAction {
-  payload: MyIdentity['identity']['address']
+interface IRemoveAction extends KiltAction {
+  payload: IMyIdentity['identity']['address']
 }
 
-type Action = UpdateAction | RemoveAction
+export type Action = IUpdateAction | IRemoveAction
 
 type State = {
-  balances: Immutable.Map<MyIdentity['identity']['address'], number>
+  balances: Immutable.Map<IMyIdentity['identity']['address'], number>
 }
 
-type ImmutableState = Immutable.Record<State>
+export type ImmutableState = Immutable.Record<State>
 
 class Store {
   public static reducer(
@@ -30,11 +30,11 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.UPDATE_BALANCE: {
-        const { address, balance } = (action as UpdateAction).payload
+        const { address, balance } = (action as IUpdateAction).payload
         return state.setIn(['balances', address], balance)
       }
       case Store.ACTIONS.REMOVE_BALANCE: {
-        const address = (action as RemoveAction).payload
+        const address = (action as IRemoveAction).payload
         return state.deleteIn(['identities', address])
       }
       default:
@@ -43,9 +43,9 @@ class Store {
   }
 
   public static updateBalance(
-    address: MyIdentity['identity']['address'],
+    address: IMyIdentity['identity']['address'],
     balance: number
-  ): UpdateAction {
+  ): IUpdateAction {
     return {
       payload: { address, balance },
       type: Store.ACTIONS.UPDATE_BALANCE,
@@ -53,8 +53,8 @@ class Store {
   }
 
   public static removeBalance(
-    address: MyIdentity['identity']['address']
-  ): RemoveAction {
+    address: IMyIdentity['identity']['address']
+  ): IRemoveAction {
     return {
       payload: address,
       type: Store.ACTIONS.REMOVE_BALANCE,
@@ -63,7 +63,7 @@ class Store {
 
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
-      balances: Immutable.Map<MyIdentity['identity']['address'], number>(),
+      balances: Immutable.Map<IMyIdentity['identity']['address'], number>(),
     } as State)(obj)
   }
 
@@ -73,23 +73,20 @@ class Store {
   }
 }
 
-const _getBalances = (state: ReduxState) => {
+const getAllBalances = (state: ReduxState): Immutable.Map<string, number> => {
   return state.balances.get('balances')
 }
 
 const getBalances = createSelector(
-  [_getBalances],
+  [getAllBalances],
   (balances: Immutable.Map<string, number>) => balances
 )
 
-const _getBalance = (
+const getStateBalance = (
   state: ReduxState,
-  address: MyIdentity['identity']['address']
-) => state.balances.get('balances').get(address)
+  address: IMyIdentity['identity']['address']
+): number | undefined => state.balances.get('balances').get(address)
 
-const getBalance = createSelector(
-  [_getBalance],
-  (entry: number) => entry
-)
+const getBalance = createSelector([getStateBalance], (entry: number) => entry)
 
-export { Store, ImmutableState, Action, getBalance, getBalances }
+export { Store, getBalance, getBalances }

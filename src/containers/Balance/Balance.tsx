@@ -1,6 +1,6 @@
 import Immutable from 'immutable'
 import React, { ChangeEvent, ReactNode } from 'react'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import KiltToken from '../../components/KiltToken/KiltToken'
 import { ModalType } from '../../components/Modal/Modal'
@@ -17,24 +17,29 @@ import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
-import { Contact, MyIdentity } from '../../types/Contact'
+import { IContact, IMyIdentity } from '../../types/Contact'
 import {
-  BlockingNotification,
+  IBlockingNotification,
   NotificationType,
 } from '../../types/UserFeedback'
 
 import './Balance.scss'
 
-type Props = {
+type StateProps = {
   balances: Immutable.Map<string, number>
-  myIdentity: MyIdentity
 }
+
+type OwnProps = {
+  myIdentity: IMyIdentity
+}
+
+type Props = StateProps & OwnProps
 
 type State = {
   transfer: {
     amount: string // String so we can have empty input field
-    toAddress: Contact['publicIdentity']['address']
-    toContact?: Contact
+    toAddress: IContact['publicIdentity']['address']
+    toContact?: IContact
   }
 }
 
@@ -57,27 +62,56 @@ class Balance extends React.Component<Props, State> {
     this.identityCheck = this.identityCheck.bind(this)
   }
 
-  public render() {
+  private onSelectTransferToContact(selectedContacts: IContact[]): void {
+    const { transfer } = this.state
+
+    this.setState({
+      transfer: {
+        ...transfer,
+        toAddress: '',
+        toContact: selectedContacts[0],
+      },
+    })
+  }
+
+  private onEnterTransferToAddress(event: ChangeEvent<HTMLInputElement>): void {
+    const { value: address } = event.target
+    const { transfer } = this.state
+
+    this.setState({
+      transfer: {
+        ...transfer,
+        toAddress: address,
+        toContact: undefined,
+      },
+    })
+    this.resetContacts()
+  }
+
+  private onEnterTransferTokens(event: ChangeEvent<HTMLInputElement>): void {
+    const { transfer } = this.state
+    const { value: amount } = event.target
     const myBalance = this.getMyBalance()
 
-    return (
-      <section className="Balance">
-        <section className="myBalance">
-          <h2>My balance</h2>
-          <div className="display">
-            <label>Balance</label>
-            {myBalance == null && (
-              <Spinner size={20} color="#ef5a28" strength={3} />
-            )}
-            {myBalance != null && <KiltToken amount={myBalance} />}
-          </div>
-        </section>
-        <section className="transfer-tokens">
-          <h2>Transfer tokens</h2>
-          {this.getTokenTransferElement(myBalance)}
-        </section>
-      </section>
-    )
+    if (!myBalance || amount.includes('.')) {
+      return
+    }
+
+    const amountNumber = Number(amount)
+
+    if (
+      amount === '' ||
+      (Number.isFinite(amountNumber) &&
+        amountNumber > 0 &&
+        myBalance - amountNumber >= 0)
+    ) {
+      this.setState({
+        transfer: {
+          ...transfer,
+          amount: `${amount}`,
+        },
+      })
+    }
   }
 
   private getMyBalance(): number | undefined {
@@ -124,16 +158,18 @@ class Balance extends React.Component<Props, State> {
             ref={el => {
               this.selectContacts = el
             }}
-            name={name as string}
             isMulti={false}
-            closeMenuOnSelect={true}
+            closeMenuOnSelect
             onChange={this.onSelectTransferToContact}
           />
         </div>
         <div className="actions">
           <button
+            type="button"
             disabled={
-              !amount || !isFinite(Number(amount)) || (!toAddress && !toContact)
+              !amount ||
+              !Number.isFinite(Number(amount)) ||
+              (!toAddress && !toContact)
             }
             onClick={this.identityCheck}
           >
@@ -144,59 +180,7 @@ class Balance extends React.Component<Props, State> {
     )
   }
 
-  private onSelectTransferToContact(selectedContacts: Contact[]) {
-    const { transfer } = this.state
-
-    this.setState({
-      transfer: {
-        ...transfer,
-        toAddress: '',
-        toContact: selectedContacts[0],
-      },
-    })
-  }
-
-  private onEnterTransferToAddress(event: ChangeEvent<HTMLInputElement>) {
-    const { value: address } = event.target
-    const { transfer } = this.state
-
-    this.setState({
-      transfer: {
-        ...transfer,
-        toAddress: address,
-        toContact: undefined,
-      },
-    })
-    this.resetContacts()
-  }
-
-  private onEnterTransferTokens(event: ChangeEvent<HTMLInputElement>) {
-    const { transfer } = this.state
-    const { value: amount } = event.target
-    const myBalance = this.getMyBalance()
-
-    if (!myBalance || amount.indexOf('.') !== -1) {
-      return
-    }
-
-    const amountNumber = Number(amount)
-
-    if (
-      amount === '' ||
-      (isFinite(amountNumber) &&
-        amountNumber > 0 &&
-        myBalance - amountNumber >= 0)
-    ) {
-      this.setState({
-        transfer: {
-          ...transfer,
-          amount: '' + amount,
-        },
-      })
-    }
-  }
-
-  private identityCheck() {
+  private identityCheck(): void {
     const { myIdentity } = this.props
     const selectedIdentity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
@@ -212,19 +196,16 @@ class Balance extends React.Component<Props, State> {
             <span>You are trying so transfer </span>
             <KiltToken />
             <span> from your identity </span>
-            <ContactPresentation
-              address={myIdentity.identity.address}
-              inline={true}
-            />
+            <ContactPresentation address={myIdentity.identity.address} inline />
             <span> which is not your currently active identity </span>
             <ContactPresentation
               address={selectedIdentity.identity.address}
-              inline={true}
+              inline
             />
           </div>
         ),
         modalType: ModalType.CONFIRM,
-        onConfirm: (notification: BlockingNotification) => {
+        onConfirm: (notification: IBlockingNotification) => {
           this.transferTokens()
           notification.remove()
         },
@@ -235,16 +216,13 @@ class Balance extends React.Component<Props, State> {
     }
   }
 
-  private transferTokens() {
+  private transferTokens(): void {
     const { myIdentity } = this.props
     const { transfer } = this.state
     const { amount, toAddress, toContact } = transfer
 
-    const receiverAddress = toAddress
-      ? toAddress
-      : toContact
-      ? toContact.publicIdentity.address
-      : undefined
+    const receiverAddress =
+      toAddress || (toContact ? toContact.publicIdentity.address : undefined)
 
     if (!receiverAddress) {
       notifyFailure(`No receiver selected/entered.`)
@@ -252,30 +230,48 @@ class Balance extends React.Component<Props, State> {
     }
 
     BalanceUtilities.makeTransfer(myIdentity, receiverAddress, Number(amount))
-      .then(() => {
-        this.setState({
-          transfer: {
-            amount: '',
-            toAddress: '',
-            toContact: undefined,
-          },
-        })
-        this.resetContacts()
-      })
-      .catch(() => {
-        // prevent clearing input/selects
-      })
+    this.setState({
+      transfer: {
+        amount: '',
+        toAddress: '',
+        toContact: undefined,
+      },
+    })
+    this.resetContacts()
   }
 
-  private resetContacts() {
+  private resetContacts(): void {
     const { selectContacts } = this
     if (selectContacts) {
       selectContacts.reset()
     }
   }
+
+  public render(): JSX.Element {
+    const myBalance = this.getMyBalance()
+
+    return (
+      <section className="Balance">
+        <section className="myBalance">
+          <h2>My balance</h2>
+          <div className="display">
+            <label>Balance</label>
+            {myBalance == null && (
+              <Spinner size={20} color="#ef5a28" strength={3} />
+            )}
+            {myBalance != null && <KiltToken amount={myBalance} />}
+          </div>
+        </section>
+        <section className="transfer-tokens">
+          <h2>Transfer tokens</h2>
+          {this.getTokenTransferElement(myBalance)}
+        </section>
+      </section>
+    )
+  }
 }
 
-const mapStateToProps = (state: ReduxState) => {
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => {
   return {
     balances: Balances.getBalances(state),
   }

@@ -1,11 +1,10 @@
-import * as React from 'react'
-import {
+import React from 'react'
+import ClientVersionHelper, {
   CheckResult,
-  clientVersionHelper,
 } from '../../services/ClientVersionHelper'
 import FeedbackService from '../../services/FeedbackService'
 import {
-  BlockingNotification,
+  IBlockingNotification,
   NotificationType,
 } from '../../types/UserFeedback'
 
@@ -20,40 +19,7 @@ type State = {
 }
 
 class CheckClientVersion extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {}
-  }
-
-  public componentDidMount() {
-    clientVersionHelper
-      // This connects to the blockchain
-      .clientResetRequired()
-      .then((checkResult: CheckResult) => {
-        if (checkResult.accountInvalid || checkResult.firstBlockHashChanged) {
-          this.openResetModal()
-        } else {
-          this.setState({ valid: true })
-        }
-      })
-  }
-
-  public render() {
-    const { valid } = this.state
-    return valid ? '' : this.showLoading()
-  }
-
-  private showLoading() {
-    return (
-      <section className="CheckClientVersion">
-        <Spinner size={200} color="#ef5a28" strength={10} />
-        <Spinner size={200} color="#ef5a28" strength={10} />
-        <div className="connecting">Connecting to chain</div>
-      </section>
-    )
-  }
-
-  private openResetModal() {
+  private static openResetModal(): void {
     FeedbackService.addBlockingNotification({
       header: 'Blockchain mismatch detected',
       message: (
@@ -64,13 +30,46 @@ class CheckClientVersion extends React.Component<Props, State> {
       ),
       modalType: ModalType.CONFIRM,
       okButtonLabel: 'Reset client',
-      onCancel: (notification: BlockingNotification) => notification.remove(),
-      onConfirm: (notification: BlockingNotification) => {
+      onCancel: (notification: IBlockingNotification) => notification.remove(),
+      onConfirm: (notification: IBlockingNotification) => {
         notification.remove()
-        clientVersionHelper.resetAndReloadClient()
+        ClientVersionHelper.resetAndReloadClient()
       },
       type: NotificationType.FAILURE,
     })
+  }
+
+  private static showLoading(): JSX.Element {
+    return (
+      <section className="CheckClientVersion">
+        <Spinner size={200} color="#ef5a28" strength={10} />
+        <Spinner size={200} color="#ef5a28" strength={10} />
+        <div className="connecting">Connecting to chain</div>
+      </section>
+    )
+  }
+
+  constructor(props: Props) {
+    super(props)
+    this.state = {}
+  }
+
+  public componentDidMount(): void {
+    ClientVersionHelper
+      // This connects to the blockchain
+      .clientResetRequired()
+      .then((checkResult: CheckResult) => {
+        if (checkResult.accountInvalid || checkResult.firstBlockHashChanged) {
+          CheckClientVersion.openResetModal()
+        } else {
+          this.setState({ valid: true })
+        }
+      })
+  }
+
+  public render(): null | JSX.Element {
+    const { valid } = this.state
+    return valid ? null : CheckClientVersion.showLoading()
   }
 }
 

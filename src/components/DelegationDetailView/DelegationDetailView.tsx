@@ -1,13 +1,13 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 
 import DelegationsService from '../../services/DelegationsService'
 import { notifyFailure } from '../../services/FeedbackService'
-import { MyDelegation } from '../../state/ducks/Delegations'
+import { IMyDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import DelegationNode, {
   DelegationsTreeNode,
@@ -16,17 +16,20 @@ import DelegationNode, {
 
 import './DelegationDetailView.scss'
 
-type Props = {
+type StateProps = {
+  selectedIdentity: IMyIdentity
+}
+
+type OwnProps = {
   id: sdk.IDelegationBaseNode['id']
 
   editable?: boolean
-  focusedNodeAlias?: MyDelegation['metaData']['alias']
+  focusedNodeAlias?: IMyDelegation['metaData']['alias']
   isPCR?: boolean
   viewType?: ViewType
-
-  // mapStateToProps
-  selectedIdentity: MyIdentity
 }
+
+type Props = StateProps & OwnProps
 
 type State = {
   delegationsTreeNode?: DelegationsTreeNode
@@ -34,6 +37,31 @@ type State = {
 }
 
 class DelegationDetailView extends React.Component<Props, State> {
+  private static async resolveRootNode(
+    currentNode: DelegationsTreeNode
+  ): Promise<sdk.IDelegationRootNode | null> {
+    const rootNode: sdk.IDelegationRootNode | null = await DelegationsService.findRootNode(
+      currentNode.delegation.id
+    )
+    return rootNode
+  }
+
+  private static async getNode(
+    id: sdk.IDelegationBaseNode['id']
+  ): Promise<sdk.DelegationBaseNode> {
+    let node: sdk.DelegationBaseNode | null = await DelegationsService.lookupNodeById(
+      id
+    )
+    if (!node) {
+      node = await DelegationsService.lookupRootNodeById(id)
+    }
+    if (!node) {
+      notifyFailure('Node not found')
+      throw new Error('Node not found')
+    }
+    return node
+  }
+
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -41,23 +69,25 @@ class DelegationDetailView extends React.Component<Props, State> {
     }
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     const { id } = this.props
 
-    this.getNode(id)
+    DelegationDetailView.getNode(id)
       .then(async (delegationNode: sdk.DelegationNode) => {
         const treeNode: DelegationsTreeNode = {
           childNodes: [],
           delegation: delegationNode,
         } as DelegationsTreeNode
 
-        const rootNode: State['rootNode'] = await this.resolveRootNode(treeNode)
+        const rootNode: State['rootNode'] = await DelegationDetailView.resolveRootNode(
+          treeNode
+        )
         const parentTreeNode: DelegationsTreeNode = await DelegationsService.resolveParent(
           treeNode
         )
 
         this.setState({
-          delegationsTreeNode: parentTreeNode ? parentTreeNode : treeNode,
+          delegationsTreeNode: parentTreeNode || treeNode,
           rootNode,
         })
       })
@@ -66,7 +96,7 @@ class DelegationDetailView extends React.Component<Props, State> {
       })
   }
 
-  public render() {
+  public render(): JSX.Element {
     const {
       viewType,
       editable,
@@ -88,9 +118,9 @@ class DelegationDetailView extends React.Component<Props, State> {
                   <span>CType: </span>
                   <CTypePresentation
                     cTypeHash={rootNode.cTypeHash}
-                    interactive={true}
-                    linked={true}
-                    inline={true}
+                    interactive
+                    linked
+                    inline
                   />
                 </h2>
               )}
@@ -119,34 +149,13 @@ class DelegationDetailView extends React.Component<Props, State> {
       </section>
     )
   }
-
-  private async resolveRootNode(
-    currentNode: DelegationsTreeNode
-  ): Promise<sdk.IDelegationRootNode | null> {
-    const rootNode: sdk.IDelegationRootNode | null = await DelegationsService.findRootNode(
-      currentNode.delegation.id
-    )
-    return rootNode
-  }
-
-  private async getNode(
-    id: sdk.IDelegationBaseNode['id']
-  ): Promise<sdk.DelegationBaseNode> {
-    let node: sdk.DelegationBaseNode | null = await DelegationsService.lookupNodeById(
-      id
-    )
-    if (!node) {
-      node = await DelegationsService.lookupRootNodeById(id)
-    }
-    if (!node) {
-      notifyFailure('Node not found')
-      throw new Error('Node not found')
-    }
-    return node
-  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

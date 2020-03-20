@@ -1,5 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 
 import * as Claims from '../../state/ducks/Claims'
@@ -21,6 +21,11 @@ type Props = {
 
 type State = {}
 
+type Actions = Array<{
+  callback: Function
+  label: string
+}>
+
 class MyClaimListView extends React.Component<Props, State> {
   private selectCTypesModal: SelectCTypesModal | null
 
@@ -31,7 +36,50 @@ class MyClaimListView extends React.Component<Props, State> {
     this.createClaimFromCType = this.createClaimFromCType.bind(this)
   }
 
-  public render() {
+  private getActions(claimEntry: Claims.Entry): Actions {
+    return [
+      {
+        callback: this.requestLegitimation.bind(this, claimEntry),
+        label: 'Request legitimations',
+      },
+      {
+        callback: this.requestAttestation.bind(this, claimEntry),
+        label: 'Request attestation',
+      },
+      {
+        callback: this.handleDelete.bind(this, claimEntry),
+        label: 'Delete',
+      },
+    ]
+  }
+
+  private handleDelete(claimEntry: Claims.Entry): void {
+    const { onRemoveClaim } = this.props
+    onRemoveClaim(claimEntry)
+  }
+
+  private requestAttestation(claimEntry: Claims.Entry): void {
+    const { onRequestAttestation } = this.props
+    onRequestAttestation(claimEntry)
+  }
+
+  private requestLegitimation(claimEntry: Claims.Entry): void {
+    const { onRequestLegitimation } = this.props
+    onRequestLegitimation(claimEntry)
+  }
+
+  private openCTypeModal(): void {
+    if (this.selectCTypesModal) {
+      this.selectCTypesModal.show()
+    }
+  }
+
+  private createClaimFromCType(selectedCTypes: ICTypeWithMetadata[]): void {
+    const { onCreateClaimFromCType } = this.props
+    onCreateClaimFromCType(selectedCTypes)
+  }
+
+  public render(): JSX.Element {
     const { claimStore } = this.props
     return (
       <section className="MyClaimListView">
@@ -57,20 +105,20 @@ class MyClaimListView extends React.Component<Props, State> {
                   <td className="cType">
                     <CTypePresentation
                       cTypeHash={claimEntry.claim.cTypeHash}
-                      interactive={true}
-                      linked={true}
+                      interactive
+                      linked
                     />
                   </td>
                   <td
-                    className={
-                      'status ' +
-                      (claimEntry.attestations.find(
-                        (attestedClaim: sdk.IAttestedClaim) =>
-                          !attestedClaim.attestation.revoked
-                      )
-                        ? 'attested'
-                        : 'revoked')
-                    }
+                    className={`status 
+                      ${
+                        claimEntry.attestations.find(
+                          (attestedClaim: sdk.IAttestedClaim) =>
+                            !attestedClaim.attestation.revoked
+                        )
+                          ? 'attested'
+                          : 'revoked'
+                      }`}
                   />
                   <td className="actionsTd">
                     <div>
@@ -83,7 +131,9 @@ class MyClaimListView extends React.Component<Props, State> {
           </table>
         )}
         <div className="actions">
-          <button onClick={this.openCTypeModal}>Create Claim</button>
+          <button type="button" onClick={this.openCTypeModal}>
+            Create Claim
+          </button>
         </div>
 
         <SelectCTypesModal
@@ -94,49 +144,6 @@ class MyClaimListView extends React.Component<Props, State> {
         />
       </section>
     )
-  }
-
-  private getActions(claimEntry: Claims.Entry) {
-    return [
-      {
-        callback: this.requestLegitimation.bind(this, claimEntry),
-        label: 'Request legitimations',
-      },
-      {
-        callback: this.requestAttestation.bind(this, claimEntry),
-        label: 'Request attestation',
-      },
-      {
-        callback: this.handleDelete.bind(this, claimEntry),
-        label: 'Delete',
-      },
-    ]
-  }
-
-  private handleDelete(claimEntry: Claims.Entry) {
-    const { onRemoveClaim } = this.props
-    onRemoveClaim(claimEntry)
-  }
-
-  private requestAttestation(claimEntry: Claims.Entry) {
-    const { onRequestAttestation } = this.props
-    onRequestAttestation(claimEntry)
-  }
-
-  private requestLegitimation(claimEntry: Claims.Entry) {
-    const { onRequestLegitimation } = this.props
-    onRequestLegitimation(claimEntry)
-  }
-
-  private openCTypeModal() {
-    if (this.selectCTypesModal) {
-      this.selectCTypesModal.show()
-    }
-  }
-
-  private createClaimFromCType(selectedCTypes: ICTypeWithMetadata[]) {
-    const { onCreateClaimFromCType } = this.props
-    onCreateClaimFromCType(selectedCTypes)
   }
 }
 

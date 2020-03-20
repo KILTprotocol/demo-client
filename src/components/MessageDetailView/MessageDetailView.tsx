@@ -9,18 +9,17 @@ import SubmitClaimsForCType from '../../containers/Tasks/SubmitClaimsForCType/Su
 import SubmitLegitimations from '../../containers/Tasks/SubmitLegitimations/SubmitLegitimations'
 import RequestAttestation from '../../containers/Tasks/RequestAttestation/RequestAttestation'
 import VerifyClaim from '../../containers/Tasks/VerifyClaim/VerifyClaim'
-import { MessageOutput } from '../../services/MessageRepository'
+import { IMessageOutput } from '../../services/MessageRepository'
 import ClaimDetailView from '../ClaimDetailView/ClaimDetailView'
 import Code from '../Code/Code'
-import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import MessageSubject from '../MessageSubject/MessageSubject'
 import ImportDelegation from '../../containers/Tasks/ImportDelegation/ImportDelegation'
 
 import './MessageDetailView.scss'
 
 type Props = {
-  message: MessageOutput
-  onDelete: (message: MessageOutput) => void
+  message: IMessageOutput
+  onDelete: (message: IMessageOutput) => void
   onCancel: (id: string) => void
 }
 
@@ -31,6 +30,14 @@ type State = {
 }
 
 class MessageDetailView extends React.Component<Props, State> {
+  private static canDisplayContentAsCode(message: IMessageOutput): boolean {
+    const messageBodyType:
+      | sdk.MessageBodyType
+      | undefined = MessageDetailView.getMessageBodyType(message)
+
+    return messageBodyType !== undefined
+  }
+
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -45,25 +52,7 @@ class MessageDetailView extends React.Component<Props, State> {
     this.selectCode = this.selectCode.bind(this)
   }
 
-  public render() {
-    const { message } = this.props
-    return (
-      <section className="MessageDetailView">
-        <h4>
-          <span>
-            Subject: <MessageSubject message={message} />
-          </span>
-          {this.canDisplayContentAsCode(message) && (
-            <button className="toggle-code" onClick={this.toggleShowCode} />
-          )}
-        </h4>
-        {this.canDisplayContentAsCode(message) && this.getCode(message)}
-        <section className="Task">{this.getTask(message)}</section>
-      </section>
-    )
-  }
-
-  private getCode(message: MessageOutput) {
+  private getCode(message: IMessageOutput): false | JSX.Element {
     const { selectedCode, showCode } = this.state
     const { encryptedMessage, ...decryptedMessage } = message
     return (
@@ -90,20 +79,14 @@ class MessageDetailView extends React.Component<Props, State> {
     )
   }
 
-  private selectCode(requestedCode: State['selectedCode']) {
-    this.setState({
-      selectedCode: requestedCode,
-    })
-  }
-
-  private getTask(message: MessageOutput): ReactNode | undefined {
+  private getTask(message: IMessageOutput): ReactNode | undefined {
     if (!message || !message.body || !message.body.content) {
       return undefined
     }
 
     const messageBodyType:
       | sdk.MessageBodyType
-      | undefined = this.getMessageBodyType(message)
+      | undefined = MessageDetailView.getMessageBodyType(message)
 
     switch (messageBodyType) {
       case sdk.MessageBodyType.REQUEST_LEGITIMATIONS: {
@@ -123,7 +106,7 @@ class MessageDetailView extends React.Component<Props, State> {
               />
             ) : (
               <div className="actions">
-                <button onClick={this.toggleShowTask}>
+                <button type="button" onClick={this.toggleShowTask}>
                   Select legitimation(s)
                 </button>
               </div>
@@ -236,7 +219,19 @@ class MessageDetailView extends React.Component<Props, State> {
     }
   }
 
-  private handleDelete() {
+  private static getMessageBodyType(
+    message: IMessageOutput
+  ): sdk.MessageBodyType | undefined {
+    return message && message.body && message.body.type
+  }
+
+  private selectCode(requestedCode: State['selectedCode']): void {
+    this.setState({
+      selectedCode: requestedCode,
+    })
+  }
+
+  private handleDelete(): void {
     const { message, onDelete } = this.props
     if (message && onDelete) {
       setTimeout(() => {
@@ -245,39 +240,48 @@ class MessageDetailView extends React.Component<Props, State> {
     }
   }
 
-  private handleCancel() {
+  private handleCancel(): void {
     const { message, onCancel } = this.props
     if (message && message.messageId && onCancel) {
       onCancel(message.messageId)
     }
   }
 
-  private toggleShowCode() {
+  private toggleShowCode(): void {
     const { showCode } = this.state
     this.setState({
       showCode: !showCode,
     })
   }
 
-  private toggleShowTask() {
+  private toggleShowTask(): void {
     const { showTask } = this.state
     this.setState({
       showTask: !showTask,
     })
   }
 
-  private getMessageBodyType(
-    message: MessageOutput
-  ): sdk.MessageBodyType | undefined {
-    return message && message.body && message.body.type
-  }
-
-  private canDisplayContentAsCode(message: MessageOutput): boolean {
-    const messageBodyType:
-      | sdk.MessageBodyType
-      | undefined = this.getMessageBodyType(message)
-
-    return messageBodyType !== undefined
+  public render(): JSX.Element {
+    const { message } = this.props
+    return (
+      <section className="MessageDetailView">
+        <h4>
+          <span>
+            Subject: <MessageSubject message={message} />
+          </span>
+          {MessageDetailView.canDisplayContentAsCode(message) && (
+            <button
+              type="button"
+              className="toggle-code"
+              onClick={this.toggleShowCode}
+            />
+          )}
+        </h4>
+        {MessageDetailView.canDisplayContentAsCode(message) &&
+          this.getCode(message)}
+        <section className="Task">{this.getTask(message)}</section>
+      </section>
+    )
   }
 }
 

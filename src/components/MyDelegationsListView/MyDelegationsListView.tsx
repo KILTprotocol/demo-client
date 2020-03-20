@@ -1,10 +1,10 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 
 import * as Delegations from '../../state/ducks/Delegations'
-import { MyDelegation } from '../../state/ducks/Delegations'
+import { IMyDelegation } from '../../state/ducks/Delegations'
 import * as UiState from '../../state/ducks/UiState'
 import PersistentStore from '../../state/PersistentStore'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
@@ -15,8 +15,8 @@ import './MyDelegationsListView.scss'
 
 type Props = {
   onCreateDelegation: () => void
-  delegationEntries: MyDelegation[]
-  onRemoveDelegation: (delegation: MyDelegation) => void
+  delegationEntries: IMyDelegation[]
+  onRemoveDelegation: (delegation: IMyDelegation) => void
 
   isPCR: boolean
 }
@@ -24,29 +24,26 @@ type Props = {
 type State = {}
 
 class MyDelegationsListView extends React.Component<Props, State> {
+  private static inviteContactsTo(delegation: IMyDelegation): void {
+    PersistentStore.store.dispatch(
+      UiState.Store.updateCurrentTaskAction({
+        objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+        props: {
+          cTypeHash: delegation.cTypeHash,
+          isPCR: !!delegation.isPCR,
+          selectedDelegations: [delegation],
+        } as RequestAcceptDelegationProps,
+      })
+    )
+  }
+
   constructor(props: Props) {
     super(props)
     this.state = {}
     this.handleCreate = this.handleCreate.bind(this)
   }
 
-  public render() {
-    const { isPCR } = this.props
-
-    return (
-      <section className="MyDelegationsListView">
-        <h1>My {isPCR ? 'PCRs' : 'Delegations'}</h1>
-        {this.getDelegationEntries()}
-        <div className="actions">
-          <button className="create" onClick={this.handleCreate}>
-            New {isPCR ? 'PCR' : 'Delegation'}
-          </button>
-        </div>
-      </section>
-    )
-  }
-
-  private getDelegationEntries() {
+  private getDelegationEntries(): false | JSX.Element {
     const { delegationEntries, isPCR } = this.props
     return (
       delegationEntries &&
@@ -68,8 +65,8 @@ class MyDelegationsListView extends React.Component<Props, State> {
             </tr>
           </thead>
           <tbody>
-            {delegationEntries.map((delegationEntry: MyDelegation) => {
-              const cTypeHash = delegationEntry.cTypeHash
+            {delegationEntries.map((delegationEntry: IMyDelegation) => {
+              const { cTypeHash } = delegationEntry
               return (
                 <tr key={delegationEntry.id}>
                   <td className="alias_ctype">
@@ -83,8 +80,8 @@ class MyDelegationsListView extends React.Component<Props, State> {
                     {cTypeHash ? (
                       <CTypePresentation
                         cTypeHash={cTypeHash}
-                        linked={true}
-                        interactive={true}
+                        linked
+                        interactive
                       />
                     ) : (
                       ''
@@ -108,8 +105,8 @@ class MyDelegationsListView extends React.Component<Props, State> {
                     {cTypeHash ? (
                       <CTypePresentation
                         cTypeHash={cTypeHash}
-                        linked={true}
-                        interactive={true}
+                        linked
+                        interactive
                       />
                     ) : (
                       ''
@@ -135,11 +132,12 @@ class MyDelegationsListView extends React.Component<Props, State> {
                     <div>
                       <SelectDelegationAction
                         delegation={delegationEntry}
-                        onInvite={this.inviteContactsTo.bind(
-                          this,
-                          delegationEntry
-                        )}
-                        onDelete={this.handleDelete.bind(this, delegationEntry)}
+                        onInvite={() =>
+                          MyDelegationsListView.inviteContactsTo(
+                            delegationEntry
+                          )
+                        }
+                        onDelete={() => this.handleDelete(delegationEntry)}
                       />
                     </div>
                   </td>
@@ -152,6 +150,11 @@ class MyDelegationsListView extends React.Component<Props, State> {
     )
   }
 
+  private handleDelete = (delegation: IMyDelegation): void => {
+    const { onRemoveDelegation } = this.props
+    onRemoveDelegation(delegation)
+  }
+
   private handleCreate(): void {
     const { onCreateDelegation } = this.props
     if (onCreateDelegation) {
@@ -159,22 +162,20 @@ class MyDelegationsListView extends React.Component<Props, State> {
     }
   }
 
-  private inviteContactsTo(delegation: MyDelegation) {
-    PersistentStore.store.dispatch(
-      UiState.Store.updateCurrentTaskAction({
-        objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
-        props: {
-          cTypeHash: delegation.cTypeHash,
-          isPCR: !!delegation.isPCR,
-          selectedDelegations: [delegation],
-        } as RequestAcceptDelegationProps,
-      })
-    )
-  }
+  public render(): JSX.Element {
+    const { isPCR } = this.props
 
-  private handleDelete = (delegation: MyDelegation) => {
-    const { onRemoveDelegation } = this.props
-    onRemoveDelegation(delegation)
+    return (
+      <section className="MyDelegationsListView">
+        <h1>My {isPCR ? 'PCRs' : 'Delegations'}</h1>
+        {this.getDelegationEntries()}
+        <div className="actions">
+          <button type="button" className="create" onClick={this.handleCreate}>
+            New {isPCR ? 'PCR' : 'Delegation'}
+          </button>
+        </div>
+      </section>
+    )
   }
 }
 

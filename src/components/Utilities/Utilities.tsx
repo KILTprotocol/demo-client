@@ -1,69 +1,58 @@
-import * as React from 'react'
-import { ChangeEvent } from 'react'
-import { connect } from 'react-redux'
+import React, { ChangeEvent } from 'react'
+import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
+import sdkPackage from '@kiltprotocol/sdk-js/package.json'
 
 import * as UiState from '../../state/ducks/UiState'
-import * as Balances from '../../state/ducks/Balances'
 import * as Wallet from '../../state/ducks/Wallet'
-
-import PersistentStore, {
-  State as ReduxState,
-} from '../../state/PersistentStore'
+import { State as ReduxState } from '../../state/PersistentStore'
 import ChainStats from '../ChainStats/ChainStats'
 import TestUserFeedback from '../TestUserFeedback/TestUserFeedback'
 import DevTools from '../DevTools/DevTools'
-import { clientVersionHelper } from '../../services/ClientVersionHelper'
-
-import sdkPackage from '@kiltprotocol/sdk-js/package.json'
-const clientPackage = require('../../../package.json')
+import ClientVersionHelper from '../../services/ClientVersionHelper'
 import { safeDestructiveAction } from '../../services/FeedbackService'
-import { MyIdentity } from '../../types/Contact'
-
+import { IMyIdentity } from '../../types/Contact'
 import './Utilities.scss'
 
-type Props = {
-  // mapStateToProps
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const clientPackage = require('../../../package.json')
+
+type StateProps = {
   debugMode: boolean
-  // mapDispatchToProps
+  selectedIdentity: IMyIdentity
+}
+
+type DispatchProps = {
   setDebugMode: (debugMode: boolean) => void
-  // mapDispatchToProps
-  selectedIdentity: MyIdentity
 }
 
-type State = {
-  selectedIdentityBalance: number
-}
+type Props = StateProps & DispatchProps
 
-class Utilities extends React.Component<Props, State> {
+class Utilities extends React.Component<Props> {
+  private static resetClient(): void {
+    safeDestructiveAction(
+      <div>
+        Do you really want to reset the client to defaults?
+        <div>You will lose all your local data!</div>
+      </div>,
+      () => {
+        window.setTimeout(() => {
+          ClientVersionHelper.resetAndReloadClient()
+        }, 500)
+      }
+    )
+  }
+
   constructor(props: Props) {
     super(props)
-
-    this.state = {
-      selectedIdentityBalance: 0,
-    }
     this.setDebugMode = this.setDebugMode.bind(this)
-    this.resetClient = this.resetClient.bind(this)
   }
 
-  public componentDidUpdate(prevProps: Props) {
-    const { selectedIdentity } = this.props
-    const { selectedIdentityBalance } = this.state
-
-    const balance: number = selectedIdentity
-      ? Balances.getBalance(
-          PersistentStore.store.getState(),
-          selectedIdentity.identity.address
-        )
-      : 0
-
-    if (selectedIdentityBalance !== balance) {
-      this.setState({
-        selectedIdentityBalance: balance,
-      })
-    }
+  private setDebugMode(event: ChangeEvent<HTMLInputElement>): void {
+    const { setDebugMode } = this.props
+    setDebugMode(event.target.checked)
   }
 
-  public render() {
+  public render(): JSX.Element {
     const { debugMode } = this.props
     return (
       <section className="Utilities">
@@ -79,7 +68,9 @@ class Utilities extends React.Component<Props, State> {
             <div>{sdkPackage.version}</div>
           </div>
           <div className="reset">
-            <button onClick={this.resetClient}>Reset</button>
+            <button type="button" onClick={Utilities.resetClient}>
+              Reset
+            </button>
           </div>
         </section>
         <section className="debugMode">
@@ -101,33 +92,14 @@ class Utilities extends React.Component<Props, State> {
       </section>
     )
   }
-
-  private resetClient() {
-    safeDestructiveAction(
-      <div>
-        Do you really want to reset the client to defaults?
-        <div>You will lose all your local data!</div>
-      </div>,
-      () => {
-        setTimeout(() => {
-          clientVersionHelper.resetAndReloadClient()
-        }, 500)
-      }
-    )
-  }
-
-  private setDebugMode(event: ChangeEvent<HTMLInputElement>) {
-    const { setDebugMode } = this.props
-    setDebugMode(event.target.checked)
-  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   debugMode: UiState.getDebugMode(state),
-  selectedIdenty: Wallet.getSelectedIdentity(state),
+  selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps = (dispatch: (action: UiState.Action) => void) => {
+const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = dispatch => {
   return {
     setDebugMode: (debugMode: boolean) => {
       dispatch(UiState.Store.setDebugModeAction(debugMode))
@@ -135,7 +107,7 @@ const mapDispatchToProps = (dispatch: (action: UiState.Action) => void) => {
   }
 }
 
-export default connect(
+export default connect<StateProps, DispatchProps, {}, ReduxState>(
   mapStateToProps,
   mapDispatchToProps
 )(Utilities)

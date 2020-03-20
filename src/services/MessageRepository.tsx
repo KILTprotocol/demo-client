@@ -1,21 +1,16 @@
-import {
-  IAttestedClaim,
-  ISubmitAttestationForClaim,
-  MessageBodyType,
-} from '@kiltprotocol/sdk-js'
+import { ISubmitAttestationForClaim } from '@kiltprotocol/sdk-js'
 import * as sdk from '@kiltprotocol/sdk-js'
 import cloneDeep from 'lodash/cloneDeep'
-import * as React from 'react'
+import React from 'react'
 import { InteractionProps } from 'react-json-view'
 import Code from '../components/Code/Code'
-import CTypePresentation from '../components/CTypePresentation/CTypePresentation'
 import { ModalType } from '../components/Modal/Modal'
 import * as UiState from '../state/ducks/UiState'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
-import { Contact, MyIdentity } from '../types/Contact'
+import { IContact, IMyIdentity } from '../types/Contact'
 import { ICType } from '../types/Ctype'
-import { BlockingNotification, NotificationType } from '../types/UserFeedback'
+import { IBlockingNotification, NotificationType } from '../types/UserFeedback'
 import { BaseDeleteParams, BasePostParams } from './BaseRepository'
 import ContactRepository from './ContactRepository'
 import errorService from './ErrorService'
@@ -24,18 +19,16 @@ import FeedbackService, {
   notifySuccess,
 } from './FeedbackService'
 
-export interface MessageOutput extends sdk.IMessage {
+export interface IMessageOutput extends sdk.IMessage {
   encryptedMessage: sdk.IEncryptedMessage
-  sender?: Contact
+  sender?: IContact
 }
 
 // TODO: add tests, create interface for this class to be implemented as mock
 // (for other tests)
 
 class MessageRepository {
-  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/messaging`
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${process.env.REACT_APP_SERVICE_PORT}/messaging`
 
   /**
    * takes contact or list of contacts
@@ -47,16 +40,19 @@ class MessageRepository {
    * @param messageBody
    */
   public static async send(
-    receivers: Contact[],
+    receivers: IContact[],
     messageBody: sdk.MessageBody
   ): Promise<void> {
-    const sender: MyIdentity = Wallet.getSelectedIdentity(
+    const sender: IMyIdentity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     )
-    const _receivers = Array.isArray(receivers) ? receivers : [receivers]
-    const requests = _receivers.reduce((promiseChain, receiver: Contact) => {
-      return MessageRepository.singleSend(messageBody, sender, receiver)
-    }, Promise.resolve())
+    const receiversAsArray = Array.isArray(receivers) ? receivers : [receivers]
+    const requests = receiversAsArray.reduce(
+      (promiseChain, receiver: IContact) => {
+        return MessageRepository.singleSend(messageBody, sender, receiver)
+      },
+      Promise.resolve()
+    )
     return requests
   }
 
@@ -68,11 +64,11 @@ class MessageRepository {
    * @param messageBody
    */
   public static async sendToAddresses(
-    receiverAddresses: Array<Contact['publicIdentity']['address']>,
+    receiverAddresses: Array<IContact['publicIdentity']['address']>,
     messageBody: sdk.MessageBody
   ): Promise<void> {
     const arrayOfPromises = receiverAddresses.map(
-      (receiverAddress: Contact['publicIdentity']['address']) => {
+      (receiverAddress: IContact['publicIdentity']['address']) => {
         return ContactRepository.findByAddress(receiverAddress)
       }
     )
@@ -82,13 +78,13 @@ class MessageRepository {
         MessageRepository.handleMultiAddressErrors(result.errors)
         return result.successes
       })
-      .then((receiverContacts: Contact[]) => {
+      .then((receiverContacts: IContact[]) => {
         return MessageRepository.send(receiverContacts, messageBody)
       })
   }
 
   public static async multiSendToAddresses(
-    receiverAddresses: Array<Contact['publicIdentity']['address']>,
+    receiverAddresses: Array<IContact['publicIdentity']['address']>,
     messageBodies: sdk.MessageBody[]
   ): Promise<void> {
     const arrayOfPromises = messageBodies.map(
@@ -105,7 +101,7 @@ class MessageRepository {
       .then(() => undefined)
   }
 
-  public static async deleteByMessageId(messageId: string) {
+  public static async deleteByMessageId(messageId: string): Promise<Response> {
     return fetch(`${MessageRepository.URL}/${messageId}`, {
       ...BaseDeleteParams,
     })
@@ -116,22 +112,19 @@ class MessageRepository {
     myIdentity: sdk.Identity
   ): Promise<sdk.IMessage | undefined> {
     return fetch(
-      `${MessageRepository.URL}/inbox/${
-        myIdentity.signPublicKeyAsHex
-      }/${messageId}`
+      `${MessageRepository.URL}/inbox/${myIdentity.signPublicKeyAsHex}/${messageId}`
     )
       .then(response => response.json())
       .then(message => {
-        return ContactRepository.findByAddress(message.senderAddress).then(
-          (sender: Contact) =>
-            sdk.Message.createFromEncryptedMessage(message, myIdentity)
+        return ContactRepository.findByAddress(message.senderAddress).then(() =>
+          sdk.Message.createFromEncryptedMessage(message, myIdentity)
         )
       })
   }
 
   public static async findByMyIdentity(
     myIdentity: sdk.Identity
-  ): Promise<MessageOutput[]> {
+  ): Promise<IMessageOutput[]> {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
       .then((encryptedMessages: sdk.IEncryptedMessage[]) => {
@@ -139,7 +132,7 @@ class MessageRepository {
           encryptedMessages.map((encryptedMessage: sdk.IEncryptedMessage) => {
             return ContactRepository.findByAddress(
               encryptedMessage.senderAddress
-            ).then((sender: Contact) => {
+            ).then((sender: IContact) => {
               try {
                 const m: sdk.IMessage = sdk.Message.createFromEncryptedMessage(
                   encryptedMessage,
@@ -154,9 +147,8 @@ class MessageRepository {
               } catch (error) {
                 errorService.log({
                   error,
-                  message:
-                    'error on decrypting message: ' +
-                    JSON.stringify(encryptedMessage),
+                  message: `error on decrypting message: 
+                    ${JSON.stringify(encryptedMessage)}`,
                   origin: 'MessageRepository.findByMyIdentity()',
                 })
                 return undefined
@@ -171,9 +163,9 @@ class MessageRepository {
 
   public static async singleSend(
     messageBody: sdk.MessageBody,
-    sender: MyIdentity,
-    receiver: Contact
-  ) {
+    sender: IMyIdentity,
+    receiver: IContact
+  ): Promise<void> {
     try {
       let message: sdk.Message = new sdk.Message(
         messageBody,
@@ -196,17 +188,13 @@ class MessageRepository {
         .then(response => response.json())
         .then(() => {
           notifySuccess(
-            `Message '${messageBody.type}' to ${
-              receiver!.metaData.name
-            } successfully sent.`
+            `Message '${messageBody.type}' to ${receiver.metaData.name} successfully sent.`
           )
         })
         .catch(error => {
           errorService.logWithNotification({
             error,
-            message: `Could not send message '${
-              messageBody.type
-            }' to receiver '${receiver!.metaData.name}'`,
+            message: `Could not send message '${messageBody.type}' to receiver '${receiver.metaData.name}'`,
             origin: 'MessageRepository.singleSend()',
             type: 'ERROR.FETCH.POST',
           })
@@ -214,9 +202,7 @@ class MessageRepository {
     } catch (error) {
       errorService.log({
         error,
-        message: `Could not create message '${messageBody.type}' to receiver '${
-          receiver!.metaData.name
-        }'`,
+        message: `Could not create message '${messageBody.type}' to receiver '${receiver.metaData.name}'`,
         origin: 'MessageRepository.singleSend()',
       })
       return Promise.reject()
@@ -224,7 +210,7 @@ class MessageRepository {
   }
 
   public static getCTypeHashes(
-    message: MessageOutput
+    message: IMessageOutput
   ): Array<ICType['cType']['hash']> {
     const { body } = message
     const { type } = body
@@ -259,20 +245,16 @@ class MessageRepository {
 
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
         return (message.body as sdk.IRequestClaimsForCTypes).content
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES:
-        const cTypeHashes: Array<
-          ICType['cType']['hash']
-        > = (message.body as sdk.ISubmitClaimsForCTypes).content.map(
-          (attestedClaim: IAttestedClaim) =>
-            attestedClaim.request.claim.cTypeHash
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
+        const cTypeHashes = (message.body as sdk.ISubmitClaimsForCTypes).content.map(
+          attestedClaim => attestedClaim.request.claim.cTypeHash
         )
-        const uniqueCTypeHashes: Array<
-          ICType['cType']['hash']
-        > = cTypeHashes.filter(
+        const uniqueCTypeHashes: Array<ICType['cType']['hash']> = cTypeHashes.filter(
           (cTypeHash: ICType['cType']['hash'], index: number) =>
             cTypeHashes.indexOf(cTypeHash) === index
         )
         return uniqueCTypeHashes
+      }
       case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPES:
         return [
           (message.body as sdk.IAcceptClaimsForCTypes).content[0].request
@@ -303,11 +285,10 @@ class MessageRepository {
     let manipulatedMessage = cloneDeep(message)
 
     if (debugMode) {
-      return new Promise<sdk.Message>(async resolve => {
+      return new Promise<sdk.Message>(resolve => {
         FeedbackService.addBlockingNotification({
           header: 'Manipulate your message before sending',
           message: (
-            /* tslint:disable:jsx-no-lambda */
             <Code
               onEdit={(edit: InteractionProps) => {
                 manipulatedMessage = edit.updated_src as sdk.Message
@@ -318,15 +299,14 @@ class MessageRepository {
             >
               {message}
             </Code>
-            /* tslint:enable:jsx-no-lambda */
           ),
           modalType: ModalType.CONFIRM,
           okButtonLabel: 'Send manipulated Message',
-          onCancel: (notification: BlockingNotification) => {
+          onCancel: (notification: IBlockingNotification) => {
             notification.remove()
             return resolve(message)
           },
-          onConfirm: (notification: BlockingNotification) => {
+          onConfirm: (notification: IBlockingNotification) => {
             notification.remove()
             return resolve(manipulatedMessage)
           },
@@ -337,7 +317,7 @@ class MessageRepository {
     return message
   }
 
-  private static handleMultiAddressErrors(errors: Error[]) {
+  private static handleMultiAddressErrors(errors: Error[]): void {
     if (errors.length) {
       notifyFailure(
         `Could not send message to ${

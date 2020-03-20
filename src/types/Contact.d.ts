@@ -3,11 +3,11 @@ import * as sdk from '@kiltprotocol/sdk-js'
 /**
  * as in prototype/services
  */
-export interface Contact {
+export interface IContact {
   metaData: {
     name: string
     addedAt?: number // timestamp
-    addedBy?: MyIdentity['identity']['address']
+    addedBy?: IMyIdentity['identity']['address']
     unregistered?: boolean
   }
   did?: {
@@ -21,13 +21,13 @@ export interface Contact {
 /**
  * local Identity
  */
-export interface MyIdentity {
+export interface IMyIdentity {
   identity: sdk.Identity
   metaData: {
     name: string
   }
   phrase: string
 
-  did?: Contact['did']
+  did?: IContact['did']
   createdAt?: number
 }

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import '../Header/Header.scss'
 
@@ -22,24 +22,24 @@ type Props = RouteComponentProps<{}> & {
   selectRoute?: () => void
 }
 
-type State = {}
-
-class Navigation extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      openNavigation: false,
+class Navigation extends React.Component<Props> {
+  private selectRoute = (e: React.MouseEvent<HTMLElement>): void => {
+    e.stopPropagation()
+    const { selectRoute } = this.props
+    if (selectRoute) {
+      selectRoute()
     }
   }
 
-  public render() {
+  public render(): JSX.Element {
+    const { history } = this.props
     return (
       <section className="Navigation">
         <ul>
           {links.map((link: NavLink) => {
             const classes = [
               link.url,
-              this.props.history.location.pathname.indexOf(link.url) === 1
+              history.location.pathname.indexOf(link.url) === 1
                 ? 'current'
                 : '',
             ]
@@ -54,14 +54,6 @@ class Navigation extends React.Component<Props, State> {
         </ul>
       </section>
     )
-  }
-
-  private selectRoute = (e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation()
-    const { selectRoute } = this.props
-    if (selectRoute) {
-      selectRoute()
-    }
   }
 }
 

@@ -1,23 +1,24 @@
-import * as React from 'react'
-import { ChangeEvent } from 'react'
-import { connect } from 'react-redux'
+import React, { ChangeEvent } from 'react'
+
+import { connect, MapStateToProps } from 'react-redux'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import * as Contacts from '../../state/ducks/Contacts'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { Contact } from '../../types/Contact'
+import { IContact } from '../../types/Contact'
 
 import './ContactList.scss'
 
-interface Props {
-  // mapStateToProps
-  myContacts: Contact[]
+type StateProps = {
+  myContacts: IContact[]
 }
 
-interface State {
-  allContacts: Contact[]
+type Props = StateProps
+
+type State = {
+  allContacts: IContact[]
 
   showAllContacts?: boolean
   importViaDID: {
@@ -42,62 +43,7 @@ class ContactList extends React.Component<Props, State> {
     this.importViaDID = this.importViaDID.bind(this)
   }
 
-  public render() {
-    const { myContacts } = this.props
-    const { allContacts, showAllContacts } = this.state
-
-    const _contacts = showAllContacts ? allContacts : myContacts
-    const noContactsMessage = showAllContacts ? (
-      <div className="noContactsMessage">No contacts found.</div>
-    ) : (
-      <div className="noContactsMessage">
-        No bookmarked contacts found.{' '}
-        <button className="allContacts" onClick={this.toggleContacts}>
-          Fetch all contacts
-        </button>
-      </div>
-    )
-
-    return (
-      <section className="ContactList">
-        <h1>{showAllContacts ? 'All contacts' : 'My contacts'}</h1>
-        <div className="contactActions">
-          {showAllContacts && (
-            <>
-              <button className="refresh" onClick={this.fetchAllContacts} />
-              <button className="toggleContacts" onClick={this.toggleContacts}>
-                My contacts
-              </button>
-            </>
-          )}
-          {!showAllContacts && (
-            <button className="toggleContacts" onClick={this.toggleContacts}>
-              All contacts
-            </button>
-          )}
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th className="name">Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!_contacts.length && (
-              <tr>
-                <td>{noContactsMessage}</td>
-              </tr>
-            )}
-            {!!_contacts.length &&
-              _contacts.map((contact: Contact) => this.getContactRow(contact))}
-          </tbody>
-        </table>
-        {this.getImportViaDID()}
-      </section>
-    )
-  }
-
-  private getImportViaDID() {
+  private getImportViaDID(): JSX.Element {
     const { importViaDID } = this.state
     return (
       <section className="importViaDID">
@@ -124,6 +70,7 @@ class ContactList extends React.Component<Props, State> {
         </div>
         <div className="actions">
           <button
+            type="button"
             onClick={this.importViaDID}
             disabled={!importViaDID.didAddress || !importViaDID.alias}
           >
@@ -134,10 +81,23 @@ class ContactList extends React.Component<Props, State> {
     )
   }
 
+  private static getContactRow(contact: IContact): JSX.Element {
+    const { publicIdentity } = contact
+    const { address } = publicIdentity
+
+    return (
+      <tr key={address}>
+        <td className="name">
+          <ContactPresentation address={address} interactive fullSizeActions />
+        </td>
+      </tr>
+    )
+  }
+
   private prepareImportViaDID(
     key: 'didAddress' | 'alias',
     event: ChangeEvent<HTMLInputElement>
-  ) {
+  ): void {
     const { importViaDID } = this.state
     const { value } = event.target
     this.setState({
@@ -145,7 +105,7 @@ class ContactList extends React.Component<Props, State> {
     })
   }
 
-  private importViaDID() {
+  private importViaDID(): void {
     const { importViaDID } = this.state
 
     if (importViaDID.didAddress && importViaDID.alias) {
@@ -167,24 +127,7 @@ class ContactList extends React.Component<Props, State> {
     }
   }
 
-  private getContactRow(contact: Contact) {
-    const { publicIdentity } = contact
-    const { address } = publicIdentity
-
-    return (
-      <tr key={address}>
-        <td className="name">
-          <ContactPresentation
-            address={address}
-            interactive={true}
-            fullSizeActions={true}
-          />
-        </td>
-      </tr>
-    )
-  }
-
-  private toggleContacts() {
+  private toggleContacts(): void {
     const { showAllContacts } = this.state
 
     this.setState({ showAllContacts: !showAllContacts })
@@ -194,9 +137,9 @@ class ContactList extends React.Component<Props, State> {
     }
   }
 
-  private fetchAllContacts() {
+  private fetchAllContacts(): void {
     ContactRepository.findAll()
-      .then((allContacts: Contact[]) => {
+      .then((allContacts: IContact[]) => {
         this.setState({ allContacts })
       })
       .catch(error => {
@@ -208,9 +151,82 @@ class ContactList extends React.Component<Props, State> {
         })
       })
   }
+
+  public render(): JSX.Element {
+    const { myContacts } = this.props
+    const { allContacts, showAllContacts } = this.state
+
+    const contacts = showAllContacts ? allContacts : myContacts
+    const noContactsMessage = showAllContacts ? (
+      <div className="noContactsMessage">No contacts found.</div>
+    ) : (
+      <div className="noContactsMessage">
+        No bookmarked contacts found.{' '}
+        <button
+          type="button"
+          className="allContacts"
+          onClick={this.toggleContacts}
+        >
+          Fetch all contacts
+        </button>
+      </div>
+    )
+
+    return (
+      <section className="ContactList">
+        <h1>{showAllContacts ? 'All contacts' : 'My contacts'}</h1>
+        <div className="contactActions">
+          {showAllContacts && (
+            <>
+              <button
+                type="button"
+                className="refresh"
+                onClick={this.fetchAllContacts}
+              />
+              <button
+                type="button"
+                className="toggleContacts"
+                onClick={this.toggleContacts}
+              >
+                My contacts
+              </button>
+            </>
+          )}
+          {!showAllContacts && (
+            <button
+              type="button"
+              className="toggleContacts"
+              onClick={this.toggleContacts}
+            >
+              All contacts
+            </button>
+          )}
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th className="name">Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {!contacts.length && (
+              <tr>
+                <td>{noContactsMessage}</td>
+              </tr>
+            )}
+            {!!contacts.length &&
+              contacts.map((contact: IContact) =>
+                ContactList.getContactRow(contact)
+              )}
+          </tbody>
+        </table>
+        {this.getImportViaDID()}
+      </section>
+    )
+  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   myContacts: Contacts.getMyContacts(state),
 })
 
