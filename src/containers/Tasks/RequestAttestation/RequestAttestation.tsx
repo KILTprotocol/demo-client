@@ -11,11 +11,12 @@ import * as Claims from '../../../state/ducks/Claims'
 import PersistentStore from '../../../state/PersistentStore'
 
 import './RequestAttestation.scss'
+import Code from '../../../components/Code/Code'
 
 export type RequestAttestationProps = {
   claim: sdk.IPartialClaim
   terms: sdk.IAttestedClaim[]
-  quoteAgreement?: sdk.IQuoteAttesterSigned
+  quote?: sdk.IQuoteAttesterSigned
   receiverAddresses: Array<sdk.PublicIdentity['address']>
   delegationId: sdk.IDelegationNode['id'] | null
   onCancel?: () => void
@@ -25,7 +26,6 @@ export type RequestAttestationProps = {
 type State = {
   savedClaimEntry?: Claims.Entry
   createNewClaim?: boolean
-  quote?: sdk.IQuoteAttesterSigned
 }
 
 class RequestAttestation extends React.Component<
@@ -50,7 +50,7 @@ class RequestAttestation extends React.Component<
   }
 
   public render() {
-    const { terms, delegationId } = this.props
+    const { terms, delegationId, quote } = this.props
     const { savedClaimEntry } = this.state
 
     return (
@@ -71,6 +71,14 @@ class RequestAttestation extends React.Component<
             context="terms"
             currentDelegationViewType={ViewType.Present}
           />
+        )}
+
+        {!quote ? (
+          <section>no Quote</section>
+        ) : (
+          <section>
+            <Code>{quote}</Code>
+          </section>
         )}
 
         <div className="actions">
