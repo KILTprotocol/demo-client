@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react'
-import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import sdkPackage from '@kiltprotocol/sdk-js/package.json'
 
 import * as UiState from '../../state/ducks/UiState'
@@ -99,12 +99,9 @@ const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = dispatch => {
-  return {
-    setDebugMode: (debugMode: boolean) => {
-      dispatch(UiState.Store.setDebugModeAction(debugMode))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  setDebugMode: (debugMode: boolean) =>
+    UiState.Store.setDebugModeAction(debugMode),
 }
 
 export default connect<StateProps, DispatchProps, {}, ReduxState>(

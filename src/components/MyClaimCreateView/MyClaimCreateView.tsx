@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React, { Component } from 'react'
-import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import * as common from 'schema-based-json-editor'
@@ -183,15 +183,9 @@ const mapStateToProps: MapStateToProps<
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps: MapDispatchToProps<
-  DispatchProps,
-  OwnProps
-> = dispatch => {
-  return {
-    saveClaim: (claim: sdk.IClaim, meta: { alias: string }) => {
-      dispatch(Claims.Store.saveAction(claim, meta))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  saveClaim: (claim: sdk.IClaim, meta: { alias: string }) =>
+    Claims.Store.saveAction(claim, meta),
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MyClaimCreateView)

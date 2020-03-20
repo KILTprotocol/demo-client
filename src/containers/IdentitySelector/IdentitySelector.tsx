@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import Select from 'react-select'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
@@ -110,12 +110,9 @@ const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = dispatch => {
-  return {
-    selectIdentity: (address: string) => {
-      dispatch(Wallet.Store.selectIdentityAction(address))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  selectIdentity: (address: string) =>
+    Wallet.Store.selectIdentityAction(address),
 }
 
 export default connect<StateProps, DispatchProps>(

@@ -1,7 +1,7 @@
 import { Identity } from '@kiltprotocol/sdk-js'
 import * as mnemonic from '@polkadot/util-crypto/mnemonic'
 import React from 'react'
-import { connect, MapDispatchToProps } from 'react-redux'
+import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 
@@ -187,12 +187,9 @@ class WalletAdd extends React.Component<Props, State> {
   }
 }
 
-const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = dispatch => {
-  return {
-    saveIdentity: (myIdentity: IMyIdentity) => {
-      dispatch(Wallet.Store.saveIdentityAction(myIdentity))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  saveIdentity: (myIdentity: IMyIdentity) =>
+    Wallet.Store.saveIdentityAction(myIdentity),
 }
 
 export default withRouter(connect(null, mapDispatchToProps)(WalletAdd))

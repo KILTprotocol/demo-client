@@ -1,5 +1,5 @@
 import React from 'react'
-import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 import IdentityView from '../../components/IdentityView/IdentityView'
@@ -131,15 +131,11 @@ const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = dispatch => {
-  return {
-    removeIdentity: (address: IMyIdentity['identity']['address']) => {
-      dispatch(Wallet.Store.removeIdentityAction(address))
-    },
-    selectIdentity: (address: IMyIdentity['identity']['address']) => {
-      dispatch(Wallet.Store.selectIdentityAction(address))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  removeIdentity: (address: IMyIdentity['identity']['address']) =>
+    Wallet.Store.removeIdentityAction(address),
+  selectIdentity: (address: IMyIdentity['identity']['address']) =>
+    Wallet.Store.selectIdentityAction(address),
 }
 
 export default withRouter(

@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
-import { connect, MapDispatchToProps } from 'react-redux'
+import { connect } from 'react-redux'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
 
@@ -70,15 +70,9 @@ class ImportAttestation extends React.Component<Props> {
   }
 }
 
-const mapDispatchToProps: MapDispatchToProps<
-  DispatchProps,
-  OwnProps
-> = dispatch => {
-  return {
-    addAttestationToClaim: (attestation: sdk.IAttestedClaim) => {
-      dispatch(Claims.Store.addAttestation(attestation))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  addAttestationToClaim: (attestation: sdk.IAttestedClaim) =>
+    Claims.Store.addAttestation(attestation),
 }
 
 export default connect(null, mapDispatchToProps)(ImportAttestation)

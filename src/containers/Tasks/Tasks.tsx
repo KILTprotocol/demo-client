@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React, { ReactNode } from 'react'
-import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import SelectContacts from '../../components/SelectContacts/SelectContacts'
@@ -384,17 +384,12 @@ const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   currentTask: UiState.getCurrentTask(state),
 })
 
-const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = dispatch => {
-  return {
-    finishCurrentTask: () => {
-      dispatch(
-        UiState.Store.updateCurrentTaskAction({
-          objective: undefined,
-          props: undefined,
-        })
-      )
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  finishCurrentTask: () =>
+    UiState.Store.updateCurrentTaskAction({
+      objective: undefined,
+      props: undefined,
+    }),
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Tasks)

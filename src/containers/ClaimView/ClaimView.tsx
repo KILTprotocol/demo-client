@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
-import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 
 import { Redirect, RouteComponentProps, withRouter } from 'react-router'
 import SelectContactsModal from '../../components/Modal/SelectContactsModal'
@@ -222,12 +222,9 @@ const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = dispatch => {
-  return {
-    removeClaim: (claimId: Claims.Entry['id']) => {
-      dispatch(Claims.Store.removeAction(claimId))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  removeClaim: (claimId: Claims.Entry['id']) =>
+    Claims.Store.removeAction(claimId),
 }
 
 export default connect(

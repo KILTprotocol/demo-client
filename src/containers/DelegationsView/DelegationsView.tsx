@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import isEqual from 'lodash/isEqual'
 import React from 'react'
-import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import { Redirect, RouteComponentProps, withRouter } from 'react-router'
 
 import { ViewType } from '../../components/DelegationNode/DelegationNode'
@@ -205,15 +205,9 @@ const mapStateToProps: MapStateToProps<
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps: MapDispatchToProps<
-  DispatchProps,
-  OwnProps
-> = dispatch => {
-  return {
-    removeDelegation: (delegation: IMyDelegation) => {
-      dispatch(Delegations.Store.removeDelegationAction(delegation))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  removeDelegation: (delegation: IMyDelegation) =>
+    Delegations.Store.removeDelegationAction(delegation),
 }
 
 export default connect<StateProps, DispatchProps, OwnProps>(
