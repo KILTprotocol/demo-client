@@ -151,14 +151,14 @@ class MyClaimCreateView extends Component<Props, State> {
     const { contents } = partialClaim
 
     if (cType && selectedIdentity) {
-      const newClaim: sdk.IClaim = sdk.Claim.fromCTypeAndClaimContents(
+      const newClaim = sdk.Claim.fromCTypeAndClaimContents(
         sdk.CType.fromCType(cType.cType),
         contents || {},
         selectedIdentity.identity.address
       )
       saveClaim(newClaim, { alias: name })
       notifySuccess(`Claim ${name} successfully created & saved.`)
-      onCreate(new sdk.Claim(newClaim))
+      onCreate(newClaim)
     }
   }
 

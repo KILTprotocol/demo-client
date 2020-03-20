@@ -196,7 +196,7 @@ class ClaimView extends React.Component<Props, State> {
     }
   }
 
-  private resolveClaim(claimId: Claims.Entry['id']): sdk.Claim | undefined {
+  private resolveClaim(claimId: Claims.Entry['id']): sdk.IClaim | undefined {
     const { claimEntries } = this.props
 
     const claimToAttest = claimEntries.find(
@@ -204,7 +204,7 @@ class ClaimView extends React.Component<Props, State> {
     )
     if (claimToAttest) {
       const { claim } = claimToAttest
-      return new sdk.Claim(claim)
+      return claim
     } else {
       return undefined
     }
