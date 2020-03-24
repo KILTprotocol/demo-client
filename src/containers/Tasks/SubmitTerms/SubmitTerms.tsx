@@ -14,8 +14,10 @@ import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
 import { ICTypeWithMetadata } from '../../../types/Ctype'
 import { getClaimInputModel } from '../../../utils/CtypeUtils'
-import './SubmitTerms.scss'
 import QuoteView from '../../../containers/QuoteView/QuoteView'
+import PersistentStore from '../../../state/PersistentStore'
+import * as Wallet from '../../../state/ducks/Wallet'
+import './SubmitTerms.scss'
 
 export type SubmitTermsProps = {
   claim: sdk.IPartialClaim
@@ -25,6 +27,7 @@ export type SubmitTermsProps = {
   enablePreFilledClaim?: boolean
   onFinished?: () => void
   onCancel?: () => void
+  quoteData?: sdk.IQuoteAttesterSigned
 }
 
 type Props = InjectedSelectProps & SubmitTermsProps
@@ -33,7 +36,6 @@ type State = {
   claim: sdk.IPartialClaim
   cType?: ICTypeWithMetadata
   selectedDelegation?: MyDelegation
-  createNewQuote?: boolean
   withPreFilledClaim?: boolean
   isValid: boolean
 }
@@ -75,7 +77,7 @@ class SubmitTerms extends React.Component<Props, State> {
       receiverAddress,
     } = this.props
 
-    const { cType, selectedDelegation, createNewQuote } = this.state
+    const { cType, selectedDelegation } = this.state
     return (
       <section className="SubmitTerms">
         {enablePreFilledClaim && cType && (
@@ -182,6 +184,7 @@ class SubmitTerms extends React.Component<Props, State> {
       enablePreFilledClaim,
       receiverAddresses,
       onFinished,
+      quoteData,
     } = this.props
     const { claim, selectedDelegation, withPreFilledClaim } = this.state
 
@@ -190,17 +193,37 @@ class SubmitTerms extends React.Component<Props, State> {
     if (enablePreFilledClaim && !withPreFilledClaim) {
       delete _claim.contents
     }
+    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
+      PersistentStore.store.getState()
+    ).identity
 
-    AttestationWorkflow.submitTerms(
-      _claim,
-      getAttestedClaims(),
-      receiverAddresses,
-      selectedDelegation
-    ).then(() => {
-      if (onFinished) {
-        onFinished()
-      }
-    })
+    if (!selectedIdentity) {
+      throw new Error('No identity selected')
+    }
+    if (quoteData) {
+      AttestationWorkflow.submitTerms(
+        _claim,
+        getAttestedClaims(),
+        receiverAddresses,
+        selectedDelegation,
+        sdk.Quote.createAttesterSignature(quoteData, selectedIdentity)
+      ).then(() => {
+        if (onFinished) {
+          onFinished()
+        }
+      })
+    } else {
+      AttestationWorkflow.submitTerms(
+        _claim,
+        getAttestedClaims(),
+        receiverAddresses,
+        selectedDelegation
+      ).then(() => {
+        if (onFinished) {
+          onFinished()
+        }
+      })
+    }
   }
 
   private changeDelegation(selectedDelegations: MyDelegation[]) {

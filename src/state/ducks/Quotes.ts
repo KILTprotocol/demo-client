@@ -5,10 +5,12 @@ import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 import { State as ReduxState } from '../PersistentStore'
 import { notifyFailure, notifySuccess } from '../../services/FeedbackService'
+import * as Wallet from './Wallet'
+import { MyIdentity } from '../../types/Contact'
 
 interface SaveAction extends KiltAction {
   payload: {
-    created?: number
+    created: number
     claimerAddress: string
     quote: sdk.IQuoteAttesterSigned | sdk.IQuoteAgreement
   }
@@ -56,43 +58,42 @@ class Store {
   public static deserialize(
     quoteStateSerialized: SerializedState
   ): ImmutableState {
-    // if (!quoteStateSerialized) {
-
-    const quoteData = JSON.parse(JSON.stringify(quoteStateSerialized))
-    const quoteEntry: Entry = {
-      created: quoteData.created,
-      claimerAddress: quoteData.claimerAddress,
-      quote: quoteData.quote,
+    if (!quoteStateSerialized) {
+      const quoteData = JSON.parse(JSON.stringify(quoteStateSerialized))
+      const quoteEntry: Entry = {
+        created: quoteData.created,
+        claimerAddress: quoteData.claimerAddress,
+        quote: quoteData.quote,
+      }
+      return Store.createState({
+        quote: Immutable.List([quoteEntry]),
+      })
     }
-    return Store.createState({
-      quote: Immutable.List(),
+
+    const quoteEntries: Entry[] = []
+    quoteStateSerialized.quote.forEach(serializedQuote => {
+      try {
+        const quoteAsJson = JSON.parse(serializedQuote)
+        const quote: sdk.IQuoteAttesterSigned | sdk.IQuoteAttesterSigned =
+          quoteAsJson.quote
+        const quoteEntry: Entry = {
+          created: quoteAsJson.created,
+          claimerAddress: quoteAsJson.claimerAddress,
+          quote: quote,
+        }
+        quoteEntries.push(quoteEntry)
+      } catch (e) {
+        errorService.log({
+          error: e,
+          message: '',
+          origin: 'Quotes.deserialize()',
+        })
+      }
     })
-    // }
 
-    // const quoteEntries: Entry[] = []
-    // quoteStateSerialized.quote.forEach(serializedQuote => {
-    //   try {
-    //     const quoteAsJson = JSON.parse(serializedQuote)
-    //     const quote: sdk.IQuoteAttesterSigned = quoteAsJson.quote
-    //     const quoteEntry: Entry = {
-    //       created: quoteAsJson.created,
-    //       claimerAlias: quoteAsJson.claimerAddress,
-    //       claimerAddress: quoteAsJson.claimerAddress,
-    //       quote: quote,
-    //     }
-    //     quoteEntries.push(quoteEntry)
-    //   } catch (e) {
-    //     errorService.log({
-    //       error: e,
-    //       message: '',
-    //       origin: 'Quotes.deserialize()',
-    //     })
-    //   }
-    // })
-
-    // return Store.createState({
-    //   quotes: Immutable.List(quoteEntries),
-    // })
+    return Store.createState({
+      quote: Immutable.List(quoteEntries),
+    })
   }
 
   public static reducer(
@@ -101,19 +102,19 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.SAVE_QUOTE: {
-        // const quoteEntry: Entry = (action as SaveAction).payload
-        // return state.update('quotes', quotes => {
-        //   return quotes
-        //     .filter((entry: Entry) => {
-        //       return (
-        //         entry.quote.attesterSignature !==
-        //         quoteEntry.quote.attesterSignature
-        //       )
-        //     })
-        //     .concat(quoteEntry)
-        // })
+        const quoteEntry: Entry = (action as SaveAction).payload
         console.log('save_quote Action', state, action.payload)
-        return state
+
+        return state.update('quote', quotes => {
+          return quotes
+            .filter((entry: Entry) => {
+              return (
+                entry.quote.attesterSignature !==
+                quoteEntry.quote.attesterSignature
+              )
+            })
+            .concat(quoteEntry)
+        })
       }
       case Store.ACTIONS.REMOVE_QUOTE: {
         // const attesterSignature: sdk.IQuoteAttesterSigned['attesterSignature'] = (action as RemoveAction)
@@ -167,6 +168,14 @@ class Store {
   }
 }
 
+const _getQuote = (state: ReduxState, created: Entry['created']) =>
+  state.quotes.get('quote').get(created)
+
+const getQuote = createSelector(
+  [_getQuote],
+  (entry: Entry) => entry
+)
+
 const _getAllMyQuotes = (state: ReduxState) =>
   state.quotes
     .get('quote')
@@ -174,19 +183,24 @@ const _getAllMyQuotes = (state: ReduxState) =>
     .toArray()
 
 const getAllMyQuotes = createSelector(
-  [_getAllMyQuotes],
-  (entries: Entry[]) =>
-    entries.sort((a, b) => {
-      if (!a.created && !b.created) {
-        return 0
-      } else if (!a.created) {
-        return 1
-      } else if (!b.created) {
-        return -1
-      } else {
-        return a.created - b.created
-      }
+  [Wallet.getSelectedIdentity, _getAllMyQuotes],
+  (selectedIdentity: MyIdentity, entries: Entry[]) => {
+    return entries.filter((entry: Entry) => {
+      return (
+        entry &&
+        entry.quote &&
+        entry.claimerAddress === selectedIdentity.identity.address
+      )
     })
+  }
 )
 
-export { Store, ImmutableState, SerializedState, Action, Entry, getAllMyQuotes }
+export {
+  Store,
+  ImmutableState,
+  SerializedState,
+  Action,
+  Entry,
+  getAllMyQuotes,
+  getQuote,
+}

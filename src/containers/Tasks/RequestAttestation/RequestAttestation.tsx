@@ -198,10 +198,33 @@ class RequestAttestation extends React.Component<
   }
 
   private handleSubmit() {
-    const { receiverAddresses, terms, delegationId, onFinished } = this.props
+    const {
+      receiverAddresses,
+      terms,
+      delegationId,
+      onFinished,
+      quote,
+    } = this.props
     const { savedClaimEntry } = this.state
 
     if (savedClaimEntry) {
+      if (quote) {
+        attestationWorkflow
+          .requestAttestationForClaim(
+            savedClaimEntry.claim,
+            receiverAddresses,
+            (terms || []).map((legitimation: sdk.IAttestedClaim) =>
+              sdk.AttestedClaim.fromAttestedClaim(legitimation)
+            ),
+            delegationId,
+            quote
+          )
+          .then(() => {
+            if (onFinished) {
+              onFinished()
+            }
+          })
+      }
       attestationWorkflow
         .requestAttestationForClaim(
           savedClaimEntry.claim,

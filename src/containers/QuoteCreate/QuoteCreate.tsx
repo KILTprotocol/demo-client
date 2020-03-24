@@ -68,7 +68,7 @@ class QuoteCreate extends React.Component<Props, State> {
 
   private handleCancel() {
     const { onCancel } = this.props
-
+    
     if (onCancel) {
       onCancel()
     }

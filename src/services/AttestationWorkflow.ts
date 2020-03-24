@@ -122,7 +122,8 @@ class AttestationWorkflow {
     claim: sdk.IClaim,
     attesterAddresses: Array<Contact['publicIdentity']['address']>,
     terms: sdk.AttestedClaim[] = [],
-    delegationId: sdk.IDelegationNode['id'] | null = null
+    delegationId: sdk.IDelegationNode['id'] | null = null,
+    quoteAgreement?: sdk.IQuoteAttesterSigned
   ): Promise<void> {
     const identity: sdk.Identity = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
@@ -133,6 +134,20 @@ class AttestationWorkflow {
       terms,
       delegationId
     )
+    if (quoteAgreement) {
+      const quote = sdk.Quote.createAgreedQuote(
+        identity,
+        quoteAgreement,
+        requestForAttestation.rootHash
+      )
+
+      const messageBody = {
+        content: { requestForAttestation, quote },
+        type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+      } as IRequestAttestationForClaim
+
+      return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
+    }
     const messageBody = {
       content: { requestForAttestation },
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
