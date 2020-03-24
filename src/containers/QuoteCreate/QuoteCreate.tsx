@@ -1,20 +1,31 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import React, { useState } from 'react'
-import PersistentStore from '../../state/PersistentStore'
+import React from 'react'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
+import { State as ReduxState } from '../../state/PersistentStore'
 import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import * as common from 'schema-based-json-editor'
-import { QuoteInputModel } from '../../utils/QuoteUtils/QuoteInputSchema'
+import * as Quotes from '../../state/ducks/Quotes'
+import * as Wallet from '../../state/ducks/Wallet'
 
 import './QuoteCreate.scss'
 
-type Props = {
-  onCancelQuote: () => void
-  createNewQuote?: boolean
-  quoteConfirm: (value?: sdk.IQuote) => void
+type Props = RouteComponentProps<{}> & {
+  cTypeHash?: sdk.ICType['hash']
+  claimerAddress?: string
+  attesterAddress?: string
+  saveQuote: (
+    attesterSignedQuote: sdk.IQuoteAttesterSigned,
+    claimerIdentity: string
+  ) => void
+  selectedIdentity: Wallet.Entry
+  onCancel?: () => void
 }
+
 type State = {
   quote?: sdk.IQuote
   isValid: boolean
+  initialValue: object
 }
 
 class QuoteCreate extends React.Component<Props, State> {
@@ -22,48 +33,88 @@ class QuoteCreate extends React.Component<Props, State> {
     super(props)
     this.state = {
       quote: undefined,
-      isValid: false,
+      isValid: true,
+      initialValue: {
+        cTypeHash: this.props.cTypeHash,
+        attesterAddress: this.props.attesterAddress,
+      },
     }
+    this.handleCancel = this.handleCancel.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.updateValue = this.updateValue.bind(this)
   }
+
   render() {
-    const { onCancelQuote, quoteConfirm } = this.props
+    const { onCancel } = this.props
+    const { initialValue } = this.state
     return (
       <section className="QuoteCreate">
         <h2>Quote</h2>
         <div>
           <SchemaEditor
-            schema={QuoteInputModel as common.Schema}
-            initialValue={undefined}
+            schema={sdk.QuoteSchema as common.Schema}
+            initialValue={initialValue}
             updateValue={this.updateValue}
           />
         </div>
         <section className="actions">
-          <div>
-            <button onClick={() => onCancelQuote()}>Cancel Quote</button>
+          {onCancel && <button onClick={this.handleCancel}>Cancel</button>}
 
-            <button
-              onClick={() => {
-                quoteConfirm(this.state.quote)
-                onCancelQuote()
-              }}
-            >
-              Confirm Quote
-            </button>
-          </div>
+          <button onClick={this.handleSubmit}>Confirm Quote</button>
         </section>
       </section>
     )
   }
 
-  private getQuoteInput(value: sdk.IQuote): boolean {
-    return sdk.Quote.validateQuoteSchema(QuoteInputModel, value)
+  private handleCancel() {
+    const { onCancel } = this.props
+
+    if (onCancel) {
+      onCancel()
+    }
   }
 
-  private updateValue = (value: sdk.IQuote, isValid: boolean) => {
-    if (!this.getQuoteInput(value)) {
-      this.setState({ quote: value, isValid: false })
+  private handleSubmit() {
+    const { saveQuote, selectedIdentity, claimerAddress } = this.props
+    const { quote } = this.state
+    if (quote && claimerAddress) {
+      quote.timeframe = new Date()
+      const attesterSignedQuote = sdk.Quote.fromQuoteDataAndIdentity(
+        quote,
+        selectedIdentity.identity
+      )
+      saveQuote(attesterSignedQuote, claimerAddress)
     }
-    this.setState({ quote: value, isValid: isValid })
+  }
+
+  public updateValue = (value: sdk.IQuote) => {
+    if (!sdk.Quote.validateQuoteSchema(sdk.QuoteSchema, value)) {
+      this.setState({ isValid: false })
+      // if (this.state.isValid === false) {
+      //   notifyFailure('Quote is not valid')
+      //   throw Error('Quote is not valid')
+      // }
+    }
+    this.setState({ quote: value, isValid: true })
   }
 }
-export default QuoteCreate
+
+const mapStateToProps = (state: ReduxState) => ({
+  selectedIdentity: Wallet.getSelectedIdentity(state),
+})
+
+const mapDispatchToProps = (dispatch: (action: Quotes.Action) => void) => {
+  return {
+    saveQuote: (
+      attesterSignedQuote: sdk.IQuoteAgreement,
+      claimerAddress: string
+    ) => {
+      dispatch(Quotes.Store.saveQuote(attesterSignedQuote, claimerAddress))
+    },
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(QuoteCreate))

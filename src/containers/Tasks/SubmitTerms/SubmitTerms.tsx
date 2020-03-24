@@ -14,18 +14,15 @@ import { MyDelegation } from '../../../state/ducks/Delegations'
 import { Contact } from '../../../types/Contact'
 import { ICTypeWithMetadata } from '../../../types/Ctype'
 import { getClaimInputModel } from '../../../utils/CtypeUtils'
-import QuoteCreate from '../../../containers/QuoteCreate/QuoteCreate'
 import './SubmitTerms.scss'
-import Code from '../../../components/Code/Code'
-import * as Wallet from '../../../state/ducks/Wallet'
-import PersistentStore from '../../../state/PersistentStore'
+import QuoteView from '../../../containers/QuoteView/QuoteView'
 
 export type SubmitTermsProps = {
   claim: sdk.IPartialClaim
   receiverAddresses: Array<Contact['publicIdentity']['address']>
-
+  senderAddress?: string
+  receiverAddress?: string
   enablePreFilledClaim?: boolean
-
   onFinished?: () => void
   onCancel?: () => void
 }
@@ -37,8 +34,6 @@ type State = {
   cType?: ICTypeWithMetadata
   selectedDelegation?: MyDelegation
   createNewQuote?: boolean
-  quoteData?: sdk.IQuote
-
   withPreFilledClaim?: boolean
   isValid: boolean
 }
@@ -56,9 +51,6 @@ class SubmitTerms extends React.Component<Props, State> {
     this.sendClaim = this.sendClaim.bind(this)
     this.updateClaim = this.updateClaim.bind(this)
     this.toggleWithPreFilledClaim = this.toggleWithPreFilledClaim.bind(this)
-    this.createQuote = this.createQuote.bind(this)
-    this.onCancelQuote = this.onCancelQuote.bind(this)
-    this.quoteConfirm = this.quoteConfirm.bind(this)
   }
 
   public componentDidMount() {
@@ -79,9 +71,11 @@ class SubmitTerms extends React.Component<Props, State> {
       enablePreFilledClaim,
       onChange,
       claim,
+      senderAddress,
+      receiverAddress,
     } = this.props
 
-    const { cType, selectedDelegation, createNewQuote, quoteData } = this.state
+    const { cType, selectedDelegation, createNewQuote } = this.state
     return (
       <section className="SubmitTerms">
         {enablePreFilledClaim && cType && (
@@ -104,29 +98,11 @@ class SubmitTerms extends React.Component<Props, State> {
             />
           </div>
           <div>
-            {!createNewQuote ? (
-              <div className="selectTerms">
-                <h2>Quote</h2>
-                {!quoteData ? (
-                  <section className="selectTerms">No Quote Found</section>
-                ) : (
-                  <section className="selectTerms">
-                    <Code>{quoteData}</Code>
-                  </section>
-                )}
-                <div className="actions">
-                  <button className="submit-cType" onClick={this.createQuote}>
-                    Create new Quote
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <QuoteCreate
-                onCancelQuote={this.onCancelQuote}
-                quoteConfirm={this.quoteConfirm}
-                createNewQuote={this.state.createNewQuote}
-              />
-            )}
+            <QuoteView
+              claim={claim}
+              senderAddress={senderAddress}
+              receiverAddress={receiverAddress}
+            />
           </div>
           <div className="actions">
             <button onClick={this.onCancel}>Cancel</button>
@@ -142,18 +118,6 @@ class SubmitTerms extends React.Component<Props, State> {
         </>
       </section>
     )
-  }
-
-  private quoteConfirm(value: sdk.IQuote) {
-    this.setState({ quoteData: value })
-  }
-
-  private createQuote() {
-    this.setState({ createNewQuote: true })
-  }
-
-  private onCancelQuote() {
-    this.setState({ createNewQuote: false })
   }
 
   private getPreFilledClaimElement() {
@@ -219,12 +183,7 @@ class SubmitTerms extends React.Component<Props, State> {
       receiverAddresses,
       onFinished,
     } = this.props
-    const {
-      claim,
-      selectedDelegation,
-      withPreFilledClaim,
-      quoteData,
-    } = this.state
+    const { claim, selectedDelegation, withPreFilledClaim } = this.state
 
     const _claim: sdk.IPartialClaim = claim
 
@@ -232,37 +191,16 @@ class SubmitTerms extends React.Component<Props, State> {
       delete _claim.contents
     }
 
-    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
-    ).identity
-
-    if (!selectedIdentity) {
-      throw new Error('No identity selected')
-    }
-    if (quoteData) {
-      AttestationWorkflow.submitTerms(
-        _claim,
-        getAttestedClaims(),
-        receiverAddresses,
-        selectedDelegation,
-        sdk.Quote.createAttesterSignature(quoteData, selectedIdentity)
-      ).then(() => {
-        if (onFinished) {
-          onFinished()
-        }
-      })
-    } else {
-      AttestationWorkflow.submitTerms(
-        _claim,
-        getAttestedClaims(),
-        receiverAddresses,
-        selectedDelegation
-      ).then(() => {
-        if (onFinished) {
-          onFinished()
-        }
-      })
-    }
+    AttestationWorkflow.submitTerms(
+      _claim,
+      getAttestedClaims(),
+      receiverAddresses,
+      selectedDelegation
+    ).then(() => {
+      if (onFinished) {
+        onFinished()
+      }
+    })
   }
 
   private changeDelegation(selectedDelegations: MyDelegation[]) {

@@ -1,4 +1,4 @@
-export const QuoteInputModel = {
+export const QuoteInputSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'KILT:quote:v1',
   type: 'object',
@@ -6,9 +6,11 @@ export const QuoteInputModel = {
   properties: {
     attesterAddress: {
       type: 'string',
+      minLength: 1,
     },
     cTypeHash: {
       type: 'string',
+      minLength: 1,
     },
     cost: {
       type: 'object',
@@ -16,9 +18,11 @@ export const QuoteInputModel = {
       properties: {
         net: {
           type: 'number',
+          minLength: 1,
         },
         gross: {
           type: 'number',
+          minLength: 1,
         },
         tax: {
           type: 'object',
@@ -27,13 +31,16 @@ export const QuoteInputModel = {
     },
     currency: {
       type: 'string',
+      minLength: 1,
     },
     termsAndConditions: {
       type: 'string',
+      minLength: 1,
     },
     timeframe: {
       type: 'string',
       format: 'date-time',
+      minLength: 1,
     },
   },
   required: [

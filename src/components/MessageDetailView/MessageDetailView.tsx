@@ -117,6 +117,8 @@ class MessageDetailView extends React.Component<Props, State> {
             {showTask ? (
               <SubmitTerms
                 receiverAddresses={[message.senderAddress]}
+                senderAddress={message.senderAddress}
+                receiverAddress={message.receiverAddress}
                 claim={(message.body as sdk.IRequestTerms).content}
                 onCancel={this.handleCancel}
                 onFinished={this.handleDelete}
