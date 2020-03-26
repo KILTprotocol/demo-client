@@ -41,7 +41,7 @@ class ErrorService {
   private errors: QualifiedError[] = []
 
   public log(
-    { error, message, onConfirm, origin, type }: QualifiedError,
+    { error, message, origin, type }: QualifiedError,
     config?: ErrorConfig
   ): void {
     const useConfig = {

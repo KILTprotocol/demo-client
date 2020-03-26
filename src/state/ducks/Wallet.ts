@@ -203,7 +203,7 @@ class Store {
   }
 }
 
-const getStateSelectedIdentity = (state: ReduxState) =>
+const getStateSelectedIdentity = (state: ReduxState): IMyIdentity | null =>
   state.wallet.get('selectedIdentity')
 
 const getSelectedIdentity = createSelector(
@@ -211,7 +211,7 @@ const getSelectedIdentity = createSelector(
   (selectedIdentity: IMyIdentity) => selectedIdentity
 )
 
-const getStateAllIdentities = (state: ReduxState) =>
+const getStateAllIdentities = (state: ReduxState): IMyIdentity[] =>
   state.wallet
     .get('identities')
     .toList()
