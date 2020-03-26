@@ -108,7 +108,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           PersistentStore.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+              objective: sdk.MessageBodyType.REQUEST_TERMS,
               props: {
                 cTypeHash,
               } as RequestLegitimationsProps,
@@ -132,7 +132,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           PersistentStore.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
+              objective: sdk.MessageBodyType.SUBMIT_TERMS,
               props: {
                 claim: { cTypeHash },
               } as SubmitLegitimationsProps,

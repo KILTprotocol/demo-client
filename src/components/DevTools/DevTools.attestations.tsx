@@ -248,9 +248,9 @@ class BsAttestation {
     }
 
     // send request for legitimation from claimer to attester
-    const requestAcceptDelegation: sdk.IRequestLegitimations = {
+    const requestAcceptDelegation: sdk.IRequestTerms = {
       content: partialClaim,
-      type: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+      type: sdk.MessageBodyType.REQUEST_TERMS,
     }
     await MessageRepository.singleSend(
       requestAcceptDelegation,
@@ -259,13 +259,13 @@ class BsAttestation {
     )
 
     // send legitimations from attester to claimer
-    const submitLegitimations: sdk.ISubmitLegitimations = {
+    const submitLegitimations: sdk.ISubmitTerms = {
       content: {
         claim: partialClaim,
-        delegationId: attestedClaim.request.delegationId,
+        delegationId: attestedClaim.request.delegationId || undefined,
         legitimations: attestedClaim.request.legitimations,
       },
-      type: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
+      type: sdk.MessageBodyType.SUBMIT_TERMS,
     }
     await MessageRepository.singleSend(
       submitLegitimations,
@@ -275,7 +275,7 @@ class BsAttestation {
 
     // send signed legitmations from claimer to attester
     const requestAttestationForClaim: sdk.IRequestAttestationForClaim = {
-      content: requestForAttestation,
+      content: { requestForAttestation },
       type: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
     await MessageRepository.singleSend(

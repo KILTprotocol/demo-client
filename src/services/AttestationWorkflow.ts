@@ -2,7 +2,7 @@ import * as sdk from '@kiltprotocol/sdk-js'
 import {
   IPartialClaim,
   IRequestAttestationForClaim,
-  IRequestLegitimations,
+  IRequestTerms,
   ISubmitAttestationForClaim,
   MessageBodyType,
 } from '@kiltprotocol/sdk-js'
@@ -26,10 +26,12 @@ class AttestationWorkflow {
     claims: IPartialClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>
   ): Promise<void> {
-    const messageBodies: IRequestLegitimations[] = claims.map(claim => ({
-      content: claim,
-      type: MessageBodyType.REQUEST_LEGITIMATIONS,
-    }))
+    const messageBodies: IRequestTerms[] = claims.map(
+      (claim: IPartialClaim) => ({
+        content: claim,
+        type: MessageBodyType.REQUEST_TERMS,
+      })
+    )
 
     return MessageRepository.multiSendToAddresses(
       receiverAddresses,
@@ -53,9 +55,9 @@ class AttestationWorkflow {
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
     delegation?: IMyDelegation
   ): Promise<void> {
-    const messageBody: sdk.ISubmitLegitimations = {
-      content: { claim, legitimations, delegationId: null },
-      type: sdk.MessageBodyType.SUBMIT_LEGITIMATIONS,
+    const messageBody: sdk.ISubmitTerms = {
+      content: { claim, legitimations, delegationId: undefined },
+      type: sdk.MessageBodyType.SUBMIT_TERMS,
     }
 
     if (delegation) {
@@ -109,7 +111,7 @@ class AttestationWorkflow {
       delegationId
     )
     const messageBody: IRequestAttestationForClaim = {
-      content: requestForAttestation,
+      content: { requestForAttestation },
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
 

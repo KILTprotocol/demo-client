@@ -43,7 +43,7 @@ class ClaimView extends React.Component<Props, State> {
   private static requestLegitimation(claimEntry: Claims.Entry): void {
     PersistentStore.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
-        objective: sdk.MessageBodyType.REQUEST_LEGITIMATIONS,
+        objective: sdk.MessageBodyType.REQUEST_TERMS,
         props: {
           cTypeHash: claimEntry.claim.cTypeHash,
           preSelectedClaimEntries: [claimEntry],

@@ -264,9 +264,9 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.2.tgz#63985d3d8b02530e0869962f4da09142ee8e200e"
 
 "@kiltprotocol/sdk-js@^0.x":
-  version "0.17.1"
-  resolved "https://registry.yarnpkg.com/@kiltprotocol/sdk-js/-/sdk-js-0.17.1.tgz#9f6ffadfa2649fb2fd79a06e31449cd3f1954c42"
-  integrity sha512-e9Yrc9OlYGG2gsta7hNSYPSrs8WqQI6VeLgNqwofK/Swf+nOlavURiVT+Rg/6Bm1usV4MFyo933XUKfPPLZVRw==
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/@kiltprotocol/sdk-js/-/sdk-js-0.18.0.tgz#2da5cdb78502361d08a78f555c46ec9ecbf99769"
+  integrity sha512-7qzI+SOCHZ2dvlxuhK3XlMj9Lnb6xWruKoqFz5vX6+LXiEM3nWuK7cpr0CSSDsMV4JIA7hL4vLnd6SbuEUOsHA==
   dependencies:
     "@polkadot/api" "^0.96.1"
     "@polkadot/keyring" "^1.7.0-beta.5"
