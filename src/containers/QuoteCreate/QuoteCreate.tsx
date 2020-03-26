@@ -20,6 +20,7 @@ type Props = RouteComponentProps<{}> & {
   ) => void
   selectedIdentity: Wallet.Entry
   onCancel?: () => void
+  quoteId: (quoteId: Quotes.Entry['quoteId']) => void
 }
 
 type State = {
@@ -47,6 +48,7 @@ class QuoteCreate extends React.Component<Props, State> {
   render() {
     const { onCancel } = this.props
     const { initialValue } = this.state
+
     return (
       <section className="QuoteCreate">
         <h2>Quote</h2>
@@ -68,16 +70,19 @@ class QuoteCreate extends React.Component<Props, State> {
 
   private handleCancel() {
     const { onCancel } = this.props
-    
+
     if (onCancel) {
       onCancel()
     }
   }
 
   private handleSubmit() {
-    const { saveQuote, selectedIdentity, claimerAddress } = this.props
+    const { saveQuote, selectedIdentity, claimerAddress, quoteId } = this.props
+
     const { quote } = this.state
+
     if (quote && claimerAddress) {
+      quoteId(Quotes.hash(quote))
       quote.timeframe = new Date()
       const attesterSignedQuote = sdk.Quote.fromQuoteDataAndIdentity(
         quote,
@@ -90,10 +95,6 @@ class QuoteCreate extends React.Component<Props, State> {
   public updateValue = (value: sdk.IQuote) => {
     if (!sdk.Quote.validateQuoteSchema(sdk.QuoteSchema, value)) {
       this.setState({ isValid: false })
-      // if (this.state.isValid === false) {
-      //   notifyFailure('Quote is not valid')
-      //   throw Error('Quote is not valid')
-      // }
     }
     this.setState({ quote: value, isValid: true })
   }

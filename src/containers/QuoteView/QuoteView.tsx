@@ -13,7 +13,7 @@ import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
 
-type Props = RouteComponentProps<{}> & {
+type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> & {
   selectedIdentity: MyIdentity
   claim: sdk.IPartialClaim
   quoteEntries?: Quotes.Entry[]
@@ -24,7 +24,8 @@ type Props = RouteComponentProps<{}> & {
 type State = {
   createNewQuote: boolean
   redirect?: string
-  newQuote?: sdk.IQuoteAttesterSigned | sdk.IQuoteAgreement
+  quoteID?: Quotes.Entry['quoteId']
+  newQuote?: Quotes.QuoteEntry
 }
 
 class QuoteView extends React.Component<Props, State> {
@@ -33,24 +34,28 @@ class QuoteView extends React.Component<Props, State> {
     this.state = { createNewQuote: false }
     this.createQuote = this.createQuote.bind(this)
     this.onCancelQuote = this.onCancelQuote.bind(this)
+    this.quoteId = this.quoteId.bind(this)
   }
 
   public componentDidMount() {
-    const { quoteEntries, receiverAddress, claim } = this.props
-    if (quoteEntries) {
-      const attesterSignedQuote = quoteEntries.map(entry => {
-        if (entry.quote.attesterAddress === receiverAddress) {
-          entry.quote.cTypeHash === claim.cTypeHash
-          return entry.quote
-        }
-        return undefined
-      })
-      console.log(attesterSignedQuote)
+    const { quoteEntries } = this.props
+    const { quoteID } = this.state
+    if (quoteEntries && quoteID) {
+      console.log('this is broken?', quoteID, PersistentStore.store.getState())
+      const selectedQuote = Quotes.getQuoteByQuoteHash(
+        PersistentStore.store.getState(),
+        quoteID
+      )
+      if (!selectedQuote) {
+        throw new Error('No quote selected')
+      }
+      console.log('this is undefined', selectedQuote)
       // this.setState({ newQuote: attesterSignedQuote })
     }
   }
 
   public componentDidUpdate(prevProps: Props) {
+    const { newQuote, quoteID } = this.state
     if (
       prevProps.selectedIdentity.identity.address !==
       this.props.selectedIdentity.identity.address
@@ -59,48 +64,56 @@ class QuoteView extends React.Component<Props, State> {
         redirect: '/quote',
       })
     }
+    if (quoteID) {
+      this.setState({
+        newQuote: Quotes.getQuoteByQuoteHash(
+          PersistentStore.store.getState(),
+          quoteID
+        )[0].quote,
+      })
+      if (newQuote) {
+        return
+      }
+    }
   }
 
   public render() {
     const { senderAddress, receiverAddress, claim } = this.props
 
-    const { createNewQuote, newQuote } = this.state
+    const { createNewQuote, quoteID, newQuote } = this.state
 
-    const isQuoteView = this.isQuoteView()
-    if (newQuote && isQuoteView) {
-      return (
+    return quoteID && newQuote ? (
+      <section className="QuoteView">
+        <h1>Quote </h1>
         <section className="QuoteView">
-          <h1>Quote </h1>
-          <section className="QuoteView">
-            <div>
-              <label>Quote</label>
-              <span>
-                <Code>{newQuote}</Code>
-              </span>
+          <div>
+            <label>Quote</label>
+            <span>
+              <Code>{newQuote}</Code>
+            </span>
+          </div>
+        </section>
+        {!createNewQuote ? (
+          <section>
+            <div className="actions">
+              <button className="submit-quote" onClick={this.createQuote}>
+                Create new Quote
+              </button>
             </div>
           </section>
-          {!createNewQuote ? (
-            <section>
-              <div className="actions">
-                <button className="submit-quote" onClick={this.createQuote}>
-                  Create new Quote
-                </button>
-              </div>
-            </section>
-          ) : (
-            <section>
-              <QuoteCreate
-                claimerAddress={senderAddress}
-                attesterAddress={receiverAddress}
-                cTypeHash={claim.cTypeHash}
-                onCancel={this.onCancelQuote}
-              />
-            </section>
-          )}
-        </section>
-      )
-    }
-    return (
+        ) : (
+          <section>
+            <QuoteCreate
+              claimerAddress={senderAddress}
+              attesterAddress={receiverAddress}
+              cTypeHash={claim.cTypeHash}
+              onCancel={this.onCancelQuote}
+              quoteId={this.quoteId}
+            />
+          </section>
+        )}
+      </section>
+    ) : (
       <section className="QuoteView">
         <h1>Quote </h1>
         <section className="QuoteView">
@@ -123,6 +136,7 @@ class QuoteView extends React.Component<Props, State> {
               attesterAddress={receiverAddress}
               cTypeHash={claim.cTypeHash}
               onCancel={this.onCancelQuote}
+              quoteId={this.quoteId}
             />
           </section>
         )}
@@ -130,21 +144,12 @@ class QuoteView extends React.Component<Props, State> {
     )
   }
 
-  private selectQuote(quoteEntry: Quotes.Entry) {
-    if (quoteEntry) {
-      const selectedQuoteEntry = Quotes.getQuote(
-        PersistentStore.store.getState(),
-        quoteEntry.quote
-      )
-      return selectedQuoteEntry
-    }
-    return undefined
-  }
+  // private selectQuote() {
+  //   const { quoteID } = this.state
 
-  private isQuoteView() {
-    const { quoteEntries } = this.props
-    return !!(quoteEntries && quoteEntries.length)
-  }
+  //   if (quoteID) {
+  //   }
+  // }
 
   private createQuote() {
     this.setState({ createNewQuote: true })
@@ -152,6 +157,9 @@ class QuoteView extends React.Component<Props, State> {
 
   private onCancelQuote() {
     this.setState({ createNewQuote: false })
+  }
+  private quoteId(quoteId: Quotes.Entry['quoteId']) {
+    this.setState({ quoteID: quoteId })
   }
 }
 

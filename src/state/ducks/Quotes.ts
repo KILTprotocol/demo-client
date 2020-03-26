@@ -10,8 +10,15 @@ import { MyIdentity } from '../../types/Contact'
 
 type QuoteEntry = sdk.IQuoteAttesterSigned | sdk.IQuoteAgreement // Could find a better name for this
 
-function hash(quote: QuoteEntry): string {
-  return sdk.Crypto.hashStr(JSON.stringify(quote))
+function hash(quote: sdk.IQuote): string {
+  const quoteHash = {
+    attesterAddress: quote.attesterAddress,
+    cTypeHash: quote.cTypeHash,
+    cost: quote.cost,
+    currency: quote.currency,
+    termsAndConditions: quote.termsAndConditions,
+  }
+  return sdk.Crypto.hashStr(JSON.stringify(quoteHash))
 }
 
 interface SaveAction extends KiltAction {
@@ -35,29 +42,26 @@ type Entry = {
 }
 
 type State = {
-  quote: Immutable.List<Entry>
+  quotes: Immutable.Map<string, Entry>
 }
 
 type ImmutableState = Immutable.Record<State>
 
 type SerializedState = {
-  quote: string[]
+  quotes: Array<Entry>
 }
 
 class Store {
   public static serialize(state: ImmutableState): SerializedState {
     const serialized: SerializedState = {
-      quote: [],
+      quotes: [],
     }
 
-    serialized.quote = state
-      .get('quote')
+    serialized.quotes = state
+      .get('quotes')
       .toList()
-      .map((quoteEntry: Entry) => {
-        return JSON.stringify(quoteEntry)
-      })
+      .map((quoteEntry: Entry) => quoteEntry)
       .toArray()
-
     return serialized
   }
 
@@ -65,28 +69,23 @@ class Store {
     quoteStateSerialized: SerializedState
   ): ImmutableState {
     if (!quoteStateSerialized) {
-      const quoteData = JSON.parse(JSON.stringify(quoteStateSerialized))
-      const quoteEntry: Entry = {
-        quoteId: quoteData.quoteId,
-        claimerAddress: quoteData.claimerAddress,
-        quote: quoteData.quote,
-      }
       return Store.createState({
-        quote: Immutable.List([quoteEntry]),
+        quotes: Immutable.Map(),
       })
     }
 
-    const quoteEntries: Entry[] = []
-    quoteStateSerialized.quote.forEach(serializedQuote => {
+    const quoteEntries = {}
+
+    quoteStateSerialized.quotes.forEach(serializedQuote => {
       try {
-        const quoteAsJson = JSON.parse(serializedQuote)
+        const quoteAsJson = JSON.parse(JSON.stringify(serializedQuote))
         const quote: QuoteEntry = quoteAsJson.quote
         const quoteEntry: Entry = {
           quoteId: quoteAsJson.quoteId,
           claimerAddress: quoteAsJson.claimerAddress,
           quote: quote,
         }
-        quoteEntries.push(quoteEntry)
+        quoteEntries[serializedQuote.quoteId] = quoteEntry
       } catch (e) {
         errorService.log({
           error: e,
@@ -97,7 +96,7 @@ class Store {
     })
 
     return Store.createState({
-      quote: Immutable.List(quoteEntries),
+      quotes: Immutable.Map(quoteEntries),
     })
   }
 
@@ -112,28 +111,15 @@ class Store {
           claimerAddress,
           quote,
         } = (action as SaveAction).payload
-        console.log('save_quote Action', state, {
-          quoteId,
-          claimerAddress,
-          quote,
-        })
 
-        return state.setIn(['quote', quoteId], {
+        return state.setIn(['quotes', quoteId], {
           quoteId,
           claimerAddress,
           quote,
         })
       }
       case Store.ACTIONS.REMOVE_QUOTE: {
-        // const attesterSignature: sdk.IQuoteAttesterSigned['attesterSignature'] = (action as RemoveAction)
-        //   .payload
-        // return state.set(
-        //   'quotes',
-        //   state.get('quotes').filter((entry: Entry) => {
-        //     return entry.quote.attesterSignature !== attesterSignature
-        //   })
-        // )
-        console.log('Remove_Quotes Action', state, action.payload)
+        return state.deleteIn(['quotes', (action as RemoveAction).payload])
 
         return state
       }
@@ -143,7 +129,6 @@ class Store {
   }
 
   public static saveQuote(quote: QuoteEntry, claimerIdentity: string): Action {
-    notifySuccess(`Quote created by ${claimerIdentity} has been successful`)
     return {
       payload: {
         quoteId: hash(quote),
@@ -163,41 +148,52 @@ class Store {
 
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
-      quote: Immutable.List<Entry>(),
+      quotes: Immutable.Map<string, Entry>(),
     })(obj)
   }
 
   private static ACTIONS = {
-    SAVE_QUOTE: 'quotes/SAVE_QUOTE',
-    REMOVE_QUOTE: 'quotes/UPDATE_QUOTE',
+    SAVE_QUOTE: 'client/quotes/SAVE_QUOTE',
+    REMOVE_QUOTE: 'client/quotes/UPDATE_QUOTE',
   }
 }
 
-const _getAllMyQuotes = (state: ReduxState) =>
+const _getAllQuotes = (state: ReduxState) =>
   state.quotes
-    .get('quote')
+    .get('quotes')
     .toList()
     .toArray()
 
 const getAllMyQuotes = createSelector(
-  [Wallet.getSelectedIdentity, _getAllMyQuotes],
+  [Wallet.getSelectedIdentity, _getAllQuotes],
   (selectedIdentity: MyIdentity, entries: Entry[]) => {
     return entries.filter((entry: Entry) => {
       return (
-        entry &&
-        entry.quote &&
-        entry.claimerAddress === selectedIdentity.identity.address
+        (entry &&
+          entry.quote &&
+          entry.claimerAddress === selectedIdentity.identity.address) ||
+        (entry &&
+          entry.quote &&
+          entry.quote.attesterAddress === selectedIdentity.identity.address)
       )
     })
   }
 )
 
-const _getQuoteHash = (state: ReduxState, quote: QuoteEntry): string =>
-  hash(quote)
+const _getQuoteHash = (
+  state: ReduxState,
+  quoteId: Entry['quoteId']
+): Entry['quoteId'] => quoteId
+
+const getQuoteByQuoteHash = createSelector(
+  [getAllMyQuotes, _getQuoteHash],
+  (entries: Entry[], quoteId: Entry['quoteId']) =>
+    entries.filter((entry: Entry) => entry.quoteId === quoteId)
+)
 
 const getQuote = createSelector(
   [_getQuoteHash, getAllMyQuotes],
-  (quoteId: string, entries: Entry[]) => {
+  (quoteId: Entry['quoteId'], entries: Entry[]) => {
     return entries.find((entry: Entry) => entry.quoteId === quoteId)
   }
 )
@@ -210,5 +206,7 @@ export {
   Action,
   Entry,
   getAllMyQuotes,
+  getQuoteByQuoteHash,
   getQuote,
+  hash,
 }
