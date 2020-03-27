@@ -11,6 +11,7 @@
     "testCI": "CI=true node scripts/test.js --env=jsdom",
     "format": "prettier --write 'src/**/*.tsx' 'src/**/*.ts'",
     "lint": "eslint 'src/**/*.tsx' 'src/**/*.ts'",
+    "lint:fix": "yarn lint --fix",
     "commit": "git-cz"
   },
   "husky": {
