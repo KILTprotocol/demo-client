@@ -38,19 +38,15 @@ class QuoteView extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    const { quoteEntries } = this.props
-    const { quoteID } = this.state
-    if (quoteEntries && quoteID) {
-      console.log('this is broken?', quoteID, PersistentStore.store.getState())
-      const selectedQuote = Quotes.getQuoteByQuoteHash(
-        PersistentStore.store.getState(),
-        quoteID
-      )
-      if (!selectedQuote) {
-        throw new Error('No quote selected')
-      }
-      console.log('this is undefined', selectedQuote)
-      // this.setState({ newQuote: attesterSignedQuote })
+    const {
+      senderAddress,
+      receiverAddress,
+      selectedIdentity,
+      claim,
+    } = this.props
+    if (!senderAddress && !receiverAddress) {
+      senderAddress === selectedIdentity.identity.address
+      receiverAddress === ' '
     }
   }
 
@@ -64,15 +60,13 @@ class QuoteView extends React.Component<Props, State> {
         redirect: '/quote',
       })
     }
-    if (quoteID) {
-      this.setState({
-        newQuote: Quotes.getQuoteByQuoteHash(
-          PersistentStore.store.getState(),
-          quoteID
-        )[0].quote,
-      })
-      if (newQuote) {
-        return
+    if (quoteID && !newQuote) {
+      const selectedQuote = Quotes.getQuoteByQuoteHash(
+        PersistentStore.store.getState(),
+        quoteID
+      )[0]
+      if (newQuote !== selectedQuote.quote) {
+        this.setState({ newQuote: selectedQuote.quote })
       }
     }
   }
@@ -85,71 +79,32 @@ class QuoteView extends React.Component<Props, State> {
     return quoteID && newQuote ? (
       <section className="QuoteView">
         <h1>Quote </h1>
-        <section className="QuoteView">
-          <div>
-            <label>Quote</label>
-            <span>
-              <Code>{newQuote}</Code>
-            </span>
-          </div>
-        </section>
-        {!createNewQuote ? (
-          <section>
-            <div className="actions">
-              <button className="submit-quote" onClick={this.createQuote}>
-                Create new Quote
-              </button>
-            </div>
-          </section>
-        ) : (
-          <section>
-            <QuoteCreate
-              claimerAddress={senderAddress}
-              attesterAddress={receiverAddress}
-              cTypeHash={claim.cTypeHash}
-              onCancel={this.onCancelQuote}
-              quoteId={this.quoteId}
-            />
-          </section>
-        )}
+        <div>
+          <span>
+            <Code>{newQuote}</Code>
+          </span>
+        </div>
+      </section>
+    ) : !createNewQuote ? (
+      <section>
+        <div className="actions">
+          <button className="submit-quote" onClick={this.createQuote}>
+            Create new Quote
+          </button>
+        </div>
       </section>
     ) : (
-      <section className="QuoteView">
-        <h1>Quote </h1>
-        <section className="QuoteView">
-          <span>
-            <h2>No Quote</h2>
-          </span>
-        </section>
-        {!createNewQuote ? (
-          <section>
-            <div className="actions">
-              <button className="submit-quote" onClick={this.createQuote}>
-                Create new Quote
-              </button>
-            </div>
-          </section>
-        ) : (
-          <section>
-            <QuoteCreate
-              claimerAddress={senderAddress}
-              attesterAddress={receiverAddress}
-              cTypeHash={claim.cTypeHash}
-              onCancel={this.onCancelQuote}
-              quoteId={this.quoteId}
-            />
-          </section>
-        )}
+      <section>
+        <QuoteCreate
+          claimerAddress={senderAddress}
+          attesterAddress={receiverAddress}
+          cTypeHash={claim?.cTypeHash}
+          onCancel={this.onCancelQuote}
+          quoteId={this.quoteId}
+        />
       </section>
     )
   }
-
-  // private selectQuote() {
-  //   const { quoteID } = this.state
-
-  //   if (quoteID) {
-  //   }
-  // }
 
   private createQuote() {
     this.setState({ createNewQuote: true })

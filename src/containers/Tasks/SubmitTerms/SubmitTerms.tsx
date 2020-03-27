@@ -27,7 +27,6 @@ export type SubmitTermsProps = {
   enablePreFilledClaim?: boolean
   onFinished?: () => void
   onCancel?: () => void
-  quoteData?: sdk.IQuoteAttesterSigned
 }
 
 type Props = InjectedSelectProps & SubmitTermsProps
@@ -38,6 +37,7 @@ type State = {
   selectedDelegation?: MyDelegation
   withPreFilledClaim?: boolean
   isValid: boolean
+  quoteData?: sdk.IQuoteAttesterSigned
 }
 
 class SubmitTerms extends React.Component<Props, State> {
@@ -184,9 +184,13 @@ class SubmitTerms extends React.Component<Props, State> {
       enablePreFilledClaim,
       receiverAddresses,
       onFinished,
-      quoteData,
     } = this.props
-    const { claim, selectedDelegation, withPreFilledClaim } = this.state
+    const {
+      claim,
+      selectedDelegation,
+      withPreFilledClaim,
+      quoteData,
+    } = this.state
 
     const _claim: sdk.IPartialClaim = claim
 

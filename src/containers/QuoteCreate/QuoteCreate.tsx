@@ -26,7 +26,7 @@ type Props = RouteComponentProps<{}> & {
 type State = {
   quote?: sdk.IQuote
   isValid: boolean
-  initialValue: object
+  initialValue?: object
 }
 
 class QuoteCreate extends React.Component<Props, State> {
@@ -36,13 +36,17 @@ class QuoteCreate extends React.Component<Props, State> {
       quote: undefined,
       isValid: true,
       initialValue: {
-        cTypeHash: this.props.cTypeHash,
         attesterAddress: this.props.attesterAddress,
+        cTypeHash: this.props.cTypeHash,
       },
     }
     this.handleCancel = this.handleCancel.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.updateValue = this.updateValue.bind(this)
+  }
+  public componentDidMount() {
+    const { claimerAddress, selectedIdentity } = this.props
+    claimerAddress === selectedIdentity.identity.address
   }
 
   render() {
