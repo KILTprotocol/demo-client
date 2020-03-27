@@ -1,4 +1,4 @@
-import { Notification, NotificationType } from '../types/UserFeedback'
+import { INotification, NotificationType } from '../types/UserFeedback'
 import FeedbackService from './FeedbackService'
 
 export type ErrorType =
@@ -23,7 +23,12 @@ type ErrorConfig = {
 }
 
 class ErrorService {
-  private static consoleLog({ error, message, origin, type }: QualifiedError) {
+  private static consoleLog({
+    error,
+    message,
+    origin,
+    type,
+  }: QualifiedError): void {
     console.groupCollapsed(
       `%c${type} @ ${origin}`,
       'background: red; color: white; padding: 5px;'
@@ -36,9 +41,9 @@ class ErrorService {
   private errors: QualifiedError[] = []
 
   public log(
-    { error, message, onConfirm, origin, type }: QualifiedError,
+    { error, message, origin, type }: QualifiedError,
     config?: ErrorConfig
-  ) {
+  ): void {
     const useConfig = {
       ...{
         blocking: true,
@@ -69,7 +74,7 @@ class ErrorService {
   public logWithNotification(
     { error, message, onConfirm, origin, type }: QualifiedError,
     config?: ErrorConfig
-  ) {
+  ): INotification {
     this.log({ error, message, onConfirm, origin, type }, config)
 
     const useConfig = {
@@ -80,7 +85,7 @@ class ErrorService {
       ...config,
     }
 
-    const notification: Partial<Notification> = {
+    const notification: Partial<INotification> = {
       className: useConfig.consoleLog ? 'console-log' : '',
       message,
       type: NotificationType.FAILURE,

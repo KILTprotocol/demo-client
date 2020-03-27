@@ -4,25 +4,25 @@ import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 
-interface SaveAction extends KiltAction {
+interface ISaveAction extends KiltAction {
   payload: Entry
 }
 
-interface RemoveAction extends KiltAction {
+interface IRemoveAction extends KiltAction {
   payload: sdk.IAttestation['claimHash']
 }
 
-interface RevokeAction extends KiltAction {
+interface IRevokeAction extends KiltAction {
   payload: sdk.IAttestation['claimHash']
 }
 
-type Action = SaveAction | RemoveAction
+export type Action = ISaveAction | IRemoveAction
 
-type Entry = {
+export type Entry = {
   created: number
   claimerAlias: string
   claimerAddress: string
@@ -34,14 +34,14 @@ type State = {
   attestations: Immutable.List<Entry>
 }
 
-type ImmutableState = Immutable.Record<State>
+export type ImmutableState = Immutable.Record<State>
 
-type SerializedState = {
+export type SerializedState = {
   attestations: string[]
 }
 
 class Store {
-  public static serialize(state: ImmutableState) {
+  public static serialize(state: ImmutableState): SerializedState {
     const serialized: SerializedState = {
       attestations: [],
     }
@@ -101,7 +101,7 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.SAVE_ATTESTATION: {
-        const attestationEntry: Entry = (action as SaveAction).payload
+        const attestationEntry: Entry = (action as ISaveAction).payload
         return state.update('attestations', attestations => {
           return attestations
             .filter((entry: Entry) => {
@@ -114,7 +114,7 @@ class Store {
         })
       }
       case Store.ACTIONS.REMOVE_ATTESTATION: {
-        const claimHash: sdk.IAttestation['claimHash'] = (action as RemoveAction)
+        const claimHash: sdk.IAttestation['claimHash'] = (action as IRemoveAction)
           .payload
         return state.set(
           'attestations',
@@ -124,7 +124,7 @@ class Store {
         )
       }
       case Store.ACTIONS.REVOKE_ATTESTATION: {
-        const claimHash: sdk.IAttestation['claimHash'] = (action as RemoveAction)
+        const claimHash: sdk.IAttestation['claimHash'] = (action as IRemoveAction)
           .payload
 
         let attestations = state.get('attestations') || []
@@ -141,7 +141,7 @@ class Store {
     }
   }
 
-  public static saveAttestation(attestationEntry: Entry): SaveAction {
+  public static saveAttestation(attestationEntry: Entry): ISaveAction {
     return {
       payload: attestationEntry,
       type: Store.ACTIONS.SAVE_ATTESTATION,
@@ -150,7 +150,7 @@ class Store {
 
   public static removeAttestation(
     claimHash: sdk.IAttestation['claimHash']
-  ): RemoveAction {
+  ): IRemoveAction {
     return {
       payload: claimHash,
       type: Store.ACTIONS.REMOVE_ATTESTATION,
@@ -159,7 +159,7 @@ class Store {
 
   public static revokeAttestation(
     claimHash: sdk.IAttestation['claimHash']
-  ): RevokeAction {
+  ): IRevokeAction {
     return {
       payload: claimHash,
       type: Store.ACTIONS.REVOKE_ATTESTATION,
@@ -179,7 +179,7 @@ class Store {
   }
 }
 
-const _getAllAttestations = (state: ReduxState): Entry[] => {
+const getAllAttestations = (state: ReduxState): Entry[] => {
   return state.attestations
     .get('attestations')
     .toList()
@@ -187,19 +187,12 @@ const _getAllAttestations = (state: ReduxState): Entry[] => {
 }
 
 const getAttestations = createSelector(
-  [Wallet.getSelectedIdentity, _getAllAttestations],
-  (selectedIdentity: MyIdentity, entries: Entry[]) => {
+  [Wallet.getSelectedIdentity, getAllAttestations],
+  (selectedIdentity: IMyIdentity, entries: Entry[]) => {
     return entries.filter((entry: Entry) => {
       return entry.attestation.owner === selectedIdentity.identity.address
     })
   }
 )
 
-export {
-  Store,
-  ImmutableState,
-  SerializedState,
-  Entry,
-  Action,
-  getAttestations,
-}
+export { Store, getAttestations }

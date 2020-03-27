@@ -1,5 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 
 import './Permissions.scss'
 
@@ -8,7 +8,17 @@ type Props = {
 }
 
 class Permissions extends React.Component<Props> {
-  public render() {
+  private static getPermissionTitle(
+    permission: string,
+    allowed: boolean
+  ): string {
+    if (allowed) {
+      return `can ${permission.toLowerCase()}`
+    }
+    return `can NOT ${permission.toLowerCase()}`
+  }
+
+  public render(): JSX.Element {
     const { permissions } = this.props
 
     return (
@@ -19,25 +29,17 @@ class Permissions extends React.Component<Props> {
               typeof sdk.Permission[permission] === 'number'
           )
           .map((permission: string) => {
-            const allowed =
-              permissions.indexOf(sdk.Permission[permission]) !== -1
+            const allowed = permissions.includes(sdk.Permission[permission])
             return (
               <span
                 key={permission}
-                title={this.getPermissionTitle(permission, allowed)}
+                title={Permissions.getPermissionTitle(permission, allowed)}
                 className={`${permission} ${allowed ? 'allowed' : 'denied'}`}
               />
             )
           })}
       </section>
     )
-  }
-
-  private getPermissionTitle(permission: string, allowed: boolean): string {
-    if (allowed) {
-      return 'can ' + permission.toLowerCase()
-    }
-    return 'can NOT ' + permission.toLowerCase()
   }
 }
 

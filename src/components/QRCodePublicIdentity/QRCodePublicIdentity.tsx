@@ -1,8 +1,9 @@
-import * as React from 'react'
+import React from 'react'
 import { QRCode } from 'react-qrcode-logo'
 import { IPublicIdentity } from '@kiltprotocol/sdk-js'
+
 import logo from '../../assets/kilt_small.svg'
-import { encodePublicIdentity } from '../../utils/PublicIdentity/Encoding'
+import encodePublicIdentity from '../../utils/PublicIdentity/Encoding'
 
 type Props = {
   publicIdentity: IPublicIdentity

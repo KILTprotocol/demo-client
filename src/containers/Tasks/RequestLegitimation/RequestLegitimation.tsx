@@ -1,5 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 import SelectClaims from '../../../components/SelectClaims/SelectClaims'
 
 import attestationWorkflow from '../../../services/AttestationWorkflow'
@@ -36,45 +36,29 @@ class RequestLegitimation extends React.Component<
     this.onSelectClaimEntry = this.onSelectClaimEntry.bind(this)
   }
 
-  public render() {
-    const { cTypeHash, preSelectedClaimEntries, receiverAddresses } = this.props
-    return (
-      <section className="RequestLegitimation">
-        <section className="selectClaims">
-          <h2 className="optional">Select claim</h2>
-          <SelectClaims
-            preSelectedClaimEntries={preSelectedClaimEntries}
-            cTypeHash={cTypeHash}
-            onChange={this.onSelectClaimEntry}
-          />
-        </section>
-        <div className="actions">
-          <button onClick={this.onCancel}>Cancel</button>
-          <button
-            className="requestLegitimation"
-            disabled={!receiverAddresses.length}
-            onClick={this.handleSubmit}
-          >
-            Request Legitimation
-          </button>
-        </div>
-      </section>
-    )
-  }
-
-  private onSelectClaimEntry(selectedClaimEntries: Claims.Entry[]) {
+  private onSelectClaimEntry(selectedClaimEntries: Claims.Entry[]): void {
     this.setState({ selectedClaimEntries })
   }
 
-  private handleSubmit() {
+  private onCancel(): void {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
+  }
+
+  private isValid(): number {
+    const { receiverAddresses } = this.props
+    return receiverAddresses && receiverAddresses.length
+  }
+
+  private handleSubmit(): void {
     const { cTypeHash, receiverAddresses, onFinished } = this.props
     const { selectedClaimEntries } = this.state
-    let claims: sdk.IPartialClaim[] = [{ cTypeHash } as sdk.IPartialClaim]
+    let claims: sdk.IPartialClaim[] = cTypeHash ? [{ cTypeHash }] : []
 
     if (selectedClaimEntries && selectedClaimEntries.length) {
-      claims = selectedClaimEntries.map(
-        (claimEntry: Claims.Entry) => claimEntry.claim
-      )
+      claims = selectedClaimEntries.map(claimEntry => claimEntry.claim)
     }
 
     if (this.isValid()) {
@@ -88,16 +72,33 @@ class RequestLegitimation extends React.Component<
     }
   }
 
-  private isValid() {
-    const { receiverAddresses } = this.props
-    return receiverAddresses && receiverAddresses.length
-  }
-
-  private onCancel() {
-    const { onCancel } = this.props
-    if (onCancel) {
-      onCancel()
-    }
+  public render(): JSX.Element {
+    const { cTypeHash, preSelectedClaimEntries, receiverAddresses } = this.props
+    return (
+      <section className="RequestLegitimation">
+        <section className="selectClaims">
+          <h2 className="optional">Select claim</h2>
+          <SelectClaims
+            preSelectedClaimEntries={preSelectedClaimEntries}
+            cTypeHash={cTypeHash}
+            onChange={this.onSelectClaimEntry}
+          />
+        </section>
+        <div className="actions">
+          <button type="button" onClick={this.onCancel}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="requestLegitimation"
+            disabled={!receiverAddresses.length}
+            onClick={this.handleSubmit}
+          >
+            Request Legitimation
+          </button>
+        </div>
+      </section>
+    )
   }
 }
 

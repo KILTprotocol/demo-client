@@ -1,10 +1,11 @@
 import { IBlockchainApi } from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
+import { Text } from '@polkadot/types'
+
 import If from '../../common/If'
 import BlockchainService from '../../services/BlockchainService'
-import { Text } from '@polkadot/types'
 
 type Props = RouteComponentProps<{
   host: string
@@ -27,12 +28,16 @@ class ChainStats extends React.Component<Props, State> {
     this.state = {}
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     this.mounted = true
-    void this.connect()
+    this.connect()
   }
 
-  public async connect() {
+  public componentWillUnmount(): void {
+    this.mounted = false
+  }
+
+  public async connect(): Promise<void> {
     // TODO: test unmount and host change
     // TODO: test error handling
     this.nodeWebsocketAddress = BlockchainService.getNodeWebsocketUrl()
@@ -53,11 +58,7 @@ class ChainStats extends React.Component<Props, State> {
     }
   }
 
-  public componentWillUnmount() {
-    this.mounted = false
-  }
-
-  public render() {
+  public render(): JSX.Element {
     const { chainName, chainVersion, chainType } = this.state
 
     return (

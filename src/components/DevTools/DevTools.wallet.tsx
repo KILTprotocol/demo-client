@@ -6,12 +6,12 @@ import { notifySuccess } from '../../services/FeedbackService'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore from '../../state/PersistentStore'
-import { Contact, MyIdentity } from '../../types/Contact'
+import { IContact, IMyIdentity } from '../../types/Contact'
 import identitiesPool from './data/identities.json'
 
 type UpdateCallback = (bsIdentityKey: keyof BsIdentitiesPool) => void
 
-type BsIdentitiesPool = {
+export type BsIdentitiesPool = {
   [key: string]: string
 }
 
@@ -20,7 +20,7 @@ class BsIdentity {
 
   public static createPool(
     updateCallback?: UpdateCallback
-  ): Promise<void | MyIdentity> {
+  ): Promise<void | IMyIdentity> {
     const identityLabels = Object.keys(BsIdentity.pool)
     const requests = identityLabels.reduce((promiseChain, bsIdentityKey) => {
       return promiseChain.then(() => {
@@ -33,7 +33,7 @@ class BsIdentity {
     return requests
   }
 
-  public static async create(alias: string): Promise<void | MyIdentity> {
+  public static async create(alias: string): Promise<void | IMyIdentity> {
     const randomPhrase = mnemonicGenerate()
     const identity = Identity.buildFromMnemonic(randomPhrase)
 
@@ -44,19 +44,19 @@ class BsIdentity {
     identity: Identity,
     phrase: string,
     alias: string
-  ): Promise<void | MyIdentity> {
-    const selectedIdentity: MyIdentity = Wallet.getSelectedIdentity(
+  ): Promise<void | IMyIdentity> {
+    const selectedIdentity: IMyIdentity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     )
 
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       BalanceUtilities.makeTransfer(
         selectedIdentity,
         identity.address,
         ENDOWMENT,
         () => {
           const { address, boxPublicKeyAsHex } = identity
-          const newContact: Contact = {
+          const newContact: IContact = {
             metaData: {
               name: alias,
             },
@@ -70,7 +70,7 @@ class BsIdentity {
               name: alias,
             },
             phrase,
-          } as MyIdentity
+          } as IMyIdentity
           PersistentStore.store.dispatch(
             Wallet.Store.saveIdentityAction(newIdentity)
           )
@@ -92,18 +92,18 @@ class BsIdentity {
 
   public static async getByKey(
     bsIdentitiesPoolKey: keyof BsIdentitiesPool
-  ): Promise<MyIdentity> {
+  ): Promise<IMyIdentity> {
     const identities = Wallet.getAllIdentities(PersistentStore.store.getState())
     const identity = identities.find(
       value => value.metaData.name === BsIdentity.pool[bsIdentitiesPoolKey]
     )
     if (identity) {
-      return identity
+      return Promise.resolve(identity)
     }
     throw new Error(`Identity '${bsIdentitiesPoolKey}' not found`)
   }
 
-  public static async selectIdentity(identity: MyIdentity): Promise<void> {
+  public static selectIdentity(identity: IMyIdentity): void {
     PersistentStore.store.dispatch(
       Wallet.Store.selectIdentityAction(identity.identity.address)
     )
@@ -117,4 +117,4 @@ class BsIdentity {
   }
 }
 
-export { BsIdentitiesPool, BsIdentity }
+export { BsIdentity }

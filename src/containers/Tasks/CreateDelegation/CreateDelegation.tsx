@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 
 import ContactPresentation from '../../../components/ContactPresentation/ContactPresentation'
 import DelegationDetailView from '../../../components/DelegationDetailView/DelegationDetailView'
@@ -14,26 +14,29 @@ import FeedbackService, {
   notifyFailure,
   notifyError,
 } from '../../../services/FeedbackService'
-import { MyDelegation } from '../../../state/ducks/Delegations'
+import { IMyDelegation } from '../../../state/ducks/Delegations'
 import * as Delegations from '../../../state/ducks/Delegations'
 import { State as ReduxState } from '../../../state/PersistentStore'
-import { Contact } from '../../../types/Contact'
+import { IContact } from '../../../types/Contact'
 import { BlockUi } from '../../../types/UserFeedback'
 
 import './CreateDelegation.scss'
 
-type Props = {
+type StateProps = {
+  myDelegations: IMyDelegation[]
+}
+
+type OwnProps = {
   delegationData: sdk.ISubmitAcceptDelegation['content']['delegationData']
-  inviteeAddress: Contact['publicIdentity']['address']
-  inviterAddress: Contact['publicIdentity']['address']
+  inviteeAddress: IContact['publicIdentity']['address']
+  inviterAddress: IContact['publicIdentity']['address']
   signatures: sdk.ISubmitAcceptDelegation['content']['signatures']
 
   onCancel?: () => void
   onFinished?: () => void
-
-  // redux
-  myDelegations: MyDelegation[]
 }
+
+type Props = StateProps & OwnProps
 
 type State = {
   isSignatureValid?: boolean
@@ -48,71 +51,19 @@ class CreateDelegation extends React.Component<Props, State> {
     this.createDelegation = this.createDelegation.bind(this)
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     // TODO: check inviters signature?
     this.checkSignature()
   }
 
-  public render() {
-    const { delegationData, inviteeAddress } = this.props
-    const { isPCR, permissions } = delegationData
-    const { isSignatureValid } = this.state
-
-    return (
-      <section className="AcceptDelegation">
-        {isSignatureValid ? (
-          <>
-            <h2>Create {isPCR ? 'PCR member' : 'delegation'}</h2>
-
-            <div className="delegationData">
-              <div>
-                <label>Invitee</label>
-                <div>
-                  <ContactPresentation
-                    address={inviteeAddress}
-                    interactive={true}
-                  />
-                </div>
-              </div>
-              <div>
-                <label>Invitees permissions</label>
-                <div>
-                  <Permissions permissions={permissions} />
-                </div>
-              </div>
-            </div>
-
-            <DelegationDetailView id={delegationData.parentId} isPCR={isPCR} />
-
-            <div className="actions">
-              <button onClick={this.onCancel}>Cancel</button>
-              <button onClick={this.createDelegation}>
-                Create {isPCR ? 'PCR member' : 'delegation'}
-              </button>
-            </div>
-          </>
-        ) : isSignatureValid == null ? (
-          <Spinner />
-        ) : (
-          <>
-            <h2 className="danger">Alert!</h2>
-            <div className="danger">
-              Inviters signature does not match attached data
-            </div>
-          </>
-        )}
-      </section>
-    )
-  }
-
-  private onCancel() {
+  private onCancel(): void {
     const { onCancel } = this.props
     if (onCancel) {
       onCancel()
     }
   }
 
-  private async createDelegation() {
+  private async createDelegation(): Promise<void> {
     const { delegationData, signatures } = this.props
     const { account, id, isPCR, parentId, permissions } = delegationData
 
@@ -161,7 +112,7 @@ class CreateDelegation extends React.Component<Props, State> {
       })
   }
 
-  private checkSignature() {
+  private checkSignature(): void {
     const { delegationData, signatures, inviterAddress } = this.props
     const valid = sdk.Crypto.verify(
       JSON.stringify(delegationData),
@@ -173,7 +124,7 @@ class CreateDelegation extends React.Component<Props, State> {
     })
   }
 
-  private replyToInvitee() {
+  private replyToInvitee(): void {
     const { delegationData, onFinished, inviteeAddress } = this.props
 
     AttestationWorkflow.informCreateDelegation(
@@ -186,9 +137,68 @@ class CreateDelegation extends React.Component<Props, State> {
       }
     })
   }
+
+  public render(): JSX.Element {
+    const { delegationData, inviteeAddress } = this.props
+    const { isPCR, permissions } = delegationData
+    const { isSignatureValid } = this.state
+
+    let content = null
+
+    if (isSignatureValid == null) {
+      content = <Spinner />
+    } else if (isSignatureValid) {
+      content = (
+        <>
+          <h2>Create {isPCR ? 'PCR member' : 'delegation'}</h2>
+
+          <div className="delegationData">
+            <div>
+              <label>Invitee</label>
+              <div>
+                <ContactPresentation address={inviteeAddress} interactive />
+              </div>
+            </div>
+            <div>
+              <label>Invitees permissions</label>
+              <div>
+                <Permissions permissions={permissions} />
+              </div>
+            </div>
+          </div>
+
+          <DelegationDetailView id={delegationData.parentId} isPCR={isPCR} />
+
+          <div className="actions">
+            <button type="button" onClick={this.onCancel}>
+              Cancel
+            </button>
+            <button type="button" onClick={this.createDelegation}>
+              Create {isPCR ? 'PCR member' : 'delegation'}
+            </button>
+          </div>
+        </>
+      )
+    } else {
+      content = (
+        <>
+          <h2 className="danger">Alert!</h2>
+          <div className="danger">
+            Inviters signature does not match attached data
+          </div>
+        </>
+      )
+    }
+
+    return <section className="AcceptDelegation">{content}</section>
+  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   myDelegations: Delegations.getDelegations(state),
 })
 

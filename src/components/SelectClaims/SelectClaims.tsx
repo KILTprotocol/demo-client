@@ -1,6 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
@@ -36,17 +35,17 @@ type State = {
 }
 
 class SelectClaims extends React.Component<Props, State> {
-  public static defaultProps = {
-    closeMenuOnSelect: true,
-    isMulti: false,
-    showAttested: true,
-  }
-
   private filterConfig: Config = {
     ignoreAccents: true,
     ignoreCase: true,
     matchFrom: 'any',
     trim: true,
+  }
+
+  public static defaultProps = {
+    closeMenuOnSelect: true,
+    isMulti: false,
+    showAttested: true,
   }
 
   constructor(props: Props) {
@@ -61,7 +60,7 @@ class SelectClaims extends React.Component<Props, State> {
     this.onSelectCType = this.onSelectCType.bind(this)
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     const { claims, cTypeHash } = this.props
 
     if (!claims || !claims.length) {
@@ -80,7 +79,76 @@ class SelectClaims extends React.Component<Props, State> {
     }
   }
 
-  public render() {
+  private static getOption(claim: Claims.Entry): SelectOption {
+    {
+      const isApproved =
+        claim.attestations &&
+        claim.attestations.find(
+          (attestedClaim: sdk.IAttestedClaim) =>
+            !attestedClaim.attestation.revoked
+        )
+      return {
+        baseValue: claim.meta.alias,
+        label: (
+          <span className={isApproved ? 'attested' : 'revoked'}>
+            {claim.meta.alias}
+          </span>
+        ),
+        value: claim.id,
+      }
+    }
+  }
+
+  private onSelectCType(selectedCtypes: ICTypeWithMetadata[]): void {
+    this.goToClaimCreate(selectedCtypes[0].cType.hash)
+  }
+
+  private onChange(selectedOptions: SelectOption | SelectOption[]): void {
+    const { claims } = this.state
+    const selectedOptionValues: Array<SelectOption['value']> = (Array.isArray(
+      selectedOptions
+    )
+      ? selectedOptions
+      : [selectedOptions]
+    ).map((selectedOption: SelectOption) => selectedOption.value)
+
+    const selectedClaims: Claims.Entry[] = claims.filter(
+      (claim: Claims.Entry) => selectedOptionValues.includes(claim.id)
+    )
+    const { onChange } = this.props
+    if (onChange) {
+      onChange(selectedClaims)
+    }
+  }
+
+  private handleClaimCreateRequest(
+    e: React.MouseEvent<HTMLAnchorElement>
+  ): void {
+    e.preventDefault()
+    const { cTypeHash } = this.props
+
+    if (cTypeHash) {
+      this.goToClaimCreate(cTypeHash)
+    } else {
+      this.setState({
+        showSelectCTypesModal: true,
+      })
+    }
+  }
+
+  private goToClaimCreate(cTypeHash: ICType['cType']['hash']): void {
+    const { history } = this.props
+    // remove maybe opened Task modal
+    PersistentStore.store.dispatch(
+      UiState.Store.updateCurrentTaskAction({
+        objective: undefined,
+        props: undefined,
+      })
+    )
+    history.push(`/claim/new/${cTypeHash}`)
+  }
+
+  public render(): JSX.Element {
     const {
       claims,
       closeMenuOnSelect,
@@ -94,31 +162,33 @@ class SelectClaims extends React.Component<Props, State> {
     } = this.props
     const { showSelectCTypesModal } = this.state
 
-    const defaultOptions = (preSelectedClaimEntries || []).map(
-      (claim: Claims.Entry) => this.getOption(claim)
+    const defaultOptions = (
+      preSelectedClaimEntries || []
+    ).map((claim: Claims.Entry) => SelectClaims.getOption(claim))
+
+    let selectedClaims
+    if (claims && claims.length) {
+      selectedClaims = claims
+    } else if (cTypeHash) {
+      selectedClaims = Claims.getClaimsByCTypeHash(
+        PersistentStore.store.getState(),
+        cTypeHash
+      )
+    } else {
+      selectedClaims = Claims.getClaims(PersistentStore.store.getState())
+    }
+
+    const options: SelectOption[] = selectedClaims.map(
+      (claim: Claims.Entry): SelectOption => SelectClaims.getOption(claim)
     )
 
-    const _claims =
-      claims && claims.length
-        ? claims
-        : cTypeHash
-        ? Claims.getClaimsByCTypeHash(
-            PersistentStore.store.getState(),
-            cTypeHash
-          )
-        : Claims.getClaims(PersistentStore.store.getState())
-
-    const options: SelectOption[] = _claims.map(
-      (claim: Claims.Entry): SelectOption => this.getOption(claim)
-    )
-
-    return !!_claims && !!_claims.length ? (
+    return !!selectedClaims && !!selectedClaims.length ? (
       <Select
         className="react-select-container"
         classNamePrefix="react-select"
-        isClearable={isMulti && _claims.length > 1}
+        isClearable={isMulti && selectedClaims.length > 1}
         isSearchable={false}
-        isMulti={isMulti && _claims.length > 1}
+        isMulti={isMulti && selectedClaims.length > 1}
         closeMenuOnSelect={closeMenuOnSelect}
         name="selectClaims"
         options={options}
@@ -139,76 +209,10 @@ class SelectClaims extends React.Component<Props, State> {
           <span> one first.</span>
         </div>
         {!cTypeHash && showSelectCTypesModal && (
-          <SelectCTypesModal onConfirm={this.onSelectCType} showOnInit={true} />
+          <SelectCTypesModal onConfirm={this.onSelectCType} showOnInit />
         )}
       </>
     )
-  }
-
-  private getOption(claim: Claims.Entry): SelectOption {
-    {
-      const isApproved =
-        claim.attestations &&
-        claim.attestations.find(
-          (attestedClaim: sdk.IAttestedClaim) =>
-            !attestedClaim.attestation.revoked
-        )
-      return {
-        baseValue: claim.meta.alias,
-        label: (
-          <span className={isApproved ? 'attested' : 'revoked'}>
-            {claim.meta.alias}
-          </span>
-        ),
-        value: claim.id,
-      }
-    }
-  }
-
-  private handleClaimCreateRequest(e: React.MouseEvent<HTMLAnchorElement>) {
-    e.preventDefault()
-    const { cTypeHash } = this.props
-
-    if (cTypeHash) {
-      this.goToClaimCreate(cTypeHash)
-    } else {
-      this.setState({
-        showSelectCTypesModal: true,
-      })
-    }
-  }
-
-  private onSelectCType(selectedCtypes: ICTypeWithMetadata[]) {
-    this.goToClaimCreate(selectedCtypes[0].cType.hash)
-  }
-
-  private goToClaimCreate(cTypeHash: ICType['cType']['hash']) {
-    // remove maybe opened Task modal
-    PersistentStore.store.dispatch(
-      UiState.Store.updateCurrentTaskAction({
-        objective: undefined,
-        props: undefined,
-      })
-    )
-    this.props.history.push(`/claim/new/${cTypeHash}`)
-  }
-
-  private onChange(selectedOptions: SelectOption | SelectOption[]) {
-    const { claims } = this.state
-    const _selectedOptions: Array<SelectOption['value']> = (Array.isArray(
-      selectedOptions
-    )
-      ? selectedOptions
-      : [selectedOptions]
-    ).map((selectedOption: SelectOption) => selectedOption.value)
-
-    const selectedClaims: Claims.Entry[] = claims.filter(
-      (claim: Claims.Entry) => _selectedOptions.indexOf(claim.id) !== -1
-    )
-    const { onChange } = this.props
-    if (onChange) {
-      onChange(selectedClaims)
-    }
   }
 }
 

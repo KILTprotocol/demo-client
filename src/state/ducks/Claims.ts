@@ -4,7 +4,7 @@ import { createSelector } from 'reselect'
 
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
@@ -13,7 +13,7 @@ function hash(claim: sdk.IPartialClaim): string {
   return sdk.Crypto.hashStr(JSON.stringify(claim))
 }
 
-interface SaveAction extends KiltAction {
+interface ISaveAction extends KiltAction {
   payload: {
     claimId: Entry['id']
     claim: sdk.IClaim
@@ -23,30 +23,30 @@ interface SaveAction extends KiltAction {
   }
 }
 
-interface RemoveAction extends KiltAction {
+interface IRemoveAction extends KiltAction {
   payload: Entry['id']
 }
 
-interface AddAttestationAction extends KiltAction {
+interface IAddAttestationAction extends KiltAction {
   payload: {
     claimId: Entry['id']
     attestation: sdk.IAttestedClaim
   }
 }
 
-interface RevokeAttestationAction extends KiltAction {
+interface IRevokeAttestationAction extends KiltAction {
   payload: {
     revokedHash: sdk.IAttestedClaim['request']['rootHash']
   }
 }
 
-type Action =
-  | SaveAction
-  | RemoveAction
-  | AddAttestationAction
-  | RevokeAttestationAction
+export type Action =
+  | ISaveAction
+  | IRemoveAction
+  | IAddAttestationAction
+  | IRevokeAttestationAction
 
-type Entry = {
+export type Entry = {
   id: string
   claim: sdk.IClaim
   attestations: sdk.IAttestedClaim[]
@@ -59,14 +59,14 @@ type State = {
   claims: Immutable.Map<string, Entry>
 }
 
-type ImmutableState = Immutable.Record<State>
+export type ImmutableState = Immutable.Record<State>
 
-type SerializedState = {
+export type SerializedState = {
   claims: Array<{ id: string; claim: string; meta: object }>
 }
 
 class Store {
-  public static serialize(state: ImmutableState) {
+  public static serialize(state: ImmutableState): SerializedState {
     const serialized: SerializedState = {
       claims: [],
     }
@@ -102,7 +102,7 @@ class Store {
       const o = claimsStateSerialized.claims[i]
       try {
         const claim = JSON.parse(o.claim) as sdk.IClaim
-        const attestations: sdk.IAttestedClaim[] = !!o.attestations
+        const attestations: sdk.IAttestedClaim[] = o.attestations
           ? (JSON.parse(o.attestations) as sdk.IAttestedClaim[])
           : []
         const entry = {
@@ -132,7 +132,7 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.CLAIM_SAVE: {
-        const { claimId, claim, meta } = (action as SaveAction).payload
+        const { claimId, claim, meta } = (action as ISaveAction).payload
 
         return state.setIn(['claims', claimId], {
           attestations: [],
@@ -142,13 +142,13 @@ class Store {
         } as Entry)
       }
       case Store.ACTIONS.CLAIM_REMOVE: {
-        return state.deleteIn(['claims', (action as RemoveAction).payload])
+        return state.deleteIn(['claims', (action as IRemoveAction).payload])
       }
       case Store.ACTIONS.ATTESTATION_ADD: {
         const {
           claimId,
           attestation,
-        } = (action as AddAttestationAction).payload
+        } = (action as IAddAttestationAction).payload
 
         let attestations =
           state.getIn(['claims', claimId, 'attestations']) || []
@@ -163,12 +163,12 @@ class Store {
         )
       }
       case Store.ACTIONS.ATTESTATION_REVOKE: {
-        const { revokedHash } = (action as RevokeAttestationAction).payload
+        const { revokedHash } = (action as IRevokeAttestationAction).payload
         const setIns: Array<Iterable<any>> = []
 
         let claims = state.get('claims')
 
-        claims.map((myClaim: Entry, myClaimHash: string) => {
+        claims.forEach((myClaim: Entry, myClaimHash: string) => {
           if (myClaim.attestations && myClaim.attestations.length) {
             myClaim.attestations.forEach(
               (attestedClaim: sdk.IAttestedClaim, index: number) => {
@@ -196,7 +196,10 @@ class Store {
     }
   }
 
-  public static saveAction(claim: sdk.IClaim, meta: Entry['meta']): SaveAction {
+  public static saveAction(
+    claim: sdk.IClaim,
+    meta: Entry['meta']
+  ): ISaveAction {
     return {
       payload: {
         claim,
@@ -207,7 +210,7 @@ class Store {
     }
   }
 
-  public static removeAction(claimId: Entry['id']): RemoveAction {
+  public static removeAction(claimId: Entry['id']): IRemoveAction {
     return {
       payload: claimId,
       type: Store.ACTIONS.CLAIM_REMOVE,
@@ -216,7 +219,7 @@ class Store {
 
   public static addAttestation(
     attestation: sdk.IAttestedClaim
-  ): AddAttestationAction {
+  ): IAddAttestationAction {
     return {
       payload: { claimId: hash(attestation.request.claim), attestation },
       type: Store.ACTIONS.ATTESTATION_ADD,
@@ -225,7 +228,7 @@ class Store {
 
   public static revokeAttestation(
     revokedHash: sdk.IAttestedClaim['request']['rootHash']
-  ): RevokeAttestationAction {
+  ): IRevokeAttestationAction {
     return {
       payload: { revokedHash },
       type: Store.ACTIONS.ATTESTATION_REVOKE,
@@ -248,7 +251,7 @@ class Store {
   private static areAttestationsEqual(
     attestatedClaim1: sdk.IAttestedClaim,
     attestatedClaim2: sdk.IAttestedClaim
-  ) {
+  ): boolean {
     const { attestation: attestation1 } = attestatedClaim1
     const { attestation: attestation2 } = attestatedClaim2
     return (
@@ -258,7 +261,7 @@ class Store {
   }
 }
 
-const _getAllClaims = (state: ReduxState): Entry[] => {
+const getAllClaims = (state: ReduxState): Entry[] => {
   return state.claims
     .get('claims')
     .toList()
@@ -266,8 +269,8 @@ const _getAllClaims = (state: ReduxState): Entry[] => {
 }
 
 const getClaims = createSelector(
-  [Wallet.getSelectedIdentity, _getAllClaims],
-  (selectedIdentity: MyIdentity, entries: Entry[]) => {
+  [Wallet.getSelectedIdentity, getAllClaims],
+  (selectedIdentity: IMyIdentity, entries: Entry[]) => {
     return entries.filter((entry: Entry) => {
       return (
         entry &&
@@ -278,35 +281,25 @@ const getClaims = createSelector(
   }
 )
 
-const _getCTypeHash = (
+const getCTypeHash = (
   state: ReduxState,
   cTypeHash: ICType['cType']['hash']
 ): ICType['cType']['hash'] => cTypeHash
 
 const getClaimsByCTypeHash = createSelector(
-  [getClaims, _getCTypeHash],
+  [getClaims, getCTypeHash],
   (entries: Entry[], cTypeHash: ICType['cType']['hash']) =>
     entries.filter((entry: Entry) => entry.claim.cTypeHash === cTypeHash)
 )
 
-const _getClaimHash = (state: ReduxState, claim: sdk.IPartialClaim): string =>
+const getClaimHash = (state: ReduxState, claim: sdk.IPartialClaim): string =>
   hash(claim)
 
 const getClaim = createSelector(
-  [_getClaimHash, getClaims],
+  [getClaimHash, getClaims],
   (claimHash: string, entries: Entry[]) => {
     return entries.find((entry: Entry) => entry.id === claimHash)
   }
 )
 
-export {
-  Store,
-  ImmutableState,
-  SerializedState,
-  Entry,
-  Action,
-  getClaims,
-  getClaimsByCTypeHash,
-  getClaim,
-  hash,
-}
+export { Store, getClaims, getClaimsByCTypeHash, getClaim, hash }

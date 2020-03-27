@@ -1,6 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
-import { ChangeEvent } from 'react'
+import React, { ChangeEvent } from 'react'
 
 type Props = {
   permissions: sdk.Permission[]
@@ -8,11 +7,25 @@ type Props = {
 }
 
 class SelectPermissions extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props)
+  private change(
+    permission: sdk.Permission,
+    event: ChangeEvent<HTMLInputElement>
+  ): void {
+    const { permissions, onChange } = this.props
+    const { checked } = event.target
+
+    const newPermissions = permissions.filter(
+      (_permission: sdk.Permission) => _permission !== permission
+    )
+
+    if (checked) {
+      newPermissions.push(permission)
+    }
+
+    onChange(newPermissions)
   }
 
-  public render() {
+  public render(): JSX.Element {
     return (
       <div className="permissions">
         <h2>Select permissions</h2>
@@ -34,24 +47,6 @@ class SelectPermissions extends React.Component<Props> {
         </div>
       </div>
     )
-  }
-
-  private change(
-    permission: sdk.Permission,
-    event: ChangeEvent<HTMLInputElement>
-  ) {
-    const { permissions, onChange } = this.props
-    const { checked } = event.target
-
-    const newPermissions = permissions.filter(
-      (_permission: sdk.Permission) => _permission !== permission
-    )
-
-    if (checked) {
-      newPermissions.push(permission)
-    }
-
-    onChange(newPermissions)
   }
 }
 

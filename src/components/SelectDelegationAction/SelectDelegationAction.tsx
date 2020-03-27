@@ -1,58 +1,39 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 import * as Delegations from '../../state/ducks/Delegations'
-import { MyDelegation } from '../../state/ducks/Delegations'
+import { IMyDelegation } from '../../state/ducks/Delegations'
 import * as UiState from '../../state/ducks/UiState'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
 
-type Props = {
-  delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | MyDelegation
+type StateProps = {
+  debugMode: boolean
+}
+
+type OwnProps = {
+  delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | IMyDelegation
 
   className?: string
   isMyChild?: boolean
 
-  onInvite?: (delegationEntry: MyDelegation) => void
-  onDelete?: (delegationEntry: MyDelegation) => void
+  onInvite?: (delegationEntry: IMyDelegation) => void
+  onDelete?: (delegationEntry: IMyDelegation) => void
   onRevokeAttestations?: () => void
   onRevokeDelegation?: () => void
-
-  // mapStateToProps
-  debugMode: boolean
 }
+
+type Props = StateProps & OwnProps
 
 class SelectDelegationAction extends React.Component<Props> {
   private static canDelegate(
-    delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | MyDelegation
+    delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | IMyDelegation
   ): boolean {
-    const permissions = (delegation as sdk.IDelegationNode | MyDelegation)
+    const permissions = (delegation as sdk.IDelegationNode | IMyDelegation)
       .permissions || [sdk.Permission.ATTEST, sdk.Permission.DELEGATE]
-    return !!permissions && permissions.indexOf(sdk.Permission.DELEGATE) !== -1
-  }
-  constructor(props: Props) {
-    super(props)
-  }
-
-  public render() {
-    const { className } = this.props
-
-    const actions: Array<Action | undefined> = [
-      this.getInviteAction(),
-      this.getDeleteAction(),
-      this.getRevokeDelegationAction(),
-      this.getRevokeAttestationsAction(),
-    ].filter((action: Action) => action)
-
-    return (
-      <section className="SelectDelegationAction">
-        {!!actions.length && (
-          <SelectAction className={className} actions={actions as Action[]} />
-        )}
-      </section>
-    )
+    return !!permissions && permissions.includes(sdk.Permission.DELEGATE)
   }
 
   private getInviteAction(): Action | undefined {
@@ -76,7 +57,7 @@ class SelectDelegationAction extends React.Component<Props> {
     return undefined
   }
 
-  private getDeleteAction() {
+  private getDeleteAction(): Action | undefined {
     const { debugMode, delegation, onDelete } = this.props
 
     if (!delegation || !onDelete) {
@@ -92,7 +73,7 @@ class SelectDelegationAction extends React.Component<Props> {
     return undefined
   }
 
-  private getRevokeAttestationsAction() {
+  private getRevokeAttestationsAction(): Action | undefined {
     const {
       debugMode,
       delegation,
@@ -113,7 +94,7 @@ class SelectDelegationAction extends React.Component<Props> {
     return undefined
   }
 
-  private getRevokeDelegationAction() {
+  private getRevokeDelegationAction(): Action | undefined {
     const { debugMode, delegation, isMyChild, onRevokeDelegation } = this.props
     if (!delegation || !onRevokeDelegation) {
       return undefined
@@ -138,9 +119,32 @@ class SelectDelegationAction extends React.Component<Props> {
       delegation.id
     )
   }
+
+  public render(): JSX.Element {
+    const { className } = this.props
+
+    const actions: Array<Action | undefined> = [
+      this.getInviteAction(),
+      this.getDeleteAction(),
+      this.getRevokeDelegationAction(),
+      this.getRevokeAttestationsAction(),
+    ].filter((action: Action) => action)
+
+    return (
+      <section className="SelectDelegationAction">
+        {!!actions.length && (
+          <SelectAction className={className} actions={actions as Action[]} />
+        )}
+      </section>
+    )
+  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   debugMode: UiState.getDebugMode(state),
 })
 

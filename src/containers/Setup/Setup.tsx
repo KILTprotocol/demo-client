@@ -5,11 +5,11 @@ import * as UiState from '../../state/ducks/UiState'
 import PersistentStore from '../../state/PersistentStore'
 
 export default class InitialSetup extends React.Component {
-  public componentDidMount() {
+  public componentDidMount(): void {
     BalanceUtilities.connectMyIdentities()
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(): void {
     // removes a maybe open task modal after routing
     const currentTask = UiState.getCurrentTask(PersistentStore.store.getState())
     if (currentTask && currentTask.objective) {
@@ -22,7 +22,7 @@ export default class InitialSetup extends React.Component {
     }
   }
 
-  public render() {
+  public render(): JSX.Element {
     return <CheckClientVersion />
   }
 }

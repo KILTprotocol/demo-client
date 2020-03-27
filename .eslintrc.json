@@ -1,0 +1,96 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": [
+    "airbnb-base",
+    "airbnb/rules/react",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier",
+    "prettier/react",
+    "prettier/@typescript-eslint"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": "error",
+    "semi": [
+      "error",
+      "never"
+    ],
+    "import/extensions": ["error", "ignorePackages", {
+      "ts": "never",
+      "tsx": "never",
+      "js": "never",
+      "jsx": "never",
+      "sass": "always",
+      "scss": "always"
+    }],
+    "import/no-extraneous-dependencies": "off",
+    "lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
+    ],
+    "react/jsx-filename-extension": ["error", { "extensions": [".tsx", ".jsx"] }],
+    "react/static-property-placement": ["error", "static public field"],
+    "react/prop-types": "off",
+    "react/jsx-props-no-spreading": ["off"],
+    "@typescript-eslint/explicit-function-return-type": [
+      "warn",
+      {
+        "allowExpressions": true
+      }
+    ],
+    "@typescript-eslint/interface-name-prefix": [
+      "error",
+      "always"
+    ],
+    "@typescript-eslint/prefer-interface": "off",
+    "@typescript-eslint/array-type": [
+      "error",
+      {
+        "default": "array-simple"
+      }
+    ],
+    "@typescript-eslint/ban-ts-ignore": "warn",
+    "@typescript-eslint/unbound-method": "off"
+  },
+  "overrides": [
+    {
+        "files": ["**/*.spec.ts?(x)", "**/*.test.ts?(x)"],
+        "env": {
+            "jest": true
+        },
+        "rules": {
+            "@typescript-eslint/no-object-literal-type-assertion": "off",
+            "@typescript-eslint/no-explicit-any": "off",
+            "no-underscore-dangle": "off",
+            "global-require": "off",
+            "@typescript-eslint/ban-ts-ignore": "off"
+        }
+    }
+],
+  "settings": {
+    "import/resolver": {
+        "node": {
+            "extensions": [".js", ".ts", ".d.ts", ".jsx", ".tsx"]
+        }
+    }
+}
+}

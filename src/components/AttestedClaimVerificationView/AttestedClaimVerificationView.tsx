@@ -1,6 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
-import AttestationService from '../../services/AttestationService'
 import * as UiState from '../../state/ducks/UiState'
 import PersistentStore from '../../state/PersistentStore'
 
@@ -8,7 +7,6 @@ import { ICType } from '../../types/Ctype'
 import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
-import Spinner from '../Spinner/Spinner'
 import { getCtypePropertyTitle } from '../../utils/CtypeUtils'
 import './AttestedClaimVerificationView.scss'
 
@@ -21,65 +19,59 @@ type Props = {
 type State = {}
 
 class AttestedClaimVerificationView extends React.Component<Props, State> {
-  private static readonly BLOCK_CHAR: string = '\u2588'
-  constructor(props: Props) {
-    super(props)
-    this.state = {}
-  }
-
-  public render() {
-    const { attestedClaim }: Props = this.props
-
-    return (
-      <section className="AttestedClaimVerificationView">
-        {attestedClaim ? (
-          <React.Fragment>
-            {this.getHeadline()}
-            <div className="container-actions">
-              <button
-                className="refresh"
-                onClick={this.verifyAttestatedClaim}
-              />
-            </div>
-            {this.buildClaimPropertiesView(attestedClaim)}
-          </React.Fragment>
-        ) : (
-          <div>Claim not found</div>
-        )}
-      </section>
-    )
-  }
-
-  private verifyAttestatedClaim() {
+  private static verifyAttestatedClaim(): void {
     PersistentStore.store.dispatch(
       UiState.Store.refreshAttestationStatusAction()
     )
   }
 
-  private getHeadline() {
+  constructor(props: Props) {
+    super(props)
+    this.state = {}
+  }
+
+  private getHeadline(): JSX.Element {
     const { attestedClaim, context }: Props = this.props
-    const _context = context != null ? context : 'Attested claim'
+    const localContext = context != null ? context : 'Attested claim'
 
     return (
       <h2>
-        {_context && <span>{_context}</span>}
+        {localContext && <span>{localContext}</span>}
         <ContactPresentation
           address={attestedClaim.attestation.owner}
-          interactive={true}
-          inline={true}
+          interactive
+          inline
         />
         <CTypePresentation
           cTypeHash={attestedClaim.request.claim.cTypeHash}
-          interactive={true}
-          linked={true}
-          inline={true}
+          interactive
+          linked
+          inline
         />
         <AttestationStatus attestation={attestedClaim} />
       </h2>
     )
   }
 
-  private buildClaimPropertiesView(attestedClaim: sdk.IAttestedClaim) {
+  private static getPropertyValue(
+    attestedClaim: sdk.IAttestedClaim,
+    propertyName: string
+  ): string {
+    const { contents } = attestedClaim.request.claim
+
+    if (!(propertyName in contents)) {
+      return AttestedClaimVerificationView.BLOCK_CHAR.repeat(12)
+    }
+    return `${contents[propertyName]}`
+  }
+
+  private static readonly BLOCK_CHAR: string = '\u2588'
+
+  private buildClaimPropertiesView(
+    attestedClaim: sdk.IAttestedClaim
+  ): JSX.Element {
+    const { cType } = this.props
+
     const propertyNames: string[] = Object.keys(
       attestedClaim.request.claimHashTree
     )
@@ -87,13 +79,18 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     return (
       <div className="attributes">
         {propertyNames.map((propertyName: string) => {
-          const propertyTitle = this.props.cType
-            ? getCtypePropertyTitle(propertyName, this.props.cType)
+          const propertyTitle = cType
+            ? getCtypePropertyTitle(propertyName, cType)
             : propertyName
           return (
             <div key={propertyName}>
               <label>{propertyTitle}</label>
-              <div>{this.getPropertyValue(attestedClaim, propertyName)}</div>
+              <div>
+                {AttestedClaimVerificationView.getPropertyValue(
+                  attestedClaim,
+                  propertyName
+                )}
+              </div>
             </div>
           )
         })}
@@ -101,17 +98,28 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     )
   }
 
-  private getPropertyValue(
-    attestedClaim: sdk.IAttestedClaim,
-    propertyName: string
-  ) {
-    const { contents } = attestedClaim.request.claim
+  public render(): JSX.Element {
+    const { attestedClaim }: Props = this.props
 
-    if (!contents.hasOwnProperty(propertyName)) {
-      return AttestedClaimVerificationView.BLOCK_CHAR.repeat(12)
-    } else {
-      return contents[propertyName] + ''
-    }
+    return (
+      <section className="AttestedClaimVerificationView">
+        {attestedClaim ? (
+          <>
+            {this.getHeadline()}
+            <div className="container-actions">
+              <button
+                type="button"
+                className="refresh"
+                onClick={AttestedClaimVerificationView.verifyAttestatedClaim}
+              />
+            </div>
+            {this.buildClaimPropertiesView(attestedClaim)}
+          </>
+        ) : (
+          <div>Claim not found</div>
+        )}
+      </section>
+    )
   }
 }
 

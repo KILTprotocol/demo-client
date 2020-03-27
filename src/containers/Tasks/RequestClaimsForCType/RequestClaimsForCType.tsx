@@ -1,15 +1,15 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 
 import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'
 import MessageRepository from '../../../services/MessageRepository'
-import { Contact } from '../../../types/Contact'
+import { IContact } from '../../../types/Contact'
 
 import './RequestClaimsForCType.scss'
 
 export type RequestClaimsForCTypeProps = {
   cTypeHashes: Array<sdk.ICType['hash']>
-  receiverAddresses: Array<Contact['publicIdentity']['address']>
+  receiverAddresses: Array<IContact['publicIdentity']['address']>
 
   onFinished?: () => void
   onCancel?: () => void
@@ -27,30 +27,14 @@ class RequestClaimsForCType extends React.Component<Props, State> {
     this.onCancel = this.onCancel.bind(this)
   }
 
-  public render() {
-    const { cTypeHashes, receiverAddresses } = this.props
-
-    return (
-      <section className="RequestClaimsForCType">
-        <div className="actions">
-          <button onClick={this.onCancel}>Cancel</button>
-          <button
-            disabled={
-              !cTypeHashes ||
-              !cTypeHashes.length ||
-              !receiverAddresses ||
-              !receiverAddresses.length
-            }
-            onClick={this.sendRequest}
-          >
-            Request claims
-          </button>
-        </div>
-      </section>
-    )
+  private onCancel(): void {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
   }
 
-  private sendRequest() {
+  private sendRequest(): void {
     const { cTypeHashes, receiverAddresses, onFinished } = this.props
 
     const messageBody: sdk.IRequestClaimsForCTypes = {
@@ -67,11 +51,30 @@ class RequestClaimsForCType extends React.Component<Props, State> {
     )
   }
 
-  private onCancel() {
-    const { onCancel } = this.props
-    if (onCancel) {
-      onCancel()
-    }
+  public render(): JSX.Element {
+    const { cTypeHashes, receiverAddresses } = this.props
+
+    return (
+      <section className="RequestClaimsForCType">
+        <div className="actions">
+          <button type="button" onClick={this.onCancel}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={
+              !cTypeHashes ||
+              !cTypeHashes.length ||
+              !receiverAddresses ||
+              !receiverAddresses.length
+            }
+            onClick={this.sendRequest}
+          >
+            Request claims
+          </button>
+        </div>
+      </section>
+    )
   }
 }
 

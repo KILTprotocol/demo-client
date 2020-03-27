@@ -1,14 +1,12 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
-import { Contact, MyIdentity } from '../types/Contact'
+import { IContact, IMyIdentity } from '../types/Contact'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
 
-export class DidService {
-  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${
-    process.env.REACT_APP_SERVICE_PORT
-  }/contacts/did`
+class DidService {
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${process.env.REACT_APP_SERVICE_PORT}/contacts/did`
 
   public static async resolveDid(
     identifier: string
@@ -16,10 +14,8 @@ export class DidService {
     return sdk.PublicIdentity.resolveFromDid(identifier, this.URL_RESOLVER)
   }
 
-  public static async createDid(myIdentity: MyIdentity): Promise<sdk.IDid> {
-    const documentStore: sdk.IDid['documentStore'] = `${
-      ContactRepository.URL
-    }/${myIdentity.identity.address}`
+  public static async createDid(myIdentity: IMyIdentity): Promise<sdk.IDid> {
+    const documentStore: sdk.IDid['documentStore'] = `${ContactRepository.URL}/${myIdentity.identity.address}`
 
     const did = sdk.Did.fromIdentity(myIdentity.identity, documentStore)
     const didDocument = did.createDefaultDidDocument(`${MessageRepository.URL}`)
@@ -32,7 +28,7 @@ export class DidService {
       },
       publicIdentity: myIdentity.identity.getPublicIdentity(),
       signature,
-    } as Contact)
+    } as IContact)
 
     const status = await did.store(myIdentity.identity)
     if (status.type !== 'Finalized') {
@@ -49,7 +45,7 @@ export class DidService {
     return did
   }
 
-  public static async deleteDid(myIdentity: MyIdentity) {
+  public static async deleteDid(myIdentity: IMyIdentity): Promise<void> {
     const status = await sdk.Did.remove(myIdentity.identity)
     if (status.type !== 'Finalized') {
       throw new Error(
@@ -62,7 +58,7 @@ export class DidService {
         name: myIdentity.metaData.name,
       },
       publicIdentity: myIdentity.identity.getPublicIdentity(),
-    } as Contact)
+    } as IContact)
     persistentStore.store.dispatch(
       Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
         did: undefined,
@@ -84,3 +80,5 @@ export class DidService {
     },
   } as sdk.IURLResolver
 }
+
+export default DidService

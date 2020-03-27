@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import Select from 'react-select'
 
 import './SelectAction.scss'
@@ -10,7 +10,7 @@ type SelectActionOption = {
 
 export type Action = {
   label: string
-  callback: () => void
+  callback: Function
 }
 
 type Props = {
@@ -19,14 +19,18 @@ type Props = {
 }
 
 class SelectAction extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      selectActionOptions: [],
+  private executeAction = (selectedActionOption: SelectActionOption): void => {
+    const { actions } = this.props
+    const action = actions.find(
+      (_action: Action) => _action.label === selectedActionOption.value
+    )
+
+    if (action) {
+      action.callback()
     }
   }
 
-  public render() {
+  public render(): JSX.Element {
     const { actions, className } = this.props
     const classes = ['SelectAction', className]
     const selectActionOptions: SelectActionOption[] = actions.map(
@@ -66,17 +70,6 @@ class SelectAction extends React.Component<Props> {
         />
       </section>
     )
-  }
-
-  private executeAction = (selectedActionOption: SelectActionOption) => {
-    const { actions } = this.props
-    const action = actions.find(
-      (_action: Action) => _action.label === selectedActionOption.value
-    )
-
-    if (action) {
-      action.callback()
-    }
   }
 }
 

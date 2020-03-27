@@ -1,9 +1,5 @@
-import * as React from 'react'
-import { ReactNode } from 'react'
-import Select from 'react-select'
-import CTypeRepository from '../../services/CtypeRepository'
+import React, { ReactNode } from 'react'
 
-import ErrorService from '../../services/ErrorService'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 import SelectCTypes from '../SelectCTypes/SelectCTypes'
 import Modal, { ModalType } from './Modal'
@@ -27,11 +23,11 @@ type State = {
 }
 
 class SelectCTypesModal extends React.Component<Props, State> {
+  private modal: Modal | null
+
   public static defaultProps = {
     placeholder: `Select cType#{multi}`,
   }
-
-  private modal: Modal | null
 
   constructor(props: Props) {
     super(props)
@@ -42,7 +38,32 @@ class SelectCTypesModal extends React.Component<Props, State> {
     this.onSelectCTypes = this.onSelectCTypes.bind(this)
   }
 
-  public render() {
+  private onSelectCTypes(selectedCTypes: ICTypeWithMetadata[]): void {
+    this.setState({ selectedCTypes })
+  }
+
+  private setSelectCTypesOpen = (
+    isSelectCTypesOpen: boolean,
+    delay = 0
+  ) => () => {
+    setTimeout(() => {
+      this.setState({ isSelectCTypesOpen })
+    }, delay)
+  }
+
+  public show(): void {
+    if (this.modal) {
+      this.modal.show()
+    }
+  }
+
+  public hide(): void {
+    if (this.modal) {
+      this.modal.hide()
+    }
+  }
+
+  public render(): JSX.Element {
     const {
       closeMenuOnSelect,
       header,
@@ -81,7 +102,7 @@ class SelectCTypesModal extends React.Component<Props, State> {
         catchBackdropClick={isSelectCTypesOpen}
         showOnInit={showOnInit}
         onCancel={onCancel}
-        onConfirm={onConfirm.bind(this, selectedCTypes)}
+        onConfirm={() => onConfirm(selectedCTypes)}
       >
         <div>
           <SelectCTypes
@@ -97,31 +118,6 @@ class SelectCTypesModal extends React.Component<Props, State> {
         </div>
       </Modal>
     )
-  }
-
-  public show() {
-    if (this.modal) {
-      this.modal.show()
-    }
-  }
-
-  public hide() {
-    if (this.modal) {
-      this.modal.hide()
-    }
-  }
-
-  private onSelectCTypes(selectedCTypes: ICTypeWithMetadata[]) {
-    this.setState({ selectedCTypes })
-  }
-
-  private setSelectCTypesOpen = (
-    isSelectCTypesOpen: boolean,
-    delay = 0
-  ) => () => {
-    setTimeout(() => {
-      this.setState({ isSelectCTypesOpen })
-    }, delay)
   }
 }
 

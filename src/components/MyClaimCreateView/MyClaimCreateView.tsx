@@ -1,10 +1,10 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import * as common from 'schema-based-json-editor'
-import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
+import SchemaEditor from '../SchemaEditor/SchemaEditor'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
@@ -18,18 +18,26 @@ import { getClaimInputModel } from '../../utils/CtypeUtils'
 import './MyClaimCreateView.scss'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Input from '../Input/Input'
-type Props = {
+
+type StateProps = {
+  selectedIdentity?: Wallet.Entry
+}
+
+type DispatchProps = {
+  saveClaim: (claim: sdk.IClaim, meta: { alias: string }) => void
+}
+
+type OwnProps = {
   onCancel?: () => void
   onCreate: (claim: sdk.Claim) => void
   partialClaim: sdk.IPartialClaim
-  saveClaim: (claim: sdk.IClaim, meta: { alias: string }) => void
-  selectedIdentity?: Wallet.Entry
 }
+
+type Props = StateProps & DispatchProps & OwnProps
 
 type State = {
   partialClaim: sdk.IPartialClaim
   name: string
-  isValid: boolean
   cType?: ICTypeWithMetadata
 }
 
@@ -42,15 +50,14 @@ class MyClaimCreateView extends Component<Props, State> {
     this.handleNameChange = this.handleNameChange.bind(this)
     this.updateClaim = this.updateClaim.bind(this)
     this.state = {
-      isValid: false,
       name: '',
       partialClaim: { ...props.partialClaim },
     }
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     const { partialClaim } = this.state
-    const { cTypeHash: cTypeHash } = partialClaim
+    const { cTypeHash } = partialClaim
 
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Fetching CTYPE',
@@ -72,72 +79,14 @@ class MyClaimCreateView extends Component<Props, State> {
       })
   }
 
-  public render() {
-    const { onCancel }: Props = this.props
-    const { cType, partialClaim, name }: State = this.state
-    const { contents } = partialClaim
-
-    return (
-      <section className="MyClaimCreateView">
-        <h1>New Claim</h1>
-        {cType && (
-          <React.Fragment>
-            <div className="Claim-base">
-              <div>
-                <label>CType</label>
-                <div>
-                  <CTypePresentation
-                    cTypeHash={cType.cType.hash}
-                    linked={true}
-                  />
-                </div>
-              </div>
-              <div>
-                <label>Claim alias</label>
-                <Input
-                  type="text"
-                  autoFocus={true}
-                  onChange={this.handleNameChange}
-                  onSubmit={this.handleSubmit}
-                />
-              </div>
-            </div>
-            <SchemaEditor
-              schema={getClaimInputModel(cType!) as common.Schema}
-              initialValue={contents}
-              updateValue={this.updateClaim}
-            />
-
-            <div className="actions">
-              {onCancel && <button onClick={this.handleCancel}>Cancel</button>}
-              <button
-                onClick={this.handleSubmit}
-                disabled={!name || name.length === 0}
-              >
-                Create
-              </button>
-            </div>
-          </React.Fragment>
-        )}
-        {!cType && (
-          <p>
-            <span>No CTYPEs found. Please </span>
-            <Link to="/ctype/new">create a new CTYPE</Link>.
-          </p>
-        )}
-      </section>
-    )
-  }
-
-  private updateClaim(contents: sdk.Claim['contents'], isValid: boolean) {
+  private updateClaim(contents: sdk.Claim['contents']): void {
     const { partialClaim } = this.state
     this.setState({
-      isValid,
       partialClaim: { ...partialClaim, contents: { ...contents } },
     })
   }
 
-  private handleCancel() {
+  private handleCancel(): void {
     const { onCancel } = this.props
 
     if (onCancel) {
@@ -145,7 +94,7 @@ class MyClaimCreateView extends Component<Props, State> {
     }
   }
 
-  private handleSubmit() {
+  private handleSubmit(): void {
     const { saveClaim, selectedIdentity, onCreate } = this.props
     const { name, partialClaim, cType }: State = this.state
     const { contents } = partialClaim
@@ -162,24 +111,81 @@ class MyClaimCreateView extends Component<Props, State> {
     }
   }
 
-  private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+  private handleNameChange(e: React.ChangeEvent<HTMLInputElement>): void {
     this.setState({ name: e.target.value })
+  }
+
+  public render(): JSX.Element {
+    const { onCancel }: Props = this.props
+    const { cType, partialClaim, name }: State = this.state
+    const { contents } = partialClaim
+
+    return (
+      <section className="MyClaimCreateView">
+        <h1>New Claim</h1>
+        {cType && (
+          <>
+            <div className="Claim-base">
+              <div>
+                <label>CType</label>
+                <div>
+                  <CTypePresentation cTypeHash={cType.cType.hash} linked />
+                </div>
+              </div>
+              <div>
+                <label>Claim alias</label>
+                <Input
+                  type="text"
+                  autoFocus
+                  onChange={this.handleNameChange}
+                  onSubmit={this.handleSubmit}
+                />
+              </div>
+            </div>
+            <SchemaEditor
+              schema={getClaimInputModel(cType) as common.Schema}
+              initialValue={contents}
+              updateValue={this.updateClaim}
+            />
+
+            <div className="actions">
+              {onCancel && (
+                <button type="button" onClick={this.handleCancel}>
+                  Cancel
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={this.handleSubmit}
+                disabled={!name || name.length === 0}
+              >
+                Create
+              </button>
+            </div>
+          </>
+        )}
+        {!cType && (
+          <p>
+            <span>No CTYPEs found. Please </span>
+            <Link to="/ctype/new">create a new CTYPE</Link>.
+          </p>
+        )}
+      </section>
+    )
   }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps = (dispatch: (action: Claims.Action) => void) => {
-  return {
-    saveClaim: (claim: sdk.IClaim, meta: { alias: string }) => {
-      dispatch(Claims.Store.saveAction(claim, meta))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  saveClaim: (claim: sdk.IClaim, meta: { alias: string }) =>
+    Claims.Store.saveAction(claim, meta),
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(MyClaimCreateView)
+export default connect(mapStateToProps, mapDispatchToProps)(MyClaimCreateView)

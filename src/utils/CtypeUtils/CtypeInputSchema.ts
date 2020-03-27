@@ -1,4 +1,4 @@
-export const CTypeInputModel = {
+export default {
   $id: 'http://kilt-protocol.org/draft-01/ctype-input#',
   $schema: 'http://json-schema.org/draft-07/schema#',
   title: 'CTYPE',

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import './Spinner.scss'
 
 type Props = {
@@ -8,8 +8,7 @@ type Props = {
   strength?: number
 }
 
-const Spinner = (props: Props) => {
-  const { className, color, size, strength } = props
+const Spinner: React.FC<Props> = ({ className, color, size, strength }) => {
   const ldsRingStyles = {
     height: `${size}px`,
     width: `${size}px`,
