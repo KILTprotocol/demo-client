@@ -16,9 +16,10 @@ function hash(quote: sdk.IQuote): string {
     cTypeHash: quote.cTypeHash,
     cost: quote.cost,
     currency: quote.currency,
+    timeframe: quote.timeframe,
     termsAndConditions: quote.termsAndConditions,
   }
-  return sdk.Crypto.hashStr(JSON.stringify(quoteHash))
+  return sdk.Crypto.hashObjectAsStr(JSON.stringify(quoteHash))
 }
 
 interface SaveAction extends KiltAction {

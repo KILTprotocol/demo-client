@@ -45,8 +45,7 @@ class QuoteCreate extends React.Component<Props, State> {
     this.updateValue = this.updateValue.bind(this)
   }
   public componentDidMount() {
-    const { claimerAddress, selectedIdentity } = this.props
-    claimerAddress === selectedIdentity.identity.address
+    const { claimerAddress } = this.props
   }
 
   render() {
@@ -86,13 +85,15 @@ class QuoteCreate extends React.Component<Props, State> {
     const { quote } = this.state
 
     if (quote && claimerAddress) {
-      quoteId(Quotes.hash(quote))
       quote.timeframe = new Date()
-      const attesterSignedQuote = sdk.Quote.fromQuoteDataAndIdentity(
-        quote,
-        selectedIdentity.identity
-      )
-      saveQuote(attesterSignedQuote, claimerAddress)
+      if (quote) {
+        quoteId(Quotes.hash(quote))
+        const attesterSignedQuote = sdk.Quote.fromQuoteDataAndIdentity(
+          quote,
+          selectedIdentity.identity
+        )
+        saveQuote(attesterSignedQuote, claimerAddress)
+      }
     }
   }
 

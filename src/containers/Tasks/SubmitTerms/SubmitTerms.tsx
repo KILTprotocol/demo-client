@@ -37,7 +37,7 @@ type State = {
   selectedDelegation?: MyDelegation
   withPreFilledClaim?: boolean
   isValid: boolean
-  quoteData?: sdk.IQuoteAttesterSigned
+  quoteData?: sdk.IQuote
 }
 
 class SubmitTerms extends React.Component<Props, State> {
@@ -53,6 +53,7 @@ class SubmitTerms extends React.Component<Props, State> {
     this.sendClaim = this.sendClaim.bind(this)
     this.updateClaim = this.updateClaim.bind(this)
     this.toggleWithPreFilledClaim = this.toggleWithPreFilledClaim.bind(this)
+    this.updateQuote = this.updateQuote.bind(this)
   }
 
   public componentDidMount() {
@@ -77,7 +78,7 @@ class SubmitTerms extends React.Component<Props, State> {
       receiverAddress,
     } = this.props
 
-    const { cType, selectedDelegation } = this.state
+    const { cType, selectedDelegation, quoteData } = this.state
     return (
       <section className="SubmitTerms">
         {enablePreFilledClaim && cType && (
@@ -104,6 +105,7 @@ class SubmitTerms extends React.Component<Props, State> {
               claim={claim}
               senderAddress={senderAddress}
               receiverAddress={receiverAddress}
+              updateQuote={this.updateQuote}
             />
           </div>
           <div className="actions">
@@ -171,6 +173,12 @@ class SubmitTerms extends React.Component<Props, State> {
     })
   }
 
+  private updateQuote(quote: sdk.IQuote) {
+    if (this.state.quoteData !== quote) {
+      this.setState({ quoteData: quote })
+    }
+  }
+
   private onCancel() {
     const { onCancel } = this.props
     if (onCancel) {
@@ -191,7 +199,6 @@ class SubmitTerms extends React.Component<Props, State> {
       withPreFilledClaim,
       quoteData,
     } = this.state
-
     const _claim: sdk.IPartialClaim = claim
 
     if (enablePreFilledClaim && !withPreFilledClaim) {

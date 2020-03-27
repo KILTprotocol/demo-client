@@ -19,6 +19,7 @@ type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> & {
   quoteEntries?: Quotes.Entry[]
   senderAddress?: string
   receiverAddress?: string
+  updateQuote: (quote: sdk.IQuote) => void
 }
 
 type State = {
@@ -65,8 +66,10 @@ class QuoteView extends React.Component<Props, State> {
         PersistentStore.store.getState(),
         quoteID
       )[0]
+
       if (newQuote !== selectedQuote.quote) {
         this.setState({ newQuote: selectedQuote.quote })
+        this.props.updateQuote(selectedQuote.quote)
       }
     }
   }

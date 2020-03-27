@@ -7,11 +7,12 @@ import attestationWorkflow from '../../../services/AttestationWorkflow'
 import FeedbackService, { notifyError } from '../../../services/FeedbackService'
 import { Contact } from '../../../types/Contact'
 import { BlockUi } from '../../../types/UserFeedback'
+import Code from '../../../components/Code/Code'
 
 type Props = {
   claimerAddresses: Array<Contact['publicIdentity']['address']>
   requestForAttestation: sdk.IRequestForAttestation
-
+  quote?: sdk.IQuoteAgreement
   onCancel?: () => void
   onFinished?: () => void
 }
@@ -28,7 +29,8 @@ class AttestClaim extends React.Component<Props, State> {
   }
 
   public render() {
-    const { requestForAttestation } = this.props
+    const { requestForAttestation, quote } = this.props
+    
     return (
       <section className="AttestClaim">
         <ClaimDetailView claim={requestForAttestation.claim} />
@@ -38,6 +40,10 @@ class AttestClaim extends React.Component<Props, State> {
           delegationId={requestForAttestation.delegationId}
           context="terms"
         />
+
+        <section>
+          <Code>{quote}</Code>
+        </section>
 
         <div className="actions">
           <button onClick={this.onCancel}>Cancel</button>

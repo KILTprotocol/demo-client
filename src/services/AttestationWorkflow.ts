@@ -71,7 +71,6 @@ class AttestationWorkflow {
       if (delegation) {
         messageBody.content.delegationId = delegation.id
       }
-
       return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
     }
     const messageBody: sdk.ISubmitTerms = {
@@ -123,7 +122,7 @@ class AttestationWorkflow {
     attesterAddresses: Array<Contact['publicIdentity']['address']>,
     terms: sdk.AttestedClaim[] = [],
     delegationId: sdk.IDelegationNode['id'] | null = null,
-    quoteAgreement?: sdk.IQuoteAttesterSigned
+    quoteAttesterSigned?: sdk.IQuoteAttesterSigned
   ): Promise<void> {
     const identity: sdk.Identity = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
@@ -134,19 +133,25 @@ class AttestationWorkflow {
       terms,
       delegationId
     )
-    if (quoteAgreement) {
-      const quote = sdk.Quote.createAgreedQuote(
-        identity,
-        quoteAgreement,
-        requestForAttestation.rootHash
+
+    if (quoteAttesterSigned && requestForAttestation) {
+      //The sdk.Quote.createAgreedQuote is not working. Need help
+      const signature = identity.signStr(
+        sdk.Crypto.hashObjectAsStr(quoteAttesterSigned)
       )
+      const quoteAgreement = {
+        ...quoteAttesterSigned,
+        rootHash: requestForAttestation.rootHash,
+        claimerSignature: signature,
+      }  
+      if (quoteAgreement) {
+        const messageBody = {
+          content: { requestForAttestation, quoteAgreement },
+          type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+        } as IRequestAttestationForClaim
 
-      const messageBody = {
-        content: { requestForAttestation, quote },
-        type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
-      } as IRequestAttestationForClaim
-
-      return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
+        return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
+      }
     }
     const messageBody = {
       content: { requestForAttestation },
