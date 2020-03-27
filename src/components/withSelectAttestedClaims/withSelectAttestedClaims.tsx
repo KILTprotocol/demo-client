@@ -15,6 +15,7 @@ type State = {
   claimSelectionData: ClaimSelectionData
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const withSelectAttestedClaims = <P extends IInjectedProps>(
   WrappedComponent: React.ComponentType<P>
 ) => {

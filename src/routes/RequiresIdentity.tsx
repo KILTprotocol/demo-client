@@ -19,6 +19,7 @@ const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const requiresIdentity = (
   WrappedComponent: ComponentType,
   additionalProps?: { [key: string]: any }
