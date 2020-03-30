@@ -10,6 +10,7 @@ import { State as ReduxState } from '../../state/PersistentStore'
 type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> & {
   selectedIdentity: MyIdentity
   quoteEntries?: Quotes.Entry[]
+  removeQuote: (claimId: Quotes.Entry['quoteId']) => void
 }
 
 type State = {
@@ -20,6 +21,7 @@ class MyQuotesList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {}
+    this.deleteQuote = this.deleteQuote.bind(this)
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -38,7 +40,7 @@ class MyQuotesList extends React.Component<Props, State> {
 
     return (
       <section className="QuoteView">
-          <h1> My Quote list</h1>
+        <h1> My Quote list</h1>
         {quoteEntries ? (
           quoteEntries.map((val: Quotes.Entry) => {
             return (
@@ -48,6 +50,9 @@ class MyQuotesList extends React.Component<Props, State> {
                 <div>
                   <Code>{val.quote}</Code>
                 </div>
+                <button onClick={() => this.deleteQuote(val.quoteId)}>
+                  Delete Quote
+                </button>
               </section>
             )
           })
@@ -57,6 +62,11 @@ class MyQuotesList extends React.Component<Props, State> {
       </section>
     )
   }
+  private deleteQuote(quoteId: Quotes.Entry['quoteId']) {
+    const { removeQuote } = this.props
+
+    removeQuote(quoteId)
+  }
 }
 
 const mapStateToProps = (state: ReduxState) => ({
@@ -64,4 +74,15 @@ const mapStateToProps = (state: ReduxState) => ({
   quoteEntries: Quotes.getAllMyQuotes(state),
 })
 
-export default connect(mapStateToProps)(withRouter(MyQuotesList))
+const mapDispatchToProps = (dispatch: (action: Quotes.Action) => void) => {
+  return {
+    removeQuote: (quoteId: Quotes.Entry['quoteId']) => {
+      dispatch(Quotes.Store.removeQuote(quoteId))
+    },
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(MyQuotesList))

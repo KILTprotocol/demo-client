@@ -121,8 +121,6 @@ class Store {
       }
       case Store.ACTIONS.REMOVE_QUOTE: {
         return state.deleteIn(['quotes', (action as RemoveAction).payload])
-
-        return state
       }
       default:
         return state
