@@ -78,7 +78,7 @@ class SubmitTerms extends React.Component<Props, State> {
       receiverAddress,
     } = this.props
 
-    const { cType, selectedDelegation, quoteData } = this.state
+    const { cType, selectedDelegation } = this.state
     return (
       <section className="SubmitTerms">
         {enablePreFilledClaim && cType && (

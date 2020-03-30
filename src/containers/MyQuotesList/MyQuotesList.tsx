@@ -6,6 +6,7 @@ import * as Quotes from '../../state/ducks/Quotes'
 import Code from '../../components/Code/Code'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { State as ReduxState } from '../../state/PersistentStore'
+import './MyQuotesList.scss'
 
 type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> & {
   selectedIdentity: MyIdentity
@@ -39,26 +40,32 @@ class MyQuotesList extends React.Component<Props, State> {
     const { quoteEntries } = this.props
 
     return (
-      <section className="QuoteView">
-        <h1> My Quote list</h1>
-        {quoteEntries ? (
-          quoteEntries.map((val: Quotes.Entry) => {
-            return (
-              <section>
-                <h2>Quote ID: {val.quoteId}</h2>
-                <label>Claimer address : {val.claimerAddress}</label>
-                <div>
-                  <Code>{val.quote}</Code>
-                </div>
-                <button onClick={() => this.deleteQuote(val.quoteId)}>
-                  Delete Quote
-                </button>
-              </section>
-            )
-          })
-        ) : (
-          <div>No Quotes</div>
-        )}
+      <section>
+        <h1>Quotes</h1>
+        <section className="MyQuotesList">
+          <h1> My Quote list</h1>
+
+          {quoteEntries && quoteEntries.length ? (
+            quoteEntries.map((val: Quotes.Entry) => {
+              return (
+                <section>
+                  <h2>Quote ID: {val.quoteId}</h2>
+                  <label>Claimer address : {val.claimerAddress}</label>
+                  <div>
+                    <Code>{val.quote}</Code>
+                  </div>
+                  <div className="actions">
+                    <button onClick={() => this.deleteQuote(val.quoteId)}>
+                      Delete Quote
+                    </button>
+                  </div>
+                </section>
+              )
+            })
+          ) : (
+            <div>No Quotes</div>
+          )}
+        </section>
       </section>
     )
   }

@@ -33,7 +33,6 @@ class QuoteCreate extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      quote: undefined,
       isValid: true,
       initialValue: {
         attesterAddress: this.props.attesterAddress,
