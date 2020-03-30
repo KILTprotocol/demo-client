@@ -19,15 +19,11 @@ import RequestAttestation, {
 import RequestClaimsForCType, {
   RequestClaimsForCTypeProps,
 } from './RequestClaimsForCType/RequestClaimsForCType'
-import RequestTerm, {
-  RequestTermsProps,
-} from './RequestTerms/RequestTerms'
+import RequestTerm, { RequestTermsProps } from './RequestTerms/RequestTerms'
 import SubmitClaimsForCType, {
   SubmitClaimsForCTypeProps,
 } from './SubmitClaimsForCType/SubmitClaimsForCType'
-import SubmitTerms, {
-  SubmitTermsProps,
-} from './SubmitTerms/SubmitTerms'
+import SubmitTerms, { SubmitTermsProps } from './SubmitTerms/SubmitTerms'
 
 import './Tasks.scss'
 

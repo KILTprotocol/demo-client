@@ -44,9 +44,6 @@ class QuoteCreate extends React.Component<Props, State> {
     this.handleSubmit = this.handleSubmit.bind(this)
     this.updateValue = this.updateValue.bind(this)
   }
-  public componentDidMount() {
-    const { claimerAddress } = this.props
-  }
 
   render() {
     const { onCancel } = this.props

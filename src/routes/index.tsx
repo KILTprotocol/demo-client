@@ -13,7 +13,6 @@ import ClaimView from '../containers/ClaimView/ClaimView'
 import ContactList from '../containers/ContactList/ContactList'
 import CTypeCreate from '../containers/CtypeCreate/CtypeCreate'
 import CtypeView from '../containers/CtypeView/CtypeView'
-import QuoteView from '../containers/QuoteView/QuoteView'
 import QuoteCreate from '../containers/QuoteCreate/QuoteCreate'
 import MessageList from '../containers/MessageView/MessageView'
 import WalletAdd from '../containers/WalletAdd/WalletAdd'
@@ -21,6 +20,7 @@ import WalletView from '../containers/WalletView/WalletView'
 import requiresIdentity from './RequiresIdentity'
 import DelegationCreate from '../containers/DelegationCreate/DelegationCreate'
 import Setup from '../containers/Setup/Setup'
+import MyQuotesList from '../containers/MyQuotesList/MyQuotesList'
 
 const Routes: React.FunctionComponent<{}> = props => {
   // const bbqBirch = encodeURIComponent('wss://substrate-rpc.parity.io/')
@@ -34,7 +34,7 @@ const Routes: React.FunctionComponent<{}> = props => {
         <Route path={'/contacts'} component={requiresIdentity(ContactList)} />
 
         <Route path={'/messages'} component={requiresIdentity(MessageList)} />
-        <Route path={'/quote'} component={requiresIdentity(QuoteView)} />
+        <Route path={'/quote'} component={requiresIdentity(MyQuotesList)} />
 
         <Route path={'/quote/new'} component={requiresIdentity(QuoteCreate)} />
 

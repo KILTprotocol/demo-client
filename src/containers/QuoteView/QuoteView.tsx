@@ -43,7 +43,6 @@ class QuoteView extends React.Component<Props, State> {
       senderAddress,
       receiverAddress,
       selectedIdentity,
-      claim,
     } = this.props
     if (!senderAddress && !receiverAddress) {
       senderAddress === selectedIdentity.identity.address

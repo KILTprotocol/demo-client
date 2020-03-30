@@ -58,34 +58,21 @@ class AttestationWorkflow {
     delegation?: MyDelegation,
     quote?: sdk.IQuoteAttesterSigned
   ): Promise<void> {
-    if (quote) {
-      const messageBody: sdk.ISubmitTerms = {
-        content: {
-          claim,
-          legitimations: terms,
-          delegationId: undefined,
-          quote: quote,
-        },
-        type: sdk.MessageBodyType.SUBMIT_TERMS,
-      }
-      if (delegation) {
-        messageBody.content.delegationId = delegation.id
-      }
-      return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
-    }
     const messageBody: sdk.ISubmitTerms = {
       content: {
         claim,
         legitimations: terms,
         delegationId: undefined,
+        quote: undefined,
       },
       type: sdk.MessageBodyType.SUBMIT_TERMS,
     }
-
     if (delegation) {
       messageBody.content.delegationId = delegation.id
     }
-
+    if (quote) {
+      messageBody.content.quote = quote
+    }
     return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
   }
 
@@ -133,8 +120,12 @@ class AttestationWorkflow {
       terms,
       delegationId
     )
+    const messageBody: IRequestAttestationForClaim = {
+      content: { requestForAttestation, quote: undefined },
+      type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+    }
 
-    if (quoteAttesterSigned && requestForAttestation) {
+    if (quoteAttesterSigned) {
       //The sdk.Quote.createAgreedQuote is not working. Need help
       const signature = identity.signStr(
         sdk.Crypto.hashObjectAsStr(quoteAttesterSigned)
@@ -144,17 +135,7 @@ class AttestationWorkflow {
         rootHash: requestForAttestation.rootHash,
         claimerSignature: signature,
       }
-      if (quoteAgreement) {
-        const messageBody: IRequestAttestationForClaim = {
-          content: { requestForAttestation, quote: quoteAgreement },
-          type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
-        }
-        return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
-      }
-    }
-    const messageBody: IRequestAttestationForClaim = {
-      content: { requestForAttestation },
-      type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+      messageBody.content.quote = quoteAgreement
     }
 
     return MessageRepository.sendToAddresses(attesterAddresses, messageBody)

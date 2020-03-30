@@ -1,41 +1,12 @@
 .MessageListView {
+  
   & table {
     @include table;
     @include responsiveTable(
       (
-        phone: (
-          '*',
-          false,
-          false,
-          false,
-          false,
-          false,
-          false,
-          false,
-          getActionTdWidth(2),
-        ),
-        tablet: (
-          false,
-          '*',
-          false,
-          false,
-          false,
-          false,
-          false,
-          110px,
-          getActionTdWidth(2),
-        ),
-        desktop: (
-          false,
-          false,
-          40%,
-          '*',
-          40%,
-          110px,
-          110px,
-          false,
-          getActionTdWidth(2),
-        ),
+        phone: ('*', false, false, false, false, false, false, false, getActionTdWidth(2)),
+        tablet: (false, '*', false, false, false, false, false, 110px, getActionTdWidth(2)),
+        desktop: (false, false, 40%, '*', 40%, 110px, 110px, false, getActionTdWidth(2)),
       )
     );
   }
