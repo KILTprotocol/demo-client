@@ -17,7 +17,9 @@ type Props = {
   onFinished?: () => void
 }
 
-type State = {}
+type State = {
+  quote?: sdk.IQuoteAgreement
+}
 
 class AttestClaim extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -28,9 +30,16 @@ class AttestClaim extends React.Component<Props, State> {
     this.attestClaim = this.attestClaim.bind(this)
   }
 
+  componentDidMount() {
+    const { quote } = this.props
+    if (quote) {
+      this.setState({ quote: this.props.quote })
+    }
+  }
   public render() {
-    const { requestForAttestation, quote } = this.props
-    
+    const { requestForAttestation } = this.props
+    const { quote } = this.state
+
     return (
       <section className="AttestClaim">
         <ClaimDetailView claim={requestForAttestation.claim} />
@@ -41,9 +50,13 @@ class AttestClaim extends React.Component<Props, State> {
           context="terms"
         />
 
-        <section>
-          <Code>{quote}</Code>
-        </section>
+        {!quote ? (
+          <section>no Quote</section>
+        ) : (
+          <section>
+            <Code>{quote}</Code>
+          </section>
+        )}
 
         <div className="actions">
           <button onClick={this.onCancel}>Cancel</button>

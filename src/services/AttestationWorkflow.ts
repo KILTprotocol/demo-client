@@ -143,20 +143,19 @@ class AttestationWorkflow {
         ...quoteAttesterSigned,
         rootHash: requestForAttestation.rootHash,
         claimerSignature: signature,
-      }  
+      }
       if (quoteAgreement) {
-        const messageBody = {
-          content: { requestForAttestation, quoteAgreement },
+        const messageBody: IRequestAttestationForClaim = {
+          content: { requestForAttestation, quote: quoteAgreement },
           type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
-        } as IRequestAttestationForClaim
-
+        }
         return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
       }
     }
-    const messageBody = {
+    const messageBody: IRequestAttestationForClaim = {
       content: { requestForAttestation },
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
-    } as IRequestAttestationForClaim
+    }
 
     return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
   }
