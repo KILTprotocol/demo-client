@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import logo from '../../assets/kilt_negative.svg'
@@ -9,9 +9,11 @@ import { State as ReduxState } from '../../state/PersistentStore'
 import Navigation from '../Navigation/Navigation'
 import './Header.scss'
 
-type Props = {
+type StateProps = {
   debugMode: boolean
 }
+
+type Props = StateProps
 
 type State = {
   openNavigation: boolean
@@ -25,7 +27,26 @@ class Header extends React.Component<Props, State> {
     }
   }
 
-  public render() {
+  private toggleNavigation = (): void => {
+    const { openNavigation } = this.state
+    this.setState({
+      openNavigation: !openNavigation,
+    })
+  }
+
+  private closeNavigation = (): void => {
+    this.setState({
+      openNavigation: false,
+    })
+  }
+
+  // private openNavigation = () => {
+  //   this.setState({
+  //     openNavigation: true
+  //   })
+  // }
+
+  public render(): JSX.Element {
     const { debugMode } = this.props
     const { openNavigation } = this.state
 
@@ -38,7 +59,11 @@ class Header extends React.Component<Props, State> {
       <>
         <header className={classes.join(' ')}>
           <section>
-            <button className="menu" onClick={this.toggleNavigation} />
+            <button
+              type="button"
+              className="menu"
+              onClick={this.toggleNavigation}
+            />
             <div
               className="navigation-container"
               onClick={this.closeNavigation}
@@ -57,27 +82,9 @@ class Header extends React.Component<Props, State> {
       </>
     )
   }
-
-  private toggleNavigation = () => {
-    this.setState({
-      openNavigation: !this.state.openNavigation,
-    })
-  }
-
-  private closeNavigation = () => {
-    this.setState({
-      openNavigation: false,
-    })
-  }
-
-  // private openNavigation = () => {
-  //   this.setState({
-  //     openNavigation: true
-  //   })
-  // }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   debugMode: UiState.getDebugMode(state),
 })
 

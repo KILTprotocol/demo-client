@@ -3,7 +3,7 @@ import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 
 import KiltAction from '../../types/Action'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 
@@ -12,7 +12,7 @@ export enum DelegationType {
   Node = 'node',
 }
 
-export interface MyDelegation {
+export interface IMyDelegation {
   account: sdk.IDelegationBaseNode['account']
   id: sdk.IDelegationBaseNode['id']
   metaData: {
@@ -27,29 +27,29 @@ export interface MyDelegation {
   isPCR?: boolean
 }
 
-interface SaveAction extends KiltAction {
-  payload: MyDelegation
+interface ISaveAction extends KiltAction {
+  payload: IMyDelegation
 }
 
-interface RemoveAction extends KiltAction {
-  payload: MyDelegation
+interface IRemoveAction extends KiltAction {
+  payload: IMyDelegation
 }
 
-interface RevokeAction extends KiltAction {
-  payload: MyDelegation['id']
+interface IRevokeAction extends KiltAction {
+  payload: IMyDelegation['id']
 }
 
-type Action = SaveAction | RemoveAction | RevokeAction
+export type Action = ISaveAction | IRemoveAction | IRevokeAction
 
-type Entry = MyDelegation
+export type Entry = IMyDelegation
 
 type State = {
-  delegations: Immutable.List<MyDelegation>
+  delegations: Immutable.List<IMyDelegation>
 }
 
-type ImmutableState = Immutable.Record<State>
+export type ImmutableState = Immutable.Record<State>
 
-type SerializedState = {
+export type SerializedState = {
   delegations: string[]
 }
 
@@ -60,7 +60,7 @@ class Store {
     }
     store.delegations = state
       .get('delegations')
-      .map((myDelegation: MyDelegation) => {
+      .map((myDelegation: IMyDelegation) => {
         return JSON.stringify(myDelegation)
       })
       .toArray()
@@ -69,12 +69,12 @@ class Store {
   }
 
   public static deserialize(serializedState: SerializedState): ImmutableState {
-    const delegations: MyDelegation[] =
+    const delegations: IMyDelegation[] =
       serializedState &&
       serializedState.delegations &&
       Array.isArray(serializedState.delegations)
         ? serializedState.delegations.map((serialized: string) => {
-            return JSON.parse(serialized) as MyDelegation
+            return JSON.parse(serialized) as IMyDelegation
           })
         : []
 
@@ -88,11 +88,12 @@ class Store {
     action: Action
   ): ImmutableState {
     switch (action.type) {
-      case Store.ACTIONS.SAVE_DELEGATION:
-        const myDelegation: MyDelegation = (action as SaveAction).payload
+      case Store.ACTIONS.SAVE_DELEGATION: {
+        const myDelegation: IMyDelegation = (action as ISaveAction).payload
         return state.mergeIn(['delegations'], [myDelegation])
-      case Store.ACTIONS.REMOVE_DELEGATION:
-        const myDelegationToRemove: MyDelegation = (action as RemoveAction)
+      }
+      case Store.ACTIONS.REMOVE_DELEGATION: {
+        const myDelegationToRemove: IMyDelegation = (action as IRemoveAction)
           .payload
         return state.set(
           'delegations',
@@ -100,30 +101,29 @@ class Store {
             .get('delegations')
             .filter((entry: Entry) => entry.id !== myDelegationToRemove.id)
         )
-      case Store.ACTIONS.REVOKE_DELEGATION:
-        const delegationId: MyDelegation['id'] = (action as RevokeAction)
+      }
+      case Store.ACTIONS.REVOKE_DELEGATION: {
+        const delegationId: IMyDelegation['id'] = (action as IRevokeAction)
           .payload
         const index: number = state
           .get('delegations')
-          .map((delegation: MyDelegation) => delegation.id)
+          .map((delegation: IMyDelegation) => delegation.id)
           .indexOf(delegationId)
-        state.updateIn(['delegations', index], (delegation: MyDelegation) => {
-          delegation.revoked = true
-        })
-        return state
+        return state.updateIn(['delegations', index, 'revoked'], () => true)
+      }
       default:
         return state
     }
   }
 
-  public static saveDelegationAction(myDelegation: MyDelegation): SaveAction {
+  public static saveDelegationAction(myDelegation: IMyDelegation): ISaveAction {
     return {
       payload: myDelegation,
       type: Store.ACTIONS.SAVE_DELEGATION,
     }
   }
 
-  public static revokeDelegationAction(id: MyDelegation['id']): RevokeAction {
+  public static revokeDelegationAction(id: IMyDelegation['id']): IRevokeAction {
     return {
       payload: id,
       type: Store.ACTIONS.REVOKE_DELEGATION,
@@ -131,8 +131,8 @@ class Store {
   }
 
   public static removeDelegationAction(
-    myDelegation: MyDelegation
-  ): RemoveAction {
+    myDelegation: IMyDelegation
+  ): IRemoveAction {
     return {
       payload: myDelegation,
       type: Store.ACTIONS.REMOVE_DELEGATION,
@@ -141,7 +141,7 @@ class Store {
 
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
-      delegations: Immutable.List<MyDelegation>(),
+      delegations: Immutable.List<IMyDelegation>(),
     } as State)(obj)
   }
 
@@ -152,14 +152,14 @@ class Store {
   }
 }
 
-const _getAllDelegations = (state: ReduxState): MyDelegation[] =>
+const getAllStateDelegations = (state: ReduxState): IMyDelegation[] =>
   state.delegations.get('delegations').toArray()
 
 const getAllDelegations = createSelector(
-  [Wallet.getSelectedIdentity, _getAllDelegations],
-  (selectedIdentity: MyIdentity, myDelegations: MyDelegation[]) => {
+  [Wallet.getSelectedIdentity, getAllStateDelegations],
+  (selectedIdentity: IMyIdentity, myDelegations: IMyDelegation[]) => {
     return myDelegations.filter(
-      (myDelegation: MyDelegation) =>
+      (myDelegation: IMyDelegation) =>
         myDelegation.account === selectedIdentity.identity.address
     )
   }
@@ -167,41 +167,37 @@ const getAllDelegations = createSelector(
 
 const getRootDelegations = createSelector(
   [getAllDelegations],
-  (myDelegations: MyDelegation[]) => {
+  (myDelegations: IMyDelegation[]) => {
     return myDelegations.filter(
-      (myDelegation: MyDelegation) => myDelegation.type === DelegationType.Root
+      (myDelegation: IMyDelegation) => myDelegation.type === DelegationType.Root
     )
   }
 )
 
 const getDelegations = createSelector(
   [getAllDelegations],
-  (myDelegations: MyDelegation[]) => {
+  (myDelegations: IMyDelegation[]) => {
     return myDelegations.filter(
-      (myDelegation: MyDelegation) => myDelegation.type !== DelegationType.Root
+      (myDelegation: IMyDelegation) => myDelegation.type !== DelegationType.Root
     )
   }
 )
 
-const _getDelegationId = (
+const getDelegationId = (
   state: ReduxState,
-  delegationId: MyDelegation['id']
-) => delegationId
+  delegationId: IMyDelegation['id']
+): string => delegationId
 
 const getDelegation = createSelector(
-  [getAllDelegations, _getDelegationId],
-  (myDelegations: MyDelegation[], delegationId: MyDelegation['id']) =>
+  [getAllDelegations, getDelegationId],
+  (myDelegations: IMyDelegation[], delegationId: IMyDelegation['id']) =>
     myDelegations.find(
-      (myDelegation: MyDelegation) => myDelegation.id === delegationId
+      (myDelegation: IMyDelegation) => myDelegation.id === delegationId
     )
 )
 
 export {
   Store,
-  ImmutableState,
-  SerializedState,
-  Entry,
-  Action,
   getAllDelegations,
   getRootDelegations,
   getDelegations,

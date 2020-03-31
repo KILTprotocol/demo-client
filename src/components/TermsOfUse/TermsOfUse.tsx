@@ -1,6 +1,6 @@
-import * as React from 'react'
+import React from 'react'
 
-const TermsOfUse = () => {
+const TermsOfUse: React.FC = () => {
   return (
     <section className="TermsOfUse">
       <h1>Terms of Use</h1>

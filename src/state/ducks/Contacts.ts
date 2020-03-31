@@ -2,41 +2,54 @@ import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 
 import KiltAction from '../../types/Action'
-import { Contact, MyIdentity } from '../../types/Contact'
-import PersistentStore, { State as ReduxState } from '../PersistentStore'
-import * as Wallet from '../../state/ducks/Wallet'
+import { IContact, IMyIdentity } from '../../types/Contact'
+import { State as ReduxState } from '../PersistentStore'
 
-interface AddContactAction extends KiltAction {
-  payload: Contact
+interface IAddContactAction extends KiltAction {
+  payload: IContact
 }
 
-interface AddContactsAction extends KiltAction {
-  payload: Contact[]
+interface IAddContactsAction extends KiltAction {
+  payload: IContact[]
 }
 
-interface RemoveContactAction extends KiltAction {
-  payload: Contact['publicIdentity']['address']
+interface IRemoveContactAction extends KiltAction {
+  payload: IContact['publicIdentity']['address']
 }
 
-type Action = AddContactAction | AddContactsAction | RemoveContactAction
+export type Action =
+  | IAddContactAction
+  | IAddContactsAction
+  | IRemoveContactAction
 
 type State = {
-  contacts: Immutable.Map<Contact['publicIdentity']['address'], Contact>
+  contacts: Immutable.Map<IContact['publicIdentity']['address'], IContact>
 }
 
-type SerializedState = {
+export type SerializedState = {
   contacts: string[]
 }
 
-type ImmutableState = Immutable.Record<State>
+export type ImmutableState = Immutable.Record<State>
+
+const arrayToMap = (
+  contactsArray: IContact[]
+): Immutable.Map<IContact['publicIdentity']['address'], IContact> => {
+  const contacts: { [address: string]: IContact } = {}
+  contactsArray.forEach((contact: IContact) => {
+    const { address } = contact.publicIdentity
+    contacts[address] = contact
+  })
+  return Immutable.Map(contacts)
+}
 
 class Store {
   public static serialize(state: ImmutableState): SerializedState {
     const contacts = state
       .get('contacts')
       .toList()
-      .filter((contact: Contact) => contact.metaData.addedAt)
-      .map((contact: Contact) => {
+      .filter((contact: IContact) => contact.metaData.addedAt)
+      .map((contact: IContact) => {
         return JSON.stringify(contact)
       })
       .toArray()
@@ -45,11 +58,11 @@ class Store {
   }
 
   public static deserialize(serializedState: SerializedState): ImmutableState {
-    let contacts: Contact[]
+    let contacts: IContact[]
 
     try {
       contacts = serializedState.contacts.map((serialized: string) => {
-        return JSON.parse(serialized) as Contact
+        return JSON.parse(serialized) as IContact
       })
     } catch (e) {
       contacts = []
@@ -64,17 +77,17 @@ class Store {
   ): ImmutableState {
     switch (action.type) {
       case Store.ACTIONS.ADD_CONTACT: {
-        const contact = (action as AddContactAction).payload
+        const contact = (action as IAddContactAction).payload
         const { publicIdentity } = contact
         return state.setIn(['contacts', publicIdentity.address], contact)
       }
       case Store.ACTIONS.ADD_CONTACTS: {
-        const contacts = arrayToMap((action as AddContactsAction).payload)
+        const contacts = arrayToMap((action as IAddContactsAction).payload)
         const currentContacts = state.getIn(['contacts'])
         return state.setIn(['contacts'], currentContacts.mergeDeep(contacts))
       }
       case Store.ACTIONS.REMOVE_CONTACT: {
-        const address = (action as RemoveContactAction).payload
+        const address = (action as IRemoveContactAction).payload
 
         const contact = state.getIn(['contacts', address])
         const { metaData, publicIdentity } = contact
@@ -92,14 +105,14 @@ class Store {
     }
   }
 
-  public static addContact(contact: Contact): AddContactAction {
+  public static addContact(contact: IContact): IAddContactAction {
     return {
       payload: contact,
       type: Store.ACTIONS.ADD_CONTACT,
     }
   }
 
-  public static addContacts(contacts: Contact[]): AddContactsAction {
+  public static addContacts(contacts: IContact[]): IAddContactsAction {
     return {
       payload: contacts,
       type: Store.ACTIONS.ADD_CONTACTS,
@@ -107,8 +120,8 @@ class Store {
   }
 
   public static removeMyContact(
-    address: MyIdentity['identity']['address']
-  ): RemoveContactAction {
+    address: IMyIdentity['identity']['address']
+  ): IRemoveContactAction {
     return {
       payload: address,
       type: Store.ACTIONS.REMOVE_CONTACT,
@@ -117,7 +130,10 @@ class Store {
 
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
-      contacts: Immutable.Map<Contact['publicIdentity']['address'], Contact>(),
+      contacts: Immutable.Map<
+        IContact['publicIdentity']['address'],
+        IContact
+      >(),
     } as State)(obj)
   }
 
@@ -128,18 +144,7 @@ class Store {
   }
 }
 
-const arrayToMap = (
-  contactsArray: Contact[]
-): Immutable.Map<Contact['publicIdentity']['address'], Contact> => {
-  const contacts: { [address: string]: Contact } = {}
-  contactsArray.forEach((contact: Contact) => {
-    const { address } = contact.publicIdentity
-    contacts[address] = contact
-  })
-  return Immutable.Map(contacts)
-}
-
-const _getContacts = (state: ReduxState) => {
+const getStateContacts = (state: ReduxState): IContact[] => {
   return state.contacts
     .get('contacts')
     .toList()
@@ -147,32 +152,22 @@ const _getContacts = (state: ReduxState) => {
 }
 
 const getContacts = createSelector(
-  [_getContacts],
-  (contacts: Contact[]) => contacts
+  [getStateContacts],
+  (contacts: IContact[]) => contacts
 )
 
-const getMyContacts = createSelector(
-  [getContacts],
-  (contacts: Contact[]) =>
-    contacts.filter((contact: Contact) => contact.metaData.addedAt)
+const getMyContacts = createSelector([getContacts], (contacts: IContact[]) =>
+  contacts.filter((contact: IContact) => contact.metaData.addedAt)
 )
 
-const _getContact = (
+const getStateContact = (
   state: ReduxState,
-  address: Contact['publicIdentity']['address']
-) => state.contacts.get('contacts').get(address)
+  address: IContact['publicIdentity']['address']
+): IContact | undefined => state.contacts.get('contacts').get(address)
 
 const getContact = createSelector(
-  [_getContact],
-  (contact: Contact) => contact
+  [getStateContact],
+  (contact: IContact) => contact
 )
 
-export {
-  Store,
-  ImmutableState,
-  SerializedState,
-  Action,
-  getContacts,
-  getContact,
-  getMyContacts,
-}
+export { Store, getContacts, getContact, getMyContacts }

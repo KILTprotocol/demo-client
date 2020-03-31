@@ -7,19 +7,28 @@ import MyClaimCreateView from '../../components/MyClaimCreateView/MyClaimCreateV
 
 type Props = RouteComponentProps<{
   cTypeHash: sdk.ICType['hash']
-}> & {}
+}>
 
-type State = {}
-
-class ClaimCreate extends Component<Props, State> {
+class ClaimCreate extends Component<Props> {
   constructor(props: Props) {
     super(props)
     this.claimCreated = this.claimCreated.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
   }
 
-  public render() {
-    const { cTypeHash } = this.props.match.params
+  private claimCreated(): void {
+    const { history } = this.props
+    history.push('/claim')
+  }
+
+  private handleCancel(): void {
+    const { history } = this.props
+    history.push('/claim')
+  }
+
+  public render(): '' | JSX.Element {
+    const { match } = this.props
+    const { cTypeHash } = match.params
 
     return (
       cTypeHash && (
@@ -30,16 +39,6 @@ class ClaimCreate extends Component<Props, State> {
         />
       )
     )
-  }
-
-  private claimCreated() {
-    const { history } = this.props
-    history.push('/claim')
-  }
-
-  private handleCancel() {
-    const { history } = this.props
-    history.push('/claim')
   }
 }
 

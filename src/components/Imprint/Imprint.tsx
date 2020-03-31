@@ -1,8 +1,8 @@
-import * as React from 'react'
+import React from 'react'
 
 import Mail from '../Mail/Mail'
 
-const Imprint = () => {
+const Imprint = (): JSX.Element => {
   return (
     <section className="Imprint">
       <h1>Imprint</h1>
@@ -19,7 +19,7 @@ const Imprint = () => {
         <br />
         Contact: Ingo Rübe
         <br />
-        <Mail mail={'info@botlabs.org'} />
+        <Mail mail="info@botlabs.org" />
         <br />
         <br />
         [Requirements according to § 5 TMG (Germany)]

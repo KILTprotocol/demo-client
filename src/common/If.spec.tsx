@@ -1,4 +1,5 @@
-import * as React from 'react'
+/* eslint-disable react/jsx-boolean-value */
+import React from 'react'
 import * as Renderer from 'react-test-renderer'
 import If from './If'
 

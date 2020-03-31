@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { ComponentType } from 'react'
-import { connect } from 'react-redux'
+import React, { ComponentType } from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 
 import Loading from '../components/Loading/Loading'
 import NoIdentities from '../components/NoIdentities/NoIdentities'
@@ -8,16 +7,19 @@ import NoSelectedIdentity from '../components/NoSelectedIdentity/NoSelectedIdent
 import * as Wallet from '../state/ducks/Wallet'
 import { State as ReduxState } from '../state/PersistentStore'
 
-type Props = {
+type StateProps = {
   identities?: Wallet.Entry[]
   selectedIdentity?: Wallet.Entry
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+type Props = StateProps
+
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   identities: Wallet.getAllIdentities(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const requiresIdentity = (
   WrappedComponent: ComponentType,
   additionalProps?: { [key: string]: any }

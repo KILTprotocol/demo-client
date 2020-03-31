@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { ChangeEvent } from 'react'
+import React, { ChangeEvent } from 'react'
 
 type Props = {
   autoFocus?: boolean
@@ -17,13 +16,13 @@ type Props = {
 type State = {}
 
 class Input extends React.Component<Props, State> {
+  private inputElement: HTMLInputElement | null
+
   public static defaultProps = {
     type: 'text',
   }
 
-  private inputElement: HTMLInputElement | null
-
-  public componentDidMount() {
+  public componentDidMount(): void {
     const { autoFocus } = this.props
 
     if (autoFocus && this.inputElement) {
@@ -31,7 +30,15 @@ class Input extends React.Component<Props, State> {
     }
   }
 
-  public render() {
+  private onKeyUp(event: React.KeyboardEvent<HTMLInputElement>): void {
+    const { onSubmit } = this.props
+
+    if (onSubmit && event.keyCode === 13) {
+      onSubmit()
+    }
+  }
+
+  public render(): JSX.Element {
     const {
       className,
       id,
@@ -64,18 +71,9 @@ class Input extends React.Component<Props, State> {
 
     switch (type) {
       case 'number':
-        const props = { ...baseProps, min, max }
-        return <input {...props} />
+        return <input {...baseProps} min={min} max={max} />
       default:
         return <input {...baseProps} />
-    }
-  }
-
-  private onKeyUp(event: React.KeyboardEvent<HTMLInputElement>) {
-    const { onSubmit } = this.props
-
-    if (onSubmit && event.keyCode === 13) {
-      onSubmit()
     }
   }
 }

@@ -5,17 +5,14 @@ import Kilt, {
   IAttestedClaim,
   Identity,
 } from '@kiltprotocol/sdk-js'
-import moment from 'moment'
 import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAttestedClaims'
 
 import * as Attestations from '../state/ducks/Attestations'
 import * as Claims from '../state/ducks/Claims'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
-import BlockchainService from './BlockchainService'
 import ErrorService from './ErrorService'
-import errorService from './ErrorService'
-import { notifySuccess, notifyFailure, notifyError } from './FeedbackService'
+import { notifySuccess, notifyError } from './FeedbackService'
 
 class AttestationService {
   /**
@@ -28,7 +25,7 @@ class AttestationService {
   public static async attestClaim(
     requestForAttestation: IRequestForAttestation
   ): Promise<AttestedClaim> {
-    const selectedIdentity = await AttestationService.getIdentity()
+    const selectedIdentity = AttestationService.getIdentity()
 
     if (!selectedIdentity) {
       throw new Error('No identity selected')
@@ -50,7 +47,7 @@ class AttestationService {
     try {
       await attestation.store(selectedIdentity)
     } catch (error) {
-      errorService.log({
+      ErrorService.log({
         error,
         message: 'Error storing attestation on blockchain',
         origin: 'AttestationService.attestClaim()',
@@ -65,7 +62,7 @@ class AttestationService {
     iAttestation: IAttestation
   ): Promise<void> {
     const attestation = Kilt.Attestation.fromAttestation(iAttestation)
-    const selectedIdentity = await AttestationService.getIdentity()
+    const selectedIdentity = AttestationService.getIdentity()
 
     if (!selectedIdentity) {
       throw new Error('No identity selected')
@@ -77,7 +74,7 @@ class AttestationService {
         Attestations.Store.revokeAttestation(attestation.claimHash)
       )
     } catch (error) {
-      errorService.log({
+      ErrorService.log({
         error,
         message: 'Could not revoke Attestation',
         origin: 'AttestationService.revokeAttestation()',
@@ -87,8 +84,10 @@ class AttestationService {
     }
   }
 
-  public static async revokeByClaimHash(claimHash: IAttestation['claimHash']) {
-    const selectedIdentity = await AttestationService.getIdentity()
+  public static revokeByClaimHash(
+    claimHash: IAttestation['claimHash']
+  ): Promise<void> {
+    const selectedIdentity = AttestationService.getIdentity()
 
     return Kilt.Attestation.revoke(claimHash, selectedIdentity)
       .then(() => {
@@ -111,19 +110,22 @@ class AttestationService {
   public static async verifyAttestatedClaim(
     attestedClaim: IAttestedClaim
   ): Promise<boolean> {
-    const _attestedClaim = Kilt.AttestedClaim.fromAttestedClaim(attestedClaim)
-    return _attestedClaim.verify()
+    const initialisedAttestedClaim = Kilt.AttestedClaim.fromAttestedClaim(
+      attestedClaim
+    )
+    return initialisedAttestedClaim.verify()
   }
 
   public static async verifyAttestation(
     attestation: IAttestation
   ): Promise<boolean> {
-    const _attestation = Kilt.Attestation.fromAttestation(attestation)
-    return _attestation.verify()
+    const initialisedAttestation = Kilt.Attestation.fromAttestation(attestation)
+    return initialisedAttestation.verify()
   }
 
   public static saveInStore(attestationEntry: Attestations.Entry): void {
-    attestationEntry.created = Date.now()
+    const newEntry = attestationEntry
+    newEntry.created = Date.now()
     persistentStore.store.dispatch(
       Attestations.Store.saveAttestation(attestationEntry)
     )
@@ -141,8 +143,7 @@ class AttestationService {
   ): string[] {
     const propertyNames: string[] = Object.keys(claimEntry.claim.contents)
     const excludedProperties = propertyNames.filter(
-      (propertyName: string) =>
-        selectedClaimProperties.indexOf(propertyName) === -1
+      (propertyName: string) => !selectedClaimProperties.includes(propertyName)
     )
     return excludedProperties
   }
@@ -174,8 +175,8 @@ class AttestationService {
     return attestedClaims
   }
 
-  private static async getIdentity(): Promise<Identity> {
-    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
+  private static getIdentity(): Identity {
+    const selectedIdentity = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
     ).identity
     return selectedIdentity

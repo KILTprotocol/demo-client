@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
 import { DelegationsTreeNode } from '../components/DelegationNode/DelegationNode'
-import { MyDelegation } from '../state/ducks/Delegations'
+import { IMyDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
@@ -15,7 +15,7 @@ class DelegationsService {
     return DelegationsService.storeRootOnChain(delegationRoot).then(() => {
       const { account, cTypeHash, id } = delegationRoot
 
-      const myDelegation: MyDelegation = {
+      const myDelegation: IMyDelegation = {
         account,
         cTypeHash,
         id,
@@ -31,14 +31,14 @@ class DelegationsService {
   public static async storeOnChain(
     delegation: sdk.DelegationNode,
     signature: string
-  ) {
+  ): Promise<sdk.TxStatus> {
     const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
     return delegation.store(selectedIdentity, signature)
   }
 
-  public static store(delegation: MyDelegation) {
+  public static store(delegation: IMyDelegation): void {
     PersistentStore.store.dispatch(
       Delegations.Store.saveDelegationAction(delegation)
     )
@@ -64,7 +64,7 @@ class DelegationsService {
   public static async lookupRootNodeById(
     rootNodeId: sdk.IDelegationRootNode['id']
   ): Promise<sdk.DelegationRootNode | null> {
-    return await sdk.DelegationRootNode.query(rootNodeId)
+    return sdk.DelegationRootNode.query(rootNodeId)
   }
 
   /**
@@ -77,58 +77,45 @@ class DelegationsService {
   ): Promise<sdk.DelegationRootNode | null> {
     const node = await sdk.DelegationNode.query(delegationNodeId)
     if (node) {
-      return await node.getRoot()
+      return node.getRoot()
     }
-    return await DelegationsService.lookupRootNodeById(delegationNodeId)
+    return DelegationsService.lookupRootNodeById(delegationNodeId)
   }
 
   public static async importDelegation(
     delegationNodeId: sdk.IDelegationBaseNode['id'],
     alias: string,
     isPCR?: boolean
-  ): Promise<MyDelegation | null> {
-    return new Promise<MyDelegation | null>(async (resolve, reject) => {
-      try {
-        const delegation = await DelegationsService.lookupNodeById(
-          delegationNodeId
-        )
-        if (delegation) {
-          const root = await delegation.getRoot()
-          const myDelegation: Delegations.MyDelegation = {
-            account: delegation.account,
-            cTypeHash: root && root.cTypeHash,
-            id: delegation.id,
-            isPCR,
-            metaData: { alias },
-            parentId: delegation.parentId,
-            permissions: delegation.permissions,
-            revoked: false,
-            rootId: delegation.rootId,
-            type: Delegations.DelegationType.Node,
-          }
-          DelegationsService.store(myDelegation)
-          resolve(myDelegation)
-        } else {
-          resolve(undefined)
-        }
-      } catch (error) {
-        reject(error)
+  ): Promise<IMyDelegation | null> {
+    const delegation = await DelegationsService.lookupNodeById(delegationNodeId)
+    if (delegation) {
+      const root = await delegation.getRoot()
+      const myDelegation: Delegations.IMyDelegation = {
+        account: delegation.account,
+        cTypeHash: root && root.cTypeHash,
+        id: delegation.id,
+        isPCR,
+        metaData: { alias },
+        parentId: delegation.parentId,
+        permissions: delegation.permissions,
+        revoked: false,
+        rootId: delegation.rootId,
+        type: Delegations.DelegationType.Node,
       }
-    })
+      DelegationsService.store(myDelegation)
+      return myDelegation
+    }
+    return null
   }
 
   public static async revoke(
     node: sdk.DelegationBaseNode,
     identity: sdk.Identity
-  ) {
-    try {
-      await node.revoke(identity)
-      PersistentStore.store.dispatch(
-        Delegations.Store.revokeDelegationAction(node.id)
-      )
-    } catch (error) {
-      throw error
-    }
+  ): Promise<void> {
+    await node.revoke(identity)
+    PersistentStore.store.dispatch(
+      Delegations.Store.revokeDelegationAction(node.id)
+    )
   }
 
   public static async resolveParent(
@@ -138,15 +125,16 @@ class DelegationsService {
 
     if (!parentDelegation) {
       return currentNode
-    } else {
-      return this.resolveParent({
-        childNodes: [currentNode],
-        delegation: parentDelegation,
-      } as DelegationsTreeNode)
     }
+    return this.resolveParent({
+      childNodes: [currentNode],
+      delegation: parentDelegation,
+    } as DelegationsTreeNode)
   }
 
-  private static async storeRootOnChain(delegation: sdk.DelegationRootNode) {
+  private static async storeRootOnChain(
+    delegation: sdk.DelegationRootNode
+  ): Promise<sdk.TxStatus> {
     const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity

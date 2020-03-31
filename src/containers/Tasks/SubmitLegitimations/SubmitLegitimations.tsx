@@ -1,17 +1,17 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 import * as common from 'schema-based-json-editor'
 
 import SchemaEditor from '../../../components/SchemaEditor/SchemaEditor'
 import SelectAttestedClaims from '../../../components/SelectAttestedClaims/SelectAttestedClaims'
 import SelectDelegations from '../../../components/SelectDelegations/SelectDelegations'
 import withSelectAttestedClaims, {
-  InjectedProps as InjectedSelectProps,
+  IInjectedProps as InjectedSelectProps,
 } from '../../../components/withSelectAttestedClaims/withSelectAttestedClaims'
 import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import CTypeRepository from '../../../services/CtypeRepository'
-import { MyDelegation } from '../../../state/ducks/Delegations'
-import { Contact } from '../../../types/Contact'
+import { IMyDelegation } from '../../../state/ducks/Delegations'
+import { IContact } from '../../../types/Contact'
 import { ICTypeWithMetadata } from '../../../types/Ctype'
 import { getClaimInputModel } from '../../../utils/CtypeUtils'
 
@@ -19,7 +19,7 @@ import './SubmitLegitimations.scss'
 
 export type SubmitLegitimationsProps = {
   claim: sdk.IPartialClaim
-  receiverAddresses: Array<Contact['publicIdentity']['address']>
+  receiverAddresses: Array<IContact['publicIdentity']['address']>
 
   enablePreFilledClaim?: boolean
 
@@ -32,7 +32,7 @@ type Props = InjectedSelectProps & SubmitLegitimationsProps
 type State = {
   claim: sdk.IPartialClaim
   cType?: ICTypeWithMetadata
-  selectedDelegation?: MyDelegation
+  selectedDelegation?: IMyDelegation
   withPreFilledClaim?: boolean
 }
 
@@ -50,7 +50,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
     this.toggleWithPreFilledClaim = this.toggleWithPreFilledClaim.bind(this)
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     const { claim } = this.state
 
     CTypeRepository.findByHash(claim.cTypeHash).then(
@@ -62,7 +62,91 @@ class SubmitLegitimations extends React.Component<Props, State> {
     )
   }
 
-  public render() {
+  private onCancel(): void {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
+  }
+
+  private getPreFilledClaimElement(): JSX.Element {
+    const { cType, withPreFilledClaim } = this.state
+
+    if (cType && withPreFilledClaim) {
+      return (
+        <>
+          <div className="container-actions">
+            <button type="button" onClick={this.toggleWithPreFilledClaim}>
+              Without prefilled claim
+            </button>
+          </div>
+          <SchemaEditor
+            schema={getClaimInputModel(cType) as common.Schema}
+            initialValue={undefined}
+            updateValue={this.updateClaim}
+          />
+        </>
+      )
+    }
+    return (
+      <div className="container-actions">
+        <button type="button" onClick={this.toggleWithPreFilledClaim}>
+          With prefilled claim
+        </button>
+      </div>
+    )
+  }
+
+  private toggleWithPreFilledClaim(): void {
+    const { withPreFilledClaim } = this.state
+    this.setState({
+      withPreFilledClaim: !withPreFilledClaim,
+    })
+  }
+
+  private updateClaim(contents: sdk.IClaim['contents']): void {
+    const { claim } = this.state
+    this.setState({
+      claim: {
+        ...claim,
+        contents: {
+          ...claim.contents,
+          ...contents,
+        },
+      },
+    })
+  }
+
+  private sendClaim(): void {
+    const {
+      getAttestedClaims,
+      enablePreFilledClaim,
+      receiverAddresses,
+      onFinished,
+    } = this.props
+    const { claim, selectedDelegation, withPreFilledClaim } = this.state
+
+    if (enablePreFilledClaim && !withPreFilledClaim) {
+      delete claim.contents
+    }
+
+    AttestationWorkflow.submitLegitimations(
+      claim,
+      getAttestedClaims(),
+      receiverAddresses,
+      selectedDelegation
+    ).then(() => {
+      if (onFinished) {
+        onFinished()
+      }
+    })
+  }
+
+  private changeDelegation(selectedDelegations: IMyDelegation[]): void {
+    this.setState({ selectedDelegation: selectedDelegations[0] })
+  }
+
+  public render(): JSX.Element {
     const {
       claimSelectionData,
       enablePreFilledClaim,
@@ -96,8 +180,11 @@ class SubmitLegitimations extends React.Component<Props, State> {
           </div>
 
           <div className="actions">
-            <button onClick={this.onCancel}>Cancel</button>
+            <button type="button" onClick={this.onCancel}>
+              Cancel
+            </button>
             <button
+              type="button"
               disabled={
                 !Object.keys(claimSelectionData).length && !selectedDelegation
               }
@@ -109,93 +196,6 @@ class SubmitLegitimations extends React.Component<Props, State> {
         </>
       </section>
     )
-  }
-
-  private getPreFilledClaimElement() {
-    const { cType, withPreFilledClaim } = this.state
-
-    if (cType && withPreFilledClaim) {
-      return (
-        <>
-          <div className="container-actions">
-            <button onClick={this.toggleWithPreFilledClaim}>
-              Without prefilled claim
-            </button>
-          </div>
-          <SchemaEditor
-            schema={getClaimInputModel(cType) as common.Schema}
-            initialValue={undefined}
-            updateValue={this.updateClaim}
-          />
-        </>
-      )
-    } else {
-      return (
-        <div className="container-actions">
-          <button onClick={this.toggleWithPreFilledClaim}>
-            With prefilled claim
-          </button>
-        </div>
-      )
-    }
-  }
-
-  private toggleWithPreFilledClaim() {
-    const { withPreFilledClaim } = this.state
-    this.setState({
-      withPreFilledClaim: !withPreFilledClaim,
-    })
-  }
-
-  private updateClaim(contents: sdk.IClaim['contents']) {
-    const { claim } = this.state
-    this.setState({
-      claim: {
-        ...claim,
-        contents: {
-          ...claim.contents,
-          ...contents,
-        },
-      },
-    })
-  }
-
-  private onCancel() {
-    const { onCancel } = this.props
-    if (onCancel) {
-      onCancel()
-    }
-  }
-
-  private sendClaim() {
-    const {
-      getAttestedClaims,
-      enablePreFilledClaim,
-      receiverAddresses,
-      onFinished,
-    } = this.props
-    const { claim, selectedDelegation, withPreFilledClaim } = this.state
-
-    const _claim: sdk.IPartialClaim = claim
-
-    if (enablePreFilledClaim && !withPreFilledClaim) {
-      delete _claim.contents
-    }
-
-    AttestationWorkflow.submitLegitimations(
-      _claim,
-      getAttestedClaims(),
-      receiverAddresses,
-      selectedDelegation
-    ).then(() => {
-      if (onFinished) {
-        onFinished()
-      }
-    })
-  }
-
-  private changeDelegation(selectedDelegations: MyDelegation[]) {
-    this.setState({ selectedDelegation: selectedDelegations[0] })
   }
 }
 

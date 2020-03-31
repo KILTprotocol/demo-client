@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { JSONEditor } from 'react-schema-based-json-editor'
 import * as common from 'schema-based-json-editor'
 
@@ -10,7 +10,11 @@ type Props = {
   updateValue: (value: common.ValueType, _isValid: boolean) => void
 }
 
-const SchemaEditor = ({ schema, initialValue, updateValue }: Props) => {
+const SchemaEditor: React.FC<Props> = ({
+  schema,
+  initialValue,
+  updateValue,
+}) => {
   return (
     <div className="schema-based-json-editor">
       <JSONEditor

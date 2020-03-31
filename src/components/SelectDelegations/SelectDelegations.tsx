@@ -1,11 +1,10 @@
+import React, { ReactNode } from 'react'
 import isEqual from 'lodash/isEqual'
-import * as React from 'react'
-import { ReactNode } from 'react'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 
 import * as Delegations from '../../state/ducks/Delegations'
-import { DelegationType, MyDelegation } from '../../state/ducks/Delegations'
+import { DelegationType, IMyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
@@ -17,34 +16,34 @@ type SelectOption = {
 
 type Props = {
   closeMenuOnSelect?: boolean
-  delegations?: MyDelegation[]
-  defaultValues?: MyDelegation[]
+  delegations?: IMyDelegation[]
+  defaultValues?: IMyDelegation[]
   isMulti?: boolean
   name?: string
   placeholder?: string
   type?: DelegationType
-  filter?: (delegation: MyDelegation) => boolean
+  filter?: (delegation: IMyDelegation) => boolean
 
-  onChange?: (selectedDelegations: MyDelegation[]) => void
+  onChange?: (selectedDelegations: IMyDelegation[]) => void
   onMenuOpen?: () => void
   onMenuClose?: () => void
 }
 
 type State = {
-  delegations: MyDelegation[]
+  delegations: IMyDelegation[]
 }
 
 class SelectDelegations extends React.Component<Props, State> {
-  public static defaultProps = {
-    closeMenuOnSelect: true,
-    isMulti: false,
-  }
-
   private filterConfig: Config = {
     ignoreAccents: true,
     ignoreCase: true,
     matchFrom: 'any',
     trim: true,
+  }
+
+  public static defaultProps = {
+    closeMenuOnSelect: true,
+    isMulti: false,
   }
 
   constructor(props: Props) {
@@ -56,17 +55,91 @@ class SelectDelegations extends React.Component<Props, State> {
     this.onChange = this.onChange.bind(this)
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     this.setDelegations()
   }
 
-  public componentDidUpdate(prevProps: Props) {
-    if (!isEqual(prevProps.delegations, this.props.delegations)) {
+  public componentDidUpdate(prevProps: Props): void {
+    const { delegations } = this.props
+    if (!isEqual(prevProps.delegations, delegations)) {
       this.setDelegations()
     }
   }
 
-  public render() {
+  private onChange(selectedOptions: SelectOption | SelectOption[]): void {
+    const { onChange } = this.props
+    const { delegations } = this.state
+
+    // normalize selectedOptions to Array
+    const selectedOptionValues: Array<SelectOption['value']> = (Array.isArray(
+      selectedOptions
+    )
+      ? selectedOptions
+      : [selectedOptions]
+    ).map((selectedOption: SelectOption) => selectedOption.baseValue)
+
+    const selectedDelegations: IMyDelegation[] = delegations.filter(
+      (delegation: IMyDelegation) =>
+        selectedOptionValues.includes(delegation.id)
+    )
+
+    if (onChange) {
+      onChange(selectedDelegations)
+    }
+  }
+
+  private static getOption(delegation: IMyDelegation): SelectOption {
+    // TODO: refactor when sdk can resolve root Node to a given node
+    const { cTypeHash } = delegation
+    return {
+      baseValue: delegation.id,
+      label: (
+        <span>
+          {delegation.metaData.alias}
+          <CTypePresentation cTypeHash={cTypeHash} inline />
+        </span>
+      ),
+      value: `${delegation.metaData.alias} ${delegation.id}`,
+    }
+  }
+
+  private setDelegations(): void {
+    const { filter } = this.props
+    const { delegations } = this.props
+
+    let newDelegations = delegations
+    if (!newDelegations) {
+      const { type } = this.props
+      switch (type) {
+        case DelegationType.Root:
+          newDelegations = Delegations.getRootDelegations(
+            PersistentStore.store.getState()
+          )
+          break
+        case DelegationType.Node:
+          newDelegations = Delegations.getDelegations(
+            PersistentStore.store.getState()
+          )
+          break
+        default:
+          newDelegations = Delegations.getAllDelegations(
+            PersistentStore.store.getState()
+          )
+      }
+
+      if (filter) {
+        newDelegations = newDelegations.filter((delegation: IMyDelegation) =>
+          filter(delegation)
+        )
+      }
+    }
+
+    this.setState({
+      delegations: newDelegations,
+    })
+  }
+
+  public render(): JSX.Element {
     const {
       closeMenuOnSelect,
       defaultValues,
@@ -80,24 +153,24 @@ class SelectDelegations extends React.Component<Props, State> {
     const { delegations } = this.state
 
     const options: SelectOption[] = delegations.map(delegation =>
-      this.getOption(delegation)
+      SelectDelegations.getOption(delegation)
     )
 
     let defaultOptions: SelectOption[] = []
     if (defaultValues) {
       defaultOptions = defaultValues.map(delegation =>
-        this.getOption(delegation)
+        SelectDelegations.getOption(delegation)
       )
     }
 
-    const _placeholder = `Select delegation${isMulti ? 's' : ''}…`
+    const placeholderFallback = `Select delegation${isMulti ? 's' : ''}…`
 
     return !!delegations && !!delegations.length ? (
       <Select
         className="react-select-container"
         classNamePrefix="react-select"
         isClearable={isMulti && delegations.length > 1}
-        isSearchable={true}
+        isSearchable
         isMulti={isMulti && delegations.length > 1}
         closeMenuOnSelect={closeMenuOnSelect}
         name={name}
@@ -106,85 +179,12 @@ class SelectDelegations extends React.Component<Props, State> {
         onChange={this.onChange}
         onMenuOpen={onMenuOpen}
         onMenuClose={onMenuClose}
-        placeholder={placeholder || _placeholder}
+        placeholder={placeholder || placeholderFallback}
         filterOption={createFilter(this.filterConfig)}
       />
     ) : (
       <div>No eligible delegations found.</div>
     )
-  }
-
-  private setDelegations() {
-    const { filter } = this.props
-    const { delegations } = this.props
-
-    let _delegations = delegations
-    if (!_delegations) {
-      const { type } = this.props
-      switch (type) {
-        case DelegationType.Root:
-          _delegations = Delegations.getRootDelegations(
-            PersistentStore.store.getState()
-          )
-          break
-        case DelegationType.Node:
-          _delegations = Delegations.getDelegations(
-            PersistentStore.store.getState()
-          )
-          break
-        default:
-          _delegations = Delegations.getAllDelegations(
-            PersistentStore.store.getState()
-          )
-      }
-
-      if (filter) {
-        _delegations = _delegations.filter((delegation: MyDelegation) =>
-          filter(delegation)
-        )
-      }
-    }
-
-    this.setState({
-      delegations: _delegations,
-    })
-  }
-
-  private getOption(delegation: MyDelegation): SelectOption {
-    // TODO: refactor when sdk can resolve root Node to a given node
-    const cTypeHash = delegation.cTypeHash
-    return {
-      baseValue: delegation.id,
-      label: (
-        <span>
-          {delegation.metaData.alias}
-          <CTypePresentation cTypeHash={cTypeHash} inline={true} />
-        </span>
-      ),
-      value: `${delegation.metaData.alias} ${delegation.id}`,
-    }
-  }
-
-  private onChange(selectedOptions: SelectOption | SelectOption[]) {
-    const { onChange } = this.props
-    const { delegations } = this.state
-
-    // normalize selectedOptions to Array
-    const _selectedOptions: Array<SelectOption['value']> = (Array.isArray(
-      selectedOptions
-    )
-      ? selectedOptions
-      : [selectedOptions]
-    ).map((selectedOption: SelectOption) => selectedOption.baseValue)
-
-    const selectedDelegations: MyDelegation[] = delegations.filter(
-      (delegation: MyDelegation) =>
-        _selectedOptions.indexOf(delegation.id) !== -1
-    )
-
-    if (onChange) {
-      onChange(selectedDelegations)
-    }
   }
 }
 

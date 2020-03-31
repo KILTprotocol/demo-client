@@ -1,20 +1,20 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 
 import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'
 import SelectAttestedClaims from '../../../components/SelectAttestedClaims/SelectAttestedClaims'
 import withSelectAttestedClaims, {
-  InjectedProps as InjectedSelectProps,
+  IInjectedProps as InjectedSelectProps,
 } from '../../../components/withSelectAttestedClaims/withSelectAttestedClaims'
 import AttestationWorkflow from '../../../services/AttestationWorkflow'
-import { MyDelegation } from '../../../state/ducks/Delegations'
-import { Contact } from '../../../types/Contact'
+import { IMyDelegation } from '../../../state/ducks/Delegations'
+import { IContact } from '../../../types/Contact'
 
 import './SubmitClaimsForCType.scss'
 
 export type SubmitClaimsForCTypeProps = {
   cTypeHashes: Array<sdk.ICType['hash']>
-  receiverAddresses: Array<Contact['publicIdentity']['address']>
+  receiverAddresses: Array<IContact['publicIdentity']['address']>
 
   onFinished?: () => void
   onCancel?: () => void
@@ -23,7 +23,7 @@ export type SubmitClaimsForCTypeProps = {
 type Props = InjectedSelectProps & SubmitClaimsForCTypeProps
 
 type State = {
-  selectedDelegation?: MyDelegation
+  selectedDelegation?: IMyDelegation
 }
 
 class SubmitClaimsForCType extends React.Component<Props, State> {
@@ -34,7 +34,27 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
     this.onCancel = this.onCancel.bind(this)
   }
 
-  public render() {
+  private onCancel(): void {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
+  }
+
+  private sendClaim(): void {
+    const { receiverAddresses, onFinished, getAttestedClaims } = this.props
+
+    AttestationWorkflow.submitClaimsForCTypes(
+      getAttestedClaims(),
+      receiverAddresses
+    ).then(() => {
+      if (onFinished) {
+        onFinished()
+      }
+    })
+  }
+
+  public render(): JSX.Element {
     const {
       cTypeHashes,
       claimSelectionData,
@@ -50,8 +70,11 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
           <SelectAttestedClaims cTypeHashes={cTypeHashes} onChange={onChange} />
 
           <div className="actions">
-            <button onClick={this.onCancel}>Cancel</button>
+            <button type="button" onClick={this.onCancel}>
+              Cancel
+            </button>
             <button
+              type="button"
               disabled={!Object.keys(claimSelectionData).length}
               onClick={this.sendClaim}
             >
@@ -61,26 +84,6 @@ class SubmitClaimsForCType extends React.Component<Props, State> {
         </section>
       </section>
     )
-  }
-
-  private sendClaim() {
-    const { receiverAddresses, onFinished, getAttestedClaims } = this.props
-
-    AttestationWorkflow.submitClaimsForCTypes(
-      getAttestedClaims(),
-      receiverAddresses
-    ).then(() => {
-      if (onFinished) {
-        onFinished()
-      }
-    })
-  }
-
-  private onCancel() {
-    const { onCancel } = this.props
-    if (onCancel) {
-      onCancel()
-    }
   }
 }
 

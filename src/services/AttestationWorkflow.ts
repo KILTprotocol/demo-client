@@ -7,12 +7,11 @@ import {
   MessageBodyType,
 } from '@kiltprotocol/sdk-js'
 
-import AttestationService from '../services/AttestationService'
-import * as Attestations from '../state/ducks/Attestations'
-import { MyDelegation } from '../state/ducks/Delegations'
+import AttestationService from './AttestationService'
+import { IMyDelegation } from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
-import { Contact } from '../types/Contact'
+import { IContact } from '../types/Contact'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
 
@@ -25,14 +24,13 @@ class AttestationWorkflow {
    */
   public static async requestLegitimations(
     claims: IPartialClaim[],
-    receiverAddresses: Array<Contact['publicIdentity']['address']>
+    receiverAddresses: Array<IContact['publicIdentity']['address']>
   ): Promise<void> {
-    const messageBodies = claims.map(
-      (claim: IPartialClaim) =>
-        ({
-          content: claim,
-          type: MessageBodyType.REQUEST_TERMS,
-        } as IRequestTerms)
+    const messageBodies: IRequestTerms[] = claims.map(
+      (claim: IPartialClaim) => ({
+        content: claim,
+        type: MessageBodyType.REQUEST_TERMS,
+      })
     )
 
     return MessageRepository.multiSendToAddresses(
@@ -54,8 +52,8 @@ class AttestationWorkflow {
   public static async submitLegitimations(
     claim: IPartialClaim,
     legitimations: sdk.IAttestedClaim[],
-    receiverAddresses: Array<Contact['publicIdentity']['address']>,
-    delegation?: MyDelegation
+    receiverAddresses: Array<IContact['publicIdentity']['address']>,
+    delegation?: IMyDelegation
   ): Promise<void> {
     const messageBody: sdk.ISubmitTerms = {
       content: { claim, legitimations, delegationId: undefined },
@@ -78,7 +76,7 @@ class AttestationWorkflow {
    */
   public static async submitClaimsForCTypes(
     attestedClaims: sdk.IAttestedClaim[],
-    receiverAddresses: Array<Contact['publicIdentity']['address']>
+    receiverAddresses: Array<IContact['publicIdentity']['address']>
   ): Promise<void> {
     const messageBody: sdk.ISubmitClaimsForCTypes = {
       content: attestedClaims,
@@ -99,23 +97,23 @@ class AttestationWorkflow {
    */
   public static async requestAttestationForClaim(
     claim: sdk.IClaim,
-    attesterAddresses: Array<Contact['publicIdentity']['address']>,
+    attesterAddresses: Array<IContact['publicIdentity']['address']>,
     legitimations: sdk.AttestedClaim[] = [],
     delegationId: sdk.IDelegationNode['id'] | null = null
   ): Promise<void> {
-    const identity: sdk.Identity = Wallet.getSelectedIdentity(
+    const { identity } = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
-    ).identity
-    const requestForAttestation: sdk.IRequestForAttestation = sdk.RequestForAttestation.fromClaimAndIdentity(
+    )
+    const requestForAttestation = sdk.RequestForAttestation.fromClaimAndIdentity(
       claim,
       identity,
       legitimations,
       delegationId
     )
-    const messageBody = {
+    const messageBody: IRequestAttestationForClaim = {
       content: { requestForAttestation },
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
-    } as IRequestAttestationForClaim
+    }
 
     return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
   }
@@ -130,15 +128,13 @@ class AttestationWorkflow {
    */
   public static async approveAndSubmitAttestationForClaim(
     requestForAttestation: sdk.IRequestForAttestation,
-    claimerAddress: Contact['publicIdentity']['address']
+    claimerAddress: IContact['publicIdentity']['address']
   ): Promise<void> {
-    const claimer: Contact | void = await ContactRepository.findByAddress(
-      claimerAddress
-    )
+    const claimer = await ContactRepository.findByAddress(claimerAddress)
     if (!claimer) {
       throw new Error('claimer not found')
     }
-    const attestedClaim: sdk.AttestedClaim = await AttestationService.attestClaim(
+    const attestedClaim = await AttestationService.attestClaim(
       requestForAttestation
     )
 
@@ -149,7 +145,7 @@ class AttestationWorkflow {
       claimerAddress: attestedClaim.request.claim.owner,
       claimerAlias: claimer.metaData.name,
       created: Date.now(),
-    } as Attestations.Entry)
+    })
 
     // build 'claim attested' message and send to claimer
     const attestationMessageBody: ISubmitAttestationForClaim = {
@@ -168,7 +164,7 @@ class AttestationWorkflow {
    */
   public static async informCreateDelegation(
     delegationNodeId: sdk.DelegationNode['id'],
-    delegateAddress: Contact['publicIdentity']['address'],
+    delegateAddress: IContact['publicIdentity']['address'],
     delegationIsPCR: sdk.ISubmitAcceptDelegation['content']['delegationData']['isPCR']
   ): Promise<void> {
     const messageBody: sdk.IInformCreateDelegation = {

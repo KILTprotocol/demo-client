@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import CTypeRepository from '../../services/CtypeRepository'
 
@@ -23,21 +23,21 @@ class CtypeDetailView extends React.Component<Props, State> {
     this.state = {}
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     const { cTypeHash } = this.props
     CTypeRepository.findByHash(cTypeHash).then((_cType: ICTypeWithMetadata) => {
       this.setState({ cType: _cType })
     })
   }
 
-  public render() {
+  public render(): JSX.Element {
     const { cTypeHash } = this.props
     const { cType } = this.state
 
     return (
       <section className="CtypeDetailView">
         {cType ? (
-          <React.Fragment>
+          <>
             <div className="attributes">
               <div>
                 <label>Title</label>
@@ -46,10 +46,12 @@ class CtypeDetailView extends React.Component<Props, State> {
               <div>
                 <label>Author</label>
                 <div>
-                  <ContactPresentation
-                    address={cType.cType.owner!}
-                    interactive={true}
-                  />
+                  {cType.cType.owner && (
+                    <ContactPresentation
+                      address={cType.cType.owner}
+                      interactive
+                    />
+                  )}
                 </div>
               </div>
               <div>
@@ -70,7 +72,7 @@ class CtypeDetailView extends React.Component<Props, State> {
               <Link to="/cType">Cancel</Link>
               <Link to={`/claim/new/${cTypeHash}`}>New Claim</Link>
             </div>
-          </React.Fragment>
+          </>
         ) : (
           <div>Given CTYPE key is not valid.</div>
         )}

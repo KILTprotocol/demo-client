@@ -1,6 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import CTypeEditor from '../../components/CtypeEditor/CtypeEditor'
 import CTypeRepository from '../../services/CtypeRepository'
@@ -16,9 +16,11 @@ import { BlockUi } from '../../types/UserFeedback'
 import './CtypeCreate.scss'
 import { fromInputModel } from '../../utils/CtypeUtils'
 
-type Props = RouteComponentProps<{}> & {
+type StateProps = {
   selectedIdentity?: Wallet.Entry
 }
+
+type Props = RouteComponentProps & StateProps
 
 type State = {
   connected: boolean
@@ -39,11 +41,18 @@ class CTypeCreate extends React.Component<Props, State> {
     this.cancel = this.cancel.bind(this)
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     this.connect()
   }
 
-  public async connect() {
+  private updateCType = (cType: string, isValid: boolean): void => {
+    this.setState({
+      cType,
+      isValid,
+    })
+  }
+
+  public connect(): void {
     // TODO: test unmount and host change
     // TODO: test error handling
     const blockUi: BlockUi = FeedbackService.addBlockUi({
@@ -53,18 +62,21 @@ class CTypeCreate extends React.Component<Props, State> {
     blockUi.remove()
   }
 
-  public async submit() {
-    if (
-      this.props.selectedIdentity &&
-      this.state.connected &&
-      this.state.isValid
-    ) {
-      const { selectedIdentity, history } = this.props
+  private cancel(): void {
+    const { history } = this.props
+    // TODO: goto CTYPE list or previous screen?
+    history.push('/cType')
+  }
+
+  public submit(): void {
+    const { selectedIdentity, history } = this.props
+    const { connected, isValid, cType: stateCtype } = this.state
+    if (selectedIdentity && connected && isValid) {
       let cType: sdk.CType
       let metadata: sdk.ICTypeMetadata
       try {
         const inputICTypeWithMetadata: ICTypeWithMetadata = fromInputModel(
-          this.state.cType
+          stateCtype
         )
         cType = sdk.CType.fromCType(inputICTypeWithMetadata.cType)
         metadata = inputICTypeWithMetadata.metaData
@@ -89,7 +101,7 @@ class CTypeCreate extends React.Component<Props, State> {
       }
       cType
         .store(selectedIdentity.identity)
-        .then((value: any) => {
+        .then(() => {
           blockUi.updateMessage(
             `CTYPE stored on blockchain,\nnow registering CTYPE`
           ) // TODO: add onrejected when sdk provides error handling
@@ -125,36 +137,25 @@ class CTypeCreate extends React.Component<Props, State> {
     }
   }
 
-  public render() {
+  public render(): JSX.Element {
+    const { cType, connected, isValid } = this.state
     return (
       <section className="CTypeCreate">
         <h1 className="App-title">Create CTYPE</h1>
         <CTypeEditor
-          cType={this.state.cType}
+          cType={cType}
           updateCType={this.updateCType}
           submit={this.submit}
           cancel={this.cancel}
-          connected={this.state.connected}
-          isValid={this.state.isValid}
+          connected={connected}
+          isValid={isValid}
         />
       </section>
     )
   }
-
-  private cancel() {
-    // TODO: goto CTYPE list or previous screen?
-    this.props.history.push('/cType')
-  }
-
-  private updateCType = (cType: string, isValid: boolean) => {
-    this.setState({
-      cType,
-      isValid,
-    })
-  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

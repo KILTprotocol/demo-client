@@ -1,5 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import React, { Component } from 'react'
+import React from 'react'
 
 import Code from '../Code/Code'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -13,42 +13,32 @@ type Props = {
 
 type State = {}
 
-class ClaimDetailView extends Component<Props, State> {
-  public render() {
-    const { claim }: Props = this.props
-
-    return (
-      <section className="ClaimDetailView">
-        <h2>Claim details</h2>
+const ClaimDetailView: React.FC<Props> = ({ claim }) => (
+  <section className="ClaimDetailView">
+    <h2>Claim details</h2>
+    <div>
+      <label>Ctype</label>
+      <div>
+        <CTypePresentation cTypeHash={claim.cTypeHash} linked interactive />
+      </div>
+    </div>
+    {claim.owner && (
+      <div>
+        <label>Owner</label>
         <div>
-          <label>Ctype</label>
-          <div>
-            <CTypePresentation
-              cTypeHash={claim.cTypeHash}
-              linked={true}
-              interactive={true}
-            />
-          </div>
+          <ContactPresentation address={claim.owner} interactive />
         </div>
-        {claim.owner && (
-          <div>
-            <label>Owner</label>
-            <div>
-              <ContactPresentation address={claim.owner} interactive={true} />
-            </div>
-          </div>
-        )}
-        {claim.contents && (
-          <div>
-            <label>Contents</label>
-            <div>
-              <Code>{claim.contents}</Code>
-            </div>
-          </div>
-        )}
-      </section>
-    )
-  }
-}
+      </div>
+    )}
+    {claim.contents && (
+      <div>
+        <label>Contents</label>
+        <div>
+          <Code>{claim.contents}</Code>
+        </div>
+      </div>
+    )}
+  </section>
+)
 
 export default ClaimDetailView

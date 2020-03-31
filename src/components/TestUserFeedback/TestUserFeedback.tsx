@@ -1,6 +1,5 @@
-import * as React from 'react'
+import React from 'react'
 import FeedbackService, { notifySuccess } from '../../services/FeedbackService'
-import * as Claims from '../../state/ducks/Claims'
 import { BlockUi, NotificationType } from '../../types/UserFeedback'
 
 type Props = {}
@@ -10,46 +9,13 @@ type State = {
 }
 
 class TestUserFeedback extends React.Component<Props, State> {
-  private notificationTimeout: any
-
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      notificationMessage: '',
-    }
-    this.testNeutral = this.testNeutral.bind(this)
-  }
-
-  public render() {
-    return (
-      <section className="TestUserFeedBack">
-        <h2>Test User Feedback</h2>
-
-        <h4>Block UI</h4>
-        <button onClick={this.testBlockUi}>Test</button>
-
-        <h4>Blocking Modals</h4>
-        <button onClick={this.testBlockingFailure}>Failure</button>
-        <button onClick={this.testBlockingSuccess}>Success</button>
-        <button onClick={this.testBlockingNeutral}>Neutral</button>
-
-        <h4>Notifications</h4>
-        <button onClick={this.testFailure}>Failure</button>
-        <button onClick={this.testSuccess}>Success</button>
-        <button onClick={this.testNeutral}>Neutral</button>
-      </section>
-    )
-  }
-
-  private testBlockUi() {
-    let bu1: BlockUi
-    let bu2: BlockUi
-
-    bu1 = FeedbackService.addBlockUi({
+  private static testBlockUi(): void {
+    const bu1 = FeedbackService.addBlockUi({
       headline: 'UI blocked by Process A',
       message: 'doing something (1/2)',
     })
 
+    let bu2: BlockUi
     setTimeout(() => {
       bu2 = FeedbackService.addBlockUi({ headline: 'UI blocked by Process B' })
     }, 2000)
@@ -75,46 +41,91 @@ class TestUserFeedback extends React.Component<Props, State> {
     }, 8000)
   }
 
-  private testBlockingFailure() {
+  private static testBlockingFailure(): void {
     FeedbackService.addBlockingNotification({ message: 'Example for Failure' })
   }
 
-  private testBlockingSuccess() {
+  private static testBlockingSuccess(): void {
     FeedbackService.addBlockingNotification({
       message: 'Example for Success',
       type: NotificationType.SUCCESS,
     })
   }
 
-  private testBlockingNeutral() {
+  private static testBlockingNeutral(): void {
     FeedbackService.addBlockingNotification({
       message: 'Example for Info',
       type: NotificationType.INFO,
     })
   }
 
-  private testFailure() {
+  private static testFailure(): void {
     FeedbackService.addNotification({
       message: 'Example for Failure',
       type: NotificationType.FAILURE,
     })
   }
 
-  private testSuccess() {
+  private static testSuccess(): void {
     notifySuccess('Example for Success')
   }
 
-  private testNeutral() {
-    const { notificationMessage } = this.state
-    const _notificationMessage = notificationMessage + 'Example for Info '
-    FeedbackService.addNotification({ message: _notificationMessage })
+  private notificationTimeout: number
 
-    this.setState({ notificationMessage: _notificationMessage })
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      notificationMessage: '',
+    }
+    this.testNeutral = this.testNeutral.bind(this)
+  }
+
+  private testNeutral(): void {
+    const { notificationMessage } = this.state
+    const newNotificationMessage = `${notificationMessage}Example for Info `
+    FeedbackService.addNotification({ message: newNotificationMessage })
+
+    this.setState({ notificationMessage: newNotificationMessage })
 
     clearTimeout(this.notificationTimeout)
-    this.notificationTimeout = setTimeout(() => {
+    this.notificationTimeout = window.setTimeout(() => {
       this.setState({ notificationMessage: '' })
     }, 3000)
+  }
+
+  public render(): JSX.Element {
+    return (
+      <section className="TestUserFeedBack">
+        <h2>Test User Feedback</h2>
+
+        <h4>Block UI</h4>
+        <button type="button" onClick={TestUserFeedback.testBlockUi}>
+          Test
+        </button>
+
+        <h4>Blocking Modals</h4>
+        <button type="button" onClick={TestUserFeedback.testBlockingFailure}>
+          Failure
+        </button>
+        <button type="button" onClick={TestUserFeedback.testBlockingSuccess}>
+          Success
+        </button>
+        <button type="button" onClick={TestUserFeedback.testBlockingNeutral}>
+          Neutral
+        </button>
+
+        <h4>Notifications</h4>
+        <button type="button" onClick={TestUserFeedback.testFailure}>
+          Failure
+        </button>
+        <button type="button" onClick={TestUserFeedback.testSuccess}>
+          Success
+        </button>
+        <button type="button" onClick={this.testNeutral}>
+          Neutral
+        </button>
+      </section>
+    )
   }
 }
 

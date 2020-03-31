@@ -1,39 +1,33 @@
-import * as React from 'react'
+import React, { ReactNode } from 'react'
 import ReactJsonView, { ReactJsonViewProps } from 'react-json-view'
 
 import './Code.scss'
 
 type Props = {
+  children?: ReactNode
   collapsed?: boolean | number
 
   onAdd?: ReactJsonViewProps['onAdd']
   onEdit?: ReactJsonViewProps['onEdit']
 }
 
-type State = {}
-
-class Code extends React.Component<Props, State> {
-  public render() {
-    const { children, collapsed, onAdd, onEdit } = this.props
-
-    if (children && typeof children === 'object') {
-      return (
-        <ReactJsonView
-          src={children as object}
-          name={false}
-          theme="monokai"
-          collapsed={collapsed != null ? collapsed : 1}
-          collapseStringsAfterLength={30}
-          enableClipboard={true}
-          displayDataTypes={false}
-          onEdit={onEdit}
-          onAdd={onAdd}
-        />
-      )
-    } else {
-      return <pre className="Code">{String(children)}</pre>
-    }
+const Code: React.FC<Props> = ({ children, collapsed, onAdd, onEdit }) => {
+  if (children && typeof children === 'object') {
+    return (
+      <ReactJsonView
+        src={children as object}
+        name={false}
+        theme="monokai"
+        collapsed={collapsed != null ? collapsed : 1}
+        collapseStringsAfterLength={30}
+        enableClipboard
+        displayDataTypes={false}
+        onEdit={onEdit}
+        onAdd={onAdd}
+      />
+    )
   }
+  return <pre className="Code">{String(children)}</pre>
 }
 
 export default Code

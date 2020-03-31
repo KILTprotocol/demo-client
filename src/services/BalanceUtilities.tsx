@@ -7,7 +7,7 @@ import KiltToken from '../components/KiltToken/KiltToken'
 import * as Balances from '../state/ducks/Balances'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
-import { Contact, MyIdentity } from '../types/Contact'
+import { IContact, IMyIdentity } from '../types/Contact'
 import { notify, notifySuccess } from './FeedbackService'
 
 const KILT_COIN = 1
@@ -24,7 +24,7 @@ const ENDOWMENT = 30 * KILT_COIN
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
-  public static async connect(myIdentity: MyIdentity) {
+  public static connect(myIdentity: IMyIdentity): void {
     if (
       Balances.getBalance(
         PersistentStore.store.getState(),
@@ -38,43 +38,41 @@ class BalanceUtilities {
         notify(
           <div>
             Now listening to balance changes of{' '}
-            <ContactPresentation
-              address={myIdentity.identity.address}
-              inline={true}
-            />
+            <ContactPresentation address={myIdentity.identity.address} inline />
           </div>
         )
       })
     }
   }
 
-  public static async getMyBalance(identity: MyIdentity): Promise<number> {
+  public static async getMyBalance(identity: IMyIdentity): Promise<number> {
     const balance: BN = await sdk.Balance.getBalance(identity.identity.address)
     return BalanceUtilities.asKiltCoin(balance)
   }
 
-  public static connectMyIdentities(store: Store = PersistentStore.store) {
+  public static connectMyIdentities(
+    store: Store = PersistentStore.store
+  ): void {
     Wallet.getAllIdentities(store.getState()).forEach(
-      (myIdentity: MyIdentity) => {
+      (myIdentity: IMyIdentity) => {
         BalanceUtilities.connect(myIdentity)
       }
     )
   }
 
-  public static async makeTransfer(
-    myIdentity: MyIdentity,
-    receiverAddress: Contact['publicIdentity']['address'],
+  public static makeTransfer(
+    myIdentity: IMyIdentity,
+    receiverAddress: IContact['publicIdentity']['address'],
     amount: number,
     successCallback?: () => void
-  ) {
+  ): void {
     const transferAmount: BN = BalanceUtilities.asMicroKilt(amount)
     notify(
       <div>
         <span>Transfer of </span>
         <KiltToken amount={amount} />
         <span> to </span>
-        <ContactPresentation address={receiverAddress} inline={true} />{' '}
-        initiated.
+        <ContactPresentation address={receiverAddress} inline /> initiated.
       </div>
     )
     sdk.Balance.makeTransfer(
@@ -82,13 +80,13 @@ class BalanceUtilities {
       receiverAddress,
       transferAmount
     )
-      .then((result: any) => {
+      .then(() => {
         notifySuccess(
           <div>
             <span>Successfully transfered </span>
             <KiltToken amount={amount} />
             <span> to </span>
-            <ContactPresentation address={receiverAddress} inline={true} />.
+            <ContactPresentation address={receiverAddress} inline />.
           </div>
         )
         if (successCallback) {
@@ -101,29 +99,25 @@ class BalanceUtilities {
             <span>Transfer of </span>
             <KiltToken amount={amount} />
             <span> to </span>
-            <ContactPresentation address={receiverAddress} inline={true} />
+            <ContactPresentation address={receiverAddress} inline />
             <span> initiated.</span>
           </div>
         )
       })
   }
 
-  private static async listener(
+  private static listener(
     account: sdk.PublicIdentity['address'],
     balance: BN,
     change: BN
-  ) {
+  ): void {
     if (!change.isZero()) {
       const inDeCreased = `${change.gtn(0) ? 'in' : 'de'}creased`
 
       notify(
         <div>
           Balance of <ContactPresentation address={account} /> {inDeCreased} by{' '}
-          <KiltToken
-            amount={BalanceUtilities.asKiltCoin(change)}
-            colored={true}
-          />
-          .
+          <KiltToken amount={BalanceUtilities.asKiltCoin(change)} colored />.
         </div>
       )
     }

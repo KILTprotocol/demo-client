@@ -12,21 +12,27 @@ import * as UiState from '../../state/ducks/UiState'
 
 import './AttestedClaimsListView.scss'
 
-type Labels = {
-  default: { [key: string]: string }
-  legitimations: { [key: string]: string }
+interface IPossibleLabels {
+  emptyList: string
+  h2Multi: string
+  h2Single: string
 }
 
-const LABELS: Labels = {
+interface ILabels {
+  default: IPossibleLabels
+  legitimations: IPossibleLabels
+}
+
+const LABELS: ILabels = {
   default: {
     emptyList: 'No attestations found.',
-    h2_multi: 'Attested claims',
-    h2_single: 'Attested claim',
+    h2Multi: 'Attested claims',
+    h2Single: 'Attested claim',
   },
   legitimations: {
     emptyList: 'No legitimations found.',
-    h2_multi: 'Legitimations',
-    h2_single: 'Legitimation',
+    h2Multi: 'Legitimations',
+    h2Single: 'Legitimation',
   },
 }
 
@@ -40,14 +46,21 @@ type Props = {
 }
 
 type State = {
-  labels: { [key: string]: string }
+  labels: IPossibleLabels
 
   closeOpenedChild?: () => void
   openedAttestedClaim?: sdk.IAttestedClaim
 }
 
 class AttestedClaimsListView extends React.Component<Props, State> {
+  private static verifyAttestations(): void {
+    PersistentStore.store.dispatch(
+      UiState.Store.refreshAttestationStatusAction()
+    )
+  }
+
   static defaultProps: { delegationId: null }
+
   constructor(props: Props) {
     super(props)
 
@@ -62,31 +75,10 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     this.closeOpenedChild = this.closeOpenedChild.bind(this)
   }
 
-  public render() {
-    const { attestedClaims, context, delegationId } = this.props
-    const { labels, openedAttestedClaim } = this.state
-
-    const classes = [
-      'AttestedClaimsListView',
-      openedAttestedClaim ? 'opened' : '',
-    ]
-
-    return attestedClaims ? (
-      <section className={classes.join(' ')}>
-        <div className={context}>
-          <h2>{labels.h2_multi}</h2>
-          {this.getAttestedClaims(attestedClaims, delegationId)}
-        </div>
-      </section>
-    ) : (
-      <section className="ClaimDetailView">Claim not found</section>
-    )
-  }
-
   private getAttestedClaims(
     attestedClaims: Props['attestedClaims'],
     delegationId: Props['delegationId']
-  ) {
+  ): JSX.Element {
     const { labels } = this.state
     if (!delegationId && !attestedClaims.length) {
       return <div>{labels.emptyList}</div>
@@ -99,23 +91,28 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     )
   }
 
-  private getAttestations(attestations: sdk.IAttestedClaim[]) {
+  private getAttestations(attestations: sdk.IAttestedClaim[]): JSX.Element {
     const { openedAttestedClaim } = this.state
     return (
       <section className="attestations">
         {openedAttestedClaim ? (
           <h2 onClick={this.toggleOpen.bind(this, openedAttestedClaim)}>
-            {LABELS.default.h2_single}
+            {LABELS.default.h2Single}
           </h2>
         ) : (
-          <h2>{LABELS.default.h2_multi}</h2>
+          <h2>{LABELS.default.h2Multi}</h2>
         )}
         <div className="container-actions">
           {!!attestations && !!attestations.length && (
-            <button className="refresh" onClick={this.verifyAttestations} />
+            <button
+              type="button"
+              className="refresh"
+              onClick={AttestedClaimsListView.verifyAttestations}
+            />
           )}
           {openedAttestedClaim && (
             <button
+              type="button"
               className="close"
               onClick={this.toggleOpen.bind(this, openedAttestedClaim)}
             />
@@ -145,14 +142,14 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                     <td className="attester">
                       <ContactPresentation
                         address={attestedClaim.attestation.owner}
-                        interactive={true}
+                        interactive
                       />
                     </td>
                     <td className="cType">
                       <CTypePresentation
                         cTypeHash={attestedClaim.attestation.cTypeHash}
-                        interactive={true}
-                        linked={true}
+                        interactive
+                        linked
                       />
                     </td>
                     <td>
@@ -161,6 +158,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                     <td className="actionsTd">
                       <div>
                         <button
+                          type="button"
                           className="open"
                           onClick={this.toggleOpen.bind(this, attestedClaim)}
                         />
@@ -198,7 +196,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     )
   }
 
-  private getDelegation(delegationId: Props['delegationId']) {
+  private getDelegation(delegationId: Props['delegationId']): JSX.Element {
     const { currentDelegationViewType } = this.props
     return (
       <div className="delegation">
@@ -215,7 +213,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     )
   }
 
-  private toggleOpen(attestedClaim: sdk.IAttestedClaim | undefined) {
+  private toggleOpen(attestedClaim: sdk.IAttestedClaim | undefined): void {
     const { onToggleChildOpen } = this.props
     const { openedAttestedClaim } = this.state
 
@@ -235,20 +233,35 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     }
   }
 
-  private toggleChildOpen(closeCallback?: () => void | undefined) {
+  private toggleChildOpen(closeCallback?: () => void | undefined): void {
     this.setState({ closeOpenedChild: closeCallback })
   }
 
-  private closeOpenedChild() {
+  private closeOpenedChild(): void {
     const { closeOpenedChild } = this.state
     if (closeOpenedChild) {
       closeOpenedChild()
     }
   }
 
-  private verifyAttestations(): void {
-    PersistentStore.store.dispatch(
-      UiState.Store.refreshAttestationStatusAction()
+  public render(): JSX.Element {
+    const { attestedClaims, context, delegationId } = this.props
+    const { labels, openedAttestedClaim } = this.state
+
+    const classes = [
+      'AttestedClaimsListView',
+      openedAttestedClaim ? 'opened' : '',
+    ]
+
+    return attestedClaims ? (
+      <section className={classes.join(' ')}>
+        <div className={context}>
+          <h2>{labels.h2Multi}</h2>
+          {this.getAttestedClaims(attestedClaims, delegationId)}
+        </div>
+      </section>
+    ) : (
+      <section className="ClaimDetailView">Claim not found</section>
     )
   }
 }

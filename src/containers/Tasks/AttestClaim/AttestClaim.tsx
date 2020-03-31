@@ -1,15 +1,15 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import FeedbackService, { notifyError } from '../../../services/FeedbackService'
-import { Contact } from '../../../types/Contact'
+import { IContact } from '../../../types/Contact'
 import { BlockUi } from '../../../types/UserFeedback'
 
 type Props = {
-  claimerAddresses: Array<Contact['publicIdentity']['address']>
+  claimerAddresses: Array<IContact['publicIdentity']['address']>
   requestForAttestation: sdk.IRequestForAttestation
 
   onCancel?: () => void
@@ -27,34 +27,14 @@ class AttestClaim extends React.Component<Props, State> {
     this.attestClaim = this.attestClaim.bind(this)
   }
 
-  public render() {
-    const { requestForAttestation } = this.props
-    return (
-      <section className="AttestClaim">
-        <ClaimDetailView claim={requestForAttestation.claim} />
-
-        <AttestedClaimsListView
-          attestedClaims={requestForAttestation.legitimations}
-          delegationId={requestForAttestation.delegationId}
-          context="legitimations"
-        />
-
-        <div className="actions">
-          <button onClick={this.onCancel}>Cancel</button>
-          <button onClick={this.attestClaim}>Attest Claim</button>
-        </div>
-      </section>
-    )
-  }
-
-  private onCancel() {
+  private onCancel(): void {
     const { onCancel } = this.props
     if (onCancel) {
       onCancel()
     }
   }
 
-  private attestClaim() {
+  private attestClaim(): void {
     const { requestForAttestation, onFinished, claimerAddresses } = this.props
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Writing attestation to chain',
@@ -75,6 +55,30 @@ class AttestClaim extends React.Component<Props, State> {
         blockUi.remove()
         notifyError(error)
       })
+  }
+
+  public render(): JSX.Element {
+    const { requestForAttestation } = this.props
+    return (
+      <section className="AttestClaim">
+        <ClaimDetailView claim={requestForAttestation.claim} />
+
+        <AttestedClaimsListView
+          attestedClaims={requestForAttestation.legitimations}
+          delegationId={requestForAttestation.delegationId}
+          context="legitimations"
+        />
+
+        <div className="actions">
+          <button type="button" onClick={this.onCancel}>
+            Cancel
+          </button>
+          <button type="button" onClick={this.attestClaim}>
+            Attest Claim
+          </button>
+        </div>
+      </section>
+    )
   }
 }
 

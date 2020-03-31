@@ -9,14 +9,14 @@ import claims from './data/claims.json'
 
 type UpdateCallback = (bsClaimKey: keyof BsClaimsPool) => void
 
-type BsClaimsPoolElement = {
+export type BsClaimsPoolElement = {
   alias: string
   claimerKey: keyof BsIdentitiesPool
   cTypeKey: keyof BsCTypesPool
   data: sdk.IClaim['contents']
 }
 
-type BsClaimsPool = {
+export type BsClaimsPool = {
   [claimKey: string]: BsClaimsPoolElement
 }
 
@@ -24,18 +24,18 @@ class BsClaim {
   public static pool: BsClaimsPool = claims as BsClaimsPool
 
   public static async save(
-    BS_claimData: BsClaimsPoolElement
+    bsClaimData: BsClaimsPoolElement
   ): Promise<void | sdk.Claim> {
-    const identity = await BsIdentity.getByKey(BS_claimData.claimerKey)
-    const cType = (await BsCType.getByKey(BS_claimData.cTypeKey)).cType
+    const identity = await BsIdentity.getByKey(bsClaimData.claimerKey)
+    const { cType } = await BsCType.getByKey(bsClaimData.cTypeKey)
     const claim = sdk.Claim.fromCTypeAndClaimContents(
       sdk.CType.fromCType(cType),
-      BS_claimData.data,
+      bsClaimData.data,
       identity.identity.address
     )
 
     PersistentStore.store.dispatch(
-      Claims.Store.saveAction(claim, { alias: BS_claimData.alias })
+      Claims.Store.saveAction(claim, { alias: bsClaimData.alias })
     )
 
     return claim
@@ -70,9 +70,7 @@ class BsClaim {
     bsClaimKey: keyof BsClaimsPool
   ): Promise<Claims.Entry> {
     const bsClaim = await BsClaim.getBsClaimByKey(bsClaimKey)
-    await BsIdentity.selectIdentity(
-      await BsIdentity.getByKey(bsClaim.claimerKey)
-    )
+    BsIdentity.selectIdentity(await BsIdentity.getByKey(bsClaim.claimerKey))
     const myClaims: Claims.Entry[] = Claims.getClaims(
       PersistentStore.store.getState()
     )
@@ -86,4 +84,4 @@ class BsClaim {
   }
 }
 
-export { BsClaim, BsClaimsPool, BsClaimsPoolElement }
+export { BsClaim }

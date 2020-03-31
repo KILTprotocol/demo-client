@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { ReactNode } from 'react'
-import { connect } from 'react-redux'
+import React, { ReactNode } from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import Select from 'react-select'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
@@ -11,7 +10,7 @@ import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 
 import './IdentitySelector.scss'
 
@@ -22,14 +21,19 @@ const addIdentity = {
 
 type SelectIdentityOption = {
   label: ReactNode
-  value: MyIdentity['identity']['address']
+  value: IMyIdentity['identity']['address']
 }
 
-type Props = RouteComponentProps<{}> & {
-  selectIdentity: (seedAsHex: string) => void
-  myIdentities: MyIdentity[]
+type StateProps = {
+  myIdentities: IMyIdentity[]
   selectedIdentity?: Wallet.Entry
 }
+
+type DispatchProps = {
+  selectIdentity: (seedAsHex: string) => void
+}
+
+type Props = StateProps & DispatchProps & RouteComponentProps<{}>
 
 type State = {
   randomPhrase: string
@@ -37,9 +41,9 @@ type State = {
 }
 
 class IdentitySelector extends React.Component<Props, State> {
-  public componentDidMount() {
+  public componentDidMount(): void {
     const { myIdentities } = this.props
-    const myIdentityContacts = myIdentities.map((myIdentity: MyIdentity) =>
+    const myIdentityContacts = myIdentities.map((myIdentity: IMyIdentity) =>
       ContactRepository.getContactFromIdentity(myIdentity, {
         unregistered: true,
       })
@@ -49,11 +53,20 @@ class IdentitySelector extends React.Component<Props, State> {
     )
   }
 
-  public render() {
+  private selectIdentity = (selectedOption: SelectIdentityOption): void => {
+    const { history, selectIdentity } = this.props
+    if (selectedOption.value === 'create') {
+      history.push('/wallet/add')
+    } else {
+      selectIdentity(selectedOption.value)
+    }
+  }
+
+  public render(): JSX.Element {
     const { myIdentities, selectedIdentity } = this.props
 
     const identityOptions: SelectIdentityOption[] = myIdentities.map(
-      (myIdentity: MyIdentity) => ({
+      (myIdentity: IMyIdentity) => ({
         label: (
           <ContactPresentation
             address={myIdentity.identity.address}
@@ -90,30 +103,19 @@ class IdentitySelector extends React.Component<Props, State> {
       </section>
     )
   }
-
-  private selectIdentity = (selectedOption: SelectIdentityOption) => {
-    if (selectedOption.value === 'create') {
-      this.props.history.push('/wallet/add')
-    } else {
-      this.props.selectIdentity(selectedOption.value)
-    }
-  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   myIdentities: Wallet.getAllIdentities(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps = (dispatch: (action: Wallet.Action) => void) => {
-  return {
-    selectIdentity: (address: string) => {
-      dispatch(Wallet.Store.selectIdentityAction(address))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  selectIdentity: (address: string) =>
+    Wallet.Store.selectIdentityAction(address),
 }
 
-export default connect(
+export default connect<StateProps, DispatchProps>(
   mapStateToProps,
   mapDispatchToProps
 )(withRouter(IdentitySelector))

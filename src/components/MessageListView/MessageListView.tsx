@@ -1,8 +1,8 @@
 import { IMessage } from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 
 import MessageRepository, {
-  MessageOutput,
+  IMessageOutput,
 } from '../../services/MessageRepository'
 import { ICType } from '../../types/Ctype'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -15,7 +15,7 @@ import './MessageListView.scss'
 type CreateReceiveErrors = { createdAt: string[]; receivedAt: string[] }
 
 type Props = {
-  messages: MessageOutput[]
+  messages: IMessageOutput[]
   onDelete: (message: IMessage) => void
   onOpen: (message: IMessage) => void
 }
@@ -23,7 +23,9 @@ type Props = {
 type State = {}
 
 class MessageListView extends React.Component<Props, State> {
-  private static getCreateReceiveErrors(message: MessageOutput) {
+  private static getCreateReceiveErrors(
+    message: IMessageOutput
+  ): CreateReceiveErrors {
     const { createdAt, receivedAt } = message
     const validDifference = 1000
     const createReceiveErrors: CreateReceiveErrors = {
@@ -49,7 +51,7 @@ class MessageListView extends React.Component<Props, State> {
   private static getDateTime(
     timestamp: number | undefined,
     errorMessages: string[]
-  ) {
+  ): JSX.Element {
     return (
       <span
         className={errorMessages.length ? 'invalid' : ''}
@@ -60,11 +62,31 @@ class MessageListView extends React.Component<Props, State> {
     )
   }
 
-  constructor(props: Props) {
-    super(props)
+  private static getCTypePresentations(message: IMessageOutput): JSX.Element[] {
+    const cTypeHashes: Array<ICType['cType']['hash']> = MessageRepository.getCTypeHashes(
+      message
+    )
+    return cTypeHashes.map((cTypeHash: ICType['cType']['hash']) => (
+      <CTypePresentation
+        key={cTypeHash}
+        cTypeHash={cTypeHash}
+        interactive
+        linked
+      />
+    ))
   }
 
-  public render() {
+  private handleDelete(message: IMessage): void {
+    const { onDelete } = this.props
+    onDelete(message)
+  }
+
+  private openMessage(message: IMessage): void {
+    const { onOpen } = this.props
+    onOpen(message)
+  }
+
+  public render(): JSX.Element {
     const { messages } = this.props
 
     return (
@@ -105,7 +127,7 @@ class MessageListView extends React.Component<Props, State> {
               </tr>
             </thead>
             <tbody>
-              {messages.map((message: MessageOutput) => {
+              {messages.map((message: IMessageOutput) => {
                 const createReceiveErrors = MessageListView.getCreateReceiveErrors(
                   message
                 )
@@ -117,22 +139,19 @@ class MessageListView extends React.Component<Props, State> {
                   message.receivedAt,
                   createReceiveErrors.receivedAt
                 )
-                const cTypeHashes: Array<
-                  ICType['cType']['hash']
-                > = MessageRepository.getCTypeHashes(message)
                 return (
                   <tr key={message.messageId}>
                     <td className="sender-subject-created-received">
                       <div>
                         <ContactPresentation
                           address={message.senderAddress}
-                          interactive={true}
+                          interactive
                         />
                       </div>
                       <div onClick={this.openMessage.bind(this, message)}>
                         <MessageSubject message={message} />
                       </div>
-                      {this.getCTypePresentations(message)}
+                      {MessageListView.getCTypePresentations(message)}
                       <div title="created">{created}</div>
                       <div title="received">{received}</div>
                     </td>
@@ -140,18 +159,18 @@ class MessageListView extends React.Component<Props, State> {
                       <div>
                         <ContactPresentation
                           address={message.senderAddress}
-                          interactive={true}
+                          interactive
                         />
                       </div>
                       <div onClick={this.openMessage.bind(this, message)}>
                         <MessageSubject message={message} />
                       </div>
-                      {this.getCTypePresentations(message)}
+                      {MessageListView.getCTypePresentations(message)}
                     </td>
                     <td className="sender">
                       <ContactPresentation
                         address={message.senderAddress}
-                        interactive={true}
+                        interactive
                       />
                     </td>
                     <td className="subject">
@@ -160,7 +179,7 @@ class MessageListView extends React.Component<Props, State> {
                       </div>
                     </td>
                     <td className="cType">
-                      {this.getCTypePresentations(message)}
+                      {MessageListView.getCTypePresentations(message)}
                     </td>
                     <td className="created">{created}</td>
                     <td className="received">{received}</td>
@@ -171,10 +190,12 @@ class MessageListView extends React.Component<Props, State> {
                     <td className="actionsTd">
                       <div>
                         <button
+                          type="button"
                           className="delete"
                           onClick={this.handleDelete.bind(this, message)}
                         />
                         <button
+                          type="button"
                           className="open"
                           onClick={this.openMessage.bind(this, message)}
                         />
@@ -188,30 +209,6 @@ class MessageListView extends React.Component<Props, State> {
         )}
       </section>
     )
-  }
-
-  private getCTypePresentations(message: MessageOutput) {
-    const cTypeHashes: Array<
-      ICType['cType']['hash']
-    > = MessageRepository.getCTypeHashes(message)
-    return cTypeHashes.map((cTypeHash: ICType['cType']['hash']) => (
-      <CTypePresentation
-        key={cTypeHash}
-        cTypeHash={cTypeHash}
-        interactive={true}
-        linked={true}
-      />
-    ))
-  }
-
-  private handleDelete(message: IMessage) {
-    const { onDelete } = this.props
-    onDelete(message)
-  }
-
-  private openMessage(message: IMessage) {
-    const { onOpen } = this.props
-    onOpen(message)
   }
 }
 

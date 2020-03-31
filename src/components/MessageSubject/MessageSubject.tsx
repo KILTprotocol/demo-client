@@ -1,14 +1,13 @@
-import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import { IMessage } from '@kiltprotocol/sdk-js'
+import React from 'react'
 
 import './MessageSubject.scss'
 
 type Props = {
-  message: sdk.IMessage
+  message: IMessage
 }
 
-const MessageSubject = (props: Props) => {
-  const { message } = props
+const MessageSubject: React.FC<Props> = ({ message }) => {
   if (!message || !message.body || !message.body.content) {
     return <span className="MessageSubject">-</span>
   }
@@ -19,7 +18,7 @@ const MessageSubject = (props: Props) => {
 
   return (
     <span className="MessageSubject">
-      <span className="type">{message.body!.type}</span>
+      <span className="type">{message.body.type}</span>
     </span>
   )
 }
