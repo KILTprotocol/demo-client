@@ -224,21 +224,22 @@ class RequestAttestation extends React.Component<
               onFinished()
             }
           })
+      } else {
+        attestationWorkflow
+          .requestAttestationForClaim(
+            savedClaimEntry.claim,
+            receiverAddresses,
+            (terms || []).map((legitimation: sdk.IAttestedClaim) =>
+              sdk.AttestedClaim.fromAttestedClaim(legitimation)
+            ),
+            delegationId
+          )
+          .then(() => {
+            if (onFinished) {
+              onFinished()
+            }
+          })
       }
-      attestationWorkflow
-        .requestAttestationForClaim(
-          savedClaimEntry.claim,
-          receiverAddresses,
-          (terms || []).map((legitimation: sdk.IAttestedClaim) =>
-            sdk.AttestedClaim.fromAttestedClaim(legitimation)
-          ),
-          delegationId
-        )
-        .then(() => {
-          if (onFinished) {
-            onFinished()
-          }
-        })
     }
   }
 }
