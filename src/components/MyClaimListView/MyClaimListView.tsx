@@ -63,7 +63,7 @@ class MyClaimListView extends React.Component<Props, State> {
     onRequestAttestation(claimEntry)
   }
 
-  private requestTerm(claimEntry: Claims.Entry) {
+  private requestTerm(claimEntry: Claims.Entry): void {
     const { onRequestTerm } = this.props
     onRequestTerm(claimEntry)
   }

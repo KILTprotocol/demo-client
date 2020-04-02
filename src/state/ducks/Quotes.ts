@@ -73,7 +73,6 @@ class Store {
         quotes: Immutable.Map(),
       })
     }
-
     const quoteEntries = {}
 
     quoteStateSerialized.quotes.forEach(serializedQuote => {
@@ -83,7 +82,7 @@ class Store {
         const quoteEntry: Entry = {
           quoteId: quoteAsJson.quoteId,
           claimerAddress: quoteAsJson.claimerAddress,
-          ...quoteAsJson.quote,
+          quote: quoteAsJson.quote,
         }
         quoteEntries[serializedQuote.quoteId] = quoteEntry
       } catch (e) {
@@ -116,7 +115,7 @@ class Store {
           quoteId,
           claimerAddress,
           quote,
-        })
+        } as Entry)
       }
       case Store.ACTIONS.REMOVE_QUOTE: {
         return state.deleteIn(['quotes', (action as IRemoveAction).payload])
@@ -156,7 +155,7 @@ class Store {
   }
 }
 
-const getAllQuotes = (state: ReduxState) =>
+const getAllQuotes = (state: ReduxState): Entry[] =>
   state.quotes
     .get('quotes')
     .toList()

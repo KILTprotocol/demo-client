@@ -56,26 +56,24 @@ class QuoteCreate extends React.Component<Props, State> {
   }
 
   public updateValue = (value: sdk.IQuote): void => {
-    if (sdk.Quote.validateQuoteSchema(sdk.QuoteSchema, value)) {
-      this.setState({ quote: value })
+    const quote = value
+    // Need to add an input for dates to actually have a selection of the dates.
+    quote.timeframe = new Date()
+    if (sdk.Quote.validateQuoteSchema(sdk.QuoteSchema, quote)) {
+      this.setState({ quote })
     }
   }
 
   private handleSubmit(): void {
     const { saveQuote, selectedIdentity, claimerAddress, quoteId } = this.props
-
     const { quote } = this.state
-
     if (quote && claimerAddress) {
-      quote.timeframe = new Date()
-      if (quote) {
-        quoteId(Quotes.hash(quote))
-        const attesterSignedQuote = sdk.Quote.fromQuoteDataAndIdentity(
-          quote,
-          selectedIdentity.identity
-        )
-        saveQuote(attesterSignedQuote, claimerAddress)
-      }
+      quoteId(Quotes.hash(quote))
+      const attesterSignedQuote = sdk.Quote.fromQuoteDataAndIdentity(
+        quote,
+        selectedIdentity.identity
+      )
+      saveQuote(attesterSignedQuote, claimerAddress)
     }
   }
 
@@ -127,11 +125,9 @@ const mapStateToProps: MapStateToProps<
 
 const mapDispatchToProps: DispatchProps = {
   saveQuote: (
-    attesterSignedQuote: sdk.IQuoteAgreement,
+    attesterSignedQuote: sdk.IQuoteAttesterSigned,
     claimerAddress: string
-  ) => {
-    Quotes.Store.saveQuote(attesterSignedQuote, claimerAddress)
-  },
+  ) => Quotes.Store.saveQuote(attesterSignedQuote, claimerAddress),
 }
 
 export default connect(
