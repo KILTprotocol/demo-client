@@ -41,19 +41,19 @@ class QuoteView extends React.Component<Props, State> {
     this.createQuote = this.createQuote.bind(this)
     this.onCancelQuote = this.onCancelQuote.bind(this)
     this.quoteId = this.quoteId.bind(this)
+    this.confirmQuote = this.confirmQuote.bind(this)
   }
 
-  public componentDidMount(): void {
+  public componentDidUpdate(): void {
     const { updateQuote } = this.props
     const { newQuote, quoteID } = this.state
-    if (quoteID && !newQuote) {
+    if (quoteID) {
       const selectedQuote = Quotes.getQuoteByQuoteHash(
         PersistentStore.store.getState(),
         quoteID
       )[0]
-
       if (newQuote !== selectedQuote.quote) {
-        this.setState({ newQuote: selectedQuote.quote })
+        this.confirmQuote(selectedQuote.quote)
         updateQuote(selectedQuote.quote)
       }
     }
@@ -71,25 +71,30 @@ class QuoteView extends React.Component<Props, State> {
     this.setState({ quoteID: quoteId })
   }
 
+  private confirmQuote(quote: Quotes.IQuoteEntry): void {
+    if (quote) {
+      this.setState({ newQuote: quote, createNewQuote: false })
+    }
+  }
+
   public render(): JSX.Element {
     const { senderAddress, receiverAddress, claim } = this.props
 
     const { createNewQuote, quoteID, newQuote } = this.state
-
     return (
       <section className="QuoteView">
         <h1>Quote </h1>
-        {!quoteID ? (
+        {quoteID && newQuote ? (
           <div>
             <span>
               <Code>{newQuote}</Code>
             </span>
           </div>
         ) : (
-          <div />
+          <div>No Quote</div>
         )}
 
-        {!createNewQuote && !quoteID ? (
+        {!createNewQuote ? (
           <section>
             <div className="actions">
               <button

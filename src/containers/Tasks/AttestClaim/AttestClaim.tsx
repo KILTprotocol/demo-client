@@ -80,11 +80,17 @@ class AttestClaim extends React.Component<Props, State> {
           context="terms"
         />
         {!quote ? (
-          <section>no Quote</section>
+          <span>
+            <h2>Quotes</h2>
+            <div>no Quote</div>
+          </span>
         ) : (
-          <section>
-            <Code>{quote}</Code>
-          </section>
+          <span>
+            <h2>Quotes</h2>
+            <div>
+              <Code>{quote}</Code>
+            </div>
+          </span>
         )}
 
         <div className="actions">

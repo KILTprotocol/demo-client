@@ -221,11 +221,17 @@ class RequestAttestation extends React.Component<
         )}
 
         {!quote ? (
-          <section>no Quote</section>
+          <div>
+            <h2>Quotes</h2>
+            <div>no Quote</div>
+          </div>
         ) : (
-          <section>
-            <Code>{quote}</Code>
-          </section>
+          <div>
+            <h2>Quotes</h2>
+            <div>
+              <Code>{quote}</Code>
+            </div>
+          </div>
         )}
 
         <div className="actions">
