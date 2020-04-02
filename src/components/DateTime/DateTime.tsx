@@ -1,5 +1,5 @@
 import moment from 'moment'
-import * as React from 'react'
+import React from 'react'
 
 type Props = {
   timestamp?: number
@@ -9,24 +9,14 @@ type Props = {
 type State = {}
 
 class DateTime extends React.Component<Props, State> {
-  public render() {
-    const { timestamp, pattern } = this.props
-
-    return timestamp
-      ? pattern
-        ? this.getPattern()
-        : this.getDefault()
-      : this.getNoTimeStamp()
-  }
-
-  private getPattern() {
+  private getPattern(): JSX.Element {
     const { timestamp, pattern } = this.props
     return (
       <span className="date-time">{moment(timestamp).format(pattern)}</span>
     )
   }
 
-  private getDefault() {
+  private getDefault(): JSX.Element {
     const { timestamp } = this.props
     return (
       <span className="date-time">
@@ -36,8 +26,20 @@ class DateTime extends React.Component<Props, State> {
     )
   }
 
-  private getNoTimeStamp() {
+  private static getNoTimeStamp(): JSX.Element {
     return <span>-</span>
+  }
+
+  public render(): JSX.Element {
+    const { timestamp, pattern } = this.props
+
+    if (timestamp) {
+      if (pattern) {
+        return this.getPattern()
+      }
+      return this.getDefault()
+    }
+    return DateTime.getNoTimeStamp()
   }
 }
 

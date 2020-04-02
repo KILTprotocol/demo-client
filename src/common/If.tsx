@@ -1,18 +1,18 @@
-import * as React from 'react'
+import React from 'react'
 
 type Props = {
   condition: boolean
-  then: any
-  else?: any
+  then: JSX.Element
+  else?: JSX.Element
 }
 
-const If: React.FunctionComponent<Props> = props => {
-  if (props.condition) {
-    return props.then
+const If: React.FC<Props> = ({ condition, else: propsElse, then }) => {
+  if (condition) {
+    return then
   }
 
-  if (!!props.else) {
-    return props.else
+  if (propsElse) {
+    return propsElse
   }
 
   return null

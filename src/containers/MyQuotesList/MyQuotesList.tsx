@@ -1,42 +1,40 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import { MyIdentity } from '../../types/Contact'
-import * as Wallet from '../../state/ducks/Wallet'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { connect, MapStateToProps } from 'react-redux'
+import { State as ReduxState } from '../../state/PersistentStore'
 import * as Quotes from '../../state/ducks/Quotes'
 import Code from '../../components/Code/Code'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
-import { State as ReduxState } from '../../state/PersistentStore'
 import './MyQuotesList.scss'
 
-type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> & {
-  selectedIdentity: MyIdentity
-  quoteEntries?: Quotes.Entry[]
+type DispatchProps = {
   removeQuote: (claimId: Quotes.Entry['quoteId']) => void
 }
 
-type State = {
-  redirect?: string
+type OwnProps = {}
+
+type StateProps = {
+  quoteEntries?: Quotes.Entry[]
 }
 
-class MyQuotesList extends React.Component<Props, State> {
+type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
+  StateProps &
+  DispatchProps &
+  OwnProps
+
+class MyQuotesList extends React.Component<Props> {
   constructor(props: Props) {
     super(props)
     this.state = {}
     this.deleteQuote = this.deleteQuote.bind(this)
   }
 
-  public componentDidUpdate(prevProps: Props) {
-    if (
-      prevProps.selectedIdentity.identity.address !==
-      this.props.selectedIdentity.identity.address
-    ) {
-      this.setState({
-        redirect: '/quote',
-      })
-    }
+  private deleteQuote(quoteId: Quotes.Entry['quoteId']): void {
+    const { removeQuote } = this.props
+
+    removeQuote(quoteId)
   }
 
-  public render() {
+  public render(): JSX.Element {
     const { quoteEntries } = this.props
 
     return (
@@ -55,7 +53,10 @@ class MyQuotesList extends React.Component<Props, State> {
                     <Code>{val.quote}</Code>
                   </div>
                   <div className="actions">
-                    <button onClick={() => this.deleteQuote(val.quoteId)}>
+                    <button
+                      type="button"
+                      onClick={() => this.deleteQuote(val.quoteId)}
+                    >
                       Delete Quote
                     </button>
                   </div>
@@ -69,24 +70,20 @@ class MyQuotesList extends React.Component<Props, State> {
       </section>
     )
   }
-  private deleteQuote(quoteId: Quotes.Entry['quoteId']) {
-    const { removeQuote } = this.props
-
-    removeQuote(quoteId)
-  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
-  selectedIdentity: Wallet.getSelectedIdentity(state),
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   quoteEntries: Quotes.getAllMyQuotes(state),
 })
 
-const mapDispatchToProps = (dispatch: (action: Quotes.Action) => void) => {
-  return {
-    removeQuote: (quoteId: Quotes.Entry['quoteId']) => {
-      dispatch(Quotes.Store.removeQuote(quoteId))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  removeQuote: (quoteId: Quotes.Entry['quoteId']) => {
+    Quotes.Store.removeQuote(quoteId)
+  },
 }
 
 export default connect(

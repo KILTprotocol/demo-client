@@ -1,42 +1,53 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
-import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
+import { connect, MapStateToProps } from 'react-redux'
+import { withRouter, RouteComponentProps } from 'react-router'
+import * as common from 'schema-based-json-editor'
+import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../../state/PersistentStore'
 import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
-import * as common from 'schema-based-json-editor'
 import * as Quotes from '../../state/ducks/Quotes'
 import * as Wallet from '../../state/ducks/Wallet'
 
 import './QuoteCreate.scss'
 
-type Props = RouteComponentProps<{}> & {
-  cTypeHash?: sdk.ICType['hash']
-  claimerAddress?: string
-  attesterAddress?: string
+type StateProps = {
+  selectedIdentity: IMyIdentity
+}
+
+type DispatchProps = {
   saveQuote: (
     attesterSignedQuote: sdk.IQuoteAttesterSigned,
     claimerIdentity: string
   ) => void
-  selectedIdentity: Wallet.Entry
+}
+
+type OwnProps = {
+  cTypeHash?: sdk.ICType['hash']
+  claimerAddress?: string
+  attesterAddress?: string
   onCancel?: () => void
   quoteId: (quoteId: Quotes.Entry['quoteId']) => void
 }
 
+type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
+  StateProps &
+  OwnProps &
+  DispatchProps
+
 type State = {
   quote?: sdk.IQuote
-  isValid: boolean
   initialValue?: object
 }
 
 class QuoteCreate extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
+    const { attesterAddress, cTypeHash } = this.props
     this.state = {
-      isValid: true,
       initialValue: {
-        attesterAddress: this.props.attesterAddress,
-        cTypeHash: this.props.cTypeHash,
+        attesterAddress,
+        cTypeHash,
       },
     }
     this.handleCancel = this.handleCancel.bind(this)
@@ -44,38 +55,13 @@ class QuoteCreate extends React.Component<Props, State> {
     this.updateValue = this.updateValue.bind(this)
   }
 
-  render() {
-    const { onCancel } = this.props
-    const { initialValue } = this.state
-
-    return (
-      <section className="QuoteCreate">
-        <h2>Quote</h2>
-        <div>
-          <SchemaEditor
-            schema={sdk.QuoteSchema as common.Schema}
-            initialValue={initialValue}
-            updateValue={this.updateValue}
-          />
-        </div>
-        <section className="actions">
-          {onCancel && <button onClick={this.handleCancel}>Cancel</button>}
-
-          <button onClick={this.handleSubmit}>Confirm Quote</button>
-        </section>
-      </section>
-    )
-  }
-
-  private handleCancel() {
-    const { onCancel } = this.props
-
-    if (onCancel) {
-      onCancel()
+  public updateValue = (value: sdk.IQuote): void => {
+    if (sdk.Quote.validateQuoteSchema(sdk.QuoteSchema, value)) {
+      this.setState({ quote: value })
     }
   }
 
-  private handleSubmit() {
+  private handleSubmit(): void {
     const { saveQuote, selectedIdentity, claimerAddress, quoteId } = this.props
 
     const { quote } = this.state
@@ -93,27 +79,59 @@ class QuoteCreate extends React.Component<Props, State> {
     }
   }
 
-  public updateValue = (value: sdk.IQuote) => {
-    if (!sdk.Quote.validateQuoteSchema(sdk.QuoteSchema, value)) {
-      this.setState({ isValid: false })
+  private handleCancel(): void {
+    const { onCancel } = this.props
+
+    if (onCancel) {
+      onCancel()
     }
-    this.setState({ quote: value, isValid: true })
+  }
+
+  render(): JSX.Element {
+    const { onCancel } = this.props
+    const { initialValue } = this.state
+
+    return (
+      <section className="QuoteCreate">
+        <h2>Quote</h2>
+        <div>
+          <SchemaEditor
+            schema={sdk.QuoteSchema as common.Schema}
+            initialValue={initialValue}
+            updateValue={this.updateValue}
+          />
+        </div>
+        <section className="actions">
+          {onCancel && (
+            <button type="button" onClick={this.handleCancel}>
+              Cancel
+            </button>
+          )}
+
+          <button type="button" onClick={this.handleSubmit}>
+            Confirm Quote
+          </button>
+        </section>
+      </section>
+    )
   }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-const mapDispatchToProps = (dispatch: (action: Quotes.Action) => void) => {
-  return {
-    saveQuote: (
-      attesterSignedQuote: sdk.IQuoteAgreement,
-      claimerAddress: string
-    ) => {
-      dispatch(Quotes.Store.saveQuote(attesterSignedQuote, claimerAddress))
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  saveQuote: (
+    attesterSignedQuote: sdk.IQuoteAgreement,
+    claimerAddress: string
+  ) => {
+    Quotes.Store.saveQuote(attesterSignedQuote, claimerAddress)
+  },
 }
 
 export default connect(

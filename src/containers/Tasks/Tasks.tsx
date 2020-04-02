@@ -1,14 +1,13 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
-import { ReactNode } from 'react'
-import { connect } from 'react-redux'
+import React, { ReactNode } from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 
 import SelectContacts from '../../components/SelectContacts/SelectContacts'
 import SelectCTypes from '../../components/SelectCTypes/SelectCTypes'
 import * as UiState from '../../state/ducks/UiState'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { Contact } from '../../types/Contact'
+import { IContact } from '../../types/Contact'
 import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import RequestAcceptDelegation, {
   RequestAcceptDelegationProps,
@@ -57,16 +56,19 @@ export type TaskProps =
       props: Partial<RequestAcceptDelegationProps>
     }
 
-type Props = {
-  // mapStateToProps
+type StateProps = {
   currentTask: TaskProps
-  // mapDispatchToProps
+}
+
+type DispatchProps = {
   finishCurrentTask: () => void
 }
 
+type Props = StateProps & DispatchProps
+
 type State = {
   openMenus: number
-  selectedReceivers: Contact[]
+  selectedReceivers: IContact[]
   selectedCTypes: ICTypeWithMetadata[]
 }
 
@@ -89,20 +91,52 @@ class Tasks extends React.Component<Props, State> {
     this.onCancel = this.onCancel.bind(this)
   }
 
-  public componentDidUpdate(prevProps: Props) {
+  public componentDidUpdate(prevProps: Props): void {
+    const { currentTask } = this.props
     if (
-      !!this.props.currentTask !== !!prevProps.currentTask ||
-      this.props.currentTask.objective !== prevProps.currentTask.objective
+      !!currentTask !== !!prevProps.currentTask ||
+      currentTask.objective !== prevProps.currentTask.objective
     ) {
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState(initialState)
     }
   }
 
-  public render() {
-    return <section className="Tasks">{this.getTask()}</section>
+  private onMenuOpen(): void {
+    const { openMenus } = this.state
+    this.setState({
+      openMenus: openMenus + 1,
+    })
   }
 
-  private getTask() {
+  private onMenuClose(): void {
+    setTimeout(() => {
+      const { openMenus } = this.state
+      this.setState({
+        openMenus: openMenus - 1,
+      })
+    }, 500)
+  }
+
+  private onSelectReceivers(selectedReceivers: IContact[]): void {
+    this.setState({ selectedReceivers })
+  }
+
+  private onSelectCTypes(selectedCTypes: ICTypeWithMetadata[]): void {
+    this.setState({ selectedCTypes })
+  }
+
+  private onTaskFinished(): void {
+    const { finishCurrentTask } = this.props
+    finishCurrentTask()
+    this.setState(initialState)
+  }
+
+  private onCancel(): void {
+    this.onTaskFinished()
+  }
+
+  private getTask(): ReactNode {
     const { currentTask } = this.props
 
     if (!currentTask) {
@@ -112,12 +146,12 @@ class Tasks extends React.Component<Props, State> {
     const { selectedCTypes, selectedReceivers } = this.state
 
     const selectedReceiverAddresses = selectedReceivers.map(
-      (receiver: Contact) => receiver.publicIdentity.address
+      (receiver: IContact) => receiver.publicIdentity.address
     )
 
     switch (currentTask.objective) {
       case sdk.MessageBodyType.REQUEST_TERMS: {
-        const props = currentTask.props
+        const { props } = currentTask
         const cTypeHash =
           selectedCTypes && selectedCTypes[0]
             ? selectedCTypes[0].cType.hash
@@ -142,7 +176,7 @@ class Tasks extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.SUBMIT_TERMS: {
-        const props = currentTask.props
+        const { props } = currentTask
         const cTypeHash = props.claim ? props.claim.cTypeHash : undefined
         return this.getModal(
           'Submit Terms',
@@ -155,7 +189,7 @@ class Tasks extends React.Component<Props, State> {
                 {...props}
                 claim={{ cTypeHash: selectedCTypes[0].cType.hash }}
                 receiverAddresses={selectedReceiverAddresses}
-                enablePreFilledClaim={true}
+                enablePreFilledClaim
                 onFinished={this.onTaskFinished}
                 onCancel={this.onCancel}
               />
@@ -167,11 +201,11 @@ class Tasks extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM: {
-        const props = currentTask.props
+        const { props } = currentTask
         return this.getModal(
           'Request attestation for claim',
           <>
-            {!!selectedReceivers.length ? (
+            {selectedReceivers.length ? (
               <RequestAttestation
                 {...props}
                 receiverAddresses={selectedReceiverAddresses}
@@ -185,7 +219,7 @@ class Tasks extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES: {
-        const props = currentTask.props
+        const { props } = currentTask
 
         return this.getModal(
           'Request claims for cType',
@@ -208,7 +242,7 @@ class Tasks extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
-        const props = currentTask.props
+        const { props } = currentTask
 
         return this.getModal(
           'Submit claims for cTypes',
@@ -231,7 +265,7 @@ class Tasks extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION: {
-        const props = currentTask.props
+        const { props } = currentTask
         return this.getModal(
           `Invite to ${props.isPCR ? 'PCR(s)' : 'delegation(s)'}`,
           <>
@@ -263,19 +297,19 @@ class Tasks extends React.Component<Props, State> {
     header: Modal['props']['header'],
     content: ReactNode,
     preselectedReceiverAddresses: Array<
-      Contact['publicIdentity']['address']
+      IContact['publicIdentity']['address']
     > = []
-  ) {
+  ): JSX.Element {
     const { openMenus } = this.state
 
     return (
       <Modal
         catchBackdropClick={openMenus > 0}
         header={header}
-        preventCloseOnCancel={true}
-        preventCloseOnConfirm={true}
+        preventCloseOnCancel
+        preventCloseOnConfirm
         type={ModalType.BLANK}
-        showOnInit={true}
+        showOnInit
         onCancel={this.onCancel}
       >
         {this.getReceiverSelect(preselectedReceiverAddresses)}
@@ -284,7 +318,7 @@ class Tasks extends React.Component<Props, State> {
     )
   }
 
-  private getMessageElement(withCType?: boolean) {
+  private getMessageElement(withCType?: boolean): JSX.Element {
     const mandatorySelects: string[] = ['receivers(s)']
     if (withCType) {
       mandatorySelects.push('cType(s)')
@@ -292,38 +326,24 @@ class Tasks extends React.Component<Props, State> {
 
     return (
       <div className="actions">
-        <button onClick={this.onCancel}>Cancel</button>
-        <button disabled={true}>
+        <button type="button" onClick={this.onCancel}>
+          Cancel
+        </button>
+        <button type="button" disabled>
           Please select {mandatorySelects.join(', ')} first
         </button>
       </div>
     )
   }
 
-  private onMenuOpen() {
-    const { openMenus } = this.state
-    this.setState({
-      openMenus: openMenus + 1,
-    })
-  }
-
-  private onMenuClose() {
-    setTimeout(() => {
-      const { openMenus } = this.state
-      this.setState({
-        openMenus: openMenus - 1,
-      })
-    }, 500)
-  }
-
   private getReceiverSelect(
-    preSelectedAddresses: Array<Contact['publicIdentity']['address']> = []
-  ) {
+    preSelectedAddresses: Array<IContact['publicIdentity']['address']> = []
+  ): JSX.Element {
     return (
       <section className="selectReceiver">
         <h2>Select receiver(s)</h2>
         <SelectContacts
-          isMulti={true}
+          isMulti
           preSelectedAddresses={preSelectedAddresses}
           onChange={this.onSelectReceivers}
           onMenuOpen={this.onMenuOpen}
@@ -333,14 +353,10 @@ class Tasks extends React.Component<Props, State> {
     )
   }
 
-  private onSelectReceivers(selectedReceivers: Contact[]) {
-    this.setState({ selectedReceivers })
-  }
-
   private getCTypeSelect(
     isMulti: boolean,
     preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | undefined>
-  ) {
+  ): JSX.Element {
     return (
       <section className="selectCType">
         <h2>Select cType{isMulti ? '(s)' : ''}</h2>
@@ -355,39 +371,21 @@ class Tasks extends React.Component<Props, State> {
     )
   }
 
-  private onSelectCTypes(selectedCTypes: ICTypeWithMetadata[]) {
-    this.setState({ selectedCTypes })
-  }
-
-  private onTaskFinished() {
-    const { finishCurrentTask } = this.props
-    finishCurrentTask()
-    this.setState(initialState)
-  }
-
-  private onCancel() {
-    this.onTaskFinished()
+  public render(): JSX.Element {
+    return <section className="Tasks">{this.getTask()}</section>
   }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   currentTask: UiState.getCurrentTask(state),
 })
 
-const mapDispatchToProps = (dispatch: (action: UiState.Action) => void) => {
-  return {
-    finishCurrentTask: () => {
-      dispatch(
-        UiState.Store.updateCurrentTaskAction({
-          objective: undefined,
-          props: undefined,
-        })
-      )
-    },
-  }
+const mapDispatchToProps: DispatchProps = {
+  finishCurrentTask: () =>
+    UiState.Store.updateCurrentTaskAction({
+      objective: undefined,
+      props: undefined,
+    }),
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Tasks)
+export default connect(mapStateToProps, mapDispatchToProps)(Tasks)

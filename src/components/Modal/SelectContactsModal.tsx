@@ -1,37 +1,36 @@
-import * as React from 'react'
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 
-import { Contact } from '../../types/Contact'
+import { IContact } from '../../types/Contact'
 import SelectContacts from '../SelectContacts/SelectContacts'
 import Modal, { ModalType } from './Modal'
 
 type Props = {
   allContacts?: boolean
   closeMenuOnSelect?: boolean
-  contacts?: Contact[]
+  contacts?: IContact[]
   header?: string | ReactNode
   isMulti?: boolean
   name?: string
   placeholder?: string
 
   onCancel: () => void
-  onConfirm: (selectedContacts: Contact[]) => void
+  onConfirm: (selectedContacts: IContact[]) => void
 }
 
 type State = {
   isSelectContactsOpen: boolean
-  selectedContacts: Contact[]
+  selectedContacts: IContact[]
 }
 
 class SelectContactsModal extends React.Component<Props, State> {
-  private static defaultProps: Partial<Props> = {
+  private modal: Modal | null
+
+  public static defaultProps: Partial<Props> = {
     closeMenuOnSelect: true,
     isMulti: true,
     name: 'selectContacts',
     placeholder: `Select contact#{multi}…`,
   }
-
-  private modal: Modal | null
 
   constructor(props: Props) {
     super(props)
@@ -42,7 +41,32 @@ class SelectContactsModal extends React.Component<Props, State> {
     this.onSelectContacts = this.onSelectContacts.bind(this)
   }
 
-  public render() {
+  private onSelectContacts(selectedContacts: IContact[]): void {
+    this.setState({ selectedContacts })
+  }
+
+  private setSelectContactsOpen = (
+    isSelectContactsOpen: boolean,
+    delay = 0
+  ) => () => {
+    setTimeout(() => {
+      this.setState({ isSelectContactsOpen })
+    }, delay)
+  }
+
+  public show(): void {
+    if (this.modal) {
+      this.modal.show()
+    }
+  }
+
+  public hide(): void {
+    if (this.modal) {
+      this.modal.hide()
+    }
+  }
+
+  public render(): JSX.Element {
     const {
       allContacts,
       closeMenuOnSelect,
@@ -80,13 +104,13 @@ class SelectContactsModal extends React.Component<Props, State> {
         type={ModalType.CONFIRM}
         header={finalHeader}
         onCancel={onCancel}
-        onConfirm={onConfirm.bind(this, selectedContacts)}
+        onConfirm={() => onConfirm(selectedContacts)}
         catchBackdropClick={isSelectContactsOpen}
       >
         <div>
           <SelectContacts
             allContacts={allContacts}
-            contacts={contacts as Contact[]}
+            contacts={contacts as IContact[]}
             name={name as string}
             isMulti={isMulti}
             closeMenuOnSelect={closeMenuOnSelect}
@@ -98,31 +122,6 @@ class SelectContactsModal extends React.Component<Props, State> {
         </div>
       </Modal>
     )
-  }
-
-  public show() {
-    if (this.modal) {
-      this.modal.show()
-    }
-  }
-
-  public hide() {
-    if (this.modal) {
-      this.modal.hide()
-    }
-  }
-
-  private onSelectContacts(selectedContacts: Contact[]) {
-    this.setState({ selectedContacts })
-  }
-
-  private setSelectContactsOpen = (
-    isSelectContactsOpen: boolean,
-    delay = 0
-  ) => () => {
-    setTimeout(() => {
-      this.setState({ isSelectContactsOpen })
-    }, delay)
   }
 }
 

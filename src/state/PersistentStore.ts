@@ -1,5 +1,4 @@
 import { combineReducers, createStore, Store } from 'redux'
-import { BalanceUtilities } from '../services/BalanceUtilities'
 
 import * as Attestations from './ducks/Attestations'
 import * as Balances from './ducks/Balances'
@@ -13,12 +12,12 @@ import * as CTypes from './ducks/CTypes'
 import * as Quotes from './ducks/Quotes'
 
 declare global {
-  /* tslint:disable */
+  /* eslint-disable */
   interface Window {
     __REDUX_DEVTOOLS_EXTENSION__: any
   }
 
-  /* tslint:enable */
+  /* eslint-enable */
 }
 
 export type State = {
@@ -46,8 +45,8 @@ type SerializedState = {
 }
 
 class PersistentStore {
-  public get store() {
-    return this._store
+  public get store(): Store {
+    return this.storeInternal
   }
 
   private static NAME = 'reduxState'
@@ -60,7 +59,7 @@ class PersistentStore {
       delegations: Delegations.Store.deserialize(obj.delegations),
       parameters: Parameters.Store.deserialize(obj.parameters),
       quotes: Quotes.Store.deserialize(obj.quotes),
-      uiState: UiState.Store.deserialize(obj.uiState),
+      uiState: UiState.Store.deserialize(),
       wallet: Wallet.Store.deserialize(obj.wallet),
     }
   }
@@ -73,14 +72,14 @@ class PersistentStore {
       delegations: Delegations.Store.serialize(state.delegations),
       parameters: Parameters.Store.serialize(state.parameters),
       quotes: Quotes.Store.serialize(state.quotes),
-      uiState: UiState.Store.serialize(state.uiState),
+      uiState: UiState.Store.serialize(),
       wallet: Wallet.Store.serialize(state.wallet),
     }
 
     return JSON.stringify(obj)
   }
 
-  private _store: Store
+  private storeInternal: Store
 
   constructor() {
     const localState = localStorage.getItem(PersistentStore.NAME)
@@ -93,7 +92,7 @@ class PersistentStore {
       }
     }
 
-    this._store = createStore(
+    this.storeInternal = createStore(
       combineReducers({
         attestations: Attestations.Store.reducer,
         balances: Balances.Store.reducer,
@@ -107,18 +106,21 @@ class PersistentStore {
         wallet: Wallet.Store.reducer,
       }),
       persistedState,
+      // eslint-disable-next-line no-underscore-dangle
       window.__REDUX_DEVTOOLS_EXTENSION__ &&
+        // eslint-disable-next-line no-underscore-dangle
         window.__REDUX_DEVTOOLS_EXTENSION__()
     )
 
-    this._store.subscribe(() => {
+    this.storeInternal.subscribe(() => {
       localStorage.setItem(
         PersistentStore.NAME,
-        PersistentStore.serialize(this._store.getState())
+        PersistentStore.serialize(this.storeInternal.getState())
       )
     })
   }
 
+  // eslint-disable-next-line class-methods-use-this
   public reset(): void {
     localStorage.clear()
   }

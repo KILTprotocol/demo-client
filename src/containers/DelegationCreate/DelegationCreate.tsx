@@ -1,16 +1,14 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import CTypePresentation from '../../components/CTypePresentation/CTypePresentation'
-import CTypeRepository from '../../services/CtypeRepository'
 import delegationService from '../../services/DelegationsService'
 import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { ICType } from '../../types/Ctype'
 import Spinner from '../../components/Spinner/Spinner'
 import FeedbackService, {
   notifySuccess,
@@ -20,13 +18,19 @@ import { BlockUi } from '../../types/UserFeedback'
 
 import './DelegationCreate.scss'
 
-type Props = RouteComponentProps<{
-  cTypeHash: sdk.ICType['hash']
-}> & {
-  isPCR: boolean
-
+type StateProps = {
   selectedIdentity?: Wallet.Entry
 }
+
+type OwnProps = {
+  isPCR: boolean
+}
+
+type Props = StateProps &
+  RouteComponentProps<{
+    cTypeHash: sdk.ICType['hash']
+  }> &
+  OwnProps
 
 type State = {
   alias: string
@@ -43,79 +47,24 @@ class DelegationCreate extends React.Component<Props, State> {
     this.submit = this.submit.bind(this)
   }
 
-  public componentDidMount() {
-    const ctypeHash = this.props.match.params.cTypeHash
-    const { selectedIdentity } = this.props
+  public componentDidMount(): void {
+    const { match, selectedIdentity } = this.props
+    const { cTypeHash } = match.params
     const { alias } = this.state
+
     if (selectedIdentity) {
       this.setState({
         alias,
         delegation: new sdk.DelegationRootNode(
           sdk.UUID.generate(),
-          ctypeHash,
+          cTypeHash,
           selectedIdentity.identity.address
         ),
       })
     }
   }
 
-  public render() {
-    const { isPCR } = this.props
-    const ctypeHash = this.props.match.params.cTypeHash
-    const { alias, delegation } = this.state
-    return (
-      <section className="DelegationCreate">
-        <h1>{isPCR ? `New Root PCR` : `New Root Delegation`}</h1>
-        {delegation ? (
-          <React.Fragment>
-            <div className="Delegation-base">
-              <div>
-                <label>Alias</label>
-                <input type="text" onChange={this.handleNameChange} />
-              </div>
-              <div>
-                <label>Id</label>
-                <div>{delegation.id}</div>
-              </div>
-              <div>
-                <label>CTYPE</label>
-                <div>
-                  <CTypePresentation
-                    cTypeHash={ctypeHash}
-                    interactive={true}
-                    linked={true}
-                  />
-                </div>
-              </div>
-              <div>
-                <label>Account</label>
-                <div>
-                  <ContactPresentation
-                    address={delegation.account}
-                    interactive={true}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="actions">
-              <Link to={`/${isPCR ? 'pcrs' : 'delegations'}`}>Cancel</Link>
-              <button
-                className="submit-delegation"
-                disabled={alias.length === 0}
-                onClick={this.submit}
-              >
-                Submit
-              </button>
-            </div>
-          </React.Fragment>
-        ) : (
-          <Spinner />
-        )}
-      </section>
-    )
-  }
-
-  private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+  private handleNameChange(e: React.ChangeEvent<HTMLInputElement>): void {
     this.setState({
       alias: e.target.value.trim(),
     })
@@ -143,9 +92,66 @@ class DelegationCreate extends React.Component<Props, State> {
         })
     }
   }
+
+  public render(): JSX.Element {
+    const { isPCR, match } = this.props
+    const { cTypeHash } = match.params
+    const { alias, delegation } = this.state
+    return (
+      <section className="DelegationCreate">
+        <h1>{isPCR ? `New Root PCR` : `New Root Delegation`}</h1>
+        {delegation ? (
+          <>
+            <div className="Delegation-base">
+              <div>
+                <label>Alias</label>
+                <input type="text" onChange={this.handleNameChange} />
+              </div>
+              <div>
+                <label>Id</label>
+                <div>{delegation.id}</div>
+              </div>
+              <div>
+                <label>CTYPE</label>
+                <div>
+                  <CTypePresentation cTypeHash={cTypeHash} interactive linked />
+                </div>
+              </div>
+              <div>
+                <label>Account</label>
+                <div>
+                  <ContactPresentation
+                    address={delegation.account}
+                    interactive
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="actions">
+              <Link to={`/${isPCR ? 'pcrs' : 'delegations'}`}>Cancel</Link>
+              <button
+                type="button"
+                className="submit-delegation"
+                disabled={alias.length === 0}
+                onClick={this.submit}
+              >
+                Submit
+              </button>
+            </div>
+          </>
+        ) : (
+          <Spinner />
+        )}
+      </section>
+    )
+  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

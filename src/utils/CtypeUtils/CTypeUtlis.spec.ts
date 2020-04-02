@@ -1,9 +1,9 @@
+import * as sdk from '@kiltprotocol/sdk-js'
 import {
   fromInputModel,
   getClaimInputModel,
   getCTypeInputModel,
 } from './CtypeUtils'
-import * as sdk from '@kiltprotocol/sdk-js'
 import { ICTypeInput } from '../../types/Ctype'
 
 describe('CType', () => {

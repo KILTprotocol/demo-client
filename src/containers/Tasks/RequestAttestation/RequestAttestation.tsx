@@ -1,5 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 
@@ -41,7 +41,7 @@ class RequestAttestation extends React.Component<
     this.onSelectClaims = this.onSelectClaims.bind(this)
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     const { claim } = this.props
     // check if we already have the messages claim stored
     this.setState({
@@ -49,65 +49,34 @@ class RequestAttestation extends React.Component<
     })
   }
 
-  public render() {
-    const { terms, delegationId, quote } = this.props
-    const { savedClaimEntry } = this.state
-
-    return (
-      <section className="RequestAttestation">
-        {savedClaimEntry ? (
-          <MyClaimDetailView
-            claimEntry={savedClaimEntry}
-            hideAttestedClaims={true}
-          />
-        ) : (
-          this.getCreateOrSelect()
-        )}
-
-        {((!!terms && !!terms.length) || !!delegationId) && (
-          <AttestedClaimsListView
-            attestedClaims={terms}
-            delegationId={delegationId}
-            context="terms"
-            currentDelegationViewType={ViewType.Present}
-          />
-        )}
-
-        {!quote ? (
-          <section>no Quote</section>
-        ) : (
-          <section>
-            <Code>{quote}</Code>
-          </section>
-        )}
-
-        <div className="actions">
-          <button onClick={this.onCancel}>Cancel</button>
-
-          <button
-            className="request-attestation"
-            disabled={!savedClaimEntry}
-            onClick={this.handleSubmit}
-          >
-            Request Attestation
-          </button>
-        </div>
-      </section>
-    )
+  private onSelectClaims(selectedClaims: Claims.Entry[]): void {
+    this.setState({
+      savedClaimEntry: selectedClaims[0],
+    })
   }
 
-  private getCreateOrSelect() {
+  private onCancel(): void {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
+  }
+
+  private getCreateOrSelect(): JSX.Element {
     const { claim } = this.props
     const { createNewClaim } = this.state
 
     const button = {
       create: (
-        <button onClick={this.setCreateNewClaim.bind(this, true)}>
+        <button type="button" onClick={this.setCreateNewClaim.bind(this, true)}>
           Create new claim
         </button>
       ),
       select: (
-        <button onClick={this.setCreateNewClaim.bind(this, false)}>
+        <button
+          type="button"
+          onClick={this.setCreateNewClaim.bind(this, false)}
+        >
           Select claim
         </button>
       ),
@@ -171,17 +140,11 @@ class RequestAttestation extends React.Component<
     }
   }
 
-  private setCreateNewClaim(createNewClaim: boolean) {
+  private setCreateNewClaim(createNewClaim: boolean): void {
     this.setState({ createNewClaim })
   }
 
-  private onSelectClaims(selectedClaims: Claims.Entry[]) {
-    this.setState({
-      savedClaimEntry: selectedClaims[0],
-    })
-  }
-
-  private handleCreateClaim(currentClaim: sdk.IPartialClaim) {
+  private handleCreateClaim(currentClaim: sdk.IPartialClaim): void {
     this.setState({
       savedClaimEntry: Claims.getClaim(
         PersistentStore.store.getState(),
@@ -190,14 +153,7 @@ class RequestAttestation extends React.Component<
     })
   }
 
-  private onCancel() {
-    const { onCancel } = this.props
-    if (onCancel) {
-      onCancel()
-    }
-  }
-
-  private handleSubmit() {
+  private handleSubmit(): void {
     const {
       receiverAddresses,
       terms,
@@ -241,6 +197,52 @@ class RequestAttestation extends React.Component<
           })
       }
     }
+  }
+
+  public render(): JSX.Element {
+    const { terms, delegationId, quote } = this.props
+    const { savedClaimEntry } = this.state
+
+    return (
+      <section className="RequestAttestation">
+        {savedClaimEntry ? (
+          <MyClaimDetailView claimEntry={savedClaimEntry} hideAttestedClaims />
+        ) : (
+          this.getCreateOrSelect()
+        )}
+
+        {((!!terms && !!terms.length) || !!delegationId) && (
+          <AttestedClaimsListView
+            attestedClaims={terms}
+            delegationId={delegationId}
+            context="terms"
+            currentDelegationViewType={ViewType.Present}
+          />
+        )}
+
+        {!quote ? (
+          <section>no Quote</section>
+        ) : (
+          <section>
+            <Code>{quote}</Code>
+          </section>
+        )}
+
+        <div className="actions">
+          <button type="button" onClick={this.onCancel}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="request-attestation"
+            disabled={!savedClaimEntry}
+            onClick={this.handleSubmit}
+          >
+            Request Attestation
+          </button>
+        </div>
+      </section>
+    )
   }
 }
 

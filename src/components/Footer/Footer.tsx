@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import * as UiState from '../../state/ducks/UiState'
@@ -7,9 +7,11 @@ import { State as ReduxState } from '../../state/PersistentStore'
 
 import './Footer.scss'
 
-type Props = {
+type StateProps = {
   debugMode: boolean
 }
+
+type Props = StateProps
 
 type State = {}
 
@@ -19,7 +21,7 @@ class Footer extends React.Component<Props, State> {
     this.state = {}
   }
 
-  public render() {
+  public render(): JSX.Element {
     const { debugMode } = this.props
 
     return (
@@ -33,7 +35,7 @@ class Footer extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   debugMode: UiState.getDebugMode(state),
 })
 

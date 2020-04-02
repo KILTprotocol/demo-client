@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import groupBy from 'lodash/groupBy'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import * as Claims from '../../state/ducks/Claims'
@@ -49,8 +49,7 @@ const LABELS: AllLabels = {
     },
     text: {
       attestationsHeadline: 'Select attestation(s)',
-      includePropertiesHeadline:
-        'Select property(s) to include in Terms',
+      includePropertiesHeadline: 'Select property(s) to include in Terms',
       noAttestationFound: 'No attestation found.',
       noClaimsForCTypeFound: `No attested claims found for CTYPE. `,
       noClaimsFound: `No terms found.`,
@@ -69,12 +68,17 @@ export type ClaimSelectionData = {
   }
 }
 
-type Props = {
-  claimEntries: Claims.Entry[] // redux
+type StateProps = {
+  claimEntries: Claims.Entry[]
+}
+
+type OwnProps = {
   cTypeHashes?: Array<sdk.ICType['hash']>
   context?: 'default' | 'terms'
   onChange: (claimSelectionData: ClaimSelectionData) => void
 }
+
+type Props = StateProps & OwnProps
 
 type State = {
   claimSelectionData: ClaimSelectionData
@@ -94,45 +98,37 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     this.changeSelection = this.changeSelection.bind(this)
   }
 
-  public render() {
-    return (
-      <section className="SelectAttestedClaims">
-        {this.getCTypeContainers()}
-      </section>
-    )
-  }
-
-  private getCTypeContainers() {
+  private getCTypeContainers(): JSX.Element | JSX.Element[] {
     const { cTypeHashes } = this.props
     const requestedCTypeHashes = cTypeHashes || []
     const relevantClaimEntries = this.getRelevantClaimEntries()
     const cTypeHashesWithClaims = Object.keys(relevantClaimEntries)
 
-    const _cTypeHashes = requestedCTypeHashes.length
-      ? cTypeHashes
-      : cTypeHashesWithClaims.length
-      ? cTypeHashesWithClaims
-      : undefined
+    let chosenCTypeHashes
 
-    if (!_cTypeHashes) {
+    if (requestedCTypeHashes.length) chosenCTypeHashes = cTypeHashes
+    else if (cTypeHashesWithClaims.length)
+      chosenCTypeHashes = cTypeHashesWithClaims
+
+    if (!chosenCTypeHashes) {
       return (
         <div className="no-claim">
           <span>{this.labels.text.noClaimsFound}</span>
-          <Link to={`/ctype`}>{this.labels.buttons.createClaim}</Link>
+          <Link to="/ctype">{this.labels.buttons.createClaim}</Link>
         </div>
       )
     }
 
-    return (_cTypeHashes || []).map(
+    return (chosenCTypeHashes || []).map(
       (cTypeHash: Claims.Entry['claim']['cTypeHash']) => (
         <div className="cType-container" key={cTypeHash}>
           <h4>
             CType{' '}
             <CTypePresentation
               cTypeHash={cTypeHash}
-              inline={true}
-              interactive={true}
-              linked={true}
+              inline
+              interactive
+              linked
             />
           </h4>
           {relevantClaimEntries[cTypeHash] ? (
@@ -155,7 +151,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
   private getSelectAttestedClaim(
     claimEntry: Claims.Entry,
     cTypeHash?: Claims.Entry['claim']['cTypeHash']
-  ) {
+  ): JSX.Element {
     return (
       <SelectAttestedClaim
         key={claimEntry.id}
@@ -172,9 +168,8 @@ class SelectAttestedClaims extends React.Component<Props, State> {
 
     const relevantClaimEntries =
       cTypeHashes && cTypeHashes.length
-        ? claimEntries.filter(
-            (claimEntry: Claims.Entry) =>
-              cTypeHashes.indexOf(claimEntry.claim.cTypeHash) !== -1
+        ? claimEntries.filter((claimEntry: Claims.Entry) =>
+            cTypeHashes.includes(claimEntry.claim.cTypeHash)
           )
         : claimEntries
 
@@ -190,7 +185,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
   private changeSelection(
     claimEntry: Claims.Entry,
     state: SelectAttestedClaimState
-  ) {
+  ): void {
     const { onChange } = this.props
     const { claimSelectionData } = this.state
 
@@ -208,9 +203,21 @@ class SelectAttestedClaims extends React.Component<Props, State> {
       onChange(claimSelectionData)
     }
   }
+
+  public render(): JSX.Element {
+    return (
+      <section className="SelectAttestedClaims">
+        {this.getCTypeContainers()}
+      </section>
+    )
+  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   claimEntries: Claims.getClaims(state),
 })
 

@@ -15,7 +15,7 @@ import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 import * as Wallet from '../../state/ducks/Wallet'
 import * as Balances from '../../state/ducks/Balances'
 import PersistentStore from '../../state/PersistentStore'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import identitiesPool from './data/identities.json'
 
 type WithMessages = {
@@ -26,13 +26,109 @@ type WithMessages = {
 type Props = {}
 
 class DevTools extends React.Component<Props> {
-  public render() {
+  private static async bootstrapIdentities(): Promise<void> {
+    const blockUi = FeedbackService.addBlockUi({
+      headline: 'Creating identities',
+    })
+
+    await BsIdentity.createPool((bsIdentityKey: keyof BsIdentitiesPool) => {
+      blockUi.updateMessage(`Creating: ${bsIdentityKey}`)
+    }).then(() => {
+      blockUi.remove()
+    })
+  }
+
+  private static async bootstrapCTypes(): Promise<void> {
+    const blockUi = FeedbackService.addBlockUi({
+      headline: 'Creating cTypes',
+    })
+
+    await BsCType.savePool((bsCTypeKey: keyof BsCTypesPool) => {
+      blockUi.updateMessage(`Creating: ${bsCTypeKey}`)
+    }).then(() => {
+      blockUi.remove()
+    })
+  }
+
+  private static async bootstrapClaims(): Promise<void> {
+    const blockUi = FeedbackService.addBlockUi({
+      headline: 'Creating claims',
+    })
+
+    await BsClaim.savePool((bsClaimKey: keyof BsClaimsPool) => {
+      blockUi.updateMessage(`creating claim: ${bsClaimKey}`)
+    }).then(() => {
+      blockUi.remove()
+    })
+  }
+
+  private static async bootstrapDelegations(
+    withMessages = false
+  ): Promise<void> {
+    const blockUi = FeedbackService.addBlockUi({
+      headline: 'Creating delegations',
+    })
+
+    await BsDelegation.create(
+      false,
+      withMessages,
+      (bsDelegationKey: keyof BsDelegationsPool) => {
+        blockUi.updateMessage(`Creating: ${bsDelegationKey}`)
+      }
+    ).then(() => {
+      blockUi.remove()
+    })
+  }
+
+  private static async bootstrapPCRs(withMessages = false): Promise<void> {
+    const blockUi = FeedbackService.addBlockUi({
+      headline: 'Creating PCRs',
+    })
+
+    await BsDelegation.create(
+      true,
+      withMessages,
+      (bsDelegationKey: keyof BsDelegationsPool) => {
+        blockUi.updateMessage(`Creating: ${bsDelegationKey}`)
+      }
+    ).then(() => {
+      blockUi.remove()
+    })
+  }
+
+  private static async bootstrapAttestations(
+    withMessages = false
+  ): Promise<void> {
+    const blockUi = FeedbackService.addBlockUi({
+      headline: 'Creating legitimations & attestations',
+    })
+
+    await BsAttestation.create(
+      withMessages,
+      (bsAttestationKey: keyof BsAttestationsPool) => {
+        blockUi.updateMessage(`Creating: ${bsAttestationKey}`)
+      }
+    ).then(() => {
+      blockUi.remove()
+    })
+  }
+
+  private static async bootstrapAll(withMessages = false): Promise<void> {
+    await DevTools.bootstrapIdentities()
+    await DevTools.bootstrapCTypes()
+    await DevTools.bootstrapClaims()
+    await DevTools.bootstrapDelegations(withMessages)
+    await DevTools.bootstrapPCRs(withMessages)
+    await DevTools.bootstrapAttestations(withMessages)
+  }
+
+  public render(): JSX.Element {
     const withMessages: WithMessages[] = [
       { label: 'Without messages', with: false },
       { label: 'With messages', with: true },
     ]
 
-    const selectedIdentity: MyIdentity = Wallet.getSelectedIdentity(
+    const selectedIdentity: IMyIdentity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     )
 
@@ -56,8 +152,9 @@ class DevTools extends React.Component<Props> {
               <h4>Auto Bootstrap</h4>
               {withMessages.map((messages: WithMessages) => (
                 <button
+                  type="button"
                   key={messages.label}
-                  onClick={this.bootstrapAll.bind(this, messages.with)}
+                  onClick={DevTools.bootstrapAll.bind(this, messages.with)}
                 >
                   {messages.label}
                 </button>
@@ -66,19 +163,30 @@ class DevTools extends React.Component<Props> {
             {withMessages.map((messages: WithMessages) => (
               <div key={messages.label}>
                 <h4>{`Manual Bootstrap ${messages.label}`}</h4>
-                <button onClick={this.bootstrapIdentities}>Identities</button>
-                <button onClick={this.bootstrapCTypes}>CTypes</button>
-                <button onClick={this.bootstrapClaims}>Claims</button>
+                <button type="button" onClick={DevTools.bootstrapIdentities}>
+                  Identities
+                </button>
+                <button type="button" onClick={DevTools.bootstrapCTypes}>
+                  CTypes
+                </button>
+                <button type="button" onClick={DevTools.bootstrapClaims}>
+                  Claims
+                </button>
                 <button
-                  onClick={this.bootstrapDelegations.bind(this, messages.with)}
+                  type="button"
+                  onClick={() => DevTools.bootstrapDelegations(messages.with)}
                 >
                   Delegations
                 </button>
-                <button onClick={this.bootstrapPCRs.bind(this, messages.with)}>
+                <button
+                  type="button"
+                  onClick={() => DevTools.bootstrapPCRs(messages.with)}
+                >
                   PCRs
                 </button>
                 <button
-                  onClick={this.bootstrapAttestations.bind(this, messages.with)}
+                  type="button"
+                  onClick={() => DevTools.bootstrapAttestations(messages.with)}
                 >
                   Attestations
                 </button>
@@ -93,98 +201,6 @@ class DevTools extends React.Component<Props> {
         )}
       </section>
     )
-  }
-
-  private async bootstrapIdentities() {
-    const blockUi = FeedbackService.addBlockUi({
-      headline: 'Creating identities',
-    })
-
-    await BsIdentity.createPool((bsIdentityKey: keyof BsIdentitiesPool) => {
-      blockUi.updateMessage(`Creating: ${bsIdentityKey}`)
-    }).then(() => {
-      blockUi.remove()
-    })
-  }
-
-  private async bootstrapCTypes() {
-    const blockUi = FeedbackService.addBlockUi({
-      headline: 'Creating cTypes',
-    })
-
-    await BsCType.savePool((bsCTypeKey: keyof BsCTypesPool) => {
-      blockUi.updateMessage(`Creating: ${bsCTypeKey}`)
-    }).then(() => {
-      blockUi.remove()
-    })
-  }
-
-  private async bootstrapClaims() {
-    const blockUi = FeedbackService.addBlockUi({
-      headline: 'Creating claims',
-    })
-
-    await BsClaim.savePool((bsClaimKey: keyof BsClaimsPool) => {
-      blockUi.updateMessage(`creating claim: ${bsClaimKey}`)
-    }).then(() => {
-      blockUi.remove()
-    })
-  }
-
-  private async bootstrapDelegations(withMessages = false) {
-    const blockUi = FeedbackService.addBlockUi({
-      headline: 'Creating delegations',
-    })
-
-    await BsDelegation.create(
-      false,
-      withMessages,
-      (bsDelegationKey: keyof BsDelegationsPool) => {
-        blockUi.updateMessage(`Creating: ${bsDelegationKey}`)
-      }
-    ).then(() => {
-      blockUi.remove()
-    })
-  }
-
-  private async bootstrapPCRs(withMessages = false) {
-    const blockUi = FeedbackService.addBlockUi({
-      headline: 'Creating PCRs',
-    })
-
-    await BsDelegation.create(
-      true,
-      withMessages,
-      (bsDelegationKey: keyof BsDelegationsPool) => {
-        blockUi.updateMessage(`Creating: ${bsDelegationKey}`)
-      }
-    ).then(() => {
-      blockUi.remove()
-    })
-  }
-
-  private async bootstrapAttestations(withMessages = false) {
-    const blockUi = FeedbackService.addBlockUi({
-      headline: 'Creating legitimations & attestations',
-    })
-
-    await BsAttestation.create(
-      withMessages,
-      (bsAttestationKey: keyof BsAttestationsPool) => {
-        blockUi.updateMessage(`Creating: ${bsAttestationKey}`)
-      }
-    ).then(() => {
-      blockUi.remove()
-    })
-  }
-
-  private async bootstrapAll(withMessages = false) {
-    await this.bootstrapIdentities()
-    await this.bootstrapCTypes()
-    await this.bootstrapClaims()
-    await this.bootstrapDelegations(withMessages)
-    await this.bootstrapPCRs(withMessages)
-    await this.bootstrapAttestations(withMessages)
   }
 }
 

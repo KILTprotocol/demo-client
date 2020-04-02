@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
 import CTypeRepository from '../../services/CtypeRepository'
@@ -32,18 +31,18 @@ type State = {
 }
 
 class SelectCTypes extends React.Component<Props, State> {
-  public static defaultProps = {
-    closeMenuOnSelect: true,
-    isMulti: false,
-    name: 'selectCTypes',
-    placeholder: `Select cType#{multi}…`,
-  }
-
   private filterConfig: Config = {
     ignoreAccents: true,
     ignoreCase: true,
     matchFrom: 'any',
     trim: true,
+  }
+
+  public static defaultProps = {
+    closeMenuOnSelect: true,
+    isMulti: false,
+    name: 'selectCTypes',
+    placeholder: `Select cType#{multi}…`,
   }
 
   constructor(props: Props) {
@@ -55,7 +54,7 @@ class SelectCTypes extends React.Component<Props, State> {
     this.onChange = this.onChange.bind(this)
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     const { cTypes } = this.state
 
     if (!cTypes.length) {
@@ -77,7 +76,50 @@ class SelectCTypes extends React.Component<Props, State> {
     }
   }
 
-  public render() {
+  private onChange(selectedOptions: SelectOption | SelectOption[]): void {
+    const { onChange } = this.props
+    const { cTypes } = this.state
+
+    // normalize selectedOptions to Array
+    const selectedOptionValues: Array<SelectOption['value']> = (Array.isArray(
+      selectedOptions
+    )
+      ? selectedOptions
+      : [selectedOptions]
+    ).map((selectedOption: SelectOption) => selectedOption.baseValue)
+
+    const selectedCTypes: ICTypeWithMetadata[] = cTypes.filter(
+      (cType: ICTypeWithMetadata) =>
+        selectedOptionValues.includes(cType.cType.hash)
+    )
+
+    if (onChange) {
+      onChange(selectedCTypes)
+    }
+  }
+
+  private static getOption(cType: ICTypeWithMetadata): SelectOption {
+    return {
+      baseValue: `${cType.cType.hash}`,
+      label: <CTypePresentation cTypeHash={cType.cType.hash} />,
+      value: `${cType.metaData.metadata.title.default} ${cType.cType.hash}`,
+    }
+  }
+
+  private initPreSelection(): void {
+    const { preSelectedCTypeHashes, onChange } = this.props
+    const { cTypes } = this.state
+
+    if (preSelectedCTypeHashes && preSelectedCTypeHashes.length && onChange) {
+      onChange(
+        cTypes.filter((cType: ICTypeWithMetadata) =>
+          preSelectedCTypeHashes.includes(cType.cType.hash)
+        )
+      )
+    }
+  }
+
+  public render(): false | JSX.Element {
     const {
       closeMenuOnSelect,
       isMulti,
@@ -88,17 +130,16 @@ class SelectCTypes extends React.Component<Props, State> {
       preSelectedCTypeHashes,
     } = this.props
     const { cTypes } = this.state
-    const _preSelectedCTypeHashes = (preSelectedCTypeHashes || []).filter(
-      (cTypeHash: ICType['cType']['hash'] | undefined) => cTypeHash
-    )
+    const filteredPreSelectedCTypeHashes = (
+      preSelectedCTypeHashes || []
+    ).filter((cTypeHash: ICType['cType']['hash'] | undefined) => cTypeHash)
 
     const options: SelectOption[] = cTypes.map(
-      (cType: ICTypeWithMetadata): SelectOption => this.getOption(cType)
+      (cType: ICTypeWithMetadata): SelectOption => SelectCTypes.getOption(cType)
     )
 
-    const defaultOptions = options.filter(
-      (option: SelectOption) =>
-        _preSelectedCTypeHashes.indexOf(option.baseValue) !== -1
+    const defaultOptions = options.filter((option: SelectOption) =>
+      filteredPreSelectedCTypeHashes.includes(option.baseValue)
     )
 
     return (
@@ -107,13 +148,15 @@ class SelectCTypes extends React.Component<Props, State> {
           className="react-select-container"
           classNamePrefix="react-select"
           isClearable={isMulti && cTypes.length > 1}
-          isSearchable={true}
+          isSearchable
           isMulti={isMulti && cTypes.length > 1}
           closeMenuOnSelect={closeMenuOnSelect}
           name={name}
           options={options}
           defaultValue={defaultOptions}
-          placeholder={placeholder!.replace('#{multi}', isMulti ? 's' : '')}
+          placeholder={
+            placeholder && placeholder.replace('#{multi}', isMulti ? 's' : '')
+          }
           filterOption={createFilter(this.filterConfig)}
           onChange={this.onChange}
           onMenuOpen={onMenuOpen}
@@ -121,50 +164,6 @@ class SelectCTypes extends React.Component<Props, State> {
         />
       )
     )
-  }
-
-  private getOption(cType: ICTypeWithMetadata): SelectOption {
-    return {
-      baseValue: `${cType.cType.hash}`,
-      label: <CTypePresentation cTypeHash={cType.cType.hash} />,
-      value: `${cType.metaData.metadata.title.default} ${cType.cType.hash}`,
-    }
-  }
-
-  private onChange(selectedOptions: SelectOption | SelectOption[]) {
-    const { onChange } = this.props
-    const { cTypes } = this.state
-
-    // normalize selectedOptions to Array
-    const _selectedOptions: Array<SelectOption['value']> = (Array.isArray(
-      selectedOptions
-    )
-      ? selectedOptions
-      : [selectedOptions]
-    ).map((selectedOption: SelectOption) => selectedOption.baseValue)
-
-    const selectedCTypes: ICTypeWithMetadata[] = cTypes.filter(
-      (cType: ICTypeWithMetadata) =>
-        _selectedOptions.indexOf(`${cType.cType.hash}`) !== -1
-    )
-
-    if (onChange) {
-      onChange(selectedCTypes)
-    }
-  }
-
-  private initPreSelection() {
-    const { preSelectedCTypeHashes, onChange } = this.props
-    const { cTypes } = this.state
-
-    if (preSelectedCTypeHashes && preSelectedCTypeHashes.length && onChange) {
-      onChange(
-        cTypes.filter(
-          (cType: ICTypeWithMetadata) =>
-            preSelectedCTypeHashes.indexOf(cType.cType.hash) !== -1
-        )
-      )
-    }
   }
 }
 

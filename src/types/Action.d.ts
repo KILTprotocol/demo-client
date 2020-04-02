@@ -1,6 +1,8 @@
-type KiltAction = {
-  type: string
+import { Action } from 'redux'
+
+interface IKiltAction extends Action<string> {
   payload: any
 }
 
-export default KiltAction
+// eslint-disable-next-line no-undef
+export default IKiltAction

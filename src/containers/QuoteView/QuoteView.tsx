@@ -1,32 +1,37 @@
 import './QuoteView.scss'
 import React from 'react'
-import { connect } from 'react-redux'
-import { MyIdentity } from '../../types/Contact'
-import * as sdk from '@kiltprotocol/sdk-js'
-import * as Wallet from '../../state/ducks/Wallet'
-import * as Quotes from '../../state/ducks/Quotes'
-import QuoteCreate from '../../containers/QuoteCreate/QuoteCreate'
-
-import Code from '../../components/Code/Code'
+import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
+import * as sdk from '@kiltprotocol/sdk-js'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
+import { IMyIdentity } from '../../types/Contact'
+import * as Wallet from '../../state/ducks/Wallet'
+import * as Quotes from '../../state/ducks/Quotes'
+import QuoteCreate from '../QuoteCreate/QuoteCreate'
+import Code from '../../components/Code/Code'
 
-type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> & {
-  selectedIdentity: MyIdentity
-  claim: sdk.IPartialClaim
+type StateProps = {
+  selectedIdentity: IMyIdentity
   quoteEntries?: Quotes.Entry[]
+}
+
+type OwnProps = {
+  claim: sdk.IPartialClaim
   senderAddress?: string
   receiverAddress?: string
   updateQuote: (quote: sdk.IQuote) => void
 }
 
+type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
+  StateProps &
+  OwnProps
+
 type State = {
   createNewQuote: boolean
-  redirect?: string
   quoteID?: Quotes.Entry['quoteId']
-  newQuote?: Quotes.QuoteEntry
+  newQuote?: Quotes.IQuoteEntry
 }
 
 class QuoteView extends React.Component<Props, State> {
@@ -38,28 +43,9 @@ class QuoteView extends React.Component<Props, State> {
     this.quoteId = this.quoteId.bind(this)
   }
 
-  public componentDidMount() {
-    const {
-      senderAddress,
-      receiverAddress,
-      selectedIdentity,
-    } = this.props
-    if (!senderAddress && !receiverAddress) {
-      senderAddress === selectedIdentity.identity.address
-      receiverAddress === ' '
-    }
-  }
-
-  public componentDidUpdate(prevProps: Props) {
+  public componentDidMount(): void {
+    const { updateQuote } = this.props
     const { newQuote, quoteID } = this.state
-    if (
-      prevProps.selectedIdentity.identity.address !==
-      this.props.selectedIdentity.identity.address
-    ) {
-      this.setState({
-        redirect: '/quote',
-      })
-    }
     if (quoteID && !newQuote) {
       const selectedQuote = Quotes.getQuoteByQuoteHash(
         PersistentStore.store.getState(),
@@ -68,59 +54,74 @@ class QuoteView extends React.Component<Props, State> {
 
       if (newQuote !== selectedQuote.quote) {
         this.setState({ newQuote: selectedQuote.quote })
-        this.props.updateQuote(selectedQuote.quote)
+        updateQuote(selectedQuote.quote)
       }
     }
   }
 
-  public render() {
+  private onCancelQuote(): void {
+    this.setState({ createNewQuote: false })
+  }
+
+  private createQuote(): void {
+    this.setState({ createNewQuote: true })
+  }
+
+  private quoteId(quoteId: Quotes.Entry['quoteId']): void {
+    this.setState({ quoteID: quoteId })
+  }
+
+  public render(): JSX.Element {
     const { senderAddress, receiverAddress, claim } = this.props
 
     const { createNewQuote, quoteID, newQuote } = this.state
 
-    return quoteID && newQuote ? (
+    return (
       <section className="QuoteView">
         <h1>Quote </h1>
-        <div>
-          <span>
-            <Code>{newQuote}</Code>
-          </span>
-        </div>
-      </section>
-    ) : !createNewQuote ? (
-      <section>
-        <div className="actions">
-          <button className="submit-quote" onClick={this.createQuote}>
-            Create new Quote
-          </button>
-        </div>
-      </section>
-    ) : (
-      <section>
-        <QuoteCreate
-          claimerAddress={senderAddress}
-          attesterAddress={receiverAddress}
-          cTypeHash={claim?.cTypeHash}
-          onCancel={this.onCancelQuote}
-          quoteId={this.quoteId}
-        />
+        {!quoteID ? (
+          <div>
+            <span>
+              <Code>{newQuote}</Code>
+            </span>
+          </div>
+        ) : (
+          <div />
+        )}
+
+        {!createNewQuote && !quoteID ? (
+          <section>
+            <div className="actions">
+              <button
+                type="button"
+                className="submit-quote"
+                onClick={this.createQuote}
+              >
+                Create new Quote
+              </button>
+            </div>
+          </section>
+        ) : (
+          <section>
+            <QuoteCreate
+              claimerAddress={senderAddress}
+              attesterAddress={receiverAddress}
+              cTypeHash={claim?.cTypeHash}
+              onCancel={this.onCancelQuote}
+              quoteId={this.quoteId}
+            />
+          </section>
+        )}
       </section>
     )
   }
-
-  private createQuote() {
-    this.setState({ createNewQuote: true })
-  }
-
-  private onCancelQuote() {
-    this.setState({ createNewQuote: false })
-  }
-  private quoteId(quoteId: Quotes.Entry['quoteId']) {
-    this.setState({ quoteID: quoteId })
-  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
   quoteEntries: Quotes.getAllMyQuotes(state),
 })

@@ -4,94 +4,94 @@ import { createSelector } from 'reselect'
 import { TaskProps } from '../../containers/Tasks/Tasks'
 import KiltAction from '../../types/Action'
 import {
-  BlockingNotification,
+  IBlockingNotification,
   BlockUi,
-  Notification,
+  INotification,
 } from '../../types/UserFeedback'
 import { State as ReduxState } from '../PersistentStore'
 
 /**
  * Notifications
  */
-interface AddNotificationAction extends KiltAction {
-  payload: Notification
+interface IAddNotificationAction extends KiltAction {
+  payload: INotification
 }
 
-interface RemoveNotificationAction extends KiltAction {
-  payload: Notification['id']
+interface IRemoveNotificationAction extends KiltAction {
+  payload: INotification['id']
 }
 
-type NotificationActions = AddNotificationAction | RemoveNotificationAction
+type NotificationActions = IAddNotificationAction | IRemoveNotificationAction
 
 /**
  * Blocking Notifications / Modals
  */
-interface AddBlockingNotificationAction extends KiltAction {
-  payload: BlockingNotification
+interface IAddBlockingNotificationAction extends KiltAction {
+  payload: IBlockingNotification
 }
 
-interface RemoveBlockingNotificationAction extends KiltAction {
-  payload: BlockingNotification['id']
+interface IRemoveBlockingNotificationAction extends KiltAction {
+  payload: IBlockingNotification['id']
 }
 
 type BlockingNotificationActions =
-  | AddBlockingNotificationAction
-  | RemoveBlockingNotificationAction
+  | IAddBlockingNotificationAction
+  | IRemoveBlockingNotificationAction
 
 /**
  * Block UI
  */
-interface AddBlockUiAction extends KiltAction {
+interface IAddBlockUiAction extends KiltAction {
   payload: BlockUi
 }
 
-interface RemoveBlockUiAction extends KiltAction {
+interface IRemoveBlockUiAction extends KiltAction {
   payload: BlockUi['id']
 }
 
-interface UpdateBlockUiAction extends KiltAction {
+interface IUpdateBlockUiAction extends KiltAction {
   payload: {
     id: BlockUi['id']
     message: BlockUi['message']
   }
 }
 
-interface UpdateCurrentTaskAction extends KiltAction {
+interface IUpdateCurrentTaskAction extends KiltAction {
   payload: TaskProps | undefined
 }
 
-type BlockUiActions = AddBlockUiAction | RemoveBlockUiAction
+type BlockUiActions = IAddBlockUiAction | IRemoveBlockUiAction
 
 /**
  * debug state
  */
-interface SetDebugModeAction extends KiltAction {
+interface ISetDebugModeAction extends KiltAction {
   payload: boolean
 }
 
 /**
  * debug state
  */
-interface RefreshAttestationStatusAction extends KiltAction {
+interface IRefreshAttestationStatusAction extends KiltAction {
   payload: undefined
 }
 
 /**
  *
  */
-type Action =
+export type Action =
   | NotificationActions
   | BlockingNotificationActions
   | BlockUiActions
-  | SetDebugModeAction
-  | UpdateCurrentTaskAction
-  | RefreshAttestationStatusAction
+  | ISetDebugModeAction
+  | IUpdateCurrentTaskAction
+  | IRefreshAttestationStatusAction
 
 type State = {
-  notifications: Immutable.Map<Notification['id'], Notification>
+  notifications: Immutable.Map<INotification['id'], INotification>
   blockingNotifications: Immutable.Map<
-    BlockingNotification['id'],
-    BlockingNotification
+    IBlockingNotification['id'],
+    IBlockingNotification
   >
   blockUis: Immutable.Map<BlockUi['id'], BlockUi>
 
@@ -100,24 +100,22 @@ type State = {
   debugMode: boolean
 }
 
-type ImmutableState = Immutable.Record<State>
+export type ImmutableState = Immutable.Record<State>
 
-type SerializedState = {
+export type SerializedState = {
   uiState: string
 }
 
 class Store {
   // TODO: add (de)serialization if needed
-  public static serialize(state: ImmutableState) {
+  public static serialize(): SerializedState {
     const serialized: SerializedState = {
       uiState: '',
     }
     return serialized
   }
 
-  public static deserialize(
-    uiStateSerialized: SerializedState
-  ): ImmutableState {
+  public static deserialize(): ImmutableState {
     return Store.createState()
   }
 
@@ -128,17 +126,17 @@ class Store {
     switch (action.type) {
       // Notifications
       case Store.ACTIONS.NOTIFICATION_ADD: {
-        const notification: Notification = (action as AddNotificationAction)
+        const notification: INotification = (action as IAddNotificationAction)
           .payload
         return state.setIn(['notifications', notification.id], notification)
       }
       case Store.ACTIONS.NOTIFICATION_REMOVE: {
-        const notificationId = (action as RemoveNotificationAction).payload
+        const notificationId = (action as IRemoveNotificationAction).payload
         return state.deleteIn(['notifications', notificationId])
       }
       // Blocking Notifications
       case Store.ACTIONS.BLOCKING_NOTIFICATION_ADD: {
-        const blockingNotification: BlockingNotification = (action as AddBlockingNotificationAction)
+        const blockingNotification: IBlockingNotification = (action as IAddBlockingNotificationAction)
           .payload
         return state.setIn(
           ['blockingNotifications', blockingNotification.id],
@@ -146,30 +144,30 @@ class Store {
         )
       }
       case Store.ACTIONS.BLOCKING_NOTIFICATION_REMOVE: {
-        const blockingNotificationId = (action as RemoveBlockingNotificationAction)
+        const blockingNotificationId = (action as IRemoveBlockingNotificationAction)
           .payload
         return state.deleteIn(['blockingNotifications', blockingNotificationId])
       }
       // Block Ui
       case Store.ACTIONS.BLOCK_UI_ADD: {
-        const blockUi: BlockUi = (action as AddBlockUiAction).payload
+        const blockUi: BlockUi = (action as IAddBlockUiAction).payload
         return state.setIn(['blockUis', blockUi.id], blockUi)
       }
       case Store.ACTIONS.BLOCK_UI_REMOVE: {
-        const blockUiId = (action as RemoveBlockUiAction).payload
+        const blockUiId = (action as IRemoveBlockUiAction).payload
         return state.deleteIn(['blockUis', blockUiId])
       }
       case Store.ACTIONS.BLOCK_UI_UPDATE: {
-        const { id, message } = (action as UpdateBlockUiAction).payload
+        const { id, message } = (action as IUpdateBlockUiAction).payload
         return state.setIn(['blockUis', id, 'message'], message)
       }
       case Store.ACTIONS.SET_DEBUG_MODE: {
-        const debugMode = (action as SetDebugModeAction).payload
+        const debugMode = (action as ISetDebugModeAction).payload
         return state.setIn(['debugMode'], debugMode)
       }
       // current task
       case Store.ACTIONS.CURRENT_TASK_UPDATE: {
-        const { objective, props } = (action as UpdateCurrentTaskAction)
+        const { objective, props } = (action as IUpdateCurrentTaskAction)
           .payload as TaskProps
         return state.setIn(['currentTask'], [{ objective, props }])
       }
@@ -184,8 +182,8 @@ class Store {
   }
 
   public static addNotificationAction(
-    notification: Notification
-  ): AddNotificationAction {
+    notification: INotification
+  ): IAddNotificationAction {
     return {
       payload: notification,
       type: Store.ACTIONS.NOTIFICATION_ADD,
@@ -193,8 +191,8 @@ class Store {
   }
 
   public static removeNotificationAction(
-    id: Notification['id']
-  ): RemoveNotificationAction {
+    id: INotification['id']
+  ): IRemoveNotificationAction {
     return {
       payload: id,
       type: Store.ACTIONS.NOTIFICATION_REMOVE,
@@ -202,8 +200,8 @@ class Store {
   }
 
   public static addBlockingNotificationAction(
-    blockingNotification: BlockingNotification
-  ): AddBlockingNotificationAction {
+    blockingNotification: IBlockingNotification
+  ): IAddBlockingNotificationAction {
     return {
       payload: blockingNotification,
       type: Store.ACTIONS.BLOCKING_NOTIFICATION_ADD,
@@ -211,22 +209,22 @@ class Store {
   }
 
   public static removeBlockingNotificationAction(
-    id: BlockingNotification['id']
-  ): RemoveBlockingNotificationAction {
+    id: IBlockingNotification['id']
+  ): IRemoveBlockingNotificationAction {
     return {
       payload: id,
       type: Store.ACTIONS.BLOCKING_NOTIFICATION_REMOVE,
     }
   }
 
-  public static addBlockUiAction(blockUi: BlockUi): AddBlockUiAction {
+  public static addBlockUiAction(blockUi: BlockUi): IAddBlockUiAction {
     return {
       payload: blockUi,
       type: Store.ACTIONS.BLOCK_UI_ADD,
     }
   }
 
-  public static removeBlockUiAction(id: BlockUi['id']): RemoveBlockUiAction {
+  public static removeBlockUiAction(id: BlockUi['id']): IRemoveBlockUiAction {
     return {
       payload: id,
       type: Store.ACTIONS.BLOCK_UI_REMOVE,
@@ -236,14 +234,14 @@ class Store {
   public static updateBlockUiAction(
     id: BlockUi['id'],
     message: BlockUi['message']
-  ): UpdateBlockUiAction {
+  ): IUpdateBlockUiAction {
     return {
       payload: { id, message },
       type: Store.ACTIONS.BLOCK_UI_UPDATE,
     }
   }
 
-  public static setDebugModeAction(debug: boolean): SetDebugModeAction {
+  public static setDebugModeAction(debug: boolean): ISetDebugModeAction {
     return {
       payload: debug,
       type: Store.ACTIONS.SET_DEBUG_MODE,
@@ -252,14 +250,14 @@ class Store {
 
   public static updateCurrentTaskAction(
     taskProps: TaskProps
-  ): UpdateCurrentTaskAction {
+  ): IUpdateCurrentTaskAction {
     return {
       payload: taskProps,
       type: Store.ACTIONS.CURRENT_TASK_UPDATE,
     }
   }
 
-  public static refreshAttestationStatusAction(): RefreshAttestationStatusAction {
+  public static refreshAttestationStatusAction(): IRefreshAttestationStatusAction {
     return {
       payload: undefined,
       type: Store.ACTIONS.ATTESTATION_STATUS_REFRESH,
@@ -270,10 +268,10 @@ class Store {
     return Immutable.Record({
       blockUis: Immutable.Map<BlockUi['id'], BlockUi>(),
       blockingNotifications: Immutable.Map<
-        BlockingNotification['id'],
-        BlockingNotification
+        IBlockingNotification['id'],
+        IBlockingNotification
       >(),
-      notifications: Immutable.Map<Notification['id'], Notification>(),
+      notifications: Immutable.Map<INotification['id'], INotification>(),
 
       attestationStatusCycle: 0,
       currentTask: Immutable.List<TaskProps>(),
@@ -296,19 +294,19 @@ class Store {
   }
 }
 
-const _getNotifications = (state: ReduxState): Notification[] =>
+const getStateNotifications = (state: ReduxState): INotification[] =>
   state.uiState
     .get('notifications')
     .toList()
     .toArray()
-    .sort((a: Notification, b: Notification) => a.created - b.created)
+    .sort((a: INotification, b: INotification) => a.created - b.created)
 
 const getNotifications = createSelector(
-  [_getNotifications],
-  (notifications: Notification[]) => notifications
+  [getStateNotifications],
+  (notifications: INotification[]) => notifications
 )
 
-const _getBlockUis = (state: ReduxState): BlockUi[] =>
+const getStateBlockUis = (state: ReduxState): BlockUi[] =>
   state.uiState
     .get('blockUis')
     .toList()
@@ -316,51 +314,50 @@ const _getBlockUis = (state: ReduxState): BlockUi[] =>
     .sort((a: BlockUi, b: BlockUi) => a.created - b.created)
 
 const getBlockUis = createSelector(
-  [_getBlockUis],
+  [getStateBlockUis],
   (blockUis: BlockUi[]) => blockUis
 )
 
-const _getBlockingNotifications = (state: ReduxState): BlockingNotification[] =>
+const getStateBlockingNotifications = (
+  state: ReduxState
+): IBlockingNotification[] =>
   state.uiState
     .get('blockingNotifications')
     .toList()
     .toArray()
-    .sort((a: Notification, b: Notification) => a.created - b.created)
+    .sort((a: INotification, b: INotification) => a.created - b.created)
 
 const getBlockingNotifications = createSelector(
-  [_getBlockingNotifications],
-  (blockingNotifications: BlockingNotification[]) => blockingNotifications
+  [getStateBlockingNotifications],
+  (blockingNotifications: IBlockingNotification[]) => blockingNotifications
 )
 
-const _getCurrentTask = (state: ReduxState): TaskProps =>
+const getStateCurrentTask = (state: ReduxState): TaskProps =>
   state.uiState.get('currentTask')[0]
 
 const getCurrentTask = createSelector(
-  [_getCurrentTask],
+  [getStateCurrentTask],
   (currentTask: TaskProps) => currentTask
 )
 
-const _getDebugMode = (state: ReduxState): boolean =>
+const getStateDebugMode = (state: ReduxState): boolean =>
   state.uiState.get('debugMode')
 
 const getDebugMode = createSelector(
-  [_getDebugMode],
+  [getStateDebugMode],
   (debugMode: boolean) => debugMode
 )
 
-const _getAttestationStatusCycle = (state: ReduxState): number =>
+const getStateAttestationStatusCycle = (state: ReduxState): number =>
   state.uiState.get('attestationStatusCycle')
 
 const getAttestationStatusCycle = createSelector(
-  [_getAttestationStatusCycle],
+  [getStateAttestationStatusCycle],
   (cycle: number) => cycle
 )
 
 export {
   Store,
-  ImmutableState,
-  SerializedState,
-  Action,
   getNotifications,
   getBlockUis,
   getBlockingNotifications,

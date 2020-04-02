@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 
 import CTypeRepository from '../../services/CtypeRepository'
@@ -11,27 +11,33 @@ import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 import './CtypeListView.scss'
 
-type Props = RouteComponentProps<{}> & {
-  onRequestTerm: (cType: ICTypeWithMetadata) => void
-  // mapStateToProps
+type StateProps = {
   cTypes?: ICTypeWithMetadata[]
 }
+
+type OwnProps = {
+  onRequestTerm: (cType: ICTypeWithMetadata) => void
+}
+
+type Props = RouteComponentProps<{}> & StateProps & OwnProps
 
 type State = {
   fetched: boolean
 }
 
 class CtypeListView extends React.Component<Props, State> {
+  private static fetchAllCTypes(): void {
+    CTypeRepository.findAll()
+  }
+
   constructor(props: Props) {
     super(props)
     this.state = {
       fetched: false,
     }
-
-    this.fetchAllCTypes = this.fetchAllCTypes.bind(this)
   }
 
-  public render() {
+  public render(): JSX.Element {
     const { cTypes } = this.props
     const { fetched } = this.state
     return (
@@ -59,29 +65,33 @@ class CtypeListView extends React.Component<Props, State> {
                   <td className="ctype-author">
                     <CTypePresentation
                       cTypeHash={cType.cType.hash}
-                      interactive={true}
-                      linked={true}
-                      right={true}
+                      interactive
+                      linked
+                      right
                     />
-                    <ContactPresentation
-                      address={cType.cType.owner!}
-                      interactive={true}
-                      right={true}
-                    />
+                    {cType.cType.owner && (
+                      <ContactPresentation
+                        address={cType.cType.owner}
+                        interactive
+                        right
+                      />
+                    )}
                   </td>
                   <td className="ctype">
                     <CTypePresentation
                       cTypeHash={cType.cType.hash}
-                      interactive={true}
-                      linked={true}
+                      interactive
+                      linked
                     />
                   </td>
                   <td className="author">
-                    <ContactPresentation
-                      address={cType.cType.owner!}
-                      interactive={true}
-                      right={true}
-                    />
+                    {cType.cType.owner && (
+                      <ContactPresentation
+                        address={cType.cType.owner}
+                        interactive
+                        right
+                      />
+                    )}
                   </td>
                 </tr>
               ))}
@@ -89,7 +99,7 @@ class CtypeListView extends React.Component<Props, State> {
           </table>
         )}
         <div className="actions">
-          <button onClick={this.fetchAllCTypes}>
+          <button type="button" onClick={CtypeListView.fetchAllCTypes}>
             {cTypes && !!cTypes.length ? 'Refetch' : 'Fetch'}
             <span> CTypes</span>
           </button>
@@ -98,13 +108,13 @@ class CtypeListView extends React.Component<Props, State> {
       </section>
     )
   }
-
-  private fetchAllCTypes() {
-    CTypeRepository.findAll()
-  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   cTypes: CTypes.getCTypes(state),
 })
 

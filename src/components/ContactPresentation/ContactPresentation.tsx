@@ -1,8 +1,8 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps } from 'react-redux'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 import { RequestTermsProps } from '../../containers/Tasks/RequestTerms/RequestTerms'
 import { SubmitTermsProps } from '../../containers/Tasks/SubmitTerms/SubmitTerms'
@@ -14,12 +14,16 @@ import * as UiState from '../../state/ducks/UiState'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
-import { Contact, MyIdentity } from '../../types/Contact'
+import { IContact, IMyIdentity } from '../../types/Contact'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
 
 import './ContactPresentation.scss'
 
-type Props = {
+type StateProps = {
+  contacts: IContact[]
+}
+
+type OwnProps = {
   address: sdk.IPublicIdentity['address']
 
   iconOnly?: boolean
@@ -28,14 +32,13 @@ type Props = {
   size?: number
   fullSizeActions?: true
   right?: true
-
-  // mapStateToProps
-  contacts: Contact[]
 }
 
+type Props = StateProps & OwnProps
+
 type State = {
-  contact?: Contact
-  myIdentity?: MyIdentity
+  contact?: IContact
+  myIdentity?: IMyIdentity
 }
 
 const DEFAULT_SIZE = 24
@@ -49,82 +52,16 @@ class ContactPresentation extends React.Component<Props, State> {
     this.remove = this.remove.bind(this)
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     this.setContact()
     this.setMyIdentity()
   }
 
-  public componentDidUpdate(prevProps: Props) {
+  public componentDidUpdate(prevProps: Props): void {
     if (!_.isEqual(this.props, prevProps)) {
       this.setContact()
       this.setMyIdentity()
     }
-  }
-
-  public render() {
-    const {
-      address,
-      inline,
-      interactive,
-      iconOnly,
-      fullSizeActions,
-      right,
-      size,
-    } = this.props
-    const { contact, myIdentity } = this.state
-
-    const name =
-      contact && contact.metaData
-        ? contact.metaData.name
-        : myIdentity
-        ? myIdentity.metaData.name
-        : address
-        ? address.substr(0, 20)
-        : '-'
-
-    let actions: Action[] = []
-
-    if (interactive) {
-      actions = this.getActions()
-    }
-
-    const classes = [
-      'ContactPresentation',
-      inline ? 'inline' : '',
-      contact ? (!contact.metaData.addedAt ? 'external' : 'internal') : '',
-      actions.length ? 'withActions' : '',
-      fullSizeActions ? 'fullSizeActions' : 'minimal',
-      right ? 'alignRight' : '',
-    ]
-
-    const dataAttributes: { [dataAttribute: string]: string } = {
-      'data-address': address,
-    }
-    if (contact && contact.metaData && contact.metaData.name) {
-      dataAttributes['data-name'] = contact.metaData.name
-    }
-
-    return (
-      <div className={classes.join(' ')} {...dataAttributes}>
-        <Identicon
-          value={address}
-          size={size || DEFAULT_SIZE}
-          theme="substrate"
-        />
-        {!iconOnly && (
-          <span className="label" title={name}>
-            {name}
-            {myIdentity && <small>(me)</small>}
-          </span>
-        )}
-        {!!actions.length && (
-          <SelectAction
-            className={fullSizeActions ? 'fullSize' : 'minimal'}
-            actions={actions}
-          />
-        )}
-      </div>
-    )
   }
 
   private getActions(): Action[] {
@@ -235,20 +172,20 @@ class ContactPresentation extends React.Component<Props, State> {
     return actions
   }
 
-  private setContact() {
+  private setContact(): void {
     const { address } = this.props
 
-    ContactRepository.findByAddress(address).then((contact: Contact) => {
+    ContactRepository.findByAddress(address).then((contact: IContact) => {
       if (contact) {
         this.setState({ contact })
       }
     })
   }
 
-  private setMyIdentity() {
+  private setMyIdentity(): void {
     const { address } = this.props
 
-    const myIdentity: MyIdentity = Wallet.getIdentity(
+    const myIdentity: IMyIdentity = Wallet.getIdentity(
       PersistentStore.store.getState(),
       address
     )
@@ -256,7 +193,7 @@ class ContactPresentation extends React.Component<Props, State> {
     this.setState({ myIdentity })
   }
 
-  private import() {
+  private import(): void {
     const { contact } = this.state
 
     const selectedIdentity = Wallet.getSelectedIdentity(
@@ -281,16 +218,96 @@ class ContactPresentation extends React.Component<Props, State> {
     }
   }
 
-  private remove() {
+  private remove(): void {
     const { address } = this.props
 
     if (address) {
       PersistentStore.store.dispatch(Contacts.Store.removeMyContact(address))
     }
   }
+
+  public render(): JSX.Element {
+    const {
+      address,
+      inline,
+      interactive,
+      iconOnly,
+      fullSizeActions,
+      right,
+      size,
+    } = this.props
+    const { contact, myIdentity } = this.state
+
+    let name = '-'
+
+    if (contact && contact.metaData) {
+      name = contact.metaData.name
+    } else if (myIdentity) {
+      name = myIdentity.metaData.name
+    } else if (address) {
+      name = address.substr(0, 20)
+    }
+
+    let actions: Action[] = []
+
+    if (interactive) {
+      actions = this.getActions()
+    }
+
+    let contactClass = ''
+    if (contact) {
+      if (contact.metaData.addedAt) {
+        contactClass = 'internal'
+      } else {
+        contactClass = 'external'
+      }
+    }
+
+    const classes = [
+      'ContactPresentation',
+      inline ? 'inline' : '',
+      contactClass,
+      actions.length ? 'withActions' : '',
+      fullSizeActions ? 'fullSizeActions' : 'minimal',
+      right ? 'alignRight' : '',
+    ]
+
+    const dataAttributes: { [dataAttribute: string]: string } = {
+      'data-address': address,
+    }
+    if (contact && contact.metaData && contact.metaData.name) {
+      dataAttributes['data-name'] = contact.metaData.name
+    }
+
+    return (
+      <div className={classes.join(' ')} {...dataAttributes}>
+        <Identicon
+          value={address}
+          size={size || DEFAULT_SIZE}
+          theme="substrate"
+        />
+        {!iconOnly && (
+          <span className="label" title={name}>
+            {name}
+            {myIdentity && <small>(me)</small>}
+          </span>
+        )}
+        {!!actions.length && (
+          <SelectAction
+            className={fullSizeActions ? 'fullSize' : 'minimal'}
+            actions={actions}
+          />
+        )}
+      </div>
+    )
+  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   contacts: Contacts.getContacts(state),
 })
 

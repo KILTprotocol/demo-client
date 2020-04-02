@@ -1,14 +1,12 @@
-import * as React from 'react'
-import { Contact } from '../../types/Contact'
+import React from 'react'
 import './DidDocumentView.scss'
 import Code from '../../components/Code/Code'
 
 type Props = {
   didDocument: object
-  children: any
 }
 
-const DidDocumentView = (props: Props) => {
+const DidDocumentView: React.FC<Props> = (props): JSX.Element => {
   const { didDocument } = props
   return (
     <div className="attributes">

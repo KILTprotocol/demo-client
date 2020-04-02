@@ -8,13 +8,8 @@ type Props = {
   context?: 'term'
 }
 
-type State = {}
-
-class VerifyClaim extends React.Component<Props, State> {
-  public render() {
-    const { attestedClaims } = this.props
-    return <AttestedClaimsListView attestedClaims={attestedClaims} />
-  }
-}
+const VerifyClaim: React.FC<Props> = ({ attestedClaims }) => (
+  <AttestedClaimsListView attestedClaims={attestedClaims} />
+)
 
 export default VerifyClaim

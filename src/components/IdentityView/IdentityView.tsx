@@ -1,5 +1,7 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, MapStateToProps } from 'react-redux'
+import { Identity } from '@kiltprotocol/sdk-js'
+
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
@@ -10,26 +12,29 @@ import DidDocumentView from '../../containers/DidDocumentView/DidDocumentView'
 import PersistentStore, {
   State as ReduxState,
 } from '../../state/PersistentStore'
-import { Contact, MyIdentity } from '../../types/Contact'
+import { IContact, IMyIdentity } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
 import './IdentityView.scss'
 import MessageRepository from '../../services/MessageRepository'
-import { Identity } from '@kiltprotocol/sdk-js'
 import QRCodePublicIdentity from '../QRCodePublicIdentity/QRCodePublicIdentity'
 
-type Props = {
+type StateProps = {
+  contacts: IContact[]
+}
+
+type OwnProps = {
   // input
-  myIdentity: MyIdentity
+  myIdentity: IMyIdentity
   selected: boolean
   // output
-  onDelete?: (address: MyIdentity['identity']['address']) => void
-  onSelect?: (seedAsHex: MyIdentity['identity']['address']) => void
-  onCreateDid?: (identity: MyIdentity) => void
-  onDeleteDid?: (identity: MyIdentity) => void
-  // mapStateToProps
-  contacts: Contact[]
+  onDelete?: (address: IMyIdentity['identity']['address']) => void
+  onSelect?: (seedAsHex: IMyIdentity['identity']['address']) => void
+  onCreateDid?: (identity: IMyIdentity) => void
+  onDeleteDid?: (identity: IMyIdentity) => void
 }
+
+type Props = StateProps & OwnProps
 
 type State = {
   showPublicIdentityQRCode: boolean
@@ -38,26 +43,94 @@ type State = {
 const FAUCET_URL = process.env.REACT_APP_FAUCET_URL
 
 class IdentityView extends React.Component<Props, State> {
+  private static openKiltFaucet(address: Identity['address']) {
+    return () => {
+      window.open(`${FAUCET_URL}?${address}`, '_blank')
+    }
+  }
 
   constructor(props: Props) {
     super(props)
     this.registerContact = this.registerContact.bind(this)
     this.toggleContacts = this.toggleContacts.bind(this)
-    this.openKiltFaucet = this.openKiltFaucet.bind(this)
     this.state = {
-      showPublicIdentityQRCode: false
+      showPublicIdentityQRCode: false,
     }
     this.togglePublicIdentityQRCode = this.togglePublicIdentityQRCode.bind(this)
   }
 
-  private togglePublicIdentityQRCode() {
+  private togglePublicIdentityQRCode(): void {
     const { showPublicIdentityQRCode } = this.state
     this.setState({
       showPublicIdentityQRCode: !showPublicIdentityQRCode,
     })
   }
 
-  public render() {
+  private registerContact(): void {
+    const { myIdentity } = this.props
+    const { identity, metaData } = myIdentity
+    const { address, boxPublicKeyAsHex } = identity
+    const { name } = metaData
+
+    const contact: IContact = {
+      metaData: { name },
+      publicIdentity: {
+        address,
+        boxPublicKeyAsHex,
+        serviceAddress: `${MessageRepository.URL}`,
+      },
+    }
+
+    ContactRepository.add(contact).then(
+      () => {
+        notifySuccess(`Identity '${name}' successfully registered.`)
+      },
+      error => {
+        errorService.log({
+          error,
+          message: `Failed to register identity '${name}'`,
+          origin: 'IdentityView.registerContact()',
+          type: 'ERROR.FETCH.POST',
+        })
+      }
+    )
+  }
+
+  private toggleContacts(): void {
+    const { contacts, myIdentity } = this.props
+    let contact = contacts.find(
+      (myContact: IContact) =>
+        myContact.publicIdentity.address === myIdentity.identity.address
+    )
+
+    if (!contact) {
+      contact = ContactRepository.getContactFromIdentity(myIdentity, {
+        unregistered: true,
+      })
+    }
+
+    const { metaData, publicIdentity } = contact
+
+    if (contact.metaData.addedAt) {
+      PersistentStore.store.dispatch(
+        Contacts.Store.removeMyContact(publicIdentity.address)
+      )
+    } else {
+      const myContact = {
+        metaData: {
+          ...metaData,
+          addedAt: Date.now(),
+          addedBy: Wallet.getSelectedIdentity(PersistentStore.store.getState())
+            .identity.address,
+        },
+        publicIdentity,
+      } as IContact
+
+      PersistentStore.store.dispatch(Contacts.Store.addContact(myContact))
+    }
+  }
+
+  public render(): JSX.Element {
     const {
       contacts,
       myIdentity,
@@ -69,12 +142,12 @@ class IdentityView extends React.Component<Props, State> {
     } = this.props
     const { showPublicIdentityQRCode } = this.state
     const { metaData, phrase, did, identity } = myIdentity
-    const contact: Contact | undefined = contacts.find(
-      (myContact: Contact) =>
+    const contact: IContact | undefined = contacts.find(
+      (myContact: IContact) =>
         myContact.publicIdentity.address === myIdentity.identity.address
     )
 
-    let balance: number = 0
+    let balance = 0
     if (contact) {
       balance = Balances.getBalance(
         PersistentStore.store.getState(),
@@ -82,8 +155,13 @@ class IdentityView extends React.Component<Props, State> {
       )
     }
     const classes = ['IdentityView', selected ? 'selected' : '']
-    const publicIdentityWithServiceAddress = {...identity.getPublicIdentity(), serviceAddress: MessageRepository.URL}
-    const togglePublicIdentityQRCodeButtonTxt = `${showPublicIdentityQRCode ? "Hide" : "Show"} QR Code`
+    const publicIdentityWithServiceAddress = {
+      ...identity.getPublicIdentity(),
+      serviceAddress: MessageRepository.URL,
+    }
+    const togglePublicIdentityQRCodeButtonTxt = `${
+      showPublicIdentityQRCode ? 'Hide' : 'Show'
+    } QR Code`
     return (
       <section className={classes.join(' ')}>
         {selected && <h2>Active identity</h2>}
@@ -117,15 +195,20 @@ class IdentityView extends React.Component<Props, State> {
             <label>Public identity (scan to send a message)</label>
             <div>
               <div>
-                <button className="QRCodeToggle" onClick={this.togglePublicIdentityQRCode}>
+                <button
+                  type="button"
+                  className="QRCodeToggle"
+                  onClick={this.togglePublicIdentityQRCode}
+                >
                   {togglePublicIdentityQRCodeButtonTxt}
                 </button>
-                {
-                  showPublicIdentityQRCode &&
+                {showPublicIdentityQRCode && (
                   <div className="QRCode">
-                    <QRCodePublicIdentity publicIdentity={publicIdentityWithServiceAddress}/>
+                    <QRCodePublicIdentity
+                      publicIdentity={publicIdentityWithServiceAddress}
+                    />
                   </div>
-                }
+                )}
               </div>
             </div>
           </div>
@@ -150,6 +233,7 @@ class IdentityView extends React.Component<Props, State> {
         <div className="actions">
           {onCreateDid && !did && (
             <button
+              type="button"
               title="Generate DID..."
               onClick={onCreateDid.bind(this, myIdentity)}
             >
@@ -158,6 +242,7 @@ class IdentityView extends React.Component<Props, State> {
           )}
           {onDeleteDid && did && (
             <button
+              type="button"
               title="Delete DID"
               onClick={onDeleteDid.bind(this, myIdentity)}
             >
@@ -165,11 +250,12 @@ class IdentityView extends React.Component<Props, State> {
             </button>
           )}
           {(!contact || (contact && contact.metaData.unregistered)) && (
-            <button onClick={this.registerContact}>
+            <button type="button" onClick={this.registerContact}>
               Register Global Contact
             </button>
           )}
           <button
+            type="button"
             className={`toggleContacts ${
               contact && contact.metaData.addedAt
                 ? 'isMyContact'
@@ -193,6 +279,7 @@ class IdentityView extends React.Component<Props, State> {
             <>
               {onDelete && (
                 <button
+                  type="button"
                   onClick={onDelete.bind(this, myIdentity.identity.address)}
                   disabled={selected}
                 >
@@ -201,6 +288,7 @@ class IdentityView extends React.Component<Props, State> {
               )}
               {onSelect && (
                 <button
+                  type="button"
                   onClick={onSelect.bind(this, myIdentity.identity.address)}
                   disabled={selected}
                 >
@@ -212,8 +300,9 @@ class IdentityView extends React.Component<Props, State> {
 
           {!(balance > 0) && (
             <button
+              type="button"
               className="requestTokens"
-              onClick={this.openKiltFaucet(myIdentity.identity.address)}
+              onClick={IdentityView.openKiltFaucet(myIdentity.identity.address)}
               title="Request Tokens"
             >
               Request Tokens
@@ -223,79 +312,13 @@ class IdentityView extends React.Component<Props, State> {
       </section>
     )
   }
-
-  private registerContact() {
-    const { myIdentity } = this.props
-    const { identity, metaData } = myIdentity
-    const { address, boxPublicKeyAsHex } = identity
-    const { name } = metaData
-
-    const contact: Contact = {
-      metaData: { name },
-      publicIdentity: {
-        address,
-        boxPublicKeyAsHex,
-        serviceAddress: `${MessageRepository.URL}`,
-      },
-    }
-
-    ContactRepository.add(contact).then(
-      () => {
-        notifySuccess(`Identity '${name}' successfully registered.`)
-      },
-      error => {
-        errorService.log({
-          error,
-          message: `Failed to register identity '${name}'`,
-          origin: 'IdentityView.registerContact()',
-          type: 'ERROR.FETCH.POST',
-        })
-      }
-    )
-  }
-
-  private openKiltFaucet(address: Identity['address']) {
-    return () => {
-      window.open(FAUCET_URL + '?' + address, '_blank')
-    }
-  }
-
-  private toggleContacts() {
-    const { contacts, myIdentity } = this.props
-    let contact = contacts.find(
-      (myContact: Contact) =>
-        myContact.publicIdentity.address === myIdentity.identity.address
-    )
-
-    if (!contact) {
-      contact = ContactRepository.getContactFromIdentity(myIdentity, {
-        unregistered: true,
-      })
-    }
-
-    const { metaData, publicIdentity } = contact
-
-    if (contact.metaData.addedAt) {
-      PersistentStore.store.dispatch(
-        Contacts.Store.removeMyContact(publicIdentity.address)
-      )
-    } else {
-      const myContact = {
-        metaData: {
-          ...metaData,
-          addedAt: Date.now(),
-          addedBy: Wallet.getSelectedIdentity(PersistentStore.store.getState())
-            .identity.address,
-        },
-        publicIdentity,
-      } as Contact
-
-      PersistentStore.store.dispatch(Contacts.Store.addContact(myContact))
-    }
-  }
 }
 
-const mapStateToProps = (state: ReduxState) => ({
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
   contacts: Contacts.getContacts(state),
 })
 

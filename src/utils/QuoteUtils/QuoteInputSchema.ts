@@ -1,4 +1,4 @@
-export const QuoteInputSchema = {
+const QuoteInputSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'KILT:quote:v1',
   type: 'object',
@@ -52,3 +52,5 @@ export const QuoteInputSchema = {
     'timeframe',
   ],
 }
+
+export default QuoteInputSchema

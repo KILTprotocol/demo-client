@@ -4,9 +4,9 @@ import ContactRepository from '../../services/ContactRepository'
 import DelegationsService from '../../services/DelegationsService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Delegations from '../../state/ducks/Delegations'
-import { DelegationType, MyDelegation } from '../../state/ducks/Delegations'
+import { DelegationType, IMyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BsCType, BsCTypesPool } from './DevTools.ctypes'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
@@ -19,20 +19,20 @@ type UpdateCallback = (bsDelegationKey: keyof BsDelegationsPool) => void
 type Permission = 'ATTEST' | 'DELEGATE'
 
 type RootData = {
-  ownerIdentity: MyIdentity
+  ownerIdentity: IMyIdentity
   rootDelegation: sdk.DelegationRootNode
 }
 
 type ParentData = {
-  ownerIdentity: MyIdentity
+  ownerIdentity: IMyIdentity
   delegation: sdk.DelegationNode | sdk.DelegationRootNode
-  metaData?: MyDelegation['metaData']
+  metaData?: IMyDelegation['metaData']
 }
 
 type DelegationDataForMessages = {
   delegation: sdk.DelegationNode
   isPCR: boolean
-  ownerIdentity: MyIdentity
+  ownerIdentity: IMyIdentity
   signature: string
 }
 
@@ -45,7 +45,7 @@ type BsDelegationsPoolElement = {
   permissions?: Permission[]
 }
 
-type BsDelegationsPool = {
+export type BsDelegationsPool = {
   [delegationKey: string]: BsDelegationsPoolElement
 }
 
@@ -68,19 +68,19 @@ class BsDelegation {
       throw new Error(`Invalid delegation data`)
     }
 
-    const ownerIdentity: MyIdentity = await BsIdentity.getByKey(ownerKey)
-    await BsIdentity.selectIdentity(parentData.ownerIdentity)
+    const ownerIdentity = await BsIdentity.getByKey(ownerKey)
+    BsIdentity.selectIdentity(parentData.ownerIdentity)
 
     if (updateCallback) {
       updateCallback(bsDelegationKey)
     }
 
     // creation
-    let _permissions: sdk.Permission[]
+    let newPermissions: sdk.Permission[]
     if (isPCR) {
-      _permissions = [sdk.Permission.ATTEST]
+      newPermissions = [sdk.Permission.ATTEST]
     } else {
-      _permissions = (permissions || []).map(
+      newPermissions = (permissions || []).map(
         permission => sdk.Permission[permission]
       )
     }
@@ -88,7 +88,7 @@ class BsDelegation {
       sdk.UUID.generate(),
       rootData.rootDelegation.id,
       ownerIdentity.identity.address,
-      _permissions,
+      newPermissions,
       parentData.delegation.id
     )
 
@@ -135,7 +135,7 @@ class BsDelegation {
     isPCR: boolean,
     withMessages: boolean,
     updateCallback?: UpdateCallback
-  ) {
+  ): Promise<void> {
     const requests = Object.keys(children).reduce(
       (promiseChain, BsDelegationKey) => {
         return promiseChain.then(() => {
@@ -170,8 +170,8 @@ class BsDelegation {
         }'`
       )
     }
-    const ownerIdentity: MyIdentity = await BsIdentity.getByKey(ownerKey)
-    await BsIdentity.selectIdentity(ownerIdentity)
+    const ownerIdentity: IMyIdentity = await BsIdentity.getByKey(ownerKey)
+    BsIdentity.selectIdentity(ownerIdentity)
     const cType: ICTypeWithMetadata = await BsCType.getByKey(cTypeKey)
 
     if (updateCallback) {
@@ -231,7 +231,7 @@ class BsDelegation {
 
   public static async getDelegationByKey(
     bsDelegationKey: keyof BsDelegationsPool
-  ): Promise<MyDelegation> {
+  ): Promise<IMyDelegation> {
     let match: BsDelegationsPoolElement | undefined
     match = await BsDelegation.getDelegationByKeyFromPool(
       bsDelegationKey,
@@ -245,14 +245,14 @@ class BsDelegation {
     }
 
     if (match) {
-      await BsIdentity.selectIdentity(await BsIdentity.getByKey(match.ownerKey))
-      const allDelegations: MyDelegation[] = Delegations.getAllDelegations(
+      BsIdentity.selectIdentity(await BsIdentity.getByKey(match.ownerKey))
+      const allDelegations: IMyDelegation[] = Delegations.getAllDelegations(
         PersistentStore.store.getState()
       )
 
       const myDelegation = allDelegations.find(
-        (_myDelegation: MyDelegation) => {
-          return _myDelegation.metaData.alias === match!.alias
+        (_myDelegation: IMyDelegation) => {
+          return match && _myDelegation.metaData.alias === match.alias
         }
       )
 
@@ -277,26 +277,23 @@ class BsDelegation {
       // the current pool contains the requested delegation
       Delegations.getAllDelegations(PersistentStore.store.getState())
       return pool[bsDelegationKey]
-    } else {
-      // dive deeper
-      return Promise.all(
-        Object.keys(pool).map(
-          async (_bsDelegationKey: keyof BsDelegationsPool) => {
-            const { children } = pool[_bsDelegationKey]
-            if (children) {
-              return BsDelegation.getDelegationByKeyFromPool(
-                bsDelegationKey,
-                children
-              )
-            }
-            return undefined
-          }
-        )
-      ).then((results: Array<BsDelegationsPoolElement | undefined>) => {
-        // remove undefined values und return first match
-        return results.filter(result => result)[0]
-      })
     }
+    // dive deeper
+    return Promise.all(
+      Object.keys(pool).map(async bsDelegationPoolKey => {
+        const { children } = pool[bsDelegationPoolKey]
+        if (children) {
+          return BsDelegation.getDelegationByKeyFromPool(
+            bsDelegationKey,
+            children
+          )
+        }
+        return undefined
+      })
+    ).then((results: Array<BsDelegationsPoolElement | undefined>) => {
+      // remove undefined values und return first match
+      return results.filter(result => result)[0]
+    })
   }
 
   /**
@@ -308,7 +305,7 @@ class BsDelegation {
   private static async sendMessages(
     parentData: ParentData,
     delegationDataForMessages: DelegationDataForMessages
-  ) {
+  ): Promise<void> {
     const {
       delegation,
       isPCR,
@@ -376,4 +373,4 @@ class BsDelegation {
   }
 }
 
-export { BsDelegation, BsDelegationsPool }
+export { BsDelegation }

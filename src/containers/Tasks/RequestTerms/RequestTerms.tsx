@@ -1,5 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import * as React from 'react'
+import React from 'react'
 import SelectClaims from '../../../components/SelectClaims/SelectClaims'
 
 import attestationWorkflow from '../../../services/AttestationWorkflow'
@@ -32,41 +32,18 @@ class RequestTerms extends React.Component<RequestTermsProps, State> {
     this.onSelectClaimEntry = this.onSelectClaimEntry.bind(this)
   }
 
-  public render() {
-    const {
-      cTypeHash,
-      preSelectedClaimEntries,
-      receiverAddresses,
-    } = this.props
-    return (
-      <section className="RequestTerms">
-        <section className="selectClaims">
-          <h2 className="optional">Select claim</h2>
-          <SelectClaims
-            preSelectedClaimEntries={preSelectedClaimEntries}
-            cTypeHash={cTypeHash}
-            onChange={this.onSelectClaimEntry}
-          />
-        </section>
-        <div className="actions">
-          <button onClick={this.onCancel}>Cancel</button>
-          <button
-            className="requestTerms"
-            disabled={!receiverAddresses.length}
-            onClick={this.handleSubmit}
-          >
-            Request Terms
-          </button>
-        </div>
-      </section>
-    )
-  }
-
-  private onSelectClaimEntry(selectedClaimEntries: Claims.Entry[]) {
+  private onSelectClaimEntry(selectedClaimEntries: Claims.Entry[]): void {
     this.setState({ selectedClaimEntries })
   }
 
-  private handleSubmit() {
+  private onCancel(): void {
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
+  }
+
+  private handleSubmit(): void {
     const { cTypeHash, receiverAddresses, onFinished } = this.props
     const { selectedClaimEntries } = this.state
     let claims: sdk.IPartialClaim[] = [{ cTypeHash } as sdk.IPartialClaim]
@@ -86,17 +63,39 @@ class RequestTerms extends React.Component<RequestTermsProps, State> {
     }
   }
 
-
-  private isValid() {
+  private isValid(): any {
     const { receiverAddresses } = this.props
     return receiverAddresses && receiverAddresses.length
   }
 
-  private onCancel() {
-    const { onCancel } = this.props
-    if (onCancel) {
-      onCancel()
-    }
+  public render(): JSX.Element {
+    const { cTypeHash, preSelectedClaimEntries, receiverAddresses } = this.props
+
+    return (
+      <section className="RequestTerms">
+        <section className="selectClaims">
+          <h2 className="optional">Select claim</h2>
+          <SelectClaims
+            preSelectedClaimEntries={preSelectedClaimEntries}
+            cTypeHash={cTypeHash}
+            onChange={this.onSelectClaimEntry}
+          />
+        </section>
+        <div className="actions">
+          <button type="button" onClick={this.onCancel}>
+            Cancel
+          </button>
+          <button
+            className="requestTerms"
+            type="button"
+            disabled={!receiverAddresses.length}
+            onClick={this.handleSubmit}
+          >
+            Request Terms
+          </button>
+        </div>
+      </section>
+    )
   }
 }
 

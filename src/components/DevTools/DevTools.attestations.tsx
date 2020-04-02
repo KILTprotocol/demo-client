@@ -1,13 +1,14 @@
 import * as sdk from '@kiltprotocol/sdk-js'
+import { IPartialClaim } from '@kiltprotocol/sdk-js'
 
 import AttestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import * as Attestations from '../../state/ducks/Attestations'
-import { MyDelegation } from '../../state/ducks/Delegations'
+import { IMyDelegation } from '../../state/ducks/Delegations'
 import PersistentStore from '../../state/PersistentStore'
-import { MyIdentity } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BsClaim, BsClaimsPool, BsClaimsPoolElement } from './DevTools.claims'
 import { BsCType } from './DevTools.ctypes'
@@ -15,7 +16,6 @@ import { BsDelegation, BsDelegationsPool } from './DevTools.delegations'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 
 import attestationsPool from './data/attestations.json'
-import { IPartialClaim } from '@kiltprotocol/sdk-js'
 
 type UpdateCallback = (bsAttestationKey: keyof BsAttestationsPool) => void
 
@@ -29,7 +29,7 @@ type BsAttestationsPoolElement = {
   then?: BsAttestationsPool
 }
 
-type BsAttestationsPool = {
+export type BsAttestationsPool = {
   [attestationKey: string]: BsAttestationsPoolElement
 }
 
@@ -55,7 +55,7 @@ class BsAttestation {
     }
 
     const bsClaim: BsClaimsPoolElement = await BsClaim.getBsClaimByKey(claimKey)
-    const claimerIdentity: MyIdentity = await BsIdentity.getByKey(
+    const claimerIdentity: IMyIdentity = await BsIdentity.getByKey(
       bsClaim.claimerKey
     )
 
@@ -65,7 +65,7 @@ class BsAttestation {
 
     // get claim to attest
     // for this we take the role of the claimer
-    await BsIdentity.selectIdentity(claimerIdentity)
+    BsIdentity.selectIdentity(claimerIdentity)
     const claimToAttest: Claims.Entry = await BsClaim.getClaimByKey(claimKey)
 
     const requestForAttestation: sdk.RequestForAttestation = await BsAttestation.getRequestForAttestation(
@@ -85,7 +85,7 @@ class BsAttestation {
 
     // import to claimers claim
     // therefore switch to claimer identity
-    await BsIdentity.selectIdentity(claimerIdentity)
+    BsIdentity.selectIdentity(claimerIdentity)
     PersistentStore.store.dispatch(Claims.Store.addAttestation(attestedClaim))
 
     if (withMessages) {
@@ -149,41 +149,36 @@ class BsAttestation {
     bsAttestationData: BsAttestationsPoolElement,
     claimToAttest: Claims.Entry,
     bsAttestedClaims: BsAttestedClaims,
-    claimerIdentity: MyIdentity
+    claimerIdentity: IMyIdentity
   ): Promise<sdk.RequestForAttestation> {
     const { attest } = bsAttestationData
     const { delegationKey, terms } = attest
 
     // resolve delegation
-    let delegation: MyDelegation | undefined
+    let delegation: IMyDelegation | undefined
     if (delegationKey) {
       delegation = await BsDelegation.getDelegationByKey(delegationKey)
     }
 
-    // get terms of attester
-    let _terms: sdk.AttestedClaim[] = []
+    let termsFromPool: sdk.AttestedClaim[] = []
     if (terms && Array.isArray(terms) && terms.length) {
-      _terms = await Promise.all(
-        (terms || []).map(
-          (
-            _bsAttestationKey: keyof BsAttestationsPool
-          ): Promise<sdk.AttestedClaim> => {
-            const bsAttestedClaim = bsAttestedClaims[_bsAttestationKey]
-            if (bsAttestedClaim) {
-              return Promise.resolve(bsAttestedClaim)
-            }
-            throw new Error(
-              `Could not find attestedClaim for key '${_bsAttestationKey}'`
-            )
+      termsFromPool = await Promise.all(
+        terms.map(bsAttestationKey => {
+          const bsAttestedClaim = bsAttestedClaims[bsAttestationKey]
+          if (bsAttestedClaim) {
+            return Promise.resolve(bsAttestedClaim)
           }
-        )
+          throw new Error(
+            `Could not find attestedClaim for key '${bsAttestationKey}'`
+          )
+        })
       )
     }
 
     return sdk.RequestForAttestation.fromClaimAndIdentity(
       claimToAttest.claim,
       claimerIdentity.identity,
-      _terms,
+      termsFromPool,
       delegation ? delegation.id : null
     )
   }
@@ -201,21 +196,23 @@ class BsAttestation {
     bsAttestationData: BsAttestationsPoolElement,
     bsAttestationKey: keyof BsAttestationsPool,
     bsAttestedClaims: BsAttestedClaims,
-    claimerIdentity: MyIdentity,
+    claimerIdentity: IMyIdentity,
     requestForAttestation: sdk.RequestForAttestation
   ): Promise<sdk.AttestedClaim> {
     const { attest } = bsAttestationData
     const { attesterKey } = attest
 
-    const attesterIdentity: MyIdentity = await BsIdentity.getByKey(attesterKey)
+    const attesterIdentity: IMyIdentity = await BsIdentity.getByKey(attesterKey)
 
     // for the following actions we need to take the role of the attester
-    await BsIdentity.selectIdentity(attesterIdentity)
+    BsIdentity.selectIdentity(attesterIdentity)
 
     // create attested claim and store for reference
     const attestedClaim: sdk.AttestedClaim = await AttestationService.attestClaim(
       requestForAttestation
     )
+    // TODO: Don't add the attested claim to the bsAttestedClaims array.
+    // eslint-disable-next-line no-param-reassign
     bsAttestedClaims[bsAttestationKey] = attestedClaim
 
     // store attestation locally
@@ -232,7 +229,7 @@ class BsAttestation {
 
   private static async sendMessages(
     bsAttestationData: BsAttestationsPoolElement,
-    claimerIdentity: MyIdentity,
+    claimerIdentity: IMyIdentity,
     bsClaim: BsClaimsPoolElement,
     requestForAttestation: sdk.RequestForAttestation,
     attestedClaim: sdk.AttestedClaim
@@ -240,11 +237,11 @@ class BsAttestation {
     const { attest } = bsAttestationData
     const { attesterKey } = attest
 
-    const attesterIdentity: MyIdentity = await BsIdentity.getByKey(attesterKey)
+    const attesterIdentity: IMyIdentity = await BsIdentity.getByKey(attesterKey)
     const cType: ICTypeWithMetadata = await BsCType.getByKey(bsClaim.cTypeKey)
 
     const partialClaim: IPartialClaim = {
-      cTypeHash: cType.cType.hash as string,
+      cTypeHash: cType.cType.hash,
       contents: bsClaim.data,
       owner: claimerIdentity.identity.address,
     }
@@ -266,7 +263,7 @@ class BsAttestation {
         claim: partialClaim,
         delegationId: attestedClaim.request.delegationId || undefined,
         legitimations: attestedClaim.request.legitimations,
-        quote: undefined
+        quote: undefined,
       },
       type: sdk.MessageBodyType.SUBMIT_TERMS,
     }
@@ -300,4 +297,4 @@ class BsAttestation {
   }
 }
 
-export { BsAttestation, BsAttestationsPool }
+export { BsAttestation }

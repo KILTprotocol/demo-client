@@ -5,9 +5,9 @@ import { ModalType } from '../components/Modal/Modal'
 import * as UiState from '../state/ducks/UiState'
 import persistentStore from '../state/PersistentStore'
 import {
-  BlockingNotification,
+  IBlockingNotification,
   BlockUi,
-  Notification,
+  INotification,
   NotificationType,
 } from '../types/UserFeedback'
 
@@ -16,7 +16,7 @@ class FeedbackService {
     className,
     message,
     type,
-  }: Partial<Notification>): Partial<Notification> {
+  }: Partial<INotification>): Partial<INotification> {
     const created = Date.now()
     const id = uuid()
     return {
@@ -32,25 +32,25 @@ class FeedbackService {
     className,
     message,
     type,
-  }: Partial<Notification>): Notification {
-    const notification: Partial<Notification> = {
+  }: Partial<INotification>): INotification {
+    const notification: Partial<INotification> = {
       ...FeedbackService.getNotificationBase({ className, message, type }),
     }
 
     notification.remove = () => {
-      FeedbackService.removeNotification(notification.id as Notification['id'])
+      FeedbackService.removeNotification(notification.id as INotification['id'])
     }
 
     // now put this into redux store UiState
     persistentStore.store.dispatch(
-      UiState.Store.addNotificationAction(notification as Notification)
+      UiState.Store.addNotificationAction(notification as INotification)
     )
 
     // return completed blockingNotification
-    return notification as Notification
+    return notification as INotification
   }
 
-  public static removeNotification(id: Notification['id']) {
+  public static removeNotification(id: INotification['id']): void {
     persistentStore.store.dispatch(UiState.Store.removeNotificationAction(id))
   }
 
@@ -64,8 +64,8 @@ class FeedbackService {
     type,
     okButtonLabel,
     cancelButtonLabel,
-  }: Partial<BlockingNotification>): BlockingNotification {
-    const blockingNotification: Partial<BlockingNotification> = {
+  }: Partial<IBlockingNotification>): IBlockingNotification {
+    const blockingNotification: Partial<IBlockingNotification> = {
       ...FeedbackService.getNotificationBase({ className, message, type }),
       cancelButtonLabel,
       header,
@@ -77,7 +77,7 @@ class FeedbackService {
 
     blockingNotification.remove = () => {
       FeedbackService.removeBlockingNotification(
-        blockingNotification.id as BlockingNotification['id']
+        blockingNotification.id as IBlockingNotification['id']
       )
     }
 
@@ -88,15 +88,17 @@ class FeedbackService {
     // now put this into redux store UiState
     persistentStore.store.dispatch(
       UiState.Store.addBlockingNotificationAction(
-        blockingNotification as BlockingNotification
+        blockingNotification as IBlockingNotification
       )
     )
 
     // return completed blockingNotification
-    return blockingNotification as BlockingNotification
+    return blockingNotification as IBlockingNotification
   }
 
-  public static removeBlockingNotification(id: BlockingNotification['id']) {
+  public static removeBlockingNotification(
+    id: IBlockingNotification['id']
+  ): void {
     persistentStore.store.dispatch(
       UiState.Store.removeBlockingNotificationAction(id)
     )
@@ -124,42 +126,57 @@ class FeedbackService {
     return blockUi as BlockUi
   }
 
-  public static removeBlockUi(id: BlockUi['id']) {
+  public static removeBlockUi(id: BlockUi['id']): void {
     persistentStore.store.dispatch(UiState.Store.removeBlockUiAction(id))
   }
 
-  public static updateBlockUi(id: BlockUi['id'], message: BlockUi['message']) {
+  public static updateBlockUi(
+    id: BlockUi['id'],
+    message: BlockUi['message']
+  ): void {
     persistentStore.store.dispatch(
       UiState.Store.updateBlockUiAction(id, message)
     )
   }
 }
 
-function _notify(
+function notifyWithType(
   type: NotificationType,
   message: string | ReactNode,
   blocking = false
-) {
-  blocking
-    ? FeedbackService.addBlockingNotification({
-        message,
-        type,
-      })
-    : FeedbackService.addNotification({ message, type })
+): void {
+  if (blocking) {
+    FeedbackService.addBlockingNotification({
+      message,
+      type,
+    })
+  } else {
+    FeedbackService.addNotification({ message, type })
+  }
 }
 
-export function notifySuccess(message: string | ReactNode, blocking = false) {
-  _notify(NotificationType.SUCCESS, message, blocking)
+export function notifySuccess(
+  message: string | ReactNode,
+  blocking = false
+): void {
+  notifyWithType(NotificationType.SUCCESS, message, blocking)
 }
 
-export function notifyFailure(message: string | ReactNode, blocking = true) {
-  _notify(NotificationType.FAILURE, message, blocking)
+export function notifyFailure(
+  message: string | ReactNode,
+  blocking = true
+): void {
+  notifyWithType(NotificationType.FAILURE, message, blocking)
 }
 
-export function notifyError(error: Error, blocking = true) {
+function isInvalidTransactionError(error: Error): boolean {
+  return error.message.includes('1010: Invalid Transaction')
+}
+
+export function notifyError(error: Error, blocking = true): void {
   try {
     if (isInvalidTransactionError(error)) {
-      _notify(
+      notifyWithType(
         NotificationType.FAILURE,
         <p>
           {error.message}. <p>Are you sure your account has enough funds?</p>
@@ -167,60 +184,56 @@ export function notifyError(error: Error, blocking = true) {
         blocking
       )
     } else {
-      _notify(NotificationType.FAILURE, error.message, blocking)
+      notifyWithType(NotificationType.FAILURE, error.message, blocking)
     }
-  } catch (error) {
+  } catch (err) {
     // ignore
   }
 }
 
-function isInvalidTransactionError(error: Error) {
-  return error.message.includes('1010: Invalid Transaction')
-}
-
-export function notify(message: string | ReactNode, blocking = false) {
-  _notify(NotificationType.INFO, message, blocking)
-}
-
-export function safeDelete(
-  message: ReactNode,
-  onConfirm: (notification: BlockingNotification) => void,
-  removeNotificationInstantly = true,
-  onCancel?: (notification: BlockingNotification) => void
-) {
-  safeDestructiveAction(
-    <div>Do you want to delete {message}?</div>,
-    onConfirm,
-    removeNotificationInstantly,
-    onCancel
-  )
+export function notify(message: string | ReactNode, blocking = false): void {
+  notifyWithType(NotificationType.INFO, message, blocking)
 }
 
 export function safeDestructiveAction(
   message: ReactNode,
-  onConfirm: (notification: BlockingNotification) => void,
+  onConfirm: (notification: IBlockingNotification) => void,
   removeNotificationInstantly = true,
-  onCancel?: (notification: BlockingNotification) => void
-) {
+  onCancel?: (notification: IBlockingNotification) => void
+): void {
   FeedbackService.addBlockingNotification({
     header: 'Are you sure?',
     message,
     modalType: ModalType.CONFIRM,
     type: NotificationType.INFO,
 
-    onCancel: (notification: BlockingNotification) => {
+    onCancel: (notification: IBlockingNotification) => {
       if (onCancel) {
         onCancel(notification)
       }
       notification.remove()
     },
-    onConfirm: (notification: BlockingNotification) => {
+    onConfirm: (notification: IBlockingNotification) => {
       onConfirm(notification)
       if (removeNotificationInstantly) {
         notification.remove()
       }
     },
   })
+}
+
+export function safeDelete(
+  message: ReactNode,
+  onConfirm: (notification: IBlockingNotification) => void,
+  removeNotificationInstantly = true,
+  onCancel?: (notification: IBlockingNotification) => void
+): void {
+  safeDestructiveAction(
+    <div>Do you want to delete {message}?</div>,
+    onConfirm,
+    removeNotificationInstantly,
+    onCancel
+  )
 }
 
 export default FeedbackService

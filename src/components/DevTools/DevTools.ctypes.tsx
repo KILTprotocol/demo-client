@@ -1,9 +1,8 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
-import BlockchainService from '../../services/BlockchainService'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
-import { notifySuccess, notifyError } from '../../services/FeedbackService'
+import { notifySuccess } from '../../services/FeedbackService'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BsIdentity } from './DevTools.wallet'
 
@@ -11,19 +10,19 @@ import cTypesPool from './data/cTypes.json'
 
 type UpdateCallback = (bsCTypeKey: keyof BsCTypesPool) => void
 
-interface BsCTypesPoolElement extends sdk.ICType {
+interface IBsCTypesPoolElement extends sdk.ICType {
   owner: string
   metadata: sdk.ICTypeMetadata['metadata']
 }
 
-type BsCTypesPool = {
-  [key: string]: BsCTypesPoolElement
+export type BsCTypesPool = {
+  [key: string]: IBsCTypesPoolElement
 }
 
 class BsCType {
   public static pool: BsCTypesPool = cTypesPool as BsCTypesPool
 
-  public static async save(bsCTypeData: BsCTypesPoolElement): Promise<void> {
+  public static async save(bsCTypeData: IBsCTypesPoolElement): Promise<void> {
     // replace owner key with his address
     const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
       .identity
@@ -36,7 +35,7 @@ class BsCType {
 
     return cType
       .store(ownerIdentity)
-      .then((value: any) => {
+      .then(() => {
         const cTypeWrapper: ICTypeWithMetadata = {
           cType,
           metaData: {
@@ -85,7 +84,7 @@ class BsCType {
   }
 
   public static async get(
-    bsCType: BsCTypesPoolElement
+    bsCType: IBsCTypesPoolElement
   ): Promise<ICTypeWithMetadata> {
     return BsCType.getByHash(bsCType.hash)
   }
@@ -98,4 +97,4 @@ class BsCType {
   }
 }
 
-export { BsCTypesPool, BsCType }
+export { BsCType }
