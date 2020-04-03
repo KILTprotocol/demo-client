@@ -1,0 +1,11 @@
+FROM node:10-alpine as builder
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+RUN yarn install
+
+COPY *.* ./
+COPY ./scripts ./scripts
+COPY ./config ./config
+COPY ./public ./public
