@@ -8,6 +8,7 @@ import { State as ReduxState } from '../../state/PersistentStore'
 import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import * as Quotes from '../../state/ducks/Quotes'
 import * as Wallet from '../../state/ducks/Wallet'
+import QuoteSchema from './QuoteSchema'
 
 import './QuoteCreate.scss'
 
@@ -59,9 +60,14 @@ class QuoteCreate extends React.Component<Props, State> {
     const quote = value
     // Need to add an input for dates to actually have a selection of the dates.
     quote.timeframe = new Date()
-    if (sdk.Quote.validateQuoteSchema(sdk.QuoteSchema, quote)) {
+    
+    const result = {}
+    Object.keys(value.cost.tax).forEach(entryKey => {
+      result[entryKey] = value.cost.tax[entryKey]
+    })
+    quote.cost.tax = result
+
       this.setState({ quote })
-    }
   }
 
   private handleSubmit(): void {
@@ -94,7 +100,7 @@ class QuoteCreate extends React.Component<Props, State> {
         <h2>Quote</h2>
         <div>
           <SchemaEditor
-            schema={sdk.QuoteSchema as common.Schema}
+            schema={QuoteSchema as common.Schema}
             initialValue={initialValue}
             updateValue={this.updateValue}
           />
