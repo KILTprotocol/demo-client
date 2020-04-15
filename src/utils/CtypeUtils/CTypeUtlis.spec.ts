@@ -11,6 +11,7 @@ describe('CType', () => {
     schema: {
       $id: 'http://example.com/ctype-1',
       $schema: 'http://kilt-protocol.org/draft-01/ctype#',
+      title: 'Cool',
       properties: {
         'first-property': { type: 'integer' },
         'second-property': { type: 'string' },
@@ -18,12 +19,14 @@ describe('CType', () => {
       type: 'object',
     },
     owner: '',
+    hash: '',
   } as sdk.ICType
 
   it('verify model transformations', () => {
     const ctypeInput: ICTypeInput = {
       $id: 'http://example.com/ctype-1',
       $schema: 'http://kilt-protocol.org/draft-01/ctype-input#',
+      title: 'Cool',
       properties: [
         {
           title: 'First Property',
@@ -37,7 +40,6 @@ describe('CType', () => {
         },
       ],
       type: 'object',
-      title: 'CType Title',
       description: '',
       owner: '',
       required: ['first-property', 'second-property'],

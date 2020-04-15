@@ -3,6 +3,7 @@
     "schema": {
       "$id": "DriversLicense",
       "$schema": "http://kilt-protocol.org/draft-01/ctype#",
+      "title": "DriversLicense",
       "properties": {
         "name": {
           "type": "string"
@@ -40,6 +41,7 @@
     "schema": {
       "$id": "IsOfficial",
       "$schema": "http://kilt-protocol.org/draft-01/ctype#",
+      "title": "IsOfficial",
       "properties": {},
       "type": "object"
     },
