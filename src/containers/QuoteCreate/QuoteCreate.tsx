@@ -60,14 +60,13 @@ class QuoteCreate extends React.Component<Props, State> {
     const quote = value
     // Need to add an input for dates to actually have a selection of the dates.
     quote.timeframe = new Date()
-    
     const result = {}
     Object.keys(value.cost.tax).forEach(entryKey => {
       result[entryKey] = value.cost.tax[entryKey]
     })
     quote.cost.tax = result
 
-      this.setState({ quote })
+    this.setState({ quote })
   }
 
   private handleSubmit(): void {
