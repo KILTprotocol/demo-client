@@ -100,7 +100,7 @@ class MyClaimCreateView extends Component<Props, State> {
     const { contents } = partialClaim
 
     if (cType && selectedIdentity) {
-      const newClaim: sdk.Claim = sdk.Claim.fromCTypeAndClaimContents(
+      const newClaim = sdk.Claim.fromCTypeAndClaimContents(
         sdk.CType.fromCType(cType.cType),
         contents || {},
         selectedIdentity.identity.getAddress()
