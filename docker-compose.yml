@@ -20,7 +20,7 @@
 # In any scenario, use `docker-compose down -v` for teardown, which removes containers
 # and purges the data volumes, resetting all state.
 
-version: '3'
+version: '3.4'
 
 services:
   mongodb:
@@ -38,7 +38,7 @@ services:
       - MONGODB_HOST=mongodb
       - MONGODB_USER=mongoadmin
       - MONGODB_PASS=secret
-      - FAUCET_ACCOUNT=faucet
+      - FAUCET_ACCOUNT=0x7220d0fa050ba8d1a6938ceae0aa78a7c8e6d9a684c275e551237747cb2bd53f
       - BOOT_NODE_ADDRESS=ws://mashnet-node:9944
     ports:
       - 3000:3000
@@ -53,7 +53,9 @@ services:
   demo-client:
     build:
       context: .
-      dockerfile: docker.dependencies_only
+      target: develop
+      args:
+        - NODE_VERSION=10
     volumes:
       - ./src:/app/src
     environment:
@@ -61,7 +63,7 @@ services:
       - REACT_APP_SERVICE_PORT=3000
       - REACT_APP_NODE_HOST=127.0.0.1
       - REACT_APP_NODE_WS_PORT=9944
-      - REACT_APP_FAUCET_URL=https://faucet.kilt.io
+      - REACT_APP_FAUCET_URL=http://127.0.0.1:3002
       - PUBLIC_URL=.
     ports:
       - 3001:3001
