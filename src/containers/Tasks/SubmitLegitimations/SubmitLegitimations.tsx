@@ -20,6 +20,7 @@ import './SubmitLegitimations.scss'
 export type SubmitLegitimationsProps = {
   claim: sdk.IPartialClaim
   receiverAddresses: Array<IContact['publicIdentity']['address']>
+  receiver?: sdk.IPublicIdentity
 
   enablePreFilledClaim?: boolean
 
@@ -121,6 +122,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
     const {
       getAttestedClaims,
       enablePreFilledClaim,
+      receiver,
       receiverAddresses,
       onFinished,
     } = this.props
@@ -134,6 +136,7 @@ class SubmitLegitimations extends React.Component<Props, State> {
       claim,
       getAttestedClaims(),
       receiverAddresses,
+      receiver,
       selectedDelegation
     ).then(() => {
       if (onFinished) {
