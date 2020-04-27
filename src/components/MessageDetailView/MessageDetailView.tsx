@@ -97,8 +97,9 @@ class MessageDetailView extends React.Component<Props, State> {
             <ClaimDetailView
               claim={(message.body as sdk.IRequestTerms).content}
             />
-            {showTask ? (
+            {showTask && message.sender ? (
               <SubmitLegitimations
+                receiver={message.sender.publicIdentity}
                 receiverAddresses={[message.senderAddress]}
                 claim={(message.body as sdk.IRequestTerms).content}
                 onCancel={this.handleCancel}
@@ -134,6 +135,7 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <AttestClaim
             claimerAddresses={[message.senderAddress]}
+            claimer={message.sender?.publicIdentity}
             requestForAttestation={
               (message.body as sdk.IRequestAttestationForClaim).content
                 .requestForAttestation
