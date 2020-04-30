@@ -42,7 +42,7 @@ services:
       - BOOT_NODE_ADDRESS=ws://mashnet-node:9944
     ports:
       - 3000:3000
-    links:
+    depends_on:
       - mongodb
       - mashnet-node
   mashnet-node:
@@ -68,6 +68,6 @@ services:
     ports:
       - 3001:3001
     command: yarn start
-    links:
+    depends_on:
       - services
       - mashnet-node
