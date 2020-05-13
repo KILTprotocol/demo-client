@@ -23,6 +23,7 @@ type OwnProps = {
   onDelete?: (delegationEntry: IMyDelegation) => void
   onRevokeAttestations?: () => void
   onRevokeDelegation?: () => void
+  onQRCode?: (delegationEntry: IMyDelegation) => void
 }
 
 type Props = StateProps & OwnProps
@@ -109,6 +110,22 @@ class SelectDelegationAction extends React.Component<Props> {
     return undefined
   }
 
+  private getQRCodeAction(): Action | undefined {
+    const { delegation, debugMode, onQRCode } = this.props
+    if (!delegation || !onQRCode) {
+      return undefined
+    }
+
+    if (debugMode || (!delegation.revoked && this.isMine())) {
+      return {
+        callback: onQRCode,
+        label: 'Show QR Code',
+      }
+    }
+
+    return undefined
+  }
+
   private isMine(): boolean {
     const { delegation } = this.props
     if (!delegation) {
@@ -128,6 +145,7 @@ class SelectDelegationAction extends React.Component<Props> {
       this.getDeleteAction(),
       this.getRevokeDelegationAction(),
       this.getRevokeAttestationsAction(),
+      this.getQRCodeAction(),
     ].filter((action: Action) => action)
 
     return (

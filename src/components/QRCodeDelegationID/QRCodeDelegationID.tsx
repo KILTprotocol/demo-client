@@ -1,21 +1,32 @@
 import React from 'react'
 import { QRCode } from 'react-qrcode-logo'
-import { IDelegationBaseNode, PublicIdentity } from '@kiltprotocol/sdk-js'
-
 import logo from '../../assets/kilt_small.svg'
-import encodePublicIdentity from '../../utils/PublicIdentity/Encoding'
+import {
+  encodePublicIdentityWithDelegation,
+  IAttesterWithDelegation,
+} from '../../utils/PublicIdentity/Encoding'
 import { IMyDelegation } from '../../state/ducks/Delegations'
+import { IMyIdentity } from '../../types/Contact'
 
 type Props = {
   delegation: IMyDelegation
+  selectedIdentity: IMyIdentity
 }
 
-const QRCodeDelegationID: React.FunctionComponent<Props> = ({ delegation }) => {
-  const formattedDelegationID = JSON.stringify(delegation.id)
-  //   encodePublicIdentity(delegation.account) +
+const QRCodeDelegationID: React.FunctionComponent<Props> = ({
+  delegation,
+  selectedIdentity,
+}) => {
+  const publicIdentityWithDelegation: IAttesterWithDelegation = {
+    publicIdentity: selectedIdentity.identity.getPublicIdentity(),
+    delegation: delegation.id,
+  }
+  const formattedDelegationID = JSON.stringify(
+    encodePublicIdentityWithDelegation(publicIdentityWithDelegation)
+  )
   return (
     <QRCode
-      size={150}
+      size={250}
       logoImage={logo}
       logoWidth={44}
       logoHeight={44}

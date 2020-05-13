@@ -156,7 +156,7 @@ class DelegationsView extends React.Component<Props, State> {
   }
 
   public render(): JSX.Element {
-    const { isPCR, match } = this.props
+    const { isPCR, match, selectedIdentity } = this.props
     const { delegationId } = match.params
     const { delegationEntries, currentDelegation, redirect } = this.state
 
@@ -170,6 +170,7 @@ class DelegationsView extends React.Component<Props, State> {
       >
         {!delegationId && (
           <MyDelegationsListView
+            selectedIdentity={selectedIdentity}
             delegationEntries={delegationEntries}
             onRemoveDelegation={this.deleteDelegation}
             onCreateDelegation={this.createDelegation}

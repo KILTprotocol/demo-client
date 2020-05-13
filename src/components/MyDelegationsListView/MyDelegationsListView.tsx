@@ -13,18 +13,19 @@ import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAc
 
 import './MyDelegationsListView.scss'
 import QRCodeDelegationID from '../QRCodeDelegationID/QRCodeDelegationID'
+import { IMyIdentity } from '../../types/Contact'
+import FeedbackService from '../../services/FeedbackService'
+import { NotificationType } from '../../types/UserFeedback'
 
 type Props = {
   onCreateDelegation: () => void
   delegationEntries: IMyDelegation[]
   onRemoveDelegation: (delegation: IMyDelegation) => void
-
+  selectedIdentity: IMyIdentity
   isPCR: boolean
 }
 
-type State = {
-  showDelegationQRCode: boolean
-}
+type State = {}
 
 class MyDelegationsListView extends React.Component<Props, State> {
   private static inviteContactsTo(delegation: IMyDelegation): void {
@@ -40,17 +41,29 @@ class MyDelegationsListView extends React.Component<Props, State> {
     )
   }
 
+  private static showQRCode(
+    delegation: IMyDelegation,
+    identity: IMyIdentity
+  ): void {
+    FeedbackService.addBlockingNotification({
+      message: (
+        <QRCodeDelegationID
+          selectedIdentity={identity}
+          delegation={delegation}
+        />
+      ),
+      type: NotificationType.INFO,
+    })
+  }
+
   constructor(props: Props) {
     super(props)
-    this.state = {
-      showDelegationQRCode: false,
-    }
+    this.state = {}
     this.handleCreate = this.handleCreate.bind(this)
   }
 
   private getDelegationEntries(): false | JSX.Element {
-    const { delegationEntries, isPCR } = this.props
-    const { showDelegationQRCode } = this.state
+    const { delegationEntries, isPCR, selectedIdentity } = this.props
     return (
       delegationEntries &&
       !!delegationEntries.length && (
@@ -133,17 +146,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
                         <Permissions permissions={[]} />
                       )}
                   </td>
-                  <td className="id">
-                    <button
-                      type="button"
-                      onClick={() => this.delegationQRCode()}
-                    >
-                      {!showDelegationQRCode && delegationEntry.id}
-                    </button>
-                    {showDelegationQRCode && (
-                      <QRCodeDelegationID delegation={delegationEntry} />
-                    )}
-                  </td>
+                  <td className="id">{delegationEntry.id}</td>
                   <td className="actionsTd">
                     <div>
                       <SelectDelegationAction
@@ -154,6 +157,12 @@ class MyDelegationsListView extends React.Component<Props, State> {
                           )
                         }
                         onDelete={() => this.handleDelete(delegationEntry)}
+                        onQRCode={() =>
+                          MyDelegationsListView.showQRCode(
+                            delegationEntry,
+                            selectedIdentity
+                          )
+                        }
                       />
                     </div>
                   </td>
@@ -164,11 +173,6 @@ class MyDelegationsListView extends React.Component<Props, State> {
         </table>
       )
     )
-  }
-
-  private delegationQRCode = (): void => {
-    const { showDelegationQRCode } = this.state
-    this.setState({ showDelegationQRCode: !showDelegationQRCode })
   }
 
   private handleDelete = (delegation: IMyDelegation): void => {
