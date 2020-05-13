@@ -12,12 +12,15 @@ import Permissions from '../Permissions/Permissions'
 import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
 
 import './MyDelegationsListView.scss'
+import QRCodeDelegationID from '../QRCodeDelegationID/QRCodeDelegationID'
+import { IMyIdentity } from '../../types/Contact'
+import FeedbackService from '../../services/FeedbackService'
+import { NotificationType } from '../../types/UserFeedback'
 
 type Props = {
   onCreateDelegation: () => void
   delegationEntries: IMyDelegation[]
   onRemoveDelegation: (delegation: IMyDelegation) => void
-
   isPCR: boolean
 }
 
@@ -35,6 +38,21 @@ class MyDelegationsListView extends React.Component<Props, State> {
         } as RequestAcceptDelegationProps,
       })
     )
+  }
+
+  private static showQRCode(
+    delegation: IMyDelegation,
+    identity: IMyIdentity
+  ): void {
+    FeedbackService.addBlockingNotification({
+      message: (
+        <QRCodeDelegationID
+          selectedIdentity={identity}
+          delegationId={delegation.id}
+        />
+      ),
+      type: NotificationType.INFO,
+    })
   }
 
   constructor(props: Props) {
@@ -138,6 +156,12 @@ class MyDelegationsListView extends React.Component<Props, State> {
                           )
                         }
                         onDelete={() => this.handleDelete(delegationEntry)}
+                        onQRCode={(selectedIdentity: IMyIdentity) =>
+                          MyDelegationsListView.showQRCode(
+                            delegationEntry,
+                            selectedIdentity
+                          )
+                        }
                       />
                     </div>
                   </td>
