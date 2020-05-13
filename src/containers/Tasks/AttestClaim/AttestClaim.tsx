@@ -11,6 +11,7 @@ import { BlockUi } from '../../../types/UserFeedback'
 type Props = {
   claimerAddresses: Array<IContact['publicIdentity']['address']>
   requestForAttestation: sdk.IRequestForAttestation
+  claimer?: sdk.IPublicIdentity
 
   onCancel?: () => void
   onFinished?: () => void
@@ -35,7 +36,12 @@ class AttestClaim extends React.Component<Props, State> {
   }
 
   private attestClaim(): void {
-    const { requestForAttestation, onFinished, claimerAddresses } = this.props
+    const {
+      requestForAttestation,
+      onFinished,
+      claimerAddresses,
+      claimer,
+    } = this.props
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Writing attestation to chain',
     })
@@ -43,7 +49,8 @@ class AttestClaim extends React.Component<Props, State> {
     attestationWorkflow
       .approveAndSubmitAttestationForClaim(
         requestForAttestation,
-        claimerAddresses[0]
+        claimerAddresses[0],
+        claimer
       )
       .then(() => {
         blockUi.remove()
