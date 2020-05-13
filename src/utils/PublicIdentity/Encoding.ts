@@ -14,12 +14,12 @@ export type IAttesterWithDelegation = {
 const encodePublicIdentityWithDelegation = (
   publicIdentityWithDelegation: IAttesterWithDelegation
 ): string[] => [
+  publicIdentityWithDelegation.delegationId,
   publicIdentityWithDelegation.publicIdentity.address,
   publicIdentityWithDelegation.publicIdentity.boxPublicKeyAsHex,
   ...(publicIdentityWithDelegation.publicIdentity.serviceAddress
     ? [publicIdentityWithDelegation.publicIdentity.serviceAddress]
     : []),
-  publicIdentityWithDelegation.delegationId,
 ]
 
 export { encodePublicIdentity, encodePublicIdentityWithDelegation }
