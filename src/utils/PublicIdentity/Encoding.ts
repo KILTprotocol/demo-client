@@ -8,7 +8,7 @@ const encodePublicIdentity = (publicIdentity: IPublicIdentity): string[] => [
 
 export type IAttesterWithDelegation = {
   publicIdentity: IPublicIdentity
-  delegation: IDelegationNode['id']
+  delegationId: IDelegationNode['id']
 }
 
 const encodePublicIdentityWithDelegation = (
@@ -19,7 +19,7 @@ const encodePublicIdentityWithDelegation = (
   ...(publicIdentityWithDelegation.publicIdentity.serviceAddress
     ? [publicIdentityWithDelegation.publicIdentity.serviceAddress]
     : []),
-  publicIdentityWithDelegation.delegation,
+  publicIdentityWithDelegation.delegationId,
 ]
 
 export { encodePublicIdentity, encodePublicIdentityWithDelegation }

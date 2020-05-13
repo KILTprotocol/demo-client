@@ -9,17 +9,17 @@ import { IMyDelegation } from '../../state/ducks/Delegations'
 import { IMyIdentity } from '../../types/Contact'
 
 type Props = {
-  delegation: IMyDelegation
+  delegationId: IMyDelegation['id']
   selectedIdentity: IMyIdentity
 }
 
 const QRCodeDelegationID: React.FunctionComponent<Props> = ({
-  delegation,
+  delegationId,
   selectedIdentity,
 }) => {
   const publicIdentityWithDelegation: IAttesterWithDelegation = {
     publicIdentity: selectedIdentity.identity.getPublicIdentity(),
-    delegation: delegation.id,
+    delegationId,
   }
   const formattedDelegationID = JSON.stringify(
     encodePublicIdentityWithDelegation(publicIdentityWithDelegation)

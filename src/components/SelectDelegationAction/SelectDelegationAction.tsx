@@ -1,6 +1,8 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
+import { IMyIdentity } from '../../types/Contact'
+import * as Wallet from '../../state/ducks/Wallet'
 import * as Delegations from '../../state/ducks/Delegations'
 import { IMyDelegation } from '../../state/ducks/Delegations'
 import * as UiState from '../../state/ducks/UiState'
@@ -11,6 +13,7 @@ import SelectAction, { Action } from '../SelectAction/SelectAction'
 
 type StateProps = {
   debugMode: boolean
+  selectedIdentity: IMyIdentity
 }
 
 type OwnProps = {
@@ -23,7 +26,7 @@ type OwnProps = {
   onDelete?: (delegationEntry: IMyDelegation) => void
   onRevokeAttestations?: () => void
   onRevokeDelegation?: () => void
-  onQRCode?: (delegationEntry: IMyDelegation) => void
+  onQRCode?: (selectedIdentity: IMyIdentity) => void
 }
 
 type Props = StateProps & OwnProps
@@ -111,14 +114,14 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 
   private getQRCodeAction(): Action | undefined {
-    const { delegation, debugMode, onQRCode } = this.props
+    const { delegation, debugMode, onQRCode, selectedIdentity } = this.props
     if (!delegation || !onQRCode) {
       return undefined
     }
 
     if (debugMode || (!delegation.revoked && this.isMine())) {
       return {
-        callback: onQRCode,
+        callback: onQRCode.bind(selectedIdentity),
         label: 'Show QR Code',
       }
     }
@@ -164,6 +167,7 @@ const mapStateToProps: MapStateToProps<
   ReduxState
 > = state => ({
   debugMode: UiState.getDebugMode(state),
+  selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
 export default connect(mapStateToProps)(SelectDelegationAction)

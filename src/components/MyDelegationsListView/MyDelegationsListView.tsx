@@ -21,7 +21,6 @@ type Props = {
   onCreateDelegation: () => void
   delegationEntries: IMyDelegation[]
   onRemoveDelegation: (delegation: IMyDelegation) => void
-  selectedIdentity: IMyIdentity
   isPCR: boolean
 }
 
@@ -49,7 +48,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
       message: (
         <QRCodeDelegationID
           selectedIdentity={identity}
-          delegation={delegation}
+          delegationId={delegation.id}
         />
       ),
       type: NotificationType.INFO,
@@ -63,7 +62,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
   }
 
   private getDelegationEntries(): false | JSX.Element {
-    const { delegationEntries, isPCR, selectedIdentity } = this.props
+    const { delegationEntries, isPCR } = this.props
     return (
       delegationEntries &&
       !!delegationEntries.length && (
@@ -157,7 +156,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
                           )
                         }
                         onDelete={() => this.handleDelete(delegationEntry)}
-                        onQRCode={() =>
+                        onQRCode={(selectedIdentity: IMyIdentity) =>
                           MyDelegationsListView.showQRCode(
                             delegationEntry,
                             selectedIdentity
