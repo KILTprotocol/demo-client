@@ -5,7 +5,7 @@
     @include responsiveTable(
         (
           phone: (100%, false, false, false, false, false, 120px),
-          tablet: (false, 100%, 70px, 100%, 120px, 100%, 170px),
+          tablet: (false, 100%, 70px, 100%, 120px, false, 170px),
           desktop: (false, 100%, 70px, 100%, 120px, 100%, 270px),
         )
     );
