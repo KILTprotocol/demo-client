@@ -121,7 +121,7 @@ class SelectDelegationAction extends React.Component<Props> {
 
     if (debugMode || (!delegation.revoked && this.isMine())) {
       return {
-        callback: onQRCode.bind(selectedIdentity),
+        callback: onQRCode.bind(null, selectedIdentity),
         label: 'Show QR Code',
       }
     }
