@@ -1,16 +1,14 @@
-const QuoteInputSchema = {
+export default {
   $schema: 'http://json-schema.org/draft-07/schema#',
-  $id: 'KILT:quote:v1',
+  $id: 'KILT:quote:v2',
   type: 'object',
   title: 'Quote',
   properties: {
     attesterAddress: {
       type: 'string',
-      minLength: 1,
     },
     cTypeHash: {
       type: 'string',
-      minLength: 1,
     },
     cost: {
       type: 'object',
@@ -18,29 +16,39 @@ const QuoteInputSchema = {
       properties: {
         net: {
           type: 'number',
-          minLength: 1,
         },
         gross: {
           type: 'number',
-          minLength: 1,
         },
         tax: {
-          type: 'object',
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              title: {
+                title: 'Tax code',
+                type: 'string',
+                default: 'New Property',
+              },
+              value: {
+                type: 'number',
+              },
+            },
+            required: ['title', 'value'],
+          },
+          collapsed: false,
         },
       },
     },
     currency: {
       type: 'string',
-      minLength: 1,
     },
     termsAndConditions: {
       type: 'string',
-      minLength: 1,
     },
     timeframe: {
       type: 'string',
       format: 'date-time',
-      minLength: 1,
     },
   },
   required: [
@@ -52,5 +60,3 @@ const QuoteInputSchema = {
     'timeframe',
   ],
 }
-
-export default QuoteInputSchema

@@ -46,26 +46,29 @@ class RequestTerms extends React.Component<RequestTermsProps, State> {
   private handleSubmit(): void {
     const { cTypeHash, receiverAddresses, onFinished } = this.props
     const { selectedClaimEntries } = this.state
-    let claims: sdk.IPartialClaim[] = [{ cTypeHash } as sdk.IPartialClaim]
 
-    if (selectedClaimEntries && selectedClaimEntries.length) {
-      claims = selectedClaimEntries.map(
-        (claimEntry: Claims.Entry) => claimEntry.claim
-      )
-    }
+    if (cTypeHash) {
+      let claims: sdk.IPartialClaim[] = [{ cTypeHash }]
 
-    if (this.isValid()) {
-      attestationWorkflow.requestTerms(claims, receiverAddresses).then(() => {
-        if (onFinished) {
-          onFinished()
-        }
-      })
+      if (selectedClaimEntries && selectedClaimEntries.length) {
+        claims = selectedClaimEntries.map(
+          (claimEntry: Claims.Entry) => claimEntry.claim
+        )
+      }
+
+      if (this.isValid()) {
+        attestationWorkflow.requestTerms(claims, receiverAddresses).then(() => {
+          if (onFinished) {
+            onFinished()
+          }
+        })
+      }
     }
   }
 
-  private isValid(): any {
+  private isValid(): boolean {
     const { receiverAddresses } = this.props
-    return receiverAddresses && receiverAddresses.length
+    return !!(receiverAddresses && receiverAddresses.length)
   }
 
   public render(): JSX.Element {

@@ -164,38 +164,21 @@ class RequestAttestation extends React.Component<
     const { savedClaimEntry } = this.state
 
     if (savedClaimEntry) {
-      if (quote) {
-        attestationWorkflow
-          .requestAttestationForClaim(
-            savedClaimEntry.claim,
-            receiverAddresses,
-            (terms || []).map((legitimation: sdk.IAttestedClaim) =>
-              sdk.AttestedClaim.fromAttestedClaim(legitimation)
-            ),
-            delegationId,
-            quote
-          )
-          .then(() => {
-            if (onFinished) {
-              onFinished()
-            }
-          })
-      } else {
-        attestationWorkflow
-          .requestAttestationForClaim(
-            savedClaimEntry.claim,
-            receiverAddresses,
-            (terms || []).map((legitimation: sdk.IAttestedClaim) =>
-              sdk.AttestedClaim.fromAttestedClaim(legitimation)
-            ),
-            delegationId
-          )
-          .then(() => {
-            if (onFinished) {
-              onFinished()
-            }
-          })
-      }
+      attestationWorkflow
+        .requestAttestationForClaim(
+          savedClaimEntry.claim,
+          receiverAddresses,
+          (terms || []).map((legitimation: sdk.IAttestedClaim) =>
+            sdk.AttestedClaim.fromAttestedClaim(legitimation)
+          ),
+          delegationId,
+          quote || undefined
+        )
+        .then(() => {
+          if (onFinished) {
+            onFinished()
+          }
+        })
     }
   }
 
@@ -220,17 +203,17 @@ class RequestAttestation extends React.Component<
           />
         )}
 
-        {!quote ? (
-          <div>
-            <h2>Quotes</h2>
-            <div>no Quote</div>
-          </div>
-        ) : (
+        {quote ? (
           <div>
             <h2>Quotes</h2>
             <div>
               <Code>{quote}</Code>
             </div>
+          </div>
+        ) : (
+          <div>
+            <h2>Quotes</h2>
+            <div>no Quote</div>
           </div>
         )}
 

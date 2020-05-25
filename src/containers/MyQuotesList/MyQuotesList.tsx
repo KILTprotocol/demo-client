@@ -45,18 +45,19 @@ class MyQuotesList extends React.Component<Props> {
           <h1> My Quote list</h1>
 
           {quoteEntries && quoteEntries.length ? (
-            quoteEntries.map((val: Quotes.Entry) => {
+            quoteEntries.map((val: Quotes.Entry, index) => {
+              const quoteItem = val
               return (
-                <section>
-                  <h2>Quote ID: {val.quoteId}</h2>
-                  <label>Claimer address : {val.claimerAddress}</label>
+                <section key={index.valueOf()}>
+                  <h2>Quote ID: {quoteItem.quoteId}</h2>
+                  <label>Claimer address : {quoteItem.claimerAddress}</label>
                   <div>
-                    <Code>{val.quote}</Code>
+                    <Code>{quoteItem.quote}</Code>
                   </div>
                   <div className="actions">
                     <button
                       type="button"
-                      onClick={() => this.deleteQuote(val.quoteId)}
+                      onClick={() => this.deleteQuote(quoteItem.quoteId)}
                     >
                       Delete Quote
                     </button>

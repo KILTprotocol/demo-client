@@ -152,18 +152,20 @@ class SubmitTerms extends React.Component<Props, State> {
     if (!selectedIdentity) {
       throw new Error('No identity selected')
     }
-    const quote = quoteData ? sdk.Quote.createAttesterSignature(quoteData, selectedIdentity) : undefined
-      AttestationWorkflow.submitTerms(
-        claim,
-        getAttestedClaims(),
-        receiverAddresses,
-        selectedDelegation,
-        quote
-      ).then(() => {
-        if (onFinished) {
-          onFinished()
-        }
-      })
+    const quote = quoteData
+      ? sdk.Quote.createAttesterSignature(quoteData, selectedIdentity)
+      : undefined
+    AttestationWorkflow.submitTerms(
+      claim,
+      getAttestedClaims(),
+      receiverAddresses,
+      selectedDelegation,
+      quote
+    ).then(() => {
+      if (onFinished) {
+        onFinished()
+      }
+    })
   }
 
   private changeDelegation(selectedDelegations: IMyDelegation[]): void {

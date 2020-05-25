@@ -79,17 +79,17 @@ class AttestClaim extends React.Component<Props, State> {
           delegationId={requestForAttestation.delegationId}
           context="terms"
         />
-        {!quote ? (
-          <span>
-            <h2>Quotes</h2>
-            <div>no Quote</div>
-          </span>
-        ) : (
+        {quote ? (
           <span>
             <h2>Quotes</h2>
             <div>
               <Code>{quote}</Code>
             </div>
+          </span>
+        ) : (
+          <span>
+            <h2>Quotes</h2>
+            <div>no Quote</div>
           </span>
         )}
 

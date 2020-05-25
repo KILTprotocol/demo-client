@@ -3,12 +3,12 @@ import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
 import * as common from 'schema-based-json-editor'
+import QuoteInputSchema from '../../utils/QuoteUtils/QuoteInputSchema'
 import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../../state/PersistentStore'
 import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import * as Quotes from '../../state/ducks/Quotes'
 import * as Wallet from '../../state/ducks/Wallet'
-import QuoteSchema from './QuoteSchema'
 
 import './QuoteCreate.scss'
 
@@ -99,7 +99,7 @@ class QuoteCreate extends React.Component<Props, State> {
         <h2>Quote</h2>
         <div>
           <SchemaEditor
-            schema={QuoteSchema as common.Schema}
+            schema={QuoteInputSchema as common.Schema}
             initialValue={initialValue}
             updateValue={this.updateValue}
           />
