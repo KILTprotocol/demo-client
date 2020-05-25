@@ -205,7 +205,7 @@ class SubmitTerms extends React.Component<Props, State> {
 
         <>
           <div className="selectTerms">
-            <h2>Select term(s)…</h2>
+            <h2>Select Legitimation(s)…</h2>
             <SelectAttestedClaims onChange={onChange} />
           </div>
 
