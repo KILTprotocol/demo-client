@@ -1,22 +1,17 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetadata'
-import { makeTransfer } from '@kiltprotocol/sdk-js/build/balance/Balance.chain'
-import { MessageBodyType } from '@kiltprotocol/sdk-js'
 import ANTICOV_CONFIG from '../components/DevTools/data/anticov.json'
+import { IMyIdentity } from '../types/Contact'
 import CTypeRepository from '../services/CtypeRepository'
 import { BalanceUtilities } from '../services/BalanceUtilities'
-import { IMyIdentity } from '../types/Contact'
 import MessageRepository from '../services/MessageRepository'
-import { BasePostParams } from '../services/BaseRepository'
+import DelegationsService from '../services/DelegationsService'
 
 const root = sdk.Identity.buildFromMnemonic(ANTICOV_CONFIG.ROOT_SEED)
 
 const ctype = sdk.CType.fromCType(ANTICOV_CONFIG.CTYPE as sdk.ICType)
 ctype.owner = root.address
-const metadata: IMetadata = {
-  title: { default: 'AntiCov' },
-  properties: { photo: { type: 'string' } },
-}
+const metadata: IMetadata = ANTICOV_CONFIG.CTYPE_METADATA
 
 const delegationRoot = new sdk.DelegationRootNode(
   ANTICOV_CONFIG.DELEGATION_ROOT_ID,
@@ -24,36 +19,31 @@ const delegationRoot = new sdk.DelegationRootNode(
   root.address
 )
 
-async function newDelegation(myIdentity: IMyIdentity) {
-  const delNode = new sdk.DelegationNode(
+async function newDelegation(delegee: IMyIdentity): Promise<void> {
+  const delegationNode = new sdk.DelegationNode(
     sdk.UUID.generate(),
     delegationRoot.id,
-    myIdentity.identity.address,
+    delegee.identity.address,
     [sdk.Permission.ATTEST]
   )
-  const signature = myIdentity.identity.signStr(delNode.generateHash())
-  await delNode.store(root, signature)
-  const messageBody: sdk.MessageBody = {
-    type: MessageBodyType.INFORM_CREATE_DELEGATION,
-    content: { delegationId: delNode.id, isPCR: false },
-  }
-  const message = new sdk.Message(
-    messageBody,
-    root,
-    myIdentity.identity.getPublicIdentity()
+  const signature = delegee.identity.signStr(delegationNode.generateHash())
+  await delegationNode.store(root, signature)
+  await DelegationsService.importDelegation(
+    delegationNode.id,
+    'AntiCov Attester',
+    false
   )
-  await fetch(`${MessageRepository.URL}`, {
-    ...BasePostParams,
-    body: JSON.stringify(message.getEncryptedMessage()),
-  }).then(response => {
-    if (!response.ok) {
-      throw new Error(response.statusText)
-    }
-    console.log(response.json())
-  })
+  const messageBody: sdk.MessageBody = {
+    type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
+    content: { delegationId: delegationNode.id, isPCR: false },
+  }
+  await MessageRepository.sendToAddresses(
+    [delegee.identity.address],
+    messageBody
+  )
 }
 
-async function setup() {
+async function setup(): Promise<void> {
   if (!(await ctype.verifyStored())) {
     await ctype.store(root)
     CTypeRepository.register({
@@ -61,20 +51,27 @@ async function setup() {
       metaData: { metadata, ctypeHash: ctype.hash },
     })
   }
-
-  if (!(await delegationRoot.verify())) {
+  // .verify() is fucked currently (at least with the mashnet)
+  const queriedRoot = await sdk.DelegationRootNode.query(delegationRoot.id)
+  if (queriedRoot?.cTypeHash !== ctype.hash) {
     await delegationRoot.store(root)
+    const messageBody: sdk.MessageBody = {
+      type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
+      content: { delegationId: delegationRoot.id, isPCR: false },
+    }
+    // sending root owner message for importing the root
+    await MessageRepository.sendToAddresses([root.address], messageBody)
   }
 }
 
-export async function setupAndDelegate(myIdentity: IMyIdentity) {
-  await makeTransfer(
-    myIdentity.identity,
+export async function setupAndDelegate(delegee: IMyIdentity): Promise<void> {
+  await sdk.Balance.makeTransfer(
+    delegee.identity,
     root.address,
-    BalanceUtilities.asMicroKilt(10)
+    BalanceUtilities.asMicroKilt(4)
   )
   await setup()
-  await newDelegation(myIdentity)
+  await newDelegation(delegee)
 }
 
 export default setupAndDelegate
