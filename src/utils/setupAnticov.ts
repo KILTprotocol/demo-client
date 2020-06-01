@@ -6,6 +6,10 @@ import CTypeRepository from '../services/CtypeRepository'
 import { BalanceUtilities } from '../services/BalanceUtilities'
 import MessageRepository from '../services/MessageRepository'
 import DelegationsService from '../services/DelegationsService'
+import FeedbackService, {
+  notifySuccess,
+  notifyFailure,
+} from '../services/FeedbackService'
 
 const root = sdk.Identity.buildFromMnemonic(ANTICOV_CONFIG.ROOT_SEED)
 
@@ -28,11 +32,13 @@ async function newDelegation(delegee: IMyIdentity): Promise<void> {
   )
   const signature = delegee.identity.signStr(delegationNode.generateHash())
   await delegationNode.store(root, signature)
+  notifySuccess(`Delegation successfully created for ${delegee.metaData.name}`)
   await DelegationsService.importDelegation(
     delegationNode.id,
     'AntiCov Attester',
     false
   )
+  notifySuccess(`Delegation imported. Switch to Delegation Tab to see it.`)
   const messageBody: sdk.MessageBody = {
     type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
     content: { delegationId: delegationNode.id, isPCR: false },
@@ -50,6 +56,7 @@ async function setup(): Promise<void> {
       cType: ctype,
       metaData: { metadata, ctypeHash: ctype.hash },
     })
+    notifySuccess(`CTYPE ${metadata.title.default} successfully created.`)
   }
   // .verify() is fucked currently (at least with the mashnet)
   const queriedRoot = await sdk.DelegationRootNode.query(delegationRoot.id)
@@ -59,19 +66,31 @@ async function setup(): Promise<void> {
       type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
       content: { delegationId: delegationRoot.id, isPCR: false },
     }
+    notifySuccess(`AntiCov Delegation Root successfully created.`)
     // sending root owner message for importing the root
     await MessageRepository.sendToAddresses([root.address], messageBody)
   }
 }
 
 export async function setupAndDelegate(delegee: IMyIdentity): Promise<void> {
-  await sdk.Balance.makeTransfer(
-    delegee.identity,
-    root.address,
-    BalanceUtilities.asMicroKilt(4)
-  )
-  await setup()
-  await newDelegation(delegee)
+  const blockUi = FeedbackService.addBlockUi({
+    headline: 'Creating AntiCov Delegation',
+  })
+  try {
+    blockUi.updateMessage('transferring funds to AntiCov authority')
+    await sdk.Balance.makeTransfer(
+      delegee.identity,
+      root.address,
+      BalanceUtilities.asMicroKilt(4)
+    )
+    blockUi.updateMessage('setting up CType and Root Delegation')
+    await setup()
+    blockUi.updateMessage('creating Delegation Node for current identity')
+    await newDelegation(delegee)
+  } catch (error) {
+    notifyFailure(`Failed to set up Delegation Node: ${error}`)
+  }
+  blockUi.remove()
 }
 
 export default setupAndDelegate
