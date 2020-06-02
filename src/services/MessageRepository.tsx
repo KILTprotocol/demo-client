@@ -193,6 +193,17 @@ class MessageRepository {
       })
   }
 
+  public static async dispatchMessage(message: sdk.Message): Promise<Response> {
+    const response = await fetch(`${MessageRepository.URL}`, {
+      ...BasePostParams,
+      body: JSON.stringify(message.getEncryptedMessage()),
+    })
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
+    return response
+  }
+
   public static async singleSend(
     messageBody: sdk.MessageBody,
     sender: IMyIdentity,
@@ -207,17 +218,7 @@ class MessageRepository {
 
       message = await MessageRepository.handleDebugMode(message)
 
-      return fetch(`${MessageRepository.URL}`, {
-        ...BasePostParams,
-        body: JSON.stringify(message.getEncryptedMessage()),
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(response.statusText)
-          }
-          return response
-        })
-        .then(response => response.json())
+      return MessageRepository.dispatchMessage(message)
         .then(() => {
           notifySuccess(
             `Message '${messageBody.type}' to receiver ${receiver.metaData

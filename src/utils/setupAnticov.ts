@@ -68,7 +68,9 @@ async function setup(): Promise<void> {
     }
     notifySuccess(`AntiCov Delegation Root successfully created.`)
     // sending root owner message for importing the root
-    await MessageRepository.sendToAddresses([root.address], messageBody)
+    const message = new sdk.Message(messageBody, root, root)
+    await MessageRepository.dispatchMessage(message)
+    notifySuccess(`Sent Delegation Root to AntiCov root authority.`)
   }
 }
 
