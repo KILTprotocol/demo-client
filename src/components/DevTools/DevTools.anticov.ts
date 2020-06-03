@@ -58,7 +58,8 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
     })
     notifySuccess(`CTYPE ${metadata.title.default} successfully created.`)
   }
-  // .verify() is fucked currently (at least with the mashnet)
+  // delegationRoot.verify() is unreliable when using the currently released mashnet-node & sdk
+  // workaround is checking the ctype hash of the query result; it is 0x000... if it doesn't exist on chain
   const queriedRoot = await sdk.DelegationRootNode.query(delegationRoot.id)
   if (queriedRoot?.cTypeHash !== ctype.hash) {
     await delegationRoot.store(root)
