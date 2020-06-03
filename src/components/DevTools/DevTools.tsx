@@ -1,6 +1,6 @@
 import React from 'react'
 
-import setupAndDelegate from '../../utils/setupAnticov'
+import setupAndDelegate from './DevTools.anticov'
 import {
   ENDOWMENT,
   MIN_BALANCE,

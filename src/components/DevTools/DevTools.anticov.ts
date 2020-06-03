@@ -1,15 +1,15 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetadata'
-import ANTICOV_CONFIG from '../components/DevTools/data/anticov.json'
-import { IMyIdentity } from '../types/Contact'
-import CTypeRepository from '../services/CtypeRepository'
-import { BalanceUtilities } from '../services/BalanceUtilities'
-import MessageRepository from '../services/MessageRepository'
-import DelegationsService from '../services/DelegationsService'
+import ANTICOV_CONFIG from './data/anticov.json'
+import { IMyIdentity } from '../../types/Contact'
+import CTypeRepository from '../../services/CtypeRepository'
+import { BalanceUtilities } from '../../services/BalanceUtilities'
+import MessageRepository from '../../services/MessageRepository'
+import DelegationsService from '../../services/DelegationsService'
 import FeedbackService, {
   notifySuccess,
   notifyFailure,
-} from '../services/FeedbackService'
+} from '../../services/FeedbackService'
 
 const root = sdk.Identity.buildFromMnemonic(ANTICOV_CONFIG.ROOT_SEED)
 
@@ -49,7 +49,7 @@ async function newDelegation(delegee: IMyIdentity): Promise<void> {
   )
 }
 
-async function setup(): Promise<void> {
+async function verifyOrAddCtypeAndRoot(): Promise<void> {
   if (!(await ctype.verifyStored())) {
     await ctype.store(root)
     CTypeRepository.register({
@@ -80,13 +80,11 @@ export async function setupAndDelegate(delegee: IMyIdentity): Promise<void> {
   })
   try {
     blockUi.updateMessage('transferring funds to AntiCov authority')
-    await sdk.Balance.makeTransfer(
-      delegee.identity,
-      root.address,
-      BalanceUtilities.asMicroKilt(4)
-    )
+    await new Promise(resolve => {
+      BalanceUtilities.makeTransfer(delegee, root.address, 4, () => resolve())
+    })
     blockUi.updateMessage('setting up CType and Root Delegation')
-    await setup()
+    await verifyOrAddCtypeAndRoot()
     blockUi.updateMessage('creating Delegation Node for current identity')
     await newDelegation(delegee)
   } catch (error) {
