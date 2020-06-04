@@ -93,8 +93,6 @@ class QuoteCreate extends React.Component<Props, State> {
             initialValue={initialValue}
             updateValue={this.updateValue}
           />
-          <label> Time Frame</label>
-          <DayPickerInput onDayChange={this.handleChange} />
         </div>
 
         <section className="actions">
