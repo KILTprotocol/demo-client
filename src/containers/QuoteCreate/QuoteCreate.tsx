@@ -1,42 +1,28 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
-import { connect, MapStateToProps } from 'react-redux'
+
 import { withRouter, RouteComponentProps } from 'react-router'
 import * as common from 'schema-based-json-editor'
 import DayPickerInput from 'react-day-picker/DayPickerInput'
 import QuoteInputSchema from '../../utils/QuoteUtils/QuoteInputSchema'
-import { IMyIdentity } from '../../types/Contact'
-import { State as ReduxState } from '../../state/PersistentStore'
+
 import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import * as Quotes from '../../state/ducks/Quotes'
-import * as Wallet from '../../state/ducks/Wallet'
+
 import 'react-day-picker/lib/style.css'
 
 import './QuoteCreate.scss'
-
-type StateProps = {
-  selectedIdentity: IMyIdentity
-}
-
-type DispatchProps = {
-  saveQuote: (
-    attesterSignedQuote: sdk.IQuoteAttesterSigned,
-    claimerIdentity: string
-  ) => void
-}
 
 type OwnProps = {
   cTypeHash?: sdk.ICType['hash']
   claimerAddress?: string
   attesterAddress?: string
   onCancel?: () => void
-  quoteId: (quoteId: Quotes.Entry['quoteId']) => void
+  newQuote: (quote: sdk.IQuote) => void
 }
 
 type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
-  StateProps &
-  OwnProps &
-  DispatchProps
+  OwnProps
 
 type State = {
   quote?: sdk.IQuote
@@ -79,16 +65,11 @@ class QuoteCreate extends React.Component<Props, State> {
   }
 
   private handleSubmit(): void {
-    const { saveQuote, selectedIdentity, claimerAddress, quoteId } = this.props
+    const { claimerAddress, newQuote } = this.props
     const { quote, startDate } = this.state
     if (quote && claimerAddress) {
       quote.timeframe = startDate
-      quoteId(Quotes.hash(quote))
-      const attesterSignedQuote = sdk.Quote.fromQuoteDataAndIdentity(
-        quote,
-        selectedIdentity.identity
-      )
-      saveQuote(attesterSignedQuote, claimerAddress)
+      newQuote(quote)
     }
   }
 
@@ -134,22 +115,4 @@ class QuoteCreate extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
-  selectedIdentity: Wallet.getSelectedIdentity(state),
-})
-
-const mapDispatchToProps: DispatchProps = {
-  saveQuote: (
-    attesterSignedQuote: sdk.IQuoteAttesterSigned,
-    claimerAddress: string
-  ) => Quotes.Store.saveQuote(attesterSignedQuote, claimerAddress),
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(QuoteCreate))
+export default withRouter(QuoteCreate)

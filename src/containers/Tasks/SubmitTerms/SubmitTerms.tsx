@@ -2,6 +2,7 @@ import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
 import * as common from 'schema-based-json-editor'
 
+import { connect } from 'react-redux'
 import SchemaEditor from '../../../components/SchemaEditor/SchemaEditor'
 import SelectAttestedClaims from '../../../components/SelectAttestedClaims/SelectAttestedClaims'
 import SelectDelegations from '../../../components/SelectDelegations/SelectDelegations'
@@ -11,6 +12,7 @@ import withSelectAttestedClaims, {
 import AttestationWorkflow from '../../../services/AttestationWorkflow'
 import CTypeRepository from '../../../services/CtypeRepository'
 import { IMyDelegation } from '../../../state/ducks/Delegations'
+import * as Quotes from '../../../state/ducks/Quotes'
 import { IContact } from '../../../types/Contact'
 import { ICTypeWithMetadata } from '../../../types/Ctype'
 import { getClaimInputModel } from '../../../utils/CtypeUtils'
@@ -18,6 +20,13 @@ import QuoteView from '../../QuoteView/QuoteView'
 import PersistentStore from '../../../state/PersistentStore'
 import * as Wallet from '../../../state/ducks/Wallet'
 import './SubmitTerms.scss'
+
+type DispatchProps = {
+  saveQuote: (
+    attesterSignedQuote: sdk.IQuoteAttesterSigned,
+    claimerIdentity: string
+  ) => void
+}
 
 export type SubmitTermsProps = {
   claim: sdk.IPartialClaim
@@ -29,7 +38,7 @@ export type SubmitTermsProps = {
   onCancel?: () => void
 }
 
-type Props = InjectedSelectProps & SubmitTermsProps
+type Props = InjectedSelectProps & SubmitTermsProps & DispatchProps
 
 type State = {
   claim: sdk.IPartialClaim
@@ -134,6 +143,8 @@ class SubmitTerms extends React.Component<Props, State> {
       enablePreFilledClaim,
       receiverAddresses,
       onFinished,
+      saveQuote,
+      senderAddress,
     } = this.props
     const {
       claim,
@@ -163,6 +174,7 @@ class SubmitTerms extends React.Component<Props, State> {
       quote
     ).then(() => {
       if (onFinished) {
+        if (quote && senderAddress) saveQuote(quote, senderAddress)
         onFinished()
       }
     })
@@ -236,4 +248,14 @@ class SubmitTerms extends React.Component<Props, State> {
   }
 }
 
-export default withSelectAttestedClaims(SubmitTerms)
+const mapDispatchToProps: DispatchProps = {
+  saveQuote: (
+    attesterSignedQuote: sdk.IQuoteAttesterSigned,
+    claimerAddress: string
+  ) => Quotes.Store.saveQuote(attesterSignedQuote, claimerAddress),
+}
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(withSelectAttestedClaims(SubmitTerms))

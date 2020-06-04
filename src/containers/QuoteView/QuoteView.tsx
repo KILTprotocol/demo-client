@@ -3,9 +3,7 @@ import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import * as sdk from '@kiltprotocol/sdk-js'
-import PersistentStore, {
-  State as ReduxState,
-} from '../../state/PersistentStore'
+import { State as ReduxState } from '../../state/PersistentStore'
 import { IMyIdentity } from '../../types/Contact'
 import * as Wallet from '../../state/ducks/Wallet'
 import * as Quotes from '../../state/ducks/Quotes'
@@ -30,8 +28,7 @@ type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
 
 type State = {
   createNewQuote: boolean
-  quoteID?: Quotes.Entry['quoteId']
-  newQuote?: Quotes.IQuoteEntry
+  newQuote?: sdk.IQuote
 }
 
 class QuoteView extends React.Component<Props, State> {
@@ -40,23 +37,14 @@ class QuoteView extends React.Component<Props, State> {
     this.state = { createNewQuote: false }
     this.createQuote = this.createQuote.bind(this)
     this.onCancelQuote = this.onCancelQuote.bind(this)
-    this.quoteId = this.quoteId.bind(this)
     this.confirmQuote = this.confirmQuote.bind(this)
   }
 
   public componentDidUpdate(): void {
     const { updateQuote } = this.props
-    const { newQuote, quoteID } = this.state
-    if (quoteID) {
-      const selectedQuote = Quotes.getQuoteByQuoteHash(
-        PersistentStore.store.getState(),
-        quoteID
-      )[0]
-      if (newQuote !== selectedQuote.quote) {
-        this.confirmQuote(selectedQuote.quote)
-        updateQuote(selectedQuote.quote)
-      }
-    }
+    const { newQuote } = this.state
+
+    if (newQuote) updateQuote(newQuote)
   }
 
   private onCancelQuote(): void {
@@ -67,11 +55,7 @@ class QuoteView extends React.Component<Props, State> {
     this.setState({ createNewQuote: true })
   }
 
-  private quoteId(quoteId: Quotes.Entry['quoteId']): void {
-    this.setState({ quoteID: quoteId })
-  }
-
-  private confirmQuote(quote: Quotes.IQuoteEntry): void {
+  private confirmQuote(quote: sdk.IQuote): void {
     if (quote) {
       this.setState({ newQuote: quote, createNewQuote: false })
     }
@@ -80,11 +64,11 @@ class QuoteView extends React.Component<Props, State> {
   public render(): JSX.Element {
     const { senderAddress, receiverAddress, claim } = this.props
 
-    const { createNewQuote, quoteID, newQuote } = this.state
+    const { createNewQuote, newQuote } = this.state
     return (
       <section className="QuoteView">
         <h1>Quote </h1>
-        {quoteID && newQuote ? (
+        {newQuote ? (
           <div>
             <span>
               <Code>{newQuote}</Code>
@@ -113,7 +97,7 @@ class QuoteView extends React.Component<Props, State> {
               attesterAddress={receiverAddress}
               cTypeHash={claim?.cTypeHash}
               onCancel={this.onCancelQuote}
-              quoteId={this.quoteId}
+              newQuote={quote => this.confirmQuote(quote)}
             />
           </section>
         )}
