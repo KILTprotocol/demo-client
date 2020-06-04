@@ -46,10 +46,6 @@ export default {
     termsAndConditions: {
       type: 'string',
     },
-    timeframe: {
-      type: 'string',
-      format: 'date-time',
-    },
   },
   required: [
     'attesterAddress',
@@ -57,6 +53,5 @@ export default {
     'cost',
     'currency',
     'termsAndConditions',
-    'timeframe',
   ],
 }

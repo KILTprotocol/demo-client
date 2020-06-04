@@ -3,12 +3,14 @@ import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
 import * as common from 'schema-based-json-editor'
+import DayPickerInput from 'react-day-picker/DayPickerInput'
 import QuoteInputSchema from '../../utils/QuoteUtils/QuoteInputSchema'
 import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../../state/PersistentStore'
 import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import * as Quotes from '../../state/ducks/Quotes'
 import * as Wallet from '../../state/ducks/Wallet'
+import 'react-day-picker/lib/style.css'
 
 import './QuoteCreate.scss'
 
@@ -39,6 +41,7 @@ type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
 type State = {
   quote?: sdk.IQuote
   initialValue?: object
+  startDate: Date
 }
 
 class QuoteCreate extends React.Component<Props, State> {
@@ -46,11 +49,13 @@ class QuoteCreate extends React.Component<Props, State> {
     super(props)
     const { attesterAddress, cTypeHash } = this.props
     this.state = {
+      startDate: new Date(),
       initialValue: {
         attesterAddress,
         cTypeHash,
       },
     }
+    this.handleChange = this.handleChange.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.updateValue = this.updateValue.bind(this)
@@ -58,8 +63,6 @@ class QuoteCreate extends React.Component<Props, State> {
 
   public updateValue = (value: sdk.IQuote): void => {
     const quote = value
-    // Need to add an input for dates to actually have a selection of the dates.
-    quote.timeframe = new Date()
     const result = {}
     Object.keys(value.cost.tax).forEach(entryKey => {
       result[entryKey] = value.cost.tax[entryKey]
@@ -69,10 +72,17 @@ class QuoteCreate extends React.Component<Props, State> {
     this.setState({ quote })
   }
 
+  private handleChange = (date: Date): void => {
+    this.setState({
+      startDate: date,
+    })
+  }
+
   private handleSubmit(): void {
     const { saveQuote, selectedIdentity, claimerAddress, quoteId } = this.props
-    const { quote } = this.state
+    const { quote, startDate } = this.state
     if (quote && claimerAddress) {
+      quote.timeframe = startDate
       quoteId(Quotes.hash(quote))
       const attesterSignedQuote = sdk.Quote.fromQuoteDataAndIdentity(
         quote,
@@ -95,15 +105,19 @@ class QuoteCreate extends React.Component<Props, State> {
     const { initialValue } = this.state
 
     return (
-      <section className="QuoteCreate">
-        <h2>Quote</h2>
+      <div className="QuoteCreate">
         <div>
+          <label> Time Frame</label>
+          <DayPickerInput onDayChange={this.handleChange} />
           <SchemaEditor
             schema={QuoteInputSchema as common.Schema}
             initialValue={initialValue}
             updateValue={this.updateValue}
           />
+          <label> Time Frame</label>
+          <DayPickerInput onDayChange={this.handleChange} />
         </div>
+
         <section className="actions">
           {onCancel && (
             <button type="button" onClick={this.handleCancel}>
@@ -115,7 +129,7 @@ class QuoteCreate extends React.Component<Props, State> {
             Confirm Quote
           </button>
         </section>
-      </section>
+      </div>
     )
   }
 }
