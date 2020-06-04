@@ -29,11 +29,18 @@ interface ISaveAction extends KiltAction {
   }
 }
 
+interface ISaveAgreedQuoteAction extends KiltAction {
+  payload: {
+    quoteId: Entry['quoteId']
+    quote: IQuoteEntry
+  }
+}
+
 interface IRemoveAction extends KiltAction {
   payload: sdk.IQuoteAttesterSigned['attesterSignature']
 }
 
-export type Action = ISaveAction | IRemoveAction
+export type Action = ISaveAction | IRemoveAction | ISaveAgreedQuoteAction
 
 export type Entry = {
   quoteId: string
@@ -117,6 +124,14 @@ class Store {
           quote,
         } as Entry)
       }
+      case Store.ACTIONS.SAVE_AGREED_QUOTE: {
+        const { quoteId, quote } = (action as ISaveAgreedQuoteAction).payload
+
+        return state.setIn(['quotes', quoteId], {
+          quoteId,
+          quote,
+        } as Entry)
+      }
       case Store.ACTIONS.REMOVE_QUOTE: {
         return state.deleteIn(['quotes', (action as IRemoveAction).payload])
       }
@@ -136,6 +151,16 @@ class Store {
     }
   }
 
+  public static saveAgreedQuote(quote: IQuoteEntry): Action {
+    return {
+      payload: {
+        quoteId: hash(quote),
+        quote,
+      },
+      type: Store.ACTIONS.SAVE_AGREED_QUOTE,
+    }
+  }
+
   public static removeQuote(quoteId: Entry['quoteId']): Action {
     return {
       payload: quoteId,
@@ -152,6 +177,7 @@ class Store {
   private static ACTIONS = {
     SAVE_QUOTE: 'client/quotes/SAVE_QUOTE',
     REMOVE_QUOTE: 'client/quotes/UPDATE_QUOTE',
+    SAVE_AGREED_QUOTE: 'client/quotes/SAVE_AGREED_QUOTE',
   }
 }
 

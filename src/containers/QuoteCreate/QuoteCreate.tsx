@@ -1,11 +1,9 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
-
 import { withRouter, RouteComponentProps } from 'react-router'
 import * as common from 'schema-based-json-editor'
 import DayPickerInput from 'react-day-picker/DayPickerInput'
 import QuoteInputSchema from '../../utils/QuoteUtils/QuoteInputSchema'
-
 import SchemaEditor from '../../components/SchemaEditor/SchemaEditor'
 import * as Quotes from '../../state/ducks/Quotes'
 

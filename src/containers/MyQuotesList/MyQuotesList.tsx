@@ -50,7 +50,9 @@ class MyQuotesList extends React.Component<Props> {
               return (
                 <section key={index.valueOf()}>
                   <h2>Quote ID: {quoteItem.quoteId}</h2>
-                  <label>Claimer address : {quoteItem.claimerAddress}</label>
+                  {quoteItem.claimerAddress && (
+                    <label>Claimer address : {quoteItem.claimerAddress}</label>
+                  )}
                   <div>
                     <Code>{quoteItem.quote}</Code>
                   </div>

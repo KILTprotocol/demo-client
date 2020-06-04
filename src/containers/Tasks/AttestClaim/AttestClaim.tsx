@@ -1,21 +1,30 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
 
+import { connect } from 'react-redux'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
+import * as Quotes from '../../../state/ducks/Quotes'
+
 import FeedbackService, { notifyError } from '../../../services/FeedbackService'
 import { IContact } from '../../../types/Contact'
 import { BlockUi } from '../../../types/UserFeedback'
 import Code from '../../../components/Code/Code'
 
-type Props = {
+type DispatchProps = {
+  saveAgreedQuote: (agreedQuote: sdk.IQuoteAgreement) => void
+}
+
+type OwnProps = {
   claimerAddresses: Array<IContact['publicIdentity']['address']>
   requestForAttestation: sdk.IRequestForAttestation
   quote?: sdk.IQuoteAgreement
   onCancel?: () => void
   onFinished?: () => void
 }
+
+type Props = OwnProps & DispatchProps
 
 type State = {
   quote?: sdk.IQuoteAgreement
@@ -45,7 +54,13 @@ class AttestClaim extends React.Component<Props, State> {
   }
 
   private attestClaim(): void {
-    const { requestForAttestation, onFinished, claimerAddresses } = this.props
+    const {
+      requestForAttestation,
+      onFinished,
+      claimerAddresses,
+      saveAgreedQuote,
+    } = this.props
+    const { quote } = this.state
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Writing attestation to chain',
     })
@@ -58,6 +73,7 @@ class AttestClaim extends React.Component<Props, State> {
       .then(() => {
         blockUi.remove()
         if (onFinished) {
+          if (quote) saveAgreedQuote(quote)
           onFinished()
         }
       })
@@ -106,4 +122,9 @@ class AttestClaim extends React.Component<Props, State> {
   }
 }
 
-export default AttestClaim
+const mapDispatchToProps: DispatchProps = {
+  saveAgreedQuote: (agreedQuote: sdk.IQuoteAgreement) =>
+    Quotes.Store.saveAgreedQuote(agreedQuote),
+}
+
+export default connect(null, mapDispatchToProps)(AttestClaim)
