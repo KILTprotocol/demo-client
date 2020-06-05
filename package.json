@@ -57,6 +57,7 @@
     "promise": "8.0.1",
     "raf": "3.4.0",
     "react": "^16.6.3",
+    "react-day-picker": "^7.4.8",
     "react-dev-utils": "^5.0.2",
     "react-dom": "^16.6.3",
     "react-json-view": "^1.19.1",
