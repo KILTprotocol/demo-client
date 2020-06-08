@@ -53,8 +53,9 @@ class AttestationWorkflow {
     claim: IPartialClaim,
     terms: sdk.IAttestedClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
-    delegation?: IMyDelegation,
-    quote?: sdk.IQuoteAttesterSigned
+    quote?: sdk.IQuoteAttesterSigned,
+    receiver?: sdk.IPublicIdentity,
+    delegation?: IMyDelegation
   ): Promise<void> {
     const messageBody: sdk.ISubmitTerms = {
       content: {
@@ -71,6 +72,10 @@ class AttestationWorkflow {
     if (quote) {
       messageBody.content.quote = quote
     }
+    if (receiver) {
+      return MessageRepository.sendToPublicIdentity(receiver, messageBody)
+    }
+
     return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
   }
 
@@ -149,10 +154,11 @@ class AttestationWorkflow {
    */
   public static async approveAndSubmitAttestationForClaim(
     requestForAttestation: sdk.IRequestForAttestation,
-    claimerAddress: IContact['publicIdentity']['address']
+    claimerAddress: IContact['publicIdentity']['address'],
+    claimerIdentity?: sdk.IPublicIdentity
   ): Promise<void> {
     const claimer = await ContactRepository.findByAddress(claimerAddress)
-    if (!claimer) {
+    if (!claimer && !claimerIdentity) {
       throw new Error('claimer not found')
     }
     const attestedClaim = await AttestationService.attestClaim(
@@ -164,7 +170,7 @@ class AttestationWorkflow {
       attestation: attestedClaim.attestation,
       cTypeHash: attestedClaim.request.claim.cTypeHash,
       claimerAddress: attestedClaim.request.claim.owner,
-      claimerAlias: claimer.metaData.name,
+      claimerAlias: (claimer && claimer.metaData.name) || '',
       created: Date.now(),
     })
 
@@ -173,7 +179,19 @@ class AttestationWorkflow {
       content: attestedClaim,
       type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
     }
-    return MessageRepository.send([claimer], attestationMessageBody)
+
+    if (claimerIdentity) {
+      return MessageRepository.sendToPublicIdentity(
+        claimerIdentity,
+        attestationMessageBody
+      )
+    }
+
+    if (claimer) {
+      return MessageRepository.send([claimer], attestationMessageBody)
+    }
+
+    throw new Error('unreachable code')
   }
 
   /**

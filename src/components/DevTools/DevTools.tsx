@@ -1,5 +1,6 @@
 import React from 'react'
 
+import setupAndDelegate from './DevTools.anticov'
 import {
   ENDOWMENT,
   MIN_BALANCE,
@@ -159,6 +160,15 @@ class DevTools extends React.Component<Props> {
                   {messages.label}
                 </button>
               ))}
+            </div>
+            <div>
+              <h4>AntiCov Setup</h4>
+              <button
+                type="button"
+                onClick={() => setupAndDelegate(selectedIdentity)}
+              >
+                AntiCov Delegation
+              </button>
             </div>
             {withMessages.map((messages: WithMessages) => (
               <div key={messages.label}>

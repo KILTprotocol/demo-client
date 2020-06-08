@@ -33,6 +33,7 @@ export type SubmitTermsProps = {
   receiverAddresses: Array<IContact['publicIdentity']['address']>
   senderAddress?: string
   receiverAddress?: string
+  receiver?: sdk.IPublicIdentity
   enablePreFilledClaim?: boolean
   onFinished?: () => void
   onCancel?: () => void
@@ -141,6 +142,7 @@ class SubmitTerms extends React.Component<Props, State> {
     const {
       getAttestedClaims,
       enablePreFilledClaim,
+      receiver,
       receiverAddresses,
       onFinished,
       saveQuote,
@@ -170,8 +172,9 @@ class SubmitTerms extends React.Component<Props, State> {
       claim,
       getAttestedClaims(),
       receiverAddresses,
-      selectedDelegation,
-      quote
+      quote,
+      receiver,
+      selectedDelegation
     ).then(() => {
       if (onFinished) {
         if (quote && senderAddress) saveQuote(quote, senderAddress)

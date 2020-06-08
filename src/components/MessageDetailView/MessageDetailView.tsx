@@ -97,8 +97,10 @@ class MessageDetailView extends React.Component<Props, State> {
             <ClaimDetailView
               claim={(message.body as sdk.IRequestTerms).content}
             />
-            {showTask ? (
+
+            {showTask && message.sender ? (
               <SubmitTerms
+                receiver={message.sender.publicIdentity}
                 receiverAddresses={[message.senderAddress]}
                 senderAddress={message.senderAddress}
                 receiverAddress={message.receiverAddress}
@@ -135,6 +137,7 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <AttestClaim
             claimerAddresses={[message.senderAddress]}
+            claimer={message.sender?.publicIdentity}
             requestForAttestation={
               (message.body as sdk.IRequestAttestationForClaim).content
                 .requestForAttestation

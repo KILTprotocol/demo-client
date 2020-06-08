@@ -20,6 +20,8 @@ type OwnProps = {
   claimerAddresses: Array<IContact['publicIdentity']['address']>
   requestForAttestation: sdk.IRequestForAttestation
   quote?: sdk.IQuoteAgreement
+  claimer?: sdk.IPublicIdentity
+
   onCancel?: () => void
   onFinished?: () => void
 }
@@ -59,8 +61,10 @@ class AttestClaim extends React.Component<Props, State> {
       onFinished,
       claimerAddresses,
       saveAgreedQuote,
+      claimer,
     } = this.props
     const { quote } = this.state
+
     const blockUi: BlockUi = FeedbackService.addBlockUi({
       headline: 'Writing attestation to chain',
     })
@@ -68,7 +72,8 @@ class AttestClaim extends React.Component<Props, State> {
     attestationWorkflow
       .approveAndSubmitAttestationForClaim(
         requestForAttestation,
-        claimerAddresses[0]
+        claimerAddresses[0],
+        claimer
       )
       .then(() => {
         blockUi.remove()

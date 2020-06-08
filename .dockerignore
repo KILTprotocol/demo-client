@@ -4,3 +4,6 @@
 .vscode
 .idea
 .DS_STORE
+Dockerfile
+docker-compose.yml
+.dockerignore
