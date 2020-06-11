@@ -59,15 +59,13 @@ services:
     volumes:
       - ./src:/app/src
     environment:
-      - REACT_APP_SERVICE_HOST=//127.0.0.1
-      - REACT_APP_SERVICE_PORT=3000
-      - REACT_APP_NODE_HOST=127.0.0.1
-      - REACT_APP_NODE_WS_PORT=9944
+      - REACT_APP_SERVICE_HOST=//127.0.0.1:3000
+      - REACT_APP_NODE_HOST=ws://127.0.0.1:9944
       - REACT_APP_FAUCET_URL=http://127.0.0.1:3002
       - PUBLIC_URL=.
-      # if you experience issues where the watcher does not trigger rebuilds 
+      # if you experience issues where the watcher does not trigger rebuilds
       # when changing files in src/ the following option may help
-      #- CHOKIDAR_USEPOLLING=true 
+      #- CHOKIDAR_USEPOLLING=true
 
     ports:
       - 3001:3001
