@@ -31,6 +31,10 @@ on:
 
 name: Deploy to Amazon ECS
 
+env:
+  ECR_REPOSITORY: kilt/demo-client
+  ECR_IMAGE_TAG: latest-develop
+
 jobs:
   deploy:
     name: Deploy
@@ -55,15 +59,13 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: kilt/demo-client
-        IMAGE_TAG: latest-develop
       run: |
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
-        docker build -f Dockerfile.devnet -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        docker build -f Dockerfile.devnet -t $ECR_REGISTRY/$ECR_REPOSITORY:$ECR_IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$ECR_IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$ECR_IMAGE_TAG"
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
@@ -80,3 +82,37 @@ jobs:
         service: demo-client
         cluster: kilt-devnet
         wait-for-service-stability: true
+
+  publish_to_docker:
+    name: Publish develop image to docker
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      
+    - name: Login to Docker Hub
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+      run: |
+        echo $DOCKER_PASS | docker login --username=$DOCKER_USER --password-stdin
+    - name: Tag and push dev image to Docker Hub
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        DOCKER_REPOSITORY: kiltprotocol/demo-client
+        DOCKER_IMAGE_TAG: develop
+      run: |
+        SOURCE_IMAGE=$ECR_REGISTRY/$ECR_REPOSITORY:$ECR_IMAGE_TAG
+        docker pull $SOURCE_IMAGE
+        docker tag $SOURCE_IMAGE $DOCKER_REPOSITORY:$DOCKER_IMAGE_TAG
+        docker push $DOCKER_REPOSITORY:$DOCKER_IMAGE_TAG
