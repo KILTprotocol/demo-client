@@ -12,7 +12,7 @@ import { notifyFailure } from './FeedbackService'
 // (for other tests)
 
 class ContactRepository {
-  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${process.env.REACT_APP_SERVICE_PORT}/contacts`
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}/contacts`
 
   public static async findAll(): Promise<IContact[]> {
     return fetch(`${ContactRepository.URL}`)
