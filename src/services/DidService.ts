@@ -6,7 +6,7 @@ import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
 
 class DidService {
-  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${process.env.REACT_APP_SERVICE_PORT}/contacts/did`
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}/contacts/did`
 
   public static async resolveDid(
     identifier: string
