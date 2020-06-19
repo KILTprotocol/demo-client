@@ -22,7 +22,7 @@ import * as Wallet from '../../../state/ducks/Wallet'
 import './SubmitTerms.scss'
 
 type DispatchProps = {
-  saveQuote: (
+  saveAttestersQuote: (
     attesterSignedQuote: sdk.IQuoteAttesterSigned,
     claimerIdentity: string
   ) => void
@@ -145,7 +145,7 @@ class SubmitTerms extends React.Component<Props, State> {
       receiver,
       receiverAddresses,
       onFinished,
-      saveQuote,
+      saveAttestersQuote,
       senderAddress,
     } = this.props
     const {
@@ -177,7 +177,7 @@ class SubmitTerms extends React.Component<Props, State> {
       selectedDelegation
     ).then(() => {
       if (onFinished) {
-        if (quote && senderAddress) saveQuote(quote, senderAddress)
+        if (quote && senderAddress) saveAttestersQuote(quote, senderAddress)
         onFinished()
       }
     })
@@ -252,10 +252,10 @@ class SubmitTerms extends React.Component<Props, State> {
 }
 
 const mapDispatchToProps: DispatchProps = {
-  saveQuote: (
+  saveAttestersQuote: (
     attesterSignedQuote: sdk.IQuoteAttesterSigned,
     claimerAddress: string
-  ) => Quotes.Store.saveQuote(attesterSignedQuote, claimerAddress),
+  ) => Quotes.Store.saveAttestersQuote(attesterSignedQuote, claimerAddress),
 }
 
 export default connect(

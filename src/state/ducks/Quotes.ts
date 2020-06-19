@@ -21,7 +21,7 @@ function hash(quote: sdk.IQuote): string {
   return sdk.Crypto.hashObjectAsStr(JSON.stringify(quoteHash))
 }
 
-interface ISaveAction extends KiltAction {
+interface ISaveAttestersAction extends KiltAction {
   payload: {
     quoteId: Entry['quoteId']
     claimerAddress: string
@@ -40,7 +40,10 @@ interface IRemoveAction extends KiltAction {
   payload: sdk.IQuoteAttesterSigned['attesterSignature']
 }
 
-export type Action = ISaveAction | IRemoveAction | ISaveAgreedQuoteAction
+export type Action =
+  | ISaveAttestersAction
+  | IRemoveAction
+  | ISaveAgreedQuoteAction
 
 export type Entry = {
   quoteId: string
@@ -111,12 +114,12 @@ class Store {
     action: Action
   ): ImmutableState {
     switch (action.type) {
-      case Store.ACTIONS.SAVE_QUOTE: {
+      case Store.ACTIONS.SAVE_ATTESTERS_QUOTE: {
         const {
           quoteId,
           claimerAddress,
           quote,
-        } = (action as ISaveAction).payload
+        } = (action as ISaveAttestersAction).payload
 
         return state.setIn(['quotes', quoteId], {
           quoteId,
@@ -140,14 +143,17 @@ class Store {
     }
   }
 
-  public static saveQuote(quote: IQuoteEntry, claimerIdentity: string): Action {
+  public static saveAttestersQuote(
+    quote: IQuoteEntry,
+    claimerIdentity: string
+  ): Action {
     return {
       payload: {
         quoteId: hash(quote),
         claimerAddress: claimerIdentity,
         quote,
       },
-      type: Store.ACTIONS.SAVE_QUOTE,
+      type: Store.ACTIONS.SAVE_ATTESTERS_QUOTE,
     }
   }
 
@@ -175,7 +181,7 @@ class Store {
   }
 
   private static ACTIONS = {
-    SAVE_QUOTE: 'client/quotes/SAVE_QUOTE',
+    SAVE_ATTESTERS_QUOTE: 'client/quotes/SAVE_ATTESTERS_QUOTE',
     REMOVE_QUOTE: 'client/quotes/UPDATE_QUOTE',
     SAVE_AGREED_QUOTE: 'client/quotes/SAVE_AGREED_QUOTE',
   }
