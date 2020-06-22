@@ -43,11 +43,12 @@ class MyQuotesList extends React.Component<Props, State> {
   }
 
   private updateQuoteApproval(quoteEntry: Quotes.IQuoteEntry): void {
-    const quote: sdk.IQuoteAgreement = quoteEntry
-    if (quote.claimerSignature) {
+    if (quoteEntry.attesterSignature) {
+      // not able to do claimer signature... Union type problem
       this.setState({ status: STATUS.APPROVED })
     }
-    if (!quote.claimerSignature) {
+    if (!quoteEntry.attesterSignature) {
+      // / not able to do claimer signature... Union type problem
       this.setState({ status: STATUS.NOTAPPROVED })
     }
   }
