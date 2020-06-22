@@ -1,9 +1,60 @@
-.MyQuotesList{
-    @include labeledCard;
-    & h1 {
-      @include h1('Ctype');
-    }
-    & > div {
-      @include label-input-combo;
+.MyQuotesList {
+  @include labeledCard;
+  & h1 {
+    @include h1('Ctype');
+  }
+  & > div {
+    @include label-input-combo;
+  }
+  & table {
+    @include table;
+    @include responsiveTable(
+      (
+        phone: (
+          '*',
+          false,
+          '*',
+          false,
+          50px,
+          getActionTdWidth(2),
+        ),
+        tablet: (
+          '*',
+          false,
+          '*',
+          100px,
+          50px,
+          getActionTdWidth(2),
+        ),
+        desktop: (
+          '*',
+          200px,
+          '*',
+          100px,
+          80px,
+          getActionTdWidth(2),
+        ),
+      )
+    );
+  }
+  & .delete {
+    @include button-icon-only($icon-trash);
+  }
+  & .notApproved {
+
+    &:before {
+      @include icon($icon-times);
+
+      color: $color-danger;
     }
   }
+
+  & .approved {
+
+    &:before {
+      @include icon($icon-check);
+
+      color: $color-success;
+    }
+  }
+}

@@ -1,12 +1,18 @@
 import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { connect, MapStateToProps } from 'react-redux'
+import * as sdk from '@kiltprotocol/sdk-js'
 import { State as ReduxState } from '../../state/PersistentStore'
 import * as Quotes from '../../state/ducks/Quotes'
 import * as Wallet from '../../state/ducks/Wallet'
 import Code from '../../components/Code/Code'
 import './MyQuotesList.scss'
 import { IMyIdentity } from '../../types/Contact'
+
+const enum STATUS {
+  APPROVED = 'approved',
+  NOTAPPROVED = 'notApproved',
+}
 
 type DispatchProps = {
   removeQuote: (claimId: Quotes.Entry['quoteId']) => void
@@ -24,11 +30,26 @@ type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
   DispatchProps &
   OwnProps
 
-class MyQuotesList extends React.Component<Props> {
+type State = {
+  status?: STATUS
+}
+
+class MyQuotesList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {}
     this.deleteQuote = this.deleteQuote.bind(this)
+    this.updateQuoteApproval = this.updateQuoteApproval.bind(this)
+  }
+
+  private updateQuoteApproval(quoteEntry: Quotes.IQuoteEntry): void {
+    const quote: sdk.IQuoteAgreement = quoteEntry
+    if (quote.claimerSignature) {
+      this.setState({ status: STATUS.APPROVED })
+    }
+    if (!quote.claimerSignature) {
+      this.setState({ status: STATUS.NOTAPPROVED })
+    }
   }
 
   private deleteQuote(quoteId: Quotes.Entry['quoteId']): void {
@@ -38,38 +59,61 @@ class MyQuotesList extends React.Component<Props> {
 
   public render(): JSX.Element {
     const { quoteEntries } = this.props
+    const { status } = this.state
     return (
       <section>
         <h1>Quotes</h1>
         <section className="MyQuotesList">
           <h1> My Quote list</h1>
-
-          {quoteEntries && quoteEntries.length ? (
-            quoteEntries.map((val: Quotes.Entry, index) => {
-              const quoteItem = val
-              return (
-                <section key={index.valueOf()}>
-                  <h2>Quote ID: {quoteItem.quoteId}</h2>
-                  {quoteItem.claimerAddress && (
-                    <label>Claimer address : {quoteItem.claimerAddress}</label>
-                  )}
-                  <div>
-                    <Code>{quoteItem.quote}</Code>
-                  </div>
-                  <div className="actions">
-                    <button
-                      type="button"
-                      onClick={() => this.deleteQuote(quoteItem.quoteId)}
-                    >
-                      Delete Quote
-                    </button>
-                  </div>
-                </section>
-              )
-            })
-          ) : (
-            <div>No Quotes</div>
-          )}
+          <table>
+            <thead>
+              <tr>
+                <th className="quoteId"> Quote Id</th>
+                <th className="claimerAddress"> Claimer Address</th>
+                <th className="quote"> Quote</th>
+                <th className="status"> Claimer Signed</th>
+                <th className="actions"> Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {quoteEntries && quoteEntries.length ? (
+                quoteEntries.map((val: Quotes.Entry, index) => {
+                  const quoteItem = val
+                  return (
+                    <tr key={index.valueOf()}>
+                      <td className="quoteId"> {quoteItem.quoteId}</td>
+                      <td className="claimerAddress">
+                        {quoteItem.claimerAddress}
+                      </td>
+                      <td className="quote">
+                        <Code>{quoteItem.quote}</Code>
+                      </td>
+                      <td className="status">
+                        {status === STATUS.NOTAPPROVED &&
+                          this.updateQuoteApproval(quoteItem.quote) && (
+                            <div className="notApproved" />
+                          )}
+                        {status === STATUS.APPROVED &&
+                          this.updateQuoteApproval(quoteItem.quote) && (
+                            <div className="approved" />
+                          )}
+                      </td>
+                      <td className="actions">
+                        <button
+                          type="button"
+                          title="Delete"
+                          className="delete"
+                          onClick={() => this.deleteQuote(quoteItem.quoteId)}
+                        />
+                      </td>
+                    </tr>
+                  )
+                })
+              ) : (
+                <div>No Quotes</div>
+              )}
+            </tbody>
+          </table>
         </section>
       </section>
     )

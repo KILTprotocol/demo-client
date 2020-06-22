@@ -7,7 +7,7 @@ import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 import { IMyIdentity } from '../../types/Contact'
 
-export type IQuoteEntry = sdk.IQuoteAttesterSigned | sdk.IQuoteAgreement // Could find a better name for this
+export type IQuoteEntry = sdk.IQuoteAgreement | sdk.IQuoteAttesterSigned // Could find a better name for this
 
 function hash(quote: sdk.IQuote): string {
   const quoteHash = {
