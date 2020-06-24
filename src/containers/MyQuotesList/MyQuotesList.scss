@@ -12,9 +12,9 @@
       (
         phone: (
           100px
+          false,
           100px
-          100px
-          100px
+          30px,
 
           getActionTdWidth(2),
         ),
@@ -22,15 +22,15 @@
           100px
           false,
           100px
-          100px,
+          50px,
 
           getActionTdWidth(2),
         ),
         desktop: (
           100px,
+          100px,
           200px,
-          100px,
-          100px,
+          50px,
           getActionTdWidth(2),
         ),
       )
