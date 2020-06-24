@@ -10,8 +10,7 @@ class BlockchainService {
   }
 
   public static getNodeWebsocketUrl(): string {
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    return `${protocol}://${process.env.REACT_APP_NODE_HOST}:${process.env.REACT_APP_NODE_WS_PORT}`
+    return `${process.env.REACT_APP_NODE_HOST}`
   }
 }
 
