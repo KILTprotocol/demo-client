@@ -11,27 +11,26 @@
     @include responsiveTable(
       (
         phone: (
-          '*',
-          false,
-          '*',
-          false,
-          50px,
+          100px
+          100px
+          100px
+          100px
+
           getActionTdWidth(2),
         ),
         tablet: (
-          '*',
+          100px
           false,
-          '*',
+          100px
           100px,
-          50px,
+
           getActionTdWidth(2),
         ),
         desktop: (
-          '*',
-          200px,
-          '*',
           100px,
-          80px,
+          200px,
+          100px,
+          100px,
           getActionTdWidth(2),
         ),
       )
@@ -40,21 +39,5 @@
   & .delete {
     @include button-icon-only($icon-trash);
   }
-  & .notApproved {
-
-    &:before {
-      @include icon($icon-times);
-
-      color: $color-danger;
-    }
-  }
-
-  & .approved {
-
-    &:before {
-      @include icon($icon-check);
-
-      color: $color-success;
-    }
-  }
+  
 }

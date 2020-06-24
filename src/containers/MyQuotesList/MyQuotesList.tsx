@@ -1,18 +1,13 @@
 import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { connect, MapStateToProps } from 'react-redux'
-import * as sdk from '@kiltprotocol/sdk-js'
+
 import { State as ReduxState } from '../../state/PersistentStore'
 import * as Quotes from '../../state/ducks/Quotes'
 import * as Wallet from '../../state/ducks/Wallet'
 import Code from '../../components/Code/Code'
 import './MyQuotesList.scss'
 import { IMyIdentity } from '../../types/Contact'
-
-const enum STATUS {
-  APPROVED = 'approved',
-  NOTAPPROVED = 'notApproved',
-}
 
 type DispatchProps = {
   removeQuote: (claimId: Quotes.Entry['quoteId']) => void
@@ -30,27 +25,11 @@ type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
   DispatchProps &
   OwnProps
 
-type State = {
-  status?: STATUS
-}
-
-class MyQuotesList extends React.Component<Props, State> {
+class MyQuotesList extends React.Component<Props> {
   constructor(props: Props) {
     super(props)
     this.state = {}
     this.deleteQuote = this.deleteQuote.bind(this)
-    this.updateQuoteApproval = this.updateQuoteApproval.bind(this)
-  }
-
-  private updateQuoteApproval(quoteEntry: Quotes.IQuoteEntry): void {
-    if (quoteEntry.attesterSignature) {
-      // not able to do claimer signature... Union type problem
-      this.setState({ status: STATUS.APPROVED })
-    }
-    if (!quoteEntry.attesterSignature) {
-      // / not able to do claimer signature... Union type problem
-      this.setState({ status: STATUS.NOTAPPROVED })
-    }
   }
 
   private deleteQuote(quoteId: Quotes.Entry['quoteId']): void {
@@ -60,7 +39,7 @@ class MyQuotesList extends React.Component<Props, State> {
 
   public render(): JSX.Element {
     const { quoteEntries } = this.props
-    const { status } = this.state
+
     return (
       <section>
         <h1>Quotes</h1>
@@ -72,7 +51,6 @@ class MyQuotesList extends React.Component<Props, State> {
                 <th className="quoteId"> Quote Id</th>
                 <th className="claimerAddress"> Claimer Address</th>
                 <th className="quote"> Quote</th>
-                <th className="status"> Claimer Signed</th>
                 <th className="actions"> Actions</th>
               </tr>
             </thead>
@@ -87,18 +65,9 @@ class MyQuotesList extends React.Component<Props, State> {
                         {quoteItem.claimerAddress}
                       </td>
                       <td className="quote">
-                        <Code>{quoteItem.quote}</Code>
+                        <Code>{quoteItem}</Code>
                       </td>
-                      <td className="status">
-                        {status === STATUS.NOTAPPROVED &&
-                          this.updateQuoteApproval(quoteItem.quote) && (
-                            <div className="notApproved" />
-                          )}
-                        {status === STATUS.APPROVED &&
-                          this.updateQuoteApproval(quoteItem.quote) && (
-                            <div className="approved" />
-                          )}
-                      </td>
+
                       <td className="actions">
                         <button
                           type="button"
