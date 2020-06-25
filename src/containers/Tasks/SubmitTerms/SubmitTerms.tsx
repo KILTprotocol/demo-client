@@ -24,7 +24,7 @@ import './SubmitTerms.scss'
 type DispatchProps = {
   saveAttestersQuote: (
     attesterSignedQuote: sdk.IQuoteAttesterSigned,
-    claimerIdentity: string
+    ownerAddress: string
   ) => void
 }
 
@@ -146,7 +146,6 @@ class SubmitTerms extends React.Component<Props, State> {
       receiverAddresses,
       onFinished,
       saveAttestersQuote,
-      senderAddress,
     } = this.props
     const {
       claim,
@@ -177,7 +176,9 @@ class SubmitTerms extends React.Component<Props, State> {
       selectedDelegation
     ).then(() => {
       if (onFinished) {
-        if (quote && senderAddress) saveAttestersQuote(quote, senderAddress)
+        if (quote && selectedIdentity) {
+          saveAttestersQuote(quote, selectedIdentity.address)
+        }
         onFinished()
       }
     })
@@ -254,8 +255,8 @@ class SubmitTerms extends React.Component<Props, State> {
 const mapDispatchToProps: DispatchProps = {
   saveAttestersQuote: (
     attesterSignedQuote: sdk.IQuoteAttesterSigned,
-    claimerAddress: string
-  ) => Quotes.Store.saveAttestersQuote(attesterSignedQuote, claimerAddress),
+    ownerAddress: string
+  ) => Quotes.Store.saveAttestersQuote(attesterSignedQuote, ownerAddress),
 }
 
 export default connect(

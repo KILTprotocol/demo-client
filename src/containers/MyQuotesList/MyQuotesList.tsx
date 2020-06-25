@@ -50,7 +50,7 @@ class MyQuotesList extends React.Component<Props> {
               <thead>
                 <tr>
                   <th className="quoteId"> Quote Id</th>
-                  <th className="claimerAddress"> Claimer Address</th>
+                  <th className="ownerAddress"> Owner Address</th>
                   <th className="quote"> Quote</th>
                   <th className="actions"> Actions</th>
                 </tr>
@@ -58,12 +58,11 @@ class MyQuotesList extends React.Component<Props> {
               <tbody>
                 {quoteEntries.map((val: Quotes.Entry, index) => {
                   const quoteItem = val
+
                   return (
                     <tr key={index.valueOf()}>
                       <td className="quoteId"> {quoteItem.quoteId}</td>
-                      <td className="claimerAddress">
-                        {quoteItem.claimerAddress}
-                      </td>
+                      <td className="ownerAddress">{quoteItem.owner}</td>
                       <td className="quote">
                         <Code>{quoteItem}</Code>
                       </td>

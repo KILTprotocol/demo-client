@@ -126,7 +126,7 @@ class MessageDetailView extends React.Component<Props, State> {
             delegationId={
               (message.body as sdk.ISubmitTerms).content.delegationId || null
             }
-            quote={(message.body as sdk.ISubmitTerms).content.quote}
+            quoteData={(message.body as sdk.ISubmitTerms).content.quote}
             receiverAddresses={[message.senderAddress]}
             onCancel={this.handleCancel}
             onFinished={this.handleDelete}
@@ -142,7 +142,7 @@ class MessageDetailView extends React.Component<Props, State> {
               (message.body as sdk.IRequestAttestationForClaim).content
                 .requestForAttestation
             }
-            quote={
+            quoteData={
               (message.body as sdk.IRequestAttestationForClaim).content.quote
             }
             onCancel={this.handleCancel}

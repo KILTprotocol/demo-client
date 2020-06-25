@@ -1,5 +1,6 @@
-import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
+import * as sdk from '@kiltprotocol/sdk-js'
+import { connect } from 'react-redux'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 
@@ -8,31 +9,39 @@ import MyClaimDetailView from '../../../components/MyClaimDetailView/MyClaimDeta
 import SelectClaims from '../../../components/SelectClaims/SelectClaims'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import * as Claims from '../../../state/ducks/Claims'
+import * as Quotes from '../../../state/ducks/Quotes'
+import * as Wallet from '../../../state/ducks/Wallet'
 import PersistentStore from '../../../state/PersistentStore'
 
 import './RequestAttestation.scss'
 import Code from '../../../components/Code/Code'
 
+type DispatchProps = {
+  saveAttestersQuote: (
+    attesterSignedQuote: sdk.IQuoteAttesterSigned,
+    ownerAddress: string
+  ) => void
+}
+
 export type RequestAttestationProps = {
   claim: sdk.IPartialClaim
   terms: sdk.IAttestedClaim[]
-  quote?: sdk.IQuoteAttesterSigned
+  quoteData?: sdk.IQuoteAttesterSigned
   receiverAddresses: Array<sdk.PublicIdentity['address']>
   delegationId: sdk.IDelegationNode['id'] | null
   onCancel?: () => void
   onFinished?: () => void
 }
 
+type Props = RequestAttestationProps & DispatchProps
+
 type State = {
   savedClaimEntry?: Claims.Entry
   createNewClaim?: boolean
 }
 
-class RequestAttestation extends React.Component<
-  RequestAttestationProps,
-  State
-> {
-  constructor(props: RequestAttestationProps) {
+class RequestAttestation extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props)
     this.state = {}
     this.handleCreateClaim = this.handleCreateClaim.bind(this)
@@ -159,11 +168,24 @@ class RequestAttestation extends React.Component<
       terms,
       delegationId,
       onFinished,
-      quote,
+      quoteData,
+      saveAttestersQuote,
     } = this.props
     const { savedClaimEntry } = this.state
 
+    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
+      PersistentStore.store.getState()
+    ).identity
+
+    if (!selectedIdentity) {
+      throw new Error('No identity selected')
+    }
+
     if (savedClaimEntry) {
+      const quote = quoteData
+        ? sdk.Quote.createAttesterSignature(quoteData, selectedIdentity)
+        : undefined
+
       attestationWorkflow
         .requestAttestationForClaim(
           savedClaimEntry.claim,
@@ -172,10 +194,13 @@ class RequestAttestation extends React.Component<
             sdk.AttestedClaim.fromAttestedClaim(legitimation)
           ),
           delegationId,
-          quote || undefined
+          quote
         )
         .then(() => {
           if (onFinished) {
+            if (quote && selectedIdentity) {
+              saveAttestersQuote(quote, selectedIdentity.address)
+            }
             onFinished()
           }
         })
@@ -183,7 +208,7 @@ class RequestAttestation extends React.Component<
   }
 
   public render(): JSX.Element {
-    const { terms, delegationId, quote } = this.props
+    const { terms, delegationId, quoteData } = this.props
     const { savedClaimEntry } = this.state
 
     return (
@@ -203,11 +228,11 @@ class RequestAttestation extends React.Component<
           />
         )}
 
-        {quote ? (
+        {quoteData ? (
           <div>
             <h2>Quotes</h2>
             <div>
-              <Code>{quote}</Code>
+              <Code>{quoteData}</Code>
             </div>
           </div>
         ) : (
@@ -235,4 +260,11 @@ class RequestAttestation extends React.Component<
   }
 }
 
-export default RequestAttestation
+const mapDispatchToProps: DispatchProps = {
+  saveAttestersQuote: (
+    attesterSignedQuote: sdk.IQuoteAttesterSigned,
+    ownerAddress: string
+  ) => Quotes.Store.saveAttestersQuote(attesterSignedQuote, ownerAddress),
+}
+
+export default connect(null, mapDispatchToProps)(RequestAttestation)

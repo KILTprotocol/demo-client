@@ -7,19 +7,21 @@ import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 import { IMyIdentity } from '../../types/Contact'
 
-export type IQuoteEntry = sdk.IQuoteAgreement | sdk.IQuoteAttesterSigned // Could find a better name for this
+export type QuoteEntry = sdk.IQuoteAgreement | sdk.IQuoteAttesterSigned
+
 interface ISaveAttestersAction extends KiltAction {
   payload: {
     quoteId: Entry['quoteId']
-    claimerAddress: string
-    quote: IQuoteEntry
+    owner: string
+    quote: QuoteEntry
   }
 }
 
 interface ISaveAgreedQuoteAction extends KiltAction {
   payload: {
     quoteId: Entry['quoteId']
-    quote: IQuoteEntry
+    owner: string
+    quote: QuoteEntry
   }
 }
 
@@ -34,8 +36,8 @@ export type Action =
 
 export type Entry = {
   quoteId: string
-  claimerAddress: string
-  quote: IQuoteEntry
+  owner: string
+  quote: QuoteEntry
 }
 
 type State = {
@@ -59,6 +61,7 @@ class Store {
       .toList()
       .map((quoteEntry: Entry) => quoteEntry)
       .toArray()
+
     return serialized
   }
 
@@ -78,7 +81,7 @@ class Store {
 
         const quoteEntry: Entry = {
           quoteId: quoteAsJson.quoteId,
-          claimerAddress: quoteAsJson.claimerAddress,
+          owner: quoteAsJson.owner,
           quote: quoteAsJson.quote,
         }
         quoteEntries[serializedQuote.quoteId] = quoteEntry
@@ -104,21 +107,26 @@ class Store {
       case Store.ACTIONS.SAVE_ATTESTERS_QUOTE: {
         const {
           quoteId,
-          claimerAddress,
+          owner,
           quote,
         } = (action as ISaveAttestersAction).payload
 
         return state.setIn(['quotes', quoteId], {
           quoteId,
-          claimerAddress,
+          owner,
           quote,
         } as Entry)
       }
       case Store.ACTIONS.SAVE_AGREED_QUOTE: {
-        const { quoteId, quote } = (action as ISaveAgreedQuoteAction).payload
+        const {
+          quoteId,
+          quote,
+          owner,
+        } = (action as ISaveAgreedQuoteAction).payload
 
         return state.setIn(['quotes', quoteId], {
           quoteId,
+          owner,
           quote,
         } as Entry)
       }
@@ -131,23 +139,27 @@ class Store {
   }
 
   public static saveAttestersQuote(
-    quote: IQuoteEntry,
-    claimerIdentity: string
+    quote: QuoteEntry,
+    ownerAddress: string
   ): Action {
     return {
       payload: {
         quoteId: sdk.UUID.generate(),
-        claimerAddress: claimerIdentity,
+        owner: ownerAddress,
         quote,
       },
       type: Store.ACTIONS.SAVE_ATTESTERS_QUOTE,
     }
   }
 
-  public static saveAgreedQuote(quote: IQuoteEntry): Action {
+  public static saveAgreedQuote(
+    quote: QuoteEntry,
+    ownerAddress: string
+  ): Action {
     return {
       payload: {
         quoteId: sdk.UUID.generate(),
+        owner: ownerAddress,
         quote,
       },
       type: Store.ACTIONS.SAVE_AGREED_QUOTE,
@@ -185,12 +197,9 @@ const getAllMyQuotes = createSelector(
   (selectedIdentity: IMyIdentity, entries: Entry[]) => {
     return entries.filter((entry: Entry) => {
       return (
-        (entry &&
-          entry.quote &&
-          entry.claimerAddress === selectedIdentity.identity.address) ||
-        (entry &&
-          entry.quote &&
-          entry.quote.attesterAddress === selectedIdentity.identity.address)
+        entry &&
+        entry.quote &&
+        entry.owner === selectedIdentity.identity.address
       )
     })
   }
