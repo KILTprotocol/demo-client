@@ -45,18 +45,18 @@ class MyQuotesList extends React.Component<Props> {
         <h1>Quotes</h1>
         <section className="MyQuotesList">
           <h1> My Quote list</h1>
-          <table>
-            <thead>
-              <tr>
-                <th className="quoteId"> Quote Id</th>
-                <th className="claimerAddress"> Claimer Address</th>
-                <th className="quote"> Quote</th>
-                <th className="actions"> Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {quoteEntries && quoteEntries.length ? (
-                quoteEntries.map((val: Quotes.Entry, index) => {
+          {quoteEntries && quoteEntries.length ? (
+            <table>
+              <thead>
+                <tr>
+                  <th className="quoteId"> Quote Id</th>
+                  <th className="claimerAddress"> Claimer Address</th>
+                  <th className="quote"> Quote</th>
+                  <th className="actions"> Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {quoteEntries.map((val: Quotes.Entry, index) => {
                   const quoteItem = val
                   return (
                     <tr key={index.valueOf()}>
@@ -78,12 +78,12 @@ class MyQuotesList extends React.Component<Props> {
                       </td>
                     </tr>
                   )
-                })
-              ) : (
-                <div>No Quotes</div>
-              )}
-            </tbody>
-          </table>
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <div>No Quotes</div>
+          )}
         </section>
       </section>
     )

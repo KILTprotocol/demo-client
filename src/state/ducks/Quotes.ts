@@ -8,19 +8,6 @@ import * as Wallet from './Wallet'
 import { IMyIdentity } from '../../types/Contact'
 
 export type IQuoteEntry = sdk.IQuoteAgreement | sdk.IQuoteAttesterSigned // Could find a better name for this
-
-function hash(quote: sdk.IQuote): string {
-  const quoteHash = {
-    attesterAddress: quote.attesterAddress,
-    cTypeHash: quote.cTypeHash,
-    cost: quote.cost,
-    currency: quote.currency,
-    timeframe: quote.timeframe,
-    termsAndConditions: quote.termsAndConditions,
-  }
-  return sdk.Crypto.hashObjectAsStr(JSON.stringify(quoteHash))
-}
-
 interface ISaveAttestersAction extends KiltAction {
   payload: {
     quoteId: Entry['quoteId']
@@ -149,7 +136,7 @@ class Store {
   ): Action {
     return {
       payload: {
-        quoteId: hash(quote),
+        quoteId: sdk.UUID.generate(),
         claimerAddress: claimerIdentity,
         quote,
       },
@@ -160,7 +147,7 @@ class Store {
   public static saveAgreedQuote(quote: IQuoteEntry): Action {
     return {
       payload: {
-        quoteId: hash(quote),
+        quoteId: sdk.UUID.generate(),
         quote,
       },
       type: Store.ACTIONS.SAVE_AGREED_QUOTE,
@@ -209,22 +196,22 @@ const getAllMyQuotes = createSelector(
   }
 )
 
-const getQuoteHash = (
+const getQuoteByID = (
   state: ReduxState,
   quoteId: Entry['quoteId']
 ): Entry['quoteId'] => quoteId
 
-const getQuoteByQuoteHash = createSelector(
-  [getAllMyQuotes, getQuoteHash],
+const getQuoteByQuoteID = createSelector(
+  [getAllMyQuotes, getQuoteByID],
   (entries: Entry[], quoteId: Entry['quoteId']) =>
     entries.filter((entry: Entry) => entry.quoteId === quoteId)
 )
 
 const getQuote = createSelector(
-  [getQuoteHash, getAllMyQuotes],
+  [getQuoteByID, getAllMyQuotes],
   (quoteId: Entry['quoteId'], entries: Entry[]) => {
     return entries.find((entry: Entry) => entry.quoteId === quoteId)
   }
 )
 
-export { Store, getAllMyQuotes, getQuoteByQuoteHash, getQuote, hash }
+export { Store, getAllMyQuotes, getQuoteByQuoteID, getQuote }
