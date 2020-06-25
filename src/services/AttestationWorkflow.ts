@@ -112,7 +112,7 @@ class AttestationWorkflow {
     attesterAddresses: Array<IContact['publicIdentity']['address']>,
     terms: sdk.AttestedClaim[] = [],
     delegationId: sdk.IDelegationNode['id'] | null = null,
-    quoteAttesterSigned?: sdk.IQuoteAttesterSigned
+    quoteAttesterSigned?: sdk.IQuoteAgreement
   ): Promise<void> {
     const { identity } = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
@@ -123,23 +123,13 @@ class AttestationWorkflow {
       terms,
       delegationId
     )
+
     const messageBody: IRequestAttestationForClaim = {
       content: { requestForAttestation, quote: undefined },
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
 
-    if (quoteAttesterSigned) {
-      // The sdk.Quote.createAgreedQuote is not working. Need help
-      const signature = identity.signStr(
-        sdk.Crypto.hashObjectAsStr(quoteAttesterSigned)
-      )
-      const quoteAgreement = {
-        ...quoteAttesterSigned,
-        rootHash: requestForAttestation.rootHash,
-        claimerSignature: signature,
-      }
-      messageBody.content.quote = quoteAgreement
-    }
+    if (quoteAttesterSigned) messageBody.content.quote = quoteAttesterSigned
 
     return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
   }

@@ -1,6 +1,7 @@
 import React from 'react'
 import * as sdk from '@kiltprotocol/sdk-js'
 import { connect } from 'react-redux'
+import QuoteServices from '../../../services/QuoteServices'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 
@@ -186,15 +187,27 @@ class RequestAttestation extends React.Component<Props, State> {
         ? sdk.Quote.createAttesterSignature(quoteData, selectedIdentity)
         : undefined
 
+      const termBreakdown = (
+        terms || []
+      ).map((legitimation: sdk.IAttestedClaim) =>
+        sdk.AttestedClaim.fromAttestedClaim(legitimation)
+      )
+
+      const quoteAgreement = QuoteServices.agreedQuote(
+        savedClaimEntry.claim,
+        selectedIdentity,
+        termBreakdown,
+        delegationId,
+        quote
+      )
+
       attestationWorkflow
         .requestAttestationForClaim(
           savedClaimEntry.claim,
           receiverAddresses,
-          (terms || []).map((legitimation: sdk.IAttestedClaim) =>
-            sdk.AttestedClaim.fromAttestedClaim(legitimation)
-          ),
+          termBreakdown,
           delegationId,
-          quote
+          quoteAgreement || undefined
         )
         .then(() => {
           if (onFinished) {
