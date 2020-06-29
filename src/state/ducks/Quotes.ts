@@ -9,15 +9,7 @@ import { IMyIdentity } from '../../types/Contact'
 
 export type QuoteEntry = sdk.IQuoteAgreement | sdk.IQuoteAttesterSigned
 
-interface ISaveAttestersAction extends KiltAction {
-  payload: {
-    quoteId: Entry['quoteId']
-    owner: string
-    quote: QuoteEntry
-  }
-}
-
-interface ISaveAgreedQuoteAction extends KiltAction {
+interface ISaveQuoteAction extends KiltAction {
   payload: {
     quoteId: Entry['quoteId']
     owner: string
@@ -29,10 +21,7 @@ interface IRemoveAction extends KiltAction {
   payload: sdk.IQuoteAttesterSigned['attesterSignature']
 }
 
-export type Action =
-  | ISaveAttestersAction
-  | IRemoveAction
-  | ISaveAgreedQuoteAction
+export type Action = IRemoveAction | ISaveQuoteAction
 
 export type Entry = {
   quoteId: string
@@ -104,25 +93,8 @@ class Store {
     action: Action
   ): ImmutableState {
     switch (action.type) {
-      case Store.ACTIONS.SAVE_ATTESTERS_QUOTE: {
-        const {
-          quoteId,
-          owner,
-          quote,
-        } = (action as ISaveAttestersAction).payload
-
-        return state.setIn(['quotes', quoteId], {
-          quoteId,
-          owner,
-          quote,
-        } as Entry)
-      }
-      case Store.ACTIONS.SAVE_AGREED_QUOTE: {
-        const {
-          quoteId,
-          quote,
-          owner,
-        } = (action as ISaveAgreedQuoteAction).payload
+      case Store.ACTIONS.SAVE_QUOTE: {
+        const { quoteId, quote, owner } = (action as ISaveQuoteAction).payload
 
         return state.setIn(['quotes', quoteId], {
           quoteId,
@@ -148,7 +120,7 @@ class Store {
         owner: ownerAddress,
         quote,
       },
-      type: Store.ACTIONS.SAVE_ATTESTERS_QUOTE,
+      type: Store.ACTIONS.SAVE_QUOTE,
     }
   }
 
@@ -162,7 +134,7 @@ class Store {
         owner: ownerAddress,
         quote,
       },
-      type: Store.ACTIONS.SAVE_AGREED_QUOTE,
+      type: Store.ACTIONS.SAVE_QUOTE,
     }
   }
 
@@ -180,9 +152,8 @@ class Store {
   }
 
   private static ACTIONS = {
-    SAVE_ATTESTERS_QUOTE: 'client/quotes/SAVE_ATTESTERS_QUOTE',
     REMOVE_QUOTE: 'client/quotes/UPDATE_QUOTE',
-    SAVE_AGREED_QUOTE: 'client/quotes/SAVE_AGREED_QUOTE',
+    SAVE_QUOTE: 'client/quotes/SAVE_QUOTE',
   }
 }
 

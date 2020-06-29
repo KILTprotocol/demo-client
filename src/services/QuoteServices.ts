@@ -13,7 +13,7 @@ class QuoteServices {
     )
   }
 
-  public static agreedQuote(
+  public static createAgreedQuote(
     claim: sdk.IClaim,
     identity: sdk.Identity,
     terms: sdk.AttestedClaim[] = [],

@@ -193,7 +193,7 @@ class RequestAttestation extends React.Component<Props, State> {
         sdk.AttestedClaim.fromAttestedClaim(legitimation)
       )
 
-      const quoteAgreement = QuoteServices.agreedQuote(
+      const quoteAgreement = QuoteServices.createAgreedQuote(
         savedClaimEntry.claim,
         selectedIdentity,
         termBreakdown,
