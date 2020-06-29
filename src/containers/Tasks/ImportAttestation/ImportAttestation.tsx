@@ -54,7 +54,7 @@ class ImportAttestation extends React.Component<Props> {
         <AttestedClaimsListView
           attestedClaims={attestedClaim.request.legitimations}
           delegationId={attestedClaim.request.delegationId}
-          context="legitimations"
+          context="terms"
         />
 
         <div className="actions">

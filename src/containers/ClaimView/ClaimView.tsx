@@ -20,7 +20,7 @@ import { IContact, IMyIdentity } from '../../types/Contact'
 import './ClaimView.scss'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 import { RequestAttestationProps } from '../Tasks/RequestAttestation/RequestAttestation'
-import { RequestLegitimationsProps } from '../Tasks/RequestLegitimation/RequestLegitimation'
+import { RequestTermsProps } from '../Tasks/RequestTerms/RequestTerms'
 
 type StateProps = {
   claimEntries: Claims.Entry[]
@@ -40,14 +40,14 @@ type State = {
 }
 
 class ClaimView extends React.Component<Props, State> {
-  private static requestLegitimation(claimEntry: Claims.Entry): void {
+  private static requestTerm(claimEntry: Claims.Entry): void {
     PersistentStore.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
         objective: sdk.MessageBodyType.REQUEST_TERMS,
         props: {
           cTypeHash: claimEntry.claim.cTypeHash,
           preSelectedClaimEntries: [claimEntry],
-        } as RequestLegitimationsProps,
+        } as RequestTermsProps,
       })
     )
   }
@@ -70,10 +70,8 @@ class ClaimView extends React.Component<Props, State> {
     super(props)
     this.state = {}
     this.deleteClaim = this.deleteClaim.bind(this)
-
     this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
     this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
-
     this.createClaimFromCType = this.createClaimFromCType.bind(this)
   }
 
@@ -133,7 +131,7 @@ class ClaimView extends React.Component<Props, State> {
 
     if (claim) {
       if (this.claimIdToLegitimate) {
-        attestationWorkflow.requestLegitimations(
+        attestationWorkflow.requestTerms(
           [claim],
           selectedAttesters.map(
             (contact: IContact) => contact.publicIdentity.address
@@ -195,7 +193,7 @@ class ClaimView extends React.Component<Props, State> {
             claimEntry={currentClaimEntry}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={ClaimView.requestAttestation}
-            onRequestLegitimation={ClaimView.requestLegitimation}
+            onRequestTerm={ClaimView.requestTerm}
           />
         )}
         {!isDetailView && (
@@ -204,7 +202,7 @@ class ClaimView extends React.Component<Props, State> {
             onCreateClaimFromCType={this.createClaimFromCType}
             onRemoveClaim={this.deleteClaim}
             onRequestAttestation={ClaimView.requestAttestation}
-            onRequestLegitimation={ClaimView.requestLegitimation}
+            onRequestTerm={ClaimView.requestTerm}
           />
         )}
         {}

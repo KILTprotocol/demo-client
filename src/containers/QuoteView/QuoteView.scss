@@ -1,0 +1,10 @@
+.QuoteView {
+  & h1 {
+    @include h1('Ctype');
+  }
+  @include labeledCard;
+
+  & > div {
+    @include label-input-combo;
+  }
+}

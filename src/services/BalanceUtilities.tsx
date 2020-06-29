@@ -129,11 +129,11 @@ class BalanceUtilities {
     )
   }
 
-  private static asKiltCoin(balance: BN): number {
+  public static asKiltCoin(balance: BN): number {
     return balance.divn(KILT_MICRO_COIN).toNumber()
   }
 
-  private static asMicroKilt(balance: number): BN {
+  public static asMicroKilt(balance: number): BN {
     return new BN(balance).muln(KILT_MICRO_COIN)
   }
 }

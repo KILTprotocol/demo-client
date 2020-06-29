@@ -1,3 +1,4 @@
+# superseded by building Dockerfile with --build-arg BUILD_ENV=.env.devnet
 FROM node:10-alpine as builder
 
 WORKDIR /app

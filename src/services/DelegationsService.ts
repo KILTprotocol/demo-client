@@ -91,16 +91,24 @@ class DelegationsService {
     if (delegation) {
       const root = await delegation.getRoot()
       const myDelegation: Delegations.IMyDelegation = {
-        account: delegation.account,
+        ...delegation,
         cTypeHash: root && root.cTypeHash,
-        id: delegation.id,
         isPCR,
         metaData: { alias },
-        parentId: delegation.parentId,
-        permissions: delegation.permissions,
         revoked: false,
-        rootId: delegation.rootId,
         type: Delegations.DelegationType.Node,
+      }
+      DelegationsService.store(myDelegation)
+      return myDelegation
+    }
+    const root = await DelegationsService.lookupRootNodeById(delegationNodeId)
+    if (root) {
+      const myDelegation: Delegations.IMyDelegation = {
+        ...root,
+        isPCR,
+        metaData: { alias },
+        revoked: false,
+        type: Delegations.DelegationType.Root,
       }
       DelegationsService.store(myDelegation)
       return myDelegation
