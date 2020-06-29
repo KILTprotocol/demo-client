@@ -1,5 +1,7 @@
-import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
+import * as sdk from '@kiltprotocol/sdk-js'
+import { connect } from 'react-redux'
+import QuoteServices from '../../../services/QuoteServices'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 
@@ -8,30 +10,39 @@ import MyClaimDetailView from '../../../components/MyClaimDetailView/MyClaimDeta
 import SelectClaims from '../../../components/SelectClaims/SelectClaims'
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import * as Claims from '../../../state/ducks/Claims'
+import * as Quotes from '../../../state/ducks/Quotes'
+import * as Wallet from '../../../state/ducks/Wallet'
 import PersistentStore from '../../../state/PersistentStore'
 
 import './RequestAttestation.scss'
+import Code from '../../../components/Code/Code'
+
+type DispatchProps = {
+  saveAttestersQuote: (
+    attesterSignedQuote: sdk.IQuoteAttesterSigned,
+    ownerAddress: string
+  ) => void
+}
 
 export type RequestAttestationProps = {
   claim: sdk.IPartialClaim
-  legitimations: sdk.IAttestedClaim[]
+  terms: sdk.IAttestedClaim[]
+  quoteData?: sdk.IQuoteAttesterSigned
   receiverAddresses: Array<sdk.PublicIdentity['address']>
   delegationId: sdk.IDelegationNode['id'] | null
-
   onCancel?: () => void
   onFinished?: () => void
 }
+
+type Props = RequestAttestationProps & DispatchProps
 
 type State = {
   savedClaimEntry?: Claims.Entry
   createNewClaim?: boolean
 }
 
-class RequestAttestation extends React.Component<
-  RequestAttestationProps,
-  State
-> {
-  constructor(props: RequestAttestationProps) {
+class RequestAttestation extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props)
     this.state = {}
     this.handleCreateClaim = this.handleCreateClaim.bind(this)
@@ -155,24 +166,54 @@ class RequestAttestation extends React.Component<
   private handleSubmit(): void {
     const {
       receiverAddresses,
-      legitimations,
+      terms,
       delegationId,
       onFinished,
+      quoteData,
+      saveAttestersQuote,
     } = this.props
     const { savedClaimEntry } = this.state
 
+    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
+      PersistentStore.store.getState()
+    ).identity
+
+    if (!selectedIdentity) {
+      throw new Error('No identity selected')
+    }
+
     if (savedClaimEntry) {
+      const quote = quoteData
+        ? sdk.Quote.createAttesterSignature(quoteData, selectedIdentity)
+        : undefined
+
+      const termBreakdown = (
+        terms || []
+      ).map((legitimation: sdk.IAttestedClaim) =>
+        sdk.AttestedClaim.fromAttestedClaim(legitimation)
+      )
+
+      const quoteAgreement = QuoteServices.createAgreedQuote(
+        savedClaimEntry.claim,
+        selectedIdentity,
+        termBreakdown,
+        delegationId,
+        quote
+      )
+
       attestationWorkflow
         .requestAttestationForClaim(
           savedClaimEntry.claim,
           receiverAddresses,
-          (legitimations || []).map((legitimation: sdk.IAttestedClaim) =>
-            sdk.AttestedClaim.fromAttestedClaim(legitimation)
-          ),
-          delegationId
+          termBreakdown,
+          delegationId,
+          quoteAgreement || undefined
         )
         .then(() => {
           if (onFinished) {
+            if (quote && selectedIdentity) {
+              saveAttestersQuote(quote, selectedIdentity.address)
+            }
             onFinished()
           }
         })
@@ -180,7 +221,7 @@ class RequestAttestation extends React.Component<
   }
 
   public render(): JSX.Element {
-    const { legitimations, delegationId } = this.props
+    const { terms, delegationId, quoteData } = this.props
     const { savedClaimEntry } = this.state
 
     return (
@@ -191,13 +232,27 @@ class RequestAttestation extends React.Component<
           this.getCreateOrSelect()
         )}
 
-        {((!!legitimations && !!legitimations.length) || !!delegationId) && (
+        {((!!terms && !!terms.length) || !!delegationId) && (
           <AttestedClaimsListView
-            attestedClaims={legitimations}
+            attestedClaims={terms}
             delegationId={delegationId}
-            context="legitimations"
+            context="terms"
             currentDelegationViewType={ViewType.Present}
           />
+        )}
+
+        {quoteData ? (
+          <div>
+            <h2>Quotes</h2>
+            <div>
+              <Code>{quoteData}</Code>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <h2>Quotes</h2>
+            <div>no Quote</div>
+          </div>
         )}
 
         <div className="actions">
@@ -218,4 +273,11 @@ class RequestAttestation extends React.Component<
   }
 }
 
-export default RequestAttestation
+const mapDispatchToProps: DispatchProps = {
+  saveAttestersQuote: (
+    attesterSignedQuote: sdk.IQuoteAttesterSigned,
+    ownerAddress: string
+  ) => Quotes.Store.saveAttestersQuote(attesterSignedQuote, ownerAddress),
+}
+
+export default connect(null, mapDispatchToProps)(RequestAttestation)

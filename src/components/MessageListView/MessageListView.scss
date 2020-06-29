@@ -1,5 +1,5 @@
 .MessageListView {
-
+  
   & table {
     @include table;
     @include responsiveTable(
@@ -38,19 +38,17 @@
   }
 
   & .invalid {
-
     &:before {
       @include icon($icon-warning);
 
       color: $color-danger;
-      margin:{
+      margin: {
         right: $base-padding/4;
       }
     }
   }
 
-  @include breakpoint(phone-tablet-only){
-
+  @include breakpoint(phone-tablet-only) {
     & td {
       padding-bottom: $base-padding;
     }

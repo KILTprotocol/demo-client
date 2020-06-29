@@ -22,7 +22,7 @@ type UpdateCallback = (bsAttestationKey: keyof BsAttestationsPool) => void
 type BsAttestationsPoolElement = {
   attest: {
     attesterKey: keyof BsIdentitiesPool
-    legitimations?: Array<keyof BsAttestationsPool>
+    terms?: Array<keyof BsAttestationsPool>
     delegationKey?: keyof BsDelegationsPool
   }
   claimKey: keyof BsClaimsPool
@@ -152,7 +152,7 @@ class BsAttestation {
     claimerIdentity: IMyIdentity
   ): Promise<sdk.RequestForAttestation> {
     const { attest } = bsAttestationData
-    const { delegationKey, legitimations } = attest
+    const { delegationKey, terms } = attest
 
     // resolve delegation
     let delegation: IMyDelegation | undefined
@@ -160,11 +160,10 @@ class BsAttestation {
       delegation = await BsDelegation.getDelegationByKey(delegationKey)
     }
 
-    // get legitimations of attester
-    let legitimationsFromPool: sdk.AttestedClaim[] = []
-    if (legitimations && Array.isArray(legitimations) && legitimations.length) {
-      legitimationsFromPool = await Promise.all(
-        legitimations.map(bsAttestationKey => {
+    let termsFromPool: sdk.AttestedClaim[] = []
+    if (terms && Array.isArray(terms) && terms.length) {
+      termsFromPool = await Promise.all(
+        terms.map(bsAttestationKey => {
           const bsAttestedClaim = bsAttestedClaims[bsAttestationKey]
           if (bsAttestedClaim) {
             return Promise.resolve(bsAttestedClaim)
@@ -179,7 +178,7 @@ class BsAttestation {
     return sdk.RequestForAttestation.fromClaimAndIdentity(
       claimToAttest.claim,
       claimerIdentity.identity,
-      legitimationsFromPool,
+      termsFromPool,
       delegation ? delegation.id : null
     )
   }
@@ -247,7 +246,7 @@ class BsAttestation {
       owner: claimerIdentity.identity.address,
     }
 
-    // send request for legitimation from claimer to attester
+    // send request for term from claimer to attester
     const requestAcceptDelegation: sdk.IRequestTerms = {
       content: partialClaim,
       type: sdk.MessageBodyType.REQUEST_TERMS,
@@ -258,17 +257,18 @@ class BsAttestation {
       ContactRepository.getContactFromIdentity(attesterIdentity)
     )
 
-    // send legitimations from attester to claimer
-    const submitLegitimations: sdk.ISubmitTerms = {
+    // send terms from attester to claimer
+    const submitTerms: sdk.ISubmitTerms = {
       content: {
         claim: partialClaim,
         delegationId: attestedClaim.request.delegationId || undefined,
         legitimations: attestedClaim.request.legitimations,
+        quote: undefined,
       },
       type: sdk.MessageBodyType.SUBMIT_TERMS,
     }
     await MessageRepository.singleSend(
-      submitLegitimations,
+      submitTerms,
       attesterIdentity,
       ContactRepository.getContactFromIdentity(claimerIdentity)
     )

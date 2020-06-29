@@ -16,7 +16,7 @@ type StateProps = {
 }
 
 type OwnProps = {
-  onRequestLegitimation: (cType: ICTypeWithMetadata) => void
+  onRequestTerm: (cType: ICTypeWithMetadata) => void
 }
 
 type Props = RouteComponentProps<{}> & StateProps & OwnProps

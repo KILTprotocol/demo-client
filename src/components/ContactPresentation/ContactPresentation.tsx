@@ -4,8 +4,8 @@ import _ from 'lodash'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
-import { RequestLegitimationsProps } from '../../containers/Tasks/RequestLegitimation/RequestLegitimation'
-import { SubmitLegitimationsProps } from '../../containers/Tasks/SubmitLegitimations/SubmitLegitimations'
+import { RequestTermsProps } from '../../containers/Tasks/RequestTerms/RequestTerms'
+import { SubmitTermsProps } from '../../containers/Tasks/SubmitTerms/SubmitTerms'
 
 import ContactRepository from '../../services/ContactRepository'
 import * as Contacts from '../../state/ducks/Contacts'
@@ -104,11 +104,11 @@ class ContactPresentation extends React.Component<Props, State> {
             objective: sdk.MessageBodyType.REQUEST_TERMS,
             props: {
               receiverAddresses: [address],
-            } as RequestLegitimationsProps,
+            } as RequestTermsProps,
           })
         )
       },
-      label: 'Request legitimations',
+      label: 'Request Terms',
     })
 
     actions.push({
@@ -132,11 +132,11 @@ class ContactPresentation extends React.Component<Props, State> {
             objective: sdk.MessageBodyType.SUBMIT_TERMS,
             props: {
               receiverAddresses: [address],
-            } as SubmitLegitimationsProps,
+            } as SubmitTermsProps,
           })
         )
       },
-      label: 'Submit legitimations',
+      label: 'Submit Terms',
     })
 
     actions.push({
