@@ -1,6 +1,8 @@
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import { IPublicIdentity } from '@kiltprotocol/sdk-js'
+
 import { Link, withRouter } from 'react-router-dom'
 import IdentityView from '../../components/IdentityView/IdentityView'
 import FeedbackService, {
@@ -22,8 +24,8 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  selectIdentity: (address: IMyIdentity['identity']['address']) => void
-  removeIdentity: (address: IMyIdentity['identity']['address']) => void
+  selectIdentity: (address: IPublicIdentity['address']) => void
+  removeIdentity: (address: IPublicIdentity['address']) => void
 }
 
 type Props = RouteComponentProps<{}> & StateProps & DispatchProps
@@ -71,22 +73,20 @@ class WalletView extends React.Component<Props> {
     this.removeIdentity = this.removeIdentity.bind(this)
   }
 
-  private selectIdentity = (
-    address: IMyIdentity['identity']['address']
-  ): void => {
+  private selectIdentity = (address: IPublicIdentity['address']): void => {
     const { selectIdentity } = this.props
     selectIdentity(address)
   }
 
-  private removeIdentity(address: IMyIdentity['identity']['address']): void {
+  private removeIdentity(address: IPublicIdentity['address']): void {
     const { identities, removeIdentity } = this.props
     const identityToDelete = identities.find(
-      (identity: Wallet.Entry) => identity.identity.address === address
+      (identity: Wallet.Entry) => identity.identity.getAddress() === address
     )
 
     if (identityToDelete) {
       safeDelete(`your identity '${identityToDelete.metaData.name}''`, () => {
-        removeIdentity(identityToDelete.identity.address)
+        removeIdentity(identityToDelete.identity.getAddress())
       })
     }
   }
@@ -97,11 +97,12 @@ class WalletView extends React.Component<Props> {
       let selected = false
       if (selectedIdentity) {
         selected =
-          myIdentity.identity.address === selectedIdentity.identity.address
+          myIdentity.identity.getAddress() ===
+          selectedIdentity.identity.getAddress()
       }
       return (
         <IdentityView
-          key={myIdentity.identity.address}
+          key={myIdentity.identity.getAddress()}
           myIdentity={myIdentity}
           selected={selected}
           onDelete={this.removeIdentity}
@@ -132,9 +133,9 @@ const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
 })
 
 const mapDispatchToProps: DispatchProps = {
-  removeIdentity: (address: IMyIdentity['identity']['address']) =>
+  removeIdentity: (address: IPublicIdentity['address']) =>
     Wallet.Store.removeIdentityAction(address),
-  selectIdentity: (address: IMyIdentity['identity']['address']) =>
+  selectIdentity: (address: IPublicIdentity['address']) =>
     Wallet.Store.selectIdentityAction(address),
 }
 

@@ -212,7 +212,7 @@ class RequestAttestation extends React.Component<Props, State> {
         .then(() => {
           if (onFinished) {
             if (quote && selectedIdentity) {
-              saveAttestersQuote(quote, selectedIdentity.address)
+              saveAttestersQuote(quote, selectedIdentity.getAddress())
             }
             onFinished()
           }

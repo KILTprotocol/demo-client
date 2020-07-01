@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { IPublicIdentity } from '@kiltprotocol/sdk-js'
 import Select from 'react-select'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import ContactRepository from '../../services/ContactRepository'
@@ -21,7 +22,7 @@ const addIdentity = {
 
 type SelectIdentityOption = {
   label: ReactNode
-  value: IMyIdentity['identity']['address']
+  value: IPublicIdentity['address']
 }
 
 type StateProps = {
@@ -69,11 +70,11 @@ class IdentitySelector extends React.Component<Props, State> {
       (myIdentity: IMyIdentity) => ({
         label: (
           <ContactPresentation
-            address={myIdentity.identity.address}
+            address={myIdentity.identity.getAddress()}
             size={20}
           />
         ),
-        value: myIdentity.identity.address,
+        value: myIdentity.identity.getAddress(),
       })
     )
 
@@ -83,7 +84,7 @@ class IdentitySelector extends React.Component<Props, State> {
     if (selectedIdentity) {
       selectedOption = identityOptions.find(
         (identityOption: SelectIdentityOption) =>
-          identityOption.value === selectedIdentity.identity.address
+          identityOption.value === selectedIdentity.identity.getAddress()
       )
     }
 

@@ -92,7 +92,7 @@ class AttestClaim extends React.Component<Props, State> {
         blockUi.remove()
         if (onFinished) {
           if (quoteData && selectedIdentity) {
-            saveAgreedQuote(quoteData, selectedIdentity.address)
+            saveAgreedQuote(quoteData, selectedIdentity.getAddress())
           }
           onFinished()
         }

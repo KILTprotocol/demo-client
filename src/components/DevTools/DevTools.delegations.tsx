@@ -87,7 +87,7 @@ class BsDelegation {
     const delegation = new sdk.DelegationNode(
       sdk.UUID.generate(),
       rootData.rootDelegation.id,
-      ownerIdentity.identity.address,
+      ownerIdentity.identity.getAddress(),
       newPermissions,
       parentData.delegation.id
     )
@@ -182,7 +182,7 @@ class BsDelegation {
     const rootDelegation = new sdk.DelegationRootNode(
       sdk.UUID.generate(),
       cType.cType.hash,
-      ownerIdentity.identity.address
+      ownerIdentity.identity.getAddress()
     )
     await DelegationsService.storeRoot(rootDelegation, alias, isPCR)
 
@@ -314,7 +314,7 @@ class BsDelegation {
     } = delegationDataForMessages
 
     const delegationData: sdk.IRequestAcceptDelegation['content']['delegationData'] = {
-      account: parentData.ownerIdentity.identity.address,
+      account: parentData.ownerIdentity.identity.getAddress(),
       id: delegation.id,
       isPCR,
       parentId: parentData.delegation.id,
