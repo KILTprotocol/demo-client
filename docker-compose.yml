@@ -32,7 +32,7 @@ services:
     ports:
       - 27017:27017
   services:
-    image: kiltprotocol/demo-services
+    image: kiltprotocol/demo-services:develop
     environment:
       - NODE_ENV=docker-compose
       - MONGODB_HOST=mongodb
@@ -46,7 +46,7 @@ services:
       - mongodb
       - mashnet-node
   mashnet-node:
-    image: kiltprotocol/mashnet-node
+    image: kiltprotocol/mashnet-node:develop
     ports:
       - 9944:9944
     command: ./target/release/mashnet-node --dev --ws-port 9944 --ws-external

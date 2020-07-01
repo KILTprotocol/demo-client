@@ -4,6 +4,7 @@ FROM node:${NODE_VERSION}-alpine as develop
 WORKDIR /app
 
 COPY package.json yarn.lock ./
+COPY ?npmrc ?yarnrc ./
 RUN yarn install
 
 COPY . ./
