@@ -175,12 +175,16 @@ class BsAttestation {
       )
     }
 
-    return sdk.RequestForAttestation.fromClaimAndIdentity(
+    const req4Att = await sdk.RequestForAttestation.fromClaimAndIdentity(
       claimToAttest.claim,
       claimerIdentity.identity,
-      termsFromPool,
-      delegation ? delegation.id : null
+      {
+        legitimations: termsFromPool,
+        delegationId: delegation ? delegation.id : undefined,
+      }
     )
+
+    return req4Att.message
   }
 
   /**
