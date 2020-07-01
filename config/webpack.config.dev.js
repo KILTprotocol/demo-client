@@ -145,7 +145,7 @@ module.exports = {
             include: [paths.appSrc, paths.appNodeModules +  '/@polkadot/util/node_modules/chalk/source/'],
             loader: require.resolve('babel-loader'),
             options: {
-              
+              presets: ['@babel/preset-env'],
               compact: true,
             },
           },
