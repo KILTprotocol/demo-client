@@ -105,7 +105,8 @@ class DelegationNode extends React.Component<Props, State> {
     this.setState({
       focusedNode: node.delegation.id === focusedNodeId,
       myDelegation,
-      myNode: node.delegation.account === selectedIdentity.identity.address,
+      myNode:
+        node.delegation.account === selectedIdentity.identity.getAddress(),
     })
 
     BlockchainService.connect().then(() => {

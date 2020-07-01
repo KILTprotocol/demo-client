@@ -115,7 +115,7 @@ class ContactPresentation extends React.Component<Props, State> {
       callback: () => {
         PersistentStore.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
-            objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES,
+            objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC,
             props: {
               receiverAddresses: [address],
             },
@@ -207,7 +207,7 @@ class ContactPresentation extends React.Component<Props, State> {
         metaData: {
           ...metaData,
           addedAt: Date.now(),
-          addedBy: selectedIdentity.identity.address,
+          addedBy: selectedIdentity.identity.getAddress(),
         },
         publicIdentity,
       }

@@ -18,21 +18,21 @@ import FeedbackService, {
 
 const root = sdk.Identity.buildFromMnemonic(ROOT_SEED)
 
-const ctype = sdk.CType.fromCType(CTYPE as sdk.ICType)
-ctype.owner = root.address
+const ctype = sdk.CType.fromSchema(JSON.parse(JSON.stringify(CTYPE.schema)))
+
 const metadata: IMetadata = CTYPE_METADATA
 
 const delegationRoot = new sdk.DelegationRootNode(
   DELEGATION_ROOT_ID,
   ctype.hash,
-  root.address
+  root.getAddress()
 )
 
 async function newDelegation(delegate: IMyIdentity): Promise<void> {
   const delegationNode = new sdk.DelegationNode(
     sdk.UUID.generate(),
     delegationRoot.id,
-    delegate.identity.address,
+    delegate.identity.getAddress(),
     [sdk.Permission.ATTEST]
   )
   const signature = delegate.identity.signStr(delegationNode.generateHash())
@@ -49,7 +49,7 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
     content: { delegationId: delegationNode.id, isPCR: false },
   }
   await MessageRepository.sendToAddresses(
-    [delegate.identity.address],
+    [delegate.identity.getAddress()],
     messageBody
   )
 }
@@ -74,7 +74,7 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
     }
     notifySuccess(`AntiCov Delegation Root successfully created.`)
     // sending root owner message for importing the root
-    const message = new sdk.Message(messageBody, root, root)
+    const message = new sdk.Message(messageBody, root, root.getPublicIdentity())
     await MessageRepository.dispatchMessage(message)
     notifySuccess(`Sent Delegation Root to AntiCov root authority.`)
   }
@@ -87,7 +87,9 @@ export async function setupAndDelegate(delegate: IMyIdentity): Promise<void> {
   try {
     blockUi.updateMessage('Transferring funds to AntiCov authority')
     await new Promise(resolve => {
-      BalanceUtilities.makeTransfer(delegate, root.address, 4, () => resolve())
+      BalanceUtilities.makeTransfer(delegate, root.getAddress(), 4, () =>
+        resolve()
+      )
     })
     blockUi.updateMessage('Setting up CType and Root Delegation')
     await verifyOrAddCtypeAndRoot()

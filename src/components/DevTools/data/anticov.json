@@ -1,8 +1,9 @@
 {
   "CTYPE": {
     "schema": {
-      "$id": "anticov",
+      "$id": "kilt:ctype:0x005db4d03c57d15c47083cd363311669f0543e5647e26da1c5f12fe4fa8cd84d",
       "$schema": "http://kilt-protocol.org/draft-01/ctype#",
+      "title": "AntiCov",
       "properties": {
         "photo": {
           "type": "string"
@@ -24,8 +25,7 @@
       "photo": {
         "title": {
           "default": "photo"
-        },
-        "description": {}
+        }
       }
     }
   },

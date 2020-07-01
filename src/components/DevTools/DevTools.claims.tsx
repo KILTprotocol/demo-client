@@ -31,7 +31,7 @@ class BsClaim {
     const claim = sdk.Claim.fromCTypeAndClaimContents(
       sdk.CType.fromCType(cType),
       bsClaimData.data,
-      identity.identity.address
+      identity.identity.getAddress()
     )
 
     PersistentStore.store.dispatch(

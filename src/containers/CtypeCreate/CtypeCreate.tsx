@@ -94,7 +94,7 @@ class CTypeCreate extends React.Component<Props, State> {
       const cTypeWrapper: ICTypeWithMetadata = {
         cType: {
           schema: cType.schema,
-          owner: selectedIdentity.identity.address,
+          owner: selectedIdentity.identity.getAddress(),
           hash: cType.hash,
         },
         metaData: metadata,

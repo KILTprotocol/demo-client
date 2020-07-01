@@ -3,8 +3,8 @@
     "baseUrl": ".",
     "outDir": "build/dist",
     "module": "esnext",
-    "target": "es5",
-    "lib": ["es2017", "es6", "dom"],
+    "target": "esnext",
+    "lib": ["es2017", "es6", "dom", "es2020", "esnext"],
     "sourceMap": true,
     "allowJs": true,
     "esModuleInterop": true, // https://github.com/polkadot-js/api/issues/406#issuecomment-440591394

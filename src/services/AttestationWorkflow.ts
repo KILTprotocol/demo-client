@@ -92,7 +92,7 @@ class AttestationWorkflow {
   ): Promise<void> {
     const messageBody: sdk.ISubmitClaimsForCTypes = {
       content: attestedClaims,
-      type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES,
+      type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC,
     }
 
     return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
@@ -111,7 +111,7 @@ class AttestationWorkflow {
     claim: sdk.IClaim,
     attesterAddresses: Array<IContact['publicIdentity']['address']>,
     terms: sdk.AttestedClaim[] = [],
-    delegationId: sdk.IDelegationNode['id'] | null = null,
+    delegationId?: sdk.IDelegationNode['id'],
     quoteAttesterSigned?: sdk.IQuoteAgreement
   ): Promise<void> {
     const { identity } = Wallet.getSelectedIdentity(
@@ -120,8 +120,7 @@ class AttestationWorkflow {
     const requestForAttestation = sdk.RequestForAttestation.fromClaimAndIdentity(
       claim,
       identity,
-      terms,
-      delegationId
+      { ...terms, delegationId }
     )
 
     const messageBody: IRequestAttestationForClaim = {

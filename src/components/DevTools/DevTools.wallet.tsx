@@ -52,15 +52,14 @@ class BsIdentity {
     return new Promise(resolve => {
       BalanceUtilities.makeTransfer(
         selectedIdentity,
-        identity.address,
+        identity.getAddress(),
         ENDOWMENT,
         () => {
-          const { address, boxPublicKeyAsHex } = identity
           const newContact: IContact = {
             metaData: {
               name: alias,
             },
-            publicIdentity: { address, boxPublicKeyAsHex },
+            publicIdentity: identity.getPublicIdentity(),
           }
           PersistentStore.store.dispatch(Contacts.Store.addContact(newContact))
 
@@ -105,7 +104,7 @@ class BsIdentity {
 
   public static selectIdentity(identity: IMyIdentity): void {
     PersistentStore.store.dispatch(
-      Wallet.Store.selectIdentityAction(identity.identity.address)
+      Wallet.Store.selectIdentityAction(identity.identity.getAddress())
     )
   }
 

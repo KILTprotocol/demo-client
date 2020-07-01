@@ -219,7 +219,7 @@ class BsAttestation {
     AttestationService.saveInStore({
       attestation: attestedClaim.attestation,
       cTypeHash: attestedClaim.request.claim.cTypeHash,
-      claimerAddress: claimerIdentity.identity.address,
+      claimerAddress: claimerIdentity.identity.getAddress(),
       claimerAlias: claimerIdentity.metaData.name,
       created: Date.now(),
     } as Attestations.Entry)
@@ -243,7 +243,7 @@ class BsAttestation {
     const partialClaim: IPartialClaim = {
       cTypeHash: cType.cType.hash,
       contents: bsClaim.data,
-      owner: claimerIdentity.identity.address,
+      owner: claimerIdentity.identity.getAddress(),
     }
 
     // send request for term from claimer to attester

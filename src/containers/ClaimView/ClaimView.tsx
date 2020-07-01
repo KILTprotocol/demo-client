@@ -87,7 +87,7 @@ class ClaimView extends React.Component<Props, State> {
     const { selectedIdentity } = this.props
     if (
       prevProps.selectedIdentity.identity.address !==
-      selectedIdentity.identity.address
+      selectedIdentity.identity.getAddress()
     ) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({
