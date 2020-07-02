@@ -1,7 +1,7 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
-
+import { AnyJsonArray, AnyJsonObject } from '@polkadot/types/types'
 import KiltAction from '../../types/Action'
 import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
@@ -16,7 +16,7 @@ export interface IMyDelegation {
   account: sdk.IDelegationBaseNode['account']
   id: sdk.IDelegationBaseNode['id']
   metaData: {
-    alias: string
+    alias: string | number | true | AnyJsonObject | AnyJsonArray | undefined
   }
   type: DelegationType
   rootId?: sdk.IDelegationNode['rootId']

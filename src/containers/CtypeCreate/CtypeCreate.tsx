@@ -72,6 +72,8 @@ class CTypeCreate extends React.Component<Props, State> {
     const { selectedIdentity, history } = this.props
     const { connected, isValid, cType: stateCtype } = this.state
     if (selectedIdentity && connected && isValid) {
+      stateCtype.$id = ''
+      console.log(stateCtype)
       let cType: sdk.CType
       let metadata: sdk.ICTypeMetadata
       try {

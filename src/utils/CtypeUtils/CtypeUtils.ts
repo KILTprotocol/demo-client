@@ -25,6 +25,7 @@ export const fromInputModel = (ctypeInput: ICTypeInput): ICTypeWithMetadata => {
   const schema: sdk.ICType['schema'] = {
     $id: ctypeInput.$id,
     $schema: CTypeInputModel.properties.$schema.default,
+    title: ctypeInput.title,
     properties: {},
     type: 'object',
   }
