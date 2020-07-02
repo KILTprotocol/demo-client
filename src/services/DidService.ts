@@ -15,7 +15,9 @@ class DidService {
   }
 
   public static async createDid(myIdentity: IMyIdentity): Promise<sdk.IDid> {
-    const documentStore: sdk.IDid['documentStore'] = `${ContactRepository.URL}/${myIdentity.identity.address}`
+    const documentStore: sdk.IDid['documentStore'] = `${
+      ContactRepository.URL
+    }/${myIdentity.identity.getAddress()}`
 
     const did = sdk.Did.fromIdentity(myIdentity.identity, documentStore)
     const didDocument = did.createDefaultDidDocument(`${MessageRepository.URL}`)
@@ -31,14 +33,14 @@ class DidService {
     } as IContact)
 
     const status = await did.store(myIdentity.identity)
-    if (status.type !== 'Finalized') {
+    if (!status.isFinalized) {
       throw new Error(
         `Error creating DID for identity ${myIdentity.metaData.name}`
       )
     }
 
     persistentStore.store.dispatch(
-      Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
+      Wallet.Store.updateIdentityAction(myIdentity.identity.getAddress(), {
         did: { identifier: did.identifier, document: didDocument },
       })
     )
@@ -47,7 +49,7 @@ class DidService {
 
   public static async deleteDid(myIdentity: IMyIdentity): Promise<void> {
     const status = await sdk.Did.remove(myIdentity.identity)
-    if (status.type !== 'Finalized') {
+    if (!status.isFinalized) {
       throw new Error(
         `Error deleting DID for identity ${myIdentity.metaData.name}`
       )
@@ -60,7 +62,7 @@ class DidService {
       publicIdentity: myIdentity.identity.getPublicIdentity(),
     } as IContact)
     persistentStore.store.dispatch(
-      Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
+      Wallet.Store.updateIdentityAction(myIdentity.identity.getAddress(), {
         did: undefined,
       })
     )

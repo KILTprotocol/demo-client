@@ -64,14 +64,14 @@ class WalletAdd extends React.Component<Props, State> {
     })
   }
 
-  private addIdentity(): void {
+  private async addIdentity(): Promise<void> {
     const { alias, myPhrase, randomPhrase, useMyPhrase } = this.state
     const { history, saveIdentity } = this.props
 
-    let identity: Identity
+    let identity
     const phrase = useMyPhrase ? myPhrase : randomPhrase
     try {
-      identity = Identity.buildFromMnemonic(phrase)
+      identity = await Identity.buildFromMnemonic(phrase)
     } catch (error) {
       errorService.log({
         error,
