@@ -45,15 +45,18 @@ export type TaskProps =
     }
   | {
       objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC
-      props: Partial<SubmitClaimsForCTypeProps>
+      props: Partial<SubmitClaimsForCTypeProps> &
+        Pick<SubmitClaimsForCTypeProps, 'cTypeHashes'>
     }
   | {
       objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES
-      props: Partial<RequestClaimsForCTypeProps>
+      props: Partial<RequestClaimsForCTypeProps> &
+        Pick<RequestClaimsForCTypeProps, 'cTypeHashes'>
     }
   | {
       objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION
-      props: Partial<RequestAcceptDelegationProps>
+      props: Partial<RequestAcceptDelegationProps> &
+        Pick<RequestAcceptDelegationProps, 'cTypeHash'>
     }
 
 type StateProps = {

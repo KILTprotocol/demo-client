@@ -212,7 +212,11 @@ class SubmitTerms extends React.Component<Props, State> {
         <>
           <div className="selectTerms">
             <h2>Select Legitimation(s)…</h2>
-            <SelectAttestedClaims onChange={onChange} />
+            <SelectAttestedClaims
+              cTypeHashes={[null]}
+              onChange={onChange}
+            />{' '}
+            {/* //This isnt right */}
           </div>
 
           <div className="selectDelegation">
