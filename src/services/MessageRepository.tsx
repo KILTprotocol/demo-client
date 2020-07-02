@@ -138,7 +138,7 @@ class MessageRepository {
       .then(response => response.json())
       .then(message => {
         return ContactRepository.findByAddress(message.senderAddress).then(() =>
-          sdk.Message.createFromEncryptedMessage(message, myIdentity)
+          sdk.Message.decrypt(message, myIdentity)
         )
       })
   }
@@ -146,7 +146,7 @@ class MessageRepository {
   public static async findByMyIdentity(
     myIdentity: sdk.Identity
   ): Promise<IMessageOutput[]> {
-    return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
+    return fetch(`${MessageRepository.URL}/inbox/${myIdentity.getAddress()}`)
       .then(response => response.json())
       .then((encryptedMessages: sdk.IEncryptedMessage[]) => {
         return Promise.any(
@@ -155,10 +155,7 @@ class MessageRepository {
               encryptedMessage.senderAddress
             ).then((contact: IContact) => {
               try {
-                const m = sdk.Message.createFromEncryptedMessage(
-                  encryptedMessage,
-                  myIdentity
-                )
+                const m = sdk.Message.decrypt(encryptedMessage, myIdentity)
                 sdk.Message.ensureOwnerIsSender(m)
                 let sender = contact
                 if (!sender) {
@@ -196,7 +193,7 @@ class MessageRepository {
   public static async dispatchMessage(message: sdk.Message): Promise<Response> {
     const response = await fetch(`${MessageRepository.URL}`, {
       ...BasePostParams,
-      body: JSON.stringify(message.getEncryptedMessage()),
+      body: JSON.stringify(message.encrypt()),
     })
     if (!response.ok) {
       throw new Error(response.statusText)
@@ -274,9 +271,11 @@ class MessageRepository {
         ]
 
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
-        return (message.body as sdk.IRequestClaimsForCTypes).content
+        return (message.body as sdk.IRequestClaimsForCTypes).content.ctypes.filter(
+          Boolean
+        ) as Array<sdk.ICType['hash']>
       case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC: {
-        const cTypeHashes = (message.body as sdk.ISubmitClaimsForCTypes).content.map(
+        const cTypeHashes = (message.body as sdk.ISubmitClaimsForCTypesPublic).content.map(
           attestedClaim => attestedClaim.request.claim.cTypeHash
         )
         const uniqueCTypeHashes: Array<ICType['cType']['hash']> = cTypeHashes.filter(
