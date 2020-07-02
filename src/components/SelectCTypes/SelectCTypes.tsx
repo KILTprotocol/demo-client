@@ -19,7 +19,7 @@ type Props = {
   isMulti?: boolean
   name?: string
   placeholder?: string
-  preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | undefined>
+  preSelectedCTypeHashes: Array<ICType['cType']['hash'] | null>
 
   onChange?: (selectedCTypes: ICTypeWithMetadata[]) => void
   onMenuOpen?: () => void
@@ -132,7 +132,7 @@ class SelectCTypes extends React.Component<Props, State> {
     const { cTypes } = this.state
     const filteredPreSelectedCTypeHashes = (
       preSelectedCTypeHashes || []
-    ).filter((cTypeHash: ICType['cType']['hash'] | undefined) => cTypeHash)
+    ).filter((cTypeHash: ICType['cType']['hash'] | null) => cTypeHash)
 
     const options: SelectOption[] = cTypes.map(
       (cType: ICTypeWithMetadata): SelectOption => SelectCTypes.getOption(cType)
