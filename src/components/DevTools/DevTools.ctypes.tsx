@@ -30,7 +30,7 @@ class BsCType {
     const cType = sdk.CType.fromCType({
       schema: bsCTypeData.schema,
       hash: bsCTypeData.hash,
-      owner: ownerIdentity.address,
+      owner: ownerIdentity.getAddress(),
     })
 
     return cType

@@ -29,7 +29,7 @@ export type RequestAttestationProps = {
   terms: sdk.IAttestedClaim[]
   quoteData?: sdk.IQuoteAttesterSigned
   receiverAddresses: Array<sdk.PublicIdentity['address']>
-  delegationId: sdk.IDelegationNode['id'] | null
+  delegationId: sdk.IDelegationNode['id'] | undefined
   onCancel?: () => void
   onFinished?: () => void
 }

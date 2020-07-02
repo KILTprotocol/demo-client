@@ -275,7 +275,7 @@ class MessageRepository {
 
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
         return (message.body as sdk.IRequestClaimsForCTypes).content
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC: {
         const cTypeHashes = (message.body as sdk.ISubmitClaimsForCTypes).content.map(
           attestedClaim => attestedClaim.request.claim.cTypeHash
         )

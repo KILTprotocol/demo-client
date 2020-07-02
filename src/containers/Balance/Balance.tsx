@@ -189,7 +189,8 @@ class Balance extends React.Component<Props, State> {
     // the identity of this component might not be the currently selected one
     // so we need to inform the user in this case
     if (
-      myIdentity.identity.address !== selectedIdentity.identity.getAddress()
+      myIdentity.identity.getAddress() !==
+      selectedIdentity.identity.getAddress()
     ) {
       FeedbackService.addBlockingNotification({
         header: `Attention!`,

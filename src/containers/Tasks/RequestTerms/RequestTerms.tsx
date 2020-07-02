@@ -10,7 +10,7 @@ import './RequestTerms.scss'
 import { notifyFailure } from '../../../services/FeedbackService'
 
 export type RequestTermsProps = {
-  cTypeHash?: ICType['cType']['hash']
+  cTypeHash: ICType['cType']['hash'] | null
   receiverAddresses: Array<sdk.PublicIdentity['address']>
   preSelectedClaimEntries?: Claims.Entry[]
   onFinished?: () => void

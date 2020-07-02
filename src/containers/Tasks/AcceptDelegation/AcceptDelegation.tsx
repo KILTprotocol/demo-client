@@ -146,7 +146,10 @@ class AcceptDelegation extends React.Component<Props, State> {
           <DelegationDetailView
             id={parentId}
             focusedNodeAlias={
-              metaData && metaData.alias && typeof metaData.alias === 'string'
+              metaData &&
+              typeof metaData === 'object' &&
+              !Array.isArray(metaData) &&
+              metaData.alias
                 ? metaData.alias
                 : undefined
             }

@@ -73,7 +73,7 @@ type StateProps = {
 }
 
 type OwnProps = {
-  cTypeHashes?: Array<sdk.ICType['hash']>
+  cTypeHashes: Array<sdk.ICType['hash'] | null>
   context?: 'default' | 'terms'
   onChange: (claimSelectionData: ClaimSelectionData) => void
 }
