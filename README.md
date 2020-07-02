@@ -10,6 +10,8 @@ To use the demo client locally, you have to install all dependencies with yarn.
 yarn install
 ```
 
+The local setup would require the use of our ![prototype services](https://github.com/KILTprotocol/prototype-services). Follow the setup steps.
+
 ## Run
 To build it and launch a dev server, run
 ```
