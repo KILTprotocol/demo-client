@@ -102,6 +102,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "case-sensitive-paths-webpack-plugin": "2.1.1",
     "commitizen": "^3.0.4",
+    "copy-webpack-plugin": "4.6.0",
     "cz-conventional-changelog": "^2.1.0",
     "env-cmd": "^10.0.1",
     "eslint": "6.1.0",
