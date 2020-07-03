@@ -21,16 +21,14 @@ class QuoteServices {
     quoteAttesterSigned: sdk.IQuoteAttesterSigned | null = null
   ): Promise<sdk.IQuoteAgreement | null> {
     if (!quoteAttesterSigned) return null
-    const requestForAttestation = await sdk.RequestForAttestation.fromClaimAndIdentity(
-      claim,
-      identity,
-      {
-        legitimations: (terms || []).map((legitimation: sdk.IAttestedClaim) =>
-          sdk.AttestedClaim.fromAttestedClaim(legitimation)
-        ),
-        delegationId,
-      }
-    )
+    const {
+      message: requestForAttestation,
+    } = await sdk.RequestForAttestation.fromClaimAndIdentity(claim, identity, {
+      legitimations: (terms || []).map((legitimation: sdk.IAttestedClaim) =>
+        sdk.AttestedClaim.fromAttestedClaim(legitimation)
+      ),
+      delegationId,
+    })
 
     const signature = identity.signStr(
       sdk.Crypto.hashObjectAsStr(quoteAttesterSigned)
@@ -38,7 +36,7 @@ class QuoteServices {
 
     const quoteAgreement: sdk.IQuoteAgreement = {
       ...quoteAttesterSigned,
-      rootHash: requestForAttestation.message.rootHash,
+      rootHash: requestForAttestation.rootHash,
       claimerSignature: signature,
     }
 
