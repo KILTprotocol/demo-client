@@ -26,12 +26,10 @@ class BsCType {
     // replace owner key with his address
     const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
       .identity
-
-    const cType = sdk.CType.fromCType({
-      schema: bsCTypeData.schema,
-      hash: bsCTypeData.hash,
-      owner: ownerIdentity.getAddress(),
-    })
+    const cType = sdk.CType.fromSchema(
+      bsCTypeData.schema,
+      ownerIdentity.getAddress()
+    )
 
     return cType
       .store(ownerIdentity)
