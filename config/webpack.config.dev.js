@@ -319,7 +319,7 @@ module.exports = {
       },
     ]),
     new webpack.DefinePlugin({
-      'process.env.WASM_FETCH_DIR': JSON.stringify('./static'),
+      'process.env.WASM_FETCH_DIR': JSON.stringify('/static'),
     }),
   ],
   // Some libraries import Node modules but don't use them in the browser.
