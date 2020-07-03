@@ -40,6 +40,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
+    - name: set up .npmrc to point to github packages
+      run: mv -f .npmrc.github .npmrc
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -50,13 +53,6 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-
-    - name: set up .npmrc & .yarnrc to connect to github packages
-      uses: actions/setup-node@v1
-      with:
-        node-version: 10
-        registry-url: https://npm.pkg.github.com
-        scope: '@kiltprotocol'
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
