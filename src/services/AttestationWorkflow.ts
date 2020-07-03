@@ -17,12 +17,12 @@ import MessageRepository from './MessageRepository'
 
 class AttestationWorkflow {
   /**
-   * Sends a legitimation request for attesting claims to attesters
+   * Sends a term request for attesting claims to attesters
    *
-   * @param claims the list of partial claims we request legitimation for
-   * @param receiverAddresses the list of attester addresses to send the legitimation request to
+   * @param claims the list of partial claims we request term for
+   * @param receiverAddresses the list of attester addresses to send the term request to
    */
-  public static async requestLegitimations(
+  public static async requestTerms(
     claims: IPartialClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>
   ): Promise<void> {
@@ -40,28 +40,40 @@ class AttestationWorkflow {
   }
 
   /**
-   * Sends back the legitimation along with the originally given (partial)
+   * Sends back the term along with the originally given (partial)
    * claim to the claimer.
    *
    * @param claim the (partial) claim to attest
-   * @param legitimations the list of legitimations to be included in the
+   * @param terms the list of terms to be included in the
    *   attestation
-   * @param receiverAddresses  list of contact addresses who will receive the legitimation
-   * @param delegation delegation to add to legitimations
+   * @param receiverAddresses  list of contact addresses who will receive the term
+   * @param delegation delegation to add to terms
    */
-  public static async submitLegitimations(
+  public static async submitTerms(
     claim: IPartialClaim,
-    legitimations: sdk.IAttestedClaim[],
+    terms: sdk.IAttestedClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
+    quote?: sdk.IQuoteAttesterSigned,
+    receiver?: sdk.IPublicIdentity,
     delegation?: IMyDelegation
   ): Promise<void> {
     const messageBody: sdk.ISubmitTerms = {
-      content: { claim, legitimations, delegationId: undefined },
+      content: {
+        claim,
+        legitimations: terms,
+        delegationId: undefined,
+        quote: undefined,
+      },
       type: sdk.MessageBodyType.SUBMIT_TERMS,
     }
-
     if (delegation) {
       messageBody.content.delegationId = delegation.id
+    }
+    if (quote) {
+      messageBody.content.quote = quote
+    }
+    if (receiver) {
+      return MessageRepository.sendToPublicIdentity(receiver, messageBody)
     }
 
     return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
@@ -91,15 +103,16 @@ class AttestationWorkflow {
    *
    * @param claim - the claim to attest
    * @param attesterAddresses - the addresses of attesters
-   * @param [legitimations] - the legitimations the claimer requested
+   * @param [terms] - the terms the claimer requested
    *   beforehand from attester
    * @param [delegationId] - the delegation the attester added as legitimation
    */
   public static async requestAttestationForClaim(
     claim: sdk.IClaim,
     attesterAddresses: Array<IContact['publicIdentity']['address']>,
-    legitimations: sdk.AttestedClaim[] = [],
-    delegationId: sdk.IDelegationNode['id'] | null = null
+    terms: sdk.AttestedClaim[] = [],
+    delegationId: sdk.IDelegationNode['id'] | null = null,
+    quoteAttesterSigned?: sdk.IQuoteAgreement
   ): Promise<void> {
     const { identity } = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
@@ -107,13 +120,16 @@ class AttestationWorkflow {
     const requestForAttestation = sdk.RequestForAttestation.fromClaimAndIdentity(
       claim,
       identity,
-      legitimations,
+      terms,
       delegationId
     )
+
     const messageBody: IRequestAttestationForClaim = {
-      content: { requestForAttestation },
+      content: { requestForAttestation, quote: undefined },
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
+
+    if (quoteAttesterSigned) messageBody.content.quote = quoteAttesterSigned
 
     return MessageRepository.sendToAddresses(attesterAddresses, messageBody)
   }
@@ -128,10 +144,11 @@ class AttestationWorkflow {
    */
   public static async approveAndSubmitAttestationForClaim(
     requestForAttestation: sdk.IRequestForAttestation,
-    claimerAddress: IContact['publicIdentity']['address']
+    claimerAddress: IContact['publicIdentity']['address'],
+    claimerIdentity?: sdk.IPublicIdentity
   ): Promise<void> {
     const claimer = await ContactRepository.findByAddress(claimerAddress)
-    if (!claimer) {
+    if (!claimer && !claimerIdentity) {
       throw new Error('claimer not found')
     }
     const attestedClaim = await AttestationService.attestClaim(
@@ -143,7 +160,7 @@ class AttestationWorkflow {
       attestation: attestedClaim.attestation,
       cTypeHash: attestedClaim.request.claim.cTypeHash,
       claimerAddress: attestedClaim.request.claim.owner,
-      claimerAlias: claimer.metaData.name,
+      claimerAlias: (claimer && claimer.metaData.name) || '',
       created: Date.now(),
     })
 
@@ -152,7 +169,19 @@ class AttestationWorkflow {
       content: attestedClaim,
       type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
     }
-    return MessageRepository.send([claimer], attestationMessageBody)
+
+    if (claimerIdentity) {
+      return MessageRepository.sendToPublicIdentity(
+        claimerIdentity,
+        attestationMessageBody
+      )
+    }
+
+    if (claimer) {
+      return MessageRepository.send([claimer], attestationMessageBody)
+    }
+
+    throw new Error('unreachable code')
   }
 
   /**

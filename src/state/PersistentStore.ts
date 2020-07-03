@@ -9,6 +9,7 @@ import * as Delegations from './ducks/Delegations'
 import * as Parameters from './ducks/Parameters'
 import * as Contacts from './ducks/Contacts'
 import * as CTypes from './ducks/CTypes'
+import * as Quotes from './ducks/Quotes'
 
 declare global {
   /* eslint-disable */
@@ -27,6 +28,7 @@ export type State = {
   cTypes: CTypes.ImmutableState
   delegations: Delegations.ImmutableState
   parameters: Parameters.ImmutableState
+  quotes: Quotes.ImmutableState
   uiState: UiState.ImmutableState
   wallet: Wallet.ImmutableState
 }
@@ -37,6 +39,7 @@ type SerializedState = {
   contacts: Contacts.SerializedState
   delegations: Delegations.SerializedState
   parameters: Parameters.SerializedState
+  quotes: Quotes.SerializedState
   uiState: UiState.SerializedState
   wallet: Wallet.SerializedState
 }
@@ -55,6 +58,7 @@ class PersistentStore {
       contacts: Contacts.Store.deserialize(obj.contacts),
       delegations: Delegations.Store.deserialize(obj.delegations),
       parameters: Parameters.Store.deserialize(obj.parameters),
+      quotes: Quotes.Store.deserialize(obj.quotes),
       uiState: UiState.Store.deserialize(),
       wallet: Wallet.Store.deserialize(obj.wallet),
     }
@@ -67,6 +71,7 @@ class PersistentStore {
       contacts: Contacts.Store.serialize(state.contacts),
       delegations: Delegations.Store.serialize(state.delegations),
       parameters: Parameters.Store.serialize(state.parameters),
+      quotes: Quotes.Store.serialize(state.quotes),
       uiState: UiState.Store.serialize(),
       wallet: Wallet.Store.serialize(state.wallet),
     }
@@ -96,6 +101,7 @@ class PersistentStore {
         contacts: Contacts.Store.reducer,
         delegations: Delegations.Store.reducer,
         parameters: Parameters.Store.reducer,
+        quotes: Quotes.Store.reducer,
         uiState: UiState.Store.reducer,
         wallet: Wallet.Store.reducer,
       }),

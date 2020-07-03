@@ -2,19 +2,18 @@ name: Lint and Test
 
 on:
   push:
-    branches: 
+    branches:
       - develop
       - master
     tags:
       - '*'
   pull_request:
-    branches: 
+    branches:
       - develop
       - master
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -22,15 +21,17 @@ jobs:
         node-version: [10.x, 12.x]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: yarn install, lint and build
-      run: |
-        yarn install --frozen-lockfile
-        yarn lint
-        # tests are not fully supported atm
-        # yarn testCI
-        yarn build
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: https://npm.pkg.github.com
+          scope: '@kiltprotocol'
+      - name: yarn install, lint and build
+        run: |
+          yarn upgrade --scope @kiltprotocol --latest
+          yarn lint
+          yarn build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

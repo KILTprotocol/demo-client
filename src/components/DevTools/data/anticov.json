@@ -1,0 +1,34 @@
+{
+  "CTYPE": {
+    "schema": {
+      "$id": "anticov",
+      "$schema": "http://kilt-protocol.org/draft-01/ctype#",
+      "properties": {
+        "photo": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "hash": "0x005db4d03c57d15c47083cd363311669f0543e5647e26da1c5f12fe4fa8cd84d",
+    "owner": "5Gtn4ZBVeqndGwt41AntNgSDCSBcsiyFr3NAm77UDGXbgxva"
+  },
+  "CTYPE_METADATA": {
+    "title": {
+      "default": "AntiCov"
+    },
+    "description": {
+      "default": "AntiCov Ctype"
+    },
+    "properties": {
+      "photo": {
+        "title": {
+          "default": "photo"
+        },
+        "description": {}
+      }
+    }
+  },
+  "DELEGATION_ROOT_ID": "0x36656438633364382d393431372d346563392d386263612d3163646136346438",
+  "ROOT_SEED": "attract follow jealous bamboo document wine object edit cave mechanic clap flavor"
+}

@@ -28,7 +28,7 @@ export interface IMessageOutput extends sdk.IMessage {
 // (for other tests)
 
 class MessageRepository {
-  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}:${process.env.REACT_APP_SERVICE_PORT}/messaging`
+  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}/messaging`
 
   /**
    * takes contact or list of contacts
@@ -83,6 +83,27 @@ class MessageRepository {
       })
   }
 
+  /**
+   * takes a public identity
+   * converts them to Contacts and initiates message sending
+   *
+   * @param receivers
+   * @param messageBody
+   */
+  public static sendToPublicIdentity(
+    receiver: sdk.IPublicIdentity,
+    messageBody: sdk.MessageBody
+  ): Promise<void> {
+    const receiverContact: IContact = {
+      metaData: {
+        name: '',
+      },
+      publicIdentity: receiver,
+    }
+
+    return MessageRepository.send([receiverContact], messageBody)
+  }
+
   public static async multiSendToAddresses(
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
     messageBodies: sdk.MessageBody[]
@@ -132,13 +153,24 @@ class MessageRepository {
           encryptedMessages.map((encryptedMessage: sdk.IEncryptedMessage) => {
             return ContactRepository.findByAddress(
               encryptedMessage.senderAddress
-            ).then((sender: IContact) => {
+            ).then((contact: IContact) => {
               try {
-                const m: sdk.IMessage = sdk.Message.createFromEncryptedMessage(
+                const m = sdk.Message.createFromEncryptedMessage(
                   encryptedMessage,
                   myIdentity
                 )
                 sdk.Message.ensureOwnerIsSender(m)
+                let sender = contact
+                if (!sender) {
+                  sender = {
+                    metaData: { name: '', unregistered: true },
+                    publicIdentity: {
+                      address: encryptedMessage.senderAddress,
+                      boxPublicKeyAsHex: encryptedMessage.senderBoxPublicKey,
+                    },
+                  }
+                }
+
                 return {
                   ...m,
                   encryptedMessage,
@@ -161,6 +193,17 @@ class MessageRepository {
       })
   }
 
+  public static async dispatchMessage(message: sdk.Message): Promise<Response> {
+    const response = await fetch(`${MessageRepository.URL}`, {
+      ...BasePostParams,
+      body: JSON.stringify(message.getEncryptedMessage()),
+    })
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
+    return response
+  }
+
   public static async singleSend(
     messageBody: sdk.MessageBody,
     sender: IMyIdentity,
@@ -175,20 +218,11 @@ class MessageRepository {
 
       message = await MessageRepository.handleDebugMode(message)
 
-      return fetch(`${MessageRepository.URL}`, {
-        ...BasePostParams,
-        body: JSON.stringify(message.getEncryptedMessage()),
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(response.statusText)
-          }
-          return response
-        })
-        .then(response => response.json())
+      return MessageRepository.dispatchMessage(message)
         .then(() => {
           notifySuccess(
-            `Message '${messageBody.type}' to ${receiver.metaData.name} successfully sent.`
+            `Message '${messageBody.type}' to receiver ${receiver.metaData
+              .name || receiver.publicIdentity.address} successfully sent.`
           )
         })
         .catch(error => {

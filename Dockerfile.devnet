@@ -1,13 +1,14 @@
+# builds the demo client with the latest development version of the sdk published to the github package repository
 FROM node:10-alpine as builder
+ARG NODE_AUTH_TOKEN
 
 WORKDIR /app
 
 COPY package.json yarn.lock ./
-RUN yarn install
+COPY .npmrc ./
+RUN yarn upgrade --scope @kiltprotocol --latest
 
 COPY . ./
-RUN yarn lint
-#RUN yarn testCI
 RUN yarn build:devnet
 
 FROM nginx:alpine

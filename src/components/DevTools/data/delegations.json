@@ -7,41 +7,29 @@
       "DRIVERS_LICENSE_1": {
         "alias": "Driving License Authority Berlin (Delegation)",
         "ownerKey": "DEPARTMENT_1",
-        "permissions": [
-          "ATTEST",
-          "DELEGATE"
-        ],
+        "permissions": ["ATTEST", "DELEGATE"],
         "children": {
           "DRIVERS_LICENSE_1_1": {
             "alias": "Employee 1 Berlin (Delegation)",
             "ownerKey": "EMPLOYEE_1_1",
-            "permissions": [
-              "ATTEST"
-            ]
+            "permissions": ["ATTEST"]
           },
           "DRIVERS_LICENSE_1_2": {
             "alias": "Employee 2 Berlin (Delegation)",
             "ownerKey": "EMPLOYEE_1_2",
-            "permissions": [
-              "ATTEST"
-            ]
+            "permissions": ["ATTEST"]
           }
         }
       },
       "DRIVERS_LICENSE_2": {
         "alias": "Driving License Authority Munich (Delegation)",
         "ownerKey": "DEPARTMENT_2",
-        "permissions": [
-          "ATTEST",
-          "DELEGATE"
-        ],
+        "permissions": ["ATTEST", "DELEGATE"],
         "children": {
           "DRIVERS_LICENSE_2_1": {
             "alias": "Employee 2 Munich (Delegation)",
             "ownerKey": "EMPLOYEE_2_1",
-            "permissions": [
-              "ATTEST"
-            ]
+            "permissions": ["ATTEST"]
           }
         }
       }
@@ -55,16 +43,12 @@
       "IS_OFFICIAL_1": {
         "alias": "Driving License Authority Berlin (Delegation)",
         "ownerKey": "DEPARTMENT_1",
-        "permissions": [
-          "ATTEST"
-        ]
+        "permissions": ["ATTEST"]
       },
       "IS_OFFICIAL_2": {
         "alias": "Driving License Authority Munich (Delegation)",
         "ownerKey": "DEPARTMENT_2",
-        "permissions": [
-          "ATTEST"
-        ]
+        "permissions": ["ATTEST"]
       }
     }
   }

@@ -1,5 +1,4 @@
 .MessageDetailView {
-
   & h4 {
     display: flex;
     justify-content: space-between;
@@ -7,11 +6,10 @@
   }
 
   & .toggle-code {
-    @include button-icon-only($icon-code)
+    @include button-icon-only($icon-code);
   }
 
   & footer {
-
     & .delete {
       @include button-primary;
     }
@@ -25,7 +23,7 @@
 
     & > * {
       @include border-radius($base-border-radius $base-border-radius 0 0);
-      border:{
+      border: {
         width: 1px 1px 0 1px;
         style: solid;
         color: $color-grey-light;
@@ -35,13 +33,10 @@
   }
 
   & .code {
-
     @each $message in encrypted, decrypted {
-
       &.#{$message} {
-
         & .#{$message} {
-          border:{
+          border: {
             color: $color-grey-dark;
           }
           background: $color-grey-dark;

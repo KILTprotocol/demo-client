@@ -1,0 +1,75 @@
+### docker-compose network for fast and easy development and testing on the demo-client ###
+#
+# The default `docker-compose up` spins up prototype-services (incl. database) and a
+# local devnet, to which the demo-client connects. The demo-client will build (`yarn start`)
+# and launch. Once you see
+# ```
+# Compiled successfully!
+# You can now view kilt-demo-client in the browser.
+# ```
+# in your console, you can access the demo-client on <http://localhost:3001/>.
+# To map to a different port, start with `docker-compose run -p 1234:3001 demo-client`
+# instead (in this example, you could access the client on <http://localhost:1234/>).
+# You can also build and run the demo-client directly on your machine but still connect
+# to containerized prototype-services and mashnet-node:
+# ```
+# docker-compose up services mashnet-node
+# yarn install
+# yarn start
+# ```
+# In any scenario, use `docker-compose down -v` for teardown, which removes containers
+# and purges the data volumes, resetting all state.
+
+version: '3.4'
+
+services:
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGODB_DATABASE=registry
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    ports:
+      - 27017:27017
+  services:
+    image: kiltprotocol/demo-services:develop
+    environment:
+      - NODE_ENV=docker-compose
+      - MONGODB_HOST=mongodb
+      - MONGODB_USER=mongoadmin
+      - MONGODB_PASS=secret
+      - FAUCET_ACCOUNT=0x7220d0fa050ba8d1a6938ceae0aa78a7c8e6d9a684c275e551237747cb2bd53f
+      - BOOT_NODE_ADDRESS=ws://mashnet-node:9944
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongodb
+      - mashnet-node
+  mashnet-node:
+    image: kiltprotocol/mashnet-node:develop
+    ports:
+      - 9944:9944
+    command: ./target/release/mashnet-node --dev --ws-port 9944 --ws-external
+  demo-client:
+    build:
+      context: .
+      target: develop
+      args:
+        - NODE_VERSION=10
+    volumes:
+      - ./src:/app/src
+    environment:
+      - REACT_APP_SERVICE_HOST=//127.0.0.1:3000
+      - REACT_APP_NODE_HOST=ws://127.0.0.1:9944
+      - REACT_APP_FAUCET_URL=http://127.0.0.1:3002
+      - PUBLIC_URL=.
+      # if you experience issues where the watcher does not trigger rebuilds
+      # when changing files in src/ the following option may help
+      #- CHOKIDAR_USEPOLLING=true
+
+    ports:
+      - 3001:3001
+    command: yarn start
+    depends_on:
+      - services
+      - mashnet-node
