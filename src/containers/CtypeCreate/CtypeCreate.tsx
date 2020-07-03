@@ -75,10 +75,8 @@ class CTypeCreate extends React.Component<Props, State> {
       let cType: sdk.CType
       let metadata: sdk.ICTypeMetadata
       try {
-        const inputICTypeWithMetadata: ICTypeWithMetadata = fromInputModel(
-          stateCtype
-        )
-        cType = sdk.CType.fromCType(inputICTypeWithMetadata.cType)
+        const inputICTypeWithMetadata = fromInputModel(stateCtype)
+        ;({ cType } = inputICTypeWithMetadata)
         metadata = inputICTypeWithMetadata.metaData
       } catch (error) {
         errorService.log({
@@ -94,7 +92,7 @@ class CTypeCreate extends React.Component<Props, State> {
       const cTypeWrapper: ICTypeWithMetadata = {
         cType: {
           schema: cType.schema,
-          owner: selectedIdentity.identity.getAddress(),
+          owner: cType.owner,
           hash: cType.hash,
         },
         metaData: metadata,

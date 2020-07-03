@@ -4,12 +4,6 @@ export default {
   title: 'CTYPE',
   type: 'object',
   properties: {
-    $id: {
-      title: 'Identifier',
-      type: 'string',
-      format: 'uri-reference',
-      minLength: 1,
-    },
     $schema: {
       title: 'Schema',
       type: 'string',
@@ -64,5 +58,5 @@ export default {
       className: 'hidden',
     },
   },
-  required: ['$id', '$schema', 'title', 'properties', 'type'],
+  required: ['$schema', 'title', 'properties', 'type'],
 }
