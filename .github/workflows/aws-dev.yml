@@ -27,7 +27,7 @@
 on:
   push:
     branches:
-      - rf-test-with-latest-sdk
+      - develop
 
 name: Deploy to Amazon ECS
 
@@ -65,4 +65,21 @@ jobs:
         # push it to ECR so that it can
         # be deployed to ECS.
         docker build -f Dockerfile.devnet -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg NODE_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }} .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: task-definition.json
+        container-name: prototype-client
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: demo-client
+        cluster: kilt-devnet
+        wait-for-service-stability: true
