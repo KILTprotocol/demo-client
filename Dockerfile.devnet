@@ -5,7 +5,7 @@ ARG NODE_AUTH_TOKEN
 WORKDIR /app
 
 COPY package.json yarn.lock ./
-COPY .npmrc .yarnrc ./
+COPY .npmrc ./
 RUN yarn upgrade --scope @kiltprotocol --latest
 
 COPY . ./
