@@ -13,21 +13,23 @@ class QuoteServices {
     )
   }
 
-  public static createAgreedQuote(
+  public static async createAgreedQuote(
     claim: sdk.IClaim,
     identity: sdk.Identity,
     terms: sdk.AttestedClaim[] = [],
-    delegationId: sdk.IDelegationNode['id'] | null = null,
+    delegationId: sdk.IDelegationNode['id'] | undefined = undefined,
     quoteAttesterSigned: sdk.IQuoteAttesterSigned | null = null
-  ): sdk.IQuoteAgreement | null {
+  ): Promise<sdk.IQuoteAgreement | null> {
     if (!quoteAttesterSigned) return null
-    const requestForAttestation = sdk.RequestForAttestation.fromClaimAndIdentity(
+    const requestForAttestation = await sdk.RequestForAttestation.fromClaimAndIdentity(
       claim,
       identity,
-      (terms || []).map((legitimation: sdk.IAttestedClaim) =>
-        sdk.AttestedClaim.fromAttestedClaim(legitimation)
-      ),
-      delegationId
+      {
+        legitimations: (terms || []).map((legitimation: sdk.IAttestedClaim) =>
+          sdk.AttestedClaim.fromAttestedClaim(legitimation)
+        ),
+        delegationId,
+      }
     )
 
     const signature = identity.signStr(
@@ -36,12 +38,15 @@ class QuoteServices {
 
     const quoteAgreement: sdk.IQuoteAgreement = {
       ...quoteAttesterSigned,
-      rootHash: requestForAttestation.rootHash,
+      rootHash: requestForAttestation.message.rootHash,
       claimerSignature: signature,
     }
 
     try {
-      QuoteServices.saveAgreedQuoteInStore(quoteAgreement, identity.address)
+      QuoteServices.saveAgreedQuoteInStore(
+        quoteAgreement,
+        identity.getAddress()
+      )
     } catch (error) {
       ErrorService.log({
         error,

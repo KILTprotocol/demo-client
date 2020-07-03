@@ -163,7 +163,7 @@ class RequestAttestation extends React.Component<Props, State> {
     })
   }
 
-  private handleSubmit(): void {
+  private async handleSubmit(): Promise<void> {
     const {
       receiverAddresses,
       terms,
@@ -193,7 +193,7 @@ class RequestAttestation extends React.Component<Props, State> {
         sdk.AttestedClaim.fromAttestedClaim(legitimation)
       )
 
-      const quoteAgreement = QuoteServices.createAgreedQuote(
+      const quoteAgreement = await QuoteServices.createAgreedQuote(
         savedClaimEntry.claim,
         selectedIdentity,
         termBreakdown,
