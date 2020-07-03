@@ -72,15 +72,11 @@ class CTypeCreate extends React.Component<Props, State> {
     const { selectedIdentity, history } = this.props
     const { connected, isValid, cType: stateCtype } = this.state
     if (selectedIdentity && connected && isValid) {
-      stateCtype.$id = ''
-      console.log(stateCtype)
       let cType: sdk.CType
       let metadata: sdk.ICTypeMetadata
       try {
-        const inputICTypeWithMetadata: ICTypeWithMetadata = fromInputModel(
-          stateCtype
-        )
-        cType = sdk.CType.fromCType(inputICTypeWithMetadata.cType)
+        const inputICTypeWithMetadata = fromInputModel(stateCtype)
+        ;({ cType } = inputICTypeWithMetadata)
         metadata = inputICTypeWithMetadata.metaData
       } catch (error) {
         errorService.log({
@@ -96,7 +92,7 @@ class CTypeCreate extends React.Component<Props, State> {
       const cTypeWrapper: ICTypeWithMetadata = {
         cType: {
           schema: cType.schema,
-          owner: selectedIdentity.identity.getAddress(),
+          owner: cType.owner,
           hash: cType.hash,
         },
         metaData: metadata,
