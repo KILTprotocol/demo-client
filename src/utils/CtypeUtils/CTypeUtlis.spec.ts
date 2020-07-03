@@ -18,6 +18,7 @@ describe('CType', () => {
       type: 'object',
     },
     owner: '',
+    hash: '',
   } as sdk.ICType
 
   it('verify model transformations', () => {
