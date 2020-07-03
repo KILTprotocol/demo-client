@@ -149,7 +149,8 @@ class AcceptDelegation extends React.Component<Props, State> {
               metaData &&
               typeof metaData === 'object' &&
               !Array.isArray(metaData) &&
-              metaData.alias
+              metaData.alias &&
+              typeof metaData.alias === 'string'
                 ? metaData.alias
                 : undefined
             }

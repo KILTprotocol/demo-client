@@ -12,12 +12,19 @@ export interface ICTypeWithMetadata {
 export interface ICTypeInput {
   $id: string
   $schema: string
-  properties: object[] // TO DO: need to refine what properties are
+  properties: ICTypeInputProperty[]
   required: string[]
   title: string
   description: string
   type: string
   owner: string | null
+}
+
+export interface ICTypeInputProperty {
+  title: string
+  $id: string
+  type: string
+  format?: string
 }
 
 export interface IClaimInput {

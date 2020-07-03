@@ -33,7 +33,7 @@ class DidService {
     } as IContact)
 
     const status = await did.store(myIdentity.identity)
-    if (!status.isFinalized) {
+    if (status.isError) {
       throw new Error(
         `Error creating DID for identity ${myIdentity.metaData.name}`
       )
@@ -49,7 +49,7 @@ class DidService {
 
   public static async deleteDid(myIdentity: IMyIdentity): Promise<void> {
     const status = await sdk.Did.remove(myIdentity.identity)
-    if (!status.isFinalized) {
+    if (status.isError) {
       throw new Error(
         `Error deleting DID for identity ${myIdentity.metaData.name}`
       )
