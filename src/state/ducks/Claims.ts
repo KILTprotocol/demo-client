@@ -275,7 +275,7 @@ const getClaims = createSelector(
       return (
         entry &&
         entry.claim &&
-        entry.claim.owner === selectedIdentity.identity.address
+        entry.claim.owner === selectedIdentity.identity.getAddress()
       )
     })
   }

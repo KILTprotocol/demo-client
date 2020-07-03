@@ -190,7 +190,7 @@ const getAttestations = createSelector(
   [Wallet.getSelectedIdentity, getAllAttestations],
   (selectedIdentity: IMyIdentity, entries: Entry[]) => {
     return entries.filter((entry: Entry) => {
-      return entry.attestation.owner === selectedIdentity.identity.address
+      return entry.attestation.owner === selectedIdentity.identity.getAddress()
     })
   }
 )

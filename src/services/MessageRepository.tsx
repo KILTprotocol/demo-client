@@ -290,10 +290,7 @@ class MessageRepository {
             .rootHash,
         ]
       case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPES:
-        return [
-          (message.body as sdk.IRejectClaimsForCTypes).content[0].request
-            .rootHash,
-        ]
+        return [(message.body as sdk.IRejectClaimsForCTypes).content[0].request]
 
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION:

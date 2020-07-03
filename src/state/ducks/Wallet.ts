@@ -3,7 +3,7 @@ import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 
 import KiltAction from '../../types/Action'
-import { IMyIdentity } from '../../types/Contact'
+import { IMyIdentity, IContact } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
 
 interface ISaveAction extends KiltAction {
@@ -12,17 +12,17 @@ interface ISaveAction extends KiltAction {
 
 interface IUpdateAction extends KiltAction {
   payload: {
-    address: IMyIdentity['identity']['address']
+    address: IContact['publicIdentity']['address']
     partialMyIdentity: Partial<IMyIdentity>
   }
 }
 
 interface IRemoveAction extends KiltAction {
-  payload: IMyIdentity['identity']['address']
+  payload: IContact['publicIdentity']['address']
 }
 
 interface ISelectAction extends KiltAction {
-  payload: IMyIdentity['identity']['address']
+  payload: IContact['publicIdentity']['address']
 }
 
 export type Action = ISaveAction | IUpdateAction | IRemoveAction | ISelectAction
@@ -30,7 +30,7 @@ export type Action = ISaveAction | IUpdateAction | IRemoveAction | ISelectAction
 export type Entry = IMyIdentity
 
 type State = {
-  identities: Immutable.Map<IMyIdentity['identity']['address'], IMyIdentity>
+  identities: Immutable.Map<IContact['publicIdentity']['address'], IMyIdentity>
   selectedIdentity: Entry | null
 }
 
@@ -45,7 +45,7 @@ type SerializedIdentity = {
 
 export type SerializedState = {
   identities: SerializedIdentity[]
-  selectedAddress?: IMyIdentity['identity']['address']
+  selectedAddress?: IContact['publicIdentity']['address']
 }
 
 class Store {
@@ -67,7 +67,7 @@ class Store {
 
     const selectedIdentity: IMyIdentity | null = state.get('selectedIdentity')
     if (selectedIdentity) {
-      wallet.selectedAddress = selectedIdentity.identity.address
+      wallet.selectedAddress = selectedIdentity.identity.getAddress()
     }
 
     return wallet
@@ -82,12 +82,14 @@ class Store {
         : []
     const identities: { [key: string]: IMyIdentity } = {}
 
-    serializedIdentities.forEach((serializedIdentity: SerializedIdentity) => {
+    serializedIdentities.map(async (serializedIdentity: SerializedIdentity) => {
+      // Not sure this fixes the problem
       const { did, name, phrase, createdAt } = serializedIdentity
 
       // TODO: use real wallet later instead of stored phrase
 
-      const identity = sdk.Identity.buildFromMnemonic(phrase)
+      const identity = await sdk.Identity.buildFromMnemonic(phrase)
+
       const myIdentity: IMyIdentity = {
         createdAt,
         did,
@@ -98,7 +100,7 @@ class Store {
         phrase,
       }
 
-      identities[identity.address] = myIdentity
+      identities[identity.getAddress()] = myIdentity
     })
 
     const { selectedAddress } = serializedState
@@ -120,7 +122,7 @@ class Store {
     switch (action.type) {
       case Store.ACTIONS.SAVE_IDENTITY: {
         const myIdentity = (action as ISaveAction).payload
-        return state.setIn(['identities', myIdentity.identity.address], {
+        return state.setIn(['identities', myIdentity.identity.getAddress()], {
           ...myIdentity,
           createdAt: Date.now(),
         })
@@ -158,7 +160,7 @@ class Store {
   }
 
   public static updateIdentityAction(
-    address: IMyIdentity['identity']['address'],
+    address: IContact['publicIdentity']['address'],
     partialMyIdentity: Partial<IMyIdentity>
   ): IUpdateAction {
     return {
@@ -168,7 +170,7 @@ class Store {
   }
 
   public static removeIdentityAction(
-    address: IMyIdentity['identity']['address']
+    address: IContact['publicIdentity']['address']
   ): IRemoveAction {
     return {
       payload: address,
@@ -177,7 +179,7 @@ class Store {
   }
 
   public static selectIdentityAction(
-    address: IMyIdentity['identity']['address']
+    address: IContact['publicIdentity']['address']
   ): ISelectAction {
     return {
       payload: address,
@@ -188,7 +190,7 @@ class Store {
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
       identities: Immutable.Map<
-        IMyIdentity['identity']['address'],
+        IContact['publicIdentity']['address'],
         IMyIdentity
       >(),
       selectedIdentity: null,

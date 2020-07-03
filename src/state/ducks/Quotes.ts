@@ -170,7 +170,7 @@ const getAllMyQuotes = createSelector(
       return (
         entry &&
         entry.quote &&
-        entry.owner === selectedIdentity.identity.address
+        entry.owner === selectedIdentity.identity.getAddress()
       )
     })
   }
