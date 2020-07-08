@@ -51,7 +51,9 @@ class PersistentStore {
 
   private static NAME = 'reduxState'
 
-  private static deserialize(obj: SerializedState): Partial<State> {
+  private static async deserialize(
+    obj: SerializedState
+  ): Promise<Partial<State>> {
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
@@ -60,7 +62,7 @@ class PersistentStore {
       parameters: Parameters.Store.deserialize(obj.parameters),
       quotes: Quotes.Store.deserialize(obj.quotes),
       uiState: UiState.Store.deserialize(),
-      wallet: Wallet.Store.deserialize(obj.wallet),
+      wallet: await Wallet.Store.deserialize(obj.wallet),
     }
   }
 
@@ -81,12 +83,14 @@ class PersistentStore {
 
   private storeInternal: Store
 
-  constructor() {
+  public async init() {
     const localState = localStorage.getItem(PersistentStore.NAME)
     let persistedState: Partial<State> = {}
     if (localState) {
       try {
-        persistedState = PersistentStore.deserialize(JSON.parse(localState))
+        persistedState = await PersistentStore.deserialize(
+          JSON.parse(localState)
+        )
       } catch (error) {
         console.error('Could not construct persistentStore', error)
       }
@@ -118,6 +122,8 @@ class PersistentStore {
         PersistentStore.serialize(this.storeInternal.getState())
       )
     })
+
+    return this.storeInternal
   }
 
   // eslint-disable-next-line class-methods-use-this

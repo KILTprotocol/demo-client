@@ -5,13 +5,15 @@ import { Provider } from 'react-redux'
 import App from './App'
 import persistentStore from './state/PersistentStore'
 
-// import registerServiceWorker from './registerServiceWorker'
-
-ReactDOM.render(
-  <Provider store={persistentStore.store}>
-    <App />
-  </Provider>,
-  document.getElementById('root') as HTMLElement
-)
+// eslint-disable-next-line import/newline-after-import
+;(async () => {
+  const store = await persistentStore.init()
+  ReactDOM.render(
+    <Provider store={store}>
+      <App />
+    </Provider>,
+    document.getElementById('root') as HTMLElement
+  )
+})()
 
 // registerServiceWorker()
