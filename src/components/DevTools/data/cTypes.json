@@ -35,7 +35,7 @@
       }
     },
     "owner": "ROOT_ATTESTER",
-    "hash": "0xde9f624875aa620d06434603787a40c8cd02cc25c7b775cf50de8a3a96bbeafa"
+    "hash": "0x5366521b1cf4497cfe5f17663a7387a87bb8f2c4295d7c40f3140e7ee6afc41b"
   },
   "IS_OFFICIAL": {
     "schema": {
@@ -55,6 +55,6 @@
       "properties": {}
     },
     "owner": "ATTESTER_OF_IS_OFFICIAL",
-    "hash": "0xa7d8f30a154328e4c9e90b9f471f028eafb130e7405d5ca66defa4a59f4c31b5"
+    "hash": "0x5b23725ed650571b80b11ca6fc2d017a5716e9dc70c618b973c2994ae0eeb0a3"
   }
 }
