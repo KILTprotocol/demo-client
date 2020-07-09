@@ -41,6 +41,7 @@ class ImportAttestation extends React.Component<Props, State> {
     const { requestForAttestationRootHash, requestForAttestations } = this.props
     let request
     requestForAttestations.map(val =>
+      // eslint-disable-next-line array-callback-return
       val.requestForAttestations.map(requestForAttestationEntry => {
         if (
           requestForAttestationEntry.rootHash === requestForAttestationRootHash
