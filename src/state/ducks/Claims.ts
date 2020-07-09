@@ -42,8 +42,6 @@ interface IRevokeAttestationAction extends KiltAction {
 
 interface IAddRequestForAttestationAction extends KiltAction {
   payload: {
-    created: number
-    address: string
     claimId: string
     requestForAttestation: sdk.IRequestForAttestation
   }
@@ -173,7 +171,6 @@ class Store {
           claimId,
           attestation,
         } = (action as IAddAttestationAction).payload
-
         let attestations =
           state.getIn(['claims', claimId, 'attestations']) || []
         attestations = attestations.filter(
@@ -223,7 +220,8 @@ class Store {
         } = (action as IAddRequestForAttestationAction).payload
 
         let requestForAttestations =
-          state.getIn(['claims', claimId, 'requestForAttestations']) || []
+          state.getIn([claimId, 'requestForAttestations']) || []
+
         requestForAttestations = requestForAttestations.filter(
           (_requestForAttestations: sdk.IRequestForAttestation) =>
             !Store.areRequetForAttestationsEqual(
@@ -232,7 +230,7 @@ class Store {
             )
         )
         return state.setIn(
-          ['claims', claimId, 'requestForAttestations'],
+          [claimId, 'requestForAttestations'],
           [...requestForAttestations, requestForAttestation]
         )
       }
@@ -313,17 +311,14 @@ class Store {
   }
 
   public static addRequestForAttestation(
-    address: sdk.IPublicIdentity['address'],
     requestForAttestation: sdk.IRequestForAttestation
   ): IAddRequestForAttestationAction {
     return {
       payload: {
-        created: Date.now(),
-        address,
         claimId: requestForAttestation.rootHash,
         requestForAttestation,
       },
-      type: Store.ACTIONS.ATTESTATION_ADD,
+      type: Store.ACTIONS.REQUEST_FOR_ATTESTATION_ADD,
     }
   }
 
@@ -332,7 +327,7 @@ class Store {
   ): IRemoveRequestForAttestationAction {
     return {
       payload: rootHash,
-      type: Store.ACTIONS.ATTESTATION_REVOKE,
+      type: Store.ACTIONS.REQUEST_FOR_ATTESTATION_REMOVE,
     }
   }
 

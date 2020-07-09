@@ -286,10 +286,7 @@ class BsAttestation {
       type: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
 
-    RequestForAttestationService.saveInStore(
-      claimerIdentity.identity.getAddress(),
-      requestForAttestation
-    )
+    RequestForAttestationService.saveInStore(requestForAttestation)
     await MessageRepository.singleSend(
       requestAttestationForClaim,
       claimerIdentity,

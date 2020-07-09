@@ -118,16 +118,14 @@ class AttestationWorkflow {
     const { identity } = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
     )
+
     const requestForAttestation = await sdk.RequestForAttestation.fromClaimAndIdentity(
       claim,
       identity,
       { ...terms, delegationId }
     )
 
-    RequestForAttestationService.saveInStore(
-      identity.getAddress(),
-      requestForAttestation.message
-    )
+    RequestForAttestationService.saveInStore(requestForAttestation.message)
 
     const messageBody: IRequestAttestationForClaim = {
       content: {
@@ -174,7 +172,9 @@ class AttestationWorkflow {
 
     // build 'claim attested' message and send to claimer
     const attestationMessageBody: ISubmitAttestationForClaim = {
-      content: attestedClaim,
+      content: {
+        attestation: attestedClaim.attestation,
+      },
       type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
     }
 

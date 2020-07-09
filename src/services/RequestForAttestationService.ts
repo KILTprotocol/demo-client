@@ -4,11 +4,10 @@ import persistentStore from '../state/PersistentStore'
 
 class RequestForAttestationService {
   public static saveInStore(
-    address: sdk.IPublicIdentity['address'],
     requestForAttestation: sdk.IRequestForAttestation
   ): void {
     persistentStore.store.dispatch(
-      Claims.Store.addRequestForAttestation(address, requestForAttestation)
+      Claims.Store.addRequestForAttestation(requestForAttestation)
     )
   }
 }

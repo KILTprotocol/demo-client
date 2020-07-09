@@ -11,8 +11,6 @@ type Props = {
   claim: sdk.IPartialClaim
 }
 
-type State = {}
-
 const ClaimDetailView: React.FC<Props> = ({ claim }) => (
   <section className="ClaimDetailView">
     <h2>Claim details</h2>

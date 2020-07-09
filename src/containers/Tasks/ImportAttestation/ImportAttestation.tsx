@@ -8,7 +8,7 @@ import { notifySuccess } from '../../../services/FeedbackService'
 import * as Claims from '../../../state/ducks/Claims'
 
 type StateProps = {
-  requestForAttestations: Claims.Entry[]
+  claims: Claims.Entry[]
 }
 
 type DispatchProps = {
@@ -26,7 +26,7 @@ type Props = DispatchProps & OwnProps & StateProps
 
 const ImportAttestation: React.FC<Props> = ({
   requestForAttestationRootHash,
-  requestForAttestations,
+  claims,
   attestation,
   onCancel,
   onFinished,
@@ -42,14 +42,12 @@ const ImportAttestation: React.FC<Props> = ({
   // this.setState({ requestForAttestation: request })
 
   const request = (): void => {
-    console.log(requestForAttestations)
-    requestForAttestations.map(val =>
+    claims.map(val =>
       // eslint-disable-next-line array-callback-return
       val.requestForAttestations.map(requestForAttestationEntry => {
         if (
           requestForAttestationEntry.rootHash === requestForAttestationRootHash
         ) {
-          console.log(requestForAttestationEntry)
           setRequestForAttestation(requestForAttestationEntry)
         }
       })
@@ -99,7 +97,7 @@ const mapStateToProps: MapStateToProps<
   OwnProps,
   ReduxState
 > = state => ({
-  requestForAttestations: Claims.getClaims(state),
+  claims: Claims.getClaims(state),
 })
 
 const mapDispatchToProps: DispatchProps = {
