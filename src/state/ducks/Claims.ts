@@ -220,7 +220,7 @@ class Store {
         } = (action as IAddRequestForAttestationAction).payload
 
         let requestForAttestations =
-          state.getIn([claimId, 'requestForAttestations']) || []
+          state.getIn(['claims', claimId, 'requestForAttestations']) || []
 
         requestForAttestations = requestForAttestations.filter(
           (_requestForAttestations: sdk.IRequestForAttestation) =>
@@ -230,7 +230,7 @@ class Store {
             )
         )
         return state.setIn(
-          [claimId, 'requestForAttestations'],
+          ['claims', claimId, 'requestForAttestations'],
           [...requestForAttestations, requestForAttestation]
         )
       }
@@ -315,7 +315,7 @@ class Store {
   ): IAddRequestForAttestationAction {
     return {
       payload: {
-        claimId: requestForAttestation.rootHash,
+        claimId: hash(requestForAttestation.claim),
         requestForAttestation,
       },
       type: Store.ACTIONS.REQUEST_FOR_ATTESTATION_ADD,
