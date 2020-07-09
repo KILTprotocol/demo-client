@@ -14,6 +14,7 @@ import persistentStore from '../state/PersistentStore'
 import { IContact } from '../types/Contact'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
+import RequestForAttestationService from './RequestForAttestationService'
 
 class AttestationWorkflow {
   /**
@@ -121,6 +122,11 @@ class AttestationWorkflow {
       claim,
       identity,
       { ...terms, delegationId }
+    )
+
+    RequestForAttestationService.saveInStore(
+      identity.getAddress(),
+      requestForAttestation.message
     )
 
     const messageBody: IRequestAttestationForClaim = {

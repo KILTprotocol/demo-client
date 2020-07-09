@@ -154,8 +154,13 @@ class MessageDetailView extends React.Component<Props, State> {
       case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM: {
         return (
           <ImportAttestation
-            attestedClaim={
-              (message.body as sdk.ISubmitClaimsForCTypesPublic).content[0]
+            attestation={
+              (message.body as sdk.ISubmitAttestationForClaim).content
+                .attestation
+            }
+            requestForAttestationRootHash={
+              (message.body as sdk.ISubmitAttestationForClaim).content
+                .attestation.claimHash
             }
             onCancel={this.handleCancel}
             onFinished={this.handleDelete}

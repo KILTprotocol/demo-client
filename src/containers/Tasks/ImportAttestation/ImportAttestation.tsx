@@ -1,32 +1,55 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
-
+import { State as ReduxState } from '../../../state/PersistentStore'
 import { notifySuccess } from '../../../services/FeedbackService'
 import * as Claims from '../../../state/ducks/Claims'
 
+type StateProps = {
+  requestForAttestations: Claims.Entry[]
+}
+
 type DispatchProps = {
-  addAttestationToClaim: (attestation: sdk.IAttestedClaim) => void
+  addAttestationToClaim: (attestation: sdk.IAttestation) => void
 }
 
 type OwnProps = {
-  attestedClaim: sdk.IAttestedClaim
-
+  attestation: sdk.IAttestation
+  requestForAttestationRootHash: sdk.IRequestForAttestation['rootHash']
   onCancel?: () => void
   onFinished?: () => void
 }
 
-type Props = DispatchProps & OwnProps
+type Props = DispatchProps & OwnProps & StateProps
 
-class ImportAttestation extends React.Component<Props> {
+type State = {
+  requestForAttestation?: sdk.IRequestForAttestation
+}
+
+class ImportAttestation extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {}
 
     this.onCancel = this.onCancel.bind(this)
     this.importAttestation = this.importAttestation.bind(this)
+  }
+
+  public componentDidMount(): void {
+    const { requestForAttestationRootHash, requestForAttestations } = this.props
+    let request
+    requestForAttestations.map(val =>
+      val.requestForAttestations.map(requestForAttestationEntry => {
+        if (
+          requestForAttestationEntry.rootHash === requestForAttestationRootHash
+        ) {
+          request = requestForAttestationEntry
+        }
+      })
+    )
+    this.setState({ requestForAttestation: request })
   }
 
   private onCancel(): void {
@@ -37,8 +60,8 @@ class ImportAttestation extends React.Component<Props> {
   }
 
   private importAttestation(): void {
-    const { addAttestationToClaim, attestedClaim, onFinished } = this.props
-    addAttestationToClaim(attestedClaim)
+    const { addAttestationToClaim, attestation, onFinished } = this.props
+    addAttestationToClaim(attestation)
     notifySuccess('Attested claim successfully imported.')
     if (onFinished) {
       onFinished()
@@ -46,33 +69,47 @@ class ImportAttestation extends React.Component<Props> {
   }
 
   public render(): JSX.Element {
-    const { attestedClaim } = this.props
-    return (
-      <section className="ImportAttestation">
-        <ClaimDetailView claim={attestedClaim.request.claim} />
+    const { requestForAttestation } = this.state
 
-        <AttestedClaimsListView
-          attestedClaims={attestedClaim.request.legitimations}
-          delegationId={attestedClaim.request.delegationId}
-          context="terms"
-        />
+    if (requestForAttestation) {
+      return (
+        requestForAttestation && (
+          <section className="ImportAttestation">
+            <ClaimDetailView claim={requestForAttestation.claim} />
 
-        <div className="actions">
-          <button type="button" onClick={this.onCancel}>
-            Cancel
-          </button>
-          <button type="button" onClick={this.importAttestation}>
-            Import Attestation
-          </button>
-        </div>
-      </section>
-    )
+            <AttestedClaimsListView
+              attestedClaims={requestForAttestation.legitimations}
+              delegationId={requestForAttestation.delegationId}
+              context="terms"
+            />
+
+            <div className="actions">
+              <button type="button" onClick={this.onCancel}>
+                Cancel
+              </button>
+              <button type="button" onClick={this.importAttestation}>
+                Import Attestation
+              </button>
+            </div>
+          </section>
+        )
+      )
+    }
+    return <></>
   }
 }
 
+const mapStateToProps: MapStateToProps<
+  StateProps,
+  OwnProps,
+  ReduxState
+> = state => ({
+  requestForAttestations: Claims.getClaims(state),
+})
+
 const mapDispatchToProps: DispatchProps = {
-  addAttestationToClaim: (attestation: sdk.IAttestedClaim) =>
+  addAttestationToClaim: (attestation: sdk.IAttestation) =>
     Claims.Store.addAttestation(attestation),
 }
 
-export default connect(null, mapDispatchToProps)(ImportAttestation)
+export default connect(mapStateToProps, mapDispatchToProps)(ImportAttestation)
