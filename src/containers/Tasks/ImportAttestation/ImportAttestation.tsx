@@ -1,5 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
@@ -24,43 +24,43 @@ type OwnProps = {
 
 type Props = DispatchProps & OwnProps & StateProps
 
-type State = {
-  requestForAttestation?: sdk.IRequestForAttestation
-}
+const ImportAttestation: React.FC<Props> = ({
+  requestForAttestationRootHash,
+  requestForAttestations,
+  attestation,
+  onCancel,
+  onFinished,
+  addAttestationToClaim,
+}) => {
+  const [requestForAttestation, setRequestForAttestation] = useState<
+    sdk.IRequestForAttestation
+  >()
+  // this.onCancel = this.onCancel.bind(this)
+  // this.importAttestation = this.importAttestation.bind(this)
 
-class ImportAttestation extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {}
+  //
+  // this.setState({ requestForAttestation: request })
 
-    this.onCancel = this.onCancel.bind(this)
-    this.importAttestation = this.importAttestation.bind(this)
-  }
-
-  public componentDidMount(): void {
-    const { requestForAttestationRootHash, requestForAttestations } = this.props
-    let request
+  const request = (): void => {
+    console.log(requestForAttestations)
     requestForAttestations.map(val =>
+      // eslint-disable-next-line array-callback-return
       val.requestForAttestations.map(requestForAttestationEntry => {
         if (
           requestForAttestationEntry.rootHash === requestForAttestationRootHash
         ) {
-          request = requestForAttestationEntry
+          console.log(requestForAttestationEntry)
+          setRequestForAttestation(requestForAttestationEntry)
         }
       })
     )
-    this.setState({ requestForAttestation: request })
   }
 
-  private onCancel(): void {
-    const { onCancel } = this.props
-    if (onCancel) {
-      onCancel()
-    }
-  }
+  useEffect(() => {
+    if (!requestForAttestation) request()
+  })
 
-  private importAttestation(): void {
-    const { addAttestationToClaim, attestation, onFinished } = this.props
+  const importAttestation = (): void => {
     addAttestationToClaim(attestation)
     notifySuccess('Attested claim successfully imported.')
     if (onFinished) {
@@ -68,35 +68,30 @@ class ImportAttestation extends React.Component<Props, State> {
     }
   }
 
-  public render(): JSX.Element {
-    const { requestForAttestation } = this.state
+  return (
+    <section className="ImportAttestation">
+      {requestForAttestation && (
+        <ClaimDetailView claim={requestForAttestation.claim} />
+      )}
 
-    if (requestForAttestation) {
-      return (
-        requestForAttestation && (
-          <section className="ImportAttestation">
-            <ClaimDetailView claim={requestForAttestation.claim} />
+      {requestForAttestation && (
+        <AttestedClaimsListView
+          attestedClaims={requestForAttestation.legitimations}
+          delegationId={requestForAttestation.delegationId}
+          context="terms"
+        />
+      )}
 
-            <AttestedClaimsListView
-              attestedClaims={requestForAttestation.legitimations}
-              delegationId={requestForAttestation.delegationId}
-              context="terms"
-            />
-
-            <div className="actions">
-              <button type="button" onClick={this.onCancel}>
-                Cancel
-              </button>
-              <button type="button" onClick={this.importAttestation}>
-                Import Attestation
-              </button>
-            </div>
-          </section>
-        )
-      )
-    }
-    return <></>
-  }
+      <div className="actions">
+        <button type="button" onClick={onCancel}>
+          Cancel
+        </button>
+        <button type="button" onClick={importAttestation}>
+          Import Attestation
+        </button>
+      </div>
+    </section>
+  )
 }
 
 const mapStateToProps: MapStateToProps<

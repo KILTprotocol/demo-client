@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import { IPartialClaim } from '@kiltprotocol/sdk-js'
 
+import RequestForAttestationService from '../../services/RequestForAttestationService'
 import AttestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
@@ -284,6 +285,11 @@ class BsAttestation {
       content: { requestForAttestation },
       type: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
+
+    RequestForAttestationService.saveInStore(
+      claimerIdentity.identity.getAddress(),
+      requestForAttestation
+    )
     await MessageRepository.singleSend(
       requestAttestationForClaim,
       claimerIdentity,
