@@ -178,7 +178,7 @@ class DelegationsView extends React.Component<Props, State> {
         )}
         {currentDelegation && (
           <DelegationDetailView
-            id={delegationId}
+            delegationId={delegationId}
             isPCR={isPCR}
             editable
             viewType={ViewType.Present}

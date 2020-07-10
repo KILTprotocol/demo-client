@@ -51,7 +51,7 @@ class DelegationsService {
    * @param delegationNodeId id of the intermediate node (non-root node)
    */
   public static async lookupNodeById(
-    delegationNodeId: string
+    delegationNodeId: sdk.IDelegationBaseNode['id']
   ): Promise<sdk.DelegationNode | null> {
     return sdk.DelegationNode.query(delegationNodeId)
   }
