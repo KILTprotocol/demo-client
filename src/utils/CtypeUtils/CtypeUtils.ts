@@ -25,8 +25,7 @@ export const fromInputModel = (
   if (!sdk.CTypeUtils.verifySchema(ctypeInput, CTypeInputModel)) {
     throw new Error('CType input does not correspond to input model schema')
   }
-  const schema: sdk.ICType['schema'] = {
-    $id: ctypeInput.$id,
+  const schema: CTypeSchemaWithoutId = {
     $schema: CTypeInputModel.properties.$schema.default,
     title: ctypeInput.title,
     properties: {},
