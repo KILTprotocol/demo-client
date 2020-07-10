@@ -259,16 +259,13 @@ class MessageRepository {
           (message.body as sdk.IRequestAttestationForClaim).content
             .requestForAttestation.claim.cTypeHash,
         ]
-      // case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
-      //   return [
-      //     (message.body as ISubmitAttestationForClaim).content.request.claim
-      //       .cTypeHash,
-      //   ]
-      // case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
-      //   return [
-      //     (message.body as sdk.IRejectAttestationForClaim).content.claim
-      //       .cTypeHash,
-      //   ]
+      case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
+        return [
+          (message.body as ISubmitAttestationForClaim).content.attestation
+            .cTypeHash,
+        ]
+      case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
+        return [(message.body as sdk.IRejectAttestationForClaim).type]
 
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
         return (message.body as sdk.IRequestClaimsForCTypes).content.ctypes.filter(
@@ -284,16 +281,6 @@ class MessageRepository {
         )
         return uniqueCTypeHashes
       }
-      // case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPES:
-      //   return [
-      //     (message.body as sdk.IAcceptClaimsForCTypes).content[0].request
-      //       .rootHash,
-      //   ]
-      // case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPES:
-      //   return [
-      //     (message.body as sdk.IRejectClaimsForCTypes).content[0].request
-      //       .rootHash,
-      //   ]
 
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION:

@@ -180,7 +180,6 @@ class MessageDetailView extends React.Component<Props, State> {
         )
       }
       case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC: {
-        // THIS IS WRONG!
         return (
           <VerifyClaim
             attestedClaims={

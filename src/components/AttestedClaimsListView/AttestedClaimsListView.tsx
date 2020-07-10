@@ -203,7 +203,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
         <h2>Delegation</h2>
         {delegationId ? (
           <DelegationDetailView
-            id={delegationId}
+            delegationId={delegationId}
             viewType={currentDelegationViewType}
           />
         ) : (
@@ -247,7 +247,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   public render(): JSX.Element {
     const { attestedClaims, context, delegationId } = this.props
     const { labels, openedAttestedClaim } = this.state
-
     const classes = [
       'AttestedClaimsListView',
       openedAttestedClaim ? 'opened' : '',
