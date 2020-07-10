@@ -247,7 +247,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   public render(): JSX.Element {
     const { attestedClaims, context, delegationId } = this.props
     const { labels, openedAttestedClaim } = this.state
-    console.log(JSON.stringify(attestedClaims, null, 4))
 
     const classes = [
       'AttestedClaimsListView',
