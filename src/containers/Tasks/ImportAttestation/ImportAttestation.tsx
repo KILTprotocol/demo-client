@@ -37,11 +37,7 @@ const ImportAttestation: React.FC<Props> = ({
   const [requestForAttestation, setRequestForAttestation] = useState<
     sdk.IRequestForAttestation
   >()
-  // this.onCancel = this.onCancel.bind(this)
-  // this.importAttestation = this.importAttestation.bind(this)
 
-  //
-  // this.setState({ requestForAttestation: request })
   const request = (): void => {
     claims.map(val =>
       // eslint-disable-next-line array-callback-return
