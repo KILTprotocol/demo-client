@@ -87,6 +87,9 @@ class BsAttestation {
     // import to claimers claim
     // therefore switch to claimer identity
     BsIdentity.selectIdentity(claimerIdentity)
+    PersistentStore.store.dispatch(
+      Claims.Store.addRequestForAttestation(requestForAttestation)
+    )
     PersistentStore.store.dispatch(Claims.Store.addAttestation(attestedClaim))
 
     if (withMessages) {
