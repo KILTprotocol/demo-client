@@ -84,8 +84,7 @@ class SelectClaims extends React.Component<Props, State> {
       const isApproved =
         claim.attestations &&
         claim.attestations.find(
-          (attestedClaim: sdk.IAttestedClaim) =>
-            !attestedClaim.attestation.revoked
+          (attestedClaim: sdk.IAttestation) => !attestedClaim.revoked
         )
       return {
         baseValue: claim.meta.alias,

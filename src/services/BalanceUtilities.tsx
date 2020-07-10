@@ -20,7 +20,7 @@ const TRANSACTION_FEE = 1 * KILT_COIN
 const MIN_BALANCE = 1 * KILT_COIN
 
 // initial endowment for automatically created accounts
-const ENDOWMENT = 1000 * KILT_COIN
+const ENDOWMENT = 2000 * KILT_COIN
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
@@ -88,7 +88,7 @@ class BalanceUtilities {
       .then(() => {
         notifySuccess(
           <div>
-            <span>Successfully transfered </span>
+            <span>Successfully transferred </span>
             <KiltToken amount={amount} />
             <span> to </span>
             <ContactPresentation address={receiverAddress} inline />.

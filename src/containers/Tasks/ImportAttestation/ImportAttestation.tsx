@@ -3,7 +3,9 @@ import React, { useState, useEffect } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
-import { State as ReduxState } from '../../../state/PersistentStore'
+import PersistentStore, {
+  State as ReduxState,
+} from '../../../state/PersistentStore'
 import { notifySuccess } from '../../../services/FeedbackService'
 import * as Claims from '../../../state/ducks/Claims'
 
@@ -12,7 +14,7 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  addAttestationToClaim: (attestation: sdk.IAttestation) => void
+  addAttestationToClaim: (attestation: sdk.IAttestedClaim) => void
 }
 
 type OwnProps = {
@@ -40,7 +42,6 @@ const ImportAttestation: React.FC<Props> = ({
 
   //
   // this.setState({ requestForAttestation: request })
-
   const request = (): void => {
     claims.map(val =>
       // eslint-disable-next-line array-callback-return
@@ -59,8 +60,13 @@ const ImportAttestation: React.FC<Props> = ({
   })
 
   const importAttestation = (): void => {
-    addAttestationToClaim(attestation)
-    notifySuccess('Attested claim successfully imported.')
+    if (!requestForAttestation) {
+      throw new Error('No matching Request')
+    } else {
+      addAttestationToClaim({ attestation, request: requestForAttestation })
+      notifySuccess('Attested claim successfully imported.')
+    }
+
     if (onFinished) {
       onFinished()
     }
@@ -101,8 +107,8 @@ const mapStateToProps: MapStateToProps<
 })
 
 const mapDispatchToProps: DispatchProps = {
-  addAttestationToClaim: (attestation: sdk.IAttestation) =>
-    Claims.Store.addAttestation(attestation),
+  addAttestationToClaim: (attestation: sdk.IAttestedClaim) =>
+    PersistentStore.store.dispatch(Claims.Store.addAttestation(attestation)),
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ImportAttestation)

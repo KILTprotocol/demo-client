@@ -62,7 +62,7 @@ export type Action =
 export type Entry = {
   id: string
   claim: sdk.IClaim
-  attestations: sdk.IAttestedClaim[]
+  attestations: sdk.IAttestation[]
   requestForAttestations: sdk.IRequestForAttestation[]
   meta: {
     alias: string
@@ -76,7 +76,13 @@ type State = {
 export type ImmutableState = Immutable.Record<State>
 
 export type SerializedState = {
-  claims: Array<{ id: string; claim: string; meta: object }>
+  claims: Array<{
+    id: string
+    claim: string
+    meta: object
+    requestForAttestations: string
+    attestations: string
+  }>
 }
 
 class Store {
@@ -119,8 +125,8 @@ class Store {
       const o = claimsStateSerialized.claims[i]
       try {
         const claim = JSON.parse(o.claim) as sdk.IClaim
-        const attestations: sdk.IAttestedClaim[] = o.attestations
-          ? (JSON.parse(o.attestations) as sdk.IAttestedClaim[])
+        const attestations: sdk.IAttestation[] = o.attestations
+          ? (JSON.parse(o.attestations) as sdk.IAttestation[])
           : []
         const requestForAttestations: sdk.IRequestForAttestation[] = o.requestForAttestations
           ? JSON.parse(o.requestForAttestations)
@@ -193,8 +199,8 @@ class Store {
         claims.forEach((myClaim: Entry, myClaimHash: string) => {
           if (myClaim.attestations && myClaim.attestations.length) {
             myClaim.attestations.forEach(
-              (attestedClaim: sdk.IAttestedClaim, index: number) => {
-                if (attestedClaim.request.rootHash === revokedHash) {
+              (attestation: sdk.IAttestation, index: number) => {
+                if (attestation.claimHash === revokedHash) {
                   // avoid changing claims while iterating
                   setIns.push([
                     myClaimHash,
@@ -293,10 +299,13 @@ class Store {
   }
 
   public static addAttestation(
-    attestation: sdk.IAttestation
+    attestation: sdk.IAttestedClaim
   ): IAddAttestationAction {
     return {
-      payload: { claimId: attestation.claimHash, attestation },
+      payload: {
+        claimId: hash(attestation.request.claim),
+        attestation: attestation.attestation,
+      },
       type: Store.ACTIONS.ATTESTATION_ADD,
     }
   }

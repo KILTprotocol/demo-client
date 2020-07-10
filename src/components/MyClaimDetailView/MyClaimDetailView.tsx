@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-
+import { IAttestedClaim } from '@kiltprotocol/sdk-js'
 import AttestedClaimsListView from '../AttestedClaimsListView/AttestedClaimsListView'
 import * as Claims from '../../state/ducks/Claims'
 import ClaimDetailView from '../ClaimDetailView/ClaimDetailView'
 
 import './MyClaimDetailView.scss'
+import { buildMatchingAttestedClaims } from '../../utils/AttestedClaimUtils/AttestedClaimUtils'
 
 type Props = {
   cancelable?: boolean
@@ -96,8 +97,10 @@ class MyClaimDetailView extends Component<Props, State> {
 
   public render(): JSX.Element {
     const { claimEntry, hideAttestedClaims }: Props = this.props
-
-    return claimEntry ? (
+    const BuiltAttestedClaims: IAttestedClaim[] = buildMatchingAttestedClaims(
+      claimEntry
+    )
+    return BuiltAttestedClaims ? (
       <section className="MyClaimDetailView">
         <h1>
           <span>
@@ -107,7 +110,7 @@ class MyClaimDetailView extends Component<Props, State> {
         </h1>
         <ClaimDetailView claim={claimEntry.claim} />
         {!hideAttestedClaims && (
-          <AttestedClaimsListView attestedClaims={claimEntry.attestations} />
+          <AttestedClaimsListView attestedClaims={BuiltAttestedClaims} />
         )}
         {this.getActions()}
       </section>
