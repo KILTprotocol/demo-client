@@ -41,7 +41,8 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   public componentDidMount(): void {
-    this.setCType()
+    const { cTypeHash } = this.props
+    if (cTypeHash) this.setCType()
   }
 
   public componentDidUpdate(prevProps: Props): void {

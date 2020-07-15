@@ -28,6 +28,12 @@ export default {
             default: 'New Property',
             minLength: 1,
           },
+          $id: {
+            title: 'Identifier',
+            type: 'string',
+            format: 'uri-reference',
+            minLength: 1,
+          },
           $ref: {
             title: 'Reference',
             type: 'string',
@@ -46,7 +52,7 @@ export default {
             enum: ['date', 'time', 'uri'],
           },
         },
-        required: ['title', 'type'],
+        required: ['title', 'type', '$id'],
       },
       collapsed: false,
     },

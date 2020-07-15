@@ -109,7 +109,7 @@ export async function setupAndDelegate(delegate: IMyIdentity): Promise<void> {
   try {
     blockUi.updateMessage('Transferring funds to AntiCov authority')
     await new Promise(resolve => {
-      BalanceUtilities.makeTransfer(delegate, root.getAddress(), 4, () =>
+      BalanceUtilities.makeTransfer(delegate, root.getAddress(), 500, () =>
         resolve()
       )
     })

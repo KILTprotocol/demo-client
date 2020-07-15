@@ -43,9 +43,9 @@ export const fromInputModel = (
 
   const properties = {}
   ctypeInput.properties.forEach((p: ICTypeInputProperty) => {
-    const { title, ...rest } = p
-    properties[title.trim()] = rest
-    sdkMetadata.properties[title] = {
+    const { title, $id, ...rest } = p
+    properties[$id] = rest
+    sdkMetadata.properties[$id] = {
       title: {
         default: title,
       },
