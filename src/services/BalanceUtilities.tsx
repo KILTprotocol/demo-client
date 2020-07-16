@@ -12,6 +12,7 @@ import { notify, notifySuccess } from './FeedbackService'
 
 const KILT_COIN = 1
 const KILT_MICRO_COIN = 1_000_000
+const KILT_FEMTO_COIN = '1000000000000000'
 
 // cost of a chain transaction
 const TRANSACTION_FEE = 1 * KILT_COIN
@@ -20,7 +21,7 @@ const TRANSACTION_FEE = 1 * KILT_COIN
 const MIN_BALANCE = 1 * KILT_COIN
 
 // initial endowment for automatically created accounts
-const ENDOWMENT = 2000 * KILT_COIN
+const ENDOWMENT = 30 * KILT_COIN
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
@@ -135,11 +136,15 @@ class BalanceUtilities {
   }
 
   public static asKiltCoin(balance: BN): number {
-    return balance.divn(KILT_MICRO_COIN).toNumber()
+    return balance.div(new BN(KILT_FEMTO_COIN)).toNumber()
   }
 
   public static asMicroKilt(balance: number): BN {
     return new BN(balance).muln(KILT_MICRO_COIN)
+  }
+
+  public static asFemtoKilt(balance: number): BN {
+    return new BN(balance).mul(new BN(KILT_FEMTO_COIN))
   }
 }
 
