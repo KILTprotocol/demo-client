@@ -83,7 +83,7 @@ class PersistentStore {
 
   private storeInternal: Store
 
-  public async init() {
+  public async init(): Promise<Store> {
     const localState = localStorage.getItem(PersistentStore.NAME)
     let persistedState: Partial<State> = {}
     if (localState) {

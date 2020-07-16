@@ -1,9 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
-import {
-  ERROR_CTYPE_ALREADY_EXISTS,
-  ExtrinsicError,
-} from '@kiltprotocol/sdk-js'
+import { ERROR_CTYPE_ALREADY_EXISTS } from '@kiltprotocol/sdk-js'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess, notifyError } from '../../services/FeedbackService'
