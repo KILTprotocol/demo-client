@@ -15,5 +15,3 @@ import persistentStore from './state/PersistentStore'
     document.getElementById('root') as HTMLElement
   )
 })()
-
-// registerServiceWorker()

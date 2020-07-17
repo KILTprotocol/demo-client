@@ -87,7 +87,6 @@ class Store {
     await Promise.all(
       serializedIdentities.map(
         async (serializedIdentity: SerializedIdentity) => {
-          // Not sure this fixes the problem
           const { did, name, phrase, createdAt } = serializedIdentity
 
           // TODO: use real wallet later instead of stored phrase
