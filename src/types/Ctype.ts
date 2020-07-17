@@ -26,6 +26,7 @@ export interface ICTypeInputProperty {
   type: string
   format?: string
 }
+
 export interface IClaimInput {
   $id: string
   $schema: string
