@@ -72,7 +72,7 @@ class BalanceUtilities {
     amount: number,
     successCallback?: () => void
   ): void {
-    const transferAmount: BN = BalanceUtilities.asMicroKilt(amount)
+    const transferAmount: BN = BalanceUtilities.asFemtoKilt(amount)
     notify(
       <div>
         <span>Transfer of </span>
