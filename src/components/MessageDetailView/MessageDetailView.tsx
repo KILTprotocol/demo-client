@@ -158,10 +158,6 @@ class MessageDetailView extends React.Component<Props, State> {
               (message.body as sdk.ISubmitAttestationForClaim).content
                 .attestation
             }
-            requestForAttestationRootHash={
-              (message.body as sdk.ISubmitAttestationForClaim).content
-                .attestation.claimHash
-            }
             onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />

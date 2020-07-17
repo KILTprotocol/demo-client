@@ -19,7 +19,6 @@ type DispatchProps = {
 
 type OwnProps = {
   attestation: sdk.IAttestation
-  requestForAttestationRootHash: sdk.IRequestForAttestation['rootHash']
   onCancel?: () => void
   onFinished?: () => void
 }
@@ -27,7 +26,6 @@ type OwnProps = {
 type Props = DispatchProps & OwnProps & StateProps
 
 const ImportAttestation: React.FC<Props> = ({
-  requestForAttestationRootHash,
   claims,
   attestation,
   onCancel,
@@ -42,9 +40,7 @@ const ImportAttestation: React.FC<Props> = ({
     claims.map(val =>
       // eslint-disable-next-line array-callback-return
       val.requestForAttestations.map(requestForAttestationEntry => {
-        if (
-          requestForAttestationEntry.rootHash === requestForAttestationRootHash
-        ) {
+        if (requestForAttestationEntry.rootHash === attestation.claimHash) {
           setRequestForAttestation(requestForAttestationEntry)
         }
       })
