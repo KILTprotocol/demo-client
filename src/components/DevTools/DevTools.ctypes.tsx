@@ -27,7 +27,10 @@ class BsCType {
     // replace owner key with his address
     const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
       .identity
-    const cType = sdk.CType.fromSchema(bsCTypeData.schema, null)
+    const cType = sdk.CType.fromSchema(
+      bsCTypeData.schema,
+      ownerIdentity.getAddress()
+    )
 
     return cType
       .store(ownerIdentity)
@@ -38,7 +41,7 @@ class BsCType {
       })
       .then(() => {
         const cTypeWrapper: ICTypeWithMetadata = {
-          cType,
+          cType: { ...cType, owner: null },
           metaData: {
             metadata: bsCTypeData.metadata,
             ctypeHash: cType.hash,
