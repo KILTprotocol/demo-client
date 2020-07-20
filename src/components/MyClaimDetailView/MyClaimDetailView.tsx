@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { IAttestedClaim } from '@kiltprotocol/sdk-js'
 import AttestedClaimsListView from '../AttestedClaimsListView/AttestedClaimsListView'
+import RequestForAttestationListView from '../RequestForAttestationListView/RequestForAttestationListView'
+
 import * as Claims from '../../state/ducks/Claims'
 import ClaimDetailView from '../ClaimDetailView/ClaimDetailView'
 
@@ -12,6 +14,7 @@ type Props = {
   cancelable?: boolean
   claimEntry: Claims.Entry
   hideAttestedClaims?: boolean
+  hideRequestForAttestation?: boolean
   onRemoveClaim?: (claimEntry: Claims.Entry) => void
   onRequestAttestation?: (claimEntry: Claims.Entry) => void
   onRequestTerm?: (claimEntry: Claims.Entry) => void
@@ -96,7 +99,11 @@ class MyClaimDetailView extends Component<Props, State> {
   }
 
   public render(): JSX.Element {
-    const { claimEntry, hideAttestedClaims }: Props = this.props
+    const {
+      claimEntry,
+      hideAttestedClaims,
+      hideRequestForAttestation,
+    }: Props = this.props
     const BuiltAttestedClaims: IAttestedClaim[] = buildMatchingAttestedClaims(
       claimEntry
     )
@@ -109,9 +116,15 @@ class MyClaimDetailView extends Component<Props, State> {
           </span>
         </h1>
         <ClaimDetailView claim={claimEntry.claim} />
+
+        {!hideRequestForAttestation && (
+          <RequestForAttestationListView claim={claimEntry} />
+        )}
+
         {!hideAttestedClaims && (
           <AttestedClaimsListView attestedClaims={BuiltAttestedClaims} />
         )}
+
         {this.getActions()}
       </section>
     ) : (

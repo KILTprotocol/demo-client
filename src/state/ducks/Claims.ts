@@ -48,7 +48,10 @@ interface IAddRequestForAttestationAction extends KiltAction {
 }
 
 interface IRemoveRequestForAttestationAction extends KiltAction {
-  payload: Entry['id']
+  payload: {
+    claimId: Entry['id']
+    rootHash: sdk.IRequestForAttestation['rootHash']
+  }
 }
 
 export type Action =
@@ -235,34 +238,30 @@ class Store {
         )
       }
       case Store.ACTIONS.REQUEST_FOR_ATTESTATION_REMOVE: {
-        const claimId = (action as IRemoveRequestForAttestationAction).payload
+        const {
+          claimId,
+          rootHash,
+        } = (action as IRemoveRequestForAttestationAction).payload
         const setIns: Array<Iterable<any>> = []
         let claims = state.get('claims')
 
-        claims.forEach((myClaim: Entry, myClaimHash: string) => {
-          if (
-            myClaim.requestForAttestations &&
-            myClaim.requestForAttestations.length
-          ) {
-            myClaim.requestForAttestations.forEach(
+        claims.forEach((entry: Entry, myClaimHash: string) => {
+          if (entry.id === claimId) {
+            entry.requestForAttestations.forEach(
               (
-                requestForAttestation: sdk.IRequestForAttestation,
+                requestForAttestationEntry: sdk.IRequestForAttestation,
                 index: number
               ) => {
-                if (requestForAttestation.rootHash === claimId) {
-                  setIns.push([
-                    myClaimHash,
-                    'requestForAttestations',
-                    index,
-                    'requestForAttesation',
-                  ])
+                if (requestForAttestationEntry.rootHash === rootHash) {
+                  setIns.push([myClaimHash, 'requestForAttestations', index])
                 }
               }
             )
           }
         })
+
         setIns.forEach((keyPath: Iterable<any>) => {
-          claims = claims.setIn(keyPath, true)
+          claims = claims.deleteIn(keyPath)
         })
         return state.setIn(['claims'], claims)
       }
@@ -326,10 +325,11 @@ class Store {
   }
 
   public static removeRequestForAttestation(
-    rootHash: sdk.IAttestedClaim['request']['rootHash']
+    claimId: Entry['id'],
+    rootHash: sdk.RequestForAttestation['rootHash']
   ): IRemoveRequestForAttestationAction {
     return {
-      payload: rootHash,
+      payload: { claimId, rootHash },
       type: Store.ACTIONS.REQUEST_FOR_ATTESTATION_REMOVE,
     }
   }

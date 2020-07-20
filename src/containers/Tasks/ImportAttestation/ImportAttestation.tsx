@@ -15,6 +15,10 @@ type StateProps = {
 
 type DispatchProps = {
   addAttestationToClaim: (attestation: sdk.IAttestedClaim) => void
+  removeRequestForAttestation: (
+    claimId: Claims.Entry['id'],
+    rootHash: sdk.IRequestForAttestation['rootHash']
+  ) => void
 }
 
 type OwnProps = {
@@ -31,17 +35,19 @@ const ImportAttestation: React.FC<Props> = ({
   onCancel,
   onFinished,
   addAttestationToClaim,
+  removeRequestForAttestation,
 }) => {
   const [requestForAttestation, setRequestForAttestation] = useState<
     sdk.IRequestForAttestation
   >()
+  const [claimId, setClaimId] = useState<Claims.Entry['id']>()
 
   const request = (): void => {
     claims.map(val =>
-      // eslint-disable-next-line array-callback-return
-      val.requestForAttestations.map(requestForAttestationEntry => {
+      val.requestForAttestations.forEach((requestForAttestationEntry): void => {
         if (requestForAttestationEntry.rootHash === attestation.claimHash) {
           setRequestForAttestation(requestForAttestationEntry)
+          setClaimId(val.id)
         }
       })
     )
@@ -57,6 +63,10 @@ const ImportAttestation: React.FC<Props> = ({
     } else {
       addAttestationToClaim({ attestation, request: requestForAttestation })
       notifySuccess('Attested claim successfully imported.')
+    }
+
+    if (claimId && requestForAttestation) {
+      removeRequestForAttestation(claimId, requestForAttestation.rootHash)
     }
 
     if (onFinished) {
@@ -101,6 +111,13 @@ const mapStateToProps: MapStateToProps<
 const mapDispatchToProps: DispatchProps = {
   addAttestationToClaim: (attestation: sdk.IAttestedClaim) =>
     PersistentStore.store.dispatch(Claims.Store.addAttestation(attestation)),
+  removeRequestForAttestation: (
+    claimId: Claims.Entry['id'],
+    rootHash: sdk.IRequestForAttestation['rootHash']
+  ) =>
+    PersistentStore.store.dispatch(
+      Claims.Store.removeRequestForAttestation(claimId, rootHash)
+    ),
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ImportAttestation)

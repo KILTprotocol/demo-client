@@ -227,7 +227,11 @@ class RequestAttestation extends React.Component<Props, State> {
     return (
       <section className="RequestAttestation">
         {savedClaimEntry ? (
-          <MyClaimDetailView claimEntry={savedClaimEntry} hideAttestedClaims />
+          <MyClaimDetailView
+            claimEntry={savedClaimEntry}
+            hideAttestedClaims
+            hideRequestForAttestation
+          />
         ) : (
           this.getCreateOrSelect()
         )}

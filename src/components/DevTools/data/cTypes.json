@@ -1,7 +1,7 @@
 {
   "DRIVERS_LICENSE": {
     "schema": {
-      "$id": "DriversLicense",
+      "$id": "kilt:ctype:0x5366521b1cf4497cfe5f17663a7387a87bb8f2c4295d7c40f3140e7ee6afc41b",
       "$schema": "http://kilt-protocol.org/draft-01/ctype#",
       "properties": {
         "name": {
@@ -38,7 +38,7 @@
   },
   "IS_OFFICIAL": {
     "schema": {
-      "$id": "IsOfficial",
+      "$id": "kilt:ctype:0x5b23725ed650571b80b11ca6fc2d017a5716e9dc70c618b973c2994ae0eeb0a3",
       "$schema": "http://kilt-protocol.org/draft-01/ctype#",
       "properties": {},
       "type": "object"

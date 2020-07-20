@@ -17,7 +17,7 @@ class QuoteServices {
     claim: sdk.IClaim,
     identity: sdk.Identity,
     terms: sdk.AttestedClaim[] = [],
-    delegationId: sdk.IDelegationNode['id'] | undefined = undefined,
+    delegationId?: sdk.IDelegationNode['id'],
     quoteAttesterSigned: sdk.IQuoteAttesterSigned | null = null
   ): Promise<sdk.IQuoteAgreement | null> {
     if (!quoteAttesterSigned) return null
