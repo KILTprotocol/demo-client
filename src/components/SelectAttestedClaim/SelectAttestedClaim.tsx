@@ -114,15 +114,15 @@ class SelectAttestedClaim extends React.Component<Props, State> {
   private getAttestionsSelect(): '' | JSX.Element {
     const { labels, claimEntry } = this.props
     const { allAttestedClaimsSelected } = this.state
-    const { attestations } = claimEntry
-    const attestedClaims = buildMatchingAttestedClaims(claimEntry)
+    const { attestedClaims } = claimEntry
+    const builtAttestedClaims = buildMatchingAttestedClaims(claimEntry)
 
-    if (!attestations || !attestations.length) {
+    if (!attestedClaims || !attestedClaims.length) {
       return ''
     }
     // TODO: should we check the attestations against chain here?
 
-    return attestations && attestations.length ? (
+    return attestedClaims && attestedClaims.length ? (
       <>
         <div className="attestations">
           <h4>
@@ -132,7 +132,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
               <span>All</span>
             </label>
           </h4>
-          {attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => (
+          {builtAttestedClaims.map((attestedClaim: sdk.IAttestedClaim) => (
             <label
               key={`${attestedClaim.attestation.claimHash}-${attestedClaim.attestation.owner}`}
               className={allAttestedClaimsSelected ? 'selected-all' : ''}

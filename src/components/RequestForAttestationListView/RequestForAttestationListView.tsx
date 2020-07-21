@@ -34,7 +34,6 @@ const RequestForAttestationListView: React.FunctionComponent<Props> = ({
   removeRequestForAttestation,
 }) => {
   const { requestForAttestations } = claim
-
   return (
     <section className="RequestForAttestationListView">
       <h2> {LABELS.h2Single}</h2>
@@ -50,22 +49,27 @@ const RequestForAttestationListView: React.FunctionComponent<Props> = ({
 
         {requestForAttestations &&
           requestForAttestations.map(val => {
-            const entry = val
+            const { requestForAttestation, attesterAddress } = val
             return (
-              <tbody key={val.rootHash}>
+              <tbody key={requestForAttestation.rootHash}>
                 <tr className="opened">
                   <td className="attester">
                     <ContactPresentation
-                      address={claim.claim.owner}
+                      address={attesterAddress}
                       interactive
                     />
                   </td>
-                  <td className="claimHash">{entry.rootHash}</td>
+                  <td className="claimHash">
+                    {requestForAttestation.rootHash}
+                  </td>
                   <td className="replied" />
                   <td
                     className="delete"
                     onClick={() =>
-                      removeRequestForAttestation(claim.id, entry.rootHash)
+                      removeRequestForAttestation(
+                        claim.id,
+                        requestForAttestation.rootHash
+                      )
                     }
                   />
                 </tr>

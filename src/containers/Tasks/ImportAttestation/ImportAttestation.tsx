@@ -1,5 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
@@ -14,7 +14,7 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  addAttestationToClaim: (attestation: sdk.IAttestedClaim) => void
+  addAttestedClaimToClaim: (attestedClaim: sdk.IAttestedClaim) => void
   removeRequestForAttestation: (
     claimId: Claims.Entry['id'],
     rootHash: sdk.IRequestForAttestation['rootHash']
@@ -34,39 +34,42 @@ const ImportAttestation: React.FC<Props> = ({
   attestation,
   onCancel,
   onFinished,
-  addAttestationToClaim,
+  addAttestedClaimToClaim,
   removeRequestForAttestation,
 }) => {
-  const [requestForAttestation, setRequestForAttestation] = useState<
+  const [requestForAttestationEntry, setRequestForAttestation] = useState<
     sdk.IRequestForAttestation
   >()
   const [claimId, setClaimId] = useState<Claims.Entry['id']>()
 
-  const request = (): void => {
-    claims.map(val =>
-      val.requestForAttestations.forEach((requestForAttestationEntry): void => {
-        if (requestForAttestationEntry.rootHash === attestation.claimHash) {
-          setRequestForAttestation(requestForAttestationEntry)
+  const requestForAttest = useCallback((): void => {
+    claims.forEach(val => {
+      val.requestForAttestations.forEach(({ requestForAttestation }): void => {
+        if (requestForAttestation.rootHash === attestation.claimHash) {
+          setRequestForAttestation(requestForAttestation)
           setClaimId(val.id)
         }
       })
-    )
-  }
+    })
+  }, [claims, attestation.claimHash])
 
   useEffect(() => {
-    if (!requestForAttestation) request()
-  })
+    requestForAttest()
+  }, [requestForAttestationEntry, requestForAttest])
 
   const importAttestation = (): void => {
-    if (!requestForAttestation) {
+    if (!requestForAttestationEntry) {
       throw new Error('No matching Request')
     } else {
-      addAttestationToClaim({ attestation, request: requestForAttestation })
+      addAttestedClaimToClaim({
+        attestation,
+        request: requestForAttestationEntry,
+      })
       notifySuccess('Attested claim successfully imported.')
     }
 
-    if (claimId && requestForAttestation) {
-      removeRequestForAttestation(claimId, requestForAttestation.rootHash)
+    if (claimId && requestForAttestationEntry) {
+      removeRequestForAttestation(claimId, requestForAttestationEntry.rootHash)
     }
 
     if (onFinished) {
@@ -76,14 +79,14 @@ const ImportAttestation: React.FC<Props> = ({
 
   return (
     <section className="ImportAttestation">
-      {requestForAttestation && (
-        <ClaimDetailView claim={requestForAttestation.claim} />
+      {requestForAttestationEntry && (
+        <ClaimDetailView claim={requestForAttestationEntry.claim} />
       )}
 
-      {requestForAttestation && (
+      {requestForAttestationEntry && (
         <AttestedClaimsListView
-          attestedClaims={requestForAttestation.legitimations}
-          delegationId={requestForAttestation.delegationId}
+          attestedClaims={requestForAttestationEntry.legitimations}
+          delegationId={requestForAttestationEntry.delegationId}
           context="terms"
         />
       )}
@@ -109,8 +112,10 @@ const mapStateToProps: MapStateToProps<
 })
 
 const mapDispatchToProps: DispatchProps = {
-  addAttestationToClaim: (attestation: sdk.IAttestedClaim) =>
-    PersistentStore.store.dispatch(Claims.Store.addAttestation(attestation)),
+  addAttestedClaimToClaim: (attestedClaim: sdk.IAttestedClaim) =>
+    PersistentStore.store.dispatch(
+      Claims.Store.addAttestedClaim(attestedClaim)
+    ),
   removeRequestForAttestation: (
     claimId: Claims.Entry['id'],
     rootHash: sdk.IRequestForAttestation['rootHash']

@@ -82,10 +82,8 @@ class SelectClaims extends React.Component<Props, State> {
   private static getOption(claim: Claims.Entry): SelectOption {
     {
       const isApproved =
-        claim.attestations &&
-        claim.attestations.find(
-          (attestedClaim: sdk.IAttestation) => !attestedClaim.revoked
-        )
+        claim.attestedClaims &&
+        claim.attestedClaims.find(({ attestation }) => !attestation.revoked)
       return {
         baseValue: claim.meta.alias,
         label: (

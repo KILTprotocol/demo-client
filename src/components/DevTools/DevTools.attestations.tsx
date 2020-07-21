@@ -84,13 +84,18 @@ class BsAttestation {
       requestForAttestation
     )
 
+    const attesterIdentity: IMyIdentity = await BsIdentity.getByKey(attesterKey)
+
     // import to claimers claim
     // therefore switch to claimer identity
     BsIdentity.selectIdentity(claimerIdentity)
     PersistentStore.store.dispatch(
-      Claims.Store.addRequestForAttestation(requestForAttestation)
+      Claims.Store.addRequestForAttestation(
+        requestForAttestation,
+        attesterIdentity.identity.getAddress()
+      )
     )
-    PersistentStore.store.dispatch(Claims.Store.addAttestation(attestedClaim))
+    PersistentStore.store.dispatch(Claims.Store.addAttestedClaim(attestedClaim))
 
     if (withMessages) {
       BsAttestation.sendMessages(
@@ -287,7 +292,11 @@ class BsAttestation {
       type: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
 
-    RequestForAttestationService.saveInStore(requestForAttestation)
+    RequestForAttestationService.saveInStore(
+      requestForAttestation,
+      attesterIdentity.identity.getAddress()
+    )
+
     await MessageRepository.singleSend(
       requestAttestationForClaim,
       claimerIdentity,

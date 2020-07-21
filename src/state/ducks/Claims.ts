@@ -4,7 +4,7 @@ import { createSelector } from 'reselect'
 
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
-import { IMyIdentity } from '../../types/Contact'
+import { IMyIdentity, IContact } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
@@ -12,6 +12,11 @@ import * as Wallet from './Wallet'
 function hash(claim: sdk.IPartialClaim): string {
   return sdk.Crypto.hashStr(JSON.stringify(claim))
 }
+
+export type RequestForAttestationWithAttesterAddress = Array<{
+  requestForAttestation: sdk.IRequestForAttestation
+  attesterAddress: IContact['publicIdentity']['address']
+}>
 
 interface ISaveAction extends KiltAction {
   payload: {
@@ -27,14 +32,14 @@ interface IRemoveAction extends KiltAction {
   payload: Entry['id']
 }
 
-interface IAddAttestationAction extends KiltAction {
+interface IAddAttestedClaimAction extends KiltAction {
   payload: {
     claimId: Entry['id']
-    attestation: sdk.IAttestation
+    attestedClaim: sdk.IAttestedClaim
   }
 }
 
-interface IRevokeAttestationAction extends KiltAction {
+interface IRevokeAttestedClaimAction extends KiltAction {
   payload: {
     revokedHash: sdk.IAttestation['claimHash']
   }
@@ -44,6 +49,7 @@ interface IAddRequestForAttestationAction extends KiltAction {
   payload: {
     claimId: string
     requestForAttestation: sdk.IRequestForAttestation
+    attesterAddress: IContact['publicIdentity']['address']
   }
 }
 
@@ -57,16 +63,16 @@ interface IRemoveRequestForAttestationAction extends KiltAction {
 export type Action =
   | ISaveAction
   | IRemoveAction
-  | IAddAttestationAction
-  | IRevokeAttestationAction
+  | IAddAttestedClaimAction
+  | IRevokeAttestedClaimAction
   | IAddRequestForAttestationAction
   | IRemoveRequestForAttestationAction
 
 export type Entry = {
   id: string
   claim: sdk.IClaim
-  attestations: sdk.IAttestation[]
-  requestForAttestations: sdk.IRequestForAttestation[]
+  attestedClaims: sdk.IAttestedClaim[]
+  requestForAttestations: RequestForAttestationWithAttesterAddress
   meta: {
     alias: string
   }
@@ -84,7 +90,7 @@ export type SerializedState = {
     claim: string
     meta: object
     requestForAttestations: string
-    attestations: string
+    attestedClaims: string
   }>
 }
 
@@ -99,7 +105,7 @@ class Store {
       .toList()
       .map(claimEntry => {
         return {
-          attestations: JSON.stringify(claimEntry.attestations),
+          attestedClaims: JSON.stringify(claimEntry.attestedClaims),
           claim: JSON.stringify(claimEntry.claim),
           requestForAttestations: JSON.stringify(
             claimEntry.requestForAttestations
@@ -128,14 +134,14 @@ class Store {
       const o = claimsStateSerialized.claims[i]
       try {
         const claim = JSON.parse(o.claim) as sdk.IClaim
-        const attestations: sdk.IAttestation[] = o.attestations
-          ? (JSON.parse(o.attestations) as sdk.IAttestation[])
+        const attestedClaims: sdk.IAttestedClaim[] = o.attestedClaims
+          ? (JSON.parse(o.attestedClaims) as sdk.IAttestedClaim[])
           : []
-        const requestForAttestations: sdk.IRequestForAttestation[] = o.requestForAttestations
+        const requestForAttestations: RequestForAttestationWithAttesterAddress = o.requestForAttestations
           ? JSON.parse(o.requestForAttestations)
           : []
         const entry = {
-          attestations,
+          attestedClaims,
           requestForAttestations,
           claim,
           id: o.id,
@@ -165,7 +171,7 @@ class Store {
         const { claimId, claim, meta } = (action as ISaveAction).payload
 
         return state.setIn(['claims', claimId], {
-          attestations: [],
+          attestedClaims: [],
           requestForAttestations: [],
           claim,
           id: claimId,
@@ -175,37 +181,38 @@ class Store {
       case Store.ACTIONS.CLAIM_REMOVE: {
         return state.deleteIn(['claims', (action as IRemoveAction).payload])
       }
-      case Store.ACTIONS.ATTESTATION_ADD: {
+      case Store.ACTIONS.ATTESTED_CLAIM_ADD: {
         const {
           claimId,
-          attestation,
-        } = (action as IAddAttestationAction).payload
-        let attestations =
-          state.getIn(['claims', claimId, 'attestations']) || []
-        attestations = attestations.filter(
-          (_attestation: sdk.IAttestation) =>
-            !Store.areAttestationsEqual(attestation, _attestation)
+          attestedClaim,
+        } = (action as IAddAttestedClaimAction).payload
+
+        let attestedClaims =
+          state.getIn(['claims', claimId, 'attestedClaims']) || []
+        attestedClaims = attestedClaims.filter(
+          (_attestedClaims: sdk.IAttestedClaim) =>
+            !Store.areAttestedClaimsEqual(attestedClaim, _attestedClaims)
         )
 
         return state.setIn(
-          ['claims', claimId, 'attestations'],
-          [...attestations, attestation]
+          ['claims', claimId, 'attestedClaims'],
+          [...attestedClaims, attestedClaim]
         )
       }
 
-      case Store.ACTIONS.ATTESTATION_REVOKE: {
-        const { revokedHash } = (action as IRevokeAttestationAction).payload
+      case Store.ACTIONS.ATTESTED_CLAIM_REVOKE: {
+        const { revokedHash } = (action as IRevokeAttestedClaimAction).payload
         const setIns: Array<Iterable<any>> = []
 
         let claims = state.get('claims')
 
         claims.forEach((myClaim: Entry, myClaimHash: string) => {
-          if (myClaim.attestations && myClaim.attestations.length) {
-            myClaim.attestations.forEach(
-              (attestation: sdk.IAttestation, index: number) => {
-                if (attestation.claimHash === revokedHash) {
+          if (myClaim.attestedClaims && myClaim.attestedClaims.length) {
+            myClaim.attestedClaims.forEach(
+              (attestedClaim: sdk.IAttestedClaim, index: number) => {
+                if (attestedClaim.attestation.claimHash === revokedHash) {
                   // avoid changing claims while iterating
-                  setIns.push([myClaimHash, 'attestations', index, 'revoked'])
+                  setIns.push([myClaimHash, 'attestedClaims', index, 'revoked'])
                 }
               }
             )
@@ -219,6 +226,7 @@ class Store {
       case Store.ACTIONS.REQUEST_FOR_ATTESTATION_ADD: {
         const {
           requestForAttestation,
+          attesterAddress,
           claimId,
         } = (action as IAddRequestForAttestationAction).payload
 
@@ -232,9 +240,13 @@ class Store {
               _requestForAttestations
             )
         )
+
         return state.setIn(
           ['claims', claimId, 'requestForAttestations'],
-          [...requestForAttestations, requestForAttestation]
+          [
+            ...requestForAttestations,
+            { requestForAttestation, attesterAddress },
+          ]
         )
       }
       case Store.ACTIONS.REQUEST_FOR_ATTESTATION_REMOVE: {
@@ -248,11 +260,11 @@ class Store {
         claims.forEach((entry: Entry, myClaimHash: string) => {
           if (entry.id === claimId) {
             entry.requestForAttestations.forEach(
-              (
-                requestForAttestationEntry: sdk.IRequestForAttestation,
-                index: number
-              ) => {
-                if (requestForAttestationEntry.rootHash === rootHash) {
+              (requestForAttestationEntry, index: number) => {
+                if (
+                  requestForAttestationEntry.requestForAttestation.rootHash ===
+                  rootHash
+                ) {
                   setIns.push([myClaimHash, 'requestForAttestations', index])
                 }
               }
@@ -291,34 +303,36 @@ class Store {
     }
   }
 
-  public static addAttestation(
-    attestation: sdk.IAttestedClaim
-  ): IAddAttestationAction {
+  public static addAttestedClaim(
+    attestedClaim: sdk.IAttestedClaim
+  ): IAddAttestedClaimAction {
     return {
       payload: {
-        claimId: hash(attestation.request.claim),
-        attestation: attestation.attestation,
+        claimId: hash(attestedClaim.request.claim),
+        attestedClaim,
       },
-      type: Store.ACTIONS.ATTESTATION_ADD,
+      type: Store.ACTIONS.ATTESTED_CLAIM_ADD,
     }
   }
 
   public static revokeAttestation(
     revokedHash: sdk.IAttestedClaim['request']['rootHash']
-  ): IRevokeAttestationAction {
+  ): IRevokeAttestedClaimAction {
     return {
       payload: { revokedHash },
-      type: Store.ACTIONS.ATTESTATION_REVOKE,
+      type: Store.ACTIONS.ATTESTED_CLAIM_REVOKE,
     }
   }
 
   public static addRequestForAttestation(
-    requestForAttestation: sdk.IRequestForAttestation
+    requestForAttestation: sdk.IRequestForAttestation,
+    attesterAddress: IContact['publicIdentity']['address']
   ): IAddRequestForAttestationAction {
     return {
       payload: {
         claimId: hash(requestForAttestation.claim),
         requestForAttestation,
+        attesterAddress,
       },
       type: Store.ACTIONS.REQUEST_FOR_ATTESTATION_ADD,
     }
@@ -341,8 +355,8 @@ class Store {
   }
 
   private static ACTIONS = {
-    ATTESTATION_ADD: 'client/claims/ATTESTATION_ADD',
-    ATTESTATION_REVOKE: 'client/claims/ATTESTATION_REVOKE',
+    ATTESTED_CLAIM_ADD: 'client/claims/ATTESTED_CLAIM_ADD',
+    ATTESTED_CLAIM_REVOKE: 'client/claims/ATTESTED_CLAIM_REVOKE',
     CLAIM_REMOVE: 'client/claims/CLAIM_REMOVE',
     CLAIM_SAVE: 'client/claims/CLAIM_SAVE',
     REQUEST_FOR_ATTESTATION_ADD: 'client/claims/REQUEST_FOR_ATTESTATION_ADD',
@@ -350,13 +364,14 @@ class Store {
       'client/claims/REQUEST_FOR_ATTESTATION_REMOVE',
   }
 
-  private static areAttestationsEqual(
-    attestation1: sdk.IAttestation,
-    attestation2: sdk.IAttestation
+  private static areAttestedClaimsEqual(
+    attestedClaim1: sdk.IAttestedClaim,
+    attestedClaim2: sdk.IAttestedClaim
   ): boolean {
     return (
-      attestation1.owner === attestation2.owner &&
-      attestation1.claimHash === attestation2.claimHash
+      attestedClaim1.attestation.owner === attestedClaim2.attestation.owner &&
+      attestedClaim1.attestation.claimHash ===
+        attestedClaim2.attestation.claimHash
     )
   }
 
@@ -364,11 +379,7 @@ class Store {
     requestForAttesation1: sdk.IRequestForAttestation,
     requestForAttesation2: sdk.IRequestForAttestation
   ): boolean {
-    return (
-      requestForAttesation1.claimOwner.hash ===
-        requestForAttesation2.claimOwner.hash &&
-      requestForAttesation1.rootHash === requestForAttesation2.rootHash
-    )
+    return requestForAttesation1.rootHash === requestForAttesation2.rootHash
   }
 }
 
