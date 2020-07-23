@@ -235,7 +235,7 @@ class Store {
 
         requestForAttestations = requestForAttestations.filter(
           (_requestForAttestations: sdk.IRequestForAttestation) =>
-            !Store.areRequetForAttestationsEqual(
+            !Store.areRequestForAttestationsEqual(
               requestForAttestation,
               _requestForAttestations
             )
@@ -375,11 +375,11 @@ class Store {
     )
   }
 
-  private static areRequetForAttestationsEqual(
-    requestForAttesation1: sdk.IRequestForAttestation,
-    requestForAttesation2: sdk.IRequestForAttestation
+  private static areRequestForAttestationsEqual(
+    requestForAttestation1: sdk.IRequestForAttestation,
+    requestForAttestation2: sdk.IRequestForAttestation
   ): boolean {
-    return requestForAttesation1.rootHash === requestForAttesation2.rootHash
+    return requestForAttestation1.rootHash === requestForAttestation2.rootHash
   }
 }
 
