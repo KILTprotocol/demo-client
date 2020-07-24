@@ -273,8 +273,8 @@ class MessageRepository {
         return (message.body as sdk.IRequestClaimsForCTypes).content.ctypes.filter(
           Boolean
         ) as Array<sdk.ICType['hash']>
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC: {
-        const cTypeHashes = (message.body as sdk.ISubmitClaimsForCTypesPublic).content.map(
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
+        const cTypeHashes = (message.body as sdk.ISubmitClaimsForCTypesClassic).content.map(
           attestedClaim => attestedClaim.request.claim.cTypeHash
         )
         const uniqueCTypeHashes: Array<ICType['cType']['hash']> = cTypeHashes.filter(

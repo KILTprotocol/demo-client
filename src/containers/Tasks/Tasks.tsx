@@ -44,7 +44,7 @@ export type TaskProps =
       props: RequestAttestationProps
     }
   | {
-      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC
+      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC
       props: Partial<SubmitClaimsForCTypeProps> &
         Pick<SubmitClaimsForCTypeProps, 'cTypeHashes'>
     }
@@ -244,7 +244,7 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC: {
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
         const { props } = currentTask
 
         return this.getModal(

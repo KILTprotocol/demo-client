@@ -175,11 +175,11 @@ class MessageDetailView extends React.Component<Props, State> {
           />
         )
       }
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC: {
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
         return (
           <VerifyClaim
             attestedClaims={
-              (message.body as sdk.ISubmitClaimsForCTypesPublic).content
+              (message.body as sdk.ISubmitClaimsForCTypesClassic).content
             }
           />
         )

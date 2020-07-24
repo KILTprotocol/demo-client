@@ -93,7 +93,7 @@ class AttestationWorkflow {
   ): Promise<void> {
     const messageBody: sdk.ISubmitClaimsForCTypes = {
       content: attestedClaims,
-      type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_PUBLIC,
+      type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
     }
 
     return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
