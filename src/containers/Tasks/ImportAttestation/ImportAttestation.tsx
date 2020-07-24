@@ -44,14 +44,25 @@ const ImportAttestation: React.FC<Props> = ({
 
   const requestForAttest = useCallback((): void => {
     claims.forEach(val => {
-      val.requestForAttestations.forEach(({ requestForAttestation }): void => {
-        if (requestForAttestation.rootHash === attestation.claimHash) {
-          setRequestForAttestation(requestForAttestation)
-          setClaimId(val.id)
-        }
-      })
+      if (!requestForAttestationEntry)
+        val.requestForAttestations.forEach(
+          ({ requestForAttestation }): void => {
+            if (requestForAttestation.rootHash === attestation.claimHash) {
+              setRequestForAttestation(requestForAttestation)
+              setClaimId(val.id)
+            }
+          }
+        )
+      else {
+        val.attestedClaims.forEach(({ request }) => {
+          if (request.rootHash === attestation.claimHash) {
+            setRequestForAttestation(request)
+            setClaimId(val.id)
+          }
+        })
+      }
     })
-  }, [claims, attestation.claimHash])
+  }, [claims, attestation.claimHash, requestForAttestationEntry])
 
   useEffect(() => {
     requestForAttest()
