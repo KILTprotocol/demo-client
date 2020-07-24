@@ -19,7 +19,7 @@ type Props = {
   isMulti?: boolean
   name?: string
   placeholder?: string
-  preSelectedCTypeHashes: Array<ICType['cType']['hash'] | null>
+  preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | null>
 
   onChange?: (selectedCTypes: ICTypeWithMetadata[]) => void
   onMenuOpen?: () => void

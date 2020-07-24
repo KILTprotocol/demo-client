@@ -45,13 +45,11 @@ export type TaskProps =
     }
   | {
       objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC
-      props: Partial<SubmitClaimsForCTypeProps> &
-        Pick<SubmitClaimsForCTypeProps, 'cTypeHashes'>
+      props: Partial<SubmitClaimsForCTypeProps>
     }
   | {
       objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES
-      props: Partial<RequestClaimsForCTypeProps> &
-        Pick<RequestClaimsForCTypeProps, 'cTypeHashes'>
+      props: Partial<RequestClaimsForCTypeProps>
     }
   | {
       objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION
@@ -358,7 +356,7 @@ class Tasks extends React.Component<Props, State> {
 
   private getCTypeSelect(
     isMulti: boolean,
-    preSelectedCTypeHashes: Array<ICType['cType']['hash'] | null>
+    preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | null>
   ): JSX.Element {
     return (
       <section className="selectCType">

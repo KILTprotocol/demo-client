@@ -114,7 +114,6 @@ class SelectCTypesModal extends React.Component<Props, State> {
             onMenuOpen={this.setSelectCTypesOpen(true)}
             onMenuClose={this.setSelectCTypesOpen(false, 500)}
             placeholder={finalPlaceholder}
-            preSelectedCTypeHashes={[null]}
           />
         </div>
       </Modal>

@@ -88,7 +88,9 @@ class ContactPresentation extends React.Component<Props, State> {
         PersistentStore.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
             objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
-            props: { cTypeHashes: [null], receiverAddresses: [address] },
+            props: {
+              receiverAddresses: [address],
+            },
           })
         )
       },
@@ -115,7 +117,6 @@ class ContactPresentation extends React.Component<Props, State> {
           UiState.Store.updateCurrentTaskAction({
             objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
             props: {
-              cTypeHashes: [null],
               receiverAddresses: [address],
             },
           })
