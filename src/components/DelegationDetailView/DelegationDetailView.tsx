@@ -68,15 +68,13 @@ const DelegationDetailView: React.FunctionComponent<Props> = ({
           childNodes: [],
           delegation: delegationNode,
         }
-        const rootNodeFind = await DelegationsService.findRootNode(
+        const newRootNode = await DelegationsService.findRootNode(
           treeNode.delegation.id
         )
-        setRootNode(rootNodeFind)
+        setRootNode(newRootNode)
 
-        const delegationTreeNode = await DelegationsService.resolveParent(
-          treeNode
-        )
-        setDelegationsTreeNode(delegationTreeNode)
+        const parentTreeNode = await DelegationsService.resolveParent(treeNode)
+        setDelegationsTreeNode(parentTreeNode || treeNode)
       })
       .catch(error => {
         console.log('error', error)
