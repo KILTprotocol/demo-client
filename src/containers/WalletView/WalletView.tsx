@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { IPublicIdentity } from '@kiltprotocol/sdk-js'
 
 import { Link, withRouter } from 'react-router-dom'
 import IdentityView from '../../components/IdentityView/IdentityView'
@@ -24,8 +23,8 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  selectIdentity: (address: IPublicIdentity['address']) => void
-  removeIdentity: (address: IPublicIdentity['address']) => void
+  selectIdentity: (address: IMyIdentity['identity']['address']) => void
+  removeIdentity: (address: IMyIdentity['identity']['address']) => void
 }
 
 type Props = RouteComponentProps<{}> & StateProps & DispatchProps
@@ -73,12 +72,14 @@ class WalletView extends React.Component<Props> {
     this.removeIdentity = this.removeIdentity.bind(this)
   }
 
-  private selectIdentity = (address: IPublicIdentity['address']): void => {
+  private selectIdentity = (
+    address: IMyIdentity['identity']['address']
+  ): void => {
     const { selectIdentity } = this.props
     selectIdentity(address)
   }
 
-  private removeIdentity(address: IPublicIdentity['address']): void {
+  private removeIdentity(address: IMyIdentity['identity']['address']): void {
     const { identities, removeIdentity } = this.props
     const identityToDelete = identities.find(
       (identity: Wallet.Entry) => identity.identity.address === address
@@ -132,9 +133,9 @@ const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
 })
 
 const mapDispatchToProps: DispatchProps = {
-  removeIdentity: (address: IPublicIdentity['address']) =>
+  removeIdentity: (address: IMyIdentity['identity']['address']) =>
     Wallet.Store.removeIdentityAction(address),
-  selectIdentity: (address: IPublicIdentity['address']) =>
+  selectIdentity: (address: IMyIdentity['identity']['address']) =>
     Wallet.Store.selectIdentityAction(address),
 }
 

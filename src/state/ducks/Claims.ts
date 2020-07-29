@@ -4,7 +4,7 @@ import { createSelector } from 'reselect'
 
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
-import { IMyIdentity, IContact } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { ICType } from '../../types/Ctype'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
@@ -15,7 +15,7 @@ function hash(claim: sdk.IPartialClaim): string {
 
 export type RequestForAttestationWithAttesterAddress = Array<{
   requestForAttestation: sdk.IRequestForAttestation
-  attesterAddress: IContact['publicIdentity']['address']
+  attesterAddress: sdk.IPublicIdentity['address']
 }>
 
 interface ISaveAction extends KiltAction {
@@ -49,7 +49,7 @@ interface IAddRequestForAttestationAction extends KiltAction {
   payload: {
     claimId: string
     requestForAttestation: sdk.IRequestForAttestation
-    attesterAddress: IContact['publicIdentity']['address']
+    attesterAddress: sdk.IPublicIdentity['address']
   }
 }
 
@@ -326,7 +326,7 @@ class Store {
 
   public static addRequestForAttestation(
     requestForAttestation: sdk.IRequestForAttestation,
-    attesterAddress: IContact['publicIdentity']['address']
+    attesterAddress: sdk.IPublicIdentity['address']
   ): IAddRequestForAttestationAction {
     return {
       payload: {

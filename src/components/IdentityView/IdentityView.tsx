@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
-import { IPublicIdentity } from '@kiltprotocol/sdk-js'
 
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
@@ -28,8 +27,8 @@ type OwnProps = {
   myIdentity: IMyIdentity
   selected: boolean
   // output
-  onDelete?: (address: IPublicIdentity['address']) => void
-  onSelect?: (seedAsHex: IPublicIdentity['address']) => void
+  onDelete?: (address: IMyIdentity['identity']['address']) => void
+  onSelect?: (seedAsHex: IMyIdentity['identity']['address']) => void
   onCreateDid?: (identity: IMyIdentity) => void
   onDeleteDid?: (identity: IMyIdentity) => void
 }
@@ -43,7 +42,7 @@ type State = {
 const FAUCET_URL = process.env.REACT_APP_FAUCET_URL
 
 class IdentityView extends React.Component<Props, State> {
-  private static openKiltFaucet(address: IPublicIdentity['address']) {
+  private static openKiltFaucet(address: IMyIdentity['identity']['address']) {
     return () => {
       window.open(`${FAUCET_URL}?${address}`, '_blank')
     }

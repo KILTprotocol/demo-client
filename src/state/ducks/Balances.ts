@@ -1,24 +1,24 @@
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 import KiltAction from '../../types/Action'
-import { IContact } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
 
 interface IUpdateAction extends KiltAction {
   payload: {
-    address: IContact['publicIdentity']['address']
+    address: IMyIdentity['identity']['address']
     balance: number
   }
 }
 
 interface IRemoveAction extends KiltAction {
-  payload: IContact['publicIdentity']['address']
+  payload: IMyIdentity['identity']['address']
 }
 
 export type Action = IUpdateAction | IRemoveAction
 
 type State = {
-  balances: Immutable.Map<IContact['publicIdentity']['address'], number>
+  balances: Immutable.Map<IMyIdentity['identity']['address'], number>
 }
 
 export type ImmutableState = Immutable.Record<State>
@@ -43,7 +43,7 @@ class Store {
   }
 
   public static updateBalance(
-    address: IContact['publicIdentity']['address'],
+    address: IMyIdentity['identity']['address'],
     balance: number
   ): IUpdateAction {
     return {
@@ -53,7 +53,7 @@ class Store {
   }
 
   public static removeBalance(
-    address: IContact['publicIdentity']['address']
+    address: IMyIdentity['identity']['address']
   ): IRemoveAction {
     return {
       payload: address,
@@ -63,7 +63,7 @@ class Store {
 
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
-      balances: Immutable.Map<IContact['publicIdentity']['address'], number>(),
+      balances: Immutable.Map<IMyIdentity['identity']['address'], number>(),
     } as State)(obj)
   }
 
@@ -84,7 +84,7 @@ const getBalances = createSelector(
 
 const getStateBalance = (
   state: ReduxState,
-  address: IContact['publicIdentity']['address']
+  address: IMyIdentity['identity']['address']
 ): number | undefined => state.balances.get('balances').get(address)
 
 const getBalance = createSelector([getStateBalance], (entry: number) => entry)

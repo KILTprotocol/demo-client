@@ -3,7 +3,7 @@ import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 
 import KiltAction from '../../types/Action'
-import { IMyIdentity, IContact } from '../../types/Contact'
+import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
 
 interface ISaveAction extends KiltAction {
@@ -12,17 +12,17 @@ interface ISaveAction extends KiltAction {
 
 interface IUpdateAction extends KiltAction {
   payload: {
-    address: IContact['publicIdentity']['address']
+    address: IMyIdentity['identity']['address']
     partialMyIdentity: Partial<IMyIdentity>
   }
 }
 
 interface IRemoveAction extends KiltAction {
-  payload: IContact['publicIdentity']['address']
+  payload: IMyIdentity['identity']['address']
 }
 
 interface ISelectAction extends KiltAction {
-  payload: IContact['publicIdentity']['address']
+  payload: IMyIdentity['identity']['address']
 }
 
 export type Action = ISaveAction | IUpdateAction | IRemoveAction | ISelectAction
@@ -30,7 +30,7 @@ export type Action = ISaveAction | IUpdateAction | IRemoveAction | ISelectAction
 export type Entry = IMyIdentity
 
 type State = {
-  identities: Immutable.Map<IContact['publicIdentity']['address'], IMyIdentity>
+  identities: Immutable.Map<IMyIdentity['identity']['address'], IMyIdentity>
   selectedIdentity: Entry | null
 }
 
@@ -45,7 +45,7 @@ type SerializedIdentity = {
 
 export type SerializedState = {
   identities: SerializedIdentity[]
-  selectedAddress?: IContact['publicIdentity']['address']
+  selectedAddress?: IMyIdentity['identity']['address']
 }
 
 class Store {
@@ -165,7 +165,7 @@ class Store {
   }
 
   public static updateIdentityAction(
-    address: IContact['publicIdentity']['address'],
+    address: IMyIdentity['identity']['address'],
     partialMyIdentity: Partial<IMyIdentity>
   ): IUpdateAction {
     return {
@@ -175,7 +175,7 @@ class Store {
   }
 
   public static removeIdentityAction(
-    address: IContact['publicIdentity']['address']
+    address: IMyIdentity['identity']['address']
   ): IRemoveAction {
     return {
       payload: address,
@@ -184,7 +184,7 @@ class Store {
   }
 
   public static selectIdentityAction(
-    address: IContact['publicIdentity']['address']
+    address: IMyIdentity['identity']['address']
   ): ISelectAction {
     return {
       payload: address,
@@ -195,7 +195,7 @@ class Store {
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
       identities: Immutable.Map<
-        IContact['publicIdentity']['address'],
+        IMyIdentity['identity']['address'],
         IMyIdentity
       >(),
       selectedIdentity: null,
