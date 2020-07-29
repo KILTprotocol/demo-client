@@ -264,10 +264,6 @@ class MessageRepository {
           (message.body as ISubmitAttestationForClaim).content.attestation
             .cTypeHash,
         ]
-      case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM: {
-        const response = JSON.stringify(message.body.content)
-        return [response]
-      }
 
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
         return (message.body as sdk.IRequestClaimsForCTypes).content.ctypes.filter(
@@ -284,6 +280,7 @@ class MessageRepository {
         return uniqueCTypeHashes
       }
 
+      case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.REJECT_ACCEPT_DELEGATION:

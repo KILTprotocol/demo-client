@@ -125,17 +125,16 @@ class AttestationWorkflow {
       { ...terms, delegationId }
     )
 
-    attesterAddresses.forEach(val =>
+    attesterAddresses.forEach(attesterAddress =>
       RequestForAttestationService.saveInStore(
         requestForAttestation.message,
-        val
+        attesterAddress
       )
     )
 
     const messageBody: IRequestAttestationForClaim = {
       content: {
         requestForAttestation: requestForAttestation.message,
-        quote: undefined,
       },
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }

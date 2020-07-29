@@ -42,31 +42,32 @@ const ImportAttestation: React.FC<Props> = ({
   >()
   const [claimId, setClaimId] = useState<Claims.Entry['id']>()
 
-  const requestForAttest = useCallback((): void => {
-    claims.forEach(val => {
-      if (!requestForAttestationEntry)
-        val.requestForAttestations.forEach(
-          ({ requestForAttestation }): void => {
-            if (requestForAttestation.rootHash === attestation.claimHash) {
-              setRequestForAttestation(requestForAttestation)
-              setClaimId(val.id)
-            }
+  useEffect(() => {
+    claims.forEach(claim => {
+      let newRequestForAttestation
+      let newClaimId
+      claim.requestForAttestations.forEach(
+        ({ requestForAttestation }): void => {
+          if (requestForAttestation.rootHash === attestation.claimHash) {
+            newRequestForAttestation = requestForAttestation
+            newClaimId = claim.id
           }
-        )
-      else {
-        val.attestedClaims.forEach(({ request }) => {
+        }
+      )
+
+      if (!newRequestForAttestation) {
+        claim.attestedClaims.forEach(({ request }) => {
           if (request.rootHash === attestation.claimHash) {
-            setRequestForAttestation(request)
-            setClaimId(val.id)
+            newRequestForAttestation = request
+            newClaimId = claim.id
           }
         })
       }
-    })
-  }, [claims, attestation.claimHash, requestForAttestationEntry])
 
-  useEffect(() => {
-    requestForAttest()
-  }, [requestForAttestationEntry, requestForAttest])
+      setRequestForAttestation(newRequestForAttestation)
+      setClaimId(newClaimId)
+    })
+  }, [claims, attestation])
 
   const importAttestation = (): void => {
     if (!requestForAttestationEntry) {
@@ -91,15 +92,14 @@ const ImportAttestation: React.FC<Props> = ({
   return (
     <section className="ImportAttestation">
       {requestForAttestationEntry && (
-        <ClaimDetailView claim={requestForAttestationEntry.claim} />
-      )}
-
-      {requestForAttestationEntry && (
-        <AttestedClaimsListView
-          attestedClaims={requestForAttestationEntry.legitimations}
-          delegationId={requestForAttestationEntry.delegationId}
-          context="terms"
-        />
+        <>
+          <ClaimDetailView claim={requestForAttestationEntry.claim} />
+          <AttestedClaimsListView
+            attestedClaims={requestForAttestationEntry.legitimations}
+            delegationId={requestForAttestationEntry.delegationId}
+            context="terms"
+          />
+        </>
       )}
 
       <div className="actions">

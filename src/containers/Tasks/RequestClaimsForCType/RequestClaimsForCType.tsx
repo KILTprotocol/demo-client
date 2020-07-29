@@ -38,7 +38,7 @@ class RequestClaimsForCType extends React.Component<Props, State> {
     const { cTypeHashes, receiverAddresses, onFinished } = this.props
 
     const messageBody: sdk.IRequestClaimsForCTypes = {
-      content: { ctypes: cTypeHashes, peRequest: {} as any, allowPE: false },
+      content: { ctypes: cTypeHashes, allowPE: false },
       type: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
     }
 
