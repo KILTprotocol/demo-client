@@ -1,5 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
 import DelegationsService from '../../services/DelegationsService'
@@ -31,6 +31,22 @@ type OwnProps = {
 
 type Props = StateProps & OwnProps
 
+const getNode = async (
+  id: sdk.IDelegationBaseNode['id']
+): Promise<sdk.DelegationBaseNode> => {
+  let node: sdk.DelegationBaseNode | null = await DelegationsService.lookupNodeById(
+    id
+  )
+  if (!node) {
+    node = await DelegationsService.lookupRootNodeById(id)
+  }
+  if (!node) {
+    notifyFailure('Node not found')
+    throw new Error('Node not found')
+  }
+  return node
+}
+
 const DelegationDetailView: React.FunctionComponent<Props> = ({
   delegationId,
   editable,
@@ -45,23 +61,7 @@ const DelegationDetailView: React.FunctionComponent<Props> = ({
 
   const [rootNode, setRootNode] = useState<sdk.IDelegationRootNode | null>(null)
 
-  const getNode = async (
-    id: sdk.IDelegationBaseNode['id']
-  ): Promise<sdk.DelegationBaseNode> => {
-    let node: sdk.DelegationBaseNode | null = await DelegationsService.lookupNodeById(
-      id
-    )
-    if (!node) {
-      node = await DelegationsService.lookupRootNodeById(id)
-    }
-    if (!node) {
-      notifyFailure('Node not found')
-      throw new Error('Node not found')
-    }
-    return node
-  }
-
-  const delegationTreeForester = useCallback((): void => {
+  useEffect(() => {
     getNode(delegationId)
       .then(async (delegationNode: sdk.DelegationNode) => {
         const treeNode: DelegationsTreeNode = {
@@ -82,10 +82,6 @@ const DelegationDetailView: React.FunctionComponent<Props> = ({
         console.log('error', error)
       })
   }, [delegationId])
-
-  useEffect(() => {
-    delegationTreeForester()
-  }, [delegationId, delegationTreeForester])
 
   return (
     <section className="DelegationDetailView">
