@@ -20,10 +20,7 @@ const Dashboard: React.FC<Props> = ({ selectedIdentity }): JSX.Element => (
   <section className="Dashboard">
     <h1>
       <div>My Dashboard</div>
-      <ContactPresentation
-        address={selectedIdentity.identity.getAddress()}
-        inline
-      />
+      <ContactPresentation address={selectedIdentity.identity.address} inline />
     </h1>
     <IdentityView myIdentity={selectedIdentity} selected />
     <div className="actions">

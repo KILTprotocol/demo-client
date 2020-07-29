@@ -15,9 +15,7 @@ class DidService {
   }
 
   public static async createDid(myIdentity: IMyIdentity): Promise<sdk.IDid> {
-    const documentStore: sdk.IDid['documentStore'] = `${
-      ContactRepository.URL
-    }/${myIdentity.identity.getAddress()}`
+    const documentStore: sdk.IDid['documentStore'] = `${ContactRepository.URL}/${myIdentity.identity.address}`
 
     const did = sdk.Did.fromIdentity(myIdentity.identity, documentStore)
     const didDocument = did.createDefaultDidDocument(`${MessageRepository.URL}`)
@@ -40,7 +38,7 @@ class DidService {
     }
 
     persistentStore.store.dispatch(
-      Wallet.Store.updateIdentityAction(myIdentity.identity.getAddress(), {
+      Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
         did: { identifier: did.identifier, document: didDocument },
       })
     )
@@ -62,7 +60,7 @@ class DidService {
       publicIdentity: myIdentity.identity.getPublicIdentity(),
     } as IContact)
     persistentStore.store.dispatch(
-      Wallet.Store.updateIdentityAction(myIdentity.identity.getAddress(), {
+      Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
         did: undefined,
       })
     )

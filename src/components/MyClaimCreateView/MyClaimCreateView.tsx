@@ -103,7 +103,7 @@ class MyClaimCreateView extends Component<Props, State> {
       const newClaim = sdk.Claim.fromCTypeAndClaimContents(
         sdk.CType.fromCType(cType.cType),
         contents || {},
-        selectedIdentity.identity.getAddress()
+        selectedIdentity.identity.address
       )
       saveClaim(newClaim, { alias: name })
       notifySuccess(`Claim ${name} successfully created & saved.`)

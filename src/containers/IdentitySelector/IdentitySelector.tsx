@@ -70,11 +70,11 @@ class IdentitySelector extends React.Component<Props, State> {
       (myIdentity: IMyIdentity) => ({
         label: (
           <ContactPresentation
-            address={myIdentity.identity.getAddress()}
+            address={myIdentity.identity.address}
             size={20}
           />
         ),
-        value: myIdentity.identity.getAddress(),
+        value: myIdentity.identity.address,
       })
     )
 
@@ -84,7 +84,7 @@ class IdentitySelector extends React.Component<Props, State> {
     if (selectedIdentity) {
       selectedOption = identityOptions.find(
         (identityOption: SelectIdentityOption) =>
-          identityOption.value === selectedIdentity.identity.getAddress()
+          identityOption.value === selectedIdentity.identity.address
       )
     }
 

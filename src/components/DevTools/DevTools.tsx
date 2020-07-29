@@ -136,7 +136,7 @@ class DevTools extends React.Component<Props> {
     const balance: number = selectedIdentity
       ? Balances.getBalance(
           PersistentStore.store.getState(),
-          selectedIdentity.identity.getAddress()
+          selectedIdentity.identity.address
         )
       : 0
 

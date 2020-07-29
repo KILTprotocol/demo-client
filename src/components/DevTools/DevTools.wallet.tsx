@@ -52,7 +52,7 @@ class BsIdentity {
     return new Promise(resolve => {
       BalanceUtilities.makeTransfer(
         selectedIdentity,
-        identity.getAddress(),
+        identity.address,
         ENDOWMENT,
         () => {
           const newContact: IContact = {
@@ -104,7 +104,7 @@ class BsIdentity {
 
   public static selectIdentity(identity: IMyIdentity): void {
     PersistentStore.store.dispatch(
-      Wallet.Store.selectIdentityAction(identity.identity.getAddress())
+      Wallet.Store.selectIdentityAction(identity.identity.address)
     )
   }
 

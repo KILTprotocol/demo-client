@@ -34,7 +34,7 @@ async function setup(): Promise<ISetup> {
     const delegationRoot = new sdk.DelegationRootNode(
       DELEGATION_ROOT_ID,
       ctype.hash,
-      root.getAddress()
+      root.address
     )
 
     cachedSetup = {
@@ -52,7 +52,7 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
   const delegationNode = new sdk.DelegationNode(
     sdk.UUID.generate(),
     delegationRoot.id,
-    delegate.identity.getAddress(),
+    delegate.identity.address,
     [sdk.Permission.ATTEST]
   )
   const signature = delegate.identity.signStr(delegationNode.generateHash())
@@ -69,7 +69,7 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
     content: { delegationId: delegationNode.id, isPCR: false },
   }
   await MessageRepository.sendToAddresses(
-    [delegate.identity.getAddress()],
+    [delegate.identity.address],
     messageBody
   )
 }
@@ -109,9 +109,7 @@ export async function setupAndDelegate(delegate: IMyIdentity): Promise<void> {
   try {
     blockUi.updateMessage('Transferring funds to AntiCov authority')
     await new Promise(resolve => {
-      BalanceUtilities.makeTransfer(delegate, root.getAddress(), 4, () =>
-        resolve()
-      )
+      BalanceUtilities.makeTransfer(delegate, root.address, 4, () => resolve())
     })
     blockUi.updateMessage('Setting up CType and Root Delegation')
     await verifyOrAddCtypeAndRoot()

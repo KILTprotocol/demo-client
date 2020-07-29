@@ -29,7 +29,7 @@ class BsCType {
       .identity
     const cType = sdk.CType.fromSchema(
       bsCTypeData.schema,
-      ownerIdentity.getAddress()
+      ownerIdentity.address
     )
 
     return cType

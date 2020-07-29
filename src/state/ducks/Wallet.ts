@@ -67,7 +67,7 @@ class Store {
 
     const selectedIdentity: IMyIdentity | null = state.get('selectedIdentity')
     if (selectedIdentity) {
-      wallet.selectedAddress = selectedIdentity.identity.getAddress()
+      wallet.selectedAddress = selectedIdentity.identity.address
     }
 
     return wallet
@@ -103,7 +103,7 @@ class Store {
             phrase,
           }
 
-          identities[identity.getAddress()] = myIdentity
+          identities[identity.address] = myIdentity
         }
       )
     )
@@ -127,7 +127,7 @@ class Store {
     switch (action.type) {
       case Store.ACTIONS.SAVE_IDENTITY: {
         const myIdentity = (action as ISaveAction).payload
-        return state.setIn(['identities', myIdentity.identity.getAddress()], {
+        return state.setIn(['identities', myIdentity.identity.address], {
           ...myIdentity,
           createdAt: Date.now(),
         })

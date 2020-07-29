@@ -116,7 +116,7 @@ class Balance extends React.Component<Props, State> {
 
   private getMyBalance(): number | undefined {
     const { balances, myIdentity } = this.props
-    return balances.get(myIdentity.identity.getAddress())
+    return balances.get(myIdentity.identity.address)
   }
 
   private getTokenTransferElement(balance: number | undefined): ReactNode {
@@ -188,10 +188,7 @@ class Balance extends React.Component<Props, State> {
 
     // the identity of this component might not be the currently selected one
     // so we need to inform the user in this case
-    if (
-      myIdentity.identity.getAddress() !==
-      selectedIdentity.identity.getAddress()
-    ) {
+    if (myIdentity.identity.address !== selectedIdentity.identity.address) {
       FeedbackService.addBlockingNotification({
         header: `Attention!`,
         message: (
@@ -199,13 +196,10 @@ class Balance extends React.Component<Props, State> {
             <span>You are trying so transfer </span>
             <KiltToken />
             <span> from your identity </span>
-            <ContactPresentation
-              address={myIdentity.identity.getAddress()}
-              inline
-            />
+            <ContactPresentation address={myIdentity.identity.address} inline />
             <span> which is not your currently active identity </span>
             <ContactPresentation
-              address={selectedIdentity.identity.getAddress()}
+              address={selectedIdentity.identity.address}
               inline
             />
           </div>

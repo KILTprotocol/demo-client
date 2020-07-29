@@ -146,7 +146,7 @@ class MessageRepository {
   public static async findByMyIdentity(
     myIdentity: sdk.Identity
   ): Promise<IMessageOutput[]> {
-    return fetch(`${MessageRepository.URL}/inbox/${myIdentity.getAddress()}`)
+    return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
       .then((encryptedMessages: sdk.IEncryptedMessage[]) => {
         return Promise.any(

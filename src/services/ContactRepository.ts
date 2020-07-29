@@ -132,7 +132,7 @@ class ContactRepository {
         did: { identifier },
         metaData: {
           addedAt: Date.now(),
-          addedBy: selectedIdentity.identity.getAddress(),
+          addedBy: selectedIdentity.identity.address,
           name: alias,
         },
         publicIdentity,

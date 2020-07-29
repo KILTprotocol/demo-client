@@ -92,7 +92,7 @@ class BsAttestation {
     PersistentStore.store.dispatch(
       Claims.Store.addRequestForAttestation(
         requestForAttestation,
-        attesterIdentity.identity.getAddress()
+        attesterIdentity.identity.address
       )
     )
     PersistentStore.store.dispatch(Claims.Store.addAttestedClaim(attestedClaim))
@@ -232,7 +232,7 @@ class BsAttestation {
     AttestationService.saveInStore({
       attestation: attestedClaim.attestation,
       cTypeHash: attestedClaim.request.claim.cTypeHash,
-      claimerAddress: claimerIdentity.identity.getAddress(),
+      claimerAddress: claimerIdentity.identity.address,
       claimerAlias: claimerIdentity.metaData.name,
       created: Date.now(),
     } as Attestations.Entry)
@@ -256,7 +256,7 @@ class BsAttestation {
     const partialClaim: IPartialClaim = {
       cTypeHash: cType.cType.hash,
       contents: bsClaim.data,
-      owner: claimerIdentity.identity.getAddress(),
+      owner: claimerIdentity.identity.address,
     }
 
     // send request for term from claimer to attester
@@ -294,7 +294,7 @@ class BsAttestation {
 
     RequestForAttestationService.saveInStore(
       requestForAttestation,
-      attesterIdentity.identity.getAddress()
+      attesterIdentity.identity.address
     )
 
     await MessageRepository.singleSend(

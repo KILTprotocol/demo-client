@@ -126,7 +126,7 @@ class MessageView extends React.Component<Props, State> {
         .catch(error => {
           errorService.log({
             error,
-            message: `Could not retrieve messages for identity ${selectedIdentity.identity.getAddress()}`,
+            message: `Could not retrieve messages for identity ${selectedIdentity.identity.address}`,
             origin: 'MessageView.fetchMessages()',
           })
           blockUi.remove()

@@ -41,10 +41,7 @@ class QuoteServices {
     }
 
     try {
-      QuoteServices.saveAgreedQuoteInStore(
-        quoteAgreement,
-        identity.getAddress()
-      )
+      QuoteServices.saveAgreedQuoteInStore(quoteAgreement, identity.address)
     } catch (error) {
       ErrorService.log({
         error,

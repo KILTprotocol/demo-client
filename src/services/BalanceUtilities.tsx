@@ -29,20 +29,17 @@ class BalanceUtilities {
     if (
       Balances.getBalance(
         PersistentStore.store.getState(),
-        myIdentity.identity.getAddress()
+        myIdentity.identity.address
       ) == null
     ) {
       sdk.Balance.listenToBalanceChanges(
-        myIdentity.identity.getAddress(),
+        myIdentity.identity.address,
         BalanceUtilities.listener
       ).then(() => {
         notify(
           <div>
             Now listening to balance changes of{' '}
-            <ContactPresentation
-              address={myIdentity.identity.getAddress()}
-              inline
-            />
+            <ContactPresentation address={myIdentity.identity.address} inline />
           </div>
         )
       })
@@ -50,9 +47,7 @@ class BalanceUtilities {
   }
 
   public static async getMyBalance(identity: IMyIdentity): Promise<number> {
-    const balance: BN = await sdk.Balance.getBalance(
-      identity.identity.getAddress()
-    )
+    const balance: BN = await sdk.Balance.getBalance(identity.identity.address)
     return BalanceUtilities.asKiltCoin(balance)
   }
 

@@ -69,7 +69,7 @@ class IdentityView extends React.Component<Props, State> {
   private registerContact(): void {
     const { myIdentity } = this.props
     const { identity, metaData } = myIdentity
-    const address = identity.getAddress()
+    const { address } = identity
     const boxPublicKeyAsHex = identity.getBoxPublicKey()
     const { name } = metaData
 
@@ -101,7 +101,7 @@ class IdentityView extends React.Component<Props, State> {
     const { contacts, myIdentity } = this.props
     let contact = contacts.find(
       (myContact: IContact) =>
-        myContact.publicIdentity.address === myIdentity.identity.getAddress()
+        myContact.publicIdentity.address === myIdentity.identity.address
     )
 
     if (!contact) {
@@ -121,9 +121,8 @@ class IdentityView extends React.Component<Props, State> {
         metaData: {
           ...metaData,
           addedAt: Date.now(),
-          addedBy: Wallet.getSelectedIdentity(
-            PersistentStore.store.getState()
-          ).identity.getAddress(),
+          addedBy: Wallet.getSelectedIdentity(PersistentStore.store.getState())
+            .identity.address,
         },
         publicIdentity,
       } as IContact
@@ -146,7 +145,7 @@ class IdentityView extends React.Component<Props, State> {
     const { metaData, phrase, did, identity } = myIdentity
     const contact: IContact | undefined = contacts.find(
       (myContact: IContact) =>
-        myContact.publicIdentity.address === myIdentity.identity.getAddress()
+        myContact.publicIdentity.address === myIdentity.identity.address
     )
 
     let balance = 0
@@ -167,7 +166,7 @@ class IdentityView extends React.Component<Props, State> {
     return (
       <section className={classes.join(' ')}>
         {selected && <h2>Active identity</h2>}
-        <ContactPresentation address={identity.getAddress()} size={50} />
+        <ContactPresentation address={identity.address} size={50} />
         <div className="attributes">
           <div>
             <label>Alias</label>
@@ -179,7 +178,7 @@ class IdentityView extends React.Component<Props, State> {
           </div>
           <div>
             <label>KILT Address</label>
-            <div>{identity.getAddress()}</div>
+            <div>{identity.address}</div>
           </div>
           <div>
             <label>Seed (as hex)</label>
@@ -282,10 +281,7 @@ class IdentityView extends React.Component<Props, State> {
               {onDelete && (
                 <button
                   type="button"
-                  onClick={onDelete.bind(
-                    this,
-                    myIdentity.identity.getAddress()
-                  )}
+                  onClick={onDelete.bind(this, myIdentity.identity.address)}
                   disabled={selected}
                 >
                   Remove
@@ -294,10 +290,7 @@ class IdentityView extends React.Component<Props, State> {
               {onSelect && (
                 <button
                   type="button"
-                  onClick={onSelect.bind(
-                    this,
-                    myIdentity.identity.getAddress()
-                  )}
+                  onClick={onSelect.bind(this, myIdentity.identity.address)}
                   disabled={selected}
                 >
                   Select
@@ -310,9 +303,7 @@ class IdentityView extends React.Component<Props, State> {
             <button
               type="button"
               className="requestTokens"
-              onClick={IdentityView.openKiltFaucet(
-                myIdentity.identity.getAddress()
-              )}
+              onClick={IdentityView.openKiltFaucet(myIdentity.identity.address)}
               title="Request Tokens"
             >
               Request Tokens

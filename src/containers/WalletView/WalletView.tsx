@@ -81,12 +81,12 @@ class WalletView extends React.Component<Props> {
   private removeIdentity(address: IPublicIdentity['address']): void {
     const { identities, removeIdentity } = this.props
     const identityToDelete = identities.find(
-      (identity: Wallet.Entry) => identity.identity.getAddress() === address
+      (identity: Wallet.Entry) => identity.identity.address === address
     )
 
     if (identityToDelete) {
       safeDelete(`your identity '${identityToDelete.metaData.name}''`, () => {
-        removeIdentity(identityToDelete.identity.getAddress())
+        removeIdentity(identityToDelete.identity.address)
       })
     }
   }
@@ -97,12 +97,11 @@ class WalletView extends React.Component<Props> {
       let selected = false
       if (selectedIdentity) {
         selected =
-          myIdentity.identity.getAddress() ===
-          selectedIdentity.identity.getAddress()
+          myIdentity.identity.address === selectedIdentity.identity.address
       }
       return (
         <IdentityView
-          key={myIdentity.identity.getAddress()}
+          key={myIdentity.identity.address}
           myIdentity={myIdentity}
           selected={selected}
           onDelete={this.removeIdentity}

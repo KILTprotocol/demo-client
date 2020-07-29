@@ -160,7 +160,7 @@ const getAllDelegations = createSelector(
   (selectedIdentity: IMyIdentity, myDelegations: IMyDelegation[]) => {
     return myDelegations.filter(
       (myDelegation: IMyDelegation) =>
-        myDelegation.account === selectedIdentity.identity.getAddress()
+        myDelegation.account === selectedIdentity.identity.address
     )
   }
 )

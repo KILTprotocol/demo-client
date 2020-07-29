@@ -71,7 +71,7 @@ class CTypeCreate extends React.Component<Props, State> {
   public submit(): void {
     const { selectedIdentity, history } = this.props
     const { connected, isValid, cType: stateCtype } = this.state
-    stateCtype.owner = selectedIdentity?.identity.getAddress()
+    stateCtype.owner = selectedIdentity?.identity.address
     if (selectedIdentity && connected && isValid) {
       let cType: sdk.CType
       let metaData: sdk.ICTypeMetadata
