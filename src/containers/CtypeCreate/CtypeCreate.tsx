@@ -74,11 +74,10 @@ class CTypeCreate extends React.Component<Props, State> {
     stateCtype.owner = selectedIdentity?.identity.getAddress()
     if (selectedIdentity && connected && isValid) {
       let cType: sdk.CType
-      let metadata: sdk.ICTypeMetadata
+      let metaData: sdk.ICTypeMetadata
       try {
         const inputICTypeWithMetadata = fromInputModel(stateCtype)
-        ;({ cType } = inputICTypeWithMetadata)
-        metadata = inputICTypeWithMetadata.metaData
+        ;({ cType, metaData } = inputICTypeWithMetadata)
       } catch (error) {
         errorService.log({
           error,
@@ -96,7 +95,7 @@ class CTypeCreate extends React.Component<Props, State> {
           owner: cType.owner,
           hash: cType.hash,
         },
-        metaData: metadata,
+        metaData,
       }
 
       cType
@@ -120,7 +119,7 @@ class CTypeCreate extends React.Component<Props, State> {
             .then(() => {
               blockUi.remove()
               notifySuccess(
-                `CTYPE ${metadata.metadata.title.default} successfully created.`
+                `CTYPE ${metaData.metadata.title.default} successfully created.`
               ) // something better?
               history.push('/cType')
             })
