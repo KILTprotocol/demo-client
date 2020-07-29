@@ -1,5 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
 import DelegationsService from '../../services/DelegationsService'
@@ -61,7 +61,7 @@ const DelegationDetailView: React.FunctionComponent<Props> = ({
     return node
   }
 
-  const delegationTreeForester = (): void => {
+  const delegationTreeForester = useCallback((): void => {
     getNode(delegationId)
       .then(async (delegationNode: sdk.DelegationNode) => {
         const treeNode: DelegationsTreeNode = {
@@ -81,11 +81,11 @@ const DelegationDetailView: React.FunctionComponent<Props> = ({
       .catch(error => {
         console.log('error', error)
       })
-  }
+  }, [delegationId])
 
   useEffect(() => {
     delegationTreeForester()
-  }, [delegationId, rootNode, delegationsTreeNode])
+  }, [delegationId, delegationTreeForester])
 
   return (
     <section className="DelegationDetailView">
