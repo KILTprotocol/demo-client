@@ -1,4 +1,3 @@
-import * as sdk from '@kiltprotocol/sdk-js'
 import React, { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
