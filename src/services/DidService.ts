@@ -47,7 +47,7 @@ class DidService {
 
   public static async deleteDid(myIdentity: IMyIdentity): Promise<void> {
     const status = await sdk.Did.remove(myIdentity.identity)
-    if (!status.isError) {
+    if (status.isError) {
       throw new Error(
         `Error deleting DID for identity ${myIdentity.metaData.name}`
       )
