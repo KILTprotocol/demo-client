@@ -35,7 +35,7 @@ class BsIdentity {
 
   public static async create(alias: string): Promise<void | IMyIdentity> {
     const randomPhrase = mnemonicGenerate()
-    const identity = Identity.buildFromMnemonic(randomPhrase)
+    const identity = await Identity.buildFromMnemonic(randomPhrase)
 
     return BsIdentity.save(identity, randomPhrase, alias)
   }
@@ -55,12 +55,11 @@ class BsIdentity {
         identity.address,
         ENDOWMENT,
         () => {
-          const { address, boxPublicKeyAsHex } = identity
           const newContact: IContact = {
             metaData: {
               name: alias,
             },
-            publicIdentity: { address, boxPublicKeyAsHex },
+            publicIdentity: identity.getPublicIdentity(),
           }
           PersistentStore.store.dispatch(Contacts.Store.addContact(newContact))
 

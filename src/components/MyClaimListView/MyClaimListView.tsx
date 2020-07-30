@@ -112,9 +112,9 @@ class MyClaimListView extends React.Component<Props, State> {
                   <td
                     className={`status 
                       ${
-                        claimEntry.attestations.find(
-                          (attestedClaim: sdk.IAttestedClaim) =>
-                            !attestedClaim.attestation.revoked
+                        claimEntry.attestedClaims.find(
+                          ({ attestation }) =>
+                            attestation && !attestation.revoked
                         )
                           ? 'attested'
                           : 'revoked'

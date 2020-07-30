@@ -8,7 +8,7 @@ import { IContact } from '../../../types/Contact'
 import './RequestClaimsForCType.scss'
 
 export type RequestClaimsForCTypeProps = {
-  cTypeHashes: Array<sdk.ICType['hash']>
+  cTypeHashes: Array<sdk.ICType['hash'] | null>
   receiverAddresses: Array<IContact['publicIdentity']['address']>
 
   onFinished?: () => void
@@ -38,7 +38,7 @@ class RequestClaimsForCType extends React.Component<Props, State> {
     const { cTypeHashes, receiverAddresses, onFinished } = this.props
 
     const messageBody: sdk.IRequestClaimsForCTypes = {
-      content: cTypeHashes,
+      content: { ctypes: cTypeHashes, allowPE: false },
       type: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
     }
 

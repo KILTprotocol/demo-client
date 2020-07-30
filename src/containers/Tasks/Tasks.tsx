@@ -44,7 +44,7 @@ export type TaskProps =
       props: RequestAttestationProps
     }
   | {
-      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES
+      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC
       props: Partial<SubmitClaimsForCTypeProps>
     }
   | {
@@ -53,7 +53,8 @@ export type TaskProps =
     }
   | {
       objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION
-      props: Partial<RequestAcceptDelegationProps>
+      props: Partial<RequestAcceptDelegationProps> &
+        Pick<RequestAcceptDelegationProps, 'cTypeHash'>
     }
 
 type StateProps = {
@@ -155,7 +156,7 @@ class Tasks extends React.Component<Props, State> {
         const cTypeHash =
           selectedCTypes && selectedCTypes[0]
             ? selectedCTypes[0].cType.hash
-            : undefined
+            : null
         return this.getModal(
           'Request Terms',
           <>
@@ -177,7 +178,7 @@ class Tasks extends React.Component<Props, State> {
       }
       case sdk.MessageBodyType.SUBMIT_TERMS: {
         const { props } = currentTask
-        const cTypeHash = props.claim ? props.claim.cTypeHash : undefined
+        const cTypeHash = props.claim ? props.claim.cTypeHash : null
         return this.getModal(
           'Submit Terms',
           <>
@@ -241,7 +242,7 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
         const { props } = currentTask
 
         return this.getModal(
@@ -355,7 +356,7 @@ class Tasks extends React.Component<Props, State> {
 
   private getCTypeSelect(
     isMulti: boolean,
-    preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | undefined>
+    preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | null>
   ): JSX.Element {
     return (
       <section className="selectCType">

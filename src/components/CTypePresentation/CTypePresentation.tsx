@@ -41,7 +41,8 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   public componentDidMount(): void {
-    this.setCType()
+    const { cTypeHash } = this.props
+    if (cTypeHash) this.setCType()
   }
 
   public componentDidUpdate(prevProps: Props): void {
@@ -121,7 +122,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           PersistentStore.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES,
+              objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
               props: { cTypeHashes: [cTypeHash] } as SubmitClaimsForCTypeProps,
             })
           )

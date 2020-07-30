@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { IPublicIdentity } from '@kiltprotocol/sdk-js'
 import Select from 'react-select'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import ContactRepository from '../../services/ContactRepository'
@@ -21,7 +22,7 @@ const addIdentity = {
 
 type SelectIdentityOption = {
   label: ReactNode
-  value: IMyIdentity['identity']['address']
+  value: IPublicIdentity['address']
 }
 
 type StateProps = {

@@ -31,7 +31,7 @@ class DelegationsService {
   public static async storeOnChain(
     delegation: sdk.DelegationNode,
     signature: string
-  ): Promise<sdk.TxStatus> {
+  ): Promise<sdk.SubmittableResult> {
     const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
@@ -51,7 +51,7 @@ class DelegationsService {
    * @param delegationNodeId id of the intermediate node (non-root node)
    */
   public static async lookupNodeById(
-    delegationNodeId: string
+    delegationNodeId: sdk.IDelegationBaseNode['id']
   ): Promise<sdk.DelegationNode | null> {
     return sdk.DelegationNode.query(delegationNodeId)
   }
@@ -142,7 +142,7 @@ class DelegationsService {
 
   private static async storeRootOnChain(
     delegation: sdk.DelegationRootNode
-  ): Promise<sdk.TxStatus> {
+  ): Promise<sdk.SubmittableResult> {
     const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity

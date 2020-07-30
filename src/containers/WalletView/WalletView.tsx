@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+
 import { Link, withRouter } from 'react-router-dom'
 import IdentityView from '../../components/IdentityView/IdentityView'
 import FeedbackService, {

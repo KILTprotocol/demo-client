@@ -1,8 +1,9 @@
 {
   "CTYPE": {
     "schema": {
-      "$id": "anticov",
+      "$id": "kilt:ctype:0x2ea0486bf4a62423c644fb127226974a8c971da5ddd27ead23b9189161e8bcea",
       "$schema": "http://kilt-protocol.org/draft-01/ctype#",
+      "title": "AntiCov",
       "properties": {
         "photo": {
           "type": "string"
@@ -10,7 +11,7 @@
       },
       "type": "object"
     },
-    "hash": "0x005db4d03c57d15c47083cd363311669f0543e5647e26da1c5f12fe4fa8cd84d",
+    "hash": "0x2ea0486bf4a62423c644fb127226974a8c971da5ddd27ead23b9189161e8bcea",
     "owner": "5Gtn4ZBVeqndGwt41AntNgSDCSBcsiyFr3NAm77UDGXbgxva"
   },
   "CTYPE_METADATA": {
@@ -24,8 +25,7 @@
       "photo": {
         "title": {
           "default": "photo"
-        },
-        "description": {}
+        }
       }
     }
   },

@@ -124,7 +124,8 @@ class MessageDetailView extends React.Component<Props, State> {
             claim={(message.body as sdk.ISubmitTerms).content.claim}
             terms={(message.body as sdk.ISubmitTerms).content.legitimations}
             delegationId={
-              (message.body as sdk.ISubmitTerms).content.delegationId || null
+              (message.body as sdk.ISubmitTerms).content.delegationId ||
+              undefined
             }
             quoteData={(message.body as sdk.ISubmitTerms).content.quote}
             receiverAddresses={[message.senderAddress]}
@@ -153,8 +154,9 @@ class MessageDetailView extends React.Component<Props, State> {
       case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM: {
         return (
           <ImportAttestation
-            attestedClaim={
+            attestation={
               (message.body as sdk.ISubmitAttestationForClaim).content
+                .attestation
             }
             onCancel={this.handleCancel}
             onFinished={this.handleDelete}
@@ -165,17 +167,19 @@ class MessageDetailView extends React.Component<Props, State> {
         return (
           <SubmitClaimsForCType
             receiverAddresses={[message.senderAddress]}
-            cTypeHashes={(message.body as sdk.IRequestClaimsForCTypes).content}
+            cTypeHashes={
+              (message.body as sdk.IRequestClaimsForCTypes).content.ctypes
+            }
             onCancel={this.handleCancel}
             onFinished={this.handleDelete}
           />
         )
       }
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
         return (
           <VerifyClaim
             attestedClaims={
-              (message.body as sdk.ISubmitClaimsForCTypes).content
+              (message.body as sdk.ISubmitClaimsForCTypesClassic).content
             }
           />
         )

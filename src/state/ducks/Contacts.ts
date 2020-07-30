@@ -2,7 +2,7 @@ import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 
 import KiltAction from '../../types/Action'
-import { IContact, IMyIdentity } from '../../types/Contact'
+import { IContact } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
 
 interface IAddContactAction extends KiltAction {
@@ -120,7 +120,7 @@ class Store {
   }
 
   public static removeMyContact(
-    address: IMyIdentity['identity']['address']
+    address: IContact['publicIdentity']['address']
   ): IRemoveContactAction {
     return {
       payload: address,

@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import { IPartialClaim } from '@kiltprotocol/sdk-js'
 
+import RequestForAttestationService from '../../services/RequestForAttestationService'
 import AttestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
@@ -83,10 +84,18 @@ class BsAttestation {
       requestForAttestation
     )
 
+    const attesterIdentity: IMyIdentity = await BsIdentity.getByKey(attesterKey)
+
     // import to claimers claim
     // therefore switch to claimer identity
     BsIdentity.selectIdentity(claimerIdentity)
-    PersistentStore.store.dispatch(Claims.Store.addAttestation(attestedClaim))
+    PersistentStore.store.dispatch(
+      Claims.Store.addRequestForAttestation(
+        requestForAttestation,
+        attesterIdentity.identity.address
+      )
+    )
+    PersistentStore.store.dispatch(Claims.Store.addAttestedClaim(attestedClaim))
 
     if (withMessages) {
       BsAttestation.sendMessages(
@@ -175,12 +184,16 @@ class BsAttestation {
       )
     }
 
-    return sdk.RequestForAttestation.fromClaimAndIdentity(
+    const req4Att = await sdk.RequestForAttestation.fromClaimAndIdentity(
       claimToAttest.claim,
       claimerIdentity.identity,
-      termsFromPool,
-      delegation ? delegation.id : null
+      {
+        legitimations: termsFromPool,
+        delegationId: delegation ? delegation.id : undefined,
+      }
     )
+
+    return req4Att.message
   }
 
   /**
@@ -278,6 +291,12 @@ class BsAttestation {
       content: { requestForAttestation },
       type: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
+
+    RequestForAttestationService.saveInStore(
+      requestForAttestation,
+      attesterIdentity.identity.address
+    )
+
     await MessageRepository.singleSend(
       requestAttestationForClaim,
       claimerIdentity,

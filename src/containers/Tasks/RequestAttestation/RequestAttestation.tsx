@@ -29,7 +29,7 @@ export type RequestAttestationProps = {
   terms: sdk.IAttestedClaim[]
   quoteData?: sdk.IQuoteAttesterSigned
   receiverAddresses: Array<sdk.PublicIdentity['address']>
-  delegationId: sdk.IDelegationNode['id'] | null
+  delegationId: sdk.IDelegationNode['id'] | undefined
   onCancel?: () => void
   onFinished?: () => void
 }
@@ -163,7 +163,7 @@ class RequestAttestation extends React.Component<Props, State> {
     })
   }
 
-  private handleSubmit(): void {
+  private async handleSubmit(): Promise<void> {
     const {
       receiverAddresses,
       terms,
@@ -193,7 +193,7 @@ class RequestAttestation extends React.Component<Props, State> {
         sdk.AttestedClaim.fromAttestedClaim(legitimation)
       )
 
-      const quoteAgreement = QuoteServices.createAgreedQuote(
+      const quoteAgreement = await QuoteServices.createAgreedQuote(
         savedClaimEntry.claim,
         selectedIdentity,
         termBreakdown,
@@ -227,7 +227,11 @@ class RequestAttestation extends React.Component<Props, State> {
     return (
       <section className="RequestAttestation">
         {savedClaimEntry ? (
-          <MyClaimDetailView claimEntry={savedClaimEntry} hideAttestedClaims />
+          <MyClaimDetailView
+            claimEntry={savedClaimEntry}
+            hideAttestedClaims
+            hideRequestForAttestation
+          />
         ) : (
           this.getCreateOrSelect()
         )}

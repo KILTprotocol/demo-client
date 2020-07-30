@@ -1,16 +1,16 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-
 import AttestedClaimsListView from '../AttestedClaimsListView/AttestedClaimsListView'
+import RequestForAttestationListView from '../RequestForAttestationListView/RequestForAttestationListView'
 import * as Claims from '../../state/ducks/Claims'
 import ClaimDetailView from '../ClaimDetailView/ClaimDetailView'
-
 import './MyClaimDetailView.scss'
 
 type Props = {
   cancelable?: boolean
   claimEntry: Claims.Entry
   hideAttestedClaims?: boolean
+  hideRequestForAttestation?: boolean
   onRemoveClaim?: (claimEntry: Claims.Entry) => void
   onRequestAttestation?: (claimEntry: Claims.Entry) => void
   onRequestTerm?: (claimEntry: Claims.Entry) => void
@@ -95,9 +95,14 @@ class MyClaimDetailView extends Component<Props, State> {
   }
 
   public render(): JSX.Element {
-    const { claimEntry, hideAttestedClaims }: Props = this.props
+    const {
+      claimEntry,
+      hideAttestedClaims,
+      hideRequestForAttestation,
+    }: Props = this.props
+    const { attestedClaims } = claimEntry
 
-    return claimEntry ? (
+    return attestedClaims ? (
       <section className="MyClaimDetailView">
         <h1>
           <span>
@@ -106,9 +111,15 @@ class MyClaimDetailView extends Component<Props, State> {
           </span>
         </h1>
         <ClaimDetailView claim={claimEntry.claim} />
-        {!hideAttestedClaims && (
-          <AttestedClaimsListView attestedClaims={claimEntry.attestations} />
+
+        {!hideRequestForAttestation && (
+          <RequestForAttestationListView claim={claimEntry} />
         )}
+
+        {!hideAttestedClaims && (
+          <AttestedClaimsListView attestedClaims={attestedClaims} />
+        )}
+
         {this.getActions()}
       </section>
     ) : (

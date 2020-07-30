@@ -14,6 +14,7 @@ import persistentStore from '../state/PersistentStore'
 import { IContact } from '../types/Contact'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
+import RequestForAttestationService from './RequestForAttestationService'
 
 class AttestationWorkflow {
   /**
@@ -92,7 +93,7 @@ class AttestationWorkflow {
   ): Promise<void> {
     const messageBody: sdk.ISubmitClaimsForCTypes = {
       content: attestedClaims,
-      type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES,
+      type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
     }
 
     return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
@@ -111,21 +112,30 @@ class AttestationWorkflow {
     claim: sdk.IClaim,
     attesterAddresses: Array<IContact['publicIdentity']['address']>,
     terms: sdk.AttestedClaim[] = [],
-    delegationId: sdk.IDelegationNode['id'] | null = null,
+    delegationId?: sdk.IDelegationNode['id'],
     quoteAttesterSigned?: sdk.IQuoteAgreement
   ): Promise<void> {
     const { identity } = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
     )
-    const requestForAttestation = sdk.RequestForAttestation.fromClaimAndIdentity(
+
+    const requestForAttestation = await sdk.RequestForAttestation.fromClaimAndIdentity(
       claim,
       identity,
-      terms,
-      delegationId
+      { ...terms, delegationId }
+    )
+
+    attesterAddresses.forEach(attesterAddress =>
+      RequestForAttestationService.saveInStore(
+        requestForAttestation.message,
+        attesterAddress
+      )
     )
 
     const messageBody: IRequestAttestationForClaim = {
-      content: { requestForAttestation, quote: undefined },
+      content: {
+        requestForAttestation: requestForAttestation.message,
+      },
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
 
@@ -166,7 +176,9 @@ class AttestationWorkflow {
 
     // build 'claim attested' message and send to claimer
     const attestationMessageBody: ISubmitAttestationForClaim = {
-      content: attestedClaim,
+      content: {
+        attestation: attestedClaim.attestation,
+      },
       type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
     }
 

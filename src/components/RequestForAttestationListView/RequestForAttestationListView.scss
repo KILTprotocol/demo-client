@@ -1,0 +1,50 @@
+.RequestForAttestationListView {
+  margin-bottom: $base-padding;
+  @include labeledCard(1);
+
+  & h1 {
+    @include h1('Claim-attested');
+  }
+
+  & table {
+    @include table;
+    @include responsiveTable(
+      (
+        phone: (
+          '*',
+          '*',
+          50px,
+          getActionTdWidth(2),
+        ),
+        tablet: (
+          '*',
+          100px,
+          50px,
+          getActionTdWidth(2),
+        ),
+        desktop: (
+          '*',
+          '*',
+          80px,
+          getActionTdWidth(2),
+        ),
+      )
+    );
+  }
+
+  & .claimerAlias {
+    @extend %ellipsis;
+  }
+
+  & .claimHash {
+    word-break: break-word;
+  }
+
+  & .replied {
+    @include icon($icon-warning);
+  }
+
+  & .delete {
+    @include button-icon-only($icon-trash);
+  }
+}

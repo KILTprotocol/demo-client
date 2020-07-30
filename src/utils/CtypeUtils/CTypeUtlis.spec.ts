@@ -11,6 +11,7 @@ describe('CType', () => {
     schema: {
       $id: 'http://example.com/ctype-1',
       $schema: 'http://kilt-protocol.org/draft-01/ctype#',
+      title: 'Ctype',
       properties: {
         'first-property': { type: 'integer' },
         'second-property': { type: 'string' },
@@ -25,6 +26,7 @@ describe('CType', () => {
     const ctypeInput: ICTypeInput = {
       $id: 'http://example.com/ctype-1',
       $schema: 'http://kilt-protocol.org/draft-01/ctype-input#',
+      title: 'Ctype',
       properties: [
         {
           title: 'First Property',
@@ -38,7 +40,6 @@ describe('CType', () => {
         },
       ],
       type: 'object',
-      title: 'CType Title',
       description: '',
       owner: '',
       required: ['first-property', 'second-property'],

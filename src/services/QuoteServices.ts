@@ -13,22 +13,22 @@ class QuoteServices {
     )
   }
 
-  public static createAgreedQuote(
+  public static async createAgreedQuote(
     claim: sdk.IClaim,
     identity: sdk.Identity,
     terms: sdk.AttestedClaim[] = [],
-    delegationId: sdk.IDelegationNode['id'] | null = null,
+    delegationId?: sdk.IDelegationNode['id'],
     quoteAttesterSigned: sdk.IQuoteAttesterSigned | null = null
-  ): sdk.IQuoteAgreement | null {
+  ): Promise<sdk.IQuoteAgreement | null> {
     if (!quoteAttesterSigned) return null
-    const requestForAttestation = sdk.RequestForAttestation.fromClaimAndIdentity(
-      claim,
-      identity,
-      (terms || []).map((legitimation: sdk.IAttestedClaim) =>
+    const {
+      message: requestForAttestation,
+    } = await sdk.RequestForAttestation.fromClaimAndIdentity(claim, identity, {
+      legitimations: (terms || []).map((legitimation: sdk.IAttestedClaim) =>
         sdk.AttestedClaim.fromAttestedClaim(legitimation)
       ),
-      delegationId
-    )
+      delegationId,
+    })
 
     const signature = identity.signStr(
       sdk.Crypto.hashObjectAsStr(quoteAttesterSigned)
