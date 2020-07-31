@@ -45,14 +45,14 @@ class AttestationWorkflow {
    * claim to the claimer.
    *
    * @param claim the (partial) claim to attest
-   * @param terms the list of terms to be included in the
+   * @param legitimations the list of legitimations to be included in the
    *   attestation
    * @param receiverAddresses  list of contact addresses who will receive the term
-   * @param delegation delegation to add to terms
+   * @param delegation delegation to add to legitimations
    */
   public static async submitTerms(
     claim: IPartialClaim,
-    terms: sdk.IAttestedClaim[],
+    legitimations: sdk.IAttestedClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
     quote?: sdk.IQuoteAttesterSigned,
     receiver?: sdk.IPublicIdentity,
@@ -61,7 +61,7 @@ class AttestationWorkflow {
     const messageBody: sdk.ISubmitTerms = {
       content: {
         claim,
-        legitimations: terms,
+        legitimations,
         delegationId: undefined,
         quote: undefined,
       },
@@ -73,6 +73,7 @@ class AttestationWorkflow {
     if (quote) {
       messageBody.content.quote = quote
     }
+
     if (receiver) {
       return MessageRepository.sendToPublicIdentity(receiver, messageBody)
     }
@@ -104,14 +105,14 @@ class AttestationWorkflow {
    *
    * @param claim - the claim to attest
    * @param attesterAddresses - the addresses of attesters
-   * @param [terms] - the terms the claimer requested
+   * @param [legitimations] - the legitimations the claimer requested
    *   beforehand from attester
    * @param [delegationId] - the delegation the attester added as legitimation
    */
   public static async requestAttestationForClaim(
     claim: sdk.IClaim,
     attesterAddresses: Array<IContact['publicIdentity']['address']>,
-    terms: sdk.AttestedClaim[] = [],
+    legitimations: sdk.AttestedClaim[] = [],
     delegationId?: sdk.IDelegationNode['id'],
     quoteAttesterSigned?: sdk.IQuoteAgreement
   ): Promise<void> {
@@ -122,7 +123,7 @@ class AttestationWorkflow {
     const requestForAttestation = await sdk.RequestForAttestation.fromClaimAndIdentity(
       claim,
       identity,
-      { ...terms, delegationId }
+      { legitimations, delegationId }
     )
 
     attesterAddresses.forEach(attesterAddress =>
