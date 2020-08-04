@@ -45,13 +45,24 @@ class DelegationCreate extends React.Component<Props, State> {
     }
     this.handleNameChange = this.handleNameChange.bind(this)
     this.submit = this.submit.bind(this)
+    this.setDelegation = this.setDelegation.bind(this)
   }
 
   public componentDidMount(): void {
+    this.setDelegation()
+  }
+
+  public componentDidUpdate(prevProps: Props): void {
+    const { selectedIdentity } = this.props
+    if (selectedIdentity !== prevProps.selectedIdentity) {
+      this.setDelegation()
+    }
+  }
+
+  public setDelegation(): void {
     const { match, selectedIdentity } = this.props
     const { cTypeHash } = match.params
     const { alias } = this.state
-
     if (selectedIdentity) {
       this.setState({
         alias,
