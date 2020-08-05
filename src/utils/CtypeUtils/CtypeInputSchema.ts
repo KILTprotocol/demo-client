@@ -4,12 +4,6 @@ export default {
   title: 'CTYPE',
   type: 'object',
   properties: {
-    $id: {
-      title: 'Identifier',
-      type: 'string',
-      format: 'uri-reference',
-      minLength: 1,
-    },
     $schema: {
       title: 'Schema',
       type: 'string',
@@ -40,6 +34,12 @@ export default {
             format: 'uri-reference',
             minLength: 1,
           },
+          $ref: {
+            title: 'Reference',
+            type: 'string',
+            format: 'uri-reference',
+            minLength: 1,
+          },
           type: {
             title: 'Type',
             type: 'string',
@@ -52,7 +52,7 @@ export default {
             enum: ['date', 'time', 'uri'],
           },
         },
-        required: ['$id', 'title', 'type'],
+        required: ['title', 'type', '$id'],
       },
       collapsed: false,
     },
@@ -64,5 +64,5 @@ export default {
       className: 'hidden',
     },
   },
-  required: ['$id', '$schema', 'title', 'properties', 'type'],
+  required: ['$schema', 'title', 'properties', 'type'],
 }

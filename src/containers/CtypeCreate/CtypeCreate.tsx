@@ -71,15 +71,13 @@ class CTypeCreate extends React.Component<Props, State> {
   public submit(): void {
     const { selectedIdentity, history } = this.props
     const { connected, isValid, cType: stateCtype } = this.state
+    stateCtype.owner = selectedIdentity?.identity.address
     if (selectedIdentity && connected && isValid) {
       let cType: sdk.CType
-      let metadata: sdk.ICTypeMetadata
+      let metaData: sdk.ICTypeMetadata
       try {
-        const inputICTypeWithMetadata: ICTypeWithMetadata = fromInputModel(
-          stateCtype
-        )
-        cType = sdk.CType.fromCType(inputICTypeWithMetadata.cType)
-        metadata = inputICTypeWithMetadata.metaData
+        const inputICTypeWithMetadata = fromInputModel(stateCtype)
+        ;({ cType, metaData } = inputICTypeWithMetadata)
       } catch (error) {
         errorService.log({
           error,
@@ -94,11 +92,12 @@ class CTypeCreate extends React.Component<Props, State> {
       const cTypeWrapper: ICTypeWithMetadata = {
         cType: {
           schema: cType.schema,
-          owner: selectedIdentity.identity.address,
+          owner: cType.owner,
           hash: cType.hash,
         },
-        metaData: metadata,
+        metaData,
       }
+
       cType
         .store(selectedIdentity.identity)
         .then(() => {
@@ -120,7 +119,7 @@ class CTypeCreate extends React.Component<Props, State> {
             .then(() => {
               blockUi.remove()
               notifySuccess(
-                `CTYPE ${metadata.metadata.title.default} successfully created.`
+                `CTYPE ${metaData.metadata.title.default} successfully created.`
               ) // something better?
               history.push('/cType')
             })

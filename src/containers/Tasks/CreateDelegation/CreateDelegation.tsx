@@ -167,7 +167,10 @@ class CreateDelegation extends React.Component<Props, State> {
             </div>
           </div>
 
-          <DelegationDetailView id={delegationData.parentId} isPCR={isPCR} />
+          <DelegationDetailView
+            delegationId={delegationData.parentId}
+            isPCR={isPCR}
+          />
 
           <div className="actions">
             <button type="button" onClick={this.onCancel}>

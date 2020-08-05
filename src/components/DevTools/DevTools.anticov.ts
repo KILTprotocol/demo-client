@@ -1,5 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetadata'
+import { ICTypeSchema } from '@kiltprotocol/sdk-js/build/types/CType'
 import {
   ROOT_SEED,
   CTYPE,
@@ -16,19 +17,38 @@ import FeedbackService, {
   notifyFailure,
 } from '../../services/FeedbackService'
 
-const root = sdk.Identity.buildFromMnemonic(ROOT_SEED)
-
-const ctype = sdk.CType.fromCType(CTYPE as sdk.ICType)
-ctype.owner = root.address
+const ctype = sdk.CType.fromSchema(CTYPE.schema as ICTypeSchema)
 const metadata: IMetadata = CTYPE_METADATA
 
-const delegationRoot = new sdk.DelegationRootNode(
-  DELEGATION_ROOT_ID,
-  ctype.hash,
-  root.address
-)
+interface ISetup {
+  root: sdk.Identity
+  delegationRoot: sdk.DelegationRootNode
+}
+
+let cachedSetup: ISetup
+
+async function setup(): Promise<ISetup> {
+  if (!cachedSetup) {
+    const root = await sdk.Identity.buildFromMnemonic(ROOT_SEED)
+
+    const delegationRoot = new sdk.DelegationRootNode(
+      DELEGATION_ROOT_ID,
+      ctype.hash,
+      root.address
+    )
+
+    cachedSetup = {
+      root,
+      delegationRoot,
+    }
+  }
+
+  return { root: cachedSetup.root, delegationRoot: cachedSetup.delegationRoot }
+}
 
 async function newDelegation(delegate: IMyIdentity): Promise<void> {
+  const { root, delegationRoot } = await setup()
+
   const delegationNode = new sdk.DelegationNode(
     sdk.UUID.generate(),
     delegationRoot.id,
@@ -55,6 +75,7 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
 }
 
 async function verifyOrAddCtypeAndRoot(): Promise<void> {
+  const { root, delegationRoot } = await setup()
   if (!(await ctype.verifyStored())) {
     await ctype.store(root)
     CTypeRepository.register({
@@ -74,13 +95,14 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
     }
     notifySuccess(`AntiCov Delegation Root successfully created.`)
     // sending root owner message for importing the root
-    const message = new sdk.Message(messageBody, root, root)
+    const message = new sdk.Message(messageBody, root, root.getPublicIdentity())
     await MessageRepository.dispatchMessage(message)
     notifySuccess(`Sent Delegation Root to AntiCov root authority.`)
   }
 }
 
 export async function setupAndDelegate(delegate: IMyIdentity): Promise<void> {
+  const { root } = await setup()
   const blockUi = FeedbackService.addBlockUi({
     headline: 'Creating AntiCov Delegation',
   })

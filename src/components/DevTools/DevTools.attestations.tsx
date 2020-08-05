@@ -1,6 +1,7 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import { IPartialClaim } from '@kiltprotocol/sdk-js'
 
+import RequestForAttestationService from '../../services/RequestForAttestationService'
 import AttestationService from '../../services/AttestationService'
 import ContactRepository from '../../services/ContactRepository'
 import MessageRepository from '../../services/MessageRepository'
@@ -22,7 +23,7 @@ type UpdateCallback = (bsAttestationKey: keyof BsAttestationsPool) => void
 type BsAttestationsPoolElement = {
   attest: {
     attesterKey: keyof BsIdentitiesPool
-    legitimations?: Array<keyof BsAttestationsPool>
+    terms?: Array<keyof BsAttestationsPool>
     delegationKey?: keyof BsDelegationsPool
   }
   claimKey: keyof BsClaimsPool
@@ -83,10 +84,18 @@ class BsAttestation {
       requestForAttestation
     )
 
+    const attesterIdentity: IMyIdentity = await BsIdentity.getByKey(attesterKey)
+
     // import to claimers claim
     // therefore switch to claimer identity
     BsIdentity.selectIdentity(claimerIdentity)
-    PersistentStore.store.dispatch(Claims.Store.addAttestation(attestedClaim))
+    PersistentStore.store.dispatch(
+      Claims.Store.addRequestForAttestation(
+        requestForAttestation,
+        attesterIdentity.identity.address
+      )
+    )
+    PersistentStore.store.dispatch(Claims.Store.addAttestedClaim(attestedClaim))
 
     if (withMessages) {
       BsAttestation.sendMessages(
@@ -152,7 +161,7 @@ class BsAttestation {
     claimerIdentity: IMyIdentity
   ): Promise<sdk.RequestForAttestation> {
     const { attest } = bsAttestationData
-    const { delegationKey, legitimations } = attest
+    const { delegationKey, terms } = attest
 
     // resolve delegation
     let delegation: IMyDelegation | undefined
@@ -160,11 +169,10 @@ class BsAttestation {
       delegation = await BsDelegation.getDelegationByKey(delegationKey)
     }
 
-    // get legitimations of attester
-    let legitimationsFromPool: sdk.AttestedClaim[] = []
-    if (legitimations && Array.isArray(legitimations) && legitimations.length) {
-      legitimationsFromPool = await Promise.all(
-        legitimations.map(bsAttestationKey => {
+    let termsFromPool: sdk.AttestedClaim[] = []
+    if (terms && Array.isArray(terms) && terms.length) {
+      termsFromPool = await Promise.all(
+        terms.map(bsAttestationKey => {
           const bsAttestedClaim = bsAttestedClaims[bsAttestationKey]
           if (bsAttestedClaim) {
             return Promise.resolve(bsAttestedClaim)
@@ -176,12 +184,16 @@ class BsAttestation {
       )
     }
 
-    return sdk.RequestForAttestation.fromClaimAndIdentity(
+    const req4Att = await sdk.RequestForAttestation.fromClaimAndIdentity(
       claimToAttest.claim,
       claimerIdentity.identity,
-      legitimationsFromPool,
-      delegation ? delegation.id : null
+      {
+        legitimations: termsFromPool,
+        delegationId: delegation ? delegation.id : undefined,
+      }
     )
+
+    return req4Att.message
   }
 
   /**
@@ -247,7 +259,7 @@ class BsAttestation {
       owner: claimerIdentity.identity.address,
     }
 
-    // send request for legitimation from claimer to attester
+    // send request for term from claimer to attester
     const requestAcceptDelegation: sdk.IRequestTerms = {
       content: partialClaim,
       type: sdk.MessageBodyType.REQUEST_TERMS,
@@ -258,17 +270,18 @@ class BsAttestation {
       ContactRepository.getContactFromIdentity(attesterIdentity)
     )
 
-    // send legitimations from attester to claimer
-    const submitLegitimations: sdk.ISubmitTerms = {
+    // send terms from attester to claimer
+    const submitTerms: sdk.ISubmitTerms = {
       content: {
         claim: partialClaim,
         delegationId: attestedClaim.request.delegationId || undefined,
         legitimations: attestedClaim.request.legitimations,
+        quote: undefined,
       },
       type: sdk.MessageBodyType.SUBMIT_TERMS,
     }
     await MessageRepository.singleSend(
-      submitLegitimations,
+      submitTerms,
       attesterIdentity,
       ContactRepository.getContactFromIdentity(claimerIdentity)
     )
@@ -278,6 +291,12 @@ class BsAttestation {
       content: { requestForAttestation },
       type: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
+
+    RequestForAttestationService.saveInStore(
+      requestForAttestation,
+      attesterIdentity.identity.address
+    )
+
     await MessageRepository.singleSend(
       requestAttestationForClaim,
       claimerIdentity,

@@ -1,8 +1,9 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
+import { ERROR_CTYPE_ALREADY_EXISTS } from '@kiltprotocol/sdk-js'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
-import { notifySuccess } from '../../services/FeedbackService'
+import { notifySuccess, notifyError } from '../../services/FeedbackService'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BsIdentity } from './DevTools.wallet'
 
@@ -26,18 +27,21 @@ class BsCType {
     // replace owner key with his address
     const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
       .identity
-
-    const cType = sdk.CType.fromCType({
-      schema: bsCTypeData.schema,
-      hash: bsCTypeData.hash,
-      owner: ownerIdentity.address,
-    })
+    const cType = sdk.CType.fromSchema(
+      bsCTypeData.schema,
+      ownerIdentity.address
+    )
 
     return cType
       .store(ownerIdentity)
+      .catch(error => {
+        if (error === ERROR_CTYPE_ALREADY_EXISTS) {
+          notifyError(error, false)
+        } else throw error
+      })
       .then(() => {
         const cTypeWrapper: ICTypeWithMetadata = {
-          cType,
+          cType: { ...cType, owner: null },
           metaData: {
             metadata: bsCTypeData.metadata,
             ctypeHash: cType.hash,

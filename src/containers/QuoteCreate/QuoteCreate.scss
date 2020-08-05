@@ -1,0 +1,9 @@
+.QuoteCreate {
+  @include labeledCard;
+  & h1 {
+    @include h1('Ctype');
+  }
+  & > div {
+    @include label-input-combo;
+  }
+}

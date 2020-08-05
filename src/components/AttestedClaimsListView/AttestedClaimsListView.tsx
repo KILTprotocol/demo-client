@@ -20,7 +20,7 @@ interface IPossibleLabels {
 
 interface ILabels {
   default: IPossibleLabels
-  legitimations: IPossibleLabels
+  terms: IPossibleLabels
 }
 
 const LABELS: ILabels = {
@@ -29,16 +29,16 @@ const LABELS: ILabels = {
     h2Multi: 'Attested claims',
     h2Single: 'Attested claim',
   },
-  legitimations: {
-    emptyList: 'No legitimations found.',
-    h2Multi: 'Legitimations',
-    h2Single: 'Legitimation',
+  terms: {
+    emptyList: 'No terms found.',
+    h2Multi: 'terms',
+    h2Single: 'term',
   },
 }
 
 type Props = {
   attestedClaims: sdk.IAttestedClaim[]
-  context?: 'legitimations'
+  context?: 'terms'
   delegationId: sdk.IDelegationNode['id'] | null
   currentDelegationViewType?: ViewType
 
@@ -172,7 +172,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
                         <AttestedClaimsListView
                           attestedClaims={attestedClaim.request.legitimations}
                           delegationId={attestedClaim.request.delegationId}
-                          context="legitimations"
+                          context="terms"
                           onToggleChildOpen={this.toggleChildOpen}
                         />
 
@@ -203,7 +203,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
         <h2>Delegation</h2>
         {delegationId ? (
           <DelegationDetailView
-            id={delegationId}
+            delegationId={delegationId}
             viewType={currentDelegationViewType}
           />
         ) : (
@@ -247,7 +247,6 @@ class AttestedClaimsListView extends React.Component<Props, State> {
   public render(): JSX.Element {
     const { attestedClaims, context, delegationId } = this.props
     const { labels, openedAttestedClaim } = this.state
-
     const classes = [
       'AttestedClaimsListView',
       openedAttestedClaim ? 'opened' : '',

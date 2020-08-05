@@ -1,4 +1,3 @@
-import * as sdk from '@kiltprotocol/sdk-js'
 import React, { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
@@ -19,7 +18,7 @@ type SelectOption = {
 type Props = RouteComponentProps<{}> & {
   closeMenuOnSelect?: boolean
   claims?: Claims.Entry[]
-  cTypeHash?: ICType['cType']['hash']
+  cTypeHash: ICType['cType']['hash'] | null
   isMulti?: boolean
   placeholder?: string
   preSelectedClaimEntries?: Claims.Entry[]
@@ -82,11 +81,8 @@ class SelectClaims extends React.Component<Props, State> {
   private static getOption(claim: Claims.Entry): SelectOption {
     {
       const isApproved =
-        claim.attestations &&
-        claim.attestations.find(
-          (attestedClaim: sdk.IAttestedClaim) =>
-            !attestedClaim.attestation.revoked
-        )
+        claim.attestedClaims &&
+        claim.attestedClaims.find(({ attestation }) => !attestation.revoked)
       return {
         baseValue: claim.meta.alias,
         label: (

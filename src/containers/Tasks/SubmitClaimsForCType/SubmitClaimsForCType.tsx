@@ -13,7 +13,7 @@ import { IContact } from '../../../types/Contact'
 import './SubmitClaimsForCType.scss'
 
 export type SubmitClaimsForCTypeProps = {
-  cTypeHashes: Array<sdk.ICType['hash']>
+  cTypeHashes: Array<sdk.ICType['hash'] | null>
   receiverAddresses: Array<IContact['publicIdentity']['address']>
 
   onFinished?: () => void

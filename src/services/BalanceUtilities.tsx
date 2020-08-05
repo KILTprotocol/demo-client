@@ -12,6 +12,7 @@ import { notify, notifySuccess } from './FeedbackService'
 
 const KILT_COIN = 1
 const KILT_MICRO_COIN = 1_000_000
+const KILT_FEMTO_COIN = '1000000000000000'
 
 // cost of a chain transaction
 const TRANSACTION_FEE = 1 * KILT_COIN
@@ -66,7 +67,7 @@ class BalanceUtilities {
     amount: number,
     successCallback?: () => void
   ): void {
-    const transferAmount: BN = BalanceUtilities.asMicroKilt(amount)
+    const transferAmount: BN = BalanceUtilities.asFemtoKilt(amount)
     notify(
       <div>
         <span>Transfer of </span>
@@ -83,7 +84,7 @@ class BalanceUtilities {
       .then(() => {
         notifySuccess(
           <div>
-            <span>Successfully transfered </span>
+            <span>Successfully transferred </span>
             <KiltToken amount={amount} />
             <span> to </span>
             <ContactPresentation address={receiverAddress} inline />.
@@ -130,11 +131,15 @@ class BalanceUtilities {
   }
 
   public static asKiltCoin(balance: BN): number {
-    return balance.divn(KILT_MICRO_COIN).toNumber()
+    return balance.div(new BN(KILT_FEMTO_COIN)).toNumber()
   }
 
   public static asMicroKilt(balance: number): BN {
     return new BN(balance).muln(KILT_MICRO_COIN)
+  }
+
+  public static asFemtoKilt(balance: number): BN {
+    return new BN(balance).mul(new BN(KILT_FEMTO_COIN))
   }
 }
 

@@ -18,15 +18,11 @@ import RequestAttestation, {
 import RequestClaimsForCType, {
   RequestClaimsForCTypeProps,
 } from './RequestClaimsForCType/RequestClaimsForCType'
-import RequestLegitimation, {
-  RequestLegitimationsProps,
-} from './RequestLegitimation/RequestLegitimation'
+import RequestTerm, { RequestTermsProps } from './RequestTerms/RequestTerms'
 import SubmitClaimsForCType, {
   SubmitClaimsForCTypeProps,
 } from './SubmitClaimsForCType/SubmitClaimsForCType'
-import SubmitLegitimations, {
-  SubmitLegitimationsProps,
-} from './SubmitLegitimations/SubmitLegitimations'
+import SubmitTerms, { SubmitTermsProps } from './SubmitTerms/SubmitTerms'
 
 import './Tasks.scss'
 
@@ -37,18 +33,18 @@ export type TaskProps =
     }
   | {
       objective: sdk.MessageBodyType.REQUEST_TERMS
-      props: RequestLegitimationsProps
+      props: RequestTermsProps
     }
   | {
       objective: sdk.MessageBodyType.SUBMIT_TERMS
-      props: SubmitLegitimationsProps
+      props: SubmitTermsProps
     }
   | {
       objective: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
       props: RequestAttestationProps
     }
   | {
-      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES
+      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC
       props: Partial<SubmitClaimsForCTypeProps>
     }
   | {
@@ -57,7 +53,8 @@ export type TaskProps =
     }
   | {
       objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION
-      props: Partial<RequestAcceptDelegationProps>
+      props: Partial<RequestAcceptDelegationProps> &
+        Pick<RequestAcceptDelegationProps, 'cTypeHash'>
     }
 
 type StateProps = {
@@ -159,13 +156,13 @@ class Tasks extends React.Component<Props, State> {
         const cTypeHash =
           selectedCTypes && selectedCTypes[0]
             ? selectedCTypes[0].cType.hash
-            : undefined
+            : null
         return this.getModal(
-          'Request legitimations',
+          'Request Terms',
           <>
             {this.getCTypeSelect(false, [props.cTypeHash])}
             {!!selectedCTypes.length && !!selectedReceivers.length ? (
-              <RequestLegitimation
+              <RequestTerm
                 {...props}
                 cTypeHash={cTypeHash}
                 receiverAddresses={selectedReceiverAddresses}
@@ -181,15 +178,15 @@ class Tasks extends React.Component<Props, State> {
       }
       case sdk.MessageBodyType.SUBMIT_TERMS: {
         const { props } = currentTask
-        const cTypeHash = props.claim ? props.claim.cTypeHash : undefined
+        const cTypeHash = props.claim ? props.claim.cTypeHash : null
         return this.getModal(
-          'Submit legitimations',
+          'Submit Terms',
           <>
             {this.getCTypeSelect(false, [cTypeHash])}
             {!!selectedCTypes.length &&
             selectedCTypes[0].cType.hash &&
             !!selectedReceivers.length ? (
-              <SubmitLegitimations
+              <SubmitTerms
                 {...props}
                 claim={{ cTypeHash: selectedCTypes[0].cType.hash }}
                 receiverAddresses={selectedReceiverAddresses}
@@ -245,7 +242,7 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
         const { props } = currentTask
 
         return this.getModal(
@@ -359,7 +356,7 @@ class Tasks extends React.Component<Props, State> {
 
   private getCTypeSelect(
     isMulti: boolean,
-    preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | undefined>
+    preSelectedCTypeHashes?: Array<ICType['cType']['hash'] | null>
   ): JSX.Element {
     return (
       <section className="selectCType">

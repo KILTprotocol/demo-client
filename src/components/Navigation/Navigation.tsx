@@ -12,6 +12,7 @@ const links: NavLink[] = [
   { url: 'claim', label: 'Claims' },
   { url: 'attestations', label: 'Attestations' },
   { url: 'delegations', label: 'Delegations' },
+  { url: 'quote', label: 'Quotes' },
   { url: 'pcrs', label: 'PCRs' },
   { url: 'contacts', label: 'Contacts' },
   { url: 'messages', label: 'Messages' },

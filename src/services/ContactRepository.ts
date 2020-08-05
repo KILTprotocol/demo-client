@@ -99,11 +99,10 @@ class ContactRepository {
     mergeMetaData?: Partial<IContact['metaData']>
   ): IContact {
     const { identity, metaData } = myIdentity
-    const { address, boxPublicKeyAsHex } = identity
 
     const contact: IContact = {
       metaData: { ...metaData, ...mergeMetaData },
-      publicIdentity: { address, boxPublicKeyAsHex },
+      publicIdentity: identity.getPublicIdentity(),
     }
 
     return contact

@@ -33,7 +33,7 @@ class AttestationService {
 
     const attestation = Kilt.Attestation.fromRequestAndPublicIdentity(
       requestForAttestation,
-      selectedIdentity
+      selectedIdentity.getPublicIdentity()
     )
 
     const attestedClaim = Kilt.AttestedClaim.fromRequestAndAttestation(
@@ -152,22 +152,26 @@ class AttestationService {
     claimSelectionData: ClaimSelectionData
   ): IAttestedClaim[] {
     const selectedClaimEntryIds = Object.keys(claimSelectionData)
+
     const attestedClaims: IAttestedClaim[] = []
+
     selectedClaimEntryIds.forEach(
       (selectedClaimEntryId: Claims.Entry['id']) => {
         const { claimEntry, state } = claimSelectionData[selectedClaimEntryId]
+
         state.selectedAttestedClaims.forEach(
           (selectedAttestedClaim: IAttestedClaim) => {
-            attestedClaims.push(
-              Kilt.AttestedClaim.fromAttestedClaim(
-                selectedAttestedClaim
-              ).createPresentation(
-                AttestationService.getExcludedProperties(
-                  claimEntry,
-                  state.selectedClaimProperties
-                )
+            const attClaim = Kilt.AttestedClaim.fromAttestedClaim(
+              selectedAttestedClaim
+            )
+
+            attClaim.request.removeClaimProperties(
+              AttestationService.getExcludedProperties(
+                claimEntry,
+                state.selectedClaimProperties
               )
             )
+            attestedClaims.push(attClaim)
           }
         )
       }

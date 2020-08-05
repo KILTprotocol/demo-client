@@ -25,7 +25,7 @@ export type SelectAttestedClaimsLabels = {
 
 type AllLabels = {
   default: SelectAttestedClaimsLabels
-  legitimation: SelectAttestedClaimsLabels
+  term: SelectAttestedClaimsLabels
 }
 
 const LABELS: AllLabels = {
@@ -42,18 +42,17 @@ const LABELS: AllLabels = {
       noClaimsFound: `No claims found.`,
     },
   },
-  legitimation: {
+  term: {
     buttons: {
-      createClaim: 'Create legitimation',
+      createClaim: 'Create Terms',
       requestAttestation: 'Request attestation(s)',
     },
     text: {
       attestationsHeadline: 'Select attestation(s)',
-      includePropertiesHeadline:
-        'Select property(s) to include in Legitimation',
+      includePropertiesHeadline: 'Select property(s) to include in Terms',
       noAttestationFound: 'No attestation found.',
       noClaimsForCTypeFound: `No attested claims found for CTYPE. `,
-      noClaimsFound: `No legitimations found.`,
+      noClaimsFound: `No terms found.`,
     },
   },
 }
@@ -74,8 +73,8 @@ type StateProps = {
 }
 
 type OwnProps = {
-  cTypeHashes?: Array<sdk.ICType['hash']>
-  context?: 'default' | 'legitimation'
+  cTypeHashes?: Array<sdk.ICType['hash'] | null>
+  context?: 'default' | 'terms'
   onChange: (claimSelectionData: ClaimSelectionData) => void
 }
 
@@ -177,7 +176,7 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     return groupBy(
       relevantClaimEntries.filter(
         (claimEntry: Claims.Entry) =>
-          claimEntry.attestations && claimEntry.attestations.length
+          claimEntry.attestedClaims && claimEntry.attestedClaims.length
       ),
       (claimEntry: Claims.Entry) => claimEntry.claim.cTypeHash
     )

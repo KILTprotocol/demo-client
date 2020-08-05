@@ -6,13 +6,13 @@ import attestationWorkflow from '../../../services/AttestationWorkflow'
 import * as Claims from '../../../state/ducks/Claims'
 import { ICType } from '../../../types/Ctype'
 
-import './RequestLegitimation.scss'
+import './RequestTerms.scss'
+import { notifyFailure } from '../../../services/FeedbackService'
 
-export type RequestLegitimationsProps = {
-  cTypeHash?: ICType['cType']['hash']
+export type RequestTermsProps = {
+  cTypeHash: ICType['cType']['hash'] | null
   receiverAddresses: Array<sdk.PublicIdentity['address']>
   preSelectedClaimEntries?: Claims.Entry[]
-
   onFinished?: () => void
   onCancel?: () => void
 }
@@ -21,11 +21,8 @@ type State = {
   selectedClaimEntries?: Claims.Entry[]
 }
 
-class RequestLegitimation extends React.Component<
-  RequestLegitimationsProps,
-  State
-> {
-  constructor(props: RequestLegitimationsProps) {
+class RequestTerms extends React.Component<RequestTermsProps, State> {
+  constructor(props: RequestTermsProps) {
     super(props)
     this.state = {
       selectedClaimEntries: props.preSelectedClaimEntries,
@@ -47,35 +44,43 @@ class RequestLegitimation extends React.Component<
     }
   }
 
-  private isValid(): number {
-    const { receiverAddresses } = this.props
-    return receiverAddresses && receiverAddresses.length
-  }
-
   private handleSubmit(): void {
     const { cTypeHash, receiverAddresses, onFinished } = this.props
     const { selectedClaimEntries } = this.state
-    let claims: sdk.IPartialClaim[] = cTypeHash ? [{ cTypeHash }] : []
 
-    if (selectedClaimEntries && selectedClaimEntries.length) {
-      claims = selectedClaimEntries.map(claimEntry => claimEntry.claim)
-    }
+    if (cTypeHash) {
+      let claims: sdk.IPartialClaim[] = [{ cTypeHash }]
 
-    if (this.isValid()) {
-      attestationWorkflow
-        .requestLegitimations(claims, receiverAddresses)
-        .then(() => {
+      if (selectedClaimEntries && selectedClaimEntries.length) {
+        claims = selectedClaimEntries.map(
+          (claimEntry: Claims.Entry) => claimEntry.claim
+        )
+      } else {
+        notifyFailure(
+          `Cannot resolve due to Corresponding CType Hash: ${cTypeHash} not matching`
+        )
+      }
+
+      if (this.isValid()) {
+        attestationWorkflow.requestTerms(claims, receiverAddresses).then(() => {
           if (onFinished) {
             onFinished()
           }
         })
+      }
     }
+  }
+
+  private isValid(): boolean {
+    const { receiverAddresses } = this.props
+    return !!(receiverAddresses && receiverAddresses.length)
   }
 
   public render(): JSX.Element {
     const { cTypeHash, preSelectedClaimEntries, receiverAddresses } = this.props
+
     return (
-      <section className="RequestLegitimation">
+      <section className="RequestTerms">
         <section className="selectClaims">
           <h2 className="optional">Select claim</h2>
           <SelectClaims
@@ -89,12 +94,12 @@ class RequestLegitimation extends React.Component<
             Cancel
           </button>
           <button
+            className="requestTerms"
             type="button"
-            className="requestLegitimation"
             disabled={!receiverAddresses.length}
             onClick={this.handleSubmit}
           >
-            Request Legitimation
+            Request Terms
           </button>
         </div>
       </section>
@@ -102,4 +107,4 @@ class RequestLegitimation extends React.Component<
   }
 }
 
-export default RequestLegitimation
+export default RequestTerms

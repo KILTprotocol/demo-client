@@ -1,19 +1,19 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-
 import AttestedClaimsListView from '../AttestedClaimsListView/AttestedClaimsListView'
+import RequestForAttestationListView from '../RequestForAttestationListView/RequestForAttestationListView'
 import * as Claims from '../../state/ducks/Claims'
 import ClaimDetailView from '../ClaimDetailView/ClaimDetailView'
-
 import './MyClaimDetailView.scss'
 
 type Props = {
   cancelable?: boolean
   claimEntry: Claims.Entry
   hideAttestedClaims?: boolean
+  hideRequestForAttestation?: boolean
   onRemoveClaim?: (claimEntry: Claims.Entry) => void
   onRequestAttestation?: (claimEntry: Claims.Entry) => void
-  onRequestLegitimation?: (claimEntry: Claims.Entry) => void
+  onRequestTerm?: (claimEntry: Claims.Entry) => void
 }
 
 type State = {
@@ -25,7 +25,7 @@ class MyClaimDetailView extends Component<Props, State> {
     super(props)
     this.handleDelete = this.handleDelete.bind(this)
     this.requestAttestation = this.requestAttestation.bind(this)
-    this.requestLegitimation = this.requestLegitimation.bind(this)
+    this.requestTerm = this.requestTerm.bind(this)
   }
 
   private getActions(): JSX.Element {
@@ -33,7 +33,7 @@ class MyClaimDetailView extends Component<Props, State> {
       cancelable,
       onRemoveClaim,
       onRequestAttestation,
-      onRequestLegitimation,
+      onRequestTerm,
     }: Props = this.props
     return (
       <div className="actions">
@@ -49,14 +49,14 @@ class MyClaimDetailView extends Component<Props, State> {
             onClick={this.handleDelete}
           />
         )}
-        {onRequestLegitimation && (
+        {onRequestTerm && (
           <button
             type="button"
-            className="requestLegitimation"
-            onClick={this.requestLegitimation}
-            title="Request legitimation for attestation of this claim from attester"
+            className="requestTerm"
+            onClick={this.requestTerm}
+            title="Request term for attestation of this claim from attester"
           >
-            Request Legitimation
+            Request Term
           </button>
         )}
         {onRequestAttestation && (
@@ -87,17 +87,22 @@ class MyClaimDetailView extends Component<Props, State> {
     }
   }
 
-  private requestLegitimation(): void {
-    const { claimEntry, onRequestLegitimation }: Props = this.props
-    if (claimEntry && onRequestLegitimation) {
-      onRequestLegitimation(claimEntry)
+  private requestTerm(): void {
+    const { claimEntry, onRequestTerm }: Props = this.props
+    if (claimEntry && onRequestTerm) {
+      onRequestTerm(claimEntry)
     }
   }
 
   public render(): JSX.Element {
-    const { claimEntry, hideAttestedClaims }: Props = this.props
+    const {
+      claimEntry,
+      hideAttestedClaims,
+      hideRequestForAttestation,
+    }: Props = this.props
+    const { attestedClaims } = claimEntry
 
-    return claimEntry ? (
+    return attestedClaims ? (
       <section className="MyClaimDetailView">
         <h1>
           <span>
@@ -106,9 +111,15 @@ class MyClaimDetailView extends Component<Props, State> {
           </span>
         </h1>
         <ClaimDetailView claim={claimEntry.claim} />
-        {!hideAttestedClaims && (
-          <AttestedClaimsListView attestedClaims={claimEntry.attestations} />
+
+        {!hideRequestForAttestation && (
+          <RequestForAttestationListView claim={claimEntry} />
         )}
+
+        {!hideAttestedClaims && (
+          <AttestedClaimsListView attestedClaims={attestedClaims} />
+        )}
+
         {this.getActions()}
       </section>
     ) : (

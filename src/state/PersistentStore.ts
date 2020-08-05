@@ -9,6 +9,7 @@ import * as Delegations from './ducks/Delegations'
 import * as Parameters from './ducks/Parameters'
 import * as Contacts from './ducks/Contacts'
 import * as CTypes from './ducks/CTypes'
+import * as Quotes from './ducks/Quotes'
 
 declare global {
   /* eslint-disable */
@@ -27,6 +28,7 @@ export type State = {
   cTypes: CTypes.ImmutableState
   delegations: Delegations.ImmutableState
   parameters: Parameters.ImmutableState
+  quotes: Quotes.ImmutableState
   uiState: UiState.ImmutableState
   wallet: Wallet.ImmutableState
 }
@@ -37,6 +39,7 @@ type SerializedState = {
   contacts: Contacts.SerializedState
   delegations: Delegations.SerializedState
   parameters: Parameters.SerializedState
+  quotes: Quotes.SerializedState
   uiState: UiState.SerializedState
   wallet: Wallet.SerializedState
 }
@@ -48,15 +51,18 @@ class PersistentStore {
 
   private static NAME = 'reduxState'
 
-  private static deserialize(obj: SerializedState): Partial<State> {
+  private static async deserialize(
+    obj: SerializedState
+  ): Promise<Partial<State>> {
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
       contacts: Contacts.Store.deserialize(obj.contacts),
       delegations: Delegations.Store.deserialize(obj.delegations),
       parameters: Parameters.Store.deserialize(obj.parameters),
+      quotes: Quotes.Store.deserialize(obj.quotes),
       uiState: UiState.Store.deserialize(),
-      wallet: Wallet.Store.deserialize(obj.wallet),
+      wallet: await Wallet.Store.deserialize(obj.wallet),
     }
   }
 
@@ -67,6 +73,7 @@ class PersistentStore {
       contacts: Contacts.Store.serialize(state.contacts),
       delegations: Delegations.Store.serialize(state.delegations),
       parameters: Parameters.Store.serialize(state.parameters),
+      quotes: Quotes.Store.serialize(state.quotes),
       uiState: UiState.Store.serialize(),
       wallet: Wallet.Store.serialize(state.wallet),
     }
@@ -76,12 +83,14 @@ class PersistentStore {
 
   private storeInternal: Store
 
-  constructor() {
+  public async init(): Promise<Store> {
     const localState = localStorage.getItem(PersistentStore.NAME)
     let persistedState: Partial<State> = {}
     if (localState) {
       try {
-        persistedState = PersistentStore.deserialize(JSON.parse(localState))
+        persistedState = await PersistentStore.deserialize(
+          JSON.parse(localState)
+        )
       } catch (error) {
         console.error('Could not construct persistentStore', error)
       }
@@ -96,6 +105,7 @@ class PersistentStore {
         contacts: Contacts.Store.reducer,
         delegations: Delegations.Store.reducer,
         parameters: Parameters.Store.reducer,
+        quotes: Quotes.Store.reducer,
         uiState: UiState.Store.reducer,
         wallet: Wallet.Store.reducer,
       }),
@@ -112,6 +122,8 @@ class PersistentStore {
         PersistentStore.serialize(this.storeInternal.getState())
       )
     })
+
+    return this.storeInternal
   }
 
   // eslint-disable-next-line class-methods-use-this

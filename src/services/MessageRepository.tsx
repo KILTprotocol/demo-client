@@ -138,7 +138,7 @@ class MessageRepository {
       .then(response => response.json())
       .then(message => {
         return ContactRepository.findByAddress(message.senderAddress).then(() =>
-          sdk.Message.createFromEncryptedMessage(message, myIdentity)
+          sdk.Message.decrypt(message, myIdentity)
         )
       })
   }
@@ -155,10 +155,7 @@ class MessageRepository {
               encryptedMessage.senderAddress
             ).then((contact: IContact) => {
               try {
-                const m = sdk.Message.createFromEncryptedMessage(
-                  encryptedMessage,
-                  myIdentity
-                )
+                const m = sdk.Message.decrypt(encryptedMessage, myIdentity)
                 sdk.Message.ensureOwnerIsSender(m)
                 let sender = contact
                 if (!sender) {
@@ -196,7 +193,7 @@ class MessageRepository {
   public static async dispatchMessage(message: sdk.Message): Promise<Response> {
     const response = await fetch(`${MessageRepository.URL}`, {
       ...BasePostParams,
-      body: JSON.stringify(message.getEncryptedMessage()),
+      body: JSON.stringify(message.encrypt()),
     })
     if (!response.ok) {
       throw new Error(response.statusText)
@@ -264,19 +261,16 @@ class MessageRepository {
         ]
       case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
         return [
-          (message.body as ISubmitAttestationForClaim).content.request.claim
-            .cTypeHash,
-        ]
-      case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
-        return [
-          (message.body as sdk.IRejectAttestationForClaim).content.claim
+          (message.body as ISubmitAttestationForClaim).content.attestation
             .cTypeHash,
         ]
 
       case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
-        return (message.body as sdk.IRequestClaimsForCTypes).content
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
-        const cTypeHashes = (message.body as sdk.ISubmitClaimsForCTypes).content.map(
+        return (message.body as sdk.IRequestClaimsForCTypes).content.ctypes.filter(
+          Boolean
+        ) as Array<sdk.ICType['hash']>
+      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
+        const cTypeHashes = (message.body as sdk.ISubmitClaimsForCTypesClassic).content.map(
           attestedClaim => attestedClaim.request.claim.cTypeHash
         )
         const uniqueCTypeHashes: Array<ICType['cType']['hash']> = cTypeHashes.filter(
@@ -285,17 +279,8 @@ class MessageRepository {
         )
         return uniqueCTypeHashes
       }
-      case sdk.MessageBodyType.ACCEPT_CLAIMS_FOR_CTYPES:
-        return [
-          (message.body as sdk.IAcceptClaimsForCTypes).content[0].request
-            .rootHash,
-        ]
-      case sdk.MessageBodyType.REJECT_CLAIMS_FOR_CTYPES:
-        return [
-          (message.body as sdk.IRejectClaimsForCTypes).content[0].request
-            .rootHash,
-        ]
 
+      case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
       case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION:
       case sdk.MessageBodyType.REJECT_ACCEPT_DELEGATION:

@@ -83,7 +83,7 @@ class ImportDelegation extends React.Component<Props, State> {
           </div>
         </section>
 
-        <DelegationDetailView id={delegationId} isPCR={isPCR} />
+        <DelegationDetailView delegationId={delegationId} isPCR={isPCR} />
 
         <div className="actions">
           <button type="button" onClick={this.onCancel}>

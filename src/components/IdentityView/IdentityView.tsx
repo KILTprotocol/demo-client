@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
-import { Identity } from '@kiltprotocol/sdk-js'
 
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
@@ -43,7 +42,7 @@ type State = {
 const FAUCET_URL = process.env.REACT_APP_FAUCET_URL
 
 class IdentityView extends React.Component<Props, State> {
-  private static openKiltFaucet(address: Identity['address']) {
+  private static openKiltFaucet(address: IMyIdentity['identity']['address']) {
     return () => {
       window.open(`${FAUCET_URL}?${address}`, '_blank')
     }
@@ -69,7 +68,8 @@ class IdentityView extends React.Component<Props, State> {
   private registerContact(): void {
     const { myIdentity } = this.props
     const { identity, metaData } = myIdentity
-    const { address, boxPublicKeyAsHex } = identity
+    const { address } = identity
+    const boxPublicKeyAsHex = identity.getBoxPublicKey()
     const { name } = metaData
 
     const contact: IContact = {
@@ -189,7 +189,7 @@ class IdentityView extends React.Component<Props, State> {
           </div>
           <div>
             <label>Encryption Public Key</label>
-            <div>{identity.boxPublicKeyAsHex}</div>
+            <div>{identity.getBoxPublicKey()}</div>
           </div>
           <div>
             <label>Public identity (scan to send a message)</label>

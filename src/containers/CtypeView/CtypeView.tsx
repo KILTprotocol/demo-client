@@ -18,12 +18,13 @@ class CtypeView extends React.Component<Props> {
 
   constructor(props: Props) {
     super(props)
-    this.requestLegitimation = this.requestLegitimation.bind(this)
+    this.requestTerm = this.requestTerm.bind(this)
+
     this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
     this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
   }
 
-  private requestLegitimation(cType: ICTypeWithMetadata): void {
+  private requestTerm(cType: ICTypeWithMetadata): void {
     if (cType && this.selectAttestersModal) {
       this.cTypeToLegitimate = cType
       this.selectAttestersModal.show()
@@ -39,7 +40,7 @@ class CtypeView extends React.Component<Props> {
 
   private finishSelectAttesters(selectedAttesters: IContact[]): void {
     if (this.cTypeToLegitimate.cType.hash) {
-      attestationWorkflow.requestLegitimations(
+      attestationWorkflow.requestTerms(
         [{ cTypeHash: this.cTypeToLegitimate.cType.hash }],
         selectedAttesters.map(
           (contact: IContact) => contact.publicIdentity.address
@@ -56,9 +57,7 @@ class CtypeView extends React.Component<Props> {
       <section className="CtypeView">
         <h1>CTYPEs</h1>
         {cTypeHash && <CTypeDetailView cTypeHash={cTypeHash} />}
-        {!cTypeHash && (
-          <CTypeListView onRequestLegitimation={this.requestLegitimation} />
-        )}
+        {!cTypeHash && <CTypeListView onRequestTerm={this.requestTerm} />}
         <SelectContactsModal
           ref={el => {
             this.selectAttestersModal = el
