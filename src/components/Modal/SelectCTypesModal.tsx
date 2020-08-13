@@ -38,6 +38,12 @@ class SelectCTypesModal extends React.Component<Props, State> {
     this.onSelectCTypes = this.onSelectCTypes.bind(this)
   }
 
+  public componentWillUnmount(): void {
+    this.setState = state => {
+      return state
+    }
+  }
+
   private onSelectCTypes(selectedCTypes: ICTypeWithMetadata[]): void {
     this.setState({ selectedCTypes })
   }

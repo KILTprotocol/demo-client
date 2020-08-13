@@ -64,6 +64,12 @@ class ContactPresentation extends React.Component<Props, State> {
     }
   }
 
+  public componentWillUnmount(): void {
+    this.setState = state => {
+      return state
+    }
+  }
+
   private getActions(): Action[] {
     const { address } = this.props
     const { contact } = this.state
@@ -174,7 +180,6 @@ class ContactPresentation extends React.Component<Props, State> {
 
   private setContact(): void {
     const { address } = this.props
-
     ContactRepository.findByAddress(address).then((contact: IContact) => {
       if (contact) {
         this.setState({ contact })
