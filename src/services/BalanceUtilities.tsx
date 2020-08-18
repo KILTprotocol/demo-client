@@ -35,20 +35,27 @@ class BalanceUtilities {
       sdk.Balance.listenToBalanceChanges(
         myIdentity.identity.address,
         BalanceUtilities.listener
-      ).then(() => {
-        notify(
-          <div>
-            Now listening to balance changes of{' '}
-            <ContactPresentation address={myIdentity.identity.address} inline />
-          </div>
-        )
-      })
+      )
+        .then(() => {
+          notify(
+            <div>
+              Now listening to balance changes of{' '}
+              <ContactPresentation
+                address={myIdentity.identity.address}
+                inline
+              />
+            </div>
+          )
+        })
+        .catch(e => {
+          console.warn(e)
+        })
     }
   }
 
   public static async getMyBalance(identity: IMyIdentity): Promise<number> {
     const balance: BN = await sdk.Balance.getBalance(identity.identity.address)
-    return BalanceUtilities.asKiltCoin(balance)
+    return BalanceUtilities.asKiltCoin(balance).toNumber()
   }
 
   public static connectMyIdentities(
@@ -71,7 +78,7 @@ class BalanceUtilities {
     notify(
       <div>
         <span>Transfer of </span>
-        <KiltToken amount={amount} />
+        <KiltToken amount={new BN(amount)} />
         <span> to </span>
         <ContactPresentation address={receiverAddress} inline /> initiated.
       </div>
@@ -85,7 +92,7 @@ class BalanceUtilities {
         notifySuccess(
           <div>
             <span>Successfully transferred </span>
-            <KiltToken amount={amount} />
+            <KiltToken amount={new BN(amount)} />
             <span> to </span>
             <ContactPresentation address={receiverAddress} inline />.
           </div>
@@ -98,7 +105,7 @@ class BalanceUtilities {
         notify(
           <div>
             <span>Transfer of </span>
-            <KiltToken amount={amount} />
+            <KiltToken amount={new BN(amount)} />
             <span> to </span>
             <ContactPresentation address={receiverAddress} inline />
             <span> initiated.</span>
@@ -130,8 +137,8 @@ class BalanceUtilities {
     )
   }
 
-  public static asKiltCoin(balance: BN): number {
-    return balance.div(new BN(KILT_FEMTO_COIN)).toNumber()
+  public static asKiltCoin(balance: BN): BN {
+    return balance
   }
 
   public static asMicroKilt(balance: number): BN {
