@@ -1,5 +1,5 @@
 import React from 'react'
-
+import { formatBalance } from '@polkadot/util'
 import './KiltToken.scss'
 
 type Props = {
@@ -25,7 +25,10 @@ const KiltToken: React.FC<Props> = ({
 
   return (
     <section className={classes.join(' ')} title={`${amount}`}>
-      {amount.toFixed(decimalPlaces)}
+      {formatBalance(amount, {
+        withSiFull: true,
+        withUnit: 'KILT',
+      })}
     </section>
   )
 }
