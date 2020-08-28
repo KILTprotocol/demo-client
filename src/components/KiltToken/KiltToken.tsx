@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { formatBalance } from '@polkadot/util'
 import './KiltToken.scss'
 
@@ -8,6 +8,8 @@ type Props = {
 }
 
 const KiltToken: React.FC<Props> = ({ amount, colored = false }) => {
+  const [isShown, setIsShown] = useState(false)
+
   if (amount == null) {
     return <section className="KiltToken" />
   }
@@ -19,11 +21,18 @@ const KiltToken: React.FC<Props> = ({ amount, colored = false }) => {
   const classes = ['KiltToken', colored ? 'colored' : '', changeIndicator]
 
   return (
-    <section className={classes.join(' ')} title={`${amount}`}>
-      {formatBalance(amount, {
-        withSiFull: true,
-        withUnit: 'KILT',
-      })}
+    <section
+      className={classes.join(' ')}
+      title={`${amount}`}
+      onMouseEnter={() => setIsShown(true)}
+      onMouseLeave={() => setIsShown(false)}
+    >
+      {!isShown &&
+        formatBalance(amount, {
+          withSiFull: true,
+          withUnit: 'KILT',
+        })}
+      {isShown && <>{amount.toFixed(2)}</>}
     </section>
   )
 }
