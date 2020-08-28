@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { formatBalance } from '@polkadot/util'
+import BN from 'bn.js'
 import './KiltToken.scss'
 
 type Props = {
-  amount?: number
+  amount?: BN
   colored?: boolean
 }
 
@@ -15,8 +16,8 @@ const KiltToken: React.FC<Props> = ({ amount, colored = false }) => {
   }
 
   let changeIndicator = ''
-  if (amount < 0) changeIndicator = 'decreased'
-  if (amount > 0) changeIndicator = 'increased'
+  if (amount.ltn(0)) changeIndicator = 'decreased'
+  if (amount.gtn(0)) changeIndicator = 'increased'
 
   const classes = ['KiltToken', colored ? 'colored' : '', changeIndicator]
 
@@ -32,7 +33,7 @@ const KiltToken: React.FC<Props> = ({ amount, colored = false }) => {
           withSiFull: true,
           withUnit: 'KILT',
         })}
-      {isShown && <>{amount.toFixed(2)}</>}
+      {isShown && <>{amount.toNumber().toFixed(2)}</>}
     </section>
   )
 }

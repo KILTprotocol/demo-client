@@ -1,5 +1,6 @@
 import React from 'react'
 
+import BN from 'bn.js'
 import setupAndDelegate from './DevTools.anticov'
 import {
   ENDOWMENT,
@@ -133,21 +134,21 @@ class DevTools extends React.Component<Props> {
       PersistentStore.store.getState()
     )
 
-    const balance: number = selectedIdentity
+    const balance: BN = selectedIdentity
       ? Balances.getBalance(
           PersistentStore.store.getState(),
           selectedIdentity.identity.address
         )
-      : 0
+      : new BN(0)
 
-    const minBalanceForBootstrap =
-      (ENDOWMENT + TRANSACTION_FEE) * Object.keys(identitiesPool).length +
-      MIN_BALANCE
+    const minBalanceForBootstrap = ENDOWMENT.add(TRANSACTION_FEE)
+      .muln(Object.keys(identitiesPool).length)
+      .add(MIN_BALANCE)
 
     return (
       <section className="DevTools">
         <h2>Dev Tools</h2>
-        {selectedIdentity && balance > minBalanceForBootstrap ? (
+        {selectedIdentity && balance.gt(minBalanceForBootstrap) ? (
           <div>
             <div>
               <h4>Auto Bootstrap</h4>

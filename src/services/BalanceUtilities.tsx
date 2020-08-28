@@ -10,18 +10,18 @@ import PersistentStore from '../state/PersistentStore'
 import { IContact, IMyIdentity } from '../types/Contact'
 import { notify, notifySuccess } from './FeedbackService'
 
-const KILT_COIN = 1
-const KILT_MICRO_COIN = 1_000_000
-const KILT_FEMTO_COIN = '1000000000000000'
+const KILT_COIN = new BN(1)
+const KILT_MICRO_COIN = new BN(1_000_000)
+const KILT_FEMTO_COIN = new BN('1000000000000000')
 
 // cost of a chain transaction
-const TRANSACTION_FEE = 1 * KILT_COIN
+const TRANSACTION_FEE = new BN(1).mul(KILT_COIN)
 
 // any balance below this will we purged
-const MIN_BALANCE = 1 * KILT_COIN
+const MIN_BALANCE = new BN(1).mul(KILT_COIN)
 
 // initial endowment for automatically created accounts
-const ENDOWMENT = 30 * KILT_COIN
+const ENDOWMENT = new BN(30).mul(KILT_COIN)
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
@@ -46,7 +46,7 @@ class BalanceUtilities {
     }
   }
 
-  public static async getMyBalance(identity: IMyIdentity): Promise<number> {
+  public static async getMyBalance(identity: IMyIdentity): Promise<BN> {
     const balance: BN = await sdk.Balance.getBalance(identity.identity.address)
     return BalanceUtilities.asKiltCoin(balance)
   }
@@ -64,7 +64,7 @@ class BalanceUtilities {
   public static makeTransfer(
     myIdentity: IMyIdentity,
     receiverAddress: IContact['publicIdentity']['address'],
-    amount: number,
+    amount: BN,
     successCallback?: () => void
   ): void {
     const transferAmount: BN = BalanceUtilities.asFemtoKilt(amount)
@@ -130,16 +130,16 @@ class BalanceUtilities {
     )
   }
 
-  public static asKiltCoin(balance: BN): number {
-    return balance.div(new BN(KILT_FEMTO_COIN)).toNumber()
+  public static asKiltCoin(balance: BN): BN {
+    return balance.div(new BN(KILT_FEMTO_COIN))
   }
 
-  public static asMicroKilt(balance: number): BN {
-    return new BN(balance).muln(KILT_MICRO_COIN)
+  public static asMicroKilt(balance: BN): BN {
+    return new BN(balance).mul(KILT_MICRO_COIN)
   }
 
-  public static asFemtoKilt(balance: number): BN {
-    return new BN(balance).mul(new BN(KILT_FEMTO_COIN))
+  public static asFemtoKilt(balance: BN): BN {
+    return new BN(balance).mul(KILT_FEMTO_COIN)
   }
 }
 

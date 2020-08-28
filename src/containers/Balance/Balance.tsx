@@ -1,5 +1,6 @@
 import Immutable from 'immutable'
 import React, { ChangeEvent, ReactNode } from 'react'
+import BN from 'bn.js'
 import { connect, MapStateToProps } from 'react-redux'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import KiltToken from '../../components/KiltToken/KiltToken'
@@ -26,7 +27,7 @@ import {
 import './Balance.scss'
 
 type StateProps = {
-  balances: Immutable.Map<string, number>
+  balances: Immutable.Map<string, BN>
 }
 
 type OwnProps = {
@@ -103,7 +104,7 @@ class Balance extends React.Component<Props, State> {
       amount === '' ||
       (Number.isFinite(amountNumber) &&
         amountNumber > 0 &&
-        myBalance - amountNumber >= 0)
+        myBalance.subn(amountNumber).gten(0))
     ) {
       this.setState({
         transfer: {
@@ -114,13 +115,13 @@ class Balance extends React.Component<Props, State> {
     }
   }
 
-  private getMyBalance(): number | undefined {
+  private getMyBalance(): BN | undefined {
     const { balances, myIdentity } = this.props
     return balances.get(myIdentity.identity.address)
   }
 
-  private getTokenTransferElement(balance: number | undefined): ReactNode {
-    if (balance === undefined || balance < TRANSACTION_FEE) {
+  private getTokenTransferElement(balance: BN | undefined): ReactNode {
+    if (balance === undefined || balance.lt(TRANSACTION_FEE)) {
       return <div>Not available due to insufficient funds.</div>
     }
 
@@ -229,7 +230,7 @@ class Balance extends React.Component<Props, State> {
       return
     }
 
-    BalanceUtilities.makeTransfer(myIdentity, receiverAddress, Number(amount))
+    BalanceUtilities.makeTransfer(myIdentity, receiverAddress, new BN(amount))
     this.setState({
       transfer: {
         amount: '',
