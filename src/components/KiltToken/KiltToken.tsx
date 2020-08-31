@@ -20,7 +20,6 @@ const KiltToken: React.FC<Props> = ({ amount, colored = false }) => {
   if (amount.gtn(0)) changeIndicator = 'increased'
 
   const classes = ['KiltToken', colored ? 'colored' : '', changeIndicator]
-
   return (
     <section
       className={classes.join(' ')}
@@ -29,11 +28,15 @@ const KiltToken: React.FC<Props> = ({ amount, colored = false }) => {
       onMouseLeave={() => setIsShown(false)}
     >
       {!isShown &&
-        formatBalance(amount, {
-          withSiFull: true,
-          withUnit: 'KILT',
-        })}
-      {isShown && <>{amount.toNumber().toFixed(2)}</>}
+        formatBalance(
+          amount,
+          {
+            withSiFull: true,
+            withUnit: 'KILT',
+          },
+          15
+        )}
+      {isShown && <>{amount.toString()}</>}
     </section>
   )
 }

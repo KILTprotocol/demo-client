@@ -7,8 +7,9 @@ import KiltToken from '../components/KiltToken/KiltToken'
 import * as Balances from '../state/ducks/Balances'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
+import errorService from './ErrorService'
 import { IContact, IMyIdentity } from '../types/Contact'
-import { notify, notifySuccess } from './FeedbackService'
+import { notify, notifySuccess, notifyFailure } from './FeedbackService'
 
 const KILT_COIN = new BN(1)
 const KILT_MICRO_COIN = new BN(1_000_000)
@@ -71,7 +72,7 @@ class BalanceUtilities {
     notify(
       <div>
         <span>Transfer of </span>
-        <KiltToken amount={amount} />
+        <KiltToken amount={transferAmount} />
         <span> to </span>
         <ContactPresentation address={receiverAddress} inline /> initiated.
       </div>
@@ -85,7 +86,7 @@ class BalanceUtilities {
         notifySuccess(
           <div>
             <span>Successfully transferred </span>
-            <KiltToken amount={amount} />
+            <KiltToken amount={transferAmount} />
             <span> to </span>
             <ContactPresentation address={receiverAddress} inline />.
           </div>
@@ -98,12 +99,20 @@ class BalanceUtilities {
         notify(
           <div>
             <span>Transfer of </span>
-            <KiltToken amount={amount} />
+            <KiltToken amount={transferAmount} />
             <span> to </span>
             <ContactPresentation address={receiverAddress} inline />
             <span> initiated.</span>
           </div>
         )
+      })
+      .catch(error => {
+        errorService.log({
+          error,
+          message: '1010: Invalid Transaction',
+          origin: 'BalanceUtilities.makeTransfer()',
+        })
+        notifyFailure('1010: Invalid Transaction')
       })
   }
 
@@ -131,15 +140,15 @@ class BalanceUtilities {
   }
 
   public static asKiltCoin(balance: BN): BN {
-    return balance.div(new BN(KILT_FEMTO_COIN))
+    return balance
   }
 
   public static asMicroKilt(balance: BN): BN {
-    return new BN(balance).mul(KILT_MICRO_COIN)
+    return balance.mul(KILT_MICRO_COIN)
   }
 
   public static asFemtoKilt(balance: BN): BN {
-    return new BN(balance).mul(KILT_FEMTO_COIN)
+    return balance.mul(KILT_FEMTO_COIN)
   }
 }
 

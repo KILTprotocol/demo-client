@@ -94,17 +94,17 @@ class Balance extends React.Component<Props, State> {
     const { value: amount } = event.target
     const myBalance = this.getMyBalance()
 
-    if (!myBalance || amount.includes('.')) {
+    if (!myBalance || !new RegExp('^[0-9]+$')) {
       return
     }
 
-    const amountNumber = Number(amount)
+    const amountNumber = new BN(amount)
 
     if (
       amount === '' ||
-      (Number.isFinite(amountNumber) &&
-        amountNumber > 0 &&
-        myBalance.subn(amountNumber).gten(0))
+      (amountNumber.gtn(0) &&
+        myBalance.sub(amountNumber).gten(0) &&
+        amountNumber.lte(myBalance))
     ) {
       this.setState({
         transfer: {
@@ -134,10 +134,10 @@ class Balance extends React.Component<Props, State> {
           <label>Transfer amount</label>
           <div>
             <input
-              type="text"
+              type="number"
               onChange={this.onEnterTransferTokens}
               value={amount}
-              placeholder="Whole numbers"
+              placeholder="Whole KILT tokens"
             />
             <KiltToken />
           </div>
