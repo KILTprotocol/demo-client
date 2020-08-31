@@ -1,7 +1,6 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetadata'
 import { ICTypeSchema } from '@kiltprotocol/sdk-js/build/types/CType'
-import BN from 'bn.js'
 import {
   ROOT_SEED,
   CTYPE,
@@ -110,9 +109,7 @@ export async function setupAndDelegate(delegate: IMyIdentity): Promise<void> {
   try {
     blockUi.updateMessage('Transferring funds to AntiCov authority')
     await new Promise(resolve => {
-      BalanceUtilities.makeTransfer(delegate, root.address, new BN(4), () =>
-        resolve()
-      )
+      BalanceUtilities.makeTransfer(delegate, root.address, 4, () => resolve())
     })
     blockUi.updateMessage('Setting up CType and Root Delegation')
     await verifyOrAddCtypeAndRoot()

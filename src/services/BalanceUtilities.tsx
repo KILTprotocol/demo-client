@@ -11,20 +11,17 @@ import errorService from './ErrorService'
 import { IContact, IMyIdentity } from '../types/Contact'
 import { notify, notifySuccess, notifyFailure } from './FeedbackService'
 
-const BN_ONE = new BN(1)
-
-const KILT_COIN = BN_ONE
-const KILT_MICRO_COIN = new BN(1_000_000)
+const KILT_COIN = new BN(1)
 const KILT_FEMTO_COIN = new BN('1000000000000000')
 
 // cost of a chain transaction
-const TRANSACTION_FEE = BN_ONE.mul(KILT_COIN)
+const TRANSACTION_FEE = KILT_COIN.muln(1)
 
 // any balance below this will we purged
-const MIN_BALANCE = BN_ONE.mul(KILT_COIN)
+const MIN_BALANCE = KILT_COIN.muln(1)
 
 // initial endowment for automatically created accounts
-const ENDOWMENT = new BN(30).mul(KILT_COIN)
+const ENDOWMENT = KILT_COIN.muln(30)
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
@@ -67,10 +64,10 @@ class BalanceUtilities {
   public static makeTransfer(
     myIdentity: IMyIdentity,
     receiverAddress: IContact['publicIdentity']['address'],
-    amount: BN,
+    amount: number,
     successCallback?: () => void
   ): void {
-    const transferAmount: BN = BalanceUtilities.asFemtoKilt(amount)
+    const transferAmount = BalanceUtilities.asFemtoKilt(amount)
     notify(
       <div>
         <span>Transfer of </span>
@@ -138,12 +135,8 @@ class BalanceUtilities {
     )
   }
 
-  public static asMicroKilt(balance: BN): BN {
-    return balance.mul(KILT_MICRO_COIN)
-  }
-
-  public static asFemtoKilt(balance: BN): BN {
-    return balance.mul(KILT_FEMTO_COIN)
+  public static asFemtoKilt(balance: number): BN {
+    return new BN(balance).mul(KILT_FEMTO_COIN)
   }
 }
 
