@@ -94,7 +94,7 @@ class Balance extends React.Component<Props, State> {
     const { value: amount } = event.target
     const myBalance = this.getMyBalance()
 
-    if (!myBalance || !new RegExp('^[0-9]+$')) {
+    if (!myBalance || amount.includes('.')) {
       return
     }
 
