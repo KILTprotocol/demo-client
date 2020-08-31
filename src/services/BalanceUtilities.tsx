@@ -11,15 +11,17 @@ import errorService from './ErrorService'
 import { IContact, IMyIdentity } from '../types/Contact'
 import { notify, notifySuccess, notifyFailure } from './FeedbackService'
 
-const KILT_COIN = new BN(1)
+const BN_ONE = new BN(1)
+
+const KILT_COIN = BN_ONE
 const KILT_MICRO_COIN = new BN(1_000_000)
 const KILT_FEMTO_COIN = new BN('1000000000000000')
 
 // cost of a chain transaction
-const TRANSACTION_FEE = new BN(1).mul(KILT_COIN)
+const TRANSACTION_FEE = BN_ONE.mul(KILT_COIN)
 
 // any balance below this will we purged
-const MIN_BALANCE = new BN(1).mul(KILT_COIN)
+const MIN_BALANCE = BN_ONE.mul(KILT_COIN)
 
 // initial endowment for automatically created accounts
 const ENDOWMENT = new BN(30).mul(KILT_COIN)
@@ -49,7 +51,7 @@ class BalanceUtilities {
 
   public static async getMyBalance(identity: IMyIdentity): Promise<BN> {
     const balance: BN = await sdk.Balance.getBalance(identity.identity.address)
-    return BalanceUtilities.asKiltCoin(balance)
+    return balance
   }
 
   public static connectMyIdentities(
@@ -127,20 +129,13 @@ class BalanceUtilities {
       notify(
         <div>
           Balance of <ContactPresentation address={account} /> {inDeCreased} by{' '}
-          <KiltToken amount={BalanceUtilities.asKiltCoin(change)} colored />.
+          <KiltToken amount={change} colored />.
         </div>
       )
     }
     PersistentStore.store.dispatch(
-      Balances.Store.updateBalance(
-        account,
-        BalanceUtilities.asKiltCoin(balance)
-      )
+      Balances.Store.updateBalance(account, balance)
     )
-  }
-
-  public static asKiltCoin(balance: BN): BN {
-    return balance
   }
 
   public static asMicroKilt(balance: BN): BN {
