@@ -53,7 +53,7 @@ class BsIdentity {
       BalanceUtilities.makeTransfer(
         selectedIdentity,
         identity.address,
-        ENDOWMENT,
+        ENDOWMENT.toNumber(),
         () => {
           const newContact: IContact = {
             metaData: {

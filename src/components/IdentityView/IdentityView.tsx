@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
-
+import BN from 'bn.js'
 import ContactRepository from '../../services/ContactRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess } from '../../services/FeedbackService'
@@ -147,7 +147,7 @@ class IdentityView extends React.Component<Props, State> {
         myContact.publicIdentity.address === myIdentity.identity.address
     )
 
-    let balance = 0
+    let balance = new BN(0)
     if (contact) {
       balance = Balances.getBalance(
         PersistentStore.store.getState(),
@@ -298,7 +298,7 @@ class IdentityView extends React.Component<Props, State> {
             </>
           )}
 
-          {!(balance > 0) && (
+          {balance && !balance.ltn(0) && (
             <button
               type="button"
               className="requestTokens"
