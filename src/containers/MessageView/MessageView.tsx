@@ -54,6 +54,7 @@ class MessageView extends React.Component<Props, State> {
 
   private onDeleteMessage(message: IMessageOutput): void {
     const { currentMessage } = this.state
+    const { selectedIdentity } = this.props
 
     if (!message.messageId) {
       return
@@ -65,31 +66,35 @@ class MessageView extends React.Component<Props, State> {
         this.fetchMessages()
       })
     }
-
-    safeDelete(
-      <span>
-        the message &apos;
-        <MessageSubject message={message} />
-        &apos; from{' '}
-        <ContactPresentation address={message.senderAddress} inline />
-      </span>,
-      (notification: IBlockingNotification) => {
-        MessageRepository.deleteByMessageId(message.messageId as string)
-          .then(() => {
-            this.fetchMessages()
-            notification.remove()
-          })
-          .catch(error => {
-            errorService.log({
-              error,
-              message: `Could not delete message ${message.messageId}`,
-              origin: 'MessageView.onDeleteMessage()',
-              type: 'ERROR.FETCH.DELETE',
+    if (selectedIdentity) {
+      safeDelete(
+        <span>
+          the message &apos;
+          <MessageSubject message={message} />
+          &apos; from{' '}
+          <ContactPresentation address={message.senderAddress} inline />
+        </span>,
+        (notification: IBlockingNotification) => {
+          MessageRepository.deleteByMessageId(
+            message.messageId as string,
+            selectedIdentity.identity.signStr(message.messageId as string)
+          )
+            .then(() => {
+              this.fetchMessages()
+              notification.remove()
             })
-          })
-      },
-      false
-    )
+            .catch(error => {
+              errorService.log({
+                error,
+                message: `Could not delete message ${message.messageId}`,
+                origin: 'MessageView.onDeleteMessage()',
+                type: 'ERROR.FETCH.DELETE',
+              })
+            })
+        },
+        false
+      )
+    }
   }
 
   private onOpenMessage(message: IMessageOutput): void {
