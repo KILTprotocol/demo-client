@@ -28,7 +28,7 @@ export interface IMessageOutput extends sdk.IMessage {
 // (for other tests)
 
 class MessageRepository {
-  public static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}/messaging`
+  public static readonly URL = `${window._env_.REACT_APP_SERVICE_HOST}/messaging`
 
   /**
    * takes contact or list of contacts
