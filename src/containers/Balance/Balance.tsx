@@ -1,5 +1,6 @@
 import Immutable from 'immutable'
 import React, { ChangeEvent, ReactNode } from 'react'
+import BN from 'bn.js'
 import { connect, MapStateToProps } from 'react-redux'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import KiltToken from '../../components/KiltToken/KiltToken'
@@ -26,7 +27,7 @@ import {
 import './Balance.scss'
 
 type StateProps = {
-  balances: Immutable.Map<string, number>
+  balances: Immutable.Map<string, BN>
 }
 
 type OwnProps = {
@@ -97,14 +98,9 @@ class Balance extends React.Component<Props, State> {
       return
     }
 
-    const amountNumber = Number(amount)
+    const amountNumber = new BN(amount)
 
-    if (
-      amount === '' ||
-      (Number.isFinite(amountNumber) &&
-        amountNumber > 0 &&
-        myBalance - amountNumber >= 0)
-    ) {
+    if (amount === '' || (amountNumber.gtn(0) && amountNumber.lte(myBalance))) {
       this.setState({
         transfer: {
           ...transfer,
@@ -114,13 +110,13 @@ class Balance extends React.Component<Props, State> {
     }
   }
 
-  private getMyBalance(): number | undefined {
+  private getMyBalance(): BN | undefined {
     const { balances, myIdentity } = this.props
     return balances.get(myIdentity.identity.address)
   }
 
-  private getTokenTransferElement(balance: number | undefined): ReactNode {
-    if (balance === undefined || balance < TRANSACTION_FEE) {
+  private getTokenTransferElement(balance: BN | undefined): ReactNode {
+    if (balance === undefined || balance.lt(TRANSACTION_FEE)) {
       return <div>Not available due to insufficient funds.</div>
     }
 
@@ -133,10 +129,10 @@ class Balance extends React.Component<Props, State> {
           <label>Transfer amount</label>
           <div>
             <input
-              type="text"
+              type="number"
               onChange={this.onEnterTransferTokens}
               value={amount}
-              placeholder="Whole numbers"
+              placeholder="Whole KILT tokens"
             />
             <KiltToken />
           </div>

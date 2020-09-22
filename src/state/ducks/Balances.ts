@@ -1,5 +1,6 @@
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
+import BN from 'bn.js'
 import KiltAction from '../../types/Action'
 import { IMyIdentity } from '../../types/Contact'
 import { State as ReduxState } from '../PersistentStore'
@@ -7,7 +8,7 @@ import { State as ReduxState } from '../PersistentStore'
 interface IUpdateAction extends KiltAction {
   payload: {
     address: IMyIdentity['identity']['address']
-    balance: number
+    balance: BN
   }
 }
 
@@ -18,7 +19,7 @@ interface IRemoveAction extends KiltAction {
 export type Action = IUpdateAction | IRemoveAction
 
 type State = {
-  balances: Immutable.Map<IMyIdentity['identity']['address'], number>
+  balances: Immutable.Map<IMyIdentity['identity']['address'], BN>
 }
 
 export type ImmutableState = Immutable.Record<State>
@@ -44,7 +45,7 @@ class Store {
 
   public static updateBalance(
     address: IMyIdentity['identity']['address'],
-    balance: number
+    balance: BN
   ): IUpdateAction {
     return {
       payload: { address, balance },
@@ -63,7 +64,7 @@ class Store {
 
   public static createState(obj?: State): ImmutableState {
     return Immutable.Record({
-      balances: Immutable.Map<IMyIdentity['identity']['address'], number>(),
+      balances: Immutable.Map<IMyIdentity['identity']['address'], BN>(),
     } as State)(obj)
   }
 
@@ -73,20 +74,20 @@ class Store {
   }
 }
 
-const getAllBalances = (state: ReduxState): Immutable.Map<string, number> => {
+const getAllBalances = (state: ReduxState): Immutable.Map<string, BN> => {
   return state.balances.get('balances')
 }
 
 const getBalances = createSelector(
   [getAllBalances],
-  (balances: Immutable.Map<string, number>) => balances
+  (balances: Immutable.Map<string, BN>) => balances
 )
 
 const getStateBalance = (
   state: ReduxState,
   address: IMyIdentity['identity']['address']
-): number | undefined => state.balances.get('balances').get(address)
+): BN | undefined => state.balances.get('balances').get(address)
 
-const getBalance = createSelector([getStateBalance], (entry: number) => entry)
+const getBalance = createSelector([getStateBalance], (entry: BN) => entry)
 
 export { Store, getBalance, getBalances }

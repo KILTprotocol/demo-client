@@ -7,21 +7,21 @@ import KiltToken from '../components/KiltToken/KiltToken'
 import * as Balances from '../state/ducks/Balances'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
+import errorService from './ErrorService'
 import { IContact, IMyIdentity } from '../types/Contact'
-import { notify, notifySuccess } from './FeedbackService'
+import { notify, notifySuccess, notifyFailure } from './FeedbackService'
 
-const KILT_COIN = 1
-const KILT_MICRO_COIN = 1_000_000
-const KILT_FEMTO_COIN = '1000000000000000'
+const KILT_COIN = new BN(1)
+const KILT_FEMTO_COIN = new BN('1000000000000000')
 
 // cost of a chain transaction
-const TRANSACTION_FEE = 1 * KILT_COIN
+const TRANSACTION_FEE = KILT_COIN.muln(1)
 
 // any balance below this will we purged
-const MIN_BALANCE = 1 * KILT_COIN
+const MIN_BALANCE = KILT_COIN.muln(1)
 
 // initial endowment for automatically created accounts
-const ENDOWMENT = 30 * KILT_COIN
+const ENDOWMENT = KILT_COIN.muln(30)
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
@@ -46,9 +46,9 @@ class BalanceUtilities {
     }
   }
 
-  public static async getMyBalance(identity: IMyIdentity): Promise<number> {
+  public static async getMyBalance(identity: IMyIdentity): Promise<BN> {
     const balance: BN = await sdk.Balance.getBalance(identity.identity.address)
-    return BalanceUtilities.asKiltCoin(balance)
+    return balance
   }
 
   public static connectMyIdentities(
@@ -67,11 +67,11 @@ class BalanceUtilities {
     amount: number,
     successCallback?: () => void
   ): void {
-    const transferAmount: BN = BalanceUtilities.asFemtoKilt(amount)
+    const transferAmount = BalanceUtilities.asFemtoKilt(amount)
     notify(
       <div>
         <span>Transfer of </span>
-        <KiltToken amount={amount} />
+        <KiltToken amount={transferAmount} />
         <span> to </span>
         <ContactPresentation address={receiverAddress} inline /> initiated.
       </div>
@@ -85,7 +85,7 @@ class BalanceUtilities {
         notifySuccess(
           <div>
             <span>Successfully transferred </span>
-            <KiltToken amount={amount} />
+            <KiltToken amount={transferAmount} />
             <span> to </span>
             <ContactPresentation address={receiverAddress} inline />.
           </div>
@@ -98,12 +98,20 @@ class BalanceUtilities {
         notify(
           <div>
             <span>Transfer of </span>
-            <KiltToken amount={amount} />
+            <KiltToken amount={transferAmount} />
             <span> to </span>
             <ContactPresentation address={receiverAddress} inline />
             <span> initiated.</span>
           </div>
         )
+      })
+      .catch(error => {
+        errorService.log({
+          error,
+          message: '1010: Invalid Transaction',
+          origin: 'BalanceUtilities.makeTransfer()',
+        })
+        notifyFailure('1010: Invalid Transaction')
       })
   }
 
@@ -118,28 +126,17 @@ class BalanceUtilities {
       notify(
         <div>
           Balance of <ContactPresentation address={account} /> {inDeCreased} by{' '}
-          <KiltToken amount={BalanceUtilities.asKiltCoin(change)} colored />.
+          <KiltToken amount={change} colored />.
         </div>
       )
     }
     PersistentStore.store.dispatch(
-      Balances.Store.updateBalance(
-        account,
-        BalanceUtilities.asKiltCoin(balance)
-      )
+      Balances.Store.updateBalance(account, balance)
     )
   }
 
-  public static asKiltCoin(balance: BN): number {
-    return balance.div(new BN(KILT_FEMTO_COIN)).toNumber()
-  }
-
-  public static asMicroKilt(balance: number): BN {
-    return new BN(balance).muln(KILT_MICRO_COIN)
-  }
-
   public static asFemtoKilt(balance: number): BN {
-    return new BN(balance).mul(new BN(KILT_FEMTO_COIN))
+    return new BN(balance).mul(KILT_FEMTO_COIN)
   }
 }
 
