@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
@@ -54,10 +55,7 @@ class MessageView extends React.Component<Props, State> {
 
   private onDeleteMessage(message: IMessageOutput): void {
     const { currentMessage } = this.state
-
-    if (!message.messageId) {
-      return
-    }
+    const { selectedIdentity } = this.props
 
     if (currentMessage) {
       this.onCloseMessage()
@@ -65,31 +63,35 @@ class MessageView extends React.Component<Props, State> {
         this.fetchMessages()
       })
     }
-
-    safeDelete(
-      <span>
-        the message &apos;
-        <MessageSubject message={message} />
-        &apos; from{' '}
-        <ContactPresentation address={message.senderAddress} inline />
-      </span>,
-      (notification: IBlockingNotification) => {
-        MessageRepository.deleteByMessageId(message.messageId as string)
-          .then(() => {
-            this.fetchMessages()
-            notification.remove()
-          })
-          .catch(error => {
-            errorService.log({
-              error,
-              message: `Could not delete message ${message.messageId}`,
-              origin: 'MessageView.onDeleteMessage()',
-              type: 'ERROR.FETCH.DELETE',
+    if (selectedIdentity && message.messageId) {
+      safeDelete(
+        <span>
+          the message &apos;
+          <MessageSubject message={message} />
+          &apos; from{' '}
+          <ContactPresentation address={message.senderAddress} inline />
+        </span>,
+        (notification: IBlockingNotification) => {
+          MessageRepository.deleteByMessageId(
+            message.messageId!,
+            selectedIdentity.identity.signStr(message.messageId!)
+          )
+            .then(() => {
+              this.fetchMessages()
+              notification.remove()
             })
-          })
-      },
-      false
-    )
+            .catch(error => {
+              errorService.log({
+                error,
+                message: `Could not delete message ${message.messageId}`,
+                origin: 'MessageView.onDeleteMessage()',
+                type: 'ERROR.FETCH.DELETE',
+              })
+            })
+        },
+        false
+      )
+    }
   }
 
   private onOpenMessage(message: IMessageOutput): void {

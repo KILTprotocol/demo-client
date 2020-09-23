@@ -122,9 +122,13 @@ class MessageRepository {
       .then(() => undefined)
   }
 
-  public static async deleteByMessageId(messageId: string): Promise<Response> {
+  public static async deleteByMessageId(
+    messageId: string,
+    signature: string
+  ): Promise<Response> {
     return fetch(`${MessageRepository.URL}/${messageId}`, {
       ...BaseDeleteParams,
+      headers: { ...BaseDeleteParams.headers, signature },
     })
   }
 
