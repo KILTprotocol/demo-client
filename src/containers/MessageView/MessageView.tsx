@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
@@ -56,17 +57,13 @@ class MessageView extends React.Component<Props, State> {
     const { currentMessage } = this.state
     const { selectedIdentity } = this.props
 
-    if (!message.messageId) {
-      return
-    }
-
     if (currentMessage) {
       this.onCloseMessage()
       setTimeout(() => {
         this.fetchMessages()
       })
     }
-    if (selectedIdentity) {
+    if (selectedIdentity && message.messageId) {
       safeDelete(
         <span>
           the message &apos;
@@ -76,8 +73,8 @@ class MessageView extends React.Component<Props, State> {
         </span>,
         (notification: IBlockingNotification) => {
           MessageRepository.deleteByMessageId(
-            message.messageId as string,
-            selectedIdentity.identity.signStr(message.messageId as string)
+            message.messageId!,
+            selectedIdentity.identity.signStr(message.messageId!)
           )
             .then(() => {
               this.fetchMessages()
