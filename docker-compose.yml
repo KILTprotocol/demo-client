@@ -62,7 +62,6 @@ services:
       - REACT_APP_SERVICE_HOST=//127.0.0.1:3000
       - REACT_APP_NODE_HOST=ws://127.0.0.1:9944
       - REACT_APP_FAUCET_URL=http://127.0.0.1:3002
-      - PUBLIC_URL=.
       # if you experience issues where the watcher does not trigger rebuilds
       # when changing files in src/ the following option may help
       #- CHOKIDAR_USEPOLLING=true
