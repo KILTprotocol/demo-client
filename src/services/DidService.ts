@@ -1,4 +1,5 @@
 import * as sdk from '@kiltprotocol/sdk-js'
+import { IDidDocumentSigned } from '@kiltprotocol/sdk-js/build/did/Did'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import { IContact, IMyIdentity } from '../types/Contact'
@@ -19,15 +20,17 @@ class DidService {
 
     const did = sdk.Did.fromIdentity(myIdentity.identity, documentStore)
     const didDocument = did.createDefaultDidDocument(`${MessageRepository.URL}`)
-    const hash = sdk.Crypto.hashStr(JSON.stringify(didDocument))
-    const signature = myIdentity.identity.signStr(hash)
+    const signedDidDocument: IDidDocumentSigned = sdk.Did.signDidDocument(
+      didDocument,
+      myIdentity.identity
+    )
+
     await ContactRepository.add({
-      did: didDocument,
+      did: signedDidDocument,
       metaData: {
         name: myIdentity.metaData.name,
       },
       publicIdentity: myIdentity.identity.getPublicIdentity(),
-      signature,
     } as IContact)
 
     const status = await did.store(myIdentity.identity)
@@ -39,7 +42,7 @@ class DidService {
 
     persistentStore.store.dispatch(
       Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
-        did: { identifier: did.identifier, document: didDocument },
+        did: { identifier: did.identifier, document: signedDidDocument },
       })
     )
     return did
