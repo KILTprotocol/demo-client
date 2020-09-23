@@ -1,5 +1,6 @@
 ARG NODE_VERSION=10
 FROM node:${NODE_VERSION}-alpine as develop
+ARG NODE_AUTH_TOKEN=""
 
 WORKDIR /app
 
@@ -8,6 +9,8 @@ COPY ?npmrc ?yarnrc ./
 RUN yarn install
 
 COPY . ./
+
+RUN rm -f .npmrc
 
 EXPOSE 3001
 CMD [ "yarn", "start" ]

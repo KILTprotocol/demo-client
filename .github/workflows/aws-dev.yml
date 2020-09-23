@@ -54,6 +54,11 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+    - name: set sdk dependency to 'latest' & set up .npmrc to connect to github packages
+      run: |
+        echo $(jq '.dependencies."@kiltprotocol/sdk-js"="latest"' package.json) > package.json
+        mv -f .npmrc.github .npmrc
+
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
