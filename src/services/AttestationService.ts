@@ -116,11 +116,9 @@ class AttestationService {
     return initialisedAttestedClaim.verify()
   }
 
-  public static async verifyAttestation(
-    attestation: IAttestation
-  ): Promise<boolean> {
+  public static verifyAttestation(attestation: IAttestation): Promise<boolean> {
     const initialisedAttestation = Kilt.Attestation.fromAttestation(attestation)
-    return initialisedAttestation.verify()
+    return initialisedAttestation.checkValidity()
   }
 
   public static saveInStore(attestationEntry: Attestations.Entry): void {
