@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Recreate config file
 rm -rf ./env-config.js
