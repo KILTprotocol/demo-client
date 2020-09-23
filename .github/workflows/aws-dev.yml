@@ -40,9 +40,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
-    - name: set up .npmrc to point to github packages
-      run: mv -f .npmrc.github .npmrc
-
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
