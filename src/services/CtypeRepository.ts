@@ -52,7 +52,7 @@ class CTypeRepository {
     })
   }
 
-  private static readonly URL = `${process.env.REACT_APP_SERVICE_HOST}/ctype`
+  private static readonly URL = `${window._env_.REACT_APP_SERVICE_HOST}/ctype`
 }
 
 export default CTypeRepository

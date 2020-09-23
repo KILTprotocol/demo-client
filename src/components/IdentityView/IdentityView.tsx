@@ -39,7 +39,7 @@ type State = {
   showPublicIdentityQRCode: boolean
 }
 
-const FAUCET_URL = process.env.REACT_APP_FAUCET_URL
+const FAUCET_URL = window._env_.REACT_APP_FAUCET_URL
 
 class IdentityView extends React.Component<Props, State> {
   private static openKiltFaucet(address: IMyIdentity['identity']['address']) {

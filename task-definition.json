@@ -21,7 +21,21 @@
           "containerPort": 80
         }
       ],
-      "essential": true
+      "essential": true,
+      "environment": [
+        {
+          "name": "REACT_APP_SERVICE_HOST",
+          "value": "https://services.devnet.kilt.io:443"
+        },
+        {
+          "name": "REACT_APP_NODE_HOST",
+          "value": "wss://full-nodes-lb.devnet.kilt.io:443"
+        },
+        {
+          "name": "REACT_APP_FAUCET_URL",
+          "value": "https://faucet-devnet.kilt.io"
+        }
+      ]
     }
   ],
   "cpu": "512",

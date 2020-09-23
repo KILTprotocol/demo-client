@@ -4,7 +4,7 @@
   "license": "BSD-4-Clause",
   "private": true,
   "scripts": {
-    "start": "PORT=3001 node scripts/start.js",
+    "start": "chmod +x ./env.sh && ./env.sh && cp env-config.js ./public/ && PORT=3001 node scripts/start.js",
     "build": "node scripts/build.js",
     "build:devnet": "env-cmd -f .env.devnet node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",

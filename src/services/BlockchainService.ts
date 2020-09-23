@@ -10,7 +10,7 @@ class BlockchainService {
   }
 
   public static getNodeWebsocketUrl(): string {
-    return `${process.env.REACT_APP_NODE_HOST}`
+    return `${window._env_.REACT_APP_NODE_HOST}`
   }
 }
 
