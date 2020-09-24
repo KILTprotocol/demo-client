@@ -4,6 +4,8 @@ ARG NODE_AUTH_TOKEN=""
 
 WORKDIR /app
 
+RUN apk add --no-cache bash
+
 COPY package.json yarn.lock ./
 COPY ?npmrc ?yarnrc ./
 RUN yarn install
