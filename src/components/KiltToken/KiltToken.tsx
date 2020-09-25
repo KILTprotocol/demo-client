@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { formatBalance } from '@polkadot/util'
 import BN from 'bn.js'
 import './KiltToken.scss'
+import { Balance } from '@kiltprotocol/sdk-js'
 
 type Props = {
   amount?: BN
@@ -27,15 +27,7 @@ const KiltToken: React.FC<Props> = ({ amount, colored = false }) => {
       onMouseEnter={() => setIsShown(true)}
       onMouseLeave={() => setIsShown(false)}
     >
-      {!isShown &&
-        formatBalance(
-          amount,
-          {
-            withSiFull: true,
-            withUnit: 'KILT',
-          },
-          15
-        )}
+      {!isShown && Balance.formatKiltBalance(amount)}
       {isShown && <>{amount.toString()}</>}
     </section>
   )

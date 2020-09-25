@@ -2,15 +2,13 @@ import Immutable from 'immutable'
 import React, { ChangeEvent, ReactNode } from 'react'
 import BN from 'bn.js'
 import { connect, MapStateToProps } from 'react-redux'
+import { Balance as sdkBalance } from '@kiltprotocol/sdk-js'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import KiltToken from '../../components/KiltToken/KiltToken'
 import { ModalType } from '../../components/Modal/Modal'
 import SelectContacts from '../../components/SelectContacts/SelectContacts'
 import Spinner from '../../components/Spinner/Spinner'
-import {
-  BalanceUtilities,
-  TRANSACTION_FEE,
-} from '../../services/BalanceUtilities'
+import { BalanceUtilities } from '../../services/BalanceUtilities'
 import FeedbackService, { notifyFailure } from '../../services/FeedbackService'
 
 import * as Balances from '../../state/ducks/Balances'
@@ -116,7 +114,7 @@ class Balance extends React.Component<Props, State> {
   }
 
   private getTokenTransferElement(balance: BN | undefined): ReactNode {
-    if (balance === undefined || balance.lt(TRANSACTION_FEE)) {
+    if (balance === undefined || balance.lt(sdkBalance.TRANSACTION_FEE)) {
       return <div>Not available due to insufficient funds.</div>
     }
 
