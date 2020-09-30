@@ -1081,10 +1081,10 @@
     "@polkadot/util" "^3.0.1"
     "@polkadot/util-crypto" "^3.0.1"
 
-"@kiltprotocol/sdk-js@^0.19.1-fe23e59.0":
-  version "0.19.1-fe23e59.0"
-  resolved "https://npm.pkg.github.com/download/@kiltprotocol/sdk-js/0.19.1-fe23e59.0/886c62a58cb21005967ecd2a562b6f6e0093fe6725638b9b2f07d375c5e0f103#a6a3cab130ebc29c70c18183b3dd00e1f4d867d0"
-  integrity sha512-Rc147dJYeE/xSq8LWOzrXH8J0tpdiCoyuGUlP2O4ZjK15nVfQvMvb+oTWdk7jia5YmxFpLq//C6LiJ/JYM3gtg==
+"@kiltprotocol/sdk-js@^0.19.1-be43462.0":
+  version "0.19.1-be43462.0"
+  resolved "https://npm.pkg.github.com/download/@kiltprotocol/sdk-js/0.19.1-be43462.0/82ccb1eba38898e45986db46cf88f528110eb53d1f8d08829e289581d3b9cfa3#9085a57aa20bd5c0e9c41f14fb613184ff19ad7c"
+  integrity sha512-GO7EbzZZlp6WHTZsKq52U9aeaczDHp/poQnY6/ZABIgOGWxQ2Dc366XmfXjqPC9VQejO/7brwxpxA7B77R9W4Q==
   dependencies:
     "@kiltprotocol/portablegabi" "^0.3.11"
     "@polkadot/api" "^1.26.1"
