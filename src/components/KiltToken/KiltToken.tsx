@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import BN from 'bn.js'
 import './KiltToken.scss'
-import { Balance } from '@kiltprotocol/sdk-js'
+import { BalanceUtils } from '@kiltprotocol/sdk-js'
 
 type Props = {
   amount?: BN
@@ -27,7 +27,7 @@ const KiltToken: React.FC<Props> = ({ amount, colored = false }) => {
       onMouseEnter={() => setIsShown(true)}
       onMouseLeave={() => setIsShown(false)}
     >
-      {!isShown && Balance.formatKiltBalance(amount)}
+      {!isShown && BalanceUtils.formatKiltBalance(amount)}
       {isShown && <>{amount.toString()}</>}
     </section>
   )

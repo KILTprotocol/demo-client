@@ -1,7 +1,7 @@
 import React from 'react'
 
 import BN from 'bn.js'
-import { Balance } from '@kiltprotocol/sdk-js'
+import { BalanceUtils } from '@kiltprotocol/sdk-js'
 import setupAndDelegate from './DevTools.anticov'
 import { ENDOWMENT, MIN_BALANCE } from '../../services/BalanceUtilities'
 import FeedbackService from '../../services/FeedbackService'
@@ -138,7 +138,7 @@ class DevTools extends React.Component<Props> {
         )
       : new BN(0)
 
-    const minBalanceForBootstrap = ENDOWMENT.add(Balance.TRANSACTION_FEE)
+    const minBalanceForBootstrap = ENDOWMENT.add(BalanceUtils.TRANSACTION_FEE)
       .muln(Object.keys(identitiesPool).length)
       .add(MIN_BALANCE)
 

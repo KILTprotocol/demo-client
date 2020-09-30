@@ -12,10 +12,10 @@ import { IContact, IMyIdentity } from '../types/Contact'
 import { notify, notifySuccess, notifyFailure } from './FeedbackService'
 
 // any balance below this will we purged
-const MIN_BALANCE = sdk.Balance.KILT_COIN.muln(1)
+const MIN_BALANCE = sdk.BalanceUtils.KILT_COIN.muln(1)
 
 // initial endowment for automatically created accounts
-const ENDOWMENT = sdk.Balance.KILT_COIN.muln(30)
+const ENDOWMENT = sdk.BalanceUtils.KILT_COIN.muln(30)
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
@@ -61,7 +61,7 @@ class BalanceUtilities {
     amount: number,
     successCallback?: () => void
   ): void {
-    const transferAmount = sdk.Balance.asFemtoKilt(new BN(amount))
+    const transferAmount = sdk.BalanceUtils.asFemtoKilt(new BN(amount))
     notify(
       <div>
         <span>Transfer of </span>
