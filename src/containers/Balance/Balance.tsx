@@ -99,7 +99,11 @@ class Balance extends React.Component<Props, State> {
 
     const amountNumber = new BN(amount)
 
-    if (amount === '' || (amountNumber.gtn(0) && amountNumber.lte(myBalance))) {
+    if (
+      amount === '' ||
+      (amountNumber.gtn(0) &&
+        BalanceUtils.convertToTxUnit(amountNumber, 0).lte(myBalance))
+    ) {
       this.setState({
         transfer: {
           ...transfer,
