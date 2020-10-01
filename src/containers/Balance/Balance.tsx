@@ -2,15 +2,13 @@ import Immutable from 'immutable'
 import React, { ChangeEvent, ReactNode } from 'react'
 import BN from 'bn.js'
 import { connect, MapStateToProps } from 'react-redux'
+import { BalanceUtils } from '@kiltprotocol/sdk-js'
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import KiltToken from '../../components/KiltToken/KiltToken'
 import { ModalType } from '../../components/Modal/Modal'
 import SelectContacts from '../../components/SelectContacts/SelectContacts'
 import Spinner from '../../components/Spinner/Spinner'
-import {
-  BalanceUtilities,
-  TRANSACTION_FEE,
-} from '../../services/BalanceUtilities'
+import { BalanceUtilities } from '../../services/BalanceUtilities'
 import FeedbackService, { notifyFailure } from '../../services/FeedbackService'
 
 import * as Balances from '../../state/ducks/Balances'
@@ -91,16 +89,21 @@ class Balance extends React.Component<Props, State> {
 
   private onEnterTransferTokens(event: ChangeEvent<HTMLInputElement>): void {
     const { transfer } = this.state
-    const { value: amount } = event.target
+    const { value: inputValue, validity } = event.target
+    const amount = validity.valid ? inputValue : transfer.amount
     const myBalance = this.getMyBalance()
 
-    if (!myBalance || amount.includes('.')) {
+    if (!myBalance) {
       return
     }
 
     const amountNumber = new BN(amount)
 
-    if (amount === '' || (amountNumber.gtn(0) && amountNumber.lte(myBalance))) {
+    if (
+      amount === '' ||
+      (amountNumber.gtn(0) &&
+        BalanceUtils.convertToTxUnit(amountNumber, 0).lte(myBalance))
+    ) {
       this.setState({
         transfer: {
           ...transfer,
@@ -116,7 +119,7 @@ class Balance extends React.Component<Props, State> {
   }
 
   private getTokenTransferElement(balance: BN | undefined): ReactNode {
-    if (balance === undefined || balance.lt(TRANSACTION_FEE)) {
+    if (balance === undefined || balance.lt(BalanceUtils.TRANSACTION_FEE)) {
       return <div>Not available due to insufficient funds.</div>
     }
 
@@ -129,7 +132,8 @@ class Balance extends React.Component<Props, State> {
           <label>Transfer amount</label>
           <div>
             <input
-              type="number"
+              type="text"
+              pattern="[0-9]*"
               onChange={this.onEnterTransferTokens}
               value={amount}
               placeholder="Whole KILT tokens"
@@ -162,11 +166,7 @@ class Balance extends React.Component<Props, State> {
         <div className="actions">
           <button
             type="button"
-            disabled={
-              !amount ||
-              !Number.isFinite(Number(amount)) ||
-              (!toAddress && !toContact)
-            }
+            disabled={!amount || (!toAddress && !toContact)}
             onClick={this.identityCheck}
           >
             Transfer
@@ -225,7 +225,7 @@ class Balance extends React.Component<Props, State> {
       return
     }
 
-    BalanceUtilities.makeTransfer(myIdentity, receiverAddress, Number(amount))
+    BalanceUtilities.makeTransfer(myIdentity, receiverAddress, new BN(amount))
     this.setState({
       transfer: {
         amount: '',

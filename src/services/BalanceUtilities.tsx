@@ -11,17 +11,11 @@ import errorService from './ErrorService'
 import { IContact, IMyIdentity } from '../types/Contact'
 import { notify, notifySuccess, notifyFailure } from './FeedbackService'
 
-const KILT_COIN = new BN(1)
-const KILT_FEMTO_COIN = new BN('1000000000000000')
-
-// cost of a chain transaction
-const TRANSACTION_FEE = KILT_COIN.muln(1)
-
 // any balance below this will we purged
-const MIN_BALANCE = KILT_COIN.muln(1)
+const MIN_BALANCE = sdk.BalanceUtils.KILT_COIN.muln(1)
 
 // initial endowment for automatically created accounts
-const ENDOWMENT = KILT_COIN.muln(30)
+const ENDOWMENT = sdk.BalanceUtils.KILT_COIN.muln(30)
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
@@ -64,10 +58,10 @@ class BalanceUtilities {
   public static makeTransfer(
     myIdentity: IMyIdentity,
     receiverAddress: IContact['publicIdentity']['address'],
-    amount: number,
+    amount: BN,
     successCallback?: () => void
   ): void {
-    const transferAmount = BalanceUtilities.asFemtoKilt(amount)
+    const transferAmount = sdk.BalanceUtils.asFemtoKilt(amount)
     notify(
       <div>
         <span>Transfer of </span>
@@ -134,10 +128,5 @@ class BalanceUtilities {
       Balances.Store.updateBalance(account, balance)
     )
   }
-
-  public static asFemtoKilt(balance: number): BN {
-    return new BN(balance).mul(KILT_FEMTO_COIN)
-  }
 }
-
-export { BalanceUtilities, ENDOWMENT, TRANSACTION_FEE, MIN_BALANCE }
+export { BalanceUtilities, MIN_BALANCE, ENDOWMENT }
