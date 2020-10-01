@@ -198,7 +198,7 @@ class SubmitTerms extends React.Component<Props, State> {
       receiverAddress,
     } = this.props
 
-    const { cType, selectedDelegation } = this.state
+    const { cType, selectedDelegation, quoteData } = this.state
 
     return (
       <section className="SubmitTerms">
@@ -239,7 +239,10 @@ class SubmitTerms extends React.Component<Props, State> {
             <button
               type="button"
               disabled={
-                !Object.keys(claimSelectionData).length && !selectedDelegation
+                quoteData
+                  ? false
+                  : !Object.keys(claimSelectionData).length &&
+                    !selectedDelegation
               }
               onClick={this.sendClaim}
             >
