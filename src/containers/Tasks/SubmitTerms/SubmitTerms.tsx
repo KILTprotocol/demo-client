@@ -239,10 +239,9 @@ class SubmitTerms extends React.Component<Props, State> {
             <button
               type="button"
               disabled={
-                quoteData
-                  ? false
-                  : !Object.keys(claimSelectionData).length &&
-                    !selectedDelegation
+                !quoteData &&
+                !Object.keys(claimSelectionData).length &&
+                !selectedDelegation
               }
               onClick={this.sendClaim}
             >
