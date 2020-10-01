@@ -89,10 +89,11 @@ class Balance extends React.Component<Props, State> {
 
   private onEnterTransferTokens(event: ChangeEvent<HTMLInputElement>): void {
     const { transfer } = this.state
-    const { value: amount } = event.target
+    const { value: inputValue, validity } = event.target
+    const amount = validity.valid ? inputValue : transfer.amount
     const myBalance = this.getMyBalance()
 
-    if (!myBalance || amount.includes('.')) {
+    if (!myBalance) {
       return
     }
 
@@ -127,7 +128,8 @@ class Balance extends React.Component<Props, State> {
           <label>Transfer amount</label>
           <div>
             <input
-              type="number"
+              type="text"
+              pattern="[0-9]*"
               onChange={this.onEnterTransferTokens}
               value={amount}
               placeholder="Whole KILT tokens"
@@ -160,11 +162,7 @@ class Balance extends React.Component<Props, State> {
         <div className="actions">
           <button
             type="button"
-            disabled={
-              !amount ||
-              !Number.isFinite(Number(amount)) ||
-              (!toAddress && !toContact)
-            }
+            disabled={!amount || (!toAddress && !toContact)}
             onClick={this.identityCheck}
           >
             Transfer
@@ -223,7 +221,7 @@ class Balance extends React.Component<Props, State> {
       return
     }
 
-    BalanceUtilities.makeTransfer(myIdentity, receiverAddress, Number(amount))
+    BalanceUtilities.makeTransfer(myIdentity, receiverAddress, new BN(amount))
     this.setState({
       transfer: {
         amount: '',

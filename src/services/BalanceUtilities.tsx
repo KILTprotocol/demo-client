@@ -58,10 +58,10 @@ class BalanceUtilities {
   public static makeTransfer(
     myIdentity: IMyIdentity,
     receiverAddress: IContact['publicIdentity']['address'],
-    amount: number,
+    amount: BN,
     successCallback?: () => void
   ): void {
-    const transferAmount = sdk.BalanceUtils.asFemtoKilt(new BN(amount))
+    const transferAmount = sdk.BalanceUtils.asFemtoKilt(amount)
     notify(
       <div>
         <span>Transfer of </span>
