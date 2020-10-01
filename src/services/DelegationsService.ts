@@ -31,7 +31,7 @@ class DelegationsService {
   public static async storeOnChain(
     delegation: sdk.DelegationNode,
     signature: string
-  ): Promise<sdk.SubmittableResult> {
+  ): Promise<sdk.SubmittableExtrinsic> {
     const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
@@ -142,7 +142,7 @@ class DelegationsService {
 
   private static async storeRootOnChain(
     delegation: sdk.DelegationRootNode
-  ): Promise<sdk.SubmittableResult> {
+  ): Promise<sdk.SubmittableExtrinsic> {
     const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
