@@ -4,6 +4,7 @@ import Kilt, {
   IAttestation,
   IAttestedClaim,
   Identity,
+  Blockchain,
 } from '@kiltprotocol/sdk-js'
 import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAttestedClaims'
 
@@ -45,7 +46,8 @@ class AttestationService {
     }
 
     try {
-      await attestation.store(selectedIdentity)
+      const tx = await attestation.store(selectedIdentity)
+      await Blockchain.submitSignedTx(tx)
     } catch (error) {
       ErrorService.log({
         error,
@@ -68,7 +70,8 @@ class AttestationService {
       throw new Error('No identity selected')
     }
     try {
-      await attestation.revoke(selectedIdentity)
+      const tx = await attestation.revoke(selectedIdentity)
+      await Blockchain.submitSignedTx(tx)
       notifySuccess('Attestation successfully revoked')
       persistentStore.store.dispatch(
         Attestations.Store.revokeAttestation(attestation.claimHash)
@@ -84,12 +87,14 @@ class AttestationService {
     }
   }
 
-  public static revokeByClaimHash(
+  public static async revokeByClaimHash(
     claimHash: IAttestation['claimHash']
   ): Promise<void> {
     const selectedIdentity = AttestationService.getIdentity()
 
-    return Kilt.Attestation.revoke(claimHash, selectedIdentity)
+    const tx = Kilt.Attestation.revoke(claimHash, selectedIdentity)
+    await Blockchain.submitSignedTx(await tx)
+    return tx
       .then(() => {
         notifySuccess(`Attestation successfully revoked.`)
         persistentStore.store.dispatch(

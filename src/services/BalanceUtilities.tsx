@@ -75,6 +75,7 @@ class BalanceUtilities {
       receiverAddress,
       transferAmount
     )
+      .then(tx => sdk.Blockchain.submitSignedTx(tx))
       .then(() => {
         notifySuccess(
           <div>

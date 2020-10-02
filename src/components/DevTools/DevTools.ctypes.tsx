@@ -31,9 +31,9 @@ class BsCType {
       bsCTypeData.schema,
       ownerIdentity.address
     )
-
-    return cType
-      .store(ownerIdentity)
+    const tx = cType.store(ownerIdentity)
+    await sdk.Blockchain.submitSignedTx(await tx)
+    return tx
       .catch(error => {
         if (error === ERROR_CTYPE_ALREADY_EXISTS) {
           notifyError(error, false)

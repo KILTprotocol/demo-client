@@ -12,7 +12,11 @@ class DelegationsService {
     alias: string,
     isPCR: boolean
   ): Promise<void> {
-    return DelegationsService.storeRootOnChain(delegationRoot).then(() => {
+    const tx = DelegationsService.storeRootOnChain(delegationRoot)
+
+    await sdk.Blockchain.submitSignedTx(await tx)
+
+    return tx.then(() => {
       const { account, cTypeHash, id } = delegationRoot
 
       const myDelegation: IMyDelegation = {
