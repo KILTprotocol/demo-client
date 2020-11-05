@@ -8,7 +8,7 @@ RUN apk add --no-cache bash
 
 COPY package.json yarn.lock ./
 COPY ?npmrc ?yarnrc ./
-RUN yarn install --verbose
+RUN yarn install
 
 COPY . ./
 
