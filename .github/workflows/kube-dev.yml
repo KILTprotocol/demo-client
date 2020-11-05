@@ -1,0 +1,66 @@
+name: Deploy to Amazon EKS
+
+on:
+  push:
+    branches:
+      - develop
+      - tw-796-kubernetes
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: set sdk dependency to 'latest' & set up .npmrc to connect to github packages
+      run: |
+        echo $(jq '.dependencies."@kiltprotocol/sdk-js"="latest"' package.json) > package.json
+        mv -f .npmrc.github .npmrc
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: kilt/demo-client
+        IMAGE_TAG: latest-develop
+        SHA_IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build \
+          -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+          -t $ECR_REGISTRY/$ECR_REPOSITORY:$SHA_IMAGE_TAG \
+          --build-arg NODE_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+          .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$SHA_IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        echo "::set-output name=image-sha::$ECR_REGISTRY/$ECR_REPOSITORY:$SHA_IMAGE_TAG"
+
+    - name: Configure Kubernetes
+      env:
+        KUBECONFIG: '${{ github.workspace }}/.kube/kubeconfig'
+      run: |
+        mkdir -p '${{ github.workspace }}/.kube' \
+          && echo '${{ secrets.KUBE_CONFIG}}' | base64 -d > $KUBECONFIG
+
+    - name: Set new image
+      env:
+        IMAGE: ${{ steps.build-image.outputs.image-sha }}
+      run: |
+        kubectl -n devnet set image deployment/node-alice-deployment node-container=$IMAGE
