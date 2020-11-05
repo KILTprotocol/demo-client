@@ -57,7 +57,8 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
     [sdk.Permission.ATTEST]
   )
   const signature = delegate.identity.signStr(delegationNode.generateHash())
-  await delegationNode.store(root, signature)
+  const tx = await delegationNode.store(root, signature)
+  await sdk.Blockchain.submitSignedTx(tx)
   notifySuccess(`Delegation successfully created for ${delegate.metaData.name}`)
   await DelegationsService.importDelegation(
     delegationNode.id,
@@ -78,7 +79,8 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
 async function verifyOrAddCtypeAndRoot(): Promise<void> {
   const { root, delegationRoot } = await setup()
   if (!(await ctype.verifyStored())) {
-    await ctype.store(root)
+    const tx = await ctype.store(root)
+    await sdk.Blockchain.submitSignedTx(tx)
     CTypeRepository.register({
       cType: ctype,
       metaData: { metadata, ctypeHash: ctype.hash },
@@ -89,7 +91,8 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
   // workaround is checking the ctype hash of the query result; it is 0x000... if it doesn't exist on chain
   const queriedRoot = await sdk.DelegationRootNode.query(delegationRoot.id)
   if (queriedRoot?.cTypeHash !== ctype.hash) {
-    await delegationRoot.store(root)
+    const tx = await delegationRoot.store(root)
+    await sdk.Blockchain.submitSignedTx(tx)
     const messageBody: sdk.MessageBody = {
       type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
       content: { delegationId: delegationRoot.id, isPCR: false },
