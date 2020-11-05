@@ -63,4 +63,4 @@ jobs:
       env:
         IMAGE: ${{ steps.build-image.outputs.image-sha }}
       run: |
-        kubectl -n devnet set image deployment/node-alice-deployment node-container=$IMAGE
+        kubectl -n devnet set image deployment/client-deployment client-container=$IMAGE
