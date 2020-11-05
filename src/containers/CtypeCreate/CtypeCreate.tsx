@@ -68,7 +68,7 @@ class CTypeCreate extends React.Component<Props, State> {
     history.push('/cType')
   }
 
-  public submit(): void {
+  public async submit(): Promise<void> {
     const { selectedIdentity, history } = this.props
     const { connected, isValid, cType: stateCtype } = this.state
     stateCtype.owner = selectedIdentity?.identity.address
@@ -98,13 +98,13 @@ class CTypeCreate extends React.Component<Props, State> {
         metaData,
       }
 
-      cType
-        .store(selectedIdentity.identity)
-        .then(() => {
-          blockUi.updateMessage(
-            `CTYPE stored on blockchain,\nnow registering CTYPE`
-          ) // TODO: add onrejected when sdk provides error handling
-        })
+      const tx = cType.store(selectedIdentity.identity)
+      await sdk.Blockchain.submitSignedTx(await tx)
+      tx.then(() => {
+        blockUi.updateMessage(
+          `CTYPE stored on blockchain,\nnow registering CTYPE`
+        ) // TODO: add onrejected when sdk provides error handling
+      })
         .catch(error => {
           errorService.log({
             error,

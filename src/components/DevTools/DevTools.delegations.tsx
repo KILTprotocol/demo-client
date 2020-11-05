@@ -94,7 +94,8 @@ class BsDelegation {
 
     const signature = ownerIdentity.identity.signStr(delegation.generateHash())
     const metaData = { alias }
-    await DelegationsService.storeOnChain(delegation, signature)
+    const tx = await DelegationsService.storeOnChain(delegation, signature)
+    await sdk.Blockchain.submitSignedTx(tx)
     DelegationsService.store({
       cTypeHash: rootData.rootDelegation.cTypeHash,
       ...delegation,
