@@ -62,5 +62,6 @@ jobs:
     - name: Set new image
       env:
         IMAGE: ${{ steps.build-image.outputs.image-sha }}
+        KUBECONFIG: '${{ github.workspace }}/.kube/kubeconfig'
       run: |
         kubectl -n devnet set image deployment/client-deployment client-container=$IMAGE
