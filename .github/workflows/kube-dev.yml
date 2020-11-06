@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - tw-796-kubernetes
 
 jobs:
   deploy:
