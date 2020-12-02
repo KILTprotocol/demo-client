@@ -1,0 +1,49 @@
+name: Test SDK Update
+
+on:
+  repository_dispatch:
+    types: [sdk-update]
+
+jobs:
+  integration_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Use Node.js 10
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+
+      - name: Upgrade sdk to latest dev version
+        run: yarn upgrade @kiltprotocol/sdk-js@dev
+
+      - name: Test demo-client
+        run: |
+          yarn lint
+          yarn build
+
+      - name: Create issue on failure
+        if: ${{ failure() }}
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          title: fix code after sdk-js upgrade
+          labels: bug
+          assignees: ${{ github.event.client_payload.github.sender.login }}
+          SHA: ${{ github.event.client_payload.github.sha }}
+          URL: https://github.com/KILTprotocol/sdk-js/commit/${{ github.event.client_payload.github.sha }}
+        with:
+          filename: .github/sdk-update-issue-template.md
