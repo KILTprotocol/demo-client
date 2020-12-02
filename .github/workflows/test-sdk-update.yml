@@ -40,8 +40,10 @@ jobs:
         uses: JasonEtco/create-an-issue@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          title: fix code snippets after sdk-js upgrade
+          title: fix code after sdk-js upgrade
           labels: bug
           assignees: ${{ github.event.client_payload.github.sender.login }}
           SHA: ${{ github.event.client_payload.github.sha }}
           URL: https://github.com/KILTprotocol/sdk-js/commit/${{ github.event.client_payload.github.sha }}
+        with:
+          filename: .github/sdk-update-issue-template.md
