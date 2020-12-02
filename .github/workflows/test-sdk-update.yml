@@ -28,7 +28,7 @@ jobs:
           node-version: 10
 
       - name: Upgrade sdk to latest dev version
-        run: yarn install && yarn upgrade @kiltprotocol/sdk-js@dev
+        run: yarn upgrade @kiltprotocol/sdk-js@dev
 
       - name: Test demo-client
         run: |
