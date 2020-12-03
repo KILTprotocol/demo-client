@@ -1,5 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
-
+import { PublicIdentity } from '@kiltprotocol/sdk-js'
 import * as Contacts from '../state/ducks/Contacts'
 import * as Wallet from '../state/ducks/Wallet'
 import PersistentStore from '../state/PersistentStore'
@@ -112,7 +111,7 @@ class ContactRepository {
     identifier: string,
     alias: string
   ): Promise<void | IContact> {
-    const publicIdentity = await sdk.PublicIdentity.resolveFromDid(
+    const publicIdentity = await PublicIdentity.resolveFromDid(
       identifier.trim(),
       {
         resolve: (url: string) => {

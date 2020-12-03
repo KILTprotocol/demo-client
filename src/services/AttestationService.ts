@@ -1,15 +1,13 @@
-import Kilt, {
-  IRequestForAttestation,
+import {
+  Attestation,
   AttestedClaim,
+  BlockchainUtils,
   IAttestation,
   IAttestedClaim,
   Identity,
-  Blockchain,
+  IRequestForAttestation,
 } from '@kiltprotocol/sdk-js'
-import {
-  IS_IN_BLOCK,
-  submitSignedTx,
-} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
+import { IS_IN_BLOCK } from '@kiltprotocol/sdk-js/build/blockchain/Blockchain.utils'
 import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAttestedClaims'
 
 import * as Attestations from '../state/ducks/Attestations'
@@ -36,12 +34,12 @@ class AttestationService {
       throw new Error('No identity selected')
     }
 
-    const attestation = Kilt.Attestation.fromRequestAndPublicIdentity(
+    const attestation = Attestation.fromRequestAndPublicIdentity(
       requestForAttestation,
       selectedIdentity.getPublicIdentity()
     )
 
-    const attestedClaim = Kilt.AttestedClaim.fromRequestAndAttestation(
+    const attestedClaim = AttestedClaim.fromRequestAndAttestation(
       requestForAttestation,
       attestation
     )
@@ -51,7 +49,9 @@ class AttestationService {
 
     try {
       const tx = await attestation.store(selectedIdentity)
-      await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
+      await BlockchainUtils.submitSignedTx(tx, {
+        resolveOn: IS_IN_BLOCK,
+      })
     } catch (error) {
       ErrorService.log({
         error,
@@ -67,7 +67,7 @@ class AttestationService {
   public static async revokeAttestation(
     iAttestation: IAttestation
   ): Promise<void> {
-    const attestation = Kilt.Attestation.fromAttestation(iAttestation)
+    const attestation = Attestation.fromAttestation(iAttestation)
     const selectedIdentity = AttestationService.getIdentity()
 
     if (!selectedIdentity) {
@@ -75,7 +75,7 @@ class AttestationService {
     }
     try {
       const tx = await attestation.revoke(selectedIdentity)
-      await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
+      await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
       notifySuccess('Attestation successfully revoked')
       persistentStore.store.dispatch(
         Attestations.Store.revokeAttestation(attestation.claimHash)
@@ -96,8 +96,10 @@ class AttestationService {
   ): Promise<void> {
     const selectedIdentity = AttestationService.getIdentity()
 
-    const tx = Kilt.Attestation.revoke(claimHash, selectedIdentity)
-    await submitSignedTx(await tx, { resolveOn: IS_IN_BLOCK })
+    const tx = Attestation.revoke(claimHash, selectedIdentity)
+    await BlockchainUtils.submitSignedTx(await tx, {
+      resolveOn: IS_IN_BLOCK,
+    })
     return tx
       .then(() => {
         notifySuccess(`Attestation successfully revoked.`)
@@ -105,7 +107,7 @@ class AttestationService {
           Attestations.Store.revokeAttestation(claimHash)
         )
       })
-      .catch(error => {
+      .catch((error: any) => {
         ErrorService.log({
           error,
           message: `Could not revoke attestation.`,
@@ -119,14 +121,14 @@ class AttestationService {
   public static async verifyAttestatedClaim(
     attestedClaim: IAttestedClaim
   ): Promise<boolean> {
-    const initialisedAttestedClaim = Kilt.AttestedClaim.fromAttestedClaim(
+    const initialisedAttestedClaim = AttestedClaim.fromAttestedClaim(
       attestedClaim
     )
     return initialisedAttestedClaim.verify()
   }
 
   public static verifyAttestation(attestation: IAttestation): Promise<boolean> {
-    const initialisedAttestation = Kilt.Attestation.fromAttestation(attestation)
+    const initialisedAttestation = Attestation.fromAttestation(attestation)
     return initialisedAttestation.checkValidity()
   }
 
@@ -168,7 +170,7 @@ class AttestationService {
 
         state.selectedAttestedClaims.forEach(
           (selectedAttestedClaim: IAttestedClaim) => {
-            const attClaim = Kilt.AttestedClaim.fromAttestedClaim(
+            const attClaim = AttestedClaim.fromAttestedClaim(
               selectedAttestedClaim
             )
 

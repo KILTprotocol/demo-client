@@ -1,11 +1,8 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { BlockchainUtils, CType, ICTypeMetadata } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import {
-  IS_IN_BLOCK,
-  submitSignedTx,
-} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
+import { IS_IN_BLOCK } from '@kiltprotocol/sdk-js/build/blockchain/Blockchain.utils'
 import CTypeEditor from '../../components/CtypeEditor/CtypeEditor'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
@@ -77,8 +74,8 @@ class CTypeCreate extends React.Component<Props, State> {
     const { connected, isValid, cType: stateCtype } = this.state
     stateCtype.owner = selectedIdentity?.identity.address
     if (selectedIdentity && connected && isValid) {
-      let cType: sdk.CType
-      let metaData: sdk.ICTypeMetadata
+      let cType: CType
+      let metaData: ICTypeMetadata
       try {
         const inputICTypeWithMetadata = fromInputModel(stateCtype)
         ;({ cType, metaData } = inputICTypeWithMetadata)
@@ -103,7 +100,9 @@ class CTypeCreate extends React.Component<Props, State> {
       }
 
       const tx = cType.store(selectedIdentity.identity)
-      await submitSignedTx(await tx, { resolveOn: IS_IN_BLOCK })
+      await BlockchainUtils.submitSignedTx(await tx, {
+        resolveOn: IS_IN_BLOCK,
+      })
       tx.then(() => {
         blockUi.updateMessage(
           `CTYPE stored on blockchain,\nnow registering CTYPE`

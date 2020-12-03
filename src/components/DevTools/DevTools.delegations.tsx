@@ -1,8 +1,14 @@
-import * as sdk from '@kiltprotocol/sdk-js'
 import {
-  IS_IN_BLOCK,
-  submitSignedTx,
-} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
+  BlockchainUtils,
+  DelegationNode,
+  DelegationRootNode,
+  IInformCreateDelegation,
+  IRequestAcceptDelegation,
+  ISubmitAcceptDelegation,
+  MessageBodyType,
+  Permission,
+  UUID,
+} from '@kiltprotocol/sdk-js'
 import ContactRepository from '../../services/ContactRepository'
 
 import DelegationsService from '../../services/DelegationsService'
@@ -20,21 +26,21 @@ import pcrPool from './data/pcr.json'
 
 type UpdateCallback = (bsDelegationKey: keyof BsDelegationsPool) => void
 
-type Permission = 'ATTEST' | 'DELEGATE'
+type Permissions = 'ATTEST' | 'DELEGATE'
 
 type RootData = {
   ownerIdentity: IMyIdentity
-  rootDelegation: sdk.DelegationRootNode
+  rootDelegation: DelegationRootNode
 }
 
 type ParentData = {
   ownerIdentity: IMyIdentity
-  delegation: sdk.DelegationNode | sdk.DelegationRootNode
+  delegation: DelegationNode | DelegationRootNode
   metaData?: IMyDelegation['metaData']
 }
 
 type DelegationDataForMessages = {
-  delegation: sdk.DelegationNode
+  delegation: DelegationNode
   isPCR: boolean
   ownerIdentity: IMyIdentity
   signature: string
@@ -46,7 +52,7 @@ type BsDelegationsPoolElement = {
 
   children?: BsDelegationsPool
   cTypeKey?: keyof BsCTypesPool
-  permissions?: Permission[]
+  permissions?: Permissions[]
 }
 
 export type BsDelegationsPool = {
@@ -80,16 +86,16 @@ class BsDelegation {
     }
 
     // creation
-    let newPermissions: sdk.Permission[]
+    let newPermissions: Permission[]
     if (isPCR) {
-      newPermissions = [sdk.Permission.ATTEST]
+      newPermissions = [Permission.ATTEST]
     } else {
       newPermissions = (permissions || []).map(
-        permission => sdk.Permission[permission]
+        permission => Permission[permission]
       )
     }
-    const delegation = new sdk.DelegationNode(
-      sdk.UUID.generate(),
+    const delegation = new DelegationNode(
+      UUID.generate(),
       rootData.rootDelegation.id,
       ownerIdentity.identity.address,
       newPermissions,
@@ -99,7 +105,9 @@ class BsDelegation {
     const signature = ownerIdentity.identity.signStr(delegation.generateHash())
     const metaData = { alias }
     const tx = await DelegationsService.storeOnChain(delegation, signature)
-    await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
+    await BlockchainUtils.submitSignedTx(tx, {
+      resolveOn: BlockchainUtils.IS_IN_BLOCK,
+    })
     DelegationsService.store({
       cTypeHash: rootData.rootDelegation.cTypeHash,
       ...delegation,
@@ -184,8 +192,8 @@ class BsDelegation {
     }
 
     // await creation
-    const rootDelegation = new sdk.DelegationRootNode(
-      sdk.UUID.generate(),
+    const rootDelegation = new DelegationRootNode(
+      UUID.generate(),
       cType.cType.hash,
       ownerIdentity.identity.address
     )
@@ -214,7 +222,7 @@ class BsDelegation {
     isPCR: boolean,
     withMessages: boolean,
     updateCallback?: UpdateCallback
-  ): Promise<void | sdk.Claim> {
+  ): Promise<void> {
     const pool = isPCR ? BsDelegation.pcrPool : BsDelegation.delegationsPool
     const bsDelegationKeys = Object.keys(pool)
     const requests = bsDelegationKeys.reduce(
@@ -318,7 +326,7 @@ class BsDelegation {
       signature,
     } = delegationDataForMessages
 
-    const delegationData: sdk.IRequestAcceptDelegation['content']['delegationData'] = {
+    const delegationData: IRequestAcceptDelegation['content']['delegationData'] = {
       account: parentData.ownerIdentity.identity.address,
       id: delegation.id,
       isPCR,
@@ -327,7 +335,7 @@ class BsDelegation {
     }
 
     // send invitation from inviter(parentIdentity) to invitee (ownerIdentity)
-    const requestAcceptDelegation: sdk.IRequestAcceptDelegation = {
+    const requestAcceptDelegation: IRequestAcceptDelegation = {
       content: {
         delegationData,
         metaData: parentData.metaData,
@@ -337,7 +345,7 @@ class BsDelegation {
           ),
         },
       },
-      type: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+      type: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
     }
     await MessageRepository.singleSend(
       requestAcceptDelegation,
@@ -346,7 +354,7 @@ class BsDelegation {
     )
 
     // send invitation acceptance back
-    const submitAcceptDelegation: sdk.ISubmitAcceptDelegation = {
+    const submitAcceptDelegation: ISubmitAcceptDelegation = {
       content: {
         delegationData,
         signatures: {
@@ -354,7 +362,7 @@ class BsDelegation {
           inviter: requestAcceptDelegation.content.signatures.inviter,
         },
       },
-      type: sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION,
+      type: MessageBodyType.SUBMIT_ACCEPT_DELEGATION,
     }
     await MessageRepository.singleSend(
       submitAcceptDelegation,
@@ -363,12 +371,12 @@ class BsDelegation {
     )
 
     // inform about delegation creation
-    const informCreateDelegation: sdk.IInformCreateDelegation = {
+    const informCreateDelegation: IInformCreateDelegation = {
       content: {
         delegationId: delegation.id,
         isPCR,
       },
-      type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
+      type: MessageBodyType.INFORM_CREATE_DELEGATION,
     }
     await MessageRepository.singleSend(
       informCreateDelegation,

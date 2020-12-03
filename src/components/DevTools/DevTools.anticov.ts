@@ -1,11 +1,17 @@
-import * as sdk from '@kiltprotocol/sdk-js'
-import {
-  IS_IN_BLOCK,
-  submitSignedTx,
-} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
+import Kilt, {
+  DelegationRootNode,
+  Identity,
+  BlockchainUtils,
+  DelegationNode,
+  MessageBody,
+  MessageBodyType,
+  Permission,
+  UUID,
+} from '@kiltprotocol/sdk-js'
 import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetadata'
 import { ICTypeSchema } from '@kiltprotocol/sdk-js/build/types/CType'
 import BN from 'bn.js'
+import { IS_IN_BLOCK } from '@kiltprotocol/sdk-js/build/blockchain/Blockchain.utils'
 import {
   ROOT_SEED,
   CTYPE,
@@ -22,21 +28,21 @@ import FeedbackService, {
   notifyFailure,
 } from '../../services/FeedbackService'
 
-const ctype = sdk.CType.fromSchema(CTYPE.schema as ICTypeSchema)
+const ctype = Kilt.CType.fromSchema(CTYPE.schema as ICTypeSchema)
 const metadata: IMetadata = CTYPE_METADATA
 
 interface ISetup {
-  root: sdk.Identity
-  delegationRoot: sdk.DelegationRootNode
+  root: Identity
+  delegationRoot: DelegationRootNode
 }
 
 let cachedSetup: ISetup
 
 async function setup(): Promise<ISetup> {
   if (!cachedSetup) {
-    const root = await sdk.Identity.buildFromMnemonic(ROOT_SEED)
+    const root = await Identity.buildFromMnemonic(ROOT_SEED)
 
-    const delegationRoot = new sdk.DelegationRootNode(
+    const delegationRoot = new DelegationRootNode(
       DELEGATION_ROOT_ID,
       ctype.hash,
       root.address
@@ -54,15 +60,15 @@ async function setup(): Promise<ISetup> {
 async function newDelegation(delegate: IMyIdentity): Promise<void> {
   const { root, delegationRoot } = await setup()
 
-  const delegationNode = new sdk.DelegationNode(
-    sdk.UUID.generate(),
+  const delegationNode = new DelegationNode(
+    UUID.generate(),
     delegationRoot.id,
     delegate.identity.address,
-    [sdk.Permission.ATTEST]
+    [Permission.ATTEST]
   )
   const signature = delegate.identity.signStr(delegationNode.generateHash())
   const tx = await delegationNode.store(root, signature)
-  await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
+  await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
   notifySuccess(`Delegation successfully created for ${delegate.metaData.name}`)
   await DelegationsService.importDelegation(
     delegationNode.id,
@@ -70,8 +76,8 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
     false
   )
   notifySuccess(`Delegation imported. Switch to Delegation Tab to see it.`)
-  const messageBody: sdk.MessageBody = {
-    type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
+  const messageBody: MessageBody = {
+    type: MessageBodyType.INFORM_CREATE_DELEGATION,
     content: { delegationId: delegationNode.id, isPCR: false },
   }
   await MessageRepository.sendToAddresses(
@@ -84,26 +90,29 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
   const { root, delegationRoot } = await setup()
   if (!(await ctype.verifyStored())) {
     const tx = await ctype.store(root)
-    await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
+    await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
     CTypeRepository.register({
       cType: ctype,
       metaData: { metadata, ctypeHash: ctype.hash },
     })
     notifySuccess(`CTYPE ${metadata.title.default} successfully created.`)
   }
-  // delegationRoot.verify() is unreliable when using the currently released mashnet-node & sdk
-  // workaround is checking the ctype hash of the query result; it is 0x000... if it doesn't exist on chain
-  const queriedRoot = await sdk.DelegationRootNode.query(delegationRoot.id)
+  // delegationRoot.verify() is unreliable when using the currently released mashnet-node &   // workaround is checking the ctype hash of the query result; it is 0x000... if it doesn't exist on chain
+  const queriedRoot = await DelegationRootNode.query(delegationRoot.id)
   if (queriedRoot?.cTypeHash !== ctype.hash) {
     const tx = await delegationRoot.store(root)
-    await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
-    const messageBody: sdk.MessageBody = {
-      type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
+    await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
+    const messageBody: MessageBody = {
+      type: MessageBodyType.INFORM_CREATE_DELEGATION,
       content: { delegationId: delegationRoot.id, isPCR: false },
     }
     notifySuccess(`AntiCov Delegation Root successfully created.`)
     // sending root owner message for importing the root
-    const message = new sdk.Message(messageBody, root, root.getPublicIdentity())
+    const message = new Kilt.Message(
+      messageBody,
+      root,
+      root.getPublicIdentity()
+    )
     await MessageRepository.dispatchMessage(message)
     notifySuccess(`Sent Delegation Root to AntiCov root authority.`)
   }

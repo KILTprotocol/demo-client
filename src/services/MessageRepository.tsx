@@ -1,5 +1,19 @@
-import { ISubmitAttestationForClaim } from '@kiltprotocol/sdk-js'
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  Identity,
+  IEncryptedMessage,
+  IMessage,
+  IPublicIdentity,
+  IRejectTerms,
+  IRequestAttestationForClaim,
+  IRequestClaimsForCTypes,
+  IRequestTerms,
+  ISubmitAttestationForClaim,
+  ISubmitClaimsForCTypesClassic,
+  ISubmitTerms,
+  Message,
+  MessageBody,
+  MessageBodyType,
+} from '@kiltprotocol/sdk-js'
 import cloneDeep from 'lodash/cloneDeep'
 import React from 'react'
 import { InteractionProps } from 'react-json-view'
@@ -19,8 +33,8 @@ import FeedbackService, {
   notifySuccess,
 } from './FeedbackService'
 
-export interface IMessageOutput extends sdk.IMessage {
-  encryptedMessage: sdk.IEncryptedMessage
+export interface IMessageOutput extends IMessage {
+  encryptedMessage: IEncryptedMessage
   sender?: IContact
 }
 
@@ -41,7 +55,7 @@ class MessageRepository {
    */
   public static async send(
     receivers: IContact[],
-    messageBody: sdk.MessageBody
+    messageBody: MessageBody
   ): Promise<void> {
     const sender: IMyIdentity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
@@ -65,7 +79,7 @@ class MessageRepository {
    */
   public static async sendToAddresses(
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
-    messageBody: sdk.MessageBody
+    messageBody: MessageBody
   ): Promise<void> {
     const arrayOfPromises = receiverAddresses.map(
       (receiverAddress: IContact['publicIdentity']['address']) => {
@@ -91,8 +105,8 @@ class MessageRepository {
    * @param messageBody
    */
   public static sendToPublicIdentity(
-    receiver: sdk.IPublicIdentity,
-    messageBody: sdk.MessageBody
+    receiver: IPublicIdentity,
+    messageBody: MessageBody
   ): Promise<void> {
     const receiverContact: IContact = {
       metaData: {
@@ -106,13 +120,11 @@ class MessageRepository {
 
   public static async multiSendToAddresses(
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
-    messageBodies: sdk.MessageBody[]
+    messageBodies: MessageBody[]
   ): Promise<void> {
-    const arrayOfPromises = messageBodies.map(
-      (messageBody: sdk.MessageBody) => {
-        return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
-      }
-    )
+    const arrayOfPromises = messageBodies.map((messageBody: MessageBody) => {
+      return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
+    })
 
     return Promise.any(arrayOfPromises)
       .then(result => {
@@ -134,33 +146,33 @@ class MessageRepository {
 
   public static async findByMessageId(
     messageId: string,
-    myIdentity: sdk.Identity
-  ): Promise<sdk.IMessage | undefined> {
+    myIdentity: Identity
+  ): Promise<IMessage | undefined> {
     return fetch(
       `${MessageRepository.URL}/inbox/${myIdentity.signPublicKeyAsHex}/${messageId}`
     )
       .then(response => response.json())
       .then(message => {
         return ContactRepository.findByAddress(message.senderAddress).then(() =>
-          sdk.Message.decrypt(message, myIdentity)
+          Message.decrypt(message, myIdentity)
         )
       })
   }
 
   public static async findByMyIdentity(
-    myIdentity: sdk.Identity
+    myIdentity: Identity
   ): Promise<IMessageOutput[]> {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
-      .then((encryptedMessages: sdk.IEncryptedMessage[]) => {
+      .then((encryptedMessages: IEncryptedMessage[]) => {
         return Promise.any(
-          encryptedMessages.map((encryptedMessage: sdk.IEncryptedMessage) => {
+          encryptedMessages.map((encryptedMessage: IEncryptedMessage) => {
             return ContactRepository.findByAddress(
               encryptedMessage.senderAddress
             ).then((contact: IContact) => {
               try {
-                const m = sdk.Message.decrypt(encryptedMessage, myIdentity)
-                sdk.Message.ensureOwnerIsSender(m)
+                const m = Message.decrypt(encryptedMessage, myIdentity)
+                Message.ensureOwnerIsSender(m)
                 let sender = contact
                 if (!sender) {
                   sender = {
@@ -194,7 +206,7 @@ class MessageRepository {
       })
   }
 
-  public static async dispatchMessage(message: sdk.Message): Promise<Response> {
+  public static async dispatchMessage(message: Message): Promise<Response> {
     const response = await fetch(`${MessageRepository.URL}`, {
       ...BasePostParams,
       body: JSON.stringify(message.encrypt()),
@@ -206,12 +218,12 @@ class MessageRepository {
   }
 
   public static async singleSend(
-    messageBody: sdk.MessageBody,
+    messageBody: MessageBody,
     sender: IMyIdentity,
     receiver: IContact
   ): Promise<void> {
     try {
-      let message: sdk.Message = new sdk.Message(
+      let message: Message = new Message(
         messageBody,
         sender.identity,
         receiver.publicIdentity
@@ -251,30 +263,30 @@ class MessageRepository {
     const { type } = body
 
     switch (type) {
-      case sdk.MessageBodyType.REQUEST_TERMS:
-        return [(message.body as sdk.IRequestTerms).content.cTypeHash]
-      case sdk.MessageBodyType.SUBMIT_TERMS:
-        return [(message.body as sdk.ISubmitTerms).content.claim.cTypeHash]
-      case sdk.MessageBodyType.REJECT_TERMS:
-        return [(message.body as sdk.IRejectTerms).content.claim.cTypeHash]
+      case MessageBodyType.REQUEST_TERMS:
+        return [(message.body as IRequestTerms).content.cTypeHash]
+      case MessageBodyType.SUBMIT_TERMS:
+        return [(message.body as ISubmitTerms).content.claim.cTypeHash]
+      case MessageBodyType.REJECT_TERMS:
+        return [(message.body as IRejectTerms).content.claim.cTypeHash]
 
-      case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
+      case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM:
         return [
-          (message.body as sdk.IRequestAttestationForClaim).content
+          (message.body as IRequestAttestationForClaim).content
             .requestForAttestation.claim.cTypeHash,
         ]
-      case sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
+      case MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM:
         return [
           (message.body as ISubmitAttestationForClaim).content.attestation
             .cTypeHash,
         ]
 
-      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
-        return (message.body as sdk.IRequestClaimsForCTypes).content.ctypes.filter(
+      case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
+        return (message.body as IRequestClaimsForCTypes).content.ctypes.filter(
           Boolean
-        ) as Array<sdk.ICType['hash']>
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
-        const cTypeHashes = (message.body as sdk.ISubmitClaimsForCTypesClassic).content.map(
+        ) as Array<ICType['cType']['hash']>
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
+        const cTypeHashes = (message.body as ISubmitClaimsForCTypesClassic).content.map(
           attestedClaim => attestedClaim.request.claim.cTypeHash
         )
         const uniqueCTypeHashes: Array<ICType['cType']['hash']> = cTypeHashes.filter(
@@ -284,11 +296,11 @@ class MessageRepository {
         return uniqueCTypeHashes
       }
 
-      case sdk.MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
-      case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION:
-      case sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION:
-      case sdk.MessageBodyType.REJECT_ACCEPT_DELEGATION:
-      case sdk.MessageBodyType.INFORM_CREATE_DELEGATION:
+      case MessageBodyType.REJECT_ATTESTATION_FOR_CLAIM:
+      case MessageBodyType.REQUEST_ACCEPT_DELEGATION:
+      case MessageBodyType.SUBMIT_ACCEPT_DELEGATION:
+      case MessageBodyType.REJECT_ACCEPT_DELEGATION:
+      case MessageBodyType.INFORM_CREATE_DELEGATION:
         return []
 
       default:
@@ -296,24 +308,22 @@ class MessageRepository {
     }
   }
 
-  private static async handleDebugMode(
-    message: sdk.Message
-  ): Promise<sdk.Message> {
+  private static async handleDebugMode(message: Message): Promise<Message> {
     const debugMode = UiState.getDebugMode(PersistentStore.store.getState())
 
     let manipulatedMessage = cloneDeep(message)
 
     if (debugMode) {
-      return new Promise<sdk.Message>(resolve => {
+      return new Promise<Message>(resolve => {
         FeedbackService.addBlockingNotification({
           header: 'Manipulate your message before sending',
           message: (
             <Code
               onEdit={(edit: InteractionProps) => {
-                manipulatedMessage = edit.updated_src as sdk.Message
+                manipulatedMessage = edit.updated_src as Message
               }}
               onAdd={(add: InteractionProps) => {
-                manipulatedMessage = add.updated_src as sdk.Message
+                manipulatedMessage = add.updated_src as Message
               }}
             >
               {message}

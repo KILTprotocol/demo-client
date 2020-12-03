@@ -1,9 +1,15 @@
-import * as sdk from '@kiltprotocol/sdk-js'
-
 import {
-  IS_IN_BLOCK,
-  submitSignedTx,
-} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
+  BlockchainUtils,
+  DelegationBaseNode,
+  DelegationNode,
+  DelegationRootNode,
+  IDelegationBaseNode,
+  IDelegationNode,
+  IDelegationRootNode,
+  Identity,
+  SubmittableExtrinsic,
+} from '@kiltprotocol/sdk-js'
+import { IS_IN_BLOCK } from '@kiltprotocol/sdk-js/build/blockchain/Blockchain.utils'
 import { DelegationsTreeNode } from '../components/DelegationNode/DelegationNode'
 import { IMyDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
@@ -12,13 +18,15 @@ import PersistentStore from '../state/PersistentStore'
 
 class DelegationsService {
   public static async storeRoot(
-    delegationRoot: sdk.DelegationRootNode,
+    delegationRoot: DelegationRootNode,
     alias: string,
     isPCR: boolean
   ): Promise<void> {
     const tx = DelegationsService.storeRootOnChain(delegationRoot)
 
-    await submitSignedTx(await tx, { resolveOn: IS_IN_BLOCK })
+    await BlockchainUtils.submitSignedTx(await tx, {
+      resolveOn: IS_IN_BLOCK,
+    })
 
     return tx.then(() => {
       const { account, cTypeHash, id } = delegationRoot
@@ -37,10 +45,10 @@ class DelegationsService {
   }
 
   public static async storeOnChain(
-    delegation: sdk.DelegationNode,
+    delegation: DelegationNode,
     signature: string
-  ): Promise<sdk.SubmittableExtrinsic> {
-    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
+  ): Promise<SubmittableExtrinsic> {
+    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
     return delegation.store(selectedIdentity, signature)
@@ -59,9 +67,9 @@ class DelegationsService {
    * @param delegationNodeId id of the intermediate node (non-root node)
    */
   public static async lookupNodeById(
-    delegationNodeId: sdk.IDelegationBaseNode['id']
-  ): Promise<sdk.DelegationNode | null> {
-    return sdk.DelegationNode.query(delegationNodeId)
+    delegationNodeId: IDelegationBaseNode['id']
+  ): Promise<DelegationNode | null> {
+    return DelegationNode.query(delegationNodeId)
   }
 
   /**
@@ -70,9 +78,9 @@ class DelegationsService {
    * @param rootNodeId id of the desired root node
    */
   public static async lookupRootNodeById(
-    rootNodeId: sdk.IDelegationRootNode['id']
-  ): Promise<sdk.DelegationRootNode | null> {
-    return sdk.DelegationRootNode.query(rootNodeId)
+    rootNodeId: IDelegationRootNode['id']
+  ): Promise<DelegationRootNode | null> {
+    return DelegationRootNode.query(rootNodeId)
   }
 
   /**
@@ -81,9 +89,9 @@ class DelegationsService {
    * @param delegationNodeId the id of the node to find the root node for
    */
   public static async findRootNode(
-    delegationNodeId: sdk.IDelegationNode['id']
-  ): Promise<sdk.DelegationRootNode | null> {
-    const node = await sdk.DelegationNode.query(delegationNodeId)
+    delegationNodeId: IDelegationNode['id']
+  ): Promise<DelegationRootNode | null> {
+    const node = await DelegationNode.query(delegationNodeId)
     if (node) {
       return node.getRoot()
     }
@@ -91,7 +99,7 @@ class DelegationsService {
   }
 
   public static async importDelegation(
-    delegationNodeId: sdk.IDelegationBaseNode['id'],
+    delegationNodeId: IDelegationBaseNode['id'],
     alias: string,
     isPCR?: boolean
   ): Promise<IMyDelegation | null> {
@@ -125,8 +133,8 @@ class DelegationsService {
   }
 
   public static async revoke(
-    node: sdk.DelegationBaseNode,
-    identity: sdk.Identity
+    node: DelegationBaseNode,
+    identity: Identity
   ): Promise<void> {
     await node.revoke(identity)
     PersistentStore.store.dispatch(
@@ -137,7 +145,7 @@ class DelegationsService {
   public static async resolveParent(
     currentNode: DelegationsTreeNode
   ): Promise<DelegationsTreeNode> {
-    const parentDelegation: sdk.IDelegationBaseNode | null = await currentNode.delegation.getParent()
+    const parentDelegation: IDelegationBaseNode | null = await currentNode.delegation.getParent()
 
     if (!parentDelegation) {
       return currentNode
@@ -149,9 +157,9 @@ class DelegationsService {
   }
 
   private static async storeRootOnChain(
-    delegation: sdk.DelegationRootNode
-  ): Promise<sdk.SubmittableExtrinsic> {
-    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
+    delegation: DelegationRootNode
+  ): Promise<SubmittableExtrinsic> {
+    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
     return delegation.store(selectedIdentity)
