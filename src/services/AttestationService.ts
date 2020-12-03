@@ -6,6 +6,10 @@ import Kilt, {
   Identity,
   Blockchain,
 } from '@kiltprotocol/sdk-js'
+import {
+  IS_IN_BLOCK,
+  submitSignedTx,
+} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
 import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAttestedClaims'
 
 import * as Attestations from '../state/ducks/Attestations'
@@ -47,7 +51,7 @@ class AttestationService {
 
     try {
       const tx = await attestation.store(selectedIdentity)
-      await Blockchain.submitSignedTx(tx)
+      await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
     } catch (error) {
       ErrorService.log({
         error,
@@ -71,7 +75,7 @@ class AttestationService {
     }
     try {
       const tx = await attestation.revoke(selectedIdentity)
-      await Blockchain.submitSignedTx(tx)
+      await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
       notifySuccess('Attestation successfully revoked')
       persistentStore.store.dispatch(
         Attestations.Store.revokeAttestation(attestation.claimHash)
@@ -93,7 +97,7 @@ class AttestationService {
     const selectedIdentity = AttestationService.getIdentity()
 
     const tx = Kilt.Attestation.revoke(claimHash, selectedIdentity)
-    await Blockchain.submitSignedTx(await tx)
+    await submitSignedTx(await tx, { resolveOn: IS_IN_BLOCK })
     return tx
       .then(() => {
         notifySuccess(`Attestation successfully revoked.`)

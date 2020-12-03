@@ -1,4 +1,8 @@
 import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  IS_IN_BLOCK,
+  submitSignedTx,
+} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
 import ContactRepository from '../../services/ContactRepository'
 
 import DelegationsService from '../../services/DelegationsService'
@@ -95,7 +99,7 @@ class BsDelegation {
     const signature = ownerIdentity.identity.signStr(delegation.generateHash())
     const metaData = { alias }
     const tx = await DelegationsService.storeOnChain(delegation, signature)
-    await sdk.Blockchain.submitSignedTx(tx)
+    await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
     DelegationsService.store({
       cTypeHash: rootData.rootDelegation.cTypeHash,
       ...delegation,

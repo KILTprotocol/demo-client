@@ -1,4 +1,8 @@
 import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  IS_IN_BLOCK,
+  submitSignedTx,
+} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
 import { IDidDocumentSigned } from '@kiltprotocol/sdk-js/build/did/Did'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
@@ -34,7 +38,7 @@ class DidService {
     } as IContact)
 
     const tx = await did.store(myIdentity.identity)
-    const status = await sdk.Blockchain.submitSignedTx(tx)
+    const status = await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
     if (status.isError) {
       throw new Error(
         `Error creating DID for identity ${myIdentity.metaData.name}`
@@ -51,7 +55,7 @@ class DidService {
 
   public static async deleteDid(myIdentity: IMyIdentity): Promise<void> {
     const tx = await sdk.Did.remove(myIdentity.identity)
-    const status = await sdk.Blockchain.submitSignedTx(tx)
+    const status = await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
     if (status.isError) {
       throw new Error(
         `Error deleting DID for identity ${myIdentity.metaData.name}`

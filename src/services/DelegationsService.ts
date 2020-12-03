@@ -1,5 +1,9 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
+import {
+  IS_IN_BLOCK,
+  submitSignedTx,
+} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
 import { DelegationsTreeNode } from '../components/DelegationNode/DelegationNode'
 import { IMyDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
@@ -14,7 +18,7 @@ class DelegationsService {
   ): Promise<void> {
     const tx = DelegationsService.storeRootOnChain(delegationRoot)
 
-    await sdk.Blockchain.submitSignedTx(await tx)
+    await submitSignedTx(await tx, { resolveOn: IS_IN_BLOCK })
 
     return tx.then(() => {
       const { account, cTypeHash, id } = delegationRoot

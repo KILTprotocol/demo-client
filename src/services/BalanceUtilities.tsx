@@ -2,6 +2,10 @@ import * as sdk from '@kiltprotocol/sdk-js'
 import BN from 'bn.js'
 import React from 'react'
 import { Store } from 'redux'
+import {
+  IS_IN_BLOCK,
+  submitSignedTx,
+} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
 import ContactPresentation from '../components/ContactPresentation/ContactPresentation'
 import KiltToken from '../components/KiltToken/KiltToken'
 import * as Balances from '../state/ducks/Balances'
@@ -75,7 +79,7 @@ class BalanceUtilities {
       receiverAddress,
       transferAmount
     )
-      .then(tx => sdk.Blockchain.submitSignedTx(tx))
+      .then(tx => submitSignedTx(tx, { resolveOn: IS_IN_BLOCK }))
       .then(() => {
         notifySuccess(
           <div>

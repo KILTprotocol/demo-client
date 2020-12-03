@@ -1,4 +1,8 @@
 import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  IS_IN_BLOCK,
+  submitSignedTx,
+} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
 import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetadata'
 import { ICTypeSchema } from '@kiltprotocol/sdk-js/build/types/CType'
 import BN from 'bn.js'
@@ -58,7 +62,7 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
   )
   const signature = delegate.identity.signStr(delegationNode.generateHash())
   const tx = await delegationNode.store(root, signature)
-  await sdk.Blockchain.submitSignedTx(tx)
+  await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
   notifySuccess(`Delegation successfully created for ${delegate.metaData.name}`)
   await DelegationsService.importDelegation(
     delegationNode.id,
@@ -80,7 +84,7 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
   const { root, delegationRoot } = await setup()
   if (!(await ctype.verifyStored())) {
     const tx = await ctype.store(root)
-    await sdk.Blockchain.submitSignedTx(tx)
+    await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
     CTypeRepository.register({
       cType: ctype,
       metaData: { metadata, ctypeHash: ctype.hash },
@@ -92,7 +96,7 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
   const queriedRoot = await sdk.DelegationRootNode.query(delegationRoot.id)
   if (queriedRoot?.cTypeHash !== ctype.hash) {
     const tx = await delegationRoot.store(root)
-    await sdk.Blockchain.submitSignedTx(tx)
+    await submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
     const messageBody: sdk.MessageBody = {
       type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
       content: { delegationId: delegationRoot.id, isPCR: false },

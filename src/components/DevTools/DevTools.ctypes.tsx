@@ -1,6 +1,10 @@
 import * as sdk from '@kiltprotocol/sdk-js'
 
 import { ERROR_CTYPE_ALREADY_EXISTS } from '@kiltprotocol/sdk-js'
+import {
+  IS_IN_BLOCK,
+  submitSignedTx,
+} from '@kiltprotocol/sdk-js/build/blockchain/Blockchain'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess, notifyError } from '../../services/FeedbackService'
@@ -32,7 +36,7 @@ class BsCType {
       ownerIdentity.address
     )
     const tx = cType.store(ownerIdentity)
-    await sdk.Blockchain.submitSignedTx(await tx)
+    await submitSignedTx(await tx, { resolveOn: IS_IN_BLOCK })
     return tx
       .catch(error => {
         if (error === ERROR_CTYPE_ALREADY_EXISTS) {
