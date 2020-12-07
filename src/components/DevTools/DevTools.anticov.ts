@@ -11,7 +11,6 @@ import Kilt, {
 import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetadata'
 import { ICTypeSchema } from '@kiltprotocol/sdk-js/build/types/CType'
 import BN from 'bn.js'
-import { IS_IN_BLOCK } from '@kiltprotocol/sdk-js/build/blockchain/Blockchain.utils'
 import {
   ROOT_SEED,
   CTYPE,
@@ -27,6 +26,8 @@ import FeedbackService, {
   notifySuccess,
   notifyFailure,
 } from '../../services/FeedbackService'
+
+const { IS_IN_BLOCK } = BlockchainUtils
 
 const ctype = Kilt.CType.fromSchema(CTYPE.schema as ICTypeSchema)
 const metadata: IMetadata = CTYPE_METADATA

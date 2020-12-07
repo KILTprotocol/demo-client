@@ -9,7 +9,6 @@ import {
   Identity,
   SubmittableExtrinsic,
 } from '@kiltprotocol/sdk-js'
-import { IS_IN_BLOCK } from '@kiltprotocol/sdk-js/build/blockchain/Blockchain.utils'
 import { DelegationsTreeNode } from '../components/DelegationNode/DelegationNode'
 import { IMyDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
@@ -25,7 +24,7 @@ class DelegationsService {
     const tx = DelegationsService.storeRootOnChain(delegationRoot)
 
     await BlockchainUtils.submitSignedTx(await tx, {
-      resolveOn: IS_IN_BLOCK,
+      resolveOn: BlockchainUtils.IS_IN_BLOCK,
     })
 
     return tx.then(() => {

@@ -6,13 +6,14 @@ import {
   IURLResolver,
   PublicIdentity,
 } from '@kiltprotocol/sdk-js'
-import { IS_IN_BLOCK } from '@kiltprotocol/sdk-js/build/blockchain/Blockchain.utils'
 import { IDidDocumentSigned } from '@kiltprotocol/sdk-js/build/did/Did'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import { IContact, IMyIdentity } from '../types/Contact'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
+
+const { IS_IN_BLOCK } = BlockchainUtils
 
 class DidService {
   public static readonly URL = `${window._env_.REACT_APP_SERVICE_HOST}/contacts/did`

@@ -7,7 +7,6 @@ import {
   Identity,
   IRequestForAttestation,
 } from '@kiltprotocol/sdk-js'
-import { IS_IN_BLOCK } from '@kiltprotocol/sdk-js/build/blockchain/Blockchain.utils'
 import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAttestedClaims'
 
 import * as Attestations from '../state/ducks/Attestations'
@@ -16,6 +15,8 @@ import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import ErrorService from './ErrorService'
 import { notifySuccess, notifyError } from './FeedbackService'
+
+const { IS_IN_BLOCK } = BlockchainUtils
 
 class AttestationService {
   /**
