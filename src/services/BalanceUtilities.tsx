@@ -1,4 +1,9 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  Balance,
+  BalanceUtils,
+  BlockchainUtils,
+  PublicIdentity,
+} from '@kiltprotocol/sdk-js'
 import BN from 'bn.js'
 import React from 'react'
 import { Store } from 'redux'
@@ -12,10 +17,10 @@ import { IContact, IMyIdentity } from '../types/Contact'
 import { notify, notifySuccess, notifyFailure } from './FeedbackService'
 
 // any balance below this will we purged
-const MIN_BALANCE = sdk.BalanceUtils.KILT_COIN.muln(1)
+const MIN_BALANCE = BalanceUtils.KILT_COIN.muln(1)
 
 // initial endowment for automatically created accounts
-const ENDOWMENT = sdk.BalanceUtils.KILT_COIN.muln(30)
+const ENDOWMENT = BalanceUtils.KILT_COIN.muln(30)
 
 // TODO: do we need to do something upon deleting an identity?
 class BalanceUtilities {
@@ -26,7 +31,7 @@ class BalanceUtilities {
         myIdentity.identity.address
       ) == null
     ) {
-      sdk.Balance.listenToBalanceChanges(
+      Balance.listenToBalanceChanges(
         myIdentity.identity.address,
         BalanceUtilities.listener
       ).then(() => {
@@ -41,7 +46,7 @@ class BalanceUtilities {
   }
 
   public static async getMyBalance(identity: IMyIdentity): Promise<BN> {
-    const balance: BN = await sdk.Balance.getBalance(identity.identity.address)
+    const balance: BN = await Balance.getBalance(identity.identity.address)
     return balance
   }
 
@@ -61,7 +66,7 @@ class BalanceUtilities {
     amount: BN,
     successCallback?: () => void
   ): void {
-    const transferAmount = sdk.BalanceUtils.asFemtoKilt(amount)
+    const transferAmount = BalanceUtils.asFemtoKilt(amount)
     notify(
       <div>
         <span>Transfer of </span>
@@ -70,12 +75,12 @@ class BalanceUtilities {
         <ContactPresentation address={receiverAddress} inline /> initiated.
       </div>
     )
-    sdk.Balance.makeTransfer(
-      myIdentity.identity,
-      receiverAddress,
-      transferAmount
-    )
-      .then(tx => sdk.Blockchain.submitSignedTx(tx))
+    Balance.makeTransfer(myIdentity.identity, receiverAddress, transferAmount)
+      .then(tx =>
+        BlockchainUtils.submitSignedTx(tx, {
+          resolveOn: BlockchainUtils.IS_IN_BLOCK,
+        })
+      )
       .then(() => {
         notifySuccess(
           <div>
@@ -111,7 +116,7 @@ class BalanceUtilities {
   }
 
   private static listener(
-    account: sdk.PublicIdentity['address'],
+    account: PublicIdentity['address'],
     balance: BN,
     change: BN
   ): void {

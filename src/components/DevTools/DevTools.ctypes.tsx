@@ -1,6 +1,10 @@
-import * as sdk from '@kiltprotocol/sdk-js'
-
-import { ERROR_CTYPE_ALREADY_EXISTS } from '@kiltprotocol/sdk-js'
+import Kilt, {
+  CType,
+  ICType,
+  ICTypeMetadata,
+  ERROR_CTYPE_ALREADY_EXISTS,
+  BlockchainUtils,
+} from '@kiltprotocol/sdk-js'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess, notifyError } from '../../services/FeedbackService'
@@ -11,9 +15,9 @@ import cTypesPool from './data/cTypes.json'
 
 type UpdateCallback = (bsCTypeKey: keyof BsCTypesPool) => void
 
-interface IBsCTypesPoolElement extends sdk.ICType {
+interface IBsCTypesPoolElement extends ICType {
   owner: string
-  metadata: sdk.ICTypeMetadata['metadata']
+  metadata: ICTypeMetadata['metadata']
 }
 
 export type BsCTypesPool = {
@@ -27,12 +31,11 @@ class BsCType {
     // replace owner key with his address
     const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
       .identity
-    const cType = sdk.CType.fromSchema(
-      bsCTypeData.schema,
-      ownerIdentity.address
-    )
+    const cType = CType.fromSchema(bsCTypeData.schema, ownerIdentity.address)
     const tx = cType.store(ownerIdentity)
-    await sdk.Blockchain.submitSignedTx(await tx)
+    await BlockchainUtils.submitSignedTx(await tx, {
+      resolveOn: BlockchainUtils.IS_IN_BLOCK,
+    })
     return tx
       .catch(error => {
         if (error === ERROR_CTYPE_ALREADY_EXISTS) {
@@ -78,7 +81,7 @@ class BsCType {
   }
 
   public static async getByHash(
-    hash: sdk.ICType['hash']
+    hash: ICType['hash']
   ): Promise<ICTypeWithMetadata> {
     const cType = await CTypeRepository.findByHash(hash)
     if (cType) {
