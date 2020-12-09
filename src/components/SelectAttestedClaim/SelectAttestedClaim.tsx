@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IAttestedClaim, ICType as SDKICType } from '@kiltprotocol/sdk-js'
 import React, { ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
 import isEqual from 'lodash/isEqual'
@@ -14,7 +14,7 @@ import { getCtypePropertyTitle } from '../../utils/CtypeUtils'
 
 type Props = {
   claimEntry: Claims.Entry
-  cTypeHash?: sdk.ICType['hash']
+  cTypeHash?: SDKICTypeu['hash']
   labels: SelectAttestedClaimsLabels
   onChangeSelections: (claimEntry: Claims.Entry, state: State) => void
 }
@@ -24,7 +24,7 @@ export type State = {
   allClaimPropertiesSelected?: boolean
   cType?: ICType
   isSelected: boolean
-  selectedAttestedClaims: sdk.IAttestedClaim[]
+  selectedAttestedClaims: IAttestedClaim[]
   selectedClaimProperties: string[]
 }
 
@@ -129,7 +129,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
               <span>All</span>
             </label>
           </h4>
-          {attestedClaims.map((attestedClaim: sdk.IAttestedClaim) => (
+          {attestedClaims.map((attestedClaim: IAttestedClaim) => (
             <label
               key={`${attestedClaim.attestation.claimHash}-${attestedClaim.attestation.owner}`}
               className={allAttestedClaimsSelected ? 'selected-all' : ''}
@@ -244,14 +244,14 @@ class SelectAttestedClaim extends React.Component<Props, State> {
   }
 
   private selectAttestation(
-    attestedClaim: sdk.IAttestedClaim,
+    attestedClaim: IAttestedClaim,
     event: ChangeEvent<HTMLInputElement>
   ): void {
     const { checked } = event.target
     const { selectedAttestedClaims } = this.state
 
     const attestationSelected = selectedAttestedClaims.find(
-      (selectedAttestedClaim: sdk.IAttestedClaim) =>
+      (selectedAttestedClaim: IAttestedClaim) =>
         isEqual(selectedAttestedClaim, attestedClaim)
     )
 
@@ -266,7 +266,7 @@ class SelectAttestedClaim extends React.Component<Props, State> {
       this.setState(
         {
           selectedAttestedClaims: selectedAttestedClaims.filter(
-            (selectedAttestedClaim: sdk.IAttestedClaim) =>
+            (selectedAttestedClaim: IAttestedClaim) =>
               attestedClaim.attestation.owner !==
               selectedAttestedClaim.attestation.owner
           ),

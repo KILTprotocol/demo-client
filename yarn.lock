@@ -1081,10 +1081,10 @@
     "@polkadot/util" "^3.5.1"
     "@polkadot/util-crypto" "^3.5.1"
 
-"@kiltprotocol/sdk-js@^0.19.1-8":
-  version "0.19.1-8"
-  resolved "https://registry.yarnpkg.com/@kiltprotocol/sdk-js/-/sdk-js-0.19.1-8.tgz#7842283d79e587f3d9d48558093c796c83eabb97"
-  integrity sha512-EL8pWG3dgZByedxwPnEGnE//ENw7xaiJasq2x3Qust5qz59PBGUMvUnt4UPa8tBSJ/UTFG9BLXu2twtHoagFzQ==
+"@kiltprotocol/sdk-js@^0.19.1-11":
+  version "0.19.1-11"
+  resolved "https://registry.yarnpkg.com/@kiltprotocol/sdk-js/-/sdk-js-0.19.1-11.tgz#7c31fd0897b162d4c8b543edde7455e6c819d10c"
+  integrity sha512-5j9irvss0qm9wmBYHVQaahzcTV1WqH76dZOUoq2H6Xgn+Csi2pNNxyqnSLqz790vnoPB32p9zpyYCiSR7qX3Vg==
   dependencies:
     "@kiltprotocol/portablegabi" "^0.4.0"
     "@polkadot/api" "^2.0.1"

@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IAttestation } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
@@ -28,7 +28,7 @@ type StateProps = {
 type Props = StateProps & RouteComponentProps<{}>
 
 type State = {
-  claimHashToRevoke: sdk.IAttestation['claimHash']
+  claimHashToRevoke: IAttestation['claimHash']
 }
 
 class AttestationsView extends React.Component<Props, State> {

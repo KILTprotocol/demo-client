@@ -1,4 +1,11 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  Attestation,
+  DelegationNode as SDKDelegationNode,
+  DelegationRootNode,
+  IDelegationNode,
+  MessageBodyType,
+  Permission,
+} from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 
@@ -35,7 +42,7 @@ export enum ViewType {
 }
 
 export type DelegationsTreeNode = {
-  delegation: sdk.DelegationNode | sdk.DelegationRootNode
+  delegation: SDKDelegationNode | DelegationRootNode
   childNodes: DelegationsTreeNode[]
 }
 
@@ -70,7 +77,7 @@ class DelegationNode extends React.Component<Props, State> {
   private static inviteContactsTo(delegation: IMyDelegation): void {
     PersistentStore.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
-        objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+        objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
         props: {
           cTypeHash: delegation.cTypeHash,
           isPCR: !!delegation.isPCR,
@@ -120,9 +127,9 @@ class DelegationNode extends React.Component<Props, State> {
   private getElementGetChildren(): false | JSX.Element | null {
     const { gettingChildren, gotChildren, node } = this.state
     const { delegation } = node
-    const { permissions } = delegation as sdk.IDelegationNode
+    const { permissions } = delegation as IDelegationNode
 
-    if (permissions && !permissions.includes(sdk.Permission.DELEGATE)) {
+    if (permissions && !permissions.includes(Permission.DELEGATE)) {
       return null
     }
 
@@ -192,13 +199,13 @@ class DelegationNode extends React.Component<Props, State> {
     this.setState({
       gettingChildren: true,
     })
-    const children: sdk.IDelegationNode[] = await delegation.getChildren()
+    const children: IDelegationNode[] = await delegation.getChildren()
 
     this.setState({
       gettingChildren: false,
       gotChildren: true,
       node: {
-        childNodes: children.map((childNode: sdk.DelegationNode) => {
+        childNodes: children.map((childNode: SDKDelegationNode) => {
           return {
             childNodes: [],
             delegation: childNode,
@@ -279,7 +286,7 @@ class DelegationNode extends React.Component<Props, State> {
     Promise.chain(
       hashes.map((hash: string, index: number) => () => {
         blockUi.updateMessage(`Revoking ${index + 1} / ${hashes.length}`)
-        return sdk.Attestation.revoke(hash, selectedIdentity.identity).catch(
+        return Attestation.revoke(hash, selectedIdentity.identity).catch(
           error => {
             // Promise.chain works with thrown object literals
             // eslint-disable-next-line no-throw-literal
@@ -334,7 +341,7 @@ class DelegationNode extends React.Component<Props, State> {
       node,
     } = this.state
     const { delegation } = node
-    const { permissions, revoked } = delegation as sdk.IDelegationNode
+    const { permissions, revoked } = delegation as IDelegationNode
 
     return (
       <section

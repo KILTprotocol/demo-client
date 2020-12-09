@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { Claim, CType, IClaim } from '@kiltprotocol/sdk-js'
 
 import * as Claims from '../../state/ducks/Claims'
 import PersistentStore from '../../state/PersistentStore'
@@ -13,7 +13,7 @@ export type BsClaimsPoolElement = {
   alias: string
   claimerKey: keyof BsIdentitiesPool
   cTypeKey: keyof BsCTypesPool
-  data: sdk.IClaim['contents']
+  data: IClaim['contents']
 }
 
 export type BsClaimsPool = {
@@ -25,11 +25,11 @@ class BsClaim {
 
   public static async save(
     bsClaimData: BsClaimsPoolElement
-  ): Promise<void | sdk.Claim> {
+  ): Promise<void | Claim> {
     const identity = await BsIdentity.getByKey(bsClaimData.claimerKey)
     const { cType } = await BsCType.getByKey(bsClaimData.cTypeKey)
-    const claim = sdk.Claim.fromCTypeAndClaimContents(
-      sdk.CType.fromCType(cType),
+    const claim = Claim.fromCTypeAndClaimContents(
+      CType.fromCType(cType),
       bsClaimData.data,
       identity.identity.address
     )
@@ -43,7 +43,7 @@ class BsClaim {
 
   public static async savePool(
     updateCallback?: UpdateCallback
-  ): Promise<void | sdk.Claim> {
+  ): Promise<void | Claim> {
     const claimKeys = Object.keys(BsClaim.pool)
     const requests = claimKeys.reduce((promiseChain, bsClaimKey) => {
       return promiseChain.then(() => {

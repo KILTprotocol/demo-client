@@ -1,11 +1,11 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IRequestForAttestation } from '@kiltprotocol/sdk-js'
 import * as Claims from '../state/ducks/Claims'
 import persistentStore from '../state/PersistentStore'
 import { IContact } from '../types/Contact'
 
 class RequestForAttestationService {
   public static saveInStore(
-    requestForAttestation: sdk.IRequestForAttestation,
+    requestForAttestation: IRequestForAttestation,
     attesterAddress: IContact['publicIdentity']['address']
   ): void {
     persistentStore.store.dispatch(

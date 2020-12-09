@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IAttestedClaim } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import * as UiState from '../../state/ducks/UiState'
 import PersistentStore from '../../state/PersistentStore'
@@ -11,7 +11,7 @@ import { getCtypePropertyTitle } from '../../utils/CtypeUtils'
 import './AttestedClaimVerificationView.scss'
 
 type Props = {
-  attestedClaim: sdk.IAttestedClaim
+  attestedClaim: IAttestedClaim
   context?: string
   cType?: ICType
 }
@@ -54,7 +54,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
   }
 
   private static getPropertyValue(
-    attestedClaim: sdk.IAttestedClaim,
+    attestedClaim: IAttestedClaim,
     propertyName: string
   ): string {
     const { contents } = attestedClaim.request.claim
@@ -67,9 +67,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
 
   private static readonly BLOCK_CHAR: string = '\u2588'
 
-  private buildClaimPropertiesView(
-    attestedClaim: sdk.IAttestedClaim
-  ): JSX.Element {
+  private buildClaimPropertiesView(attestedClaim: IAttestedClaim): JSX.Element {
     const { cType } = this.props
 
     const propertyNames: string[] = Object.keys(

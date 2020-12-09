@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IPartialClaim, PublicIdentity } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import SelectClaims from '../../../components/SelectClaims/SelectClaims'
 
@@ -11,7 +11,7 @@ import { notifyFailure } from '../../../services/FeedbackService'
 
 export type RequestTermsProps = {
   cTypeHash: ICType['cType']['hash'] | null
-  receiverAddresses: Array<sdk.PublicIdentity['address']>
+  receiverAddresses: Array<PublicIdentity['address']>
   preSelectedClaimEntries?: Claims.Entry[]
   onFinished?: () => void
   onCancel?: () => void
@@ -49,7 +49,7 @@ class RequestTerms extends React.Component<RequestTermsProps, State> {
     const { selectedClaimEntries } = this.state
 
     if (cTypeHash) {
-      let claims: sdk.IPartialClaim[] = [{ cTypeHash }]
+      let claims: IPartialClaim[] = [{ cTypeHash }]
 
       if (selectedClaimEntries && selectedClaimEntries.length) {
         claims = selectedClaimEntries.map(

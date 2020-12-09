@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { DelegationRootNode, ICType, UUID } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
@@ -28,13 +28,13 @@ type OwnProps = {
 
 type Props = StateProps &
   RouteComponentProps<{
-    cTypeHash: sdk.ICType['hash']
+    cTypeHash: ICType['hash']
   }> &
   OwnProps
 
 type State = {
   alias: string
-  delegation?: sdk.DelegationRootNode
+  delegation?: DelegationRootNode
 }
 
 class DelegationCreate extends React.Component<Props, State> {
@@ -66,8 +66,8 @@ class DelegationCreate extends React.Component<Props, State> {
     if (selectedIdentity) {
       this.setState({
         alias,
-        delegation: new sdk.DelegationRootNode(
-          sdk.UUID.generate(),
+        delegation: new DelegationRootNode(
+          UUID.generate(),
           cTypeHash,
           selectedIdentity.identity.address
         ),

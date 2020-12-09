@@ -1,4 +1,10 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  Crypto,
+  DelegationNode,
+  IDelegationNode,
+  IDelegationRootNode,
+  ISubmitAcceptDelegation,
+} from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
@@ -27,10 +33,10 @@ type StateProps = {
 }
 
 type OwnProps = {
-  delegationData: sdk.ISubmitAcceptDelegation['content']['delegationData']
+  delegationData: ISubmitAcceptDelegation['content']['delegationData']
   inviteeAddress: IContact['publicIdentity']['address']
   inviterAddress: IContact['publicIdentity']['address']
-  signatures: sdk.ISubmitAcceptDelegation['content']['signatures']
+  signatures: ISubmitAcceptDelegation['content']['signatures']
 
   onCancel?: () => void
   onFinished?: () => void
@@ -71,7 +77,7 @@ class CreateDelegation extends React.Component<Props, State> {
       headline: `Creating ${isPCR ? 'PCR member' : 'delegation'}`,
     })
 
-    const rootNode: sdk.IDelegationRootNode | null = await DelegationService.findRootNode(
+    const rootNode: IDelegationRootNode | null = await DelegationService.findRootNode(
       parentId
     )
     if (!rootNode) {
@@ -79,12 +85,12 @@ class CreateDelegation extends React.Component<Props, State> {
       return
     }
     const rootId = rootNode.id
-    let optionalParentId: sdk.IDelegationNode['parentId']
+    let optionalParentId: IDelegationNode['parentId']
     if (rootId !== parentId) {
       optionalParentId = parentId
     }
 
-    const newDelegationNode = new sdk.DelegationNode(
+    const newDelegationNode = new DelegationNode(
       id,
       rootId,
       account,
@@ -114,7 +120,7 @@ class CreateDelegation extends React.Component<Props, State> {
 
   private checkSignature(): void {
     const { delegationData, signatures, inviterAddress } = this.props
-    const valid = sdk.Crypto.verify(
+    const valid = Crypto.verify(
       JSON.stringify(delegationData),
       signatures.inviter,
       inviterAddress

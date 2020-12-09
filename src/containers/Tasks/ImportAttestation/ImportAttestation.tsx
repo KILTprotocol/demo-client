@@ -1,4 +1,8 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  IAttestation,
+  IAttestedClaim,
+  IRequestForAttestation,
+} from '@kiltprotocol/sdk-js'
 import React, { useState, useEffect } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
@@ -14,15 +18,15 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  addAttestedClaimToClaim: (attestedClaim: sdk.IAttestedClaim) => void
+  addAttestedClaimToClaim: (attestedClaim: IAttestedClaim) => void
   removeRequestForAttestation: (
     claimId: Claims.Entry['id'],
-    rootHash: sdk.IRequestForAttestation['rootHash']
+    rootHash: IRequestForAttestation['rootHash']
   ) => void
 }
 
 type OwnProps = {
-  attestation: sdk.IAttestation
+  attestation: IAttestation
   onCancel?: () => void
   onFinished?: () => void
 }
@@ -38,7 +42,7 @@ const ImportAttestation: React.FC<Props> = ({
   removeRequestForAttestation,
 }) => {
   const [requestForAttestationEntry, setRequestForAttestation] = useState<
-    sdk.IRequestForAttestation
+    IRequestForAttestation
   >()
   const [claimId, setClaimId] = useState<Claims.Entry['id']>()
 
@@ -123,13 +127,13 @@ const mapStateToProps: MapStateToProps<
 })
 
 const mapDispatchToProps: DispatchProps = {
-  addAttestedClaimToClaim: (attestedClaim: sdk.IAttestedClaim) =>
+  addAttestedClaimToClaim: (attestedClaim: IAttestedClaim) =>
     PersistentStore.store.dispatch(
       Claims.Store.addAttestedClaim(attestedClaim)
     ),
   removeRequestForAttestation: (
     claimId: Claims.Entry['id'],
-    rootHash: sdk.IRequestForAttestation['rootHash']
+    rootHash: IRequestForAttestation['rootHash']
   ) =>
     PersistentStore.store.dispatch(
       Claims.Store.removeRequestForAttestation(claimId, rootHash)

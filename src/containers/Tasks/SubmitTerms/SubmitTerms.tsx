@@ -1,4 +1,12 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  IClaim,
+  Identity,
+  IPartialClaim,
+  IPublicIdentity,
+  IQuote,
+  IQuoteAttesterSigned,
+  Quote,
+} from '@kiltprotocol/sdk-js'
 import React from 'react'
 import * as common from 'schema-based-json-editor'
 
@@ -23,17 +31,17 @@ import './SubmitTerms.scss'
 
 type DispatchProps = {
   saveAttestersQuote: (
-    attesterSignedQuote: sdk.IQuoteAttesterSigned,
+    attesterSignedQuote: IQuoteAttesterSigned,
     ownerAddress: string
   ) => void
 }
 
 export type SubmitTermsProps = {
-  claim: sdk.IPartialClaim
+  claim: IPartialClaim
   receiverAddresses: Array<IContact['publicIdentity']['address']>
   senderAddress?: string
   receiverAddress?: string
-  receiver?: sdk.IPublicIdentity
+  receiver?: IPublicIdentity
   enablePreFilledClaim?: boolean
   onFinished?: () => void
   onCancel?: () => void
@@ -42,11 +50,11 @@ export type SubmitTermsProps = {
 type Props = InjectedSelectProps & SubmitTermsProps & DispatchProps
 
 type State = {
-  claim: sdk.IPartialClaim
+  claim: IPartialClaim
   cType?: ICTypeWithMetadata
   selectedDelegation?: IMyDelegation
   withPreFilledClaim?: boolean
-  quoteData?: sdk.IQuote
+  quoteData?: IQuote
 }
 
 class SubmitTerms extends React.Component<Props, State> {
@@ -118,7 +126,7 @@ class SubmitTerms extends React.Component<Props, State> {
     })
   }
 
-  private updateClaim(contents: sdk.IClaim['contents']): void {
+  private updateClaim(contents: IClaim['contents']): void {
     const { claim } = this.state
     this.setState({
       claim: {
@@ -131,7 +139,7 @@ class SubmitTerms extends React.Component<Props, State> {
     })
   }
 
-  private updateQuote(quote: sdk.IQuote): void {
+  private updateQuote(quote: IQuote): void {
     const { quoteData } = this.state
     if (quoteData !== quote) {
       this.setState({ quoteData: quote })
@@ -157,7 +165,7 @@ class SubmitTerms extends React.Component<Props, State> {
     if (enablePreFilledClaim && !withPreFilledClaim) {
       delete claim.contents
     }
-    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
+    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
 
@@ -165,7 +173,7 @@ class SubmitTerms extends React.Component<Props, State> {
       throw new Error('No identity selected')
     }
     const quote = quoteData
-      ? sdk.Quote.createAttesterSignature(quoteData, selectedIdentity)
+      ? Quote.createAttesterSignature(quoteData, selectedIdentity)
       : undefined
     AttestationWorkflow.submitTerms(
       claim,
@@ -256,7 +264,7 @@ class SubmitTerms extends React.Component<Props, State> {
 
 const mapDispatchToProps: DispatchProps = {
   saveAttestersQuote: (
-    attesterSignedQuote: sdk.IQuoteAttesterSigned,
+    attesterSignedQuote: IQuoteAttesterSigned,
     ownerAddress: string
   ) => Quotes.Store.saveAttestersQuote(attesterSignedQuote, ownerAddress),
 }

@@ -1,4 +1,4 @@
-import Kilt, {
+import {
   CType,
   ICType,
   ICTypeMetadata,

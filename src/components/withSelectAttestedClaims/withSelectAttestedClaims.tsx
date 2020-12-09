@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IAttestedClaim } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { Subtract } from 'utility-types'
 
@@ -7,7 +7,7 @@ import { ClaimSelectionData } from '../SelectAttestedClaims/SelectAttestedClaims
 
 export interface IInjectedProps {
   claimSelectionData: ClaimSelectionData
-  getAttestedClaims: () => sdk.IAttestedClaim[]
+  getAttestedClaims: () => IAttestedClaim[]
   onChange: (claimSelectionData: ClaimSelectionData) => void
 }
 
@@ -32,7 +32,7 @@ const withSelectAttestedClaims = <P extends IInjectedProps>(
       this.getAttestedClaims = this.getAttestedClaims.bind(this)
     }
 
-    private getAttestedClaims(): sdk.IAttestedClaim[] {
+    private getAttestedClaims(): IAttestedClaim[] {
       const { claimSelectionData } = this.state
       return AttestationService.getAttestedClaims(claimSelectionData)
     }

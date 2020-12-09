@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { ICType } from '@kiltprotocol/sdk-js'
 import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
@@ -6,7 +6,7 @@ import { withRouter } from 'react-router-dom'
 import MyClaimCreateView from '../../components/MyClaimCreateView/MyClaimCreateView'
 
 type Props = RouteComponentProps<{
-  cTypeHash: sdk.ICType['hash']
+  cTypeHash: ICType['hash']
 }>
 
 class ClaimCreate extends Component<Props> {

@@ -1,10 +1,10 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IAttestedClaim } from '@kiltprotocol/sdk-js'
 import React from 'react'
 
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 
 type Props = {
-  attestedClaims: sdk.IAttestedClaim[]
+  attestedClaims: IAttestedClaim[]
   context?: 'term'
 }
 

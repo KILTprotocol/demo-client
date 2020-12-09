@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { MessageBodyType } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
@@ -30,7 +30,7 @@ class MyDelegationsListView extends React.Component<Props, State> {
   private static inviteContactsTo(delegation: IMyDelegation): void {
     PersistentStore.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
-        objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+        objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
         props: {
           cTypeHash: delegation.cTypeHash,
           isPCR: !!delegation.isPCR,

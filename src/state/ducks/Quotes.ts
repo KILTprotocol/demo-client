@@ -1,13 +1,17 @@
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  IQuoteAgreement,
+  IQuoteAttesterSigned,
+  UUID,
+} from '@kiltprotocol/sdk-js'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 import { IMyIdentity } from '../../types/Contact'
 
-export type QuoteEntry = sdk.IQuoteAgreement | sdk.IQuoteAttesterSigned
+export type QuoteEntry = IQuoteAgreement | IQuoteAttesterSigned
 
 interface ISaveQuoteAction extends KiltAction {
   payload: {
@@ -18,7 +22,7 @@ interface ISaveQuoteAction extends KiltAction {
 }
 
 interface IRemoveAction extends KiltAction {
-  payload: sdk.IQuoteAttesterSigned['attesterSignature']
+  payload: IQuoteAttesterSigned['attesterSignature']
 }
 
 export type Action = IRemoveAction | ISaveQuoteAction
@@ -116,7 +120,7 @@ class Store {
   ): Action {
     return {
       payload: {
-        quoteId: sdk.UUID.generate(),
+        quoteId: UUID.generate(),
         owner: ownerAddress,
         quote,
       },
@@ -130,7 +134,7 @@ class Store {
   ): Action {
     return {
       payload: {
-        quoteId: sdk.UUID.generate(),
+        quoteId: UUID.generate(),
         owner: ownerAddress,
         quote,
       },

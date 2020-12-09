@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { ICType, IQuote } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { withRouter, RouteComponentProps } from 'react-router'
 import * as common from 'schema-based-json-editor'
@@ -12,18 +12,18 @@ import 'react-day-picker/lib/style.css'
 import './QuoteCreate.scss'
 
 type OwnProps = {
-  cTypeHash?: sdk.ICType['hash']
+  cTypeHash?: ICType['hash']
   claimerAddress?: string
   attesterAddress?: string
   onCancel?: () => void
-  newQuote: (quote: sdk.IQuote) => void
+  newQuote: (quote: IQuote) => void
 }
 
 type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
   OwnProps
 
 type State = {
-  quote?: sdk.IQuote
+  quote?: IQuote
   initialValue?: object
   startDate: Date
 }
@@ -45,7 +45,7 @@ class QuoteCreate extends React.Component<Props, State> {
     this.updateValue = this.updateValue.bind(this)
   }
 
-  public updateValue = (value: sdk.IQuote): void => {
+  public updateValue = (value: IQuote): void => {
     const quote = value
     const result = {}
     Object.keys(value.cost.tax).forEach(entryKey => {

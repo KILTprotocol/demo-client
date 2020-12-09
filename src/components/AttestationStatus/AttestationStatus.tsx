@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IAttestation, IAttestedClaim } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
@@ -20,9 +20,9 @@ const enum STATUS {
 }
 
 function isAttestedClaim(
-  arg: sdk.IAttestedClaim | sdk.IAttestation
-): arg is sdk.IAttestedClaim {
-  return (arg as sdk.IAttestedClaim).request !== undefined
+  arg: IAttestedClaim | IAttestation
+): arg is IAttestedClaim {
+  return (arg as IAttestedClaim).request !== undefined
 }
 
 type StateProps = {
@@ -30,7 +30,7 @@ type StateProps = {
 }
 
 type OwnProps = {
-  attestation: sdk.IAttestedClaim | sdk.IAttestation
+  attestation: IAttestedClaim | IAttestation
 }
 
 type Props = StateProps & OwnProps

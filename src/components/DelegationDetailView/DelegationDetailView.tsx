@@ -1,4 +1,9 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  DelegationNode as SDKDelegationNode,
+  DelegationBaseNode,
+  IDelegationBaseNode,
+  IDelegationRootNode,
+} from '@kiltprotocol/sdk-js'
 import React, { useState, useEffect } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
@@ -21,7 +26,7 @@ type StateProps = {
 }
 
 type OwnProps = {
-  delegationId: sdk.IDelegationBaseNode['id']
+  delegationId: IDelegationBaseNode['id']
 
   editable?: boolean
   focusedNodeAlias?: IMyDelegation['metaData']['alias']
@@ -32,9 +37,9 @@ type OwnProps = {
 type Props = StateProps & OwnProps
 
 const getNode = async (
-  id: sdk.IDelegationBaseNode['id']
-): Promise<sdk.DelegationBaseNode> => {
-  let node: sdk.DelegationBaseNode | null = await DelegationsService.lookupNodeById(
+  id: IDelegationBaseNode['id']
+): Promise<DelegationBaseNode> => {
+  let node: DelegationBaseNode | null = await DelegationsService.lookupNodeById(
     id
   )
   if (!node) {
@@ -59,11 +64,11 @@ const DelegationDetailView: React.FunctionComponent<Props> = ({
     DelegationsTreeNode | undefined
   >(undefined)
 
-  const [rootNode, setRootNode] = useState<sdk.IDelegationRootNode | null>(null)
+  const [rootNode, setRootNode] = useState<IDelegationRootNode | null>(null)
 
   useEffect(() => {
     getNode(delegationId)
-      .then(async (delegationNode: sdk.DelegationNode) => {
+      .then(async (delegationNode: SDKDelegationNode) => {
         const treeNode: DelegationsTreeNode = {
           childNodes: [],
           delegation: delegationNode,

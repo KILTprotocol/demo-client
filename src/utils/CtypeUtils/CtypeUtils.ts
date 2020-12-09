@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { CType, CTypeUtils, ICTypeMetadata } from '@kiltprotocol/sdk-js'
 import { CTypeSchemaWithoutId } from '@kiltprotocol/sdk-js/build/types/CType'
 
 import {
@@ -21,8 +21,8 @@ import CTypeInputModel from './CtypeInputSchema'
 
 export const fromInputModel = (
   ctypeInput: ICTypeInput
-): { cType: sdk.CType; metaData: sdk.ICTypeMetadata } => {
-  if (!sdk.CTypeUtils.verifySchema(ctypeInput, CTypeInputModel)) {
+): { cType: CType; metaData: ICTypeMetadata } => {
+  if (!CTypeUtils.verifySchema(ctypeInput, CTypeInputModel)) {
     throw new Error('CType input does not correspond to input model schema')
   }
   const schema: CTypeSchemaWithoutId = {
@@ -31,7 +31,7 @@ export const fromInputModel = (
     properties: {},
     type: 'object',
   }
-  const sdkMetadata: sdk.ICTypeMetadata['metadata'] = {
+  const sdkMetadata: ICTypeMetadata['metadata'] = {
     title: {
       default: ctypeInput.title,
     },
@@ -54,8 +54,8 @@ export const fromInputModel = (
 
   schema.properties = properties
 
-  const sdkCType = sdk.CType.fromSchema(schema, ctypeInput.owner)
-  const sdkCTypeMetadata: sdk.ICTypeMetadata = {
+  const sdkCType = CType.fromSchema(schema, ctypeInput.owner)
+  const sdkCTypeMetadata: ICTypeMetadata = {
     metadata: sdkMetadata,
     ctypeHash: sdkCType.hash,
   }

@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { MessageBodyType } from '@kiltprotocol/sdk-js'
 import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
 import React, { ReactNode } from 'react'
@@ -98,7 +98,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           PersistentStore.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
+              objective: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
               props: { cTypeHashes: [cTypeHash] } as RequestClaimsForCTypeProps,
             })
           )
@@ -109,7 +109,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           PersistentStore.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: sdk.MessageBodyType.REQUEST_TERMS,
+              objective: MessageBodyType.REQUEST_TERMS,
               props: {
                 cTypeHash,
               } as RequestTermsProps,
@@ -122,7 +122,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           PersistentStore.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
+              objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
               props: { cTypeHashes: [cTypeHash] } as SubmitClaimsForCTypeProps,
             })
           )
@@ -133,7 +133,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           PersistentStore.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: sdk.MessageBodyType.SUBMIT_TERMS,
+              objective: MessageBodyType.SUBMIT_TERMS,
               props: {
                 claim: { cTypeHash },
               } as SubmitTermsProps,
@@ -146,7 +146,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           PersistentStore.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+              objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
               props: {
                 cTypeHash,
                 isPCR: false,
@@ -160,7 +160,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           PersistentStore.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+              objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
               props: {
                 cTypeHash,
                 isPCR: true,

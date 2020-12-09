@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IClaim, MessageBodyType } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
@@ -43,7 +43,7 @@ class ClaimView extends React.Component<Props, State> {
   private static requestTerm(claimEntry: Claims.Entry): void {
     PersistentStore.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
-        objective: sdk.MessageBodyType.REQUEST_TERMS,
+        objective: MessageBodyType.REQUEST_TERMS,
         props: {
           cTypeHash: claimEntry.claim.cTypeHash,
           preSelectedClaimEntries: [claimEntry],
@@ -55,7 +55,7 @@ class ClaimView extends React.Component<Props, State> {
   private static requestAttestation(claimEntry: Claims.Entry): void {
     PersistentStore.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
-        objective: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+        objective: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
         props: {
           claim: claimEntry.claim,
         } as RequestAttestationProps,
@@ -150,7 +150,7 @@ class ClaimView extends React.Component<Props, State> {
     }
   }
 
-  private resolveClaim(claimId: Claims.Entry['id']): sdk.IClaim | undefined {
+  private resolveClaim(claimId: Claims.Entry['id']): IClaim | undefined {
     const { claimEntries } = this.props
 
     const claimToAttest = claimEntries.find(

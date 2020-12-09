@@ -2,7 +2,7 @@ import './QuoteView.scss'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IPartialClaim, IQuote } from '@kiltprotocol/sdk-js'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { IMyIdentity } from '../../types/Contact'
 import * as Wallet from '../../state/ducks/Wallet'
@@ -16,10 +16,10 @@ type StateProps = {
 }
 
 type OwnProps = {
-  claim: sdk.IPartialClaim
+  claim: IPartialClaim
   senderAddress?: string
   receiverAddress?: string
-  updateQuote: (quote: sdk.IQuote) => void
+  updateQuote: (quote: IQuote) => void
 }
 
 type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
@@ -28,7 +28,7 @@ type Props = RouteComponentProps<{ quoteId: Quotes.Entry['quoteId'] }> &
 
 type State = {
   createNewQuote: boolean
-  newQuote?: sdk.IQuote
+  newQuote?: IQuote
 }
 
 class QuoteView extends React.Component<Props, State> {
@@ -55,7 +55,7 @@ class QuoteView extends React.Component<Props, State> {
     this.setState({ createNewQuote: true })
   }
 
-  private confirmQuote(quote: sdk.IQuote): void {
+  private confirmQuote(quote: IQuote): void {
     if (quote) {
       this.setState({ newQuote: quote, createNewQuote: false })
     }

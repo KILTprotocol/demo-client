@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { MessageBodyType } from '@kiltprotocol/sdk-js'
 import React, { ReactNode } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import Modal, { ModalType } from '../../components/Modal/Modal'
@@ -32,27 +32,27 @@ export type TaskProps =
       props: undefined
     }
   | {
-      objective: sdk.MessageBodyType.REQUEST_TERMS
+      objective: MessageBodyType.REQUEST_TERMS
       props: RequestTermsProps
     }
   | {
-      objective: sdk.MessageBodyType.SUBMIT_TERMS
+      objective: MessageBodyType.SUBMIT_TERMS
       props: SubmitTermsProps
     }
   | {
-      objective: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
+      objective: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM
       props: RequestAttestationProps
     }
   | {
-      objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC
+      objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC
       props: Partial<SubmitClaimsForCTypeProps>
     }
   | {
-      objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES
+      objective: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES
       props: Partial<RequestClaimsForCTypeProps>
     }
   | {
-      objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION
+      objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION
       props: Partial<RequestAcceptDelegationProps> &
         Pick<RequestAcceptDelegationProps, 'cTypeHash'>
     }
@@ -151,7 +151,7 @@ class Tasks extends React.Component<Props, State> {
     )
 
     switch (currentTask.objective) {
-      case sdk.MessageBodyType.REQUEST_TERMS: {
+      case MessageBodyType.REQUEST_TERMS: {
         const { props } = currentTask
         const cTypeHash =
           selectedCTypes && selectedCTypes[0]
@@ -176,7 +176,7 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case sdk.MessageBodyType.SUBMIT_TERMS: {
+      case MessageBodyType.SUBMIT_TERMS: {
         const { props } = currentTask
         const cTypeHash = props.claim ? props.claim.cTypeHash : null
         return this.getModal(
@@ -201,7 +201,7 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM: {
+      case MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM: {
         const { props } = currentTask
         return this.getModal(
           'Request attestation for claim',
@@ -219,7 +219,7 @@ class Tasks extends React.Component<Props, State> {
           </>
         )
       }
-      case sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES: {
+      case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES: {
         const { props } = currentTask
 
         return this.getModal(
@@ -242,7 +242,7 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
         const { props } = currentTask
 
         return this.getModal(
@@ -265,7 +265,7 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION: {
+      case MessageBodyType.REQUEST_ACCEPT_DELEGATION: {
         const { props } = currentTask
         return this.getModal(
           `Invite to ${props.isPCR ? 'PCR(s)' : 'delegation(s)'}`,

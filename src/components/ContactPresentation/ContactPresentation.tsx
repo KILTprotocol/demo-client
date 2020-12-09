@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IPublicIdentity, MessageBodyType } from '@kiltprotocol/sdk-js'
 import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
 import React from 'react'
@@ -24,7 +24,7 @@ type StateProps = {
 }
 
 type OwnProps = {
-  address: sdk.IPublicIdentity['address']
+  address: IPublicIdentity['address']
 
   iconOnly?: boolean
   inline?: true
@@ -87,7 +87,7 @@ class ContactPresentation extends React.Component<Props, State> {
       callback: () => {
         PersistentStore.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
-            objective: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
+            objective: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
             props: {
               receiverAddresses: [address],
             },
@@ -101,7 +101,7 @@ class ContactPresentation extends React.Component<Props, State> {
       callback: () => {
         PersistentStore.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
-            objective: sdk.MessageBodyType.REQUEST_TERMS,
+            objective: MessageBodyType.REQUEST_TERMS,
             props: {
               receiverAddresses: [address],
             } as RequestTermsProps,
@@ -115,7 +115,7 @@ class ContactPresentation extends React.Component<Props, State> {
       callback: () => {
         PersistentStore.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
-            objective: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
+            objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
             props: {
               receiverAddresses: [address],
             },
@@ -129,7 +129,7 @@ class ContactPresentation extends React.Component<Props, State> {
       callback: () => {
         PersistentStore.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
-            objective: sdk.MessageBodyType.SUBMIT_TERMS,
+            objective: MessageBodyType.SUBMIT_TERMS,
             props: {
               receiverAddresses: [address],
             } as SubmitTermsProps,
@@ -143,7 +143,7 @@ class ContactPresentation extends React.Component<Props, State> {
       callback: () => {
         PersistentStore.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
-            objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+            objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
             props: {
               isPCR: false,
               receiverAddresses: [address],
@@ -158,7 +158,7 @@ class ContactPresentation extends React.Component<Props, State> {
       callback: () => {
         PersistentStore.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
-            objective: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+            objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
             props: {
               isPCR: true,
               receiverAddresses: [address],
