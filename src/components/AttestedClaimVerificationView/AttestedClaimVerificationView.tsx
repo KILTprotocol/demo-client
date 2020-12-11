@@ -71,7 +71,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     const { cType } = this.props
 
     const propertyNames: string[] = Object.keys(
-      attestedClaim.request.claimHashTree
+      attestedClaim.request.claimHashes
     )
 
     return (
