@@ -14,7 +14,7 @@ import { getCtypePropertyTitle } from '../../utils/CtypeUtils'
 
 type Props = {
   claimEntry: Claims.Entry
-  cTypeHash?: SDKICTypeu['hash']
+  cTypeHash?: SDKICType['hash']
   labels: SelectAttestedClaimsLabels
   onChangeSelections: (claimEntry: Claims.Entry, state: State) => void
 }
