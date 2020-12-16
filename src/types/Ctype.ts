@@ -1,12 +1,12 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { ICTypeMetadata, ICType as SDKICType } from '@kiltprotocol/sdk-js'
 
-export interface ICType extends sdk.ICTypeMetadata {
-  cType: sdk.ICType
+export interface ICType extends ICTypeMetadata {
+  cType: SDKICType
 }
 
 export interface ICTypeWithMetadata {
-  cType: sdk.ICType
-  metaData: sdk.ICTypeMetadata
+  cType: SDKICType
+  metaData: ICTypeMetadata
 }
 
 export interface ICTypeInput {

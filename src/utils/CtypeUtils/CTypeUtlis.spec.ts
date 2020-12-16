@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { CType, IClaim, ICType } from '@kiltprotocol/sdk-js'
 import {
   fromInputModel,
   getClaimInputModel,
@@ -20,7 +20,7 @@ describe('CType', () => {
     },
     owner: '',
     hash: '',
-  } as sdk.ICType
+  } as ICType
 
   it('verify model transformations', () => {
     const ctypeInput: ICTypeInput = {
@@ -57,7 +57,7 @@ describe('CType', () => {
       description: '',
       required: ['first-property', 'second-property'],
     }
-    const goodClaim: sdk.IClaim = {
+    const goodClaim: IClaim = {
       owner: '',
       contents: {
         'first-property': 10,
@@ -75,7 +75,7 @@ describe('CType', () => {
       cTypeHash: '',
     }
     const ctypeFromInput = fromInputModel(ctypeInput)
-    const ctypeFromModel = sdk.CType.fromCType(ctypeModel)
+    const ctypeFromModel = CType.fromCType(ctypeModel)
     expect(JSON.stringify(ctypeFromInput.cType)).toEqual(
       JSON.stringify(ctypeFromModel)
     )
@@ -88,15 +88,15 @@ describe('CType', () => {
     )
 
     expect(
-      sdk.CType.fromCType(ctypeFromInput.cType).verifyClaimStructure(goodClaim)
+      CType.fromCType(ctypeFromInput.cType).verifyClaimStructure(goodClaim)
     ).toBeTruthy()
     expect(
-      sdk.CType.fromCType(ctypeFromInput.cType).verifyClaimStructure(badClaim)
+      CType.fromCType(ctypeFromInput.cType).verifyClaimStructure(badClaim)
     ).toBeFalsy()
 
     expect(() => {
       // @ts-ignore
-      sdk.CType.fromCType(goodClaim)
+      CType.fromCType(goodClaim)
     }).toThrow(new Error('CType does not correspond to schema'))
     expect(() => {
       ctypeInput.$schema = 'object'

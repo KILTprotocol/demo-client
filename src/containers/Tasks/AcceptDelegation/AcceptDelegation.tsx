@@ -1,4 +1,11 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  Crypto,
+  DelegationNode,
+  IDelegationRootNode,
+  IRequestAcceptDelegation,
+  ISubmitAcceptDelegation,
+  MessageBodyType,
+} from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
@@ -19,11 +26,11 @@ type StateProps = {
 }
 
 type OwnProps = {
-  delegationData: sdk.IRequestAcceptDelegation['content']['delegationData']
+  delegationData: IRequestAcceptDelegation['content']['delegationData']
   inviterAddress: IContact['publicIdentity']['address']
-  signatures: sdk.IRequestAcceptDelegation['content']['signatures']
+  signatures: IRequestAcceptDelegation['content']['signatures']
 
-  metaData?: sdk.IRequestAcceptDelegation['content']['metaData']
+  metaData?: IRequestAcceptDelegation['content']['metaData']
 
   onCancel?: () => void
   onFinished?: () => void
@@ -65,7 +72,7 @@ class AcceptDelegation extends React.Component<Props, State> {
 
     const signature = await this.signNewDelegationNode(delegationData)
 
-    const messageBody: sdk.ISubmitAcceptDelegation = {
+    const messageBody: ISubmitAcceptDelegation = {
       content: {
         delegationData,
         signatures: {
@@ -73,7 +80,7 @@ class AcceptDelegation extends React.Component<Props, State> {
           invitee: signature,
         },
       },
-      type: sdk.MessageBodyType.SUBMIT_ACCEPT_DELEGATION,
+      type: MessageBodyType.SUBMIT_ACCEPT_DELEGATION,
     }
 
     MessageRepository.sendToAddresses([inviterAddress], messageBody).then(
@@ -86,12 +93,12 @@ class AcceptDelegation extends React.Component<Props, State> {
   }
 
   private async signNewDelegationNode(
-    delegationData: sdk.IRequestAcceptDelegation['content']['delegationData']
+    delegationData: IRequestAcceptDelegation['content']['delegationData']
   ): Promise<string> {
     const { selectedIdentity } = this.props
     const { account, id, parentId, permissions } = delegationData
 
-    const rootNode: sdk.IDelegationRootNode | null = await DelegationsService.findRootNode(
+    const rootNode: IDelegationRootNode | null = await DelegationsService.findRootNode(
       parentId
     )
     if (!rootNode) {
@@ -99,7 +106,7 @@ class AcceptDelegation extends React.Component<Props, State> {
       throw new Error(`Root node not found for node ${parentId}`)
     }
 
-    const newDelegationNode = new sdk.DelegationNode(
+    const newDelegationNode = new DelegationNode(
       id,
       rootNode.id,
       account,
@@ -112,7 +119,7 @@ class AcceptDelegation extends React.Component<Props, State> {
 
   private checkSignature(): void {
     const { delegationData, signatures, inviterAddress } = this.props
-    const valid = sdk.Crypto.verify(
+    const valid = Crypto.verify(
       JSON.stringify(delegationData),
       signatures.inviter,
       inviterAddress

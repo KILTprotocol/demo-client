@@ -1,4 +1,8 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  IDelegationBaseNode,
+  IDelegationNode,
+  IDelegationRootNode,
+} from '@kiltprotocol/sdk-js'
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 import { AnyJson } from '@polkadot/types/types'
@@ -13,17 +17,17 @@ export enum DelegationType {
 }
 
 export interface IMyDelegation {
-  account: sdk.IDelegationBaseNode['account']
-  id: sdk.IDelegationBaseNode['id']
+  account: IDelegationBaseNode['account']
+  id: IDelegationBaseNode['id']
   metaData: {
     alias: string | number | true | AnyJson | undefined
   }
   type: DelegationType
-  rootId?: sdk.IDelegationNode['rootId']
-  permissions?: sdk.IDelegationNode['permissions']
-  parentId?: sdk.IDelegationNode['parentId']
-  cTypeHash: sdk.IDelegationRootNode['cTypeHash']
-  revoked: sdk.IDelegationBaseNode['revoked']
+  rootId?: IDelegationNode['rootId']
+  permissions?: IDelegationNode['permissions']
+  parentId?: IDelegationNode['parentId']
+  cTypeHash: IDelegationRootNode['cTypeHash']
+  revoked: IDelegationBaseNode['revoked']
   isPCR?: boolean
 }
 

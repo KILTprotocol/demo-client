@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { Identity, PublicIdentity } from '@kiltprotocol/sdk-js'
 import { IDidDocumentSigned } from '@kiltprotocol/sdk-js/build/did/Did'
 
 /**
@@ -16,14 +16,14 @@ export interface IContact {
     document?: IDidDocumentSigned
   }
 
-  publicIdentity: sdk.PublicIdentity
+  publicIdentity: PublicIdentity
 }
 
 /**
  * local Identity
  */
 export interface IMyIdentity {
-  identity: sdk.Identity
+  identity: Identity
   metaData: {
     name: string
   }

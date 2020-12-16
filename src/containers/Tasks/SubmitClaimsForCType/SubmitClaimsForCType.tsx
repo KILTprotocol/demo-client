@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { ICType } from '@kiltprotocol/sdk-js'
 import React from 'react'
 
 import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'
@@ -13,7 +13,7 @@ import { IContact } from '../../../types/Contact'
 import './SubmitClaimsForCType.scss'
 
 export type SubmitClaimsForCTypeProps = {
-  cTypeHashes: Array<sdk.ICType['hash'] | null>
+  cTypeHashes: Array<ICType['hash'] | null>
   receiverAddresses: Array<IContact['publicIdentity']['address']>
 
   onFinished?: () => void

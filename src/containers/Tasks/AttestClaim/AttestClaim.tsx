@@ -1,4 +1,9 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  Identity,
+  IPublicIdentity,
+  IQuoteAgreement,
+  IRequestForAttestation,
+} from '@kiltprotocol/sdk-js'
 import React from 'react'
 
 import { connect } from 'react-redux'
@@ -15,17 +20,14 @@ import { BlockUi } from '../../../types/UserFeedback'
 import Code from '../../../components/Code/Code'
 
 type DispatchProps = {
-  saveAgreedQuote: (
-    agreedQuote: sdk.IQuoteAgreement,
-    ownerAddress: string
-  ) => void
+  saveAgreedQuote: (agreedQuote: IQuoteAgreement, ownerAddress: string) => void
 }
 
 type OwnProps = {
   claimerAddresses: Array<IContact['publicIdentity']['address']>
-  requestForAttestation: sdk.IRequestForAttestation
-  quoteData?: sdk.IQuoteAgreement
-  claimer?: sdk.IPublicIdentity
+  requestForAttestation: IRequestForAttestation
+  quoteData?: IQuoteAgreement
+  claimer?: IPublicIdentity
 
   onCancel?: () => void
   onFinished?: () => void
@@ -34,7 +36,7 @@ type OwnProps = {
 type Props = OwnProps & DispatchProps
 
 type State = {
-  quoteData?: sdk.IQuoteAgreement
+  quoteData?: IQuoteAgreement
 }
 
 class AttestClaim extends React.Component<Props, State> {
@@ -74,7 +76,7 @@ class AttestClaim extends React.Component<Props, State> {
       headline: 'Writing attestation to chain',
     })
 
-    const selectedIdentity: sdk.Identity = Wallet.getSelectedIdentity(
+    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
       PersistentStore.store.getState()
     ).identity
 
@@ -143,7 +145,7 @@ class AttestClaim extends React.Component<Props, State> {
 }
 
 const mapDispatchToProps: DispatchProps = {
-  saveAgreedQuote: (agreedQuote: sdk.IQuoteAgreement, ownerAddress: string) =>
+  saveAgreedQuote: (agreedQuote: IQuoteAgreement, ownerAddress: string) =>
     Quotes.Store.saveAgreedQuote(agreedQuote, ownerAddress),
 }
 

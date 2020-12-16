@@ -1,4 +1,8 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  IDelegationNode,
+  IDelegationRootNode,
+  Permission,
+} from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { IMyIdentity } from '../../types/Contact'
@@ -17,7 +21,7 @@ type StateProps = {
 }
 
 type OwnProps = {
-  delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | IMyDelegation
+  delegation: IDelegationNode | IDelegationRootNode | IMyDelegation
 
   className?: string
   isMyChild?: boolean
@@ -33,11 +37,11 @@ type Props = StateProps & OwnProps
 
 class SelectDelegationAction extends React.Component<Props> {
   private static canDelegate(
-    delegation: sdk.IDelegationNode | sdk.IDelegationRootNode | IMyDelegation
+    delegation: IDelegationNode | IDelegationRootNode | IMyDelegation
   ): boolean {
-    const permissions = (delegation as sdk.IDelegationNode | IMyDelegation)
-      .permissions || [sdk.Permission.ATTEST, sdk.Permission.DELEGATE]
-    return !!permissions && permissions.includes(sdk.Permission.DELEGATE)
+    const permissions = (delegation as IDelegationNode | IMyDelegation)
+      .permissions || [Permission.ATTEST, Permission.DELEGATE]
+    return !!permissions && permissions.includes(Permission.DELEGATE)
   }
 
   private getInviteAction(): Action | undefined {

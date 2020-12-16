@@ -1,5 +1,13 @@
-import * as sdk from '@kiltprotocol/sdk-js'
-import { IPartialClaim } from '@kiltprotocol/sdk-js'
+import {
+  AttestedClaim,
+  IPartialClaim,
+  IRequestAttestationForClaim,
+  IRequestTerms,
+  ISubmitAttestationForClaim,
+  ISubmitTerms,
+  MessageBodyType,
+  RequestForAttestation,
+} from '@kiltprotocol/sdk-js'
 
 import RequestForAttestationService from '../../services/RequestForAttestationService'
 import AttestationService from '../../services/AttestationService'
@@ -35,7 +43,7 @@ export type BsAttestationsPool = {
 }
 
 type BsAttestedClaims = {
-  [attestationKey: string]: sdk.AttestedClaim
+  [attestationKey: string]: AttestedClaim
 }
 
 class BsAttestation {
@@ -69,14 +77,14 @@ class BsAttestation {
     BsIdentity.selectIdentity(claimerIdentity)
     const claimToAttest: Claims.Entry = await BsClaim.getClaimByKey(claimKey)
 
-    const requestForAttestation: sdk.RequestForAttestation = await BsAttestation.getRequestForAttestation(
+    const requestForAttestation: RequestForAttestation = await BsAttestation.getRequestForAttestation(
       bsAttestationData,
       claimToAttest,
       bsAttestedClaims,
       claimerIdentity
     )
 
-    const attestedClaim: sdk.AttestedClaim = await BsAttestation.attesterAttestsClaim(
+    const attestedClaim: AttestedClaim = await BsAttestation.attesterAttestsClaim(
       bsAttestationData,
       bsAttestationKey,
       bsAttestedClaims,
@@ -159,7 +167,7 @@ class BsAttestation {
     claimToAttest: Claims.Entry,
     bsAttestedClaims: BsAttestedClaims,
     claimerIdentity: IMyIdentity
-  ): Promise<sdk.RequestForAttestation> {
+  ): Promise<RequestForAttestation> {
     const { attest } = bsAttestationData
     const { delegationKey, terms } = attest
 
@@ -169,7 +177,7 @@ class BsAttestation {
       delegation = await BsDelegation.getDelegationByKey(delegationKey)
     }
 
-    let termsFromPool: sdk.AttestedClaim[] = []
+    let termsFromPool: AttestedClaim[] = []
     if (terms && Array.isArray(terms) && terms.length) {
       termsFromPool = await Promise.all(
         terms.map(bsAttestationKey => {
@@ -184,7 +192,7 @@ class BsAttestation {
       )
     }
 
-    const req4Att = await sdk.RequestForAttestation.fromClaimAndIdentity(
+    const req4Att = await RequestForAttestation.fromClaimAndIdentity(
       claimToAttest.claim,
       claimerIdentity.identity,
       {
@@ -210,8 +218,8 @@ class BsAttestation {
     bsAttestationKey: keyof BsAttestationsPool,
     bsAttestedClaims: BsAttestedClaims,
     claimerIdentity: IMyIdentity,
-    requestForAttestation: sdk.RequestForAttestation
-  ): Promise<sdk.AttestedClaim> {
+    requestForAttestation: RequestForAttestation
+  ): Promise<AttestedClaim> {
     const { attest } = bsAttestationData
     const { attesterKey } = attest
 
@@ -221,7 +229,7 @@ class BsAttestation {
     BsIdentity.selectIdentity(attesterIdentity)
 
     // create attested claim and store for reference
-    const attestedClaim: sdk.AttestedClaim = await AttestationService.attestClaim(
+    const attestedClaim: AttestedClaim = await AttestationService.attestClaim(
       requestForAttestation
     )
     // TODO: Don't add the attested claim to the bsAttestedClaims array.
@@ -244,8 +252,8 @@ class BsAttestation {
     bsAttestationData: BsAttestationsPoolElement,
     claimerIdentity: IMyIdentity,
     bsClaim: BsClaimsPoolElement,
-    requestForAttestation: sdk.RequestForAttestation,
-    attestedClaim: sdk.AttestedClaim
+    requestForAttestation: RequestForAttestation,
+    attestedClaim: AttestedClaim
   ): Promise<void> {
     const { attest } = bsAttestationData
     const { attesterKey } = attest
@@ -260,9 +268,9 @@ class BsAttestation {
     }
 
     // send request for term from claimer to attester
-    const requestAcceptDelegation: sdk.IRequestTerms = {
+    const requestAcceptDelegation: IRequestTerms = {
       content: partialClaim,
-      type: sdk.MessageBodyType.REQUEST_TERMS,
+      type: MessageBodyType.REQUEST_TERMS,
     }
     await MessageRepository.singleSend(
       requestAcceptDelegation,
@@ -271,14 +279,14 @@ class BsAttestation {
     )
 
     // send terms from attester to claimer
-    const submitTerms: sdk.ISubmitTerms = {
+    const submitTerms: ISubmitTerms = {
       content: {
         claim: partialClaim,
         delegationId: attestedClaim.request.delegationId || undefined,
         legitimations: attestedClaim.request.legitimations,
         quote: undefined,
       },
-      type: sdk.MessageBodyType.SUBMIT_TERMS,
+      type: MessageBodyType.SUBMIT_TERMS,
     }
     await MessageRepository.singleSend(
       submitTerms,
@@ -287,9 +295,9 @@ class BsAttestation {
     )
 
     // send signed legitmations from claimer to attester
-    const requestAttestationForClaim: sdk.IRequestAttestationForClaim = {
+    const requestAttestationForClaim: IRequestAttestationForClaim = {
       content: { requestForAttestation },
-      type: sdk.MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
+      type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }
 
     RequestForAttestationService.saveInStore(
@@ -304,9 +312,9 @@ class BsAttestation {
     )
 
     // send attested claim from attester to claimer
-    const submitAttestationForClaim: sdk.ISubmitAttestationForClaim = {
+    const submitAttestationForClaim: ISubmitAttestationForClaim = {
       content: attestedClaim,
-      type: sdk.MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
+      type: MessageBodyType.SUBMIT_ATTESTATION_FOR_CLAIM,
     }
     await MessageRepository.singleSend(
       submitAttestationForClaim,

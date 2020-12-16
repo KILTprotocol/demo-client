@@ -1,4 +1,9 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  IRequestAcceptDelegation,
+  MessageBodyType,
+  Permission,
+  UUID,
+} from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
@@ -50,7 +55,7 @@ type State = {
 
     pool?: IMyDelegation[]
   }
-  permissions: sdk.Permission[]
+  permissions: Permission[]
 }
 
 class MyDelegationsInviteModal extends React.Component<Props, State> {
@@ -186,13 +191,13 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
   private getDelegationData(
     receiver: IContact,
     delegation: IMyDelegation
-  ): sdk.IRequestAcceptDelegation['content']['delegationData'] {
+  ): IRequestAcceptDelegation['content']['delegationData'] {
     const { isPCR } = this.props
     const { permissions } = this.state
 
     return {
       account: receiver.publicIdentity.address,
-      id: sdk.UUID.generate(),
+      id: UUID.generate(),
       isPCR,
       parentId: delegation.id,
       permissions,
@@ -216,7 +221,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
     }, delay)
   }
 
-  private changePermissions(newPermissions: sdk.Permission[]): void {
+  private changePermissions(newPermissions: Permission[]): void {
     this.setState({ permissions: newPermissions })
   }
 
@@ -246,7 +251,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
     // check permissions
     return !(
       delegation.permissions &&
-      !delegation.permissions.includes(sdk.Permission.DELEGATE)
+      !delegation.permissions.includes(Permission.DELEGATE)
     )
   }
 
@@ -295,7 +300,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 
     const delegationData = this.getDelegationData(receiver, delegation)
 
-    const messageBody: sdk.IRequestAcceptDelegation = {
+    const messageBody: IRequestAcceptDelegation = {
       content: {
         delegationData,
         metaData,
@@ -305,7 +310,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
           ),
         },
       },
-      type: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+      type: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
     }
 
     MessageRepository.send([receiver], messageBody)

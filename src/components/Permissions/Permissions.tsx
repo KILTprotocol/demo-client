@@ -1,10 +1,10 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { Permission } from '@kiltprotocol/sdk-js'
 import React from 'react'
 
 import './Permissions.scss'
 
 type Props = {
-  permissions: sdk.Permission[]
+  permissions: Permission[]
 }
 
 class Permissions extends React.Component<Props> {
@@ -23,13 +23,12 @@ class Permissions extends React.Component<Props> {
 
     return (
       <section className="Permissions">
-        {Object.keys(sdk.Permission)
+        {Object.keys(Permission)
           .filter(
-            (permission: string) =>
-              typeof sdk.Permission[permission] === 'number'
+            (permission: string) => typeof Permission[permission] === 'number'
           )
           .map((permission: string) => {
-            const allowed = permissions.includes(sdk.Permission[permission])
+            const allowed = permissions.includes(Permission[permission])
             return (
               <span
                 key={permission}

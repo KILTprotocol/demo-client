@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IAttestedClaim, IDelegationNode } from '@kiltprotocol/sdk-js'
 import React from 'react'
 
 import PersistentStore from '../../state/PersistentStore'
@@ -37,9 +37,9 @@ const LABELS: ILabels = {
 }
 
 type Props = {
-  attestedClaims: sdk.IAttestedClaim[]
+  attestedClaims: IAttestedClaim[]
   context?: 'terms'
-  delegationId: sdk.IDelegationNode['id'] | null
+  delegationId: IDelegationNode['id'] | null
   currentDelegationViewType?: ViewType
 
   onToggleChildOpen?: (closeCallback?: () => void | undefined) => void
@@ -49,7 +49,7 @@ type State = {
   labels: IPossibleLabels
 
   closeOpenedChild?: () => void
-  openedAttestedClaim?: sdk.IAttestedClaim
+  openedAttestedClaim?: IAttestedClaim
 }
 
 class AttestedClaimsListView extends React.Component<Props, State> {
@@ -91,7 +91,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     )
   }
 
-  private getAttestations(attestations: sdk.IAttestedClaim[]): JSX.Element {
+  private getAttestations(attestations: IAttestedClaim[]): JSX.Element {
     const { openedAttestedClaim } = this.state
     return (
       <section className="attestations">
@@ -130,7 +130,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
               </tr>
             </thead>
 
-            {attestations.map((attestedClaim: sdk.IAttestedClaim) => {
+            {attestations.map((attestedClaim: IAttestedClaim) => {
               const opened = attestedClaim === openedAttestedClaim
 
               return (
@@ -213,7 +213,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     )
   }
 
-  private toggleOpen(attestedClaim: sdk.IAttestedClaim | undefined): void {
+  private toggleOpen(attestedClaim: IAttestedClaim | undefined): void {
     const { onToggleChildOpen } = this.props
     const { openedAttestedClaim } = this.state
 

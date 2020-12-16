@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { Permission } from '@kiltprotocol/sdk-js'
 import isEqual from 'lodash/isEqual'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
@@ -40,7 +40,7 @@ type State = {
   delegationEntries: IMyDelegation[]
 
   currentDelegation?: IMyDelegation
-  invitePermissions?: sdk.Permission[]
+  invitePermissions?: Permission[]
   redirect?: string
 }
 

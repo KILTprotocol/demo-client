@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IDelegationBaseNode } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import DelegationDetailView from '../../../components/DelegationDetailView/DelegationDetailView'
 import DelegationsService from '../../../services/DelegationsService'
@@ -8,7 +8,7 @@ import * as Delegations from '../../../state/ducks/Delegations'
 import './ImportDelegation.scss'
 
 type Props = {
-  delegationId: sdk.IDelegationBaseNode['id']
+  delegationId: IDelegationBaseNode['id']
   isPCR: boolean
 
   onCancel?: () => void

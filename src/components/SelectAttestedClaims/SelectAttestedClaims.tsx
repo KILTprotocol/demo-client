@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { ICType } from '@kiltprotocol/sdk-js'
 import groupBy from 'lodash/groupBy'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
@@ -73,7 +73,7 @@ type StateProps = {
 }
 
 type OwnProps = {
-  cTypeHashes?: Array<sdk.ICType['hash'] | null>
+  cTypeHashes?: Array<ICType['hash'] | null>
   context?: 'default' | 'terms'
   onChange: (claimSelectionData: ClaimSelectionData) => void
 }

@@ -1,4 +1,8 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  ICType,
+  IRequestClaimsForCTypes,
+  MessageBodyType,
+} from '@kiltprotocol/sdk-js'
 import React from 'react'
 
 import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'
@@ -8,7 +12,7 @@ import { IContact } from '../../../types/Contact'
 import './RequestClaimsForCType.scss'
 
 export type RequestClaimsForCTypeProps = {
-  cTypeHashes: Array<sdk.ICType['hash'] | null>
+  cTypeHashes: Array<ICType['hash'] | null>
   receiverAddresses: Array<IContact['publicIdentity']['address']>
 
   onFinished?: () => void
@@ -37,9 +41,9 @@ class RequestClaimsForCType extends React.Component<Props, State> {
   private sendRequest(): void {
     const { cTypeHashes, receiverAddresses, onFinished } = this.props
 
-    const messageBody: sdk.IRequestClaimsForCTypes = {
+    const messageBody: IRequestClaimsForCTypes = {
       content: { ctypes: cTypeHashes, allowPE: false },
-      type: sdk.MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
+      type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
     }
 
     MessageRepository.sendToAddresses(receiverAddresses, messageBody).then(

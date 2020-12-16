@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { Identity, PublicIdentity } from '@kiltprotocol/sdk-js'
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 
@@ -91,7 +91,7 @@ class Store {
 
           // TODO: use real wallet later instead of stored phrase
 
-          const identity = await sdk.Identity.buildFromMnemonic(phrase)
+          const identity = await Identity.buildFromMnemonic(phrase)
 
           const myIdentity: IMyIdentity = {
             createdAt,
@@ -243,7 +243,7 @@ const getAllIdentities = createSelector(
 
 const getStateIdentity = (
   state: ReduxState,
-  address: sdk.PublicIdentity['address']
+  address: PublicIdentity['address']
 ): IMyIdentity | undefined => state.wallet.get('identities').get(address)
 
 const getIdentity = createSelector([getStateIdentity], (entry: Entry) => entry)

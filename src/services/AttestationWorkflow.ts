@@ -1,10 +1,23 @@
-import * as sdk from '@kiltprotocol/sdk-js'
 import {
+  AttestedClaim,
+  DelegationNode,
+  IAttestedClaim,
+  IClaim,
+  IDelegationNode,
+  IInformCreateDelegation,
   IPartialClaim,
+  IPublicIdentity,
+  IQuoteAgreement,
+  IQuoteAttesterSigned,
   IRequestAttestationForClaim,
+  IRequestForAttestation,
   IRequestTerms,
+  ISubmitAcceptDelegation,
   ISubmitAttestationForClaim,
+  ISubmitClaimsForCTypes,
+  ISubmitTerms,
   MessageBodyType,
+  RequestForAttestation,
 } from '@kiltprotocol/sdk-js'
 
 import AttestationService from './AttestationService'
@@ -52,20 +65,20 @@ class AttestationWorkflow {
    */
   public static async submitTerms(
     claim: IPartialClaim,
-    legitimations: sdk.IAttestedClaim[],
+    legitimations: IAttestedClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
-    quote?: sdk.IQuoteAttesterSigned,
-    receiver?: sdk.IPublicIdentity,
+    quote?: IQuoteAttesterSigned,
+    receiver?: IPublicIdentity,
     delegation?: IMyDelegation
   ): Promise<void> {
-    const messageBody: sdk.ISubmitTerms = {
+    const messageBody: ISubmitTerms = {
       content: {
         claim,
         legitimations,
         delegationId: undefined,
         quote: undefined,
       },
-      type: sdk.MessageBodyType.SUBMIT_TERMS,
+      type: MessageBodyType.SUBMIT_TERMS,
     }
     if (delegation) {
       messageBody.content.delegationId = delegation.id
@@ -89,12 +102,12 @@ class AttestationWorkflow {
    * @param receiverAddresses  list of contact addresses who will receive the attested claims
    */
   public static async submitClaimsForCTypes(
-    attestedClaims: sdk.IAttestedClaim[],
+    attestedClaims: IAttestedClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>
   ): Promise<void> {
-    const messageBody: sdk.ISubmitClaimsForCTypes = {
+    const messageBody: ISubmitClaimsForCTypes = {
       content: attestedClaims,
-      type: sdk.MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
+      type: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
     }
 
     return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
@@ -110,17 +123,17 @@ class AttestationWorkflow {
    * @param [delegationId] - the delegation the attester added as legitimation
    */
   public static async requestAttestationForClaim(
-    claim: sdk.IClaim,
+    claim: IClaim,
     attesterAddresses: Array<IContact['publicIdentity']['address']>,
-    legitimations: sdk.AttestedClaim[] = [],
-    delegationId?: sdk.IDelegationNode['id'],
-    quoteAttesterSigned?: sdk.IQuoteAgreement
+    legitimations: AttestedClaim[] = [],
+    delegationId?: IDelegationNode['id'],
+    quoteAttesterSigned?: IQuoteAgreement
   ): Promise<void> {
     const { identity } = Wallet.getSelectedIdentity(
       persistentStore.store.getState()
     )
 
-    const requestForAttestation = await sdk.RequestForAttestation.fromClaimAndIdentity(
+    const requestForAttestation = await RequestForAttestation.fromClaimAndIdentity(
       claim,
       identity,
       { legitimations, delegationId }
@@ -154,9 +167,9 @@ class AttestationWorkflow {
    * @param claimerAddress the contacts address who wants his claim to be attested
    */
   public static async approveAndSubmitAttestationForClaim(
-    requestForAttestation: sdk.IRequestForAttestation,
+    requestForAttestation: IRequestForAttestation,
     claimerAddress: IContact['publicIdentity']['address'],
-    claimerIdentity?: sdk.IPublicIdentity
+    claimerIdentity?: IPublicIdentity
   ): Promise<void> {
     const claimer = await ContactRepository.findByAddress(claimerAddress)
     if (!claimer && !claimerIdentity) {
@@ -205,16 +218,16 @@ class AttestationWorkflow {
    * @param delegationIsPCR is the delegation a pcr
    */
   public static async informCreateDelegation(
-    delegationNodeId: sdk.DelegationNode['id'],
+    delegationNodeId: DelegationNode['id'],
     delegateAddress: IContact['publicIdentity']['address'],
-    delegationIsPCR: sdk.ISubmitAcceptDelegation['content']['delegationData']['isPCR']
+    delegationIsPCR: ISubmitAcceptDelegation['content']['delegationData']['isPCR']
   ): Promise<void> {
-    const messageBody: sdk.IInformCreateDelegation = {
+    const messageBody: IInformCreateDelegation = {
       content: {
         delegationId: delegationNodeId,
         isPCR: delegationIsPCR,
       },
-      type: sdk.MessageBodyType.INFORM_CREATE_DELEGATION,
+      type: MessageBodyType.INFORM_CREATE_DELEGATION,
     }
 
     return MessageRepository.sendToAddresses([delegateAddress], messageBody)

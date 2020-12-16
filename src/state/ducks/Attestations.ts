@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IAttestation } from '@kiltprotocol/sdk-js'
 
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
@@ -13,11 +13,11 @@ interface ISaveAction extends KiltAction {
 }
 
 interface IRemoveAction extends KiltAction {
-  payload: sdk.IAttestation['claimHash']
+  payload: IAttestation['claimHash']
 }
 
 interface IRevokeAction extends KiltAction {
-  payload: sdk.IAttestation['claimHash']
+  payload: IAttestation['claimHash']
 }
 
 export type Action = ISaveAction | IRemoveAction
@@ -27,7 +27,7 @@ export type Entry = {
   claimerAlias: string
   claimerAddress: string
   cTypeHash: string
-  attestation: sdk.IAttestation
+  attestation: IAttestation
 }
 
 type State = {
@@ -71,7 +71,7 @@ class Store {
       serializedAttestatation => {
         try {
           const attestationAsJson = JSON.parse(serializedAttestatation)
-          const iAttestation = attestationAsJson.attestation as sdk.IAttestation
+          const iAttestation = attestationAsJson.attestation as IAttestation
           const attestationEntry: Entry = {
             attestation: iAttestation,
             cTypeHash: attestationAsJson.cTypeHash,
@@ -114,7 +114,7 @@ class Store {
         })
       }
       case Store.ACTIONS.REMOVE_ATTESTATION: {
-        const claimHash: sdk.IAttestation['claimHash'] = (action as IRemoveAction)
+        const claimHash: IAttestation['claimHash'] = (action as IRemoveAction)
           .payload
         return state.set(
           'attestations',
@@ -124,7 +124,7 @@ class Store {
         )
       }
       case Store.ACTIONS.REVOKE_ATTESTATION: {
-        const claimHash: sdk.IAttestation['claimHash'] = (action as IRemoveAction)
+        const claimHash: IAttestation['claimHash'] = (action as IRemoveAction)
           .payload
 
         let attestations = state.get('attestations') || []
@@ -149,7 +149,7 @@ class Store {
   }
 
   public static removeAttestation(
-    claimHash: sdk.IAttestation['claimHash']
+    claimHash: IAttestation['claimHash']
   ): IRemoveAction {
     return {
       payload: claimHash,
@@ -158,7 +158,7 @@ class Store {
   }
 
   public static revokeAttestation(
-    claimHash: sdk.IAttestation['claimHash']
+    claimHash: IAttestation['claimHash']
   ): IRevokeAction {
     return {
       payload: claimHash,

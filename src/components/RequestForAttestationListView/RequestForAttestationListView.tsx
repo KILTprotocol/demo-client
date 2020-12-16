@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { IRequestForAttestation } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect } from 'react-redux'
 import PersistentStore from '../../state/PersistentStore'
@@ -23,7 +23,7 @@ type OwnProps = { claim: Claims.Entry }
 type DispatchProps = {
   removeRequestForAttestation: (
     claimId: Claims.Entry['id'],
-    rootHash: sdk.IRequestForAttestation['rootHash']
+    rootHash: IRequestForAttestation['rootHash']
   ) => void
 }
 
@@ -84,7 +84,7 @@ const RequestForAttestationListView: React.FunctionComponent<Props> = ({
 const mapDispatchToProps: DispatchProps = {
   removeRequestForAttestation: (
     claimId: Claims.Entry['id'],
-    rootHash: sdk.IRequestForAttestation['rootHash']
+    rootHash: IRequestForAttestation['rootHash']
   ) =>
     PersistentStore.store.dispatch(
       Claims.Store.removeRequestForAttestation(claimId, rootHash)

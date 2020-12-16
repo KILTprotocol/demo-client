@@ -1,4 +1,4 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import { Claim, CType, IClaim, IPartialClaim } from '@kiltprotocol/sdk-js'
 import React, { Component } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -24,19 +24,19 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  saveClaim: (claim: sdk.IClaim, meta: { alias: string }) => void
+  saveClaim: (claim: IClaim, meta: { alias: string }) => void
 }
 
 type OwnProps = {
   onCancel?: () => void
-  onCreate: (claim: sdk.Claim) => void
-  partialClaim: sdk.IPartialClaim
+  onCreate: (claim: Claim) => void
+  partialClaim: IPartialClaim
 }
 
 type Props = StateProps & DispatchProps & OwnProps
 
 type State = {
-  partialClaim: sdk.IPartialClaim
+  partialClaim: IPartialClaim
   name: string
   cType?: ICTypeWithMetadata
 }
@@ -79,7 +79,7 @@ class MyClaimCreateView extends Component<Props, State> {
       })
   }
 
-  private updateClaim(contents: sdk.Claim['contents']): void {
+  private updateClaim(contents: Claim['contents']): void {
     const { partialClaim } = this.state
     this.setState({
       partialClaim: { ...partialClaim, contents: { ...contents } },
@@ -100,8 +100,8 @@ class MyClaimCreateView extends Component<Props, State> {
     const { contents } = partialClaim
 
     if (cType && selectedIdentity) {
-      const newClaim = sdk.Claim.fromCTypeAndClaimContents(
-        sdk.CType.fromCType(cType.cType),
+      const newClaim = Claim.fromCTypeAndClaimContents(
+        CType.fromCType(cType.cType),
         contents || {},
         selectedIdentity.identity.address
       )
@@ -184,7 +184,7 @@ const mapStateToProps: MapStateToProps<
 })
 
 const mapDispatchToProps: DispatchProps = {
-  saveClaim: (claim: sdk.IClaim, meta: { alias: string }) =>
+  saveClaim: (claim: IClaim, meta: { alias: string }) =>
     Claims.Store.saveAction(claim, meta),
 }
 

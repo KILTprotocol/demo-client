@@ -1,4 +1,9 @@
-import * as sdk from '@kiltprotocol/sdk-js'
+import {
+  IRequestAcceptDelegation,
+  MessageBodyType,
+  Permission,
+  UUID,
+} from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
@@ -55,7 +60,7 @@ type StateProps = {
 type Props = RequestAcceptDelegationProps & StateProps
 
 type State = {
-  permissions: sdk.Permission[]
+  permissions: Permission[]
   selectedDelegations: IMyDelegation[]
 }
 
@@ -104,13 +109,13 @@ class RequestAcceptDelegation extends React.Component<Props, State> {
   private getDelegationData(
     receiverAddress: IContact['publicIdentity']['address'],
     delegation: IMyDelegation
-  ): sdk.IRequestAcceptDelegation['content']['delegationData'] {
+  ): IRequestAcceptDelegation['content']['delegationData'] {
     const { isPCR } = this.props
     const { permissions } = this.state
 
     return {
       account: receiverAddress,
-      id: sdk.UUID.generate(),
+      id: UUID.generate(),
       isPCR,
       parentId: delegation.id,
       permissions,
@@ -131,11 +136,11 @@ class RequestAcceptDelegation extends React.Component<Props, State> {
         !myDelegation.revoked &&
         (!myDelegation.permissions ||
           (myDelegation.permissions &&
-            myDelegation.permissions.includes(sdk.Permission.DELEGATE)))
+            myDelegation.permissions.includes(Permission.DELEGATE)))
     )
   }
 
-  private changePermissions(newPermissions: sdk.Permission[]): void {
+  private changePermissions(newPermissions: Permission[]): void {
     this.setState({ permissions: newPermissions })
   }
 
@@ -152,7 +157,7 @@ class RequestAcceptDelegation extends React.Component<Props, State> {
 
     const delegationData = this.getDelegationData(receiverAddress, delegation)
 
-    const messageBody: sdk.IRequestAcceptDelegation = {
+    const messageBody: IRequestAcceptDelegation = {
       content: {
         delegationData,
         metaData,
@@ -162,7 +167,7 @@ class RequestAcceptDelegation extends React.Component<Props, State> {
           ),
         },
       },
-      type: sdk.MessageBodyType.REQUEST_ACCEPT_DELEGATION,
+      type: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
     }
 
     MessageRepository.sendToAddresses([receiverAddress], messageBody)
