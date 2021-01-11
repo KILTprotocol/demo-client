@@ -1,4 +1,5 @@
 import { combineReducers, createStore, Store } from 'redux'
+import { encryption, decryption } from '../utils/Encryption/Encryption'
 
 import * as Attestations from './ducks/Attestations'
 import * as Balances from './ducks/Balances'
@@ -52,8 +53,9 @@ class PersistentStore {
   private static NAME = 'reduxState'
 
   private static async deserialize(
-    obj: SerializedState
+    encryptedState: string
   ): Promise<Partial<State>> {
+    const obj = JSON.parse(encryptedState)
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
@@ -77,8 +79,11 @@ class PersistentStore {
       uiState: UiState.Store.serialize(),
       wallet: Wallet.Store.serialize(state.wallet),
     }
-
-    return JSON.stringify(obj)
+    const encryptedState = encryption(
+      JSON.stringify(obj),
+      '0x000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F'
+    )
+    return JSON.stringify(encryptedState)
   }
 
   private storeInternal: Store
@@ -88,9 +93,13 @@ class PersistentStore {
     let persistedState: Partial<State> = {}
     if (localState) {
       try {
-        persistedState = await PersistentStore.deserialize(
-          JSON.parse(localState)
+        const decryptedState = decryption(
+          localState,
+          '0x000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F'
         )
+        if (decryptedState) {
+          persistedState = await PersistentStore.deserialize(decryptedState)
+        }
       } catch (error) {
         console.error('Could not construct persistentStore', error)
       }

@@ -1,23 +1,17 @@
 import {
-  encryptSymmetric,
-  decryptSymmetric,
+  encryptSymmetricAsStr,
+  decryptSymmetricStr,
   CryptoInput,
-  EncryptedSymmetric,
   EncryptedSymmetricString,
 } from '@kiltprotocol/sdk-js/build/crypto'
-import * as string from '@polkadot/util/string'
 
 export function encryption(
   message: string,
   secret: CryptoInput
-): EncryptedSymmetric {
-  const data = new Uint8Array(string.stringToU8a(message))
-  return encryptSymmetric(data, secret)
+): EncryptedSymmetricString {
+  return encryptSymmetricAsStr(message, secret)
 }
 
-export function decryption(
-  data: EncryptedSymmetric | EncryptedSymmetricString,
-  secret: CryptoInput
-): Uint8Array | null {
-  return decryptSymmetric(data, secret)
+export function decryption(data: string, secret: CryptoInput): string | null {
+  return decryptSymmetricStr(JSON.parse(data), secret)
 }
