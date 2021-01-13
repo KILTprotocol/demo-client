@@ -1,5 +1,9 @@
 import { combineReducers, createStore, Store } from 'redux'
-import { encryption, decryption } from '../utils/Encryption/Encryption'
+import {
+  encryption,
+  decryption,
+  passwordHashing,
+} from '../utils/Encryption/Encryption'
 
 import * as Attestations from './ducks/Attestations'
 import * as Balances from './ducks/Balances'
@@ -79,10 +83,9 @@ class PersistentStore {
       uiState: UiState.Store.serialize(),
       wallet: Wallet.Store.serialize(state.wallet),
     }
-    const encryptedState = encryption(
-      JSON.stringify(obj),
-      '0x000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F'
-    )
+
+    const password = passwordHashing('password123SD')
+    const encryptedState = encryption(JSON.stringify(obj), `0x${password}`)
     return JSON.stringify(encryptedState)
   }
 
@@ -93,10 +96,8 @@ class PersistentStore {
     let persistedState: Partial<State> = {}
     if (localState) {
       try {
-        const decryptedState = decryption(
-          localState,
-          '0x000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F'
-        )
+        const password = passwordHashing('password123SD')
+        const decryptedState = decryption(localState, `0x${password}`)
         if (decryptedState) {
           persistedState = await PersistentStore.deserialize(decryptedState)
         }
