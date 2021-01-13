@@ -1,4 +1,6 @@
 import { combineReducers, createStore, Store } from 'redux'
+import nacl from 'tweetnacl'
+import { u8aToHex } from '@kiltprotocol/sdk-js/build/crypto'
 import {
   encryption,
   decryption,
@@ -55,6 +57,7 @@ class PersistentStore {
   }
 
   private static NAME = 'reduxState'
+  private static SALT = 'salt'
 
   private static async deserialize(
     encryptedState: string
@@ -84,20 +87,25 @@ class PersistentStore {
       wallet: Wallet.Store.serialize(state.wallet),
     }
 
-    const password = passwordHashing('password123SD')
-    const encryptedState = encryption(JSON.stringify(obj), `0x${password}`)
-    return JSON.stringify(encryptedState)
+    return JSON.stringify(obj)
   }
 
   private storeInternal: Store
 
   public async init(): Promise<Store> {
     const localState = localStorage.getItem(PersistentStore.NAME)
+    let salt = localStorage.getItem(PersistentStore.SALT)
+
+    if (!salt) {
+      salt = u8aToHex(nacl.randomBytes(24))
+      localStorage.setItem(PersistentStore.SALT, salt)
+    }
+
+    const password = await passwordHashing('password', salt)
     let persistedState: Partial<State> = {}
     if (localState) {
       try {
-        const password = passwordHashing('password123SD')
-        const decryptedState = decryption(localState, `0x${password}`)
+        const decryptedState = decryption(localState, password)
         if (decryptedState) {
           persistedState = await PersistentStore.deserialize(decryptedState)
         }
@@ -127,10 +135,11 @@ class PersistentStore {
     )
 
     this.storeInternal.subscribe(() => {
-      localStorage.setItem(
-        PersistentStore.NAME,
-        PersistentStore.serialize(this.storeInternal.getState())
+      const serializedState = PersistentStore.serialize(
+        this.storeInternal.getState()
       )
+      const encryptedState = encryption(serializedState, password)
+      localStorage.setItem(PersistentStore.NAME, JSON.stringify(encryptedState))
     })
 
     return this.storeInternal

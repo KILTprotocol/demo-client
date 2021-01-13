@@ -3,9 +3,9 @@ import {
   decryptSymmetricStr,
   CryptoInput,
   EncryptedSymmetricString,
+  coToUInt8,
 } from '@kiltprotocol/sdk-js/build/crypto'
-import scrypt from 'scrypt-async'
-import nacl from 'tweetnacl'
+import { scrypt } from 'scrypt-js'
 
 export function encryption(
   message: string,
@@ -18,27 +18,13 @@ export function decryption(data: string, secret: CryptoInput): string | null {
   return decryptSymmetricStr(JSON.parse(data), secret)
 }
 
-export function passwordHashing(password: string): CryptoInput {
-  const nonce = nacl.randomBytes(24)
-  let key
-  const error = console.error('Password not hashed')
-  scrypt(
-    password,
-    nonce,
-    {
-      N: 16384,
-      r: 8,
-      p: 1,
-      dkLen: 32,
-      encoding: 'hex',
-    },
-    (derivedKey: any) => {
-      key = derivedKey
-    }
-  )
-
-  if (!key) {
-    throw error
-  }
-  return key
+export function passwordHashing(
+  password: string,
+  salt: string
+): Promise<Uint8Array> {
+  const N = 1024
+  const r = 8
+  const p = 1
+  const dkLen = 32
+  return scrypt(coToUInt8(password), coToUInt8(salt), N, r, p, dkLen)
 }
