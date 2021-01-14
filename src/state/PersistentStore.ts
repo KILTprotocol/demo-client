@@ -1,4 +1,11 @@
 import { combineReducers, createStore, Store } from 'redux'
+import nacl from 'tweetnacl'
+import { u8aToHex } from '@kiltprotocol/sdk-js/build/crypto'
+import {
+  encryption,
+  decryption,
+  passwordHashing,
+} from '../utils/Encryption/Encryption'
 
 import * as Attestations from './ducks/Attestations'
 import * as Balances from './ducks/Balances'
@@ -50,10 +57,12 @@ class PersistentStore {
   }
 
   private static NAME = 'reduxState'
+  private static SALT = 'salt'
 
   private static async deserialize(
-    obj: SerializedState
+    encryptedState: string
   ): Promise<Partial<State>> {
+    const obj = JSON.parse(encryptedState)
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
       claims: Claims.Store.deserialize(obj.claims),
@@ -85,12 +94,21 @@ class PersistentStore {
 
   public async init(): Promise<Store> {
     const localState = localStorage.getItem(PersistentStore.NAME)
+    let salt = localStorage.getItem(PersistentStore.SALT)
+
+    if (!salt) {
+      salt = u8aToHex(nacl.randomBytes(24))
+      localStorage.setItem(PersistentStore.SALT, salt)
+    }
+
+    const password = await passwordHashing('password', salt)
     let persistedState: Partial<State> = {}
     if (localState) {
       try {
-        persistedState = await PersistentStore.deserialize(
-          JSON.parse(localState)
-        )
+        const decryptedState = decryption(localState, password)
+        if (decryptedState) {
+          persistedState = await PersistentStore.deserialize(decryptedState)
+        }
       } catch (error) {
         console.error('Could not construct persistentStore', error)
       }
@@ -117,10 +135,11 @@ class PersistentStore {
     )
 
     this.storeInternal.subscribe(() => {
-      localStorage.setItem(
-        PersistentStore.NAME,
-        PersistentStore.serialize(this.storeInternal.getState())
+      const serializedState = PersistentStore.serialize(
+        this.storeInternal.getState()
       )
+      const encryptedState = encryption(serializedState, password)
+      localStorage.setItem(PersistentStore.NAME, JSON.stringify(encryptedState))
     })
 
     return this.storeInternal
