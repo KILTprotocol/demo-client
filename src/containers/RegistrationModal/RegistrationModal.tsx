@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 import './RegistrationModal.scss'
 
@@ -8,6 +8,10 @@ type Props = {
 }
 
 const RegistrationModal: React.FC<Props> = ({ showOnInit, onClose }) => {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordChecker, setPasswordChecker] = useState('')
+
   const submit = (): void => {
     console.log('submit')
   }
@@ -24,15 +28,27 @@ const RegistrationModal: React.FC<Props> = ({ showOnInit, onClose }) => {
         <form>
           <label>
             Username:
-            <input />
+            <input
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              required
+            />
           </label>
           <label>
             Password:
-            <input type="password" />
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
           </label>
           <label>
             Re-Enter Password:
-            <input type="password" />
+            <input
+              value={passwordChecker}
+              type="password"
+              onChange={e => setPasswordChecker(e.target.value)}
+            />
           </label>
           <button type="button" onClick={submit}>
             Create account

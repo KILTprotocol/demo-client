@@ -1,9 +1,13 @@
 import React, { useState } from 'react'
 import RegistrationModal from '../RegistrationModal/RegistrationModal'
 import './Login.scss'
+import '../../App.scss'
 
 const Login: React.FC = () => {
   const [registrationType, setRegistrationType] = useState(false)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+
   const registration = (): void => {
     setRegistrationType(true)
   }
@@ -17,14 +21,24 @@ const Login: React.FC = () => {
   }
 
   return (
-    <>
+    <section className="App">
       {!registrationType && (
         <form className="Login">
           <label>
-            Username: <input type="user" />
+            Username:{' '}
+            <input
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              required
+            />
           </label>
           <label>
-            Password: <input type="password" />
+            Password:{' '}
+            <input
+              value={password}
+              type="password"
+              onChange={e => setPassword(e.target.value)}
+            />
           </label>
           <button type="button" className="link" onClick={registration}>
             Create new Account
@@ -37,7 +51,7 @@ const Login: React.FC = () => {
       {registrationType && (
         <RegistrationModal showOnInit={registrationType} onClose={onClose} />
       )}
-    </>
+    </section>
   )
 }
 
