@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { notifyFailure } from '../../services/FeedbackService'
 import Modal, { ModalType } from '../../components/Modal/Modal'
 import './RegistrationModal.scss'
 
@@ -13,6 +14,22 @@ const RegistrationModal: React.FC<Props> = ({ showOnInit, onClose }) => {
   const [passwordChecker, setPasswordChecker] = useState('')
 
   const submit = (): void => {
+    if (!password || !username) {
+      notifyFailure('Please enter a username and password')
+      throw new Error('Please enter a username and password')
+    }
+    if (username.length <= 8) {
+      notifyFailure('Username must be 8 characters or greater')
+      throw new Error('Username must be 8 characters or greater')
+    }
+    if (password !== passwordChecker) {
+      notifyFailure('Passwords do not match')
+      throw new Error('Passwords do not match')
+    }
+    if (password.length <= 12) {
+      notifyFailure('Password must be 12 characters or greater')
+      throw new Error('Password must be 12 characters or greater')
+    }
     console.log('submit')
   }
 

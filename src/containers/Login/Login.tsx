@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import RegistrationModal from '../RegistrationModal/RegistrationModal'
+import { notifyFailure } from '../../services/FeedbackService'
+
 import './Login.scss'
 import '../../App.scss'
 
@@ -13,6 +15,15 @@ const Login: React.FC = () => {
   }
 
   const submit = (): void => {
+    // This will be changed to access the localstorage. From the username and salt.
+    // Will add the salt and password hashing.
+    const fakePassword = 'password'
+    if (password !== fakePassword) {
+      notifyFailure(
+        `Username Passwords do not match. Please, enter the correct password for ${username}`
+      )
+      throw new Error('Username Passwords do not match.')
+    }
     console.log('confirmed')
   }
 
@@ -40,9 +51,9 @@ const Login: React.FC = () => {
               onChange={e => setPassword(e.target.value)}
             />
           </label>
-          <button type="button" className="link" onClick={registration}>
+          <a type="button" className="link" onClick={registration}>
             Create new Account
-          </button>
+          </a>
           <button type="button" className="confirm" onClick={submit}>
             Login
           </button>
