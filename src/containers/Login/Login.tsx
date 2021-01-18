@@ -6,12 +6,12 @@ import './Login.scss'
 import '../../App.scss'
 
 const Login: React.FC = () => {
-  const [registrationType, setRegistrationType] = useState(false)
+  const [register, setRegister] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
   const registration = (): void => {
-    setRegistrationType(true)
+    setRegister(true)
   }
 
   const submit = (): void => {
@@ -28,12 +28,12 @@ const Login: React.FC = () => {
   }
 
   const onClose = (): void => {
-    setRegistrationType(false)
+    setRegister(false)
   }
 
   return (
     <section className="App">
-      {!registrationType && (
+      {!register && (
         <form className="Login">
           <label>
             Username:{' '}
@@ -59,8 +59,8 @@ const Login: React.FC = () => {
           </button>
         </form>
       )}
-      {registrationType && (
-        <RegistrationModal showOnInit={registrationType} onClose={onClose} />
+      {register && (
+        <RegistrationModal showOnInit={register} onClose={onClose} />
       )}
     </section>
   )
