@@ -51,7 +51,7 @@ type SerializedState = {
   wallet: Wallet.SerializedState
 }
 
-class PersistentStore {
+export class PersistentStore {
   public get store(): Store {
     return this.storeInternal
   }
@@ -92,41 +92,86 @@ class PersistentStore {
 
   private storeInternal: Store
 
-  public async init(): Promise<Store> {
-    const localState = localStorage.getItem(PersistentStore.NAME)
-    let salt = localStorage.getItem(PersistentStore.SALT)
+  public static createSalt(): void {
+    const salt = u8aToHex(nacl.randomBytes(24))
+    localStorage.setItem(PersistentStore.SALT, salt)
+  }
 
-    if (!salt) {
-      salt = u8aToHex(nacl.randomBytes(24))
-      localStorage.setItem(PersistentStore.SALT, salt)
-    }
+  public static async createLocalState(password: string): Promise<void> {
+    const hashedPassword = await PersistentStore.getHashedPassword(password)
+    const combinedReducers = PersistentStore.getCombinedReducers()
+    const state = combinedReducers({} as State, { type: '' })
+    PersistentStore.serializeEncryptAndStore(state, hashedPassword)
+  }
 
-    const password = await passwordHashing('password', salt)
-    let persistedState: Partial<State> = {}
-    if (localState) {
-      try {
-        const decryptedState = decryption(localState, password)
-        if (decryptedState) {
-          persistedState = await PersistentStore.deserialize(decryptedState)
-        }
-      } catch (error) {
-        console.error('Could not construct persistentStore', error)
-      }
-    }
+  public static getLocalState(): string | null {
+    return localStorage.getItem(PersistentStore.NAME)
+  }
+
+  public static getLocalSalt(): string | null {
+    return localStorage.getItem(PersistentStore.SALT)
+  }
+
+  public static async getHashedPassword(password: string): Promise<Uint8Array> {
+    const salt = PersistentStore.getLocalSalt()
+    if (!salt) throw new Error('No password salt found')
+
+    return passwordHashing(password, salt)
+  }
+
+  public static async decrypt(password: string): Promise<string | null> {
+    const localState = PersistentStore.getLocalState()
+
+    const hashedPassword = await PersistentStore.getHashedPassword(password)
+    if (!localState) throw new Error('LocalState not found')
+
+    return decryption(localState, hashedPassword)
+  }
+
+  public static async decryptAndDeserialize(
+    password: string
+  ): Promise<Partial<State>> {
+    const decryptedState = await PersistentStore.decrypt(password)
+    if (!decryptedState) throw new Error('Store could not be decrypted')
+    const persistedState = await PersistentStore.deserialize(decryptedState)
+
+    return persistedState
+  }
+
+  public static serializeEncryptAndStore(
+    state: State,
+    hashedPassword: Uint8Array
+  ) {
+    const serializedState = PersistentStore.serialize(state)
+    const encryptedState = encryption(serializedState, hashedPassword)
+    localStorage.setItem(PersistentStore.NAME, JSON.stringify(encryptedState))
+  }
+
+  public static clearLocalStorage(): void {
+    localStorage.removeItem(PersistentStore.NAME)
+    localStorage.removeItem(PersistentStore.SALT)
+  }
+
+  public static getCombinedReducers() {
+    return combineReducers({
+      attestations: Attestations.Store.reducer,
+      balances: Balances.Store.reducer,
+      cTypes: CTypes.Store.reducer,
+      claims: Claims.Store.reducer,
+      contacts: Contacts.Store.reducer,
+      delegations: Delegations.Store.reducer,
+      parameters: Parameters.Store.reducer,
+      quotes: Quotes.Store.reducer,
+      uiState: UiState.Store.reducer,
+      wallet: Wallet.Store.reducer,
+    })
+  }
+
+  public async init(password: string): Promise<Store> {
+    const persistedState = await PersistentStore.decryptAndDeserialize(password)
 
     this.storeInternal = createStore(
-      combineReducers({
-        attestations: Attestations.Store.reducer,
-        balances: Balances.Store.reducer,
-        cTypes: CTypes.Store.reducer,
-        claims: Claims.Store.reducer,
-        contacts: Contacts.Store.reducer,
-        delegations: Delegations.Store.reducer,
-        parameters: Parameters.Store.reducer,
-        quotes: Quotes.Store.reducer,
-        uiState: UiState.Store.reducer,
-        wallet: Wallet.Store.reducer,
-      }),
+      PersistentStore.getCombinedReducers(),
       persistedState,
       // eslint-disable-next-line no-underscore-dangle
       window.__REDUX_DEVTOOLS_EXTENSION__ &&
@@ -134,12 +179,12 @@ class PersistentStore {
         window.__REDUX_DEVTOOLS_EXTENSION__()
     )
 
+    const hashedPassword = await PersistentStore.getHashedPassword(password)
     this.storeInternal.subscribe(() => {
-      const serializedState = PersistentStore.serialize(
-        this.storeInternal.getState()
+      PersistentStore.serializeEncryptAndStore(
+        this.storeInternal.getState(),
+        hashedPassword
       )
-      const encryptedState = encryption(serializedState, password)
-      localStorage.setItem(PersistentStore.NAME, JSON.stringify(encryptedState))
     })
 
     return this.storeInternal
