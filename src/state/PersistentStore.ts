@@ -141,7 +141,7 @@ export class PersistentStore {
   public static serializeEncryptAndStore(
     state: State,
     hashedPassword: Uint8Array
-  ) {
+  ): void {
     const serializedState = PersistentStore.serialize(state)
     const encryptedState = encryption(serializedState, hashedPassword)
     localStorage.setItem(PersistentStore.NAME, JSON.stringify(encryptedState))
@@ -152,6 +152,7 @@ export class PersistentStore {
     localStorage.removeItem(PersistentStore.SALT)
   }
 
+  /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
   public static getCombinedReducers() {
     return combineReducers({
       attestations: Attestations.Store.reducer,
