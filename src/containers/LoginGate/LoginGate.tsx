@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
-import Login from '../Login/Login'
-import Register from '../Register/Register'
+import Login from '../../components/Login/Login'
+import Register from '../../components/Register/Register'
 import { PersistentStore } from '../../state/PersistentStore'
 import PasswordContext from '../../utils/PasswordContext/PasswordContext'
 
