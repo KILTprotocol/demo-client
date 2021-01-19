@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { notifyFailure } from '../../services/FeedbackService'
 import Modal, { ModalType } from '../../components/Modal/Modal'
-import './RegistrationModal.scss'
+// import './RegistrationModal.scss'
 
 type Props = {
   showOnInit: boolean

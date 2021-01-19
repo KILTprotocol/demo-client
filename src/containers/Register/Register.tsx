@@ -1,18 +1,17 @@
 import React, { useState } from 'react'
 
-// import './Login.scss'
 import '../../App.scss'
 
 type Props = {
   submit: (password: string) => void
 }
 
-const Login: React.FC<Props> = ({ submit }) => {
+const Register: React.FC<Props> = ({ submit }) => {
   const [password, setPassword] = useState('')
 
   return (
     <section className="App">
-      Existing User -- Please login
+      New User -- Please create password
       <form
         className="Login"
         onSubmit={e => {
@@ -36,4 +35,4 @@ const Login: React.FC<Props> = ({ submit }) => {
   )
 }
 
-export default Login
+export default Register
