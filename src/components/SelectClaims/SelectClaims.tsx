@@ -5,7 +5,7 @@ import { Config } from 'react-select/lib/filters'
 
 import * as Claims from '../../state/ducks/Claims'
 import * as UiState from '../../state/ducks/UiState'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import SelectCTypesModal from '../Modal/SelectCTypesModal'
 
@@ -66,13 +66,13 @@ class SelectClaims extends React.Component<Props, State> {
       if (cTypeHash) {
         this.setState({
           claims: Claims.getClaimsByCTypeHash(
-            PersistentStore.store.getState(),
+            persistentStoreInstance.store.getState(),
             cTypeHash
           ),
         })
       } else {
         this.setState({
-          claims: Claims.getClaims(PersistentStore.store.getState()),
+          claims: Claims.getClaims(persistentStoreInstance.store.getState()),
         })
       }
     }
@@ -135,7 +135,7 @@ class SelectClaims extends React.Component<Props, State> {
   private goToClaimCreate(cTypeHash: ICType['cType']['hash']): void {
     const { history } = this.props
     // remove maybe opened Task modal
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
         objective: undefined,
         props: undefined,
@@ -167,11 +167,13 @@ class SelectClaims extends React.Component<Props, State> {
       selectedClaims = claims
     } else if (cTypeHash) {
       selectedClaims = Claims.getClaimsByCTypeHash(
-        PersistentStore.store.getState(),
+        persistentStoreInstance.store.getState(),
         cTypeHash
       )
     } else {
-      selectedClaims = Claims.getClaims(PersistentStore.store.getState())
+      selectedClaims = Claims.getClaims(
+        persistentStoreInstance.store.getState()
+      )
     }
 
     const options: SelectOption[] = selectedClaims.map(

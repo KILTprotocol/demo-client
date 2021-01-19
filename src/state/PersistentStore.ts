@@ -151,4 +151,4 @@ class PersistentStore {
   }
 }
 
-export default new PersistentStore()
+export const persistentStoreInstance = new PersistentStore()

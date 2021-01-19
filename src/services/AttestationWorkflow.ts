@@ -23,7 +23,7 @@ import {
 import AttestationService from './AttestationService'
 import { IMyDelegation } from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
-import persistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 import { IContact } from '../types/Contact'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
@@ -130,7 +130,7 @@ class AttestationWorkflow {
     quoteAttesterSigned?: IQuoteAgreement
   ): Promise<void> {
     const { identity } = Wallet.getSelectedIdentity(
-      persistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     )
 
     const requestForAttestation = await RequestForAttestation.fromClaimAndIdentity(

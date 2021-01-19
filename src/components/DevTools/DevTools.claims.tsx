@@ -1,7 +1,7 @@
 import { Claim, CType, IClaim } from '@kiltprotocol/sdk-js'
 
 import * as Claims from '../../state/ducks/Claims'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { BsCType, BsCTypesPool } from './DevTools.ctypes'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 
@@ -34,7 +34,7 @@ class BsClaim {
       identity.identity.address
     )
 
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Claims.Store.saveAction(claim, { alias: bsClaimData.alias })
     )
 
@@ -72,7 +72,7 @@ class BsClaim {
     const bsClaim = await BsClaim.getBsClaimByKey(bsClaimKey)
     BsIdentity.selectIdentity(await BsIdentity.getByKey(bsClaim.claimerKey))
     const myClaims: Claims.Entry[] = Claims.getClaims(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     )
     const myClaim: Claims.Entry | undefined = myClaims.find(
       (claim: Claims.Entry) => claim.meta.alias === bsClaim.alias

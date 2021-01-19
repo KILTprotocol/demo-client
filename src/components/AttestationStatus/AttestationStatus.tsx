@@ -6,7 +6,8 @@ import AttestationService from '../../services/AttestationService'
 import * as Claims from '../../state/ducks/Claims'
 import * as UiState from '../../state/ducks/UiState'
 import * as Attestations from '../../state/ducks/Attestations'
-import PersistentStore, {
+import {
+  persistentStoreInstance,
   State as ReduxState,
 } from '../../state/PersistentStore'
 import Spinner from '../Spinner/Spinner'
@@ -99,11 +100,11 @@ class AttestationStatus extends React.Component<Props, State> {
           status: STATUS.UNVERIFIED,
         })
         if (isAttestedClaim(attestation)) {
-          PersistentStore.store.dispatch(
+          persistentStoreInstance.store.dispatch(
             Claims.Store.revokeAttestation(attestation.request.rootHash)
           )
         } else {
-          PersistentStore.store.dispatch(
+          persistentStoreInstance.store.dispatch(
             Attestations.Store.revokeAttestation(attestation.claimHash)
           )
         }

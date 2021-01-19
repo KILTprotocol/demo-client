@@ -11,7 +11,7 @@ import ContactPresentation from '../components/ContactPresentation/ContactPresen
 import KiltToken from '../components/KiltToken/KiltToken'
 import * as Balances from '../state/ducks/Balances'
 import * as Wallet from '../state/ducks/Wallet'
-import PersistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 import errorService from './ErrorService'
 import { IContact, IMyIdentity } from '../types/Contact'
 import { notify, notifySuccess, notifyFailure } from './FeedbackService'
@@ -27,7 +27,7 @@ class BalanceUtilities {
   public static connect(myIdentity: IMyIdentity): void {
     if (
       Balances.getBalance(
-        PersistentStore.store.getState(),
+        persistentStoreInstance.store.getState(),
         myIdentity.identity.address
       ) == null
     ) {
@@ -51,7 +51,7 @@ class BalanceUtilities {
   }
 
   public static connectMyIdentities(
-    store: Store = PersistentStore.store
+    store: Store = persistentStoreInstance.store
   ): void {
     Wallet.getAllIdentities(store.getState()).forEach(
       (myIdentity: IMyIdentity) => {
@@ -130,7 +130,7 @@ class BalanceUtilities {
         </div>
       )
     }
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Balances.Store.updateBalance(account, balance)
     )
   }

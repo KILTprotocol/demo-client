@@ -21,7 +21,7 @@ import Code from '../components/Code/Code'
 import { ModalType } from '../components/Modal/Modal'
 import * as UiState from '../state/ducks/UiState'
 import * as Wallet from '../state/ducks/Wallet'
-import PersistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 import { IContact, IMyIdentity } from '../types/Contact'
 import { ICType } from '../types/Ctype'
 import { IBlockingNotification, NotificationType } from '../types/UserFeedback'
@@ -58,7 +58,7 @@ class MessageRepository {
     messageBody: MessageBody
   ): Promise<void> {
     const sender: IMyIdentity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     )
     const receiversAsArray = Array.isArray(receivers) ? receivers : [receivers]
     const requests = receiversAsArray.reduce(
@@ -309,7 +309,9 @@ class MessageRepository {
   }
 
   private static async handleDebugMode(message: Message): Promise<Message> {
-    const debugMode = UiState.getDebugMode(PersistentStore.store.getState())
+    const debugMode = UiState.getDebugMode(
+      persistentStoreInstance.store.getState()
+    )
 
     let manipulatedMessage = cloneDeep(message)
 
