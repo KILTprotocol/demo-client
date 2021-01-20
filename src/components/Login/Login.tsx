@@ -1,8 +1,5 @@
 import React, { useState } from 'react'
 
-// import './Login.scss'
-import '../../App.scss'
-
 type Props = {
   submit: (password: string) => void
 }
@@ -11,10 +8,10 @@ const Login: React.FC<Props> = ({ submit }) => {
   const [password, setPassword] = useState('')
 
   return (
-    <section className="App">
-      Existing User -- Please login
+    <section>
+      <h2>Existing User</h2>
+      Please login
       <form
-        className="Login"
         onSubmit={e => {
           e.preventDefault()
           submit(password)
@@ -28,9 +25,7 @@ const Login: React.FC<Props> = ({ submit }) => {
             onChange={e => setPassword(e.target.value)}
           />
         </label>
-        <button type="submit" className="confirm">
-          Login
-        </button>
+        <button type="submit">Login</button>
       </form>
     </section>
   )

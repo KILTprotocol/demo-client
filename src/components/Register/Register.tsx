@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 
-import '../../App.scss'
-
 type Props = {
   submit: (password: string) => void
 }
@@ -10,8 +8,9 @@ const Register: React.FC<Props> = ({ submit }) => {
   const [password, setPassword] = useState('')
 
   return (
-    <section className="App">
-      New User -- Please create password
+    <section>
+      <h2>New User</h2>
+      Please create password
       <form
         className="Login"
         onSubmit={e => {
