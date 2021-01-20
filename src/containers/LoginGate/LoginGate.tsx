@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Modal, { ModalType } from '../../components/Modal/Modal'
 import logo from '../../assets/kilt_negative.svg'
 
 import Login from '../../components/Login/Login'
@@ -16,23 +17,12 @@ const LoginGate: React.FC = ({ children }) => {
   const register = async (newPassword: string): Promise<void> => {
     PersistentStore.createSalt()
     await PersistentStore.createLocalState(newPassword)
-    if (!newPassword) {
-      setErrorMessage('Please, enter a password')
-      // throw new Error('Please, enter a password')
-      return setError(true)
-    }
-    if (newPassword.length <= 12) {
-      setErrorMessage('Password must be 12 characters or greater')
-      // throw new Error('Password must be 12 characters or greater')
-      return setError(true)
-    }
     return setPassword(newPassword)
   }
 
   const login = async (newPassword: string): Promise<void> => {
     if (!newPassword) {
       setErrorMessage('Please, enter a password')
-      // throw new Error('Please enter a password')
       return setError(true)
     }
     const decrypted = await PersistentStore.decrypt(newPassword)
@@ -65,7 +55,6 @@ const LoginGate: React.FC = ({ children }) => {
             </div>
             <h1>Client Login</h1>
             <Register submit={register} />
-            {errorMessage}
           </div>
         </section>
       )
@@ -82,12 +71,18 @@ const LoginGate: React.FC = ({ children }) => {
           <h1>Client Login</h1>
           <Login submit={login} />
           {error && (
-            <div className="container">
+            <Modal
+              type={ModalType.BLANK}
+              header="Error"
+              showOnInit
+              className="small"
+              onCancel={() => setError(false)}
+            >
               {errorMessage}
               <button type="button" onClick={clear} className="clear">
                 Clear Storage
               </button>
-            </div>
+            </Modal>
           )}
         </div>
       </section>

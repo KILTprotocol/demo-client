@@ -10,7 +10,7 @@ const Login: React.FC<Props> = ({ submit }) => {
   return (
     <section>
       <h2>Existing User</h2>
-      Please login
+      <p>Please login</p>
       <form
         onSubmit={e => {
           e.preventDefault()

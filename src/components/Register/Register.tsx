@@ -6,16 +6,38 @@ type Props = {
 
 const Register: React.FC<Props> = ({ submit }) => {
   const [password, setPassword] = useState('')
+  const [error, setError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const handleSubmit = (): void => {
+    if (!password) {
+      setErrorMessage('Please, enter a password')
+      return setError(true)
+    }
+    if (password.length <= 12) {
+      setErrorMessage('Password must be 12 characters or greater')
+      return setError(true)
+    }
+    // Allows all ASCII characters
+    const regex = /[ -~]/
+    if (!regex.test(password)) {
+      setErrorMessage(
+        'Only characters 0-9, upper case and lower case a-z and ! - ~'
+      )
+      return setError(true)
+    }
+    return submit(password)
+  }
 
   return (
     <section>
       <h2>New User</h2>
-      Please create password
+      <p>Please create password</p>
       <form
         className="Login"
         onSubmit={e => {
           e.preventDefault()
-          submit(password)
+          handleSubmit()
         }}
       >
         <label>
@@ -30,6 +52,7 @@ const Register: React.FC<Props> = ({ submit }) => {
           Login
         </button>
       </form>
+      {error && <p>{errorMessage}</p>}
     </section>
   )
 }

@@ -6,6 +6,9 @@
     top: 0;
     left: 0;
     background: $color-purple;
+    justify-content: center;
+    position: relative;
+    display: flex;
   }
 
   & > .container {
@@ -28,26 +31,51 @@
     }
   }
 
+  & h1 {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  & h2 {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  & p {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   & form {
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 1%
+    padding: 1%;
   }
 
   & button {
     @include button-primary;
-    margin: 1%;
+    margin: 2%;
   }
+  
   & input {
     flex-grow: 1;
     margin: {
       right: $base-padding/2;
     }
   }
+
   & .clear {
     @include button-secondary;
+    margin: 2%;
+    position: relative;
   }
 }
