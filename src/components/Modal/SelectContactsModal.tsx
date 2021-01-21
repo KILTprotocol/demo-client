@@ -5,7 +5,6 @@ import SelectContacts from '../SelectContacts/SelectContacts'
 import Modal, { ModalType } from './Modal'
 
 type Props = {
-  allContacts?: boolean
   closeMenuOnSelect?: boolean
   contacts?: IContact[]
   header?: string | ReactNode
@@ -68,7 +67,6 @@ class SelectContactsModal extends React.Component<Props, State> {
 
   public render(): JSX.Element {
     const {
-      allContacts,
       closeMenuOnSelect,
       contacts,
       header,
@@ -109,7 +107,6 @@ class SelectContactsModal extends React.Component<Props, State> {
       >
         <div>
           <SelectContacts
-            allContacts={allContacts}
             contacts={contacts as IContact[]}
             name={name as string}
             isMulti={isMulti}

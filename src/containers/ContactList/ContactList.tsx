@@ -4,7 +4,6 @@ import { connect, MapStateToProps } from 'react-redux'
 
 import ContactPresentation from '../../components/ContactPresentation/ContactPresentation'
 import ContactRepository from '../../services/ContactRepository'
-import errorService from '../../services/ErrorService'
 import * as Contacts from '../../state/ducks/Contacts'
 import { State as ReduxState } from '../../state/PersistentStore'
 import { IContact } from '../../types/Contact'
@@ -18,9 +17,6 @@ type StateProps = {
 type Props = StateProps
 
 type State = {
-  allContacts: IContact[]
-
-  showAllContacts?: boolean
   importViaDID: {
     alias: string
     didAddress: string
@@ -31,15 +27,12 @@ class ContactList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      allContacts: [],
       importViaDID: {
         alias: '',
         didAddress: '',
       },
     }
 
-    this.toggleContacts = this.toggleContacts.bind(this)
-    this.fetchAllContacts = this.fetchAllContacts.bind(this)
     this.importViaDID = this.importViaDID.bind(this)
   }
 
@@ -127,81 +120,15 @@ class ContactList extends React.Component<Props, State> {
     }
   }
 
-  private toggleContacts(): void {
-    const { showAllContacts } = this.state
-
-    this.setState({ showAllContacts: !showAllContacts })
-
-    if (!showAllContacts) {
-      this.fetchAllContacts()
-    }
-  }
-
-  private fetchAllContacts(): void {
-    ContactRepository.findAll()
-      .then((allContacts: IContact[]) => {
-        this.setState({ allContacts })
-      })
-      .catch(error => {
-        errorService.log({
-          error,
-          message: 'Could not fetch allContacts',
-          origin: 'ContactList.componentDidMount()',
-          type: 'ERROR.FETCH.GET',
-        })
-      })
-  }
-
   public render(): JSX.Element {
     const { myContacts } = this.props
-    const { allContacts, showAllContacts } = this.state
 
-    const contacts = showAllContacts ? allContacts : myContacts
-    const noContactsMessage = showAllContacts ? (
-      <div className="noContactsMessage">No contacts found.</div>
-    ) : (
-      <div className="noContactsMessage">
-        No bookmarked contacts found.{' '}
-        <button
-          type="button"
-          className="allContacts"
-          onClick={this.toggleContacts}
-        >
-          Fetch all contacts
-        </button>
-      </div>
-    )
+    const contacts = myContacts
 
     return (
       <section className="ContactList">
-        <h1>{showAllContacts ? 'All contacts' : 'My contacts'}</h1>
-        <div className="contactActions">
-          {showAllContacts && (
-            <>
-              <button
-                type="button"
-                className="refresh"
-                onClick={this.fetchAllContacts}
-              />
-              <button
-                type="button"
-                className="toggleContacts"
-                onClick={this.toggleContacts}
-              >
-                My contacts
-              </button>
-            </>
-          )}
-          {!showAllContacts && (
-            <button
-              type="button"
-              className="toggleContacts"
-              onClick={this.toggleContacts}
-            >
-              All contacts
-            </button>
-          )}
-        </div>
+        <h1>My contacts</h1>
+        <div className="contactActions" />
         <table>
           <thead>
             <tr>
@@ -211,7 +138,9 @@ class ContactList extends React.Component<Props, State> {
           <tbody>
             {!contacts.length && (
               <tr>
-                <td>{noContactsMessage}</td>
+                <td>
+                  <div className="noContactsMessage">No contacts found.</div>
+                </td>
               </tr>
             )}
             {!!contacts.length &&

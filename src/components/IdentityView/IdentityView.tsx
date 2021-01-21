@@ -249,11 +249,6 @@ class IdentityView extends React.Component<Props, State> {
               Delete DID
             </button>
           )}
-          {(!contact || (contact && contact.metaData.unregistered)) && (
-            <button type="button" onClick={this.registerContact}>
-              Register Global Contact
-            </button>
-          )}
           <button
             type="button"
             className={`toggleContacts ${

@@ -17,7 +17,6 @@ type SelectOption = {
 }
 
 type Props = {
-  allContacts?: boolean
   closeMenuOnSelect?: boolean
   contacts?: IContact[]
   isMulti?: boolean
@@ -61,26 +60,17 @@ class SelectContacts extends React.Component<Props, State> {
   }
 
   public componentDidMount(): void {
-    const { allContacts } = this.props
     const { contacts } = this.state
 
     if (!contacts.length) {
-      if (allContacts) {
-        ContactRepository.findAll().then(_contacts => {
-          this.setState({ contacts: _contacts }, () => {
-            this.initPreSelection()
-          })
-        })
-      } else {
-        this.setState(
-          {
-            contacts: Contacts.getMyContacts(PersistentStore.store.getState()),
-          },
-          () => {
-            this.initPreSelection()
-          }
-        )
-      }
+      this.setState(
+        {
+          contacts: Contacts.getMyContacts(PersistentStore.store.getState()),
+        },
+        () => {
+          this.initPreSelection()
+        }
+      )
     } else {
       this.initPreSelection()
     }

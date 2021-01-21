@@ -13,30 +13,6 @@ import { notifyFailure } from './FeedbackService'
 class ContactRepository {
   public static readonly URL = `${window._env_.REACT_APP_SERVICE_HOST}/contacts`
 
-  public static async findAll(): Promise<IContact[]> {
-    return fetch(`${ContactRepository.URL}`)
-      .then(response => {
-        if (!response.ok) {
-          throw Error(response.statusText)
-        }
-        return response
-      })
-      .then(response => response.json())
-      .then((contacts: IContact[]) => {
-        PersistentStore.store.dispatch(Contacts.Store.addContacts(contacts))
-        return Contacts.getContacts(PersistentStore.store.getState())
-      })
-      .catch(error => {
-        ErrorService.log({
-          error,
-          message: `Could not resolve contacts'`,
-          origin: 'ContactRepository.findAll()',
-          type: 'ERROR.FETCH.GET',
-        })
-        return error
-      })
-  }
-
   public static async findByAddress(
     address: string,
     propagateError = false
