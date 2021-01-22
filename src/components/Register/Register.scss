@@ -1,0 +1,35 @@
+.Register {
+  & form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1%;
+  }
+
+  & p {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  & h2 {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  & button {
+    @include button-primary;
+    margin: 2%;
+  }
+
+  & input {
+    flex-grow: 1;
+    margin: {
+      right: $base-padding/2;
+    }
+  }
+}
