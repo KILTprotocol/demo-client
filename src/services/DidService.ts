@@ -1,6 +1,7 @@
 import {
   BlockchainUtils,
   Did,
+  Identity,
   IDid,
   IPublicIdentity,
   IURLResolver,
@@ -17,6 +18,23 @@ const { IS_IN_BLOCK } = BlockchainUtils
 
 class DidService {
   public static readonly URL = `${window._env_.REACT_APP_SERVICE_HOST}/contacts/did`
+
+  public static async fetchDID(
+    identity: Identity
+  ): Promise<IDidDocumentSigned | null> {
+    const did = await Did.queryByAddress(identity.address)
+    if (did) {
+      const didDocument = Did.createDefaultDidDocument(
+        did.identifier,
+        did.publicBoxKey,
+        did.publicSigningKey,
+        did.documentStore || undefined
+      )
+      return Did.signDidDocument(didDocument, identity)
+    }
+
+    return did
+  }
 
   public static async resolveDid(
     identifier: string

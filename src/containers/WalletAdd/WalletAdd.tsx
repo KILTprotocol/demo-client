@@ -4,6 +4,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
+import DidService from '../../services/DidService'
 
 import Input from '../../components/Input/Input'
 import { BalanceUtilities } from '../../services/BalanceUtilities'
@@ -69,6 +70,7 @@ class WalletAdd extends React.Component<Props, State> {
     const { history, saveIdentity } = this.props
 
     let identity
+    let did
     const phrase = useMyPhrase ? myPhrase : randomPhrase
     try {
       identity = await Identity.buildFromMnemonic(phrase)
@@ -84,12 +86,22 @@ class WalletAdd extends React.Component<Props, State> {
     notify(`Creation of identity '${alias}' initiated.`)
     history.push('/wallet')
 
+    const didcheck = await DidService.fetchDID(identity)
+
+    if (didcheck) {
+      did = didcheck
+    }
+
     const newIdentity: IMyIdentity = {
       identity,
       metaData: {
         name: alias,
       },
       phrase,
+      did: {
+        identifier: did?.id,
+        document: did,
+      },
     }
     saveIdentity(newIdentity)
     PersistentStore.store.dispatch(
