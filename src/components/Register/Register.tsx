@@ -15,7 +15,7 @@ const Register: React.FC<Props> = ({ submit }) => {
       setErrorMessage('Please, enter a password')
       return setError(true)
     }
-    if (password.length <= 12) {
+    if (password.length <= 11) {
       setErrorMessage('Password must be 12 characters or greater')
       return setError(true)
     }
@@ -41,17 +41,21 @@ const Register: React.FC<Props> = ({ submit }) => {
           handleSubmit()
         }}
       >
-        <label>
-          Password:{' '}
-          <input
-            value={password}
-            type="password"
-            onChange={e => setPassword(e.target.value)}
-          />
-        </label>
-        <button type="submit" className="confirm">
-          Login
-        </button>
+        <div>
+          <label>
+            Password{' '}
+            <div>
+              <input
+                value={password}
+                type="password"
+                onChange={e => setPassword(e.target.value)}
+              />
+            </div>
+          </label>
+          <button type="submit" className="confirm">
+            Login
+          </button>
+        </div>
       </form>
       {error && <p>{errorMessage}</p>}
     </section>

@@ -8,6 +8,10 @@
     padding: 1%;
   }
 
+  & label {
+    font-weight: 600;
+  }
+
   & p {
     position: relative;
     display: flex;
@@ -31,5 +35,7 @@
     margin: {
       right: $base-padding/2;
     }
+    margin-bottom: 5px;
+    margin-top: 5px;
   }
 }

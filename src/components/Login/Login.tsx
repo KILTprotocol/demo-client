@@ -18,14 +18,18 @@ const Login: React.FC<Props> = ({ submit }) => {
           submit(password)
         }}
       >
-        <label>
-          Password:{' '}
-          <input
-            value={password}
-            type="password"
-            onChange={e => setPassword(e.target.value)}
-          />
-        </label>
+        <div>
+          <label>
+            Password{' '}
+            <div>
+              <input
+                value={password}
+                type="password"
+                onChange={e => setPassword(e.target.value)}
+              />
+            </div>
+          </label>
+        </div>
         <button type="submit">Login</button>
       </form>
     </section>

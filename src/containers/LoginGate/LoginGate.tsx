@@ -79,7 +79,7 @@ const LoginGate: React.FC = ({ children }) => {
               onCancel={() => setError(false)}
             >
               <p>{errorMessage}</p>
-              <p> Forgotten your pasword</p>
+              <p>Forgotten your password?</p>
               <div className="centerDiv">
                 <button type="button" onClick={clear} className="clear">
                   Clear Storage

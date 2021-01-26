@@ -35,8 +35,8 @@
   }
 
   & .logo-id {
-    height: 100px;
-
+    height: 90px;
+    margin: 10px 0;
     & img {
       height: 100%;
       width: auto;
@@ -48,6 +48,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 20px;
   }
 
   & p {
@@ -59,12 +60,10 @@
 
   & button {
     @include button-primary;
-    margin: 2%;
   }
 
   & .clear {
     @include button-secondary;
-    margin: 2%;
     position: relative;
   }
 }
