@@ -53,7 +53,7 @@ const Register: React.FC<Props> = ({ submit }) => {
             </div>
           </label>
           <button type="submit" className="confirm">
-            Login
+            Create Account
           </button>
         </div>
       </form>
