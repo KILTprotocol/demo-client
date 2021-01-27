@@ -15,7 +15,7 @@ const Register: React.FC<Props> = ({ submit }) => {
       setErrorMessage('Please, enter a password')
       return setError(true)
     }
-    if (password.length <= 11) {
+    if (password.length < 12) {
       setErrorMessage('Password must be 12 characters or greater')
       return setError(true)
     }
