@@ -27,13 +27,15 @@
   }
   & button {
     @include button-primary;
+    margin: 2%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   & input {
     flex-grow: 1;
-    margin: {
-      right: $base-padding/2;
-    }
     margin-bottom: 5px;
     margin-top: 5px;
   }
