@@ -13,10 +13,7 @@ import { notifyFailure } from './FeedbackService'
 class ContactRepository {
   public static readonly URL = `${window._env_.REACT_APP_SERVICE_HOST}/contacts`
 
-  public static async findByAddress(
-    address: string,
-    propagateError = false
-  ): Promise<void | IContact> {
+  public static findByAddress(address: string): IContact | null {
     const persistedContact = Contacts.getContact(
       PersistentStore.store.getState(),
       address
@@ -25,24 +22,7 @@ class ContactRepository {
     if (persistedContact) {
       return persistedContact
     }
-
-    return fetch(`${ContactRepository.URL}/${address}`)
-      .then(response => {
-        if (!response.ok) {
-          throw Error(address)
-        }
-        return response
-      })
-      .then(response => response.json())
-      .then((contact: IContact) => {
-        PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
-        return contact
-      })
-      .catch(error => {
-        if (propagateError) {
-          throw error
-        }
-      })
+    return null
   }
 
   public static async add(contact: IContact): Promise<void> {

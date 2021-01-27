@@ -144,21 +144,6 @@ class MessageRepository {
     })
   }
 
-  public static async findByMessageId(
-    messageId: string,
-    myIdentity: Identity
-  ): Promise<IMessage | undefined> {
-    return fetch(
-      `${MessageRepository.URL}/inbox/${myIdentity.signPublicKeyAsHex}/${messageId}`
-    )
-      .then(response => response.json())
-      .then(message => {
-        return ContactRepository.findByAddress(message.senderAddress).then(() =>
-          Message.decrypt(message, myIdentity)
-        )
-      })
-  }
-
   public static async findByMyIdentity(
     myIdentity: Identity
   ): Promise<IMessageOutput[]> {
@@ -167,38 +152,36 @@ class MessageRepository {
       .then((encryptedMessages: IEncryptedMessage[]) => {
         return Promise.any(
           encryptedMessages.map((encryptedMessage: IEncryptedMessage) => {
-            return ContactRepository.findByAddress(
+            let sender = ContactRepository.findByAddress(
               encryptedMessage.senderAddress
-            ).then((contact: IContact) => {
-              try {
-                const m = Message.decrypt(encryptedMessage, myIdentity)
-                Message.ensureOwnerIsSender(m)
-                let sender = contact
-                if (!sender) {
-                  sender = {
-                    metaData: { name: '', unregistered: true },
-                    publicIdentity: {
-                      address: encryptedMessage.senderAddress,
-                      boxPublicKeyAsHex: encryptedMessage.senderBoxPublicKey,
-                    },
-                  }
+            )
+            try {
+              const m = Message.decrypt(encryptedMessage, myIdentity)
+              Message.ensureOwnerIsSender(m)
+              if (!sender) {
+                sender = {
+                  metaData: { name: '', unregistered: true },
+                  publicIdentity: {
+                    address: encryptedMessage.senderAddress,
+                    boxPublicKeyAsHex: encryptedMessage.senderBoxPublicKey,
+                  },
                 }
-
-                return {
-                  ...m,
-                  encryptedMessage,
-                  sender,
-                }
-              } catch (error) {
-                errorService.log({
-                  error,
-                  message: `error on decrypting message: 
-                    ${JSON.stringify(encryptedMessage)}`,
-                  origin: 'MessageRepository.findByMyIdentity()',
-                })
-                return undefined
               }
-            })
+
+              return {
+                ...m,
+                encryptedMessage,
+                sender,
+              }
+            } catch (error) {
+              errorService.log({
+                error,
+                message: `error on decrypting message: 
+                    ${JSON.stringify(encryptedMessage)}`,
+                origin: 'MessageRepository.findByMyIdentity()',
+              })
+              return undefined
+            }
           })
         ).then(result => {
           return result.successes
