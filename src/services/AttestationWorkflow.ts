@@ -171,7 +171,7 @@ class AttestationWorkflow {
     claimerAddress: IContact['publicIdentity']['address'],
     claimerIdentity?: IPublicIdentity
   ): Promise<void> {
-    const claimer = await ContactRepository.findByAddress(claimerAddress)
+    const claimer = ContactRepository.findByAddress(claimerAddress)
     if (!claimer && !claimerIdentity) {
       throw new Error('claimer not found')
     }
