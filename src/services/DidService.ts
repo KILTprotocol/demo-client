@@ -7,11 +7,15 @@ import {
   IURLResolver,
   PublicIdentity,
 } from '@kiltprotocol/sdk-js'
-import { IDidDocumentSigned } from '@kiltprotocol/sdk-js/build/did/Did'
+import {
+  IDidDocument,
+  IDidDocumentSigned,
+} from '@kiltprotocol/sdk-js/build/did/Did'
 import * as Wallet from '../state/ducks/Wallet'
 import persistentStore from '../state/PersistentStore'
 import { IContact, IMyIdentity } from '../types/Contact'
 import ContactRepository from './ContactRepository'
+import { notifyFailure } from './FeedbackService'
 import MessageRepository from './MessageRepository'
 
 const { IS_IN_BLOCK } = BlockchainUtils
@@ -21,19 +25,43 @@ class DidService {
 
   public static async fetchDID(
     identity: Identity
-  ): Promise<IDidDocumentSigned | null> {
-    const did = await Did.queryByAddress(identity.address)
-    if (did) {
-      const didDocument = Did.createDefaultDidDocument(
-        did.identifier,
-        did.publicBoxKey,
-        did.publicSigningKey,
-        did.documentStore || undefined
+  ): Promise<IDidDocument | null> {
+    const didIdentitier = await Did.queryByAddress(identity.address)
+    if (!didIdentitier) {
+      return null
+    }
+    if (!didIdentitier.documentStore) {
+      return Did.createDefaultDidDocument(
+        didIdentitier.identifier,
+        didIdentitier.publicBoxKey,
+        didIdentitier.publicSigningKey
       )
-      return Did.signDidDocument(didDocument, identity)
     }
 
-    return did
+    try {
+      const response = await fetch(didIdentitier.documentStore)
+      if (!response.ok) {
+        throw Error(identity.address)
+      }
+      const contact = await response.json()
+      const { did } = contact
+
+      const verifyDid = Did.verifyDidDocumentSignature(
+        did,
+        didIdentitier.identifier
+      )
+      if (!verifyDid) {
+        notifyFailure('Signature on DID Document could not be verified.', false)
+        return null
+      }
+      return did
+    } catch {
+      notifyFailure(
+        'DID Document could not be fetched from the defined service.',
+        false
+      )
+      return null
+    }
   }
 
   public static async resolveDid(

@@ -14,7 +14,7 @@ import { notify, notifySuccess } from '../../services/FeedbackService'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
 import PersistentStore from '../../state/PersistentStore'
-import { IMyIdentity } from '../../types/Contact'
+import { IContact, IMyIdentity } from '../../types/Contact'
 
 import './WalletAdd.scss'
 
@@ -70,7 +70,6 @@ class WalletAdd extends React.Component<Props, State> {
     const { history, saveIdentity } = this.props
 
     let identity
-    let did
     const phrase = useMyPhrase ? myPhrase : randomPhrase
     try {
       identity = await Identity.buildFromMnemonic(phrase)
@@ -86,23 +85,24 @@ class WalletAdd extends React.Component<Props, State> {
     notify(`Creation of identity '${alias}' initiated.`)
     history.push('/wallet')
 
-    const didcheck = await DidService.fetchDID(identity)
-
-    if (didcheck) {
-      did = didcheck
-    }
-
     const newIdentity: IMyIdentity = {
       identity,
       metaData: {
         name: alias,
       },
       phrase,
-      did: {
-        identifier: did?.id,
-        document: did,
-      },
     }
+
+    const didDocument = await DidService.fetchDID(identity)
+
+    if (didDocument) {
+      const did: IContact['did'] = {
+        identifier: didDocument.id,
+        document: didDocument,
+      }
+      newIdentity.did = did
+    }
+
     saveIdentity(newIdentity)
     PersistentStore.store.dispatch(
       Contacts.Store.addContact(
