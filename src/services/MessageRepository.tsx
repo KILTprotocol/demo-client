@@ -93,9 +93,9 @@ class MessageRepository {
       }
     )
 
-    const filtered = arrayContacts.filter(filterArray)
+    const filteredContacts = arrayContacts.filter(filterArray)
 
-    return MessageRepository.send(filtered, messageBody)
+    return MessageRepository.send(filteredContacts, messageBody)
   }
 
   /**
@@ -143,8 +143,8 @@ class MessageRepository {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
       .then((encryptedMessages: IEncryptedMessage[]) => {
-        return Promise.any(
-          encryptedMessages.map((encryptedMessage: IEncryptedMessage) => {
+        const decryptedMesssages = encryptedMessages.map(
+          (encryptedMessage: IEncryptedMessage) => {
             let sender = ContactRepository.findByAddress(
               encryptedMessage.senderAddress
             )
@@ -175,10 +175,9 @@ class MessageRepository {
               })
               return undefined
             }
-          })
-        ).then(result => {
-          return result.successes
-        })
+          }
+        )
+        return decryptedMesssages.filter(filterArray)
       })
   }
 

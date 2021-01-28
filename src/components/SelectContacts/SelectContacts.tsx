@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
+import filterArray from '../../utils/filterArray'
 
 import ContactRepository from '../../services/ContactRepository'
 import * as Contacts from '../../state/ducks/Contacts'
@@ -125,7 +126,7 @@ class SelectContacts extends React.Component<Props, State> {
     })
   }
 
-  private initPreSelection(): Promise<void> | null {
+  private initPreSelection(): void | null {
     const { preSelectedAddresses, onChange } = this.props
     const { contacts } = this.state
 
@@ -133,37 +134,35 @@ class SelectContacts extends React.Component<Props, State> {
       return null
     }
 
-    const arrayOfPromises = preSelectedAddresses.map(
+    const arrayContacts = preSelectedAddresses.map(
       (selectedAddress: IContact['publicIdentity']['address']) => {
         return ContactRepository.findByAddress(selectedAddress)
       }
     )
 
-    return Promise.any(arrayOfPromises)
-      .then(result => {
-        return result.successes
-      })
-      .then((preSelectedContacts: IContact[]) => {
-        this.setState({ preSelectedContacts }, () => {
-          if (onChange) {
-            onChange(preSelectedContacts)
-          }
-        })
-        // add preSelected contacts to pool if not already contained
-        this.setState({
-          contacts: [
-            ...preSelectedContacts.filter(
-              (preSelectedContact: IContact) =>
-                !contacts.find(
-                  (contact: IContact) =>
-                    contact.publicIdentity.address ===
-                    preSelectedContact.publicIdentity.address
-                )
-            ),
-            ...contacts,
-          ],
-        })
-      })
+    const filteredArray = arrayContacts.filter(filterArray)
+    this.setState({ preSelectedContacts: filteredArray }, () => {
+      if (onChange) {
+        onChange(filteredArray)
+      }
+    })
+
+    // add preSelected contacts to pool if not already contained
+    this.setState({
+      contacts: [
+        ...filteredArray.filter(
+          (preSelectedContact: IContact) =>
+            !contacts.find(
+              (contact: IContact) =>
+                contact.publicIdentity.address ===
+                preSelectedContact.publicIdentity.address
+            )
+        ),
+        ...contacts,
+      ],
+    })
+
+    return null
   }
 
   public render(): JSX.Element {
