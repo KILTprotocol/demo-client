@@ -13,7 +13,8 @@ import FeedbackService, { notifyFailure } from '../../services/FeedbackService'
 
 import * as Balances from '../../state/ducks/Balances'
 import * as Wallet from '../../state/ducks/Wallet'
-import PersistentStore, {
+import {
+  persistentStoreInstance,
   State as ReduxState,
 } from '../../state/PersistentStore'
 import { IContact, IMyIdentity } from '../../types/Contact'
@@ -179,7 +180,7 @@ class Balance extends React.Component<Props, State> {
   private identityCheck(): void {
     const { myIdentity } = this.props
     const selectedIdentity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     )
 
     // the identity of this component might not be the currently selected one

@@ -20,7 +20,7 @@ import FeedbackService, {
 import * as Delegations from '../../state/ducks/Delegations'
 import { IMyDelegation } from '../../state/ducks/Delegations'
 import * as UiState from '../../state/ducks/UiState'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IMyIdentity } from '../../types/Contact'
 import {
   IBlockingNotification,
@@ -75,7 +75,7 @@ type State = {
 
 class DelegationNode extends React.Component<Props, State> {
   private static inviteContactsTo(delegation: IMyDelegation): void {
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
         objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
         props: {
@@ -105,7 +105,7 @@ class DelegationNode extends React.Component<Props, State> {
     const { node } = this.state
 
     const myDelegation = Delegations.getDelegation(
-      PersistentStore.store.getState(),
+      persistentStoreInstance.store.getState(),
       node.delegation.id
     )
 

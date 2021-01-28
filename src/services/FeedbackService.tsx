@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 
 import { ModalType } from '../components/Modal/Modal'
 import * as UiState from '../state/ducks/UiState'
-import persistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 import {
   IBlockingNotification,
   BlockUi,
@@ -42,7 +42,7 @@ class FeedbackService {
     }
 
     // now put this into redux store UiState
-    persistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.addNotificationAction(notification as INotification)
     )
 
@@ -51,7 +51,9 @@ class FeedbackService {
   }
 
   public static removeNotification(id: INotification['id']): void {
-    persistentStore.store.dispatch(UiState.Store.removeNotificationAction(id))
+    persistentStoreInstance.store.dispatch(
+      UiState.Store.removeNotificationAction(id)
+    )
   }
 
   public static addBlockingNotification({
@@ -86,7 +88,7 @@ class FeedbackService {
     }
 
     // now put this into redux store UiState
-    persistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.addBlockingNotificationAction(
         blockingNotification as IBlockingNotification
       )
@@ -99,7 +101,7 @@ class FeedbackService {
   public static removeBlockingNotification(
     id: IBlockingNotification['id']
   ): void {
-    persistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.removeBlockingNotificationAction(id)
     )
   }
@@ -118,7 +120,7 @@ class FeedbackService {
     }
 
     // now put this into redux store UiState
-    persistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.addBlockUiAction(blockUi as BlockUi)
     )
 
@@ -127,14 +129,16 @@ class FeedbackService {
   }
 
   public static removeBlockUi(id: BlockUi['id']): void {
-    persistentStore.store.dispatch(UiState.Store.removeBlockUiAction(id))
+    persistentStoreInstance.store.dispatch(
+      UiState.Store.removeBlockUiAction(id)
+    )
   }
 
   public static updateBlockUi(
     id: BlockUi['id'],
     message: BlockUi['message']
   ): void {
-    persistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.updateBlockUiAction(id, message)
     )
   }

@@ -6,7 +6,8 @@ import * as Balances from '../../state/ducks/Balances'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
 import DidDocumentView from '../../containers/DidDocumentView/DidDocumentView'
-import PersistentStore, {
+import {
+  persistentStoreInstance,
   State as ReduxState,
 } from '../../state/PersistentStore'
 import { IContact, IMyIdentity } from '../../types/Contact'
@@ -78,7 +79,7 @@ class IdentityView extends React.Component<Props, State> {
     const { metaData, publicIdentity } = contact
 
     if (contact.metaData.addedAt) {
-      PersistentStore.store.dispatch(
+      persistentStoreInstance.store.dispatch(
         Contacts.Store.removeMyContact(publicIdentity.address)
       )
     } else {
@@ -86,13 +87,16 @@ class IdentityView extends React.Component<Props, State> {
         metaData: {
           ...metaData,
           addedAt: Date.now(),
-          addedBy: Wallet.getSelectedIdentity(PersistentStore.store.getState())
-            .identity.address,
+          addedBy: Wallet.getSelectedIdentity(
+            persistentStoreInstance.store.getState()
+          ).identity.address,
         },
         publicIdentity,
       } as IContact
 
-      PersistentStore.store.dispatch(Contacts.Store.addContact(myContact))
+      persistentStoreInstance.store.dispatch(
+        Contacts.Store.addContact(myContact)
+      )
     }
   }
 
@@ -116,7 +120,7 @@ class IdentityView extends React.Component<Props, State> {
     let balance = new BN(0)
     if (contact) {
       balance = Balances.getBalance(
-        PersistentStore.store.getState(),
+        persistentStoreInstance.store.getState(),
         contact.publicIdentity.address
       )
     }

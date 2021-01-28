@@ -1,0 +1,42 @@
+.Register {
+  & form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1%;
+  }
+
+  & label {
+    font-weight: 600;
+  }
+
+  & p {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  & h2 {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  & button {
+    @include button-primary;
+    margin: 2%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  & input {
+    flex-grow: 1;
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
+}

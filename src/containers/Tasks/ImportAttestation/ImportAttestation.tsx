@@ -7,7 +7,8 @@ import React, { useState, useEffect } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
 import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView'
-import PersistentStore, {
+import {
+  persistentStoreInstance,
   State as ReduxState,
 } from '../../../state/PersistentStore'
 import { notifySuccess } from '../../../services/FeedbackService'
@@ -128,14 +129,14 @@ const mapStateToProps: MapStateToProps<
 
 const mapDispatchToProps: DispatchProps = {
   addAttestedClaimToClaim: (attestedClaim: IAttestedClaim) =>
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Claims.Store.addAttestedClaim(attestedClaim)
     ),
   removeRequestForAttestation: (
     claimId: Claims.Entry['id'],
     rootHash: IRequestForAttestation['rootHash']
   ) =>
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Claims.Store.removeRequestForAttestation(claimId, rootHash)
     ),
 }

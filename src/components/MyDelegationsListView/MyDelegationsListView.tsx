@@ -6,7 +6,7 @@ import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcce
 import * as Delegations from '../../state/ducks/Delegations'
 import { IMyDelegation } from '../../state/ducks/Delegations'
 import * as UiState from '../../state/ducks/UiState'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import Permissions from '../Permissions/Permissions'
 import SelectDelegationAction from '../SelectDelegationAction/SelectDelegationAction'
@@ -28,7 +28,7 @@ type State = {}
 
 class MyDelegationsListView extends React.Component<Props, State> {
   private static inviteContactsTo(delegation: IMyDelegation): void {
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
         objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
         props: {

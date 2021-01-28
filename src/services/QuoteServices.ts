@@ -10,7 +10,7 @@ import {
   RequestForAttestation,
 } from '@kiltprotocol/sdk-js'
 import * as Quotes from '../state/ducks/Quotes'
-import PersistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 import ErrorService from './ErrorService'
 
 class QuoteServices {
@@ -18,7 +18,7 @@ class QuoteServices {
     quoteEntry: Quotes.QuoteEntry,
     ownerAddress: string
   ): void {
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Quotes.Store.saveAgreedQuote(quoteEntry, ownerAddress)
     )
   }

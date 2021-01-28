@@ -1,17 +1,15 @@
 import React from 'react'
 import * as ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
 
+import LoginGate from './containers/LoginGate/LoginGate'
+import StoreGate from './containers/StoreGate/StoreGate'
 import App from './App'
-import persistentStore from './state/PersistentStore'
 
-// eslint-disable-next-line import/newline-after-import
-;(async () => {
-  const store = await persistentStore.init()
-  ReactDOM.render(
-    <Provider store={store}>
+ReactDOM.render(
+  <LoginGate>
+    <StoreGate>
       <App />
-    </Provider>,
-    document.getElementById('root') as HTMLElement
-  )
-})()
+    </StoreGate>
+  </LoginGate>,
+  document.getElementById('root') as HTMLElement
+)

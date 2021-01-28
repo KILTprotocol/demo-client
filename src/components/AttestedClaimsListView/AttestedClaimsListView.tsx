@@ -1,7 +1,7 @@
 import { IAttestedClaim, IDelegationNode } from '@kiltprotocol/sdk-js'
 import React from 'react'
 
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import AttestedClaimVerificationView from '../AttestedClaimVerificationView/AttestedClaimVerificationView'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -54,7 +54,7 @@ type State = {
 
 class AttestedClaimsListView extends React.Component<Props, State> {
   private static verifyAttestations(): void {
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.refreshAttestationStatusAction()
     )
   }

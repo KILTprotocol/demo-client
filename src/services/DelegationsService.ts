@@ -13,7 +13,7 @@ import { DelegationsTreeNode } from '../components/DelegationNode/DelegationNode
 import { IMyDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
-import PersistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 
 class DelegationsService {
   public static async storeRoot(
@@ -48,13 +48,13 @@ class DelegationsService {
     signature: string
   ): Promise<SubmittableExtrinsic> {
     const selectedIdentity: Identity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     ).identity
     return delegation.store(selectedIdentity, signature)
   }
 
   public static store(delegation: IMyDelegation): void {
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Delegations.Store.saveDelegationAction(delegation)
     )
   }
@@ -136,7 +136,7 @@ class DelegationsService {
     identity: Identity
   ): Promise<void> {
     await node.revoke(identity)
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Delegations.Store.revokeDelegationAction(node.id)
     )
   }
@@ -159,7 +159,7 @@ class DelegationsService {
     delegation: DelegationRootNode
   ): Promise<SubmittableExtrinsic> {
     const selectedIdentity: Identity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     ).identity
     return delegation.store(selectedIdentity)
   }

@@ -13,7 +13,7 @@ import { BsDelegation, BsDelegationsPool } from './DevTools.delegations'
 import { BsIdentitiesPool, BsIdentity } from './DevTools.wallet'
 import * as Wallet from '../../state/ducks/Wallet'
 import * as Balances from '../../state/ducks/Balances'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IMyIdentity } from '../../types/Contact'
 import identitiesPool from './data/identities.json'
 
@@ -128,12 +128,12 @@ class DevTools extends React.Component<Props> {
     ]
 
     const selectedIdentity: IMyIdentity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     )
 
     const balance: BN = selectedIdentity
       ? Balances.getBalance(
-          PersistentStore.store.getState(),
+          persistentStoreInstance.store.getState(),
           selectedIdentity.identity.address
         )
       : new BN(0)

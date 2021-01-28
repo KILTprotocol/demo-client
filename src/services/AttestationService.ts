@@ -12,7 +12,7 @@ import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAtt
 import * as Attestations from '../state/ducks/Attestations'
 import * as Claims from '../state/ducks/Claims'
 import * as Wallet from '../state/ducks/Wallet'
-import persistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 import ErrorService from './ErrorService'
 import { notifySuccess, notifyError } from './FeedbackService'
 
@@ -78,7 +78,7 @@ class AttestationService {
       const tx = await attestation.revoke(selectedIdentity)
       await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
       notifySuccess('Attestation successfully revoked')
-      persistentStore.store.dispatch(
+      persistentStoreInstance.store.dispatch(
         Attestations.Store.revokeAttestation(attestation.claimHash)
       )
     } catch (error) {
@@ -104,7 +104,7 @@ class AttestationService {
     return tx
       .then(() => {
         notifySuccess(`Attestation successfully revoked.`)
-        persistentStore.store.dispatch(
+        persistentStoreInstance.store.dispatch(
           Attestations.Store.revokeAttestation(claimHash)
         )
       })
@@ -136,13 +136,13 @@ class AttestationService {
   public static saveInStore(attestationEntry: Attestations.Entry): void {
     const newEntry = attestationEntry
     newEntry.created = Date.now()
-    persistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Attestations.Store.saveAttestation(attestationEntry)
     )
   }
 
   public static removeFromStore(claimHash: IAttestation['claimHash']): void {
-    persistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Attestations.Store.removeAttestation(claimHash)
     )
   }
@@ -191,7 +191,7 @@ class AttestationService {
 
   private static getIdentity(): Identity {
     const selectedIdentity = Wallet.getSelectedIdentity(
-      persistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     ).identity
     return selectedIdentity
   }

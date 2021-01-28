@@ -16,7 +16,7 @@ import MessageRepository from '../../services/MessageRepository'
 import * as Claims from '../../state/ducks/Claims'
 import * as Attestations from '../../state/ducks/Attestations'
 import { IMyDelegation } from '../../state/ducks/Delegations'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IMyIdentity } from '../../types/Contact'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BsClaim, BsClaimsPool, BsClaimsPoolElement } from './DevTools.claims'
@@ -97,13 +97,15 @@ class BsAttestation {
     // import to claimers claim
     // therefore switch to claimer identity
     BsIdentity.selectIdentity(claimerIdentity)
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Claims.Store.addRequestForAttestation(
         requestForAttestation,
         attesterIdentity.identity.address
       )
     )
-    PersistentStore.store.dispatch(Claims.Store.addAttestedClaim(attestedClaim))
+    persistentStoreInstance.store.dispatch(
+      Claims.Store.addAttestedClaim(attestedClaim)
+    )
 
     if (withMessages) {
       BsAttestation.sendMessages(
