@@ -12,7 +12,7 @@ import ClaimDetailView from '../../../components/ClaimDetailView/ClaimDetailView
 import attestationWorkflow from '../../../services/AttestationWorkflow'
 import * as Quotes from '../../../state/ducks/Quotes'
 import * as Wallet from '../../../state/ducks/Wallet'
-import PersistentStore from '../../../state/PersistentStore'
+import { persistentStoreInstance } from '../../../state/PersistentStore'
 
 import FeedbackService, { notifyError } from '../../../services/FeedbackService'
 import { IContact } from '../../../types/Contact'
@@ -77,7 +77,7 @@ class AttestClaim extends React.Component<Props, State> {
     })
 
     const selectedIdentity: Identity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     ).identity
 
     if (!selectedIdentity) {

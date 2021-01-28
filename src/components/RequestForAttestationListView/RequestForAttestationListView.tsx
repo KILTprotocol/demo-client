@@ -1,7 +1,7 @@
 import { IRequestForAttestation } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { connect } from 'react-redux'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import * as Claims from '../../state/ducks/Claims'
 import './RequestForAttestationListView.scss'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
@@ -86,7 +86,7 @@ const mapDispatchToProps: DispatchProps = {
     claimId: Claims.Entry['id'],
     rootHash: IRequestForAttestation['rootHash']
   ) =>
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Claims.Store.removeRequestForAttestation(claimId, rootHash)
     ),
 }

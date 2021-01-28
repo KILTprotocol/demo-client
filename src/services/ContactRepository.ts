@@ -1,7 +1,7 @@
 import { PublicIdentity } from '@kiltprotocol/sdk-js'
 import * as Contacts from '../state/ducks/Contacts'
 import * as Wallet from '../state/ducks/Wallet'
-import PersistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 import { IContact, IMyIdentity } from '../types/Contact'
 import { BasePostParams } from './BaseRepository'
 import ErrorService from './ErrorService'
@@ -23,8 +23,10 @@ class ContactRepository {
       })
       .then(response => response.json())
       .then((contacts: IContact[]) => {
-        PersistentStore.store.dispatch(Contacts.Store.addContacts(contacts))
-        return Contacts.getContacts(PersistentStore.store.getState())
+        persistentStoreInstance.store.dispatch(
+          Contacts.Store.addContacts(contacts)
+        )
+        return Contacts.getContacts(persistentStoreInstance.store.getState())
       })
       .catch(error => {
         ErrorService.log({
@@ -42,7 +44,7 @@ class ContactRepository {
     propagateError = false
   ): Promise<void | IContact> {
     const persistedContact = Contacts.getContact(
-      PersistentStore.store.getState(),
+      persistentStoreInstance.store.getState(),
       address
     )
 
@@ -59,7 +61,9 @@ class ContactRepository {
       })
       .then(response => response.json())
       .then((contact: IContact) => {
-        PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
+        persistentStoreInstance.store.dispatch(
+          Contacts.Store.addContact(contact)
+        )
         return contact
       })
       .catch(error => {
@@ -81,7 +85,9 @@ class ContactRepository {
         return response
       })
       .then(() => {
-        PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
+        persistentStoreInstance.store.dispatch(
+          Contacts.Store.addContact(contact)
+        )
       })
       .catch(error => {
         ErrorService.log({
@@ -125,7 +131,7 @@ class ContactRepository {
 
     if (publicIdentity) {
       const selectedIdentity = Wallet.getSelectedIdentity(
-        PersistentStore.store.getState()
+        persistentStoreInstance.store.getState()
       )
       const contact = {
         did: { identifier },
@@ -136,7 +142,7 @@ class ContactRepository {
         },
         publicIdentity,
       }
-      PersistentStore.store.dispatch(Contacts.Store.addContact(contact))
+      persistentStoreInstance.store.dispatch(Contacts.Store.addContact(contact))
       return contact
     }
     notifyFailure(`No contact for DID '${identifier}' found.`)

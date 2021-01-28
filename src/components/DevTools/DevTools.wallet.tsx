@@ -5,7 +5,7 @@ import ContactRepository from '../../services/ContactRepository'
 import { notifySuccess } from '../../services/FeedbackService'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IContact, IMyIdentity } from '../../types/Contact'
 import identitiesPool from './data/identities.json'
 
@@ -46,7 +46,7 @@ class BsIdentity {
     alias: string
   ): Promise<void | IMyIdentity> {
     const selectedIdentity: IMyIdentity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     )
 
     return new Promise(resolve => {
@@ -61,7 +61,9 @@ class BsIdentity {
             },
             publicIdentity: identity.getPublicIdentity(),
           }
-          PersistentStore.store.dispatch(Contacts.Store.addContact(newContact))
+          persistentStoreInstance.store.dispatch(
+            Contacts.Store.addContact(newContact)
+          )
 
           const newIdentity = {
             identity,
@@ -70,10 +72,10 @@ class BsIdentity {
             },
             phrase,
           } as IMyIdentity
-          PersistentStore.store.dispatch(
+          persistentStoreInstance.store.dispatch(
             Wallet.Store.saveIdentityAction(newIdentity)
           )
-          PersistentStore.store.dispatch(
+          persistentStoreInstance.store.dispatch(
             Contacts.Store.addContact(
               ContactRepository.getContactFromIdentity(newIdentity, {
                 unregistered: true,
@@ -92,7 +94,9 @@ class BsIdentity {
   public static async getByKey(
     bsIdentitiesPoolKey: keyof BsIdentitiesPool
   ): Promise<IMyIdentity> {
-    const identities = Wallet.getAllIdentities(PersistentStore.store.getState())
+    const identities = Wallet.getAllIdentities(
+      persistentStoreInstance.store.getState()
+    )
     const identity = identities.find(
       value => value.metaData.name === BsIdentity.pool[bsIdentitiesPoolKey]
     )
@@ -103,7 +107,7 @@ class BsIdentity {
   }
 
   public static selectIdentity(identity: IMyIdentity): void {
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Wallet.Store.selectIdentityAction(identity.identity.address)
     )
   }

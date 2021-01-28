@@ -11,7 +11,8 @@ import { notifyFailure, safeDelete } from '../../services/FeedbackService'
 import * as Claims from '../../state/ducks/Claims'
 import * as UiState from '../../state/ducks/UiState'
 import * as Wallet from '../../state/ducks/Wallet'
-import PersistentStore, {
+import {
+  persistentStoreInstance,
   State as ReduxState,
 } from '../../state/PersistentStore'
 
@@ -41,7 +42,7 @@ type State = {
 
 class ClaimView extends React.Component<Props, State> {
   private static requestTerm(claimEntry: Claims.Entry): void {
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
         objective: MessageBodyType.REQUEST_TERMS,
         props: {
@@ -53,7 +54,7 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   private static requestAttestation(claimEntry: Claims.Entry): void {
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
         objective: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
         props: {

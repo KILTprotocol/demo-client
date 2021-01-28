@@ -15,7 +15,7 @@ import DelegationsService from '../../services/DelegationsService'
 import MessageRepository from '../../services/MessageRepository'
 import * as Delegations from '../../state/ducks/Delegations'
 import { DelegationType, IMyDelegation } from '../../state/ducks/Delegations'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IMyIdentity } from '../../types/Contact'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 import { BsCType, BsCTypesPool } from './DevTools.ctypes'
@@ -260,7 +260,7 @@ class BsDelegation {
     if (match) {
       BsIdentity.selectIdentity(await BsIdentity.getByKey(match.ownerKey))
       const allDelegations: IMyDelegation[] = Delegations.getAllDelegations(
-        PersistentStore.store.getState()
+        persistentStoreInstance.store.getState()
       )
 
       const myDelegation = allDelegations.find(
@@ -288,7 +288,7 @@ class BsDelegation {
     const bsDelegation = pool[bsDelegationKey]
     if (bsDelegation) {
       // the current pool contains the requested delegation
-      Delegations.getAllDelegations(PersistentStore.store.getState())
+      Delegations.getAllDelegations(persistentStoreInstance.store.getState())
       return pool[bsDelegationKey]
     }
     // dive deeper

@@ -6,7 +6,7 @@ import { Config } from 'react-select/lib/filters'
 
 import ContactRepository from '../../services/ContactRepository'
 import * as Contacts from '../../state/ducks/Contacts'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IContact } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
@@ -74,7 +74,9 @@ class SelectContacts extends React.Component<Props, State> {
       } else {
         this.setState(
           {
-            contacts: Contacts.getMyContacts(PersistentStore.store.getState()),
+            contacts: Contacts.getMyContacts(
+              persistentStoreInstance.store.getState()
+            ),
           },
           () => {
             this.initPreSelection()

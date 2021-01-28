@@ -11,7 +11,7 @@ import { SubmitTermsProps } from '../../containers/Tasks/SubmitTerms/SubmitTerms
 
 import CTypeRepository from '../../services/CtypeRepository'
 import * as UiState from '../../state/ducks/UiState'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { ICTypeWithMetadata } from '../../types/Ctype'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
 
@@ -96,7 +96,7 @@ class CTypePresentation extends React.Component<Props, State> {
       },
       {
         callback: () => {
-          PersistentStore.store.dispatch(
+          persistentStoreInstance.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
               objective: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
               props: { cTypeHashes: [cTypeHash] } as RequestClaimsForCTypeProps,
@@ -107,7 +107,7 @@ class CTypePresentation extends React.Component<Props, State> {
       },
       {
         callback: () => {
-          PersistentStore.store.dispatch(
+          persistentStoreInstance.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
               objective: MessageBodyType.REQUEST_TERMS,
               props: {
@@ -120,7 +120,7 @@ class CTypePresentation extends React.Component<Props, State> {
       },
       {
         callback: () => {
-          PersistentStore.store.dispatch(
+          persistentStoreInstance.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
               objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
               props: { cTypeHashes: [cTypeHash] } as SubmitClaimsForCTypeProps,
@@ -131,7 +131,7 @@ class CTypePresentation extends React.Component<Props, State> {
       },
       {
         callback: () => {
-          PersistentStore.store.dispatch(
+          persistentStoreInstance.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
               objective: MessageBodyType.SUBMIT_TERMS,
               props: {
@@ -144,7 +144,7 @@ class CTypePresentation extends React.Component<Props, State> {
       },
       {
         callback: () => {
-          PersistentStore.store.dispatch(
+          persistentStoreInstance.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
               objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
               props: {
@@ -158,7 +158,7 @@ class CTypePresentation extends React.Component<Props, State> {
       },
       {
         callback: () => {
-          PersistentStore.store.dispatch(
+          persistentStoreInstance.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
               objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
               props: {
