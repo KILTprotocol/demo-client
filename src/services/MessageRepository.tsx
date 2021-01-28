@@ -71,8 +71,8 @@ class MessageRepository {
   }
 
   /**
-   * takes a address or list of addresses
-   * Contacts and initiates message sending
+   * takes an address or list of addresses,
+   * gets the corresponding Contact (if existent) and initiates message sending
    *
    * @param receiverAddresses
    * @param messageBody
@@ -99,8 +99,7 @@ class MessageRepository {
   }
 
   /**
-   * takes a public identity
-   * Contacts and initiates message sending
+   * takes a public identity and initiates message sending
    *
    * @param receivers
    * @param messageBody
