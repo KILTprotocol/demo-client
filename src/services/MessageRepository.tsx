@@ -32,7 +32,7 @@ import FeedbackService, {
   notifyFailure,
   notifySuccess,
 } from './FeedbackService'
-import filterArray from '../utils/Tools/Utils'
+import filterArray from '../utils/filterArray'
 
 export interface IMessageOutput extends IMessage {
   encryptedMessage: IEncryptedMessage
@@ -85,7 +85,11 @@ class MessageRepository {
       (
         receiverAddress: IContact['publicIdentity']['address']
       ): IContact | null => {
-        return ContactRepository.findByAddress(receiverAddress)
+        const contact = ContactRepository.findByAddress(receiverAddress)
+        if (!contact) {
+          notifyFailure(`Could not send message to ${receiverAddress}`, false)
+        }
+        return contact
       }
     )
 

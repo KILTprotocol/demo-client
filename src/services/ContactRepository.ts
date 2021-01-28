@@ -23,11 +23,6 @@ class ContactRepository {
       return persistedContact
     }
 
-    notifyFailure(
-      `Could not send message to ${address}  'this address'
-      `,
-      false
-    )
     return null
   }
 
