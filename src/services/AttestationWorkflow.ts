@@ -36,10 +36,10 @@ class AttestationWorkflow {
    * @param claims the list of partial claims we request term for
    * @param receiverAddresses the list of attester addresses to send the term request to
    */
-  public static async requestTerms(
+  public static requestTerms(
     claims: IPartialClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>
-  ): Promise<void> {
+  ): void {
     const messageBodies: IRequestTerms[] = claims.map(
       (claim: IPartialClaim) => ({
         content: claim,
@@ -171,7 +171,7 @@ class AttestationWorkflow {
     claimerAddress: IContact['publicIdentity']['address'],
     claimerIdentity?: IPublicIdentity
   ): Promise<void> {
-    const claimer = await ContactRepository.findByAddress(claimerAddress)
+    const claimer = ContactRepository.findByAddress(claimerAddress)
     if (!claimer && !claimerIdentity) {
       throw new Error('claimer not found')
     }

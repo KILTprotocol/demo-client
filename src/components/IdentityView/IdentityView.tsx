@@ -2,8 +2,6 @@ import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import BN from 'bn.js'
 import ContactRepository from '../../services/ContactRepository'
-import errorService from '../../services/ErrorService'
-import { notifySuccess } from '../../services/FeedbackService'
 import * as Balances from '../../state/ducks/Balances'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
@@ -51,7 +49,6 @@ class IdentityView extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
-    this.registerContact = this.registerContact.bind(this)
     this.toggleContacts = this.toggleContacts.bind(this)
     this.state = {
       showPublicIdentityQRCode: false,
@@ -64,37 +61,6 @@ class IdentityView extends React.Component<Props, State> {
     this.setState({
       showPublicIdentityQRCode: !showPublicIdentityQRCode,
     })
-  }
-
-  private registerContact(): void {
-    const { myIdentity } = this.props
-    const { identity, metaData } = myIdentity
-    const { address } = identity
-    const boxPublicKeyAsHex = identity.getBoxPublicKey()
-    const { name } = metaData
-
-    const contact: IContact = {
-      metaData: { name },
-      publicIdentity: {
-        address,
-        boxPublicKeyAsHex,
-        serviceAddress: `${MessageRepository.URL}`,
-      },
-    }
-
-    ContactRepository.add(contact).then(
-      () => {
-        notifySuccess(`Identity '${name}' successfully registered.`)
-      },
-      error => {
-        errorService.log({
-          error,
-          message: `Failed to register identity '${name}'`,
-          origin: 'IdentityView.registerContact()',
-          type: 'ERROR.FETCH.POST',
-        })
-      }
-    )
   }
 
   private toggleContacts(): void {
@@ -251,11 +217,6 @@ class IdentityView extends React.Component<Props, State> {
               onClick={onDeleteDid.bind(this, myIdentity)}
             >
               Delete DID
-            </button>
-          )}
-          {(!contact || (contact && contact.metaData.unregistered)) && (
-            <button type="button" onClick={this.registerContact}>
-              Register Global Contact
             </button>
           )}
           <button

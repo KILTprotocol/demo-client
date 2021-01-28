@@ -13,36 +13,7 @@ import { notifyFailure } from './FeedbackService'
 class ContactRepository {
   public static readonly URL = `${window._env_.REACT_APP_SERVICE_HOST}/contacts`
 
-  public static async findAll(): Promise<IContact[]> {
-    return fetch(`${ContactRepository.URL}`)
-      .then(response => {
-        if (!response.ok) {
-          throw Error(response.statusText)
-        }
-        return response
-      })
-      .then(response => response.json())
-      .then((contacts: IContact[]) => {
-        persistentStoreInstance.store.dispatch(
-          Contacts.Store.addContacts(contacts)
-        )
-        return Contacts.getContacts(persistentStoreInstance.store.getState())
-      })
-      .catch(error => {
-        ErrorService.log({
-          error,
-          message: `Could not resolve contacts'`,
-          origin: 'ContactRepository.findAll()',
-          type: 'ERROR.FETCH.GET',
-        })
-        return error
-      })
-  }
-
-  public static async findByAddress(
-    address: string,
-    propagateError = false
-  ): Promise<void | IContact> {
+  public static findByAddress(address: string): IContact | null {
     const persistedContact = Contacts.getContact(
       persistentStoreInstance.store.getState(),
       address
@@ -52,25 +23,7 @@ class ContactRepository {
       return persistedContact
     }
 
-    return fetch(`${ContactRepository.URL}/${address}`)
-      .then(response => {
-        if (!response.ok) {
-          throw Error(address)
-        }
-        return response
-      })
-      .then(response => response.json())
-      .then((contact: IContact) => {
-        persistentStoreInstance.store.dispatch(
-          Contacts.Store.addContact(contact)
-        )
-        return contact
-      })
-      .catch(error => {
-        if (propagateError) {
-          throw error
-        }
-      })
+    return null
   }
 
   public static async add(contact: IContact): Promise<void> {

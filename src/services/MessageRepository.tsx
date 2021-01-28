@@ -32,6 +32,7 @@ import FeedbackService, {
   notifyFailure,
   notifySuccess,
 } from './FeedbackService'
+import filterArray from '../utils/filterArray'
 
 export interface IMessageOutput extends IMessage {
   encryptedMessage: IEncryptedMessage
@@ -43,7 +44,6 @@ export interface IMessageOutput extends IMessage {
 
 class MessageRepository {
   public static readonly URL = `${window._env_.REACT_APP_SERVICE_HOST}/messaging`
-
   /**
    * takes contact or list of contacts
    * and send a message to every contact in list
@@ -71,8 +71,8 @@ class MessageRepository {
   }
 
   /**
-   * takes a address or list of addresses
-   * converts them to Contacts and initiates message sending
+   * takes an address or list of addresses,
+   * gets the corresponding Contact (if existent) and initiates message sending
    *
    * @param receiverAddresses
    * @param messageBody
@@ -81,25 +81,25 @@ class MessageRepository {
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
     messageBody: MessageBody
   ): Promise<void> {
-    const arrayOfPromises = receiverAddresses.map(
-      (receiverAddress: IContact['publicIdentity']['address']) => {
-        return ContactRepository.findByAddress(receiverAddress)
+    const arrayContacts = receiverAddresses.map(
+      (
+        receiverAddress: IContact['publicIdentity']['address']
+      ): IContact | null => {
+        const contact = ContactRepository.findByAddress(receiverAddress)
+        if (!contact) {
+          notifyFailure(`Could not send message to ${receiverAddress}`, false)
+        }
+        return contact
       }
     )
 
-    return Promise.any(arrayOfPromises)
-      .then(result => {
-        MessageRepository.handleMultiAddressErrors(result.errors)
-        return result.successes
-      })
-      .then((receiverContacts: IContact[]) => {
-        return MessageRepository.send(receiverContacts, messageBody)
-      })
+    const filteredContacts = arrayContacts.filter(filterArray)
+
+    return MessageRepository.send(filteredContacts, messageBody)
   }
 
   /**
-   * takes a public identity
-   * converts them to Contacts and initiates message sending
+   * takes a public identity and initiates message sending
    *
    * @param receivers
    * @param messageBody
@@ -118,20 +118,13 @@ class MessageRepository {
     return MessageRepository.send([receiverContact], messageBody)
   }
 
-  public static async multiSendToAddresses(
+  public static multiSendToAddresses(
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
     messageBodies: MessageBody[]
-  ): Promise<void> {
-    const arrayOfPromises = messageBodies.map((messageBody: MessageBody) => {
+  ): void {
+    messageBodies.map((messageBody: MessageBody) => {
       return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
     })
-
-    return Promise.any(arrayOfPromises)
-      .then(result => {
-        MessageRepository.handleMultiAddressErrors(result.errors)
-        return result.successes
-      })
-      .then(() => undefined)
   }
 
   public static async deleteByMessageId(
@@ -144,65 +137,47 @@ class MessageRepository {
     })
   }
 
-  public static async findByMessageId(
-    messageId: string,
-    myIdentity: Identity
-  ): Promise<IMessage | undefined> {
-    return fetch(
-      `${MessageRepository.URL}/inbox/${myIdentity.signPublicKeyAsHex}/${messageId}`
-    )
-      .then(response => response.json())
-      .then(message => {
-        return ContactRepository.findByAddress(message.senderAddress).then(() =>
-          Message.decrypt(message, myIdentity)
-        )
-      })
-  }
-
   public static async findByMyIdentity(
     myIdentity: Identity
   ): Promise<IMessageOutput[]> {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
       .then(response => response.json())
       .then((encryptedMessages: IEncryptedMessage[]) => {
-        return Promise.any(
-          encryptedMessages.map((encryptedMessage: IEncryptedMessage) => {
-            return ContactRepository.findByAddress(
+        const decryptedMesssages = encryptedMessages.map(
+          (encryptedMessage: IEncryptedMessage) => {
+            let sender = ContactRepository.findByAddress(
               encryptedMessage.senderAddress
-            ).then((contact: IContact) => {
-              try {
-                const m = Message.decrypt(encryptedMessage, myIdentity)
-                Message.ensureOwnerIsSender(m)
-                let sender = contact
-                if (!sender) {
-                  sender = {
-                    metaData: { name: '', unregistered: true },
-                    publicIdentity: {
-                      address: encryptedMessage.senderAddress,
-                      boxPublicKeyAsHex: encryptedMessage.senderBoxPublicKey,
-                    },
-                  }
+            )
+            try {
+              const m = Message.decrypt(encryptedMessage, myIdentity)
+              Message.ensureOwnerIsSender(m)
+              if (!sender) {
+                sender = {
+                  metaData: { name: '', unregistered: true },
+                  publicIdentity: {
+                    address: encryptedMessage.senderAddress,
+                    boxPublicKeyAsHex: encryptedMessage.senderBoxPublicKey,
+                  },
                 }
-
-                return {
-                  ...m,
-                  encryptedMessage,
-                  sender,
-                }
-              } catch (error) {
-                errorService.log({
-                  error,
-                  message: `error on decrypting message: 
-                    ${JSON.stringify(encryptedMessage)}`,
-                  origin: 'MessageRepository.findByMyIdentity()',
-                })
-                return undefined
               }
-            })
-          })
-        ).then(result => {
-          return result.successes
-        })
+
+              return {
+                ...m,
+                encryptedMessage,
+                sender,
+              }
+            } catch (error) {
+              errorService.log({
+                error,
+                message: `error on decrypting message: 
+                    ${JSON.stringify(encryptedMessage)}`,
+                origin: 'MessageRepository.findByMyIdentity()',
+              })
+              return undefined
+            }
+          }
+        )
+        return decryptedMesssages.filter(filterArray)
       })
   }
 
