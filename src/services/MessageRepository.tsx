@@ -32,6 +32,7 @@ import FeedbackService, {
   notifyFailure,
   notifySuccess,
 } from './FeedbackService'
+import filterArray from '../utils/Tools/Utils'
 
 export interface IMessageOutput extends IMessage {
   encryptedMessage: IEncryptedMessage
@@ -43,7 +44,6 @@ export interface IMessageOutput extends IMessage {
 
 class MessageRepository {
   public static readonly URL = `${window._env_.REACT_APP_SERVICE_HOST}/messaging`
-
   /**
    * takes contact or list of contacts
    * and send a message to every contact in list
@@ -72,7 +72,7 @@ class MessageRepository {
 
   /**
    * takes a address or list of addresses
-   * converts them to Contacts and initiates message sending
+   * Contacts and initiates message sending
    *
    * @param receiverAddresses
    * @param messageBody
@@ -81,25 +81,22 @@ class MessageRepository {
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
     messageBody: MessageBody
   ): Promise<void> {
-    const arrayOfPromises = receiverAddresses.map(
-      (receiverAddress: IContact['publicIdentity']['address']) => {
+    const arrayContacts = receiverAddresses.map(
+      (
+        receiverAddress: IContact['publicIdentity']['address']
+      ): IContact | null => {
         return ContactRepository.findByAddress(receiverAddress)
       }
     )
 
-    return Promise.any(arrayOfPromises)
-      .then(result => {
-        MessageRepository.handleMultiAddressErrors(result.errors)
-        return result.successes
-      })
-      .then((receiverContacts: IContact[]) => {
-        return MessageRepository.send(receiverContacts, messageBody)
-      })
+    const filtered = arrayContacts.filter(filterArray)
+
+    return MessageRepository.send(filtered, messageBody)
   }
 
   /**
    * takes a public identity
-   * converts them to Contacts and initiates message sending
+   * Contacts and initiates message sending
    *
    * @param receivers
    * @param messageBody
@@ -118,20 +115,13 @@ class MessageRepository {
     return MessageRepository.send([receiverContact], messageBody)
   }
 
-  public static async multiSendToAddresses(
+  public static multiSendToAddresses(
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
     messageBodies: MessageBody[]
-  ): Promise<void> {
-    const arrayOfPromises = messageBodies.map((messageBody: MessageBody) => {
+  ): void {
+    messageBodies.map((messageBody: MessageBody) => {
       return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
     })
-
-    return Promise.any(arrayOfPromises)
-      .then(result => {
-        MessageRepository.handleMultiAddressErrors(result.errors)
-        return result.successes
-      })
-      .then(() => undefined)
   }
 
   public static async deleteByMessageId(
