@@ -36,10 +36,10 @@ class AttestationWorkflow {
    * @param claims the list of partial claims we request term for
    * @param receiverAddresses the list of attester addresses to send the term request to
    */
-  public static async requestTerms(
+  public static requestTerms(
     claims: IPartialClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>
-  ): Promise<void> {
+  ): void {
     const messageBodies: IRequestTerms[] = claims.map(
       (claim: IPartialClaim) => ({
         content: claim,
