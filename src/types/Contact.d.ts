@@ -1,5 +1,4 @@
-import { Identity, PublicIdentity } from '@kiltprotocol/sdk-js'
-import { IDidDocumentSigned } from '@kiltprotocol/sdk-js/build/did/Did'
+import { Identity, PublicIdentity, IDidDocument } from '@kiltprotocol/sdk-js'
 
 /**
  * as in prototype/services
@@ -13,7 +12,7 @@ export interface IContact {
   }
   did?: {
     identifier?: string
-    document?: IDidDocumentSigned
+    document?: IDidDocument
   }
 
   publicIdentity: PublicIdentity
