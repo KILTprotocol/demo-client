@@ -1,6 +1,6 @@
 import { Hash } from '@polkadot/types/interfaces'
 
-import PersistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 import * as Parameters from '../state/ducks/Parameters'
 import * as Wallet from '../state/ducks/Wallet'
 import BlockchainService from './BlockchainService'
@@ -21,7 +21,7 @@ class ClientVersionHelper {
       resetCause.firstBlockHashChanged = true
     } else {
       const selectedIdentity: Wallet.Entry = Wallet.getSelectedIdentity(
-        PersistentStore.store.getState()
+        persistentStoreInstance.store.getState()
       )
       if (selectedIdentity) {
         // [ap] disable balance check since we have zero-balanced accounts initially.
@@ -52,7 +52,7 @@ class ClientVersionHelper {
   public static isHashMatching(chainHash: string): boolean {
     let differentChain = false
     const parameters = Parameters.getParameters(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     )
     if (
       !parameters.blockHash ||
@@ -71,7 +71,7 @@ class ClientVersionHelper {
   }
 
   public static updateBlockNumber(newBlockHashCheck: string): void {
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Parameters.Store.updateParameters({
         blockHash: newBlockHashCheck,
       })
@@ -79,7 +79,7 @@ class ClientVersionHelper {
   }
 
   public static resetAndReloadClient(): void {
-    PersistentStore.reset()
+    persistentStoreInstance.reset()
     window.location.reload()
   }
 }

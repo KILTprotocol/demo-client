@@ -21,7 +21,7 @@ import attestationWorkflow from '../../../services/AttestationWorkflow'
 import * as Claims from '../../../state/ducks/Claims'
 import * as Quotes from '../../../state/ducks/Quotes'
 import * as Wallet from '../../../state/ducks/Wallet'
-import PersistentStore from '../../../state/PersistentStore'
+import { persistentStoreInstance } from '../../../state/PersistentStore'
 
 import './RequestAttestation.scss'
 import Code from '../../../components/Code/Code'
@@ -64,7 +64,10 @@ class RequestAttestation extends React.Component<Props, State> {
     const { claim } = this.props
     // check if we already have the messages claim stored
     this.setState({
-      savedClaimEntry: Claims.getClaim(PersistentStore.store.getState(), claim),
+      savedClaimEntry: Claims.getClaim(
+        persistentStoreInstance.store.getState(),
+        claim
+      ),
     })
   }
 
@@ -102,7 +105,7 @@ class RequestAttestation extends React.Component<Props, State> {
     }
 
     const myClaims = Claims.getClaimsByCTypeHash(
-      PersistentStore.store.getState(),
+      persistentStoreInstance.store.getState(),
       claim.cTypeHash
     )
 
@@ -166,7 +169,7 @@ class RequestAttestation extends React.Component<Props, State> {
   private handleCreateClaim(currentClaim: IPartialClaim): void {
     this.setState({
       savedClaimEntry: Claims.getClaim(
-        PersistentStore.store.getState(),
+        persistentStoreInstance.store.getState(),
         currentClaim
       ),
     })
@@ -184,7 +187,7 @@ class RequestAttestation extends React.Component<Props, State> {
     const { savedClaimEntry } = this.state
 
     const selectedIdentity: Identity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     ).identity
 
     if (!selectedIdentity) {

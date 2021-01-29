@@ -13,7 +13,7 @@ import errorService from '../../services/ErrorService'
 import { notify, notifySuccess } from '../../services/FeedbackService'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IContact, IMyIdentity } from '../../types/Contact'
 
 import './WalletAdd.scss'
@@ -104,7 +104,7 @@ class WalletAdd extends React.Component<Props, State> {
     }
 
     saveIdentity(newIdentity)
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Contacts.Store.addContact(
         ContactRepository.getContactFromIdentity(newIdentity, {
           unregistered: true,

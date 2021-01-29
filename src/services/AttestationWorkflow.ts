@@ -23,7 +23,7 @@ import {
 import AttestationService from './AttestationService'
 import { IMyDelegation } from '../state/ducks/Delegations'
 import * as Wallet from '../state/ducks/Wallet'
-import persistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 import { IContact } from '../types/Contact'
 import ContactRepository from './ContactRepository'
 import MessageRepository from './MessageRepository'
@@ -36,10 +36,10 @@ class AttestationWorkflow {
    * @param claims the list of partial claims we request term for
    * @param receiverAddresses the list of attester addresses to send the term request to
    */
-  public static async requestTerms(
+  public static requestTerms(
     claims: IPartialClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>
-  ): Promise<void> {
+  ): void {
     const messageBodies: IRequestTerms[] = claims.map(
       (claim: IPartialClaim) => ({
         content: claim,
@@ -130,7 +130,7 @@ class AttestationWorkflow {
     quoteAttesterSigned?: IQuoteAgreement
   ): Promise<void> {
     const { identity } = Wallet.getSelectedIdentity(
-      persistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     )
 
     const requestForAttestation = await RequestForAttestation.fromClaimAndIdentity(
@@ -171,7 +171,7 @@ class AttestationWorkflow {
     claimerAddress: IContact['publicIdentity']['address'],
     claimerIdentity?: IPublicIdentity
   ): Promise<void> {
-    const claimer = await ContactRepository.findByAddress(claimerAddress)
+    const claimer = ContactRepository.findByAddress(claimerAddress)
     if (!claimer && !claimerIdentity) {
       throw new Error('claimer not found')
     }

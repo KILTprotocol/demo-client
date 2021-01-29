@@ -11,7 +11,8 @@ import ContactRepository from '../../services/ContactRepository'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
 import * as UiState from '../../state/ducks/UiState'
-import PersistentStore, {
+import {
+  persistentStoreInstance,
   State as ReduxState,
 } from '../../state/PersistentStore'
 import { IContact, IMyIdentity } from '../../types/Contact'
@@ -85,7 +86,7 @@ class ContactPresentation extends React.Component<Props, State> {
 
     actions.push({
       callback: () => {
-        PersistentStore.store.dispatch(
+        persistentStoreInstance.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
             objective: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
             props: {
@@ -99,7 +100,7 @@ class ContactPresentation extends React.Component<Props, State> {
 
     actions.push({
       callback: () => {
-        PersistentStore.store.dispatch(
+        persistentStoreInstance.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
             objective: MessageBodyType.REQUEST_TERMS,
             props: {
@@ -113,7 +114,7 @@ class ContactPresentation extends React.Component<Props, State> {
 
     actions.push({
       callback: () => {
-        PersistentStore.store.dispatch(
+        persistentStoreInstance.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
             objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
             props: {
@@ -127,7 +128,7 @@ class ContactPresentation extends React.Component<Props, State> {
 
     actions.push({
       callback: () => {
-        PersistentStore.store.dispatch(
+        persistentStoreInstance.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
             objective: MessageBodyType.SUBMIT_TERMS,
             props: {
@@ -141,7 +142,7 @@ class ContactPresentation extends React.Component<Props, State> {
 
     actions.push({
       callback: () => {
-        PersistentStore.store.dispatch(
+        persistentStoreInstance.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
             objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
             props: {
@@ -156,7 +157,7 @@ class ContactPresentation extends React.Component<Props, State> {
 
     actions.push({
       callback: () => {
-        PersistentStore.store.dispatch(
+        persistentStoreInstance.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
             objective: MessageBodyType.REQUEST_ACCEPT_DELEGATION,
             props: {
@@ -175,18 +176,17 @@ class ContactPresentation extends React.Component<Props, State> {
   private setContact(): void {
     const { address } = this.props
 
-    ContactRepository.findByAddress(address).then((contact: IContact) => {
-      if (contact) {
-        this.setState({ contact })
-      }
-    })
+    const contact = ContactRepository.findByAddress(address)
+    if (contact) {
+      this.setState({ contact })
+    }
   }
 
   private setMyIdentity(): void {
     const { address } = this.props
 
     const myIdentity: IMyIdentity = Wallet.getIdentity(
-      PersistentStore.store.getState(),
+      persistentStoreInstance.store.getState(),
       address
     )
 
@@ -197,7 +197,7 @@ class ContactPresentation extends React.Component<Props, State> {
     const { contact } = this.state
 
     const selectedIdentity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     )
 
     if (contact) {
@@ -211,7 +211,9 @@ class ContactPresentation extends React.Component<Props, State> {
         },
         publicIdentity,
       }
-      PersistentStore.store.dispatch(Contacts.Store.addContact(myContact))
+      persistentStoreInstance.store.dispatch(
+        Contacts.Store.addContact(myContact)
+      )
       this.setState({
         contact: myContact,
       })
@@ -222,7 +224,9 @@ class ContactPresentation extends React.Component<Props, State> {
     const { address } = this.props
 
     if (address) {
-      PersistentStore.store.dispatch(Contacts.Store.removeMyContact(address))
+      persistentStoreInstance.store.dispatch(
+        Contacts.Store.removeMyContact(address)
+      )
     }
   }
 

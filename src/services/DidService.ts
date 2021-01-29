@@ -12,7 +12,7 @@ import {
   IDidDocumentSigned,
 } from '@kiltprotocol/sdk-js/build/did/Did'
 import * as Wallet from '../state/ducks/Wallet'
-import persistentStore from '../state/PersistentStore'
+import { persistentStoreInstance } from '../state/PersistentStore'
 import { IContact, IMyIdentity } from '../types/Contact'
 import ContactRepository from './ContactRepository'
 import { notifyFailure } from './FeedbackService'
@@ -98,7 +98,7 @@ class DidService {
       )
     }
 
-    persistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
         did: { identifier: did.identifier, document: signedDidDocument },
       })
@@ -123,7 +123,7 @@ class DidService {
       },
       publicIdentity: myIdentity.identity.getPublicIdentity(),
     } as IContact)
-    persistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
         did: undefined,
       })

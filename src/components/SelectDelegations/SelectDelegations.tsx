@@ -5,7 +5,7 @@ import { Config } from 'react-select/lib/filters'
 
 import * as Delegations from '../../state/ducks/Delegations'
 import { DelegationType, IMyDelegation } from '../../state/ducks/Delegations'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type SelectOption = {
@@ -113,17 +113,17 @@ class SelectDelegations extends React.Component<Props, State> {
       switch (type) {
         case DelegationType.Root:
           newDelegations = Delegations.getRootDelegations(
-            PersistentStore.store.getState()
+            persistentStoreInstance.store.getState()
           )
           break
         case DelegationType.Node:
           newDelegations = Delegations.getDelegations(
-            PersistentStore.store.getState()
+            persistentStoreInstance.store.getState()
           )
           break
         default:
           newDelegations = Delegations.getAllDelegations(
-            PersistentStore.store.getState()
+            persistentStoreInstance.store.getState()
           )
       }
 

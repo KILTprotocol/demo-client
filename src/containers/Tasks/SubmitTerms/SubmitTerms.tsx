@@ -25,7 +25,7 @@ import { IContact } from '../../../types/Contact'
 import { ICTypeWithMetadata } from '../../../types/Ctype'
 import { getClaimInputModel } from '../../../utils/CtypeUtils'
 import QuoteView from '../../QuoteView/QuoteView'
-import PersistentStore from '../../../state/PersistentStore'
+import { persistentStoreInstance } from '../../../state/PersistentStore'
 import * as Wallet from '../../../state/ducks/Wallet'
 import './SubmitTerms.scss'
 
@@ -166,7 +166,7 @@ class SubmitTerms extends React.Component<Props, State> {
       delete claim.contents
     }
     const selectedIdentity: Identity = Wallet.getSelectedIdentity(
-      PersistentStore.store.getState()
+      persistentStoreInstance.store.getState()
     ).identity
 
     if (!selectedIdentity) {

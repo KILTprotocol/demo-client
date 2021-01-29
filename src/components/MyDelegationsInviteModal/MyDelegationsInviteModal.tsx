@@ -12,7 +12,8 @@ import * as Contacts from '../../state/ducks/Contacts'
 import * as Delegations from '../../state/ducks/Delegations'
 import { IMyDelegation } from '../../state/ducks/Delegations'
 import * as Wallet from '../../state/ducks/Wallet'
-import PersistentStore, {
+import {
+  persistentStoreInstance,
   State as ReduxState,
 } from '../../state/PersistentStore'
 import { IContact, IMyIdentity } from '../../types/Contact'
@@ -92,7 +93,8 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
     const { contactsPool, delegationsPool, myDelegations }: Props = this.props
 
     this.createPools(
-      contactsPool || Contacts.getMyContacts(PersistentStore.store.getState()),
+      contactsPool ||
+        Contacts.getMyContacts(persistentStoreInstance.store.getState()),
       delegationsPool || myDelegations
     )
   }

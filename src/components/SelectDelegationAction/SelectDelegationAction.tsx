@@ -10,7 +10,8 @@ import * as Wallet from '../../state/ducks/Wallet'
 import * as Delegations from '../../state/ducks/Delegations'
 import { IMyDelegation } from '../../state/ducks/Delegations'
 import * as UiState from '../../state/ducks/UiState'
-import PersistentStore, {
+import {
+  persistentStoreInstance,
   State as ReduxState,
 } from '../../state/PersistentStore'
 import SelectAction, { Action } from '../SelectAction/SelectAction'
@@ -139,7 +140,7 @@ class SelectDelegationAction extends React.Component<Props> {
       return false
     }
     return !!Delegations.getDelegation(
-      PersistentStore.store.getState(),
+      persistentStoreInstance.store.getState(),
       delegation.id
     )
   }

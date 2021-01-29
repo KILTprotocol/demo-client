@@ -3,10 +3,11 @@ import React, { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
 import { Config } from 'react-select/lib/filters'
+import filterArray from '../../utils/filterArray'
 
 import ContactRepository from '../../services/ContactRepository'
 import * as Contacts from '../../state/ducks/Contacts'
-import PersistentStore from '../../state/PersistentStore'
+import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IContact } from '../../types/Contact'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 
@@ -17,7 +18,6 @@ type SelectOption = {
 }
 
 type Props = {
-  allContacts?: boolean
   closeMenuOnSelect?: boolean
   contacts?: IContact[]
   isMulti?: boolean
@@ -61,26 +61,19 @@ class SelectContacts extends React.Component<Props, State> {
   }
 
   public componentDidMount(): void {
-    const { allContacts } = this.props
     const { contacts } = this.state
 
     if (!contacts.length) {
-      if (allContacts) {
-        ContactRepository.findAll().then(_contacts => {
-          this.setState({ contacts: _contacts }, () => {
-            this.initPreSelection()
-          })
-        })
-      } else {
-        this.setState(
-          {
-            contacts: Contacts.getMyContacts(PersistentStore.store.getState()),
-          },
-          () => {
-            this.initPreSelection()
-          }
-        )
-      }
+      this.setState(
+        {
+          contacts: Contacts.getMyContacts(
+            persistentStoreInstance.store.getState()
+          ),
+        },
+        () => {
+          this.initPreSelection()
+        }
+      )
     } else {
       this.initPreSelection()
     }
@@ -135,7 +128,7 @@ class SelectContacts extends React.Component<Props, State> {
     })
   }
 
-  private initPreSelection(): Promise<void> | null {
+  private initPreSelection(): void | null {
     const { preSelectedAddresses, onChange } = this.props
     const { contacts } = this.state
 
@@ -143,37 +136,35 @@ class SelectContacts extends React.Component<Props, State> {
       return null
     }
 
-    const arrayOfPromises = preSelectedAddresses.map(
+    const arrayContacts = preSelectedAddresses.map(
       (selectedAddress: IContact['publicIdentity']['address']) => {
         return ContactRepository.findByAddress(selectedAddress)
       }
     )
 
-    return Promise.any(arrayOfPromises)
-      .then(result => {
-        return result.successes
-      })
-      .then((preSelectedContacts: IContact[]) => {
-        this.setState({ preSelectedContacts }, () => {
-          if (onChange) {
-            onChange(preSelectedContacts)
-          }
-        })
-        // add preSelected contacts to pool if not already contained
-        this.setState({
-          contacts: [
-            ...preSelectedContacts.filter(
-              (preSelectedContact: IContact) =>
-                !contacts.find(
-                  (contact: IContact) =>
-                    contact.publicIdentity.address ===
-                    preSelectedContact.publicIdentity.address
-                )
-            ),
-            ...contacts,
-          ],
-        })
-      })
+    const filteredArray = arrayContacts.filter(filterArray)
+    this.setState({ preSelectedContacts: filteredArray }, () => {
+      if (onChange) {
+        onChange(filteredArray)
+      }
+    })
+
+    // add preSelected contacts to pool if not already contained
+    this.setState({
+      contacts: [
+        ...filteredArray.filter(
+          (preSelectedContact: IContact) =>
+            !contacts.find(
+              (contact: IContact) =>
+                contact.publicIdentity.address ===
+                preSelectedContact.publicIdentity.address
+            )
+        ),
+        ...contacts,
+      ],
+    })
+
+    return null
   }
 
   public render(): JSX.Element {

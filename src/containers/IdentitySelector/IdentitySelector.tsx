@@ -8,7 +8,8 @@ import ContactRepository from '../../services/ContactRepository'
 
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
-import PersistentStore, {
+import {
+  persistentStoreInstance,
   State as ReduxState,
 } from '../../state/PersistentStore'
 import { IMyIdentity } from '../../types/Contact'
@@ -49,7 +50,7 @@ class IdentitySelector extends React.Component<Props, State> {
         unregistered: true,
       })
     )
-    PersistentStore.store.dispatch(
+    persistentStoreInstance.store.dispatch(
       Contacts.Store.addContacts(myIdentityContacts)
     )
   }

@@ -1,0 +1,69 @@
+.LoginGate {
+  & .header {
+    flex-direction: row;
+    padding: 3px;
+    z-index: $z-index-header;
+    top: 0;
+    left: 0;
+    background: $color-purple;
+    justify-content: center;
+    position: relative;
+    display: flex;
+  }
+
+  & > .container {
+    @include border-radius($base-border-radius);
+    position: relative;
+    z-index: $z-index-modal + 2;
+    width: 40%;
+    max-width: 1024px - 2 * $base-padding;
+    margin: auto;
+    background: $color-white;
+    border: $base-border;
+    @media (max-width: 600px) {
+      width: 70%;
+    }
+    @media (min-width: 601px) and (max-width: 1000px) {
+      width: 50%;
+    }
+  }
+
+  & .centerDiv {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  & .logo-id {
+    height: 90px;
+    margin: 10px 0;
+    & img {
+      height: 100%;
+      width: auto;
+    }
+  }
+
+  & h1 {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  & p {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  & button {
+    @include button-primary;
+  }
+
+  & .clear {
+    @include button-secondary;
+    position: relative;
+  }
+}

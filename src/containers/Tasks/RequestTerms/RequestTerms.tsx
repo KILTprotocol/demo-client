@@ -62,11 +62,10 @@ class RequestTerms extends React.Component<RequestTermsProps, State> {
       }
 
       if (this.isValid()) {
-        attestationWorkflow.requestTerms(claims, receiverAddresses).then(() => {
-          if (onFinished) {
-            onFinished()
-          }
-        })
+        attestationWorkflow.requestTerms(claims, receiverAddresses)
+        if (onFinished) {
+          onFinished()
+        }
       }
     }
   }
