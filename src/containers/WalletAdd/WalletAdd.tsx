@@ -108,6 +108,7 @@ class WalletAdd extends React.Component<Props, State> {
       Contacts.Store.addContact(
         ContactRepository.getContactFromIdentity(newIdentity, {
           unregistered: true,
+          addedAt: Date.now(),
         })
       )
     )
