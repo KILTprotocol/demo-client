@@ -25,7 +25,7 @@ import { RequestTermsProps } from '../Tasks/RequestTerms/RequestTerms'
 
 type StateProps = {
   claimEntries: Claims.Entry[]
-  selectedIdentity: IMyIdentity
+  selectedIdentity?: IMyIdentity
 }
 
 type DispatchProps = {
@@ -86,6 +86,10 @@ class ClaimView extends React.Component<Props, State> {
 
   public componentDidUpdate(prevProps: Props): void {
     const { selectedIdentity } = this.props
+    if (!selectedIdentity || !prevProps.selectedIdentity) {
+      throw new Error('No selected Identity')
+    }
+
     if (
       prevProps.selectedIdentity.identity.address !==
       selectedIdentity.identity.address

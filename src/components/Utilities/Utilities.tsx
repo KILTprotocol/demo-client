@@ -3,14 +3,12 @@ import { connect, MapStateToProps } from 'react-redux'
 import sdkPackage from '@kiltprotocol/sdk-js/package.json'
 
 import * as UiState from '../../state/ducks/UiState'
-import * as Wallet from '../../state/ducks/Wallet'
 import { State as ReduxState } from '../../state/PersistentStore'
 import ChainStats from '../ChainStats/ChainStats'
 import TestUserFeedback from '../TestUserFeedback/TestUserFeedback'
 import DevTools from '../DevTools/DevTools'
 import ClientVersionHelper from '../../services/ClientVersionHelper'
 import { safeDestructiveAction } from '../../services/FeedbackService'
-import { IMyIdentity } from '../../types/Contact'
 import './Utilities.scss'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -18,7 +16,6 @@ const clientPackage = require('../../../package.json')
 
 type StateProps = {
   debugMode: boolean
-  selectedIdentity: IMyIdentity
 }
 
 type DispatchProps = {
@@ -96,7 +93,6 @@ class Utilities extends React.Component<Props> {
 
 const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   debugMode: UiState.getDebugMode(state),
-  selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
 const mapDispatchToProps: DispatchProps = {

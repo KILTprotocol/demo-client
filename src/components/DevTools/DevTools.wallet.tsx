@@ -45,12 +45,17 @@ class BsIdentity {
     phrase: string,
     alias: string
   ): Promise<void | IMyIdentity> {
-    const selectedIdentity: IMyIdentity = Wallet.getSelectedIdentity(
+    const selectedIdentity:
+      | IMyIdentity
+      | undefined = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
     )
 
-    return new Promise(resolve => {
-      BalanceUtilities.makeTransfer(
+    return new Promise((resolve, reject) => {
+      if (!selectedIdentity) {
+        return reject(new Error('No Identity selected'))
+      }
+      return BalanceUtilities.makeTransfer(
         selectedIdentity,
         identity.address,
         ENDOWMENT,

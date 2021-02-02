@@ -86,6 +86,10 @@ class ContactRepository {
       const selectedIdentity = Wallet.getSelectedIdentity(
         persistentStoreInstance.store.getState()
       )
+
+      if (!selectedIdentity) {
+        throw new Error('No selected Identity')
+      }
       const contact = {
         did: { identifier },
         metaData: {

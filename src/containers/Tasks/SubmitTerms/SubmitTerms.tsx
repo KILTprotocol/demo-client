@@ -165,12 +165,12 @@ class SubmitTerms extends React.Component<Props, State> {
     if (enablePreFilledClaim && !withPreFilledClaim) {
       delete claim.contents
     }
-    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
+    const selectedIdentity = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
-    ).identity
+    )?.identity
 
     if (!selectedIdentity) {
-      throw new Error('No identity selected')
+      throw new Error('No selected Identity')
     }
     const quote = quoteData
       ? Quote.createAttesterSignature(quoteData, selectedIdentity)

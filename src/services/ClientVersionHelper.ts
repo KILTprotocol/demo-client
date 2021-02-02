@@ -20,9 +20,10 @@ class ClientVersionHelper {
     if (!blockCheck) {
       resetCause.firstBlockHashChanged = true
     } else {
-      const selectedIdentity: Wallet.Entry = Wallet.getSelectedIdentity(
+      const selectedIdentity = Wallet.getSelectedIdentity(
         persistentStoreInstance.store.getState()
-      )
+      )?.identity
+
       if (selectedIdentity) {
         // [ap] disable balance check since we have zero-balanced accounts initially.
         // const balance: number = await BalanceUtilities.getMyBalance(

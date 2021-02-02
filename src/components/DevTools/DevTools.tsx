@@ -127,7 +127,9 @@ class DevTools extends React.Component<Props> {
       { label: 'With messages', with: true },
     ]
 
-    const selectedIdentity: IMyIdentity = Wallet.getSelectedIdentity(
+    const selectedIdentity:
+      | IMyIdentity
+      | undefined = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
     )
 

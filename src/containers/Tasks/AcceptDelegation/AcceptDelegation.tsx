@@ -22,7 +22,7 @@ import DelegationsService from '../../../services/DelegationsService'
 import './AcceptDelegation.scss'
 
 type StateProps = {
-  selectedIdentity: IMyIdentity
+  selectedIdentity?: IMyIdentity
 }
 
 type OwnProps = {
@@ -97,6 +97,10 @@ class AcceptDelegation extends React.Component<Props, State> {
   ): Promise<string> {
     const { selectedIdentity } = this.props
     const { account, id, parentId, permissions } = delegationData
+
+    if (!selectedIdentity) {
+      throw new Error('No selected Identity')
+    }
 
     const rootNode: IDelegationRootNode | null = await DelegationsService.findRootNode(
       parentId

@@ -22,7 +22,7 @@ import DelegationNode, {
 import './DelegationDetailView.scss'
 
 type StateProps = {
-  selectedIdentity: IMyIdentity
+  selectedIdentity?: IMyIdentity
 }
 
 type OwnProps = {
@@ -85,6 +85,10 @@ const DelegationDetailView: React.FunctionComponent<Props> = ({
         console.log('error', error)
       })
   }, [delegationId])
+
+  if (!selectedIdentity) {
+    return null
+  }
 
   return (
     <section className="DelegationDetailView">

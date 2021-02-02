@@ -20,7 +20,7 @@ import './DelegationsView.scss'
 
 type StateProps = {
   delegationEntries: IMyDelegation[]
-  selectedIdentity: IMyIdentity
+  selectedIdentity?: IMyIdentity
 }
 
 type DispatchProps = {
@@ -89,6 +89,11 @@ class DelegationsView extends React.Component<Props, State> {
 
   public componentDidUpdate(prevProps: Props): void {
     const { delegationEntries, isPCR, selectedIdentity } = this.props
+
+    if (!selectedIdentity || !prevProps.selectedIdentity) {
+      throw new Error('No selected Identity')
+    }
+
     if (
       prevProps.selectedIdentity.identity.address !==
       selectedIdentity.identity.address

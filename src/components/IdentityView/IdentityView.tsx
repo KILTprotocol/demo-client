@@ -89,7 +89,7 @@ class IdentityView extends React.Component<Props, State> {
           addedAt: Date.now(),
           addedBy: Wallet.getSelectedIdentity(
             persistentStoreInstance.store.getState()
-          ).identity.address,
+          )?.identity.address,
         },
         publicIdentity,
       } as IContact
