@@ -45,25 +45,6 @@ const Dashboard: React.FC<Props> = ({ selectedIdentity }) => {
       })
   }
 
-  const deleteDid = (myIdentity: IMyIdentity): void => {
-    safeDelete(`the DID for '${myIdentity.metaData.name}'`, () => {
-      const blockUi = FeedbackService.addBlockUi({
-        headline: `Removing DID for '${myIdentity.metaData.name}'`,
-      })
-      DidService.deleteDid(myIdentity)
-        .then(() => {
-          notifySuccess(
-            `Successfully deleted DID for '${myIdentity.metaData.name}'`
-          )
-          blockUi.remove()
-        })
-        .catch(err => {
-          notifyError(err)
-          blockUi.remove()
-        })
-    })
-  }
-
   return (
     <section className="Dashboard">
       <h1>
@@ -77,7 +58,6 @@ const Dashboard: React.FC<Props> = ({ selectedIdentity }) => {
         myIdentity={selectedIdentity}
         selected
         onCreateDid={createDid}
-        onDeleteDid={deleteDid}
       />
       <div className="actions">
         <Link to="/wallet">Manage Identities</Link>
