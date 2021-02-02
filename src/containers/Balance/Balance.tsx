@@ -183,6 +183,10 @@ class Balance extends React.Component<Props, State> {
       persistentStoreInstance.store.getState()
     )
 
+    if (!selectedIdentity) {
+      throw new Error('No selected Error')
+    }
+
     // the identity of this component might not be the currently selected one
     // so we need to inform the user in this case
     if (myIdentity.identity.address !== selectedIdentity.identity.address) {

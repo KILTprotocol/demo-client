@@ -26,7 +26,7 @@ import './MyDelegationsInviteModal.scss'
 
 type StateProps = {
   myDelegations: IMyDelegation[]
-  selectedIdentity: IMyIdentity
+  selectedIdentity?: IMyIdentity
 }
 
 type OwnProps = {
@@ -299,7 +299,9 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
   ): void {
     const { selectedIdentity } = this.props
     const { metaData } = delegation
-
+    if (!selectedIdentity) {
+      throw new Error('No selected Identity')
+    }
     const delegationData = this.getDelegationData(receiver, delegation)
 
     const messageBody: IRequestAcceptDelegation = {

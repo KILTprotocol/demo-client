@@ -18,12 +18,16 @@ import IdentityView from '../IdentityView/IdentityView'
 import './Dashboard.scss'
 
 type StateProps = {
-  selectedIdentity: Wallet.Entry
+  selectedIdentity?: Wallet.Entry
 }
 
 type Props = StateProps
 
-const Dashboard: React.FC<Props> = ({ selectedIdentity }): JSX.Element => {
+const Dashboard: React.FC<Props> = ({ selectedIdentity }) => {
+  if (!selectedIdentity) {
+    return null
+  }
+
   const createDid = (myIdentity: IMyIdentity): void => {
     const blockUi = FeedbackService.addBlockUi({
       headline: `Generating DID for '${myIdentity.metaData.name}'`,

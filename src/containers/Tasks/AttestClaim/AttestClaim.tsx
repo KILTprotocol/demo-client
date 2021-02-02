@@ -76,9 +76,9 @@ class AttestClaim extends React.Component<Props, State> {
       headline: 'Writing attestation to chain',
     })
 
-    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
+    const selectedIdentity = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
-    ).identity
+    )?.identity
 
     if (!selectedIdentity) {
       throw new Error('No identity selected')

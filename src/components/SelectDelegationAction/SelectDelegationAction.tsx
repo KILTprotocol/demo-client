@@ -18,7 +18,7 @@ import SelectAction, { Action } from '../SelectAction/SelectAction'
 
 type StateProps = {
   debugMode: boolean
-  selectedIdentity: IMyIdentity
+  selectedIdentity?: IMyIdentity
 }
 
 type OwnProps = {
@@ -120,6 +120,11 @@ class SelectDelegationAction extends React.Component<Props> {
 
   private getQRCodeAction(): Action | undefined {
     const { delegation, debugMode, onQRCode, selectedIdentity } = this.props
+
+    if (!selectedIdentity) {
+      throw new Error('No selected Identity')
+    }
+
     if (!delegation || !onQRCode) {
       return undefined
     }

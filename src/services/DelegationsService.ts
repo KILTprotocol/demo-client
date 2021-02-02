@@ -47,9 +47,13 @@ class DelegationsService {
     delegation: DelegationNode,
     signature: string
   ): Promise<SubmittableExtrinsic> {
-    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
+    const selectedIdentity = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
-    ).identity
+    )?.identity
+
+    if (!selectedIdentity) {
+      throw new Error('No selected Identity')
+    }
     return delegation.store(selectedIdentity, signature)
   }
 
@@ -158,9 +162,14 @@ class DelegationsService {
   private static async storeRootOnChain(
     delegation: DelegationRootNode
   ): Promise<SubmittableExtrinsic> {
-    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
+    const selectedIdentity = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
-    ).identity
+    )?.identity
+
+    if (!selectedIdentity) {
+      throw new Error('No selected Identity')
+    }
+
     return delegation.store(selectedIdentity)
   }
 }

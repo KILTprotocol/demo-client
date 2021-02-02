@@ -57,9 +57,14 @@ class MessageRepository {
     receivers: IContact[],
     messageBody: MessageBody
   ): Promise<void> {
-    const sender: IMyIdentity = Wallet.getSelectedIdentity(
+    const sender = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
     )
+
+    if (!sender) {
+      throw new Error('No selected Identity')
+    }
+
     const receiversAsArray = Array.isArray(receivers) ? receivers : [receivers]
     const requests = receiversAsArray.reduce(
       (promiseChain, receiver: IContact) => {

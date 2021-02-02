@@ -54,7 +54,7 @@ export type RequestAcceptDelegationProps = {
 type StateProps = {
   debugMode: boolean
   myDelegations: IMyDelegation[]
-  selectedIdentity: IMyIdentity
+  selectedIdentity?: IMyIdentity
 }
 
 type Props = RequestAcceptDelegationProps & StateProps
@@ -154,6 +154,10 @@ class RequestAcceptDelegation extends React.Component<Props, State> {
   ): void {
     const { selectedIdentity } = this.props
     const { metaData } = delegation
+
+    if (!selectedIdentity) {
+      throw new Error('No selected Identity')
+    }
 
     const delegationData = this.getDelegationData(receiverAddress, delegation)
 

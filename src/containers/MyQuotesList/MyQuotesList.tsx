@@ -7,7 +7,6 @@ import * as Quotes from '../../state/ducks/Quotes'
 import * as Wallet from '../../state/ducks/Wallet'
 import Code from '../../components/Code/Code'
 import './MyQuotesList.scss'
-import { IMyIdentity } from '../../types/Contact'
 
 type DispatchProps = {
   removeQuote: (claimId: Quotes.Entry['quoteId']) => void
@@ -16,7 +15,6 @@ type DispatchProps = {
 type OwnProps = {}
 
 type StateProps = {
-  selectedIdentity: IMyIdentity
   quoteEntries: Quotes.Entry[]
 }
 
@@ -94,7 +92,6 @@ const mapStateToProps: MapStateToProps<
   OwnProps,
   ReduxState
 > = state => ({
-  selectedIdentity: Wallet.getSelectedIdentity(state),
   quoteEntries: Quotes.getAllMyQuotes(state),
 })
 

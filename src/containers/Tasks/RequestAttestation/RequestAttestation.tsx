@@ -186,12 +186,12 @@ class RequestAttestation extends React.Component<Props, State> {
     } = this.props
     const { savedClaimEntry } = this.state
 
-    const selectedIdentity: Identity = Wallet.getSelectedIdentity(
+    const selectedIdentity = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
-    ).identity
+    )?.identity
 
     if (!selectedIdentity) {
-      throw new Error('No identity selected')
+      throw new Error('No selected Identity')
     }
 
     if (savedClaimEntry) {

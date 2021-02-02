@@ -129,13 +129,17 @@ class AttestationWorkflow {
     delegationId?: IDelegationNode['id'],
     quoteAttesterSigned?: IQuoteAgreement
   ): Promise<void> {
-    const { identity } = Wallet.getSelectedIdentity(
+    const selectedIdentity = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
-    )
+    )?.identity
+
+    if (!selectedIdentity) {
+      throw new Error('No selected Identity')
+    }
 
     const requestForAttestation = await RequestForAttestation.fromClaimAndIdentity(
       claim,
-      identity,
+      selectedIdentity,
       { legitimations, delegationId }
     )
 

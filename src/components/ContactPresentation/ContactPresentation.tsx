@@ -207,7 +207,7 @@ class ContactPresentation extends React.Component<Props, State> {
         metaData: {
           ...metaData,
           addedAt: Date.now(),
-          addedBy: selectedIdentity.identity.address,
+          addedBy: selectedIdentity?.identity.address,
         },
         publicIdentity,
       }

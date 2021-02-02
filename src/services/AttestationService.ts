@@ -192,7 +192,12 @@ class AttestationService {
   private static getIdentity(): Identity {
     const selectedIdentity = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
-    ).identity
+    )?.identity
+
+    if (!selectedIdentity) {
+      throw new Error('No selected Identity')
+    }
+
     return selectedIdentity
   }
 }

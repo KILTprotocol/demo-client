@@ -4,14 +4,11 @@ import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { IPartialClaim, IQuote } from '@kiltprotocol/sdk-js'
 import { State as ReduxState } from '../../state/PersistentStore'
-import { IMyIdentity } from '../../types/Contact'
-import * as Wallet from '../../state/ducks/Wallet'
 import * as Quotes from '../../state/ducks/Quotes'
 import QuoteCreate from '../QuoteCreate/QuoteCreate'
 import Code from '../../components/Code/Code'
 
 type StateProps = {
-  selectedIdentity: IMyIdentity
   quoteEntries?: Quotes.Entry[]
 }
 
@@ -111,7 +108,6 @@ const mapStateToProps: MapStateToProps<
   OwnProps,
   ReduxState
 > = state => ({
-  selectedIdentity: Wallet.getSelectedIdentity(state),
   quoteEntries: Quotes.getAllMyQuotes(state),
 })
 
