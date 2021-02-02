@@ -4,6 +4,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
+import DidService from '../../services/DidService'
 
 import Input from '../../components/Input/Input'
 import { BalanceUtilities } from '../../services/BalanceUtilities'
@@ -13,7 +14,7 @@ import { notify, notifySuccess } from '../../services/FeedbackService'
 import * as Contacts from '../../state/ducks/Contacts'
 import * as Wallet from '../../state/ducks/Wallet'
 import { persistentStoreInstance } from '../../state/PersistentStore'
-import { IMyIdentity } from '../../types/Contact'
+import { IContact, IMyIdentity } from '../../types/Contact'
 
 import './WalletAdd.scss'
 
@@ -91,11 +92,23 @@ class WalletAdd extends React.Component<Props, State> {
       },
       phrase,
     }
+
+    const didDocument = await DidService.fetchDID(identity)
+
+    if (didDocument) {
+      const did: IContact['did'] = {
+        identifier: didDocument.id,
+        document: didDocument,
+      }
+      newIdentity.did = did
+    }
+
     saveIdentity(newIdentity)
     persistentStoreInstance.store.dispatch(
       Contacts.Store.addContact(
         ContactRepository.getContactFromIdentity(newIdentity, {
           unregistered: true,
+          addedAt: Date.now(),
         })
       )
     )
