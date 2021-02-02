@@ -24,9 +24,6 @@ class ClientVersionHelper {
         persistentStoreInstance.store.getState()
       )?.identity
 
-      if (!selectedIdentity) {
-        throw new Error('No selected Identity')
-      }
       if (selectedIdentity) {
         // [ap] disable balance check since we have zero-balanced accounts initially.
         // const balance: number = await BalanceUtilities.getMyBalance(
