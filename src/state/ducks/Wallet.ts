@@ -31,7 +31,7 @@ export type Entry = IMyIdentity
 
 type State = {
   identities: Immutable.Map<IMyIdentity['identity']['address'], IMyIdentity>
-  selectedIdentity: Entry | null
+  selectedIdentity: IMyIdentity['identity']['address'] | null
 }
 
 export type ImmutableState = Immutable.Record<State>
@@ -65,9 +65,11 @@ class Store {
       }))
       .toArray()
 
-    const selectedIdentity: IMyIdentity | null = state.get('selectedIdentity')
+    const selectedIdentity:
+      | IMyIdentity['identity']['address']
+      | null = state.get('selectedIdentity')
     if (selectedIdentity) {
-      wallet.selectedAddress = selectedIdentity.identity.address
+      wallet.selectedAddress = selectedIdentity
     }
 
     return wallet
@@ -111,7 +113,7 @@ class Store {
     const { selectedAddress } = serializedState
     let selectedIdentity = null
     if (selectedAddress) {
-      selectedIdentity = identities[selectedAddress]
+      selectedIdentity = selectedAddress
     }
 
     return Store.createState({
@@ -149,8 +151,8 @@ class Store {
       }
       case Store.ACTIONS.SELECT_IDENTITY: {
         const selectAddress = (action as ISelectAction).payload
-        const selectedIdentity = state.getIn(['identities', selectAddress])
-        return state.set('selectedIdentity', selectedIdentity)
+
+        return state.set('selectedIdentity', selectAddress)
       }
       default:
         return state
@@ -210,12 +212,25 @@ class Store {
   }
 }
 
-const getStateSelectedIdentity = (state: ReduxState): IMyIdentity | null =>
+const getStateSelectedIdentity = (
+  state: ReduxState
+): IMyIdentity['identity']['address'] | null =>
   state.wallet.get('selectedIdentity')
 
+const getStateIdentities = (state: ReduxState): State['identities'] =>
+  state.wallet.get('identities')
+
 const getSelectedIdentity = createSelector(
-  [getStateSelectedIdentity],
-  (selectedIdentity: IMyIdentity) => selectedIdentity
+  [getStateSelectedIdentity, getStateIdentities],
+  (
+    selectedIdentity: IMyIdentity['identity']['address'],
+    identities: State['identities']
+  ) => {
+    if (!selectedIdentity) {
+      return undefined
+    }
+    return identities.get(selectedIdentity)
+  }
 )
 
 const getStateAllIdentities = (state: ReduxState): IMyIdentity[] =>
