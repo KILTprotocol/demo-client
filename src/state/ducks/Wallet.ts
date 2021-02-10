@@ -87,6 +87,7 @@ class Store {
     const identities: { [key: string]: IMyIdentity } = {}
 
     await Promise.all(
+      // eslint-disable-next-line array-callback-return
       serializedIdentities.map((serializedIdentity: SerializedIdentity) => {
         const { did, name, phrase, createdAt } = serializedIdentity
 
