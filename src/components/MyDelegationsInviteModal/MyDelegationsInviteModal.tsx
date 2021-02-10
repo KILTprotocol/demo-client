@@ -2,8 +2,8 @@ import {
   IRequestAcceptDelegation,
   MessageBodyType,
   Permission,
-  UUID,
 } from '@kiltprotocol/sdk-js'
+import { UUID } from '@kiltprotocol/utils'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 

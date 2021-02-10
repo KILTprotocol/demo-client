@@ -1,12 +1,13 @@
 import {
   IInformCreateDelegation,
+  IPartialClaim,
   IRequestAcceptDelegation,
   IRequestAttestationForClaim,
   IRequestClaimsForCTypes,
   IRequestTerms,
   ISubmitAcceptDelegation,
   ISubmitAttestationForClaim,
-  ISubmitClaimsForCTypesClassic,
+  ISubmitClaimsForCTypes,
   ISubmitTerms,
   MessageBodyType,
 } from '@kiltprotocol/sdk-js'
@@ -128,9 +129,12 @@ class MessageDetailView extends React.Component<Props, State> {
         )
       }
       case MessageBodyType.SUBMIT_TERMS: {
+        // Need to fix with the update in Message Compresss and Decompress
         return (
           <RequestAttestation
-            claim={(message.body as ISubmitTerms).content.claim}
+            claim={
+              (message.body as ISubmitTerms).content.claim as IPartialClaim
+            }
             terms={(message.body as ISubmitTerms).content.legitimations}
             delegationId={
               (message.body as ISubmitTerms).content.delegationId || undefined
@@ -182,12 +186,10 @@ class MessageDetailView extends React.Component<Props, State> {
           />
         )
       }
-      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
         return (
           <VerifyClaim
-            attestedClaims={
-              (message.body as ISubmitClaimsForCTypesClassic).content
-            }
+            attestedClaims={(message.body as ISubmitClaimsForCTypes).content}
           />
         )
       }

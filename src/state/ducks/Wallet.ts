@@ -87,27 +87,25 @@ class Store {
     const identities: { [key: string]: IMyIdentity } = {}
 
     await Promise.all(
-      serializedIdentities.map(
-        async (serializedIdentity: SerializedIdentity) => {
-          const { did, name, phrase, createdAt } = serializedIdentity
+      serializedIdentities.map((serializedIdentity: SerializedIdentity) => {
+        const { did, name, phrase, createdAt } = serializedIdentity
 
-          // TODO: use real wallet later instead of stored phrase
+        // TODO: use real wallet later instead of stored phrase
 
-          const identity = await Identity.buildFromMnemonic(phrase)
+        const identity = Identity.buildFromMnemonic(phrase)
 
-          const myIdentity: IMyIdentity = {
-            createdAt,
-            did,
-            identity,
-            metaData: {
-              name,
-            },
-            phrase,
-          }
-
-          identities[identity.address] = myIdentity
+        const myIdentity: IMyIdentity = {
+          createdAt,
+          did,
+          identity,
+          metaData: {
+            name,
+          },
+          phrase,
         }
-      )
+
+        identities[identity.address] = myIdentity
+      })
     )
 
     const { selectedAddress } = serializedState

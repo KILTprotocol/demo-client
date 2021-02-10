@@ -5,7 +5,6 @@ import DidService from '../../services/DidService'
 import FeedbackService, {
   notifySuccess,
   notifyError,
-  safeDelete,
 } from '../../services/FeedbackService'
 import { IMyIdentity } from '../../types/Contact'
 import Balance from '../../containers/Balance/Balance'

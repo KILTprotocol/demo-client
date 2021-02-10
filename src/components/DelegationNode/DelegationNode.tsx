@@ -283,10 +283,37 @@ class DelegationNode extends React.Component<Props, State> {
       }'`,
     })
 
+    // if the attester is not the owner, we need to check the delegation tree
+    // if (
+    //   attestation.owner !== attester.address &&
+    //   attestation.delegationId !== null
+    // ) {
+    //   delegationTreeTraversalSteps += 1
+    //   const delegationNode = await DelegationNode.query(
+    //     attestation.delegationId
+    //   )
+
+    //   if (typeof delegationNode !== 'undefined' && delegationNode !== null) {
+    //     const { steps, node } = await delegationNode.findParent(
+    //       attester.address
+    //     )
+    //     delegationTreeTraversalSteps += steps
+    //     if (node === null) {
+    //       throw SDKErrors.ERROR_UNAUTHORIZED(
+    //         'Attester is not athorized to revoke this attestation. (attester not in delegation tree)'
+    //       )
+    //     }
+    //   }
+    // } else if (attestation.owner !== attester.address) {
+    //   throw SDKErrors.ERROR_UNAUTHORIZED(
+    //     'Attester is not athorized to revoke this attestation. (not the owner, no delegations)'
+    //   )
+    // }
+
     Promise.chain(
       hashes.map((hash: string, index: number) => () => {
         blockUi.updateMessage(`Revoking ${index + 1} / ${hashes.length}`)
-        return Attestation.revoke(hash, selectedIdentity.identity).catch(
+        return Attestation.revoke(hash, selectedIdentity.identity, 1).catch(
           error => {
             // Promise.chain works with thrown object literals
             // eslint-disable-next-line no-throw-literal

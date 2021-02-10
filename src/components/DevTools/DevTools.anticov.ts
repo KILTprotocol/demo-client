@@ -1,15 +1,14 @@
 import Kilt, {
   DelegationRootNode,
   Identity,
-  BlockchainUtils,
   DelegationNode,
   MessageBody,
   MessageBodyType,
   Permission,
-  UUID,
+  BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
-import { IMetadata } from '@kiltprotocol/sdk-js/build/types/CTypeMetadata'
-import { ICTypeSchema } from '@kiltprotocol/sdk-js/build/types/CType'
+import { IMetadata, ICTypeSchema } from '@kiltprotocol/types'
+import { UUID } from '@kiltprotocol/utils'
 import BN from 'bn.js'
 import {
   ROOT_SEED,
@@ -39,9 +38,9 @@ interface ISetup {
 
 let cachedSetup: ISetup
 
-async function setup(): Promise<ISetup> {
+function setup(): ISetup {
   if (!cachedSetup) {
-    const root = await Identity.buildFromMnemonic(ROOT_SEED)
+    const root = Identity.buildFromMnemonic(ROOT_SEED)
 
     const delegationRoot = new DelegationRootNode(
       DELEGATION_ROOT_ID,
@@ -59,7 +58,7 @@ async function setup(): Promise<ISetup> {
 }
 
 async function newDelegation(delegate: IMyIdentity): Promise<void> {
-  const { root, delegationRoot } = await setup()
+  const { root, delegationRoot } = setup()
 
   const delegationNode = new DelegationNode(
     UUID.generate(),
@@ -88,7 +87,7 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
 }
 
 async function verifyOrAddCtypeAndRoot(): Promise<void> {
-  const { root, delegationRoot } = await setup()
+  const { root, delegationRoot } = setup()
   if (!(await ctype.verifyStored())) {
     const tx = await ctype.store(root)
     await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
@@ -120,13 +119,13 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
 }
 
 export async function setupAndDelegate(delegate: IMyIdentity): Promise<void> {
-  const { root } = await setup()
+  const { root } = setup()
   const blockUi = FeedbackService.addBlockUi({
     headline: 'Creating AntiCov Delegation',
   })
   try {
     blockUi.updateMessage('Transferring funds to AntiCov authority')
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       BalanceUtilities.makeTransfer(delegate, root.address, new BN(4), () =>
         resolve()
       )

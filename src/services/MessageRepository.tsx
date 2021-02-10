@@ -2,13 +2,14 @@ import {
   Identity,
   IEncryptedMessage,
   IMessage,
+  IPartialClaim,
   IPublicIdentity,
   IRejectTerms,
   IRequestAttestationForClaim,
   IRequestClaimsForCTypes,
   IRequestTerms,
   ISubmitAttestationForClaim,
-  ISubmitClaimsForCTypesClassic,
+  ISubmitClaimsForCTypes,
   ISubmitTerms,
   Message,
   MessageBody,
@@ -246,7 +247,11 @@ class MessageRepository {
       case MessageBodyType.REQUEST_TERMS:
         return [(message.body as IRequestTerms).content.cTypeHash]
       case MessageBodyType.SUBMIT_TERMS:
-        return [(message.body as ISubmitTerms).content.claim.cTypeHash]
+        // Need to fix with the Message compress and decompress update
+        return [
+          ((message.body as ISubmitTerms).content.claim as IPartialClaim)
+            .cTypeHash,
+        ]
       case MessageBodyType.REJECT_TERMS:
         return [(message.body as IRejectTerms).content.claim.cTypeHash]
 
@@ -264,9 +269,9 @@ class MessageRepository {
       case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
         return (message.body as IRequestClaimsForCTypes).content.ctypes.filter(
           Boolean
-        ) as Array<ICType['cType']['hash']>
-      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
-        const cTypeHashes = (message.body as ISubmitClaimsForCTypesClassic).content.map(
+        )
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
+        const cTypeHashes = (message.body as ISubmitClaimsForCTypes).content.map(
           attestedClaim => attestedClaim.request.claim.cTypeHash
         )
         const uniqueCTypeHashes: Array<ICType['cType']['hash']> = cTypeHashes.filter(

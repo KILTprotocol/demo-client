@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import CTypeRepository from '../../services/CtypeRepository'
-
 import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import Code from '../Code/Code'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'

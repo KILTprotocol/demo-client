@@ -75,7 +75,7 @@ class AttestationService {
       throw new Error('No identity selected')
     }
     try {
-      const tx = await attestation.revoke(selectedIdentity)
+      const tx = await attestation.revoke(selectedIdentity, 1)
       await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
       notifySuccess('Attestation successfully revoked')
       persistentStoreInstance.store.dispatch(
@@ -97,7 +97,7 @@ class AttestationService {
   ): Promise<void> {
     const selectedIdentity = AttestationService.getIdentity()
 
-    const tx = Attestation.revoke(claimHash, selectedIdentity)
+    const tx = Attestation.revoke(claimHash, selectedIdentity, 1)
     await BlockchainUtils.submitSignedTx(await tx, {
       resolveOn: IS_IN_BLOCK,
     })

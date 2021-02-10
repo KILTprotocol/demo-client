@@ -1,10 +1,8 @@
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
-import {
-  IQuoteAgreement,
-  IQuoteAttesterSigned,
-  UUID,
-} from '@kiltprotocol/sdk-js'
+import { IQuoteAgreement, IQuoteAttesterSigned } from '@kiltprotocol/sdk-js'
+import { UUID } from '@kiltprotocol/utils'
+
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 import { State as ReduxState } from '../PersistentStore'

@@ -18,7 +18,7 @@ type SelectOption = {
 type Props = RouteComponentProps<{}> & {
   closeMenuOnSelect?: boolean
   claims?: Claims.Entry[]
-  cTypeHash: ICType['cType']['hash'] | null
+  cTypeHash: ICType['ctypeHash'] | null
   isMulti?: boolean
   placeholder?: string
   preSelectedClaimEntries?: Claims.Entry[]

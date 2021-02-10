@@ -1,5 +1,4 @@
 import {
-  Crypto,
   AttestedClaim,
   IAttestedClaim,
   IClaim,
@@ -9,6 +8,7 @@ import {
   IQuoteAttesterSigned,
   RequestForAttestation,
 } from '@kiltprotocol/sdk-js'
+import { Crypto } from '@kiltprotocol/utils'
 import * as Quotes from '../state/ducks/Quotes'
 import { persistentStoreInstance } from '../state/PersistentStore'
 import ErrorService from './ErrorService'
@@ -23,22 +23,24 @@ class QuoteServices {
     )
   }
 
-  public static async createAgreedQuote(
+  public static createAgreedQuote(
     claim: IClaim,
     identity: Identity,
     terms: AttestedClaim[] = [],
     delegationId?: IDelegationNode['id'],
     quoteAttesterSigned: IQuoteAttesterSigned | null = null
-  ): Promise<IQuoteAgreement | null> {
+  ): IQuoteAgreement | null {
     if (!quoteAttesterSigned) return null
-    const {
-      message: requestForAttestation,
-    } = await RequestForAttestation.fromClaimAndIdentity(claim, identity, {
-      legitimations: (terms || []).map((legitimation: IAttestedClaim) =>
-        AttestedClaim.fromAttestedClaim(legitimation)
-      ),
-      delegationId,
-    })
+    const requestForAttestation = RequestForAttestation.fromClaimAndIdentity(
+      claim,
+      identity,
+      {
+        legitimations: (terms || []).map((legitimation: IAttestedClaim) =>
+          AttestedClaim.fromAttestedClaim(legitimation)
+        ),
+        delegationId,
+      }
+    )
 
     const signature = identity.signStr(
       Crypto.hashObjectAsStr(quoteAttesterSigned)

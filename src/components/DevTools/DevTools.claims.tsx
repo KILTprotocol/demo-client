@@ -1,5 +1,5 @@
-import { Claim, CType, IClaim } from '@kiltprotocol/sdk-js'
-
+import { Claim, CType } from '@kiltprotocol/sdk-js'
+import { IClaim } from '@kiltprotocol/types'
 import * as Claims from '../../state/ducks/Claims'
 import { persistentStoreInstance } from '../../state/PersistentStore'
 import { BsCType, BsCTypesPool } from './DevTools.ctypes'

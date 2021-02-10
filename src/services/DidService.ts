@@ -3,14 +3,12 @@ import {
   Did,
   Identity,
   IDid,
-  IPublicIdentity,
   IURLResolver,
   PublicIdentity,
-} from '@kiltprotocol/sdk-js'
-import {
   IDidDocument,
-  IDidDocumentSigned,
-} from '@kiltprotocol/sdk-js/build/did/Did'
+} from '@kiltprotocol/core'
+import { IPublicIdentity } from '@kiltprotocol/types'
+
 import * as Wallet from '../state/ducks/Wallet'
 import { persistentStoreInstance } from '../state/PersistentStore'
 import { IContact, IMyIdentity } from '../types/Contact'
@@ -75,7 +73,7 @@ class DidService {
 
     const did = Did.fromIdentity(myIdentity.identity, documentStore)
     const didDocument = did.createDefaultDidDocument(`${MessageRepository.URL}`)
-    const signedDidDocument: IDidDocumentSigned = Did.signDidDocument(
+    const signedDidDocument = Did.signDidDocument(
       didDocument,
       myIdentity.identity
     )

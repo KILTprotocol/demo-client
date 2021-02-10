@@ -1,14 +1,15 @@
 import React from 'react'
 import {
   AttestedClaim,
-  IAttestedClaim,
-  IDelegationNode,
-  Identity,
-  IPartialClaim,
-  IQuoteAttesterSigned,
   PublicIdentity,
   Quote,
+  IPartialClaim,
 } from '@kiltprotocol/sdk-js'
+import {
+  IQuoteAttesterSigned,
+  IAttestedClaim,
+  IDelegationNode,
+} from '@kiltprotocol/types'
 import { connect } from 'react-redux'
 import QuoteServices from '../../../services/QuoteServices'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
@@ -175,7 +176,7 @@ class RequestAttestation extends React.Component<Props, State> {
     })
   }
 
-  private async handleSubmit(): Promise<void> {
+  private handleSubmit(): void {
     const {
       receiverAddresses,
       terms,
@@ -203,7 +204,7 @@ class RequestAttestation extends React.Component<Props, State> {
         AttestedClaim.fromAttestedClaim(legitimation)
       )
 
-      const quoteAgreement = await QuoteServices.createAgreedQuote(
+      const quoteAgreement = QuoteServices.createAgreedQuote(
         savedClaimEntry.claim,
         selectedIdentity,
         termBreakdown,

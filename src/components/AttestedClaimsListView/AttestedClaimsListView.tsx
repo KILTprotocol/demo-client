@@ -1,4 +1,4 @@
-import { IAttestedClaim, IDelegationNode } from '@kiltprotocol/sdk-js'
+import { IAttestedClaim, IDelegationNode } from '@kiltprotocol/types'
 import React from 'react'
 
 import { persistentStoreInstance } from '../../state/PersistentStore'

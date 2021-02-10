@@ -1,9 +1,8 @@
 import {
-  DelegationNode as SDKDelegationNode,
   DelegationBaseNode,
-  IDelegationBaseNode,
-  IDelegationRootNode,
+  DelegationNode as SDKDelegationNode,
 } from '@kiltprotocol/sdk-js'
+import { IDelegationBaseNode, IDelegationRootNode } from '@kiltprotocol/types'
 import React, { useState, useEffect } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 

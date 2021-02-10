@@ -1,10 +1,9 @@
 import {
   CType,
-  ICType,
-  ICTypeMetadata,
   ERROR_CTYPE_ALREADY_EXISTS,
   BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
+import { ICType, ICTypeMetadata } from '@kiltprotocol/types'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess, notifyError } from '../../services/FeedbackService'

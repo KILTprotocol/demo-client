@@ -6,7 +6,8 @@ class BlockchainService {
   public static async connect(
     host: string = this.getNodeWebsocketUrl()
   ): Promise<IBlockchainApi> {
-    return Kilt.connect(host)
+    Kilt.config({ address: host })
+    return Kilt.connect()
   }
 
   public static getNodeWebsocketUrl(): string {

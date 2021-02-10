@@ -1,21 +1,18 @@
-import {
-  encryptSymmetricAsStr,
-  decryptSymmetricStr,
-  CryptoInput,
-  EncryptedSymmetricString,
-  coToUInt8,
-} from '@kiltprotocol/sdk-js/build/crypto'
+import { Crypto } from '@kiltprotocol/utils'
 import { scrypt } from 'scrypt-js'
 
 export function encryption(
   message: string,
-  secret: CryptoInput
-): EncryptedSymmetricString {
-  return encryptSymmetricAsStr(message, secret)
+  secret: Crypto.CryptoInput
+): Crypto.EncryptedSymmetricString {
+  return Crypto.encryptSymmetricAsStr(message, secret)
 }
 
-export function decryption(data: string, secret: CryptoInput): string | null {
-  return decryptSymmetricStr(JSON.parse(data), secret)
+export function decryption(
+  data: string,
+  secret: Crypto.CryptoInput
+): string | null {
+  return Crypto.decryptSymmetricStr(JSON.parse(data), secret)
 }
 
 export function passwordHashing(
@@ -26,5 +23,12 @@ export function passwordHashing(
   const r = 8
   const p = 1
   const dkLen = 32
-  return scrypt(coToUInt8(password), coToUInt8(salt), N, r, p, dkLen)
+  return scrypt(
+    Crypto.coToUInt8(password),
+    Crypto.coToUInt8(salt),
+    N,
+    r,
+    p,
+    dkLen
+  )
 }

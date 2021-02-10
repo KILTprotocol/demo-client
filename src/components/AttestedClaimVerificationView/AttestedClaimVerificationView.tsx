@@ -1,4 +1,4 @@
-import { IAttestedClaim } from '@kiltprotocol/sdk-js'
+import { IAttestedClaim } from '@kiltprotocol/types'
 import React from 'react'
 import * as UiState from '../../state/ducks/UiState'
 import { persistentStoreInstance } from '../../state/PersistentStore'

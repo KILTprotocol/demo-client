@@ -122,7 +122,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           persistentStoreInstance.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
+              objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES,
               props: { cTypeHashes: [cTypeHash] } as SubmitClaimsForCTypeProps,
             })
           )

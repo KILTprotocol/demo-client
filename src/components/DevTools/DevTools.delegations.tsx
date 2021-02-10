@@ -7,8 +7,9 @@ import {
   ISubmitAcceptDelegation,
   MessageBodyType,
   Permission,
-  UUID,
 } from '@kiltprotocol/sdk-js'
+import { UUID } from '@kiltprotocol/utils'
+
 import ContactRepository from '../../services/ContactRepository'
 
 import DelegationsService from '../../services/DelegationsService'

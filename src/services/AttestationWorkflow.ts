@@ -107,7 +107,7 @@ class AttestationWorkflow {
   ): Promise<void> {
     const messageBody: ISubmitClaimsForCTypes = {
       content: attestedClaims,
-      type: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
+      type: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES,
     }
 
     return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
@@ -137,7 +137,7 @@ class AttestationWorkflow {
       throw new Error('No selected Identity')
     }
 
-    const requestForAttestation = await RequestForAttestation.fromClaimAndIdentity(
+    const requestForAttestation = RequestForAttestation.fromClaimAndIdentity(
       claim,
       selectedIdentity,
       { legitimations, delegationId }
@@ -145,14 +145,14 @@ class AttestationWorkflow {
 
     attesterAddresses.forEach(attesterAddress =>
       RequestForAttestationService.saveInStore(
-        requestForAttestation.message,
+        requestForAttestation,
         attesterAddress
       )
     )
 
     const messageBody: IRequestAttestationForClaim = {
       content: {
-        requestForAttestation: requestForAttestation.message,
+        requestForAttestation,
       },
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }

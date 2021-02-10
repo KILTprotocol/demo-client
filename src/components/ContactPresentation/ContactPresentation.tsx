@@ -1,8 +1,9 @@
-import { IPublicIdentity, MessageBodyType } from '@kiltprotocol/sdk-js'
+import { IPublicIdentity } from '@kiltprotocol/types'
 import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
+import { MessageBodyType } from '@kiltprotocol/sdk-js'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 import { RequestTermsProps } from '../../containers/Tasks/RequestTerms/RequestTerms'
 import { SubmitTermsProps } from '../../containers/Tasks/SubmitTerms/SubmitTerms'
@@ -116,7 +117,7 @@ class ContactPresentation extends React.Component<Props, State> {
       callback: () => {
         persistentStoreInstance.store.dispatch(
           UiState.Store.updateCurrentTaskAction({
-            objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
+            objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES,
             props: {
               receiverAddresses: [address],
             },

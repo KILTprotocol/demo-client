@@ -1,13 +1,13 @@
 import {
-  IPartialClaim,
-  Crypto,
   IRequestForAttestation,
   IPublicIdentity,
   IClaim,
   IAttestedClaim,
   IAttestation,
   RequestForAttestation,
+  IPartialClaim,
 } from '@kiltprotocol/sdk-js'
+import { Crypto } from '@kiltprotocol/utils'
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 
@@ -416,7 +416,7 @@ const getCTypeHash = (
 
 const getClaimsByCTypeHash = createSelector(
   [getClaims, getCTypeHash],
-  (entries: Entry[], cTypeHash: ICType['cType']['hash']) =>
+  (entries: Entry[], cTypeHash: ICType['ctypeHash']) =>
     entries.filter((entry: Entry) => entry.claim.cTypeHash === cTypeHash)
 )
 

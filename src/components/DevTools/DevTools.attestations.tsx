@@ -203,7 +203,7 @@ class BsAttestation {
       }
     )
 
-    return req4Att.message
+    return req4Att
   }
 
   /**
@@ -263,7 +263,7 @@ class BsAttestation {
     const attesterIdentity: IMyIdentity = await BsIdentity.getByKey(attesterKey)
     const cType: ICTypeWithMetadata = await BsCType.getByKey(bsClaim.cTypeKey)
 
-    const partialClaim: IPartialClaim = {
+    const IPartialClaim: IPartialClaim = {
       cTypeHash: cType.cType.hash,
       contents: bsClaim.data,
       owner: claimerIdentity.identity.address,
@@ -271,7 +271,7 @@ class BsAttestation {
 
     // send request for term from claimer to attester
     const requestAcceptDelegation: IRequestTerms = {
-      content: partialClaim,
+      content: IPartialClaim,
       type: MessageBodyType.REQUEST_TERMS,
     }
     await MessageRepository.singleSend(
@@ -283,7 +283,7 @@ class BsAttestation {
     // send terms from attester to claimer
     const submitTerms: ISubmitTerms = {
       content: {
-        claim: partialClaim,
+        claim: IPartialClaim,
         delegationId: attestedClaim.request.delegationId || undefined,
         legitimations: attestedClaim.request.legitimations,
         quote: undefined,

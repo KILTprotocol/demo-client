@@ -1,6 +1,6 @@
 import { combineReducers, createStore, Store } from 'redux'
 import nacl from 'tweetnacl'
-import { u8aToHex } from '@kiltprotocol/sdk-js/build/crypto'
+import { Crypto } from '@kiltprotocol/utils'
 import {
   encryption,
   decryption,
@@ -93,7 +93,7 @@ export class PersistentStore {
   private storeInternal: Store
 
   public static createSalt(): void {
-    const salt = u8aToHex(nacl.randomBytes(24))
+    const salt = Crypto.u8aToHex(nacl.randomBytes(24))
     localStorage.setItem(PersistentStore.SALT, salt)
   }
 
