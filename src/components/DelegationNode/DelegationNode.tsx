@@ -1,10 +1,12 @@
 import {
   Attestation,
+  BlockchainUtils,
   DelegationNode as SDKDelegationNode,
   DelegationRootNode,
   IDelegationNode,
   MessageBodyType,
   Permission,
+  SDKErrors,
 } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
@@ -261,7 +263,6 @@ class DelegationNode extends React.Component<Props, State> {
       node: { delegation },
       selectedIdentity,
     } = this.props
-
     const { myDelegation } = this.state
 
     const hashes = await delegation.getAttestationHashes()
@@ -283,43 +284,36 @@ class DelegationNode extends React.Component<Props, State> {
       }'`,
     })
 
-    // if the attester is not the owner, we need to check the delegation tree
-    // if (
-    //   attestation.owner !== attester.address &&
-    //   attestation.delegationId !== null
-    // ) {
-    //   delegationTreeTraversalSteps += 1
-    //   const delegationNode = await DelegationNode.query(
-    //     attestation.delegationId
-    //   )
+    await Promise.chain(
+      hashes.map((hash: string, index: number) => async () => {
+        const attestation = await Attestation.query(hash)
 
-    //   if (typeof delegationNode !== 'undefined' && delegationNode !== null) {
-    //     const { steps, node } = await delegationNode.findParent(
-    //       attester.address
-    //     )
-    //     delegationTreeTraversalSteps += steps
-    //     if (node === null) {
-    //       throw SDKErrors.ERROR_UNAUTHORIZED(
-    //         'Attester is not athorized to revoke this attestation. (attester not in delegation tree)'
-    //       )
-    //     }
-    //   }
-    // } else if (attestation.owner !== attester.address) {
-    //   throw SDKErrors.ERROR_UNAUTHORIZED(
-    //     'Attester is not athorized to revoke this attestation. (not the owner, no delegations)'
-    //   )
-    // }
+        if (attestation === null) {
+          throw SDKErrors.ERROR_NOT_FOUND('Attestation not on chain')
+        }
 
-    Promise.chain(
-      hashes.map((hash: string, index: number) => () => {
-        blockUi.updateMessage(`Revoking ${index + 1} / ${hashes.length}`)
-        return Attestation.revoke(hash, selectedIdentity.identity, 1).catch(
-          error => {
-            // Promise.chain works with thrown object literals
-            // eslint-disable-next-line no-throw-literal
-            throw { hash, error }
-          }
+        if (attestation.revoked) {
+          throw SDKErrors.ERROR_NOT_FOUND('Attestation is revoked')
+        }
+
+        const delegationTreeTraversalSteps = await DelegationsService.checkTraversalStepsToParent(
+          selectedIdentity.identity,
+          attestation
         )
+
+        blockUi.updateMessage(`Revoking ${index + 1} / ${hashes.length}`)
+
+        const tx = await Attestation.revoke(
+          hash,
+          selectedIdentity.identity,
+          delegationTreeTraversalSteps
+        )
+
+        const result = await BlockchainUtils.submitSignedTx(tx, {
+          resolveOn: BlockchainUtils.IS_IN_BLOCK,
+        })
+
+        return result
       }),
       true
     ).then(result => {
