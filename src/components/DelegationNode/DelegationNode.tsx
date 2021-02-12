@@ -48,6 +48,12 @@ export type DelegationsTreeNode = {
   childNodes: DelegationsTreeNode[]
 }
 
+export type attestationSteps = {
+  attestation: Attestation | null
+  index: number
+  steps: number
+}
+
 type Props = {
   node: DelegationsTreeNode
   selectedIdentity: IMyIdentity
@@ -284,10 +290,20 @@ class DelegationNode extends React.Component<Props, State> {
       }'`,
     })
 
+    const firstAttestation = await Attestation.query(hashes[0])
+
+    if (firstAttestation === null) {
+      throw SDKErrors.ERROR_NOT_FOUND('Attestation not on chain')
+    }
+
+    const steps = await DelegationsService.checkTraversalStepsToParent(
+      selectedIdentity.identity,
+      firstAttestation
+    )
+
     await Promise.chain(
       hashes.map((hash: string, index: number) => async () => {
         const attestation = await Attestation.query(hash)
-
         if (attestation === null) {
           throw SDKErrors.ERROR_NOT_FOUND('Attestation not on chain')
         }
@@ -296,17 +312,12 @@ class DelegationNode extends React.Component<Props, State> {
           throw SDKErrors.ERROR_NOT_FOUND('Attestation is revoked')
         }
 
-        const delegationTreeTraversalSteps = await DelegationsService.checkTraversalStepsToParent(
-          selectedIdentity.identity,
-          attestation
-        )
-
         blockUi.updateMessage(`Revoking ${index + 1} / ${hashes.length}`)
 
         const tx = await Attestation.revoke(
-          hash,
+          attestation.claimHash,
           selectedIdentity.identity,
-          delegationTreeTraversalSteps
+          steps
         )
 
         const result = await BlockchainUtils.submitSignedTx(tx, {
