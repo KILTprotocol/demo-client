@@ -33,7 +33,7 @@ class BsIdentity {
     return requests
   }
 
-  public static async create(alias: string): Promise<void | IMyIdentity> {
+  public static create(alias: string): void | IMyIdentity {
     const randomPhrase = mnemonicGenerate()
     const identity = Identity.buildFromMnemonic(randomPhrase)
 
@@ -44,56 +44,52 @@ class BsIdentity {
     identity: Identity,
     phrase: string,
     alias: string
-  ): Promise<void | IMyIdentity> {
+  ): void | IMyIdentity {
     const selectedIdentity:
       | IMyIdentity
       | undefined = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
     )
 
-    return new Promise((resolve, reject) => {
-      if (!selectedIdentity) {
-        return reject(new Error('No Identity selected'))
-      }
-      return BalanceUtilities.makeTransfer(
-        selectedIdentity,
-        identity.address,
-        ENDOWMENT,
-        () => {
-          const newContact: IContact = {
-            metaData: {
-              name: alias,
-            },
-            publicIdentity: identity.getPublicIdentity(),
-          }
-          persistentStoreInstance.store.dispatch(
-            Contacts.Store.addContact(newContact)
-          )
-
-          const newIdentity = {
-            identity,
-            metaData: {
-              name: alias,
-            },
-            phrase,
-          } as IMyIdentity
-          persistentStoreInstance.store.dispatch(
-            Wallet.Store.saveIdentityAction(newIdentity)
-          )
-          persistentStoreInstance.store.dispatch(
-            Contacts.Store.addContact(
-              ContactRepository.getContactFromIdentity(newIdentity, {
-                unregistered: true,
-              })
-            )
-          )
-          BalanceUtilities.connect(newIdentity)
-          notifySuccess(`Identity ${alias} successfully created.`)
-
-          resolve(newIdentity)
+    if (!selectedIdentity) {
+      throw new Error('No Identity selected')
+    }
+    return BalanceUtilities.makeTransfer(
+      selectedIdentity,
+      identity.address,
+      ENDOWMENT,
+      () => {
+        const newContact: IContact = {
+          metaData: {
+            name: alias,
+          },
+          publicIdentity: identity.getPublicIdentity(),
         }
-      )
-    })
+        persistentStoreInstance.store.dispatch(
+          Contacts.Store.addContact(newContact)
+        )
+
+        const newIdentity = {
+          identity,
+          metaData: {
+            name: alias,
+          },
+          phrase,
+        } as IMyIdentity
+        persistentStoreInstance.store.dispatch(
+          Wallet.Store.saveIdentityAction(newIdentity)
+        )
+        persistentStoreInstance.store.dispatch(
+          Contacts.Store.addContact(
+            ContactRepository.getContactFromIdentity(newIdentity, {
+              unregistered: true,
+            })
+          )
+        )
+        BalanceUtilities.connect(newIdentity)
+        notifySuccess(`Identity ${alias} successfully created.`)
+      }
+    )
   }
 
   public static async getByKey(
