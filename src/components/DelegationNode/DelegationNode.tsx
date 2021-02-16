@@ -3,6 +3,7 @@ import {
   BlockchainUtils,
   DelegationNode as SDKDelegationNode,
   DelegationRootNode,
+  DelegationNodeUtils,
   IDelegationNode,
   MessageBodyType,
   Permission,
@@ -296,7 +297,7 @@ class DelegationNode extends React.Component<Props, State> {
       throw SDKErrors.ERROR_NOT_FOUND('Attestation not on chain')
     }
 
-    const steps = await DelegationsService.checkTraversalStepsToParent(
+    const steps = await DelegationNodeUtils.countNodeDepth(
       selectedIdentity.identity,
       firstAttestation
     )
