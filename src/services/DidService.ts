@@ -6,6 +6,7 @@ import {
   IURLResolver,
   PublicIdentity,
   IDidDocument,
+  IDidDocumentSigned,
 } from '@kiltprotocol/core'
 import { IPublicIdentity } from '@kiltprotocol/types'
 
@@ -73,7 +74,7 @@ class DidService {
 
     const did = Did.fromIdentity(myIdentity.identity, documentStore)
     const didDocument = did.createDefaultDidDocument(`${MessageRepository.URL}`)
-    const signedDidDocument = Did.signDidDocument(
+    const signedDidDocument: IDidDocumentSigned = Did.signDidDocument(
       didDocument,
       myIdentity.identity
     )
