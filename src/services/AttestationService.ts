@@ -2,6 +2,7 @@ import {
   Attestation,
   AttestedClaim,
   BlockchainUtils,
+  DelegationNodeUtils,
   IAttestation,
   IAttestedClaim,
   Identity,
@@ -14,7 +15,6 @@ import * as Attestations from '../state/ducks/Attestations'
 import * as Claims from '../state/ducks/Claims'
 import * as Wallet from '../state/ducks/Wallet'
 import { persistentStoreInstance } from '../state/PersistentStore'
-import DelegationsService from './DelegationsService'
 import ErrorService from './ErrorService'
 import { notifySuccess, notifyError } from './FeedbackService'
 
@@ -73,7 +73,7 @@ class AttestationService {
     const attestation = Attestation.fromAttestation(iAttestation)
     const selectedIdentity = AttestationService.getIdentity()
 
-    const delegationTreeTraversalSteps = await DelegationsService.checkTraversalStepsToParent(
+    const delegationTreeTraversalSteps = await DelegationNodeUtils.countNodeDepth(
       selectedIdentity,
       attestation
     )
@@ -112,7 +112,7 @@ class AttestationService {
     if (attestation === null) {
       throw SDKErrors.ERROR_NOT_FOUND('Attestation not on chain')
     }
-    const delegationTreeTraversalSteps = await DelegationsService.checkTraversalStepsToParent(
+    const delegationTreeTraversalSteps = await DelegationNodeUtils.countNodeDepth(
       selectedIdentity,
       attestation
     )

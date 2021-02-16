@@ -1,15 +1,12 @@
 import {
-  Attestation,
   BlockchainUtils,
   DelegationBaseNode,
   DelegationNode,
   DelegationRootNode,
-  IAttestation,
   IDelegationBaseNode,
   IDelegationNode,
   IDelegationRootNode,
   Identity,
-  SDKErrors,
   SubmittableExtrinsic,
 } from '@kiltprotocol/sdk-js'
 import { DelegationsTreeNode } from '../components/DelegationNode/DelegationNode'
@@ -174,42 +171,6 @@ class DelegationsService {
     }
 
     return delegation.store(selectedIdentity)
-  }
-
-  public static async checkTraversalStepsToParent(
-    attester: Identity,
-    attestation: Attestation
-  ): Promise<number> {
-    let delegationTreeTraversalSteps = 0
-
-    // if the attester is not the owner, we need to check the delegation tree
-    if (
-      attestation.owner !== attester.address &&
-      attestation.delegationId !== null
-    ) {
-      delegationTreeTraversalSteps += 1
-      const delegationNode = await DelegationNode.query(
-        attestation.delegationId
-      )
-
-      if (typeof delegationNode !== 'undefined' && delegationNode !== null) {
-        const { steps, node } = await delegationNode.findParent(
-          attester.address
-        )
-        delegationTreeTraversalSteps += steps
-        if (node === null) {
-          throw SDKErrors.ERROR_UNAUTHORIZED(
-            'Attester is not athorized to revoke this attestation. (attester not in delegation tree)'
-          )
-        }
-      }
-    } else if (attestation.owner !== attester.address) {
-      throw SDKErrors.ERROR_UNAUTHORIZED(
-        'Attester is not athorized to revoke this attestation. (not the owner, no delegations)'
-      )
-    }
-
-    return delegationTreeTraversalSteps
   }
 }
 
