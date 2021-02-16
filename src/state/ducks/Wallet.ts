@@ -75,9 +75,7 @@ class Store {
     return wallet
   }
 
-  public static async deserialize(
-    serializedState: SerializedState
-  ): Promise<ImmutableState> {
+  public static deserialize(serializedState: SerializedState): ImmutableState {
     const serializedIdentities: SerializedIdentity[] =
       serializedState &&
       serializedState.identities &&
@@ -86,28 +84,25 @@ class Store {
         : []
     const identities: { [key: string]: IMyIdentity } = {}
 
-    await Promise.all(
-      // eslint-disable-next-line array-callback-return
-      serializedIdentities.map((serializedIdentity: SerializedIdentity) => {
-        const { did, name, phrase, createdAt } = serializedIdentity
+    serializedIdentities.map((serializedIdentity: SerializedIdentity) => {
+      const { did, name, phrase, createdAt } = serializedIdentity
 
-        // TODO: use real wallet later instead of stored phrase
+      // TODO: use real wallet later instead of stored phrase
 
-        const identity = Identity.buildFromMnemonic(phrase)
+      const identity = Identity.buildFromMnemonic(phrase)
 
-        const myIdentity: IMyIdentity = {
-          createdAt,
-          did,
-          identity,
-          metaData: {
-            name,
-          },
-          phrase,
-        }
+      const myIdentity: IMyIdentity = {
+        createdAt,
+        did,
+        identity,
+        metaData: {
+          name,
+        },
+        phrase,
+      }
 
-        identities[identity.address] = myIdentity
-      })
-    )
+      identities[identity.address] = myIdentity
+    })
 
     const { selectedAddress } = serializedState
     let selectedIdentity = null

@@ -59,9 +59,7 @@ export class PersistentStore {
   private static NAME = 'reduxState'
   private static SALT = 'salt'
 
-  private static async deserialize(
-    encryptedState: string
-  ): Promise<Partial<State>> {
+  private static deserialize(encryptedState: string): Partial<State> {
     const obj = JSON.parse(encryptedState)
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
@@ -71,7 +69,7 @@ export class PersistentStore {
       parameters: Parameters.Store.deserialize(obj.parameters),
       quotes: Quotes.Store.deserialize(obj.quotes),
       uiState: UiState.Store.deserialize(),
-      wallet: await Wallet.Store.deserialize(obj.wallet),
+      wallet: Wallet.Store.deserialize(obj.wallet),
     }
   }
 
@@ -133,7 +131,7 @@ export class PersistentStore {
   ): Promise<Partial<State>> {
     const decryptedState = await PersistentStore.decrypt(password)
     if (!decryptedState) throw new Error('Store could not be decrypted')
-    const persistedState = await PersistentStore.deserialize(decryptedState)
+    const persistedState = PersistentStore.deserialize(decryptedState)
 
     return persistedState
   }
