@@ -1,4 +1,4 @@
-import { IPartialClaim, PublicIdentity } from '@kiltprotocol/sdk-js'
+import { PartialClaim, PublicIdentity } from '@kiltprotocol/sdk-js'
 import React from 'react'
 import SelectClaims from '../../../components/SelectClaims/SelectClaims'
 
@@ -48,7 +48,7 @@ class RequestTerms extends React.Component<RequestTermsProps, State> {
     const { selectedClaimEntries } = this.state
 
     if (cTypeHash) {
-      let claims: IPartialClaim[] = cTypeHash ? [{ cTypeHash }] : []
+      let claims: PartialClaim[] = cTypeHash ? [{ cTypeHash }] : []
 
       if (selectedClaimEntries && selectedClaimEntries.length) {
         claims = selectedClaimEntries.map(

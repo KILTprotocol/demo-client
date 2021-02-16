@@ -5,7 +5,7 @@ import {
   IClaim,
   IDelegationNode,
   IInformCreateDelegation,
-  IPartialClaim,
+  PartialClaim,
   IPublicIdentity,
   IQuoteAgreement,
   IQuoteAttesterSigned,
@@ -37,11 +37,11 @@ class AttestationWorkflow {
    * @param receiverAddresses the list of attester addresses to send the term request to
    */
   public static requestTerms(
-    claims: IPartialClaim[],
+    claims: PartialClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>
   ): void {
     const messageBodies: IRequestTerms[] = claims.map(
-      (claim: IPartialClaim) => ({
+      (claim: PartialClaim) => ({
         content: claim,
         type: MessageBodyType.REQUEST_TERMS,
       })
@@ -64,7 +64,7 @@ class AttestationWorkflow {
    * @param delegation delegation to add to legitimations
    */
   public static async submitTerms(
-    claim: IPartialClaim,
+    claim: PartialClaim,
     legitimations: IAttestedClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
     quote?: IQuoteAttesterSigned,

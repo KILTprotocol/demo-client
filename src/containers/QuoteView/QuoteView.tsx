@@ -2,7 +2,7 @@ import './QuoteView.scss'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
-import { IPartialClaim, IQuote } from '@kiltprotocol/sdk-js'
+import { PartialClaim, IQuote } from '@kiltprotocol/sdk-js'
 import { State as ReduxState } from '../../state/PersistentStore'
 import * as Quotes from '../../state/ducks/Quotes'
 import QuoteCreate from '../QuoteCreate/QuoteCreate'
@@ -13,7 +13,7 @@ type StateProps = {
 }
 
 type OwnProps = {
-  claim: IPartialClaim
+  claim: PartialClaim
   senderAddress?: string
   receiverAddress?: string
   updateQuote: (quote: IQuote) => void

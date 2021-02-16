@@ -1,6 +1,6 @@
 import {
   AttestedClaim,
-  IPartialClaim,
+  PartialClaim,
   IRequestAttestationForClaim,
   IRequestTerms,
   ISubmitAttestationForClaim,
@@ -263,7 +263,7 @@ class BsAttestation {
     const attesterIdentity: IMyIdentity = await BsIdentity.getByKey(attesterKey)
     const cType: ICTypeWithMetadata = await BsCType.getByKey(bsClaim.cTypeKey)
 
-    const partialClaim: IPartialClaim = {
+    const partialClaim: PartialClaim = {
       cTypeHash: cType.cType.hash,
       contents: bsClaim.data,
       owner: claimerIdentity.identity.address,

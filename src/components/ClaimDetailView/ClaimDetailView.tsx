@@ -1,4 +1,4 @@
-import { IPartialClaim } from '@kiltprotocol/sdk-js'
+import { PartialClaim } from '@kiltprotocol/sdk-js'
 import React from 'react'
 
 import Code from '../Code/Code'
@@ -8,7 +8,7 @@ import './ClaimDetailView.scss'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 
 type Props = {
-  claim: IPartialClaim
+  claim: PartialClaim
 }
 
 const ClaimDetailView: React.FC<Props> = ({ claim }) => (

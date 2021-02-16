@@ -1,4 +1,4 @@
-import { Claim, CType, IClaim, IPartialClaim } from '@kiltprotocol/sdk-js'
+import { Claim, CType, IClaim, PartialClaim } from '@kiltprotocol/sdk-js'
 import React, { Component } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -30,13 +30,13 @@ type DispatchProps = {
 type OwnProps = {
   onCancel?: () => void
   onCreate: (claim: Claim) => void
-  partialClaim: IPartialClaim
+  partialClaim: PartialClaim
 }
 
 type Props = StateProps & DispatchProps & OwnProps
 
 type State = {
-  partialClaim: IPartialClaim
+  partialClaim: PartialClaim
   name: string
   cType?: ICTypeWithMetadata
 }

@@ -1,7 +1,7 @@
 import {
   IClaim,
   Identity,
-  IPartialClaim,
+  PartialClaim,
   IPublicIdentity,
   IQuote,
   IQuoteAttesterSigned,
@@ -37,7 +37,7 @@ type DispatchProps = {
 }
 
 export type SubmitTermsProps = {
-  claim: IPartialClaim
+  claim: PartialClaim
   receiverAddresses: Array<IContact['publicIdentity']['address']>
   senderAddress?: string
   receiverAddress?: string
@@ -50,7 +50,7 @@ export type SubmitTermsProps = {
 type Props = InjectedSelectProps & SubmitTermsProps & DispatchProps
 
 type State = {
-  claim: IPartialClaim
+  claim: PartialClaim
   cType?: ICTypeWithMetadata
   selectedDelegation?: IMyDelegation
   withPreFilledClaim?: boolean

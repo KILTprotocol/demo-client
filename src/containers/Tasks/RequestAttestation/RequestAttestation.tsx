@@ -3,7 +3,7 @@ import {
   AttestedClaim,
   PublicIdentity,
   Quote,
-  IPartialClaim,
+  PartialClaim,
 } from '@kiltprotocol/sdk-js'
 import {
   IQuoteAttesterSigned,
@@ -35,7 +35,7 @@ type DispatchProps = {
 }
 
 export type RequestAttestationProps = {
-  claim: IPartialClaim
+  claim: PartialClaim
   terms: IAttestedClaim[]
   quoteData?: IQuoteAttesterSigned
   receiverAddresses: Array<PublicIdentity['address']>
@@ -167,7 +167,7 @@ class RequestAttestation extends React.Component<Props, State> {
     this.setState({ createNewClaim })
   }
 
-  private handleCreateClaim(currentClaim: IPartialClaim): void {
+  private handleCreateClaim(currentClaim: PartialClaim): void {
     this.setState({
       savedClaimEntry: Claims.getClaim(
         persistentStoreInstance.store.getState(),

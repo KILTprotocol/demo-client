@@ -1,6 +1,5 @@
 import {
   IInformCreateDelegation,
-  IPartialClaim,
   IRequestAcceptDelegation,
   IRequestAttestationForClaim,
   IRequestClaimsForCTypes,
@@ -132,9 +131,7 @@ class MessageDetailView extends React.Component<Props, State> {
         // Need to fix with the update in Message Compresss and Decompress
         return (
           <RequestAttestation
-            claim={
-              (message.body as ISubmitTerms).content.claim as IPartialClaim
-            }
+            claim={(message.body as ISubmitTerms).content.claim}
             terms={(message.body as ISubmitTerms).content.legitimations}
             delegationId={
               (message.body as ISubmitTerms).content.delegationId || undefined
