@@ -7,7 +7,6 @@ import * as Claims from '../../../state/ducks/Claims'
 import { ICType } from '../../../types/Ctype'
 
 import './RequestTerms.scss'
-import { notifyFailure } from '../../../services/FeedbackService'
 
 export type RequestTermsProps = {
   cTypeHash: ICType['cType']['hash'] | null
@@ -49,15 +48,11 @@ class RequestTerms extends React.Component<RequestTermsProps, State> {
     const { selectedClaimEntries } = this.state
 
     if (cTypeHash) {
-      let claims: IPartialClaim[] = [{ cTypeHash }]
+      let claims: IPartialClaim[] = cTypeHash ? [{ cTypeHash }] : []
 
       if (selectedClaimEntries && selectedClaimEntries.length) {
         claims = selectedClaimEntries.map(
           (claimEntry: Claims.Entry) => claimEntry.claim
-        )
-      } else {
-        notifyFailure(
-          `Cannot resolve due to Corresponding CType Hash: ${cTypeHash} not matching`
         )
       }
 
