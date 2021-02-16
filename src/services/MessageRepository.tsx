@@ -2,7 +2,6 @@ import {
   Identity,
   IEncryptedMessage,
   IMessage,
-  IPartialClaim,
   IPublicIdentity,
   IRejectTerms,
   IRequestAttestationForClaim,
@@ -11,10 +10,10 @@ import {
   ISubmitAttestationForClaim,
   ISubmitClaimsForCTypes,
   ISubmitTerms,
-  Message,
   MessageBody,
   MessageBodyType,
 } from '@kiltprotocol/sdk-js'
+import Message from '@kiltprotocol/messaging'
 import cloneDeep from 'lodash/cloneDeep'
 import React from 'react'
 import { InteractionProps } from 'react-json-view'
@@ -248,10 +247,7 @@ class MessageRepository {
         return [(message.body as IRequestTerms).content.cTypeHash]
       case MessageBodyType.SUBMIT_TERMS:
         // Need to fix with the Message compress and decompress update
-        return [
-          ((message.body as ISubmitTerms).content.claim as IPartialClaim)
-            .cTypeHash,
-        ]
+        return [(message.body as ISubmitTerms).content.claim.cTypeHash]
       case MessageBodyType.REJECT_TERMS:
         return [(message.body as IRejectTerms).content.claim.cTypeHash]
 
