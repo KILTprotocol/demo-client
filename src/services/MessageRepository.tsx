@@ -246,7 +246,6 @@ class MessageRepository {
       case MessageBodyType.REQUEST_TERMS:
         return [(message.body as IRequestTerms).content.cTypeHash]
       case MessageBodyType.SUBMIT_TERMS:
-        // Need to fix with the Message compress and decompress update
         return [(message.body as ISubmitTerms).content.claim.cTypeHash]
       case MessageBodyType.REJECT_TERMS:
         return [(message.body as IRejectTerms).content.claim.cTypeHash]
