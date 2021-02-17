@@ -1,4 +1,7 @@
-import { DelegationRootNode, ICType, UUID } from '@kiltprotocol/sdk-js'
+import { DelegationRootNode } from '@kiltprotocol/sdk-js'
+import { UUID } from '@kiltprotocol/utils'
+import { ICType } from '@kiltprotocol/types'
+
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'

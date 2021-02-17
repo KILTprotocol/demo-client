@@ -1,4 +1,4 @@
-import { ICType, IQuote } from '@kiltprotocol/sdk-js'
+import { ICType, IQuote } from '@kiltprotocol/types'
 import React from 'react'
 import { withRouter, RouteComponentProps } from 'react-router'
 import * as common from 'schema-based-json-editor'

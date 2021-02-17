@@ -1,4 +1,4 @@
-import { IAttestation, IAttestedClaim } from '@kiltprotocol/sdk-js'
+import { IAttestation, IAttestedClaim } from '@kiltprotocol/types'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 

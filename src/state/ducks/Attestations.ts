@@ -1,4 +1,4 @@
-import { IAttestation } from '@kiltprotocol/sdk-js'
+import { IAttestation } from '@kiltprotocol/types'
 
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'

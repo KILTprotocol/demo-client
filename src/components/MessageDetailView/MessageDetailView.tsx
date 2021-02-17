@@ -6,10 +6,10 @@ import {
   IRequestTerms,
   ISubmitAcceptDelegation,
   ISubmitAttestationForClaim,
-  ISubmitClaimsForCTypesClassic,
+  ISubmitClaimsForCTypes,
   ISubmitTerms,
   MessageBodyType,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import React, { ReactNode } from 'react'
 
 import AcceptDelegation from '../../containers/Tasks/AcceptDelegation/AcceptDelegation'
@@ -182,12 +182,10 @@ class MessageDetailView extends React.Component<Props, State> {
           />
         )
       }
-      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
         return (
           <VerifyClaim
-            attestedClaims={
-              (message.body as ISubmitClaimsForCTypesClassic).content
-            }
+            attestedClaims={(message.body as ISubmitClaimsForCTypes).content}
           />
         )
       }

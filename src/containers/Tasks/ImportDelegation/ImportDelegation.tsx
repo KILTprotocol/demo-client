@@ -1,4 +1,4 @@
-import { IDelegationBaseNode } from '@kiltprotocol/sdk-js'
+import { IDelegationBaseNode } from '@kiltprotocol/types'
 import React from 'react'
 import DelegationDetailView from '../../../components/DelegationDetailView/DelegationDetailView'
 import DelegationsService from '../../../services/DelegationsService'

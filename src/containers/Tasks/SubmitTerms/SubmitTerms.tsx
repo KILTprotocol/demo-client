@@ -1,12 +1,11 @@
+import { Quote } from '@kiltprotocol/sdk-js'
 import {
   IClaim,
-  Identity,
-  IPartialClaim,
+  PartialClaim,
   IPublicIdentity,
   IQuote,
   IQuoteAttesterSigned,
-  Quote,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import React from 'react'
 import * as common from 'schema-based-json-editor'
 
@@ -37,7 +36,7 @@ type DispatchProps = {
 }
 
 export type SubmitTermsProps = {
-  claim: IPartialClaim
+  claim: PartialClaim
   receiverAddresses: Array<IContact['publicIdentity']['address']>
   senderAddress?: string
   receiverAddress?: string
@@ -50,7 +49,7 @@ export type SubmitTermsProps = {
 type Props = InjectedSelectProps & SubmitTermsProps & DispatchProps
 
 type State = {
-  claim: IPartialClaim
+  claim: PartialClaim
   cType?: ICTypeWithMetadata
   selectedDelegation?: IMyDelegation
   withPreFilledClaim?: boolean

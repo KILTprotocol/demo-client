@@ -1,4 +1,4 @@
-import { MessageBodyType } from '@kiltprotocol/sdk-js'
+import { MessageBodyType } from '@kiltprotocol/types'
 import Identicon from '@polkadot/ui-identicon'
 import _ from 'lodash'
 import React, { ReactNode } from 'react'
@@ -122,7 +122,7 @@ class CTypePresentation extends React.Component<Props, State> {
         callback: () => {
           persistentStoreInstance.store.dispatch(
             UiState.Store.updateCurrentTaskAction({
-              objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
+              objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES,
               props: { cTypeHashes: [cTypeHash] } as SubmitClaimsForCTypeProps,
             })
           )

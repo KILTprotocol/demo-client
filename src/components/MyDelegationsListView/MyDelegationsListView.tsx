@@ -1,4 +1,4 @@
-import { MessageBodyType } from '@kiltprotocol/sdk-js'
+import { MessageBodyType } from '@kiltprotocol/types'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'

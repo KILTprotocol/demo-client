@@ -2,11 +2,15 @@ import {
   Attestation,
   AttestedClaim,
   BlockchainUtils,
+  DelegationNodeUtils,
+  Identity,
+  SDKErrors,
+} from '@kiltprotocol/sdk-js'
+import {
   IAttestation,
   IAttestedClaim,
-  Identity,
   IRequestForAttestation,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAttestedClaims'
 
 import * as Attestations from '../state/ducks/Attestations'
@@ -71,11 +75,20 @@ class AttestationService {
     const attestation = Attestation.fromAttestation(iAttestation)
     const selectedIdentity = AttestationService.getIdentity()
 
+    const delegationTreeTraversalSteps = await DelegationNodeUtils.countNodeDepth(
+      selectedIdentity,
+      attestation
+    )
+
     if (!selectedIdentity) {
       throw new Error('No identity selected')
     }
     try {
-      const tx = await attestation.revoke(selectedIdentity)
+      const tx = await attestation.revoke(
+        selectedIdentity,
+        delegationTreeTraversalSteps
+      )
+
       await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
       notifySuccess('Attestation successfully revoked')
       persistentStoreInstance.store.dispatch(
@@ -96,27 +109,39 @@ class AttestationService {
     claimHash: IAttestation['claimHash']
   ): Promise<void> {
     const selectedIdentity = AttestationService.getIdentity()
+    const attestation = await Attestation.query(claimHash)
 
-    const tx = Attestation.revoke(claimHash, selectedIdentity)
-    await BlockchainUtils.submitSignedTx(await tx, {
-      resolveOn: IS_IN_BLOCK,
-    })
-    return tx
-      .then(() => {
-        notifySuccess(`Attestation successfully revoked.`)
-        persistentStoreInstance.store.dispatch(
-          Attestations.Store.revokeAttestation(claimHash)
-        )
+    if (attestation === null) {
+      throw SDKErrors.ERROR_NOT_FOUND('Attestation not on chain')
+    }
+    const delegationTreeTraversalSteps = await DelegationNodeUtils.countNodeDepth(
+      selectedIdentity,
+      attestation
+    )
+
+    try {
+      const tx = await attestation.revoke(
+        selectedIdentity,
+        delegationTreeTraversalSteps
+      )
+
+      await BlockchainUtils.submitSignedTx(tx, {
+        resolveOn: IS_IN_BLOCK,
       })
-      .catch((error: any) => {
-        ErrorService.log({
-          error,
-          message: `Could not revoke attestation.`,
-          origin: 'AttestationService.revokeByClaimHash()',
-          type: 'ERROR.BLOCKCHAIN',
-        })
-        notifyError(error)
+
+      notifySuccess(`Attestation successfully revoked.`)
+      persistentStoreInstance.store.dispatch(
+        Attestations.Store.revokeAttestation(claimHash)
+      )
+    } catch (error) {
+      ErrorService.log({
+        error,
+        message: 'Could not revoke Attestation',
+        origin: 'AttestationService.revokeAttestation()',
+        type: 'ERROR.BLOCKCHAIN',
       })
+      notifyError(error)
+    }
   }
 
   public static async verifyAttestatedClaim(

@@ -1,24 +1,23 @@
+import { RequestForAttestation } from '@kiltprotocol/sdk-js'
 import {
-  IPartialClaim,
-  Crypto,
   IRequestForAttestation,
   IPublicIdentity,
   IClaim,
   IAttestedClaim,
   IAttestation,
-  RequestForAttestation,
-} from '@kiltprotocol/sdk-js'
+  PartialClaim,
+} from '@kiltprotocol/types'
+import { Crypto } from '@kiltprotocol/utils'
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
-
+import { ICType } from '../../types/Ctype'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 import { IMyIdentity } from '../../types/Contact'
-import { ICType } from '../../types/Ctype'
 import { State as ReduxState } from '../PersistentStore'
 import * as Wallet from './Wallet'
 
-function hash(claim: IPartialClaim): string {
+function hash(claim: PartialClaim): string {
   return Crypto.hashStr(JSON.stringify(claim))
 }
 
@@ -420,7 +419,7 @@ const getClaimsByCTypeHash = createSelector(
     entries.filter((entry: Entry) => entry.claim.cTypeHash === cTypeHash)
 )
 
-const getClaimHash = (state: ReduxState, claim: IPartialClaim): string =>
+const getClaimHash = (state: ReduxState, claim: PartialClaim): string =>
   hash(claim)
 
 const getClaim = createSelector(

@@ -1,4 +1,4 @@
-import { IPublicIdentity, IDelegationNode } from '@kiltprotocol/sdk-js'
+import { IPublicIdentity, IDelegationNode } from '@kiltprotocol/types'
 
 export type IAttesterWithDelegation = {
   publicIdentity: IPublicIdentity

@@ -1,5 +1,5 @@
+import { Identity } from '@kiltprotocol/sdk-js'
 import {
-  Identity,
   IEncryptedMessage,
   IMessage,
   IPublicIdentity,
@@ -8,12 +8,12 @@ import {
   IRequestClaimsForCTypes,
   IRequestTerms,
   ISubmitAttestationForClaim,
-  ISubmitClaimsForCTypesClassic,
+  ISubmitClaimsForCTypes,
   ISubmitTerms,
-  Message,
   MessageBody,
   MessageBodyType,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
+import Message from '@kiltprotocol/messaging'
 import cloneDeep from 'lodash/cloneDeep'
 import React from 'react'
 import { InteractionProps } from 'react-json-view'
@@ -264,9 +264,9 @@ class MessageRepository {
       case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
         return (message.body as IRequestClaimsForCTypes).content.ctypes.filter(
           Boolean
-        ) as Array<ICType['cType']['hash']>
-      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
-        const cTypeHashes = (message.body as ISubmitClaimsForCTypesClassic).content.map(
+        )
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
+        const cTypeHashes = (message.body as ISubmitClaimsForCTypes).content.map(
           attestedClaim => attestedClaim.request.claim.cTypeHash
         )
         const uniqueCTypeHashes: Array<ICType['cType']['hash']> = cTypeHashes.filter(

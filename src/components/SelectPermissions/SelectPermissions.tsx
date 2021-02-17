@@ -1,4 +1,4 @@
-import { Permission } from '@kiltprotocol/sdk-js'
+import { Permission } from '@kiltprotocol/types'
 import React, { ChangeEvent } from 'react'
 
 type Props = {

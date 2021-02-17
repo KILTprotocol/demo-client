@@ -2,7 +2,7 @@ import {
   ICType,
   IRequestClaimsForCTypes,
   MessageBodyType,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import React from 'react'
 
 import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'
@@ -12,7 +12,7 @@ import { IContact } from '../../../types/Contact'
 import './RequestClaimsForCType.scss'
 
 export type RequestClaimsForCTypeProps = {
-  cTypeHashes: Array<ICType['hash'] | null>
+  cTypeHashes: Array<ICType['hash']>
   receiverAddresses: Array<IContact['publicIdentity']['address']>
 
   onFinished?: () => void
@@ -42,7 +42,7 @@ class RequestClaimsForCType extends React.Component<Props, State> {
     const { cTypeHashes, receiverAddresses, onFinished } = this.props
 
     const messageBody: IRequestClaimsForCTypes = {
-      content: { ctypes: cTypeHashes, allowPE: false },
+      content: { ctypes: cTypeHashes },
       type: MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES,
     }
 

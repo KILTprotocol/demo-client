@@ -1,4 +1,4 @@
-import { MessageBodyType } from '@kiltprotocol/sdk-js'
+import { MessageBodyType } from '@kiltprotocol/types'
 import React, { ReactNode } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import Modal, { ModalType } from '../../components/Modal/Modal'
@@ -44,7 +44,7 @@ export type TaskProps =
       props: RequestAttestationProps
     }
   | {
-      objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC
+      objective: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES
       props: Partial<SubmitClaimsForCTypeProps>
     }
   | {
@@ -242,7 +242,7 @@ class Tasks extends React.Component<Props, State> {
           props.receiverAddresses
         )
       }
-      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC: {
+      case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
         const { props } = currentTask
 
         return this.getModal(

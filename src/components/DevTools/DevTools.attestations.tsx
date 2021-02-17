@@ -1,13 +1,12 @@
+import { AttestedClaim, RequestForAttestation } from '@kiltprotocol/sdk-js'
 import {
-  AttestedClaim,
-  IPartialClaim,
+  PartialClaim,
   IRequestAttestationForClaim,
   IRequestTerms,
   ISubmitAttestationForClaim,
   ISubmitTerms,
   MessageBodyType,
-  RequestForAttestation,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 
 import RequestForAttestationService from '../../services/RequestForAttestationService'
 import AttestationService from '../../services/AttestationService'
@@ -194,7 +193,7 @@ class BsAttestation {
       )
     }
 
-    const req4Att = await RequestForAttestation.fromClaimAndIdentity(
+    const req4Att = RequestForAttestation.fromClaimAndIdentity(
       claimToAttest.claim,
       claimerIdentity.identity,
       {
@@ -203,7 +202,7 @@ class BsAttestation {
       }
     )
 
-    return req4Att.message
+    return req4Att
   }
 
   /**
@@ -263,7 +262,7 @@ class BsAttestation {
     const attesterIdentity: IMyIdentity = await BsIdentity.getByKey(attesterKey)
     const cType: ICTypeWithMetadata = await BsCType.getByKey(bsClaim.cTypeKey)
 
-    const partialClaim: IPartialClaim = {
+    const partialClaim: PartialClaim = {
       cTypeHash: cType.cType.hash,
       contents: bsClaim.data,
       owner: claimerIdentity.identity.address,

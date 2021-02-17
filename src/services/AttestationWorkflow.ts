@@ -1,11 +1,14 @@
 import {
   AttestedClaim,
   DelegationNode,
+  RequestForAttestation,
+} from '@kiltprotocol/sdk-js'
+import {
   IAttestedClaim,
   IClaim,
   IDelegationNode,
   IInformCreateDelegation,
-  IPartialClaim,
+  PartialClaim,
   IPublicIdentity,
   IQuoteAgreement,
   IQuoteAttesterSigned,
@@ -17,8 +20,7 @@ import {
   ISubmitClaimsForCTypes,
   ISubmitTerms,
   MessageBodyType,
-  RequestForAttestation,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 
 import AttestationService from './AttestationService'
 import { IMyDelegation } from '../state/ducks/Delegations'
@@ -37,11 +39,11 @@ class AttestationWorkflow {
    * @param receiverAddresses the list of attester addresses to send the term request to
    */
   public static requestTerms(
-    claims: IPartialClaim[],
+    claims: PartialClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>
   ): void {
     const messageBodies: IRequestTerms[] = claims.map(
-      (claim: IPartialClaim) => ({
+      (claim: PartialClaim) => ({
         content: claim,
         type: MessageBodyType.REQUEST_TERMS,
       })
@@ -64,7 +66,7 @@ class AttestationWorkflow {
    * @param delegation delegation to add to legitimations
    */
   public static async submitTerms(
-    claim: IPartialClaim,
+    claim: PartialClaim,
     legitimations: IAttestedClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>,
     quote?: IQuoteAttesterSigned,
@@ -101,13 +103,13 @@ class AttestationWorkflow {
    *   attestation
    * @param receiverAddresses  list of contact addresses who will receive the attested claims
    */
-  public static async submitClaimsForCTypes(
+  public static submitClaimsForCTypes(
     attestedClaims: IAttestedClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>
   ): Promise<void> {
     const messageBody: ISubmitClaimsForCTypes = {
       content: attestedClaims,
-      type: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES_CLASSIC,
+      type: MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES,
     }
 
     return MessageRepository.sendToAddresses(receiverAddresses, messageBody)
@@ -137,7 +139,7 @@ class AttestationWorkflow {
       throw new Error('No selected Identity')
     }
 
-    const requestForAttestation = await RequestForAttestation.fromClaimAndIdentity(
+    const requestForAttestation = RequestForAttestation.fromClaimAndIdentity(
       claim,
       selectedIdentity,
       { legitimations, delegationId }
@@ -145,14 +147,14 @@ class AttestationWorkflow {
 
     attesterAddresses.forEach(attesterAddress =>
       RequestForAttestationService.saveInStore(
-        requestForAttestation.message,
+        requestForAttestation,
         attesterAddress
       )
     )
 
     const messageBody: IRequestAttestationForClaim = {
       content: {
-        requestForAttestation: requestForAttestation.message,
+        requestForAttestation,
       },
       type: MessageBodyType.REQUEST_ATTESTATION_FOR_CLAIM,
     }

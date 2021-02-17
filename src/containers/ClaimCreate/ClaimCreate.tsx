@@ -1,4 +1,4 @@
-import { ICType } from '@kiltprotocol/sdk-js'
+import { ICType } from '@kiltprotocol/types'
 import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'

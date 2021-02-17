@@ -1,14 +1,14 @@
 import {
-  Crypto,
-  DelegationNode,
   IDelegationRootNode,
   IRequestAcceptDelegation,
   ISubmitAcceptDelegation,
   MessageBodyType,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
+import { Crypto } from '@kiltprotocol/utils'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
+import { DelegationNode } from '@kiltprotocol/sdk-js'
 import DelegationDetailView from '../../../components/DelegationDetailView/DelegationDetailView'
 import Permissions from '../../../components/Permissions/Permissions'
 import Spinner from '../../../components/Spinner/Spinner'

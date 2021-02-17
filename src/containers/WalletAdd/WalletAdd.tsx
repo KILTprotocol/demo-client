@@ -72,7 +72,7 @@ class WalletAdd extends React.Component<Props, State> {
     let identity
     const phrase = useMyPhrase ? myPhrase : randomPhrase
     try {
-      identity = await Identity.buildFromMnemonic(phrase)
+      identity = Identity.buildFromMnemonic(phrase)
     } catch (error) {
       errorService.log({
         error,

@@ -1,4 +1,4 @@
-import { IAttestedClaim, ICType as SDKICType } from '@kiltprotocol/sdk-js'
+import { IAttestedClaim, ICType as SDKICType } from '@kiltprotocol/types'
 import React, { ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
 import isEqual from 'lodash/isEqual'

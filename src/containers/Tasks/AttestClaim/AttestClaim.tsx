@@ -1,9 +1,8 @@
 import {
-  Identity,
   IPublicIdentity,
   IQuoteAgreement,
   IRequestForAttestation,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import React from 'react'
 
 import { connect } from 'react-redux'

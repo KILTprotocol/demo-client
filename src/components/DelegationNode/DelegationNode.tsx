@@ -1,11 +1,16 @@
 import {
   Attestation,
+  BlockchainUtils,
   DelegationNode as SDKDelegationNode,
   DelegationRootNode,
+  DelegationNodeUtils,
+  SDKErrors,
+} from '@kiltprotocol/sdk-js'
+import {
   IDelegationNode,
   MessageBodyType,
   Permission,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import React from 'react'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 
@@ -44,6 +49,12 @@ export enum ViewType {
 export type DelegationsTreeNode = {
   delegation: SDKDelegationNode | DelegationRootNode
   childNodes: DelegationsTreeNode[]
+}
+
+export type attestationSteps = {
+  attestation: Attestation | null
+  index: number
+  steps: number
 }
 
 type Props = {
@@ -261,7 +272,6 @@ class DelegationNode extends React.Component<Props, State> {
       node: { delegation },
       selectedIdentity,
     } = this.props
-
     const { myDelegation } = this.state
 
     const hashes = await delegation.getAttestationHashes()
@@ -283,16 +293,41 @@ class DelegationNode extends React.Component<Props, State> {
       }'`,
     })
 
-    Promise.chain(
-      hashes.map((hash: string, index: number) => () => {
+    const firstAttestation = await Attestation.query(hashes[0])
+
+    if (firstAttestation === null) {
+      throw SDKErrors.ERROR_NOT_FOUND('Attestation not on chain')
+    }
+
+    const steps = await DelegationNodeUtils.countNodeDepth(
+      selectedIdentity.identity,
+      firstAttestation
+    )
+
+    await Promise.chain(
+      hashes.map((hash: string, index: number) => async () => {
+        const attestation = await Attestation.query(hash)
+        if (attestation === null) {
+          throw SDKErrors.ERROR_NOT_FOUND('Attestation not on chain')
+        }
+
+        if (attestation.revoked) {
+          throw SDKErrors.ERROR_NOT_FOUND('Attestation is revoked')
+        }
+
         blockUi.updateMessage(`Revoking ${index + 1} / ${hashes.length}`)
-        return Attestation.revoke(hash, selectedIdentity.identity).catch(
-          error => {
-            // Promise.chain works with thrown object literals
-            // eslint-disable-next-line no-throw-literal
-            throw { hash, error }
-          }
+
+        const tx = await Attestation.revoke(
+          attestation.claimHash,
+          selectedIdentity.identity,
+          steps
         )
+
+        const result = await BlockchainUtils.submitSignedTx(tx, {
+          resolveOn: BlockchainUtils.IS_IN_BLOCK,
+        })
+
+        return result
       }),
       true
     ).then(result => {

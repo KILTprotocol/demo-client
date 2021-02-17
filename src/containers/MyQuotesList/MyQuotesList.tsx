@@ -4,7 +4,6 @@ import { connect, MapStateToProps } from 'react-redux'
 
 import { State as ReduxState } from '../../state/PersistentStore'
 import * as Quotes from '../../state/ducks/Quotes'
-import * as Wallet from '../../state/ducks/Wallet'
 import Code from '../../components/Code/Code'
 import './MyQuotesList.scss'
 

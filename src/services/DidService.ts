@@ -2,15 +2,14 @@ import {
   BlockchainUtils,
   Did,
   Identity,
-  IDid,
-  IPublicIdentity,
-  IURLResolver,
   PublicIdentity,
-} from '@kiltprotocol/sdk-js'
-import {
+  IDid,
   IDidDocument,
   IDidDocumentSigned,
-} from '@kiltprotocol/sdk-js/build/did/Did'
+  IURLResolver,
+} from '@kiltprotocol/core'
+import { IPublicIdentity } from '@kiltprotocol/types'
+
 import * as Wallet from '../state/ducks/Wallet'
 import { persistentStoreInstance } from '../state/PersistentStore'
 import { IContact, IMyIdentity } from '../types/Contact'

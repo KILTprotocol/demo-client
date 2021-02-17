@@ -1,6 +1,6 @@
 import { combineReducers, createStore, Store } from 'redux'
 import nacl from 'tweetnacl'
-import { u8aToHex } from '@kiltprotocol/sdk-js/build/crypto'
+import { Crypto } from '@kiltprotocol/utils'
 import {
   encryption,
   decryption,
@@ -59,9 +59,7 @@ export class PersistentStore {
   private static NAME = 'reduxState'
   private static SALT = 'salt'
 
-  private static async deserialize(
-    encryptedState: string
-  ): Promise<Partial<State>> {
+  private static deserialize(encryptedState: string): Partial<State> {
     const obj = JSON.parse(encryptedState)
     return {
       attestations: Attestations.Store.deserialize(obj.attestations),
@@ -71,7 +69,7 @@ export class PersistentStore {
       parameters: Parameters.Store.deserialize(obj.parameters),
       quotes: Quotes.Store.deserialize(obj.quotes),
       uiState: UiState.Store.deserialize(),
-      wallet: await Wallet.Store.deserialize(obj.wallet),
+      wallet: Wallet.Store.deserialize(obj.wallet),
     }
   }
 
@@ -93,7 +91,7 @@ export class PersistentStore {
   private storeInternal: Store
 
   public static createSalt(): void {
-    const salt = u8aToHex(nacl.randomBytes(24))
+    const salt = Crypto.u8aToHex(nacl.randomBytes(24))
     localStorage.setItem(PersistentStore.SALT, salt)
   }
 
@@ -133,7 +131,7 @@ export class PersistentStore {
   ): Promise<Partial<State>> {
     const decryptedState = await PersistentStore.decrypt(password)
     if (!decryptedState) throw new Error('Store could not be decrypted')
-    const persistedState = await PersistentStore.deserialize(decryptedState)
+    const persistedState = PersistentStore.deserialize(decryptedState)
 
     return persistedState
   }

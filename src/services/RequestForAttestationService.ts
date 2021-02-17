@@ -1,4 +1,4 @@
-import { IRequestForAttestation } from '@kiltprotocol/sdk-js'
+import { IRequestForAttestation } from '@kiltprotocol/types'
 import * as Claims from '../state/ducks/Claims'
 import { persistentStoreInstance } from '../state/PersistentStore'
 import { IContact } from '../types/Contact'

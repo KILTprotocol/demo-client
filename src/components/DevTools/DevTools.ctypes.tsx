@@ -1,10 +1,5 @@
-import {
-  CType,
-  ICType,
-  ICTypeMetadata,
-  ERROR_CTYPE_ALREADY_EXISTS,
-  BlockchainUtils,
-} from '@kiltprotocol/sdk-js'
+import { CType, BlockchainUtils, ExtrinsicErrors } from '@kiltprotocol/sdk-js'
+import { ICType, ICTypeMetadata } from '@kiltprotocol/types'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'
 import { notifySuccess, notifyError } from '../../services/FeedbackService'
@@ -38,7 +33,7 @@ class BsCType {
     })
     return tx
       .catch(error => {
-        if (error === ERROR_CTYPE_ALREADY_EXISTS) {
+        if (error === ExtrinsicErrors.CType.ERROR_CTYPE_ALREADY_EXISTS) {
           notifyError(error, false)
         } else throw error
       })
