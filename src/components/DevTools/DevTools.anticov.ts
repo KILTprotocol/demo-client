@@ -2,12 +2,15 @@ import Kilt, {
   DelegationRootNode,
   Identity,
   DelegationNode,
+  BlockchainUtils,
+} from '@kiltprotocol/sdk-js'
+import {
   MessageBody,
   MessageBodyType,
   Permission,
-  BlockchainUtils,
-} from '@kiltprotocol/sdk-js'
-import { IMetadata, ICTypeSchema } from '@kiltprotocol/types'
+  IMetadata,
+  ICTypeSchema,
+} from '@kiltprotocol/types'
 import { UUID } from '@kiltprotocol/utils'
 import BN from 'bn.js'
 import {

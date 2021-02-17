@@ -1,4 +1,4 @@
-import { PartialClaim } from '@kiltprotocol/sdk-js'
+import { PartialClaim } from '@kiltprotocol/types'
 import React from 'react'
 
 import Code from '../Code/Code'

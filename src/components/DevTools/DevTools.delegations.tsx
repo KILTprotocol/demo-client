@@ -2,12 +2,14 @@ import {
   BlockchainUtils,
   DelegationNode,
   DelegationRootNode,
+} from '@kiltprotocol/sdk-js'
+import {
   IInformCreateDelegation,
   IRequestAcceptDelegation,
   ISubmitAcceptDelegation,
   MessageBodyType,
   Permission,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import { UUID } from '@kiltprotocol/utils'
 
 import ContactRepository from '../../services/ContactRepository'

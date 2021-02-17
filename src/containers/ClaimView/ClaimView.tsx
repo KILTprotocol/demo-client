@@ -1,4 +1,4 @@
-import { IClaim, MessageBodyType } from '@kiltprotocol/sdk-js'
+import { IClaim, MessageBodyType } from '@kiltprotocol/types'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 

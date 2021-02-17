@@ -2,7 +2,7 @@ import {
   IRequestAcceptDelegation,
   MessageBodyType,
   Permission,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import { UUID } from '@kiltprotocol/utils'
 
 import React from 'react'

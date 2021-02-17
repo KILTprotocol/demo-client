@@ -1,4 +1,4 @@
-import { IBlockchainApi } from '@kiltprotocol/sdk-js'
+import { IBlockchainApi } from '@kiltprotocol/core'
 import React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'

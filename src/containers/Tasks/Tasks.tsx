@@ -1,4 +1,4 @@
-import { MessageBodyType } from '@kiltprotocol/sdk-js'
+import { MessageBodyType } from '@kiltprotocol/types'
 import React, { ReactNode } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import Modal, { ModalType } from '../../components/Modal/Modal'

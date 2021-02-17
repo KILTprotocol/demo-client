@@ -1,4 +1,5 @@
-import { CType, IClaim, ICType } from '@kiltprotocol/sdk-js'
+import { CType } from '@kiltprotocol/sdk-js'
+import { ICType, IClaim } from '@kiltprotocol/types'
 import {
   fromInputModel,
   getClaimInputModel,

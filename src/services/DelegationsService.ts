@@ -3,12 +3,14 @@ import {
   DelegationBaseNode,
   DelegationNode,
   DelegationRootNode,
-  IDelegationBaseNode,
-  IDelegationNode,
-  IDelegationRootNode,
   Identity,
   SubmittableExtrinsic,
 } from '@kiltprotocol/sdk-js'
+import {
+  IDelegationBaseNode,
+  IDelegationNode,
+  IDelegationRootNode,
+} from '@kiltprotocol/types'
 import { DelegationsTreeNode } from '../components/DelegationNode/DelegationNode'
 import { IMyDelegation } from '../state/ducks/Delegations'
 import * as Delegations from '../state/ducks/Delegations'

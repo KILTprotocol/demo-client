@@ -1,13 +1,15 @@
 import {
   AttestedClaim,
+  Identity,
+  RequestForAttestation,
+} from '@kiltprotocol/sdk-js'
+import {
+  IQuoteAgreement,
+  IQuoteAttesterSigned,
   IAttestedClaim,
   IClaim,
   IDelegationNode,
-  Identity,
-  IQuoteAgreement,
-  IQuoteAttesterSigned,
-  RequestForAttestation,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import { Crypto } from '@kiltprotocol/utils'
 import * as Quotes from '../state/ducks/Quotes'
 import { persistentStoreInstance } from '../state/PersistentStore'

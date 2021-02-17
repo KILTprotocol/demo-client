@@ -1,10 +1,5 @@
-import {
-  CType,
-  CTypeUtils,
-  ICTypeMetadata,
-  CTypeSchemaWithoutId,
-} from '@kiltprotocol/sdk-js'
-
+import { CType, CTypeUtils, CTypeSchemaWithoutId } from '@kiltprotocol/sdk-js'
+import { ICTypeMetadata } from '@kiltprotocol/types'
 import {
   ICTypeInput,
   IClaimInput,

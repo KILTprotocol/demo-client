@@ -2,7 +2,7 @@ import {
   ICType,
   IRequestClaimsForCTypes,
   MessageBodyType,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import React from 'react'
 
 import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'

@@ -1,4 +1,4 @@
-import { IAttestedClaim } from '@kiltprotocol/sdk-js'
+import { IAttestedClaim } from '@kiltprotocol/types'
 import React from 'react'
 import { Subtract } from 'utility-types'
 

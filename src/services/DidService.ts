@@ -2,11 +2,11 @@ import {
   BlockchainUtils,
   Did,
   Identity,
-  IDid,
-  IURLResolver,
   PublicIdentity,
+  IDid,
   IDidDocument,
   IDidDocumentSigned,
+  IURLResolver,
 } from '@kiltprotocol/core'
 import { IPublicIdentity } from '@kiltprotocol/types'
 

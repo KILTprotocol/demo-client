@@ -1,4 +1,5 @@
-import { Claim, CType, IClaim, PartialClaim } from '@kiltprotocol/sdk-js'
+import { Claim, CType } from '@kiltprotocol/sdk-js'
+import { PartialClaim, IClaim } from '@kiltprotocol/types'
 import React, { Component } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { Link } from 'react-router-dom'

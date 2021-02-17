@@ -2,7 +2,7 @@ import {
   IDelegationBaseNode,
   IDelegationNode,
   IDelegationRootNode,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
 import { AnyJson } from '@polkadot/types/types'

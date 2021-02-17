@@ -9,7 +9,7 @@ import {
   ISubmitClaimsForCTypes,
   ISubmitTerms,
   MessageBodyType,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import React, { ReactNode } from 'react'
 
 import AcceptDelegation from '../../containers/Tasks/AcceptDelegation/AcceptDelegation'

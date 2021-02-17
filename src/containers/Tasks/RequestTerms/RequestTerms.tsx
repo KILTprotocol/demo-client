@@ -1,4 +1,5 @@
-import { PartialClaim, PublicIdentity } from '@kiltprotocol/sdk-js'
+import { PublicIdentity } from '@kiltprotocol/sdk-js'
+import { PartialClaim } from '@kiltprotocol/types'
 import React from 'react'
 import SelectClaims from '../../../components/SelectClaims/SelectClaims'
 

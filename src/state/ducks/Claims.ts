@@ -1,13 +1,13 @@
+import { RequestForAttestation } from '@kiltprotocol/sdk-js'
 import {
   IRequestForAttestation,
   IPublicIdentity,
   IClaim,
   IAttestedClaim,
   IAttestation,
-  RequestForAttestation,
   PartialClaim,
   ICType,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import { Crypto } from '@kiltprotocol/utils'
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'

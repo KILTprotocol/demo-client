@@ -1,12 +1,11 @@
+import { Quote } from '@kiltprotocol/sdk-js'
 import {
   IClaim,
-  Identity,
   PartialClaim,
   IPublicIdentity,
   IQuote,
   IQuoteAttesterSigned,
-  Quote,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import React from 'react'
 import * as common from 'schema-based-json-editor'
 

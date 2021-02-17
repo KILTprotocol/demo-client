@@ -1,4 +1,5 @@
-import { Identity, PublicIdentity, IDidDocument } from '@kiltprotocol/sdk-js'
+import { Identity, PublicIdentity } from '@kiltprotocol/sdk-js'
+import { IDidDocument } from '@kiltprotocol/types'
 
 /**
  * as in prototype/services

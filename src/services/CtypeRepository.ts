@@ -1,4 +1,4 @@
-import { ICType } from '@kiltprotocol/sdk-js'
+import { ICType } from '@kiltprotocol/types'
 import * as CTypes from '../state/ducks/CTypes'
 import { persistentStoreInstance } from '../state/PersistentStore'
 import { ICTypeWithMetadata } from '../types/Ctype'

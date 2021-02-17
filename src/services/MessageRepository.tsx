@@ -1,5 +1,5 @@
+import { Identity } from '@kiltprotocol/sdk-js'
 import {
-  Identity,
   IEncryptedMessage,
   IMessage,
   IPublicIdentity,
@@ -12,7 +12,7 @@ import {
   ISubmitTerms,
   MessageBody,
   MessageBodyType,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import Message from '@kiltprotocol/messaging'
 import cloneDeep from 'lodash/cloneDeep'
 import React from 'react'

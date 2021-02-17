@@ -1,14 +1,10 @@
 import React from 'react'
-import {
-  AttestedClaim,
-  PublicIdentity,
-  Quote,
-  PartialClaim,
-} from '@kiltprotocol/sdk-js'
+import { AttestedClaim, PublicIdentity, Quote } from '@kiltprotocol/sdk-js'
 import {
   IQuoteAttesterSigned,
   IAttestedClaim,
   IDelegationNode,
+  PartialClaim,
 } from '@kiltprotocol/types'
 import { connect } from 'react-redux'
 import QuoteServices from '../../../services/QuoteServices'

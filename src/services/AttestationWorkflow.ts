@@ -1,6 +1,9 @@
 import {
   AttestedClaim,
   DelegationNode,
+  RequestForAttestation,
+} from '@kiltprotocol/sdk-js'
+import {
   IAttestedClaim,
   IClaim,
   IDelegationNode,
@@ -17,8 +20,7 @@ import {
   ISubmitClaimsForCTypes,
   ISubmitTerms,
   MessageBodyType,
-  RequestForAttestation,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 
 import AttestationService from './AttestationService'
 import { IMyDelegation } from '../state/ducks/Delegations'

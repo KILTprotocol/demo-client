@@ -4,11 +4,13 @@ import {
   DelegationNode as SDKDelegationNode,
   DelegationRootNode,
   DelegationNodeUtils,
+  SDKErrors,
+} from '@kiltprotocol/sdk-js'
+import {
   IDelegationNode,
   MessageBodyType,
   Permission,
-  SDKErrors,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import React from 'react'
 import { RequestAcceptDelegationProps } from '../../containers/Tasks/RequestAcceptDelegation/RequestAcceptDelegation'
 

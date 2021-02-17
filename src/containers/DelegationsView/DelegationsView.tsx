@@ -1,4 +1,4 @@
-import { Permission } from '@kiltprotocol/sdk-js'
+import { Permission } from '@kiltprotocol/types'
 import isEqual from 'lodash/isEqual'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'

@@ -1,4 +1,4 @@
-import { ICType } from '@kiltprotocol/sdk-js'
+import { ICType } from '@kiltprotocol/types'
 import React from 'react'
 
 import '../../../components/SelectAttestedClaim/SelectAttestedClaim.scss'

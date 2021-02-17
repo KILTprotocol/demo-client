@@ -1,4 +1,4 @@
-import { IRequestForAttestation } from '@kiltprotocol/sdk-js'
+import { IRequestForAttestation } from '@kiltprotocol/types'
 import React from 'react'
 import { connect } from 'react-redux'
 import { persistentStoreInstance } from '../../state/PersistentStore'

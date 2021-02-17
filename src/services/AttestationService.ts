@@ -3,12 +3,14 @@ import {
   AttestedClaim,
   BlockchainUtils,
   DelegationNodeUtils,
-  IAttestation,
-  IAttestedClaim,
   Identity,
-  IRequestForAttestation,
   SDKErrors,
 } from '@kiltprotocol/sdk-js'
+import {
+  IAttestation,
+  IAttestedClaim,
+  IRequestForAttestation,
+} from '@kiltprotocol/types'
 import { ClaimSelectionData } from '../components/SelectAttestedClaims/SelectAttestedClaims'
 
 import * as Attestations from '../state/ducks/Attestations'

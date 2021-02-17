@@ -1,4 +1,4 @@
-import { ICType } from '@kiltprotocol/sdk-js'
+import { ICType } from '@kiltprotocol/types'
 import groupBy from 'lodash/groupBy'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'

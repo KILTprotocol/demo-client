@@ -2,7 +2,7 @@ import {
   IDelegationNode,
   IDelegationRootNode,
   Permission,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { IMyIdentity } from '../../types/Contact'

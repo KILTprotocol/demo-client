@@ -1,4 +1,4 @@
-import { IAttestation } from '@kiltprotocol/sdk-js'
+import { IAttestation } from '@kiltprotocol/types'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'

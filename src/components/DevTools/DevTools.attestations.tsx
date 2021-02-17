@@ -1,13 +1,12 @@
+import { AttestedClaim, RequestForAttestation } from '@kiltprotocol/sdk-js'
 import {
-  AttestedClaim,
   PartialClaim,
   IRequestAttestationForClaim,
   IRequestTerms,
   ISubmitAttestationForClaim,
   ISubmitTerms,
   MessageBodyType,
-  RequestForAttestation,
-} from '@kiltprotocol/sdk-js'
+} from '@kiltprotocol/types'
 
 import RequestForAttestationService from '../../services/RequestForAttestationService'
 import AttestationService from '../../services/AttestationService'

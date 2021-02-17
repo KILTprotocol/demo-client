@@ -1,4 +1,4 @@
-import { IMessage } from '@kiltprotocol/sdk-js'
+import { IMessage } from '@kiltprotocol/types'
 import React from 'react'
 
 import MessageRepository, {
