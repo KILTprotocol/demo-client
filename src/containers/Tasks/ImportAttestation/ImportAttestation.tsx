@@ -49,29 +49,30 @@ const ImportAttestation: React.FC<Props> = ({
 
   useEffect(() => {
     claims.forEach(claim => {
+      let newRequestForAttestation
+      let newClaimId
       claim.requestForAttestations.forEach(
         ({ requestForAttestation }): void => {
           if (requestForAttestation.rootHash === attestation.claimHash) {
-            setRequestForAttestation(requestForAttestation)
-            setClaimId(claim.id)
+            newRequestForAttestation = requestForAttestation
+            newClaimId = claim.id
           }
         }
       )
-    })
-  }, [claims, attestation])
 
-  useEffect(() => {
-    claims.forEach(claim => {
-      if (!requestForAttestationEntry) {
+      if (!newRequestForAttestation) {
         claim.attestedClaims.forEach(({ request }) => {
           if (request.rootHash === attestation.claimHash) {
-            setRequestForAttestation(request)
-            setClaimId(claim.id)
+            newRequestForAttestation = request
+            newClaimId = claim.id
           }
         })
       }
+
+      setRequestForAttestation(newRequestForAttestation)
+      setClaimId(newClaimId)
     })
-  }, [claims, attestation, requestForAttestationEntry])
+  }, [claims, attestation])
 
   const importAttestation = (): void => {
     if (!requestForAttestationEntry) {
