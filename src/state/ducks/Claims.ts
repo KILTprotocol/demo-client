@@ -6,12 +6,11 @@ import {
   IAttestedClaim,
   IAttestation,
   PartialClaim,
-  ICType,
 } from '@kiltprotocol/types'
 import { Crypto } from '@kiltprotocol/utils'
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
-
+import { ICType } from '../../types/Ctype'
 import errorService from '../../services/ErrorService'
 import KiltAction from '../../types/Action'
 import { IMyIdentity } from '../../types/Contact'
@@ -411,12 +410,12 @@ const getClaims = createSelector(
 
 const getCTypeHash = (
   state: ReduxState,
-  cTypeHash: ICType['hash']
-): ICType['hash'] => cTypeHash
+  cTypeHash: ICType['cType']['hash']
+): ICType['cType']['hash'] => cTypeHash
 
 const getClaimsByCTypeHash = createSelector(
   [getClaims, getCTypeHash],
-  (entries: Entry[], cTypeHash: ICType['hash']) =>
+  (entries: Entry[], cTypeHash: ICType['cType']['hash']) =>
     entries.filter((entry: Entry) => entry.claim.cTypeHash === cTypeHash)
 )
 

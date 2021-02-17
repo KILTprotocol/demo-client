@@ -1,4 +1,3 @@
-import { ICType } from '@kiltprotocol/types'
 import React, { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
@@ -7,7 +6,7 @@ import { Config } from 'react-select/lib/filters'
 import * as Claims from '../../state/ducks/Claims'
 import * as UiState from '../../state/ducks/UiState'
 import { persistentStoreInstance } from '../../state/PersistentStore'
-import { ICTypeWithMetadata } from '../../types/Ctype'
+import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import SelectCTypesModal from '../Modal/SelectCTypesModal'
 
 type SelectOption = {
@@ -19,7 +18,7 @@ type SelectOption = {
 type Props = RouteComponentProps<{}> & {
   closeMenuOnSelect?: boolean
   claims?: Claims.Entry[]
-  cTypeHash: ICType['hash'] | null
+  cTypeHash: ICType['cType']['hash'] | null
   isMulti?: boolean
   placeholder?: string
   preSelectedClaimEntries?: Claims.Entry[]
@@ -133,7 +132,7 @@ class SelectClaims extends React.Component<Props, State> {
     }
   }
 
-  private goToClaimCreate(cTypeHash: ICType['hash']): void {
+  private goToClaimCreate(cTypeHash: ICType['cType']['hash']): void {
     const { history } = this.props
     // remove maybe opened Task modal
     persistentStoreInstance.store.dispatch(
