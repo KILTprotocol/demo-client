@@ -1,6 +1,6 @@
 import Immutable from 'immutable'
 import { createSelector } from 'reselect'
-import { IQuoteAgreement, IQuoteAttesterSigned } from '@kiltprotocol/sdk-js'
+import { IQuoteAgreement, IQuoteAttesterSigned } from '@kiltprotocol/types'
 import { UUID } from '@kiltprotocol/utils'
 
 import errorService from '../../services/ErrorService'
