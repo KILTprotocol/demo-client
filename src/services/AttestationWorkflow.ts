@@ -103,7 +103,7 @@ class AttestationWorkflow {
    *   attestation
    * @param receiverAddresses  list of contact addresses who will receive the attested claims
    */
-  public static async submitClaimsForCTypes(
+  public static submitClaimsForCTypes(
     attestedClaims: IAttestedClaim[],
     receiverAddresses: Array<IContact['publicIdentity']['address']>
   ): Promise<void> {
