@@ -128,7 +128,6 @@ class MessageDetailView extends React.Component<Props, State> {
         )
       }
       case MessageBodyType.SUBMIT_TERMS: {
-        // Need to fix with the update in Message Compresss and Decompress
         return (
           <RequestAttestation
             claim={(message.body as ISubmitTerms).content.claim}

@@ -84,8 +84,7 @@ class Store {
         : []
     const identities: { [key: string]: IMyIdentity } = {}
 
-    // eslint-disable-next-line array-callback-return
-    serializedIdentities.map((serializedIdentity: SerializedIdentity) => {
+    serializedIdentities.forEach((serializedIdentity: SerializedIdentity) => {
       const { did, name, phrase, createdAt } = serializedIdentity
 
       // TODO: use real wallet later instead of stored phrase
