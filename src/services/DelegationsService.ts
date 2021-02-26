@@ -1,11 +1,11 @@
 import {
-  BlockchainUtils,
   DelegationBaseNode,
   DelegationNode,
   DelegationRootNode,
   Identity,
   SubmittableExtrinsic,
 } from '@kiltprotocol/sdk-js'
+import { BlockchainUtils } from '@kiltprotocol/chain-helpers'
 import {
   IDelegationBaseNode,
   IDelegationNode,

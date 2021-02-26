@@ -1,9 +1,9 @@
-import { IBlockchainApi } from '@kiltprotocol/core'
 import React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 import { Text } from '@polkadot/types'
 
+import { IBlockchainApi } from '@kiltprotocol/sdk-js'
 import If from '../../common/If'
 import BlockchainService from '../../services/BlockchainService'
 

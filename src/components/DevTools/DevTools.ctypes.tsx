@@ -1,4 +1,5 @@
-import { CType, BlockchainUtils, ExtrinsicErrors } from '@kiltprotocol/sdk-js'
+import { CType } from '@kiltprotocol/sdk-js'
+import { BlockchainUtils, ExtrinsicErrors } from '@kiltprotocol/chain-helpers'
 import { ICType, ICTypeMetadata } from '@kiltprotocol/types'
 import CTypeRepository from '../../services/CtypeRepository'
 import errorService from '../../services/ErrorService'

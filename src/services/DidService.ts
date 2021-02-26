@@ -1,5 +1,4 @@
 import {
-  BlockchainUtils,
   Did,
   Identity,
   PublicIdentity,
@@ -8,6 +7,7 @@ import {
   IDidDocumentSigned,
   IURLResolver,
 } from '@kiltprotocol/core'
+import { BlockchainUtils } from '@kiltprotocol/chain-helpers'
 import { IPublicIdentity } from '@kiltprotocol/types'
 
 import * as Wallet from '../state/ducks/Wallet'
