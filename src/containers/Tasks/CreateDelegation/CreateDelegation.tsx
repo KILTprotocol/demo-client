@@ -4,6 +4,7 @@ import {
   ISubmitAcceptDelegation,
 } from '@kiltprotocol/types'
 import { Crypto } from '@kiltprotocol/utils'
+import { BlockchainUtils } from '@kiltprotocol/chain-helpers'
 
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
@@ -99,7 +100,14 @@ class CreateDelegation extends React.Component<Props, State> {
       optionalParentId
     )
 
-    DelegationService.storeOnChain(newDelegationNode, signatures.invitee)
+    const tx = await DelegationService.storeOnChain(
+      newDelegationNode,
+      signatures.invitee
+    )
+
+    BlockchainUtils.submitSignedTx(tx, {
+      resolveOn: BlockchainUtils.IS_IN_BLOCK,
+    })
       .then(() => {
         notifySuccess(
           `${isPCR ? 'PCR member' : 'Delegation'} successfully created`
