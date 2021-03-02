@@ -49,7 +49,7 @@ services:
     image: kiltprotocol/mashnet-node:develop
     ports:
       - 9944:9944
-    command: ./target/release/mashnet-node --dev --ws-port 9944 --ws-external
+    command: --dev --ws-port 9944 --ws-external
   demo-client:
     build:
       context: .
