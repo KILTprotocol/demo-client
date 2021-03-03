@@ -1,5 +1,8 @@
-import { DelegationNode, DelegationRootNode } from '@kiltprotocol/sdk-js'
-import { BlockchainUtils } from '@kiltprotocol/chain-helpers'
+import {
+  DelegationNode,
+  DelegationRootNode,
+  BlockchainUtils,
+} from '@kiltprotocol/sdk-js'
 import {
   IInformCreateDelegation,
   IRequestAcceptDelegation,

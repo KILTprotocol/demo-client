@@ -2,8 +2,8 @@ import Kilt, {
   DelegationRootNode,
   Identity,
   DelegationNode,
+  BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
-import { BlockchainUtils } from '@kiltprotocol/chain-helpers'
 import {
   MessageBody,
   MessageBodyType,

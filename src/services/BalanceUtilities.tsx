@@ -1,5 +1,9 @@
-import { Balance, BalanceUtils, PublicIdentity } from '@kiltprotocol/sdk-js'
-import { BlockchainUtils } from '@kiltprotocol/chain-helpers'
+import {
+  Balance,
+  BalanceUtils,
+  PublicIdentity,
+  BlockchainUtils,
+} from '@kiltprotocol/sdk-js'
 import BN from 'bn.js'
 import React from 'react'
 import { Store } from 'redux'

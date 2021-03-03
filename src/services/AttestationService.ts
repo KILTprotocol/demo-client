@@ -4,8 +4,8 @@ import {
   DelegationNodeUtils,
   Identity,
   SDKErrors,
+  BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
-import { BlockchainUtils } from '@kiltprotocol/chain-helpers'
 import {
   IAttestation,
   IAttestedClaim,
