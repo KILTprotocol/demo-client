@@ -1,4 +1,4 @@
-import { BlockchainUtils, CType } from '@kiltprotocol/sdk-js'
+import { CType, BlockchainUtils } from '@kiltprotocol/sdk-js'
 import { ICTypeMetadata } from '@kiltprotocol/types'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'

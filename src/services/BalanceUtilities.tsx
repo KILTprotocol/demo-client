@@ -1,8 +1,8 @@
 import {
   Balance,
   BalanceUtils,
-  BlockchainUtils,
   PublicIdentity,
+  BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
 import BN from 'bn.js'
 import React from 'react'

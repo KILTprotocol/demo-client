@@ -1,10 +1,10 @@
 import {
   Attestation,
   AttestedClaim,
-  BlockchainUtils,
   DelegationNodeUtils,
   Identity,
   SDKErrors,
+  BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
 import {
   IAttestation,

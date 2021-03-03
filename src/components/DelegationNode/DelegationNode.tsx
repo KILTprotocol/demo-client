@@ -1,10 +1,10 @@
 import {
   Attestation,
-  BlockchainUtils,
   DelegationNode as SDKDelegationNode,
   DelegationRootNode,
   DelegationNodeUtils,
   SDKErrors,
+  BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
 import {
   IDelegationNode,
