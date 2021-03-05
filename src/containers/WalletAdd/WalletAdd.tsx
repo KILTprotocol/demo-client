@@ -111,7 +111,6 @@ class WalletAdd extends React.Component<Props, State> {
     let identity
     const phrase = useMyPhrase ? myPhrase : randomPhrase
     try {
-      console.log(mySigningKeyPairType.value)
       identity = Identity.buildFromMnemonic(phrase, {
         signingKeyPairType: mySigningKeyPairType.value,
       })
@@ -223,7 +222,7 @@ class WalletAdd extends React.Component<Props, State> {
           Import Seed Phrase
         </div>
 
-        <div className="advanced-options">
+        <div className="actions">
           <button type="button" onClick={this.toggleAdvancedOptions}>
             Advanced Options
           </button>
