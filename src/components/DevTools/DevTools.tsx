@@ -147,7 +147,7 @@ class DevTools extends React.Component<Props> {
     return (
       <section className="DevTools">
         <h2>Dev Tools</h2>
-        {selectedIdentity && balance.gt(minBalanceForBootstrap) ? (
+        {selectedIdentity && balance && balance.gt(minBalanceForBootstrap) ? (
           <div>
             <div>
               <h4>Auto Bootstrap</h4>
