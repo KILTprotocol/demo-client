@@ -43,7 +43,9 @@ let cachedSetup: ISetup
 
 function setup(): ISetup {
   if (!cachedSetup) {
-    const root = Identity.buildFromMnemonic(ROOT_SEED)
+    const root = Identity.buildFromMnemonic(ROOT_SEED, {
+      signingKeyPairType: 'ed25519',
+    })
 
     const delegationRoot = new DelegationRootNode(
       DELEGATION_ROOT_ID,

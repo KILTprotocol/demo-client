@@ -1,5 +1,6 @@
 import { Identity, PublicIdentity } from '@kiltprotocol/sdk-js'
 import { IDidDocument } from '@kiltprotocol/types'
+import { KeypairType } from '@polkadot/util-crypto/types'
 
 /**
  * as in prototype/services
@@ -24,6 +25,7 @@ export interface IContact {
  */
 export interface IMyIdentity {
   identity: Identity
+  keypairType: KeypairType
   metaData: {
     name: string
   }

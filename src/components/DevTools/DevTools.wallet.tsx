@@ -35,7 +35,9 @@ class BsIdentity {
 
   public static async create(alias: string): Promise<void | IMyIdentity> {
     const randomPhrase = mnemonicGenerate()
-    const identity = Identity.buildFromMnemonic(randomPhrase)
+    const identity = Identity.buildFromMnemonic(randomPhrase, {
+      signingKeyPairType: 'ed25519',
+    })
 
     return BsIdentity.save(identity, randomPhrase, alias)
   }
