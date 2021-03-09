@@ -43,8 +43,6 @@ type State = {
 const keypairTypeOptions: OptionsKeyPairType[] = [
   { value: 'sr25519', label: 'SR25519' },
   { value: 'ed25519', label: 'ED25519' },
-  { value: 'ecdsa', label: 'ECDSA' },
-  { value: 'ethereum', label: 'Ethereum' },
 ]
 
 class WalletAdd extends React.Component<Props, State> {
