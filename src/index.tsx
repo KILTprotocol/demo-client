@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import App from './App'
 import { persistentStoreInstance } from './state/PersistentStore'
 
+persistentStoreInstance.init()
 ReactDOM.render(
   // <LoginGate>
   //   <StoreGate>
