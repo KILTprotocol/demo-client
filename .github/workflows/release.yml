@@ -5,35 +5,13 @@ on:
 name: Release
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Use Node.js v10
-        uses: actions/setup-node@v1
-        with:
-          node-version: 10.x
-
-      - name: yarn install, lint and test
-        run: |
-          yarn install --frozen-lockfile
-          yarn lint
-  buildECR:
-    needs: test
-    
+  deploy:
     name: Build image and push to Amazon ECR
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: Build image
-      run: |
-        docker build -t kilt/demo-client .
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -45,8 +23,13 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build image
+      run: |
+        docker build -t kilt/demo-client .
     
     - name: Tag, and push image to Amazon ECR
+      id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: kilt/demo-client
@@ -56,10 +39,23 @@ jobs:
         docker tag kilt/demo-client $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Configure Kubernetes
+      env:
+        KUBECONFIG: '${{ github.workspace }}/.kube/kubeconfig'
+      run: |
+        mkdir -p '${{ github.workspace }}/.kube' \
+          && echo '${{ secrets.KUBE_CONFIG}}' | base64 -d > $KUBECONFIG
+
+    - name: Set new image
+      env:
+        IMAGE: ${{ steps.build-image.outputs.image }}
+        KUBECONFIG: '${{ github.workspace }}/.kube/kubeconfig'
+      run: |
+        kubectl -n testnet set image deployment/client-deployment client-container=$IMAGE
 
   buildDocker:
-    needs: test
-
     name: Build image and push to Docker Hub
     runs-on: ubuntu-latest
 
