@@ -1,11 +1,11 @@
 import { combineReducers, createStore, Store } from 'redux'
-import nacl from 'tweetnacl'
-import { Crypto } from '@kiltprotocol/utils'
-import {
-  encryption,
-  decryption,
-  passwordHashing,
-} from '../utils/Encryption/Encryption'
+// import nacl from 'tweetnacl'
+// import { Crypto } from '@kiltprotocol/utils'
+// import {
+//   encryption,
+//   decryption,
+//   passwordHashing,
+// } from '../utils/Encryption/Encryption'
 
 import * as Attestations from './ducks/Attestations'
 import * as Balances from './ducks/Balances'
@@ -57,7 +57,7 @@ export class PersistentStore {
   }
 
   private static NAME = 'reduxState'
-  private static SALT = 'salt'
+  // private static SALT = 'salt'
 
   private static deserialize(encryptedState: string): Partial<State> {
     const obj = JSON.parse(encryptedState)
@@ -90,65 +90,65 @@ export class PersistentStore {
 
   private storeInternal: Store
 
-  public static createSalt(): void {
-    const salt = Crypto.u8aToHex(nacl.randomBytes(24))
-    localStorage.setItem(PersistentStore.SALT, salt)
-  }
+  // public static createSalt(): void {
+  //   const salt = Crypto.u8aToHex(nacl.randomBytes(24))
+  //   localStorage.setItem(PersistentStore.SALT, salt)
+  // }
 
-  public static async createLocalState(password: string): Promise<void> {
-    const hashedPassword = await PersistentStore.getHashedPassword(password)
+  public static createLocalState(): void {
+    // const hashedPassword = await PersistentStore.getHashedPassword(password)
     const combinedReducers = PersistentStore.getCombinedReducers()
     const state = combinedReducers({} as State, { type: '' })
-    PersistentStore.serializeEncryptAndStore(state, hashedPassword)
+    PersistentStore.serializeStore(state)
   }
 
   public static getLocalState(): string | null {
     return localStorage.getItem(PersistentStore.NAME)
   }
 
-  public static getLocalSalt(): string | null {
-    return localStorage.getItem(PersistentStore.SALT)
-  }
+  // public static getLocalSalt(): string | null {
+  //   return localStorage.getItem(PersistentStore.SALT)
+  // }
 
-  public static async getHashedPassword(password: string): Promise<Uint8Array> {
-    const salt = PersistentStore.getLocalSalt()
-    if (!salt) throw new Error('No password salt found')
+  // public static async getHashedPassword(password: string): Promise<Uint8Array> {
+  //   const salt = PersistentStore.getLocalSalt()
+  //   if (!salt) throw new Error('No password salt found')
 
-    return passwordHashing(password, salt)
-  }
+  //   return passwordHashing(password, salt)
+  // }
 
-  public static async decrypt(password: string): Promise<string | null> {
-    const localState = PersistentStore.getLocalState()
+  // public static async decrypt(password: string): Promise<string | null> {
+  //   const localState = PersistentStore.getLocalState()
 
-    const hashedPassword = await PersistentStore.getHashedPassword(password)
-    if (!localState) throw new Error('LocalState not found')
+  //   const hashedPassword = await PersistentStore.getHashedPassword(password)
+  //   if (!localState) throw new Error('LocalState not found')
 
-    return decryption(localState, hashedPassword)
-  }
+  //   return decryption(localState, hashedPassword)
+  // }
 
-  public static async decryptAndDeserialize(
-    password: string
-  ): Promise<Partial<State>> {
-    const decryptedState = await PersistentStore.decrypt(password)
-    if (!decryptedState) throw new Error('Store could not be decrypted')
-    const persistedState = PersistentStore.deserialize(decryptedState)
+  // public static deserializeState(): Partial<State> {
+  //   // const decryptedState = await PersistentStore.decrypt(password)
+  //   const localState = PersistentStore.getLocalState()
 
-    return persistedState
-  }
+  //   // if (!decryptedState) throw new Error('Store could not be decrypted')
+  //   const persistedState = PersistentStore.deserialize(JSON.parse(localState))
 
-  public static serializeEncryptAndStore(
-    state: State,
-    hashedPassword: Uint8Array
+  //   return persistedState
+  // }
+
+  public static serializeStore(
+    state: State
+    // hashedPassword: Uint8Array
   ): void {
     const serializedState = PersistentStore.serialize(state)
-    const encryptedState = encryption(serializedState, hashedPassword)
-    localStorage.setItem(PersistentStore.NAME, JSON.stringify(encryptedState))
+    // const encryptedState = encryption(serializedState, hashedPassword)
+    localStorage.setItem(PersistentStore.NAME, JSON.stringify(serializedState))
   }
 
-  public static clearLocalStorage(): void {
-    localStorage.removeItem(PersistentStore.NAME)
-    localStorage.removeItem(PersistentStore.SALT)
-  }
+  // public static clearLocalStorage(): void {
+  //   localStorage.removeItem(PersistentStore.NAME)
+  //   localStorage.removeItem(PersistentStore.SALT)
+  // }
 
   /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
   public static getCombinedReducers() {
@@ -166,9 +166,18 @@ export class PersistentStore {
     })
   }
 
-  public async init(password: string): Promise<Store> {
-    const persistedState = await PersistentStore.decryptAndDeserialize(password)
+  public init(): Store {
+    // const persistedState = await PersistentStore.decryptAndDeserialize(password)
+    const localState = PersistentStore.getLocalState()
 
+    let persistedState: Partial<State> = {}
+    if (localState) {
+      try {
+        persistedState = PersistentStore.deserialize(JSON.parse(localState))
+      } catch (error) {
+        console.error('Could not construct persistentStore', error)
+      }
+    }
     this.storeInternal = createStore(
       PersistentStore.getCombinedReducers(),
       persistedState,
@@ -178,11 +187,11 @@ export class PersistentStore {
         window.__REDUX_DEVTOOLS_EXTENSION__()
     )
 
-    const hashedPassword = await PersistentStore.getHashedPassword(password)
+    // const hashedPassword = await PersistentStore.getHashedPassword(password)
     this.storeInternal.subscribe(() => {
-      PersistentStore.serializeEncryptAndStore(
-        this.storeInternal.getState(),
-        hashedPassword
+      PersistentStore.serializeStore(
+        this.storeInternal.getState()
+        // hashedPassword
       )
     })
 
