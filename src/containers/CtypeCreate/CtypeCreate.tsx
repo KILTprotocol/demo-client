@@ -100,9 +100,13 @@ class CTypeCreate extends React.Component<Props, State> {
       }
 
       const tx = cType.store(selectedIdentity.identity)
-      await BlockchainUtils.submitSignedTx(await tx, {
-        resolveOn: BlockchainUtils.IS_IN_BLOCK,
-      })
+      await BlockchainUtils.submitTxWithReSign(
+        await tx,
+        selectedIdentity.identity,
+        {
+          resolveOn: BlockchainUtils.IS_IN_BLOCK,
+        }
+      )
       tx.then(() => {
         blockUi.updateMessage(
           `CTYPE stored on blockchain,\nnow registering CTYPE`

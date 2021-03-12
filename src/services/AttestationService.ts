@@ -54,7 +54,7 @@ class AttestationService {
 
     try {
       const tx = await attestation.store(selectedIdentity)
-      await BlockchainUtils.submitSignedTx(tx, {
+      await BlockchainUtils.submitTxWithReSign(tx, selectedIdentity, {
         resolveOn: IS_IN_BLOCK,
       })
     } catch (error) {
@@ -89,7 +89,9 @@ class AttestationService {
         delegationTreeTraversalSteps
       )
 
-      await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
+      await BlockchainUtils.submitTxWithReSign(tx, selectedIdentity, {
+        resolveOn: IS_IN_BLOCK,
+      })
       notifySuccess('Attestation successfully revoked')
       persistentStoreInstance.store.dispatch(
         Attestations.Store.revokeAttestation(attestation.claimHash)
@@ -125,7 +127,7 @@ class AttestationService {
         delegationTreeTraversalSteps
       )
 
-      await BlockchainUtils.submitSignedTx(tx, {
+      await BlockchainUtils.submitTxWithReSign(tx, selectedIdentity, {
         resolveOn: IS_IN_BLOCK,
       })
 

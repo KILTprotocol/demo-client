@@ -77,7 +77,7 @@ class BalanceUtilities {
     )
     Balance.makeTransfer(myIdentity.identity, receiverAddress, transferAmount)
       .then(tx =>
-        BlockchainUtils.submitSignedTx(tx, {
+        BlockchainUtils.submitTxWithReSign(tx, myIdentity.identity, {
           resolveOn: BlockchainUtils.IS_IN_BLOCK,
         })
       )

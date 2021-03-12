@@ -21,6 +21,7 @@ import FeedbackService, {
   notifyFailure,
   notifySuccess,
   notifyError,
+  notify,
 } from '../../services/FeedbackService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { IMyDelegation } from '../../state/ducks/Delegations'
@@ -276,6 +277,13 @@ class DelegationNode extends React.Component<Props, State> {
 
     const hashes = await delegation.getAttestationHashes()
 
+    if (hashes.length < 1) {
+      notify(
+        <span>No attestations associated with this Delegation</span>,
+        false
+      )
+    }
+
     const delegationTitle = (
       <span>
         <strong>
@@ -323,9 +331,13 @@ class DelegationNode extends React.Component<Props, State> {
           steps
         )
 
-        const result = await BlockchainUtils.submitSignedTx(tx, {
-          resolveOn: BlockchainUtils.IS_IN_BLOCK,
-        })
+        const result = await BlockchainUtils.submitTxWithReSign(
+          tx,
+          selectedIdentity.identity,
+          {
+            resolveOn: BlockchainUtils.IS_IN_BLOCK,
+          }
+        )
 
         return result
       }),

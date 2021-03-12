@@ -1,8 +1,4 @@
-import {
-  DelegationNode,
-  DelegationRootNode,
-  BlockchainUtils,
-} from '@kiltprotocol/sdk-js'
+import { DelegationNode, DelegationRootNode } from '@kiltprotocol/sdk-js'
 import {
   IInformCreateDelegation,
   IRequestAcceptDelegation,
@@ -107,10 +103,7 @@ class BsDelegation {
 
     const signature = ownerIdentity.identity.signStr(delegation.generateHash())
     const metaData = { alias }
-    const tx = await DelegationsService.storeOnChain(delegation, signature)
-    await BlockchainUtils.submitSignedTx(tx, {
-      resolveOn: BlockchainUtils.IS_IN_BLOCK,
-    })
+    await DelegationsService.storeOnChain(delegation, signature)
     DelegationsService.store({
       cTypeHash: rootData.rootDelegation.cTypeHash,
       ...delegation,

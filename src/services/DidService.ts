@@ -88,9 +88,13 @@ class DidService {
     } as IContact)
 
     const tx = await did.store(myIdentity.identity)
-    const status = await BlockchainUtils.submitSignedTx(tx, {
-      resolveOn: IS_IN_BLOCK,
-    })
+    const status = await BlockchainUtils.submitTxWithReSign(
+      tx,
+      myIdentity.identity,
+      {
+        resolveOn: IS_IN_BLOCK,
+      }
+    )
     if (status.isError) {
       throw new Error(
         `Error creating DID for identity ${myIdentity.metaData.name}`
@@ -107,9 +111,13 @@ class DidService {
 
   public static async deleteDid(myIdentity: IMyIdentity): Promise<void> {
     const tx = await Did.remove(myIdentity.identity)
-    const status = await BlockchainUtils.submitSignedTx(tx, {
-      resolveOn: IS_IN_BLOCK,
-    })
+    const status = await BlockchainUtils.submitTxWithReSign(
+      tx,
+      myIdentity.identity,
+      {
+        resolveOn: IS_IN_BLOCK,
+      }
+    )
     if (status.isError) {
       throw new Error(
         `Error deleting DID for identity ${myIdentity.metaData.name}`
