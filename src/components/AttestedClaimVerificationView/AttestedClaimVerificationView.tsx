@@ -3,12 +3,13 @@ import React from 'react'
 import * as UiState from '../../state/ducks/UiState'
 import { persistentStoreInstance } from '../../state/PersistentStore'
 
-import { ICType } from '../../types/Ctype'
+import { ICType, ICTypeWithMetadata } from '../../types/Ctype'
 import AttestationStatus from '../AttestationStatus/AttestationStatus'
 import ContactPresentation from '../ContactPresentation/ContactPresentation'
 import CTypePresentation from '../CTypePresentation/CTypePresentation'
 import { getCtypePropertyTitle } from '../../utils/CtypeUtils'
 import './AttestedClaimVerificationView.scss'
+import CTypeRepository from '../../services/CtypeRepository'
 
 type Props = {
   attestedClaim: IAttestedClaim
@@ -16,7 +17,9 @@ type Props = {
   cType?: ICType
 }
 
-type State = {}
+type State = {
+  cType?: ICTypeWithMetadata
+}
 
 class AttestedClaimVerificationView extends React.Component<Props, State> {
   private static verifyAttestatedClaim(): void {
@@ -28,6 +31,20 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {}
+  }
+
+  public componentDidMount(): void {
+    this.setCType()
+  }
+
+  private setCType(): void {
+    const { attestedClaim } = this.props
+
+    CTypeRepository.findByHash(attestedClaim.attestation.cTypeHash).then(
+      _cType => {
+        if (_cType) this.setState({ cType: _cType })
+      }
+    )
   }
 
   private getHeadline(): JSX.Element {
@@ -68,27 +85,51 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
   private static readonly BLOCK_CHAR: string = '\u2588'
 
   private buildClaimPropertiesView(attestedClaim: IAttestedClaim): JSX.Element {
-    const { cType } = this.props
+    const { cType } = this.state
 
-    const propertyNames: string[] = Object.keys(
-      attestedClaim.request.claimHashes
-    )
+    let properties: Array<{ key: string; label: string; value: string }> = []
+    if (cType) {
+      const propertyNames = Object.keys(cType.cType.schema.properties)
+      properties = propertyNames.map(propertyName => {
+        const label = getCtypePropertyTitle(propertyName, {
+          // TODO: What the hell? Why do we have two so similar types for a ctype with metadata?
+          cType: cType.cType,
+          metadata: cType.metaData.metadata,
+          ctypeHash: cType.metaData.ctypeHash,
+        })
+        const value = AttestedClaimVerificationView.getPropertyValue(
+          attestedClaim,
+          propertyName
+        )
+        return {
+          key: propertyName,
+          label,
+          value,
+        }
+      })
+    } else {
+      const propertyNames: string[] = Object.keys(
+        attestedClaim.request.claim.contents
+      )
+      properties = propertyNames.map(propertyName => {
+        return {
+          key: propertyName,
+          label: propertyName,
+          value: AttestedClaimVerificationView.getPropertyValue(
+            attestedClaim,
+            propertyName
+          ),
+        }
+      })
+    }
 
     return (
       <div className="attributes">
-        {propertyNames.map((propertyName: string) => {
-          const propertyTitle = cType
-            ? getCtypePropertyTitle(propertyName, cType)
-            : propertyName
+        {properties.map(({ key, label, value }) => {
           return (
-            <div key={propertyName}>
-              <label>{propertyTitle}</label>
-              <div>
-                {AttestedClaimVerificationView.getPropertyValue(
-                  attestedClaim,
-                  propertyName
-                )}
-              </div>
+            <div key={key}>
+              <label>{label}</label>
+              <div>{value}</div>
             </div>
           )
         })}
