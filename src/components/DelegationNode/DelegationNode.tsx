@@ -2,7 +2,6 @@ import {
   Attestation,
   DelegationNode as SDKDelegationNode,
   DelegationRootNode,
-  DelegationNodeUtils,
   SDKErrors,
   BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
@@ -21,6 +20,7 @@ import FeedbackService, {
   notifyFailure,
   notifySuccess,
   notifyError,
+  notify,
 } from '../../services/FeedbackService'
 import * as Delegations from '../../state/ducks/Delegations'
 import { IMyDelegation } from '../../state/ducks/Delegations'
@@ -276,6 +276,14 @@ class DelegationNode extends React.Component<Props, State> {
 
     const hashes = await delegation.getAttestationHashes()
 
+    if (hashes.length < 1) {
+      notify(
+        <span>No attestations associated with this Delegation</span>,
+        false
+      )
+      return
+    }
+
     const delegationTitle = (
       <span>
         <strong>
@@ -293,15 +301,8 @@ class DelegationNode extends React.Component<Props, State> {
       }'`,
     })
 
-    const firstAttestation = await Attestation.query(hashes[0])
-
-    if (firstAttestation === null) {
-      throw SDKErrors.ERROR_NOT_FOUND('Attestation not on chain')
-    }
-
-    const steps = await DelegationNodeUtils.countNodeDepth(
-      selectedIdentity.identity,
-      firstAttestation
+    const { steps } = await delegation.findAncestorOwnedBy(
+      selectedIdentity.identity.address
     )
 
     await Promise.chain(
@@ -320,7 +321,7 @@ class DelegationNode extends React.Component<Props, State> {
         const tx = await Attestation.revoke(
           attestation.claimHash,
           selectedIdentity.identity,
-          steps
+          steps + 1
         )
 
         const result = await BlockchainUtils.submitSignedTx(tx, {
