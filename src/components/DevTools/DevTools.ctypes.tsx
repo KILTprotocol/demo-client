@@ -28,7 +28,7 @@ class BsCType {
       .identity
     const cType = CType.fromSchema(bsCTypeData.schema, ownerIdentity.address)
     const tx = cType.store(ownerIdentity)
-    await BlockchainUtils.submitSignedTx(await tx, {
+    await BlockchainUtils.submitTxWithReSign(await tx, ownerIdentity, {
       resolveOn: BlockchainUtils.IS_IN_BLOCK,
     })
     return tx

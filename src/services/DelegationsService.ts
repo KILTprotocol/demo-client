@@ -3,13 +3,13 @@ import {
   DelegationNode,
   DelegationRootNode,
   Identity,
-  SubmittableExtrinsic,
   BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
 import {
   IDelegationBaseNode,
   IDelegationNode,
   IDelegationRootNode,
+  ISubmittableResult,
 } from '@kiltprotocol/types'
 import { DelegationsTreeNode } from '../components/DelegationNode/DelegationNode'
 import { IMyDelegation } from '../state/ducks/Delegations'
@@ -23,32 +23,26 @@ class DelegationsService {
     alias: string,
     isPCR: boolean
   ): Promise<void> {
-    const tx = DelegationsService.storeRootOnChain(delegationRoot)
+    await DelegationsService.storeRootOnChain(delegationRoot)
 
-    await BlockchainUtils.submitSignedTx(await tx, {
-      resolveOn: BlockchainUtils.IS_IN_BLOCK,
-    })
+    const { account, cTypeHash, id } = delegationRoot
 
-    return tx.then(() => {
-      const { account, cTypeHash, id } = delegationRoot
-
-      const myDelegation: IMyDelegation = {
-        account,
-        cTypeHash,
-        id,
-        isPCR,
-        metaData: { alias },
-        revoked: false,
-        type: Delegations.DelegationType.Root,
-      }
-      DelegationsService.store(myDelegation)
-    })
+    const myDelegation: IMyDelegation = {
+      account,
+      cTypeHash,
+      id,
+      isPCR,
+      metaData: { alias },
+      revoked: false,
+      type: Delegations.DelegationType.Root,
+    }
+    DelegationsService.store(myDelegation)
   }
 
   public static async storeOnChain(
     delegation: DelegationNode,
     signature: string
-  ): Promise<SubmittableExtrinsic> {
+  ): Promise<ISubmittableResult> {
     const selectedIdentity = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
     )?.identity
@@ -56,7 +50,10 @@ class DelegationsService {
     if (!selectedIdentity) {
       throw new Error('No selected Identity')
     }
-    return delegation.store(selectedIdentity, signature)
+    const tx = await delegation.store(selectedIdentity, signature)
+    return BlockchainUtils.submitTxWithReSign(tx, selectedIdentity, {
+      resolveOn: BlockchainUtils.IS_IN_BLOCK,
+    })
   }
 
   public static store(delegation: IMyDelegation): void {
@@ -163,7 +160,7 @@ class DelegationsService {
 
   private static async storeRootOnChain(
     delegation: DelegationRootNode
-  ): Promise<SubmittableExtrinsic> {
+  ): Promise<ISubmittableResult> {
     const selectedIdentity = Wallet.getSelectedIdentity(
       persistentStoreInstance.store.getState()
     )?.identity
@@ -172,7 +169,10 @@ class DelegationsService {
       throw new Error('No selected Identity')
     }
 
-    return delegation.store(selectedIdentity)
+    const tx = await delegation.store(selectedIdentity)
+    return BlockchainUtils.submitTxWithReSign(tx, selectedIdentity, {
+      resolveOn: BlockchainUtils.IS_IN_BLOCK,
+    })
   }
 }
 

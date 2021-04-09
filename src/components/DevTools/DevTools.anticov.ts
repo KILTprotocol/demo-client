@@ -73,7 +73,7 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
   )
   const signature = delegate.identity.signStr(delegationNode.generateHash())
   const tx = await delegationNode.store(root, signature)
-  await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
+  await BlockchainUtils.submitTxWithReSign(tx, root, { resolveOn: IS_IN_BLOCK })
   notifySuccess(`Delegation successfully created for ${delegate.metaData.name}`)
   await DelegationsService.importDelegation(
     delegationNode.id,
@@ -95,7 +95,9 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
   const { root, delegationRoot } = setup()
   if (!(await ctype.verifyStored())) {
     const tx = await ctype.store(root)
-    await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
+    await BlockchainUtils.submitTxWithReSign(tx, root, {
+      resolveOn: IS_IN_BLOCK,
+    })
     CTypeRepository.register({
       cType: ctype,
       metaData: { metadata, ctypeHash: ctype.hash },
@@ -106,7 +108,9 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
   const queriedRoot = await DelegationRootNode.query(delegationRoot.id)
   if (queriedRoot?.cTypeHash !== ctype.hash) {
     const tx = await delegationRoot.store(root)
-    await BlockchainUtils.submitSignedTx(tx, { resolveOn: IS_IN_BLOCK })
+    await BlockchainUtils.submitTxWithReSign(tx, root, {
+      resolveOn: IS_IN_BLOCK,
+    })
     const messageBody: MessageBody = {
       type: MessageBodyType.INFORM_CREATE_DELEGATION,
       content: { delegationId: delegationRoot.id, isPCR: false },
