@@ -199,7 +199,8 @@ class AttestationService {
         state.selectedAttestedClaims.forEach(
           (selectedAttestedClaim: IAttestedClaim) => {
             const attClaim = AttestedClaim.fromAttestedClaim(
-              selectedAttestedClaim
+              // deep copy to avoid deleting properties on the original object
+              JSON.parse(JSON.stringify(selectedAttestedClaim))
             )
 
             attClaim.request.removeClaimProperties(
