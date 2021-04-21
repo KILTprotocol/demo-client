@@ -262,9 +262,9 @@ class MessageRepository {
         ]
 
       case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
-        return (message.body as IRequestClaimsForCTypes).content.ctypes.filter(
-          Boolean
-        )
+        return (message.body as IRequestClaimsForCTypes).content
+          .map(val => val.cTypeHash)
+          .filter(Boolean)
       case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
         const cTypeHashes = (message.body as ISubmitClaimsForCTypes).content.map(
           attestedClaim => attestedClaim.request.claim.cTypeHash
