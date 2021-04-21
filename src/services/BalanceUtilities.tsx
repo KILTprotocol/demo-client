@@ -4,6 +4,7 @@ import {
   PublicIdentity,
   BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
+import { Balances as KiltBalances } from '@kiltprotocol/types'
 import BN from 'bn.js'
 import React from 'react'
 import { Store } from 'redux'
@@ -46,8 +47,10 @@ class BalanceUtilities {
   }
 
   public static async getMyBalance(identity: IMyIdentity): Promise<BN> {
-    const balance: BN = await Balance.getBalance(identity.identity.address)
-    return balance
+    const balance: KiltBalances = await Balance.getBalances(
+      identity.identity.address
+    )
+    return balance.free
   }
 
   public static connectMyIdentities(
@@ -117,21 +120,21 @@ class BalanceUtilities {
 
   private static listener(
     account: PublicIdentity['address'],
-    balance: BN,
-    change: BN
+    balance: KiltBalances,
+    change: KiltBalances
   ): void {
-    if (!change.isZero()) {
-      const inDeCreased = `${change.gtn(0) ? 'in' : 'de'}creased`
+    if (!change.free.isZero()) {
+      const inDeCreased = `${change.free.gtn(0) ? 'in' : 'de'}creased`
 
       notify(
         <div>
           Balance of <ContactPresentation address={account} /> {inDeCreased} by{' '}
-          <KiltToken amount={change} colored />.
+          <KiltToken amount={change.free} colored />.
         </div>
       )
     }
     persistentStoreInstance.store.dispatch(
-      Balances.Store.updateBalance(account, balance)
+      Balances.Store.updateBalance(account, balance.free)
     )
   }
 }
