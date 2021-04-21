@@ -72,8 +72,8 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
     [Permission.ATTEST]
   )
   const signature = delegate.identity.signStr(delegationNode.generateHash())
-  const tx = await delegationNode.store(root, signature)
-  await BlockchainUtils.submitTxWithReSign(tx, root, { resolveOn: IS_IN_BLOCK })
+  const tx = await delegationNode.store(signature)
+  await BlockchainUtils.signAndSubmitTx(tx, root, { resolveOn: IS_IN_BLOCK })
   notifySuccess(`Delegation successfully created for ${delegate.metaData.name}`)
   await DelegationsService.importDelegation(
     delegationNode.id,
@@ -94,8 +94,8 @@ async function newDelegation(delegate: IMyIdentity): Promise<void> {
 async function verifyOrAddCtypeAndRoot(): Promise<void> {
   const { root, delegationRoot } = setup()
   if (!(await ctype.verifyStored())) {
-    const tx = await ctype.store(root)
-    await BlockchainUtils.submitTxWithReSign(tx, root, {
+    const tx = await ctype.store()
+    await BlockchainUtils.signAndSubmitTx(tx, root, {
       resolveOn: IS_IN_BLOCK,
     })
     CTypeRepository.register({
@@ -107,8 +107,8 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
   // delegationRoot.verify() is unreliable when using the currently released mashnet-node &   // workaround is checking the ctype hash of the query result; it is 0x000... if it doesn't exist on chain
   const queriedRoot = await DelegationRootNode.query(delegationRoot.id)
   if (queriedRoot?.cTypeHash !== ctype.hash) {
-    const tx = await delegationRoot.store(root)
-    await BlockchainUtils.submitTxWithReSign(tx, root, {
+    const tx = await delegationRoot.store()
+    await BlockchainUtils.signAndSubmitTx(tx, root, {
       resolveOn: IS_IN_BLOCK,
     })
     const messageBody: MessageBody = {

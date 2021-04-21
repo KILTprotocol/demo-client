@@ -75,9 +75,9 @@ class BalanceUtilities {
         <ContactPresentation address={receiverAddress} inline /> initiated.
       </div>
     )
-    Balance.makeTransfer(myIdentity.identity, receiverAddress, transferAmount)
+    Balance.makeTransfer(receiverAddress, transferAmount)
       .then(tx =>
-        BlockchainUtils.submitTxWithReSign(tx, myIdentity.identity, {
+        BlockchainUtils.signAndSubmitTx(tx, myIdentity.identity, {
           resolveOn: BlockchainUtils.IS_IN_BLOCK,
         })
       )

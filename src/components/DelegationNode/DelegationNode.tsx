@@ -324,7 +324,7 @@ class DelegationNode extends React.Component<Props, State> {
           steps + 1
         )
 
-        const result = await BlockchainUtils.submitTxWithReSign(
+        const result = await BlockchainUtils.signAndSubmitTx(
           tx,
           selectedIdentity.identity,
           {

@@ -99,8 +99,8 @@ class CTypeCreate extends React.Component<Props, State> {
         metaData,
       }
 
-      const tx = cType.store(selectedIdentity.identity)
-      await BlockchainUtils.submitTxWithReSign(
+      const tx = cType.store()
+      await BlockchainUtils.signAndSubmitTx(
         await tx,
         selectedIdentity.identity,
         {
