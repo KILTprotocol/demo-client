@@ -182,7 +182,17 @@ class MessageRepository {
             }
           }
         )
-        return decryptedMesssages.filter(filterArray)
+        return (
+          decryptedMesssages
+            .filter(filterArray)
+            // TODO: check message structure via SDK
+            .filter(
+              message =>
+                message.body.type !==
+                  MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES ||
+                Array.isArray(message.body.content)
+            )
+        )
       })
   }
 
