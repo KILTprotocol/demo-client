@@ -84,10 +84,7 @@ class AttestationService {
       throw new Error('No identity selected')
     }
     try {
-      const tx = await attestation.revoke(
-        selectedIdentity,
-        delegationTreeTraversalSteps
-      )
+      const tx = await attestation.revoke(delegationTreeTraversalSteps)
 
       await BlockchainUtils.signAndSubmitTx(tx, selectedIdentity, {
         resolveOn: IS_IN_BLOCK,
@@ -122,10 +119,7 @@ class AttestationService {
     )
 
     try {
-      const tx = await attestation.revoke(
-        selectedIdentity,
-        delegationTreeTraversalSteps
-      )
+      const tx = await attestation.revoke(delegationTreeTraversalSteps)
 
       await BlockchainUtils.signAndSubmitTx(tx, selectedIdentity, {
         resolveOn: IS_IN_BLOCK,

@@ -138,7 +138,7 @@ class DelegationsService {
     node: DelegationBaseNode,
     identity: Identity
   ): Promise<void> {
-    await node.revoke(identity)
+    await node.revoke(identity.address)
     persistentStoreInstance.store.dispatch(
       Delegations.Store.revokeDelegationAction(node.id)
     )
