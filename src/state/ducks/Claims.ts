@@ -220,7 +220,13 @@ class Store {
               (attestedClaim: IAttestedClaim, index: number) => {
                 if (attestedClaim.attestation.claimHash === revokedHash) {
                   // avoid changing claims while iterating
-                  setIns.push([myClaimHash, 'attestedClaims', index, 'revoked'])
+                  setIns.push([
+                    myClaimHash,
+                    'attestedClaims',
+                    index,
+                    'attestation',
+                    'revoked',
+                  ])
                 }
               }
             )
