@@ -138,7 +138,11 @@ class DelegationsService {
     node: DelegationBaseNode,
     identity: Identity
   ): Promise<void> {
-    await node.revoke(identity.address)
+    await BlockchainUtils.signAndSubmitTx(
+      await node.revoke(identity.address),
+      identity,
+      { resolveOn: BlockchainUtils.IS_IN_BLOCK }
+    )
     persistentStoreInstance.store.dispatch(
       Delegations.Store.revokeDelegationAction(node.id)
     )
