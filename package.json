@@ -1,6 +1,6 @@
 {
   "name": "kilt-demo-client",
-  "version": "0.21.0-rc.1",
+  "version": "0.22.0",
   "license": "BSD-4-Clause",
   "private": true,
   "scripts": {
@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.10.4",
-    "@kiltprotocol/sdk-js": "^0.21.0-rc.9",
+    "@kiltprotocol/sdk-js": "^0.21.0",
     "@polkadot/ui-identicon": "^0.33.1",
     "@types/react-select": "^2.0.11",
     "@types/reselect": "^2.2.0",
