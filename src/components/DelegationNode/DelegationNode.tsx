@@ -318,13 +318,9 @@ class DelegationNode extends React.Component<Props, State> {
 
         blockUi.updateMessage(`Revoking ${index + 1} / ${hashes.length}`)
 
-        const tx = await Attestation.revoke(
-          attestation.claimHash,
-          selectedIdentity.identity,
-          steps + 1
-        )
+        const tx = await Attestation.revoke(attestation.claimHash, steps + 1)
 
-        const result = await BlockchainUtils.submitTxWithReSign(
+        const result = await BlockchainUtils.signAndSubmitTx(
           tx,
           selectedIdentity.identity,
           {

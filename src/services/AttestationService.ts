@@ -53,8 +53,8 @@ class AttestationService {
     }
 
     try {
-      const tx = await attestation.store(selectedIdentity)
-      await BlockchainUtils.submitTxWithReSign(tx, selectedIdentity, {
+      const tx = await attestation.store()
+      await BlockchainUtils.signAndSubmitTx(tx, selectedIdentity, {
         resolveOn: IS_IN_BLOCK,
       })
     } catch (error) {
@@ -84,12 +84,9 @@ class AttestationService {
       throw new Error('No identity selected')
     }
     try {
-      const tx = await attestation.revoke(
-        selectedIdentity,
-        delegationTreeTraversalSteps
-      )
+      const tx = await attestation.revoke(delegationTreeTraversalSteps)
 
-      await BlockchainUtils.submitTxWithReSign(tx, selectedIdentity, {
+      await BlockchainUtils.signAndSubmitTx(tx, selectedIdentity, {
         resolveOn: IS_IN_BLOCK,
       })
       notifySuccess('Attestation successfully revoked')
@@ -122,12 +119,9 @@ class AttestationService {
     )
 
     try {
-      const tx = await attestation.revoke(
-        selectedIdentity,
-        delegationTreeTraversalSteps
-      )
+      const tx = await attestation.revoke(delegationTreeTraversalSteps)
 
-      await BlockchainUtils.submitTxWithReSign(tx, selectedIdentity, {
+      await BlockchainUtils.signAndSubmitTx(tx, selectedIdentity, {
         resolveOn: IS_IN_BLOCK,
       })
 

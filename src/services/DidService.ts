@@ -87,8 +87,8 @@ class DidService {
       publicIdentity: myIdentity.identity.getPublicIdentity(),
     } as IContact)
 
-    const tx = await did.store(myIdentity.identity)
-    const status = await BlockchainUtils.submitTxWithReSign(
+    const tx = await did.store()
+    const status = await BlockchainUtils.signAndSubmitTx(
       tx,
       myIdentity.identity,
       {
@@ -110,8 +110,8 @@ class DidService {
   }
 
   public static async deleteDid(myIdentity: IMyIdentity): Promise<void> {
-    const tx = await Did.remove(myIdentity.identity)
-    const status = await BlockchainUtils.submitTxWithReSign(
+    const tx = await Did.remove()
+    const status = await BlockchainUtils.signAndSubmitTx(
       tx,
       myIdentity.identity,
       {
