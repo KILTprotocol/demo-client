@@ -50,8 +50,8 @@ class DelegationsService {
     if (!selectedIdentity) {
       throw new Error('No selected Identity')
     }
-    const tx = await delegation.store(selectedIdentity, signature)
-    return BlockchainUtils.submitTxWithReSign(tx, selectedIdentity, {
+    const tx = await delegation.store(signature)
+    return BlockchainUtils.signAndSubmitTx(tx, selectedIdentity, {
       resolveOn: BlockchainUtils.IS_IN_BLOCK,
     })
   }
@@ -138,7 +138,11 @@ class DelegationsService {
     node: DelegationBaseNode,
     identity: Identity
   ): Promise<void> {
-    await node.revoke(identity)
+    await BlockchainUtils.signAndSubmitTx(
+      await node.revoke(identity.address),
+      identity,
+      { resolveOn: BlockchainUtils.IS_IN_BLOCK }
+    )
     persistentStoreInstance.store.dispatch(
       Delegations.Store.revokeDelegationAction(node.id)
     )
@@ -169,8 +173,8 @@ class DelegationsService {
       throw new Error('No selected Identity')
     }
 
-    const tx = await delegation.store(selectedIdentity)
-    return BlockchainUtils.submitTxWithReSign(tx, selectedIdentity, {
+    const tx = await delegation.store()
+    return BlockchainUtils.signAndSubmitTx(tx, selectedIdentity, {
       resolveOn: BlockchainUtils.IS_IN_BLOCK,
     })
   }
