@@ -1,3 +1,4 @@
+@use 'styles/library';
 .ContactPresentation {
   @include presentation;
 
@@ -26,9 +27,7 @@
   }
 
   &.internal {
-
     & .ui--IdentityIcon {
-
       &:after {
         font-size: 12px;
       }

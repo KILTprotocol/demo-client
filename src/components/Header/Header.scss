@@ -1,3 +1,4 @@
+@use 'styles/library';
 .Header {
   position: fixed;
   z-index: $z-index-header;
@@ -53,14 +54,12 @@
   }
 
   &.open-navigation {
-
     & .Navigation {
       display: block;
     }
   }
 
-  @include breakpoint('phone-tablet-only'){
-
+  @include breakpoint("phone-tablet-only") {
     & .Navigation {
       $icon-size: 24px;
 
@@ -81,7 +80,7 @@
       }
 
       &:before {
-        content: '';
+        content: "";
         position: absolute;
         top: $header-height;
         left: 0;
@@ -102,7 +101,6 @@
         }
 
         &.current {
-
           & a {
             background: transparent;
             color: $color-primary;
@@ -130,7 +128,7 @@
           }
 
           &:before {
-            content: '';
+            content: "";
             display: block;
             width: $icon-size;
             height: $icon-size;
@@ -143,19 +141,24 @@
           }
         }
 
-        $icons: (dashboard: 'Identity', attestations: 'Claim-attested', wallet: 'Wallet', ctype: 'Ctype', claim: 'Claim', utilities: 'Settings', contacts: 'Contact', messages: 'Message');
+        $icons: (
+          dashboard: "Identity",
+          attestations: "Claim-attested",
+          wallet: "Wallet",
+          ctype: "Ctype",
+          claim: "Claim",
+          utilities: "Settings",
+          contacts: "Contact",
+          messages: "Message",
+        );
 
         @each $class, $icon in $icons {
-
-          @if ($icon != '') {
-
+          @if ($icon != "") {
             &.#{$class} {
-
               & a {
-
                 &:before {
                   background: {
-                    image: url('~src/assets/#{$icon}.svg')
+                    image: url("~src/assets/#{$icon}.svg");
                   }
                 }
               }
@@ -166,8 +169,7 @@
     }
   }
 
-  @include breakpoint('desktop') {
-
+  @include breakpoint("desktop") {
     & .menu {
       display: none;
       pointer-events: none;
@@ -186,7 +188,6 @@
         display: inline-block;
 
         &.current {
-
           & a {
             color: $color-primary !important;
           }

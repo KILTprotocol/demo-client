@@ -1,5 +1,5 @@
+@use 'styles/library';
 .MyDelegationsInviteModal {
-
   & .permissions,
   & .contactsSelect,
   & .delegationsSelect {
@@ -7,7 +7,6 @@
   }
 
   & .permissions {
-
     & label {
       @include checkbox;
 
@@ -29,7 +28,6 @@
   }
 
   & button {
-
     &.invite {
       @include button-primary;
     }

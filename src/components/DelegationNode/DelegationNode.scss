@@ -1,3 +1,4 @@
+@use 'styles/library';
 .DelegationNode {
   $identiconSize: 24px;
   $marginTop: $base-padding;
@@ -20,7 +21,7 @@
     &:before {
       @include border-radius($base-border-radius);
 
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       right: 0;
@@ -46,7 +47,8 @@
       @include baseFont-bold;
 
       display: inline-block;
-      margin:{right: $base-padding/2;
+      margin: {
+        right: $base-padding/2;
         bottom: $base-padding/4;
         left: $base-padding/4;
       }
@@ -83,13 +85,11 @@
   }
 
   &.myNode {
-
     & h3 {
       color: $color-secondary;
     }
 
     & > .label {
-
       &:before {
         border-color: $color-secondary;
       }
@@ -97,18 +97,14 @@
   }
 
   &.focusedNode {
-
     & > .label {
-
       &:before {
         background: $color-grey;
       }
     }
 
     &.myNode {
-
       & > .label {
-
         &:before {
           background: $color-secondary;
         }
@@ -126,12 +122,9 @@
     }
   }
 
-  &.viewType-present{
-
+  &.viewType-present {
     &.revoked {
-
       & > .label {
-
         & .header,
         & .content,
         &:before {
@@ -145,12 +138,13 @@
   &:after,
   & .getSiblings:after,
   & .getChildren:after {
-    content: '';
+    content: "";
     position: absolute;
     top: -$marginTop + $lineIdenticonDistance - $labelPadding;
     left: $identiconSize/2 - $lineWidth/2 - $marginLeft + $labelPadding;
     height: $marginTop + $identiconSize/2 + $labelPadding;
-    width: $marginLeft - $identiconSize/2 - $lineIdenticonDistance - $labelPadding;
+    width: $marginLeft - $identiconSize/2 - $lineIdenticonDistance -
+      $labelPadding;
     border: {
       color: $color-grey;
       style: solid;
@@ -219,12 +213,13 @@
 
   & .getSiblings {
     display: none;
-    top: $marginTop + $identiconSize/2 + $addLineHeight - $marginTop + $lineIdenticonDistance + $labelPadding;
+    top: $marginTop + $identiconSize/2 + $addLineHeight - $marginTop +
+      $lineIdenticonDistance + $labelPadding;
     left: $identiconSize/2 - $marginLeft + $labelPadding;
   }
 
   & .getChildren {
-    bottom: 0 - 2*$labelPadding;
+    bottom: 0 - 2 * $labelPadding;
     left: $marginLeft + $identiconSize/2 - $marginLeft + $labelPadding;
   }
 
@@ -241,7 +236,6 @@
   }
 
   &:last-child {
-
     &:before {
       height: $marginTop + $identiconSize/2 + $labelPadding;
     }

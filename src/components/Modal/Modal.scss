@@ -1,3 +1,4 @@
+@use 'styles/library';
 .Modal {
   z-index: $z-index-modal;
   display: flex;
@@ -26,7 +27,7 @@
     position: relative;
     z-index: $z-index-modal + 2;
     width: 100%;
-    max-width: 1024px - 2*$base-padding;
+    max-width: 1024px - 2 * $base-padding;
     margin: auto;
     background: $color-white;
     border: $base-border;
@@ -94,7 +95,6 @@
   }
 
   &.small {
-
     & > .container {
       max-width: 640px;
     }

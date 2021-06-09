@@ -1,5 +1,5 @@
+@use 'styles/library';
 .AttestedClaimVerificationView {
-
   @include labeledCard(1);
 
   & .refresh {
@@ -7,7 +7,6 @@
   }
 
   & h2 {
-
     & .status {
       font-size: 16px;
     }
@@ -18,7 +17,6 @@
   }
 
   & .attributes {
-
     & > div {
       @include label-input-combo;
     }

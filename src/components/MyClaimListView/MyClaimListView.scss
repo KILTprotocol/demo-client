@@ -1,13 +1,28 @@
+@use 'styles/library';
 .MyClaimListView {
-
   & table {
     @include table;
     @include responsiveTable(
-        (
-          phone: (100%, 100%, 30px, 120px),
-          tablet: (100%, 100%, 100px, 170px),
-          desktop: (100%, 100%, 100px, 270px),
-        )
+      (
+        phone: (
+          100%,
+          100%,
+          30px,
+          120px,
+        ),
+        tablet: (
+          100%,
+          100%,
+          100px,
+          170px,
+        ),
+        desktop: (
+          100%,
+          100%,
+          100px,
+          270px,
+        ),
+      )
     );
   }
 

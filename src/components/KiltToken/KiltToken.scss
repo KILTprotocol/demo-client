@@ -1,3 +1,4 @@
+@use 'styles/library';
 .KiltToken {
   display: inline-block;
 
@@ -9,11 +10,11 @@
 
     @include border-radius(50%);
 
-    content: 'K';
+    content: "K";
     display: inline-block;
     width: #{$size}em;
     height: #{$size}em;
-    margin:{
+    margin: {
       left: 0.5em;
     }
     border: 1px solid $color-primary;
@@ -25,12 +26,10 @@
   }
 
   &.colored {
-
     &.decreased {
       color: $color-danger;
     }
     &.increased {
-
       color: $color-success;
     }
   }

@@ -1,10 +1,11 @@
+@use 'styles/library';
 .Spinner {
   & .lds-ring {
     display: inline-block;
     position: relative;
     width: 64px;
     height: 64px;
-    
+
     & div {
       box-sizing: border-box;
       display: block;
@@ -28,7 +29,7 @@
         animation-delay: -0.3s;
       }
 
-      &:nth-child(3) {  
+      &:nth-child(3) {
         animation-delay: -0.15s;
       }
     }
@@ -41,5 +42,5 @@
     100% {
       transform: rotate(360deg);
     }
-  }      
+  }
 }
