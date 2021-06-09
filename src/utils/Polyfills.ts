@@ -1,5 +1,4 @@
 declare global {
-  // eslint-disable-next-line @typescript-eslint/interface-name-prefix
   interface PromiseConstructor {
     any<T>(
       arrayOfPromises: Array<T | PromiseLike<T>>

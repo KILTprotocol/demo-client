@@ -1,4 +1,4 @@
-@use 'styles/library';
+@import 'styles/library';
 
 .BlockUi {
   $z-index: $z-index-modal + 100;

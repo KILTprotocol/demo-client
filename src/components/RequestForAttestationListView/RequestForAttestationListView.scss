@@ -1,4 +1,4 @@
-@use 'styles/library';
+@import 'styles/library';
 .RequestForAttestationListView {
   margin-bottom: $base-padding;
   @include labeledCard(1);

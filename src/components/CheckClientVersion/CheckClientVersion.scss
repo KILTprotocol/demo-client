@@ -1,4 +1,4 @@
-@use 'styles/library';
+@import 'styles/library';
 .CheckClientVersion {
   position: fixed;
   z-index: $z-index-modal - 1;
