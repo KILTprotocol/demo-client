@@ -1,3 +1,5 @@
+@use 'styles/library';
+
 .BlockingNotifications {
   $z-index: $z-index-modal + 300;
 

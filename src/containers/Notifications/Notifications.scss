@@ -1,3 +1,5 @@
+@use 'styles/library';
+
 .Notifications {
   $z-index: $z-index-header + -1;
 

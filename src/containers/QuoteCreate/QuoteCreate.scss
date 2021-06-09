@@ -1,3 +1,5 @@
+@use 'styles/library';
+
 .QuoteCreate {
   @include labeledCard;
   & h1 {

@@ -1,3 +1,5 @@
+@use 'styles/library';
+
 .DidView {
   &h1 {
     @include h1('Wallet');
