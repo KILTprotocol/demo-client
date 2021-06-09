@@ -14,7 +14,7 @@ import Spinner from '../Spinner/Spinner'
 
 import './AttestationStatus.scss'
 
-const enum STATUS {
+enum STATUS {
   PENDING = 'pending',
   UNVERIFIED = 'unverified',
   ATTESTED = 'attested',
