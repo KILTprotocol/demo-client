@@ -1,9 +1,8 @@
-.PrivacyPolicy{
-
-
+@use 'styles/library';
+.PrivacyPolicy {
   & h2 {
     margin: {
-      top: 2*$base-padding;
+      top: 2 * $base-padding;
     }
   }
 }

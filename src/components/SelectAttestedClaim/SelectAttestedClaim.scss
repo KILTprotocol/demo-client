@@ -1,3 +1,4 @@
+@use 'styles/library';
 .SelectAttestedClaim {
   @include card;
 
@@ -16,7 +17,7 @@
     display: flex;
     flex-direction: column;
     margin: {
-      left: 1.5*$base-padding;
+      left: 1.5 * $base-padding;
     }
 
     & h4 {
@@ -35,7 +36,7 @@
       }
 
       &.selected-all {
-        @include opacity(0.3)
+        @include opacity(0.3);
       }
     }
   }
@@ -55,7 +56,6 @@
     width: 30px;
 
     &.unverified {
-
       & + .ContactPresentation {
         color: $color-danger;
         text-decoration: line-through;
@@ -63,7 +63,6 @@
     }
 
     &.attested {
-
       & + .ContactPresentation {
         color: $color-success;
       }

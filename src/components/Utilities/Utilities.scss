@@ -1,7 +1,7 @@
+@use 'styles/library';
 .Utilities {
-
   & h1 {
-    @include h1('Settings');
+    @include h1("Settings");
   }
 
   & > section {
@@ -24,9 +24,7 @@
   }
 
   & .DevTools {
-
     & > div {
-
       & > div {
         margin: {
           top: $base-padding;
@@ -36,20 +34,18 @@
   }
 
   & .versions {
-
     & > div {
       @include label-input-combo;
     }
   }
 
   & .debugMode {
-
     & > div {
       @include checkbox;
     }
   }
 
   & .reset {
-    margin-top: 20px
+    margin-top: 20px;
   }
 }

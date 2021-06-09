@@ -1,18 +1,29 @@
+@use 'styles/library';
 .CtypeListView {
-
   & table {
     @include table;
     @include responsiveTable(
-        (
-          phone: ('*', false, false),
-          tablet: (false, '*', '*'),
-          desktop: (false, '*', '*'),
-        )
+      (
+        phone: (
+          "*",
+          false,
+          false,
+        ),
+        tablet: (
+          false,
+          "*",
+          "*",
+        ),
+        desktop: (
+          false,
+          "*",
+          "*",
+        ),
+      )
     );
   }
 
-  @include breakpoint(phone-tablet-only){
-
+  @include breakpoint(phone-tablet-only) {
     & td {
       padding-bottom: $base-padding;
     }

@@ -1,5 +1,5 @@
+@use 'styles/library';
 .SelectAttestedClaims {
-
   & .cType-container {
     @include labeledCard;
 

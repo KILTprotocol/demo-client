@@ -1,8 +1,8 @@
+@use 'styles/library';
 .AttestationStatus {
   text-align: center;
 
   & .unverified {
-
     &:before {
       @include icon($icon-times);
 
@@ -11,7 +11,6 @@
   }
 
   & .attested {
-
     &:before {
       @include icon($icon-check);
 

@@ -1,3 +1,4 @@
+@use 'styles/library';
 .schema-based-json-editor {
   width: 100%;
   margin: {
@@ -35,19 +36,17 @@
     @include card;
 
     & .schema-based-json-editor {
-
       &--row,
       &--error-row {
         @include label-input-combo;
 
         margin-top: $base-padding;
 
-        &:first-child{
+        &:first-child {
           margin-top: 0;
         }
 
         & label {
-
           & > .schema-based-json-editor--button-group {
             @include baseFont;
           }
@@ -68,7 +67,6 @@
     }
 
     &:first-child {
-
       & h3 {
         margin: {
           top: 0;
@@ -94,7 +92,6 @@
 
     // expand
     & .fa-caret-square-down {
-
       &:before {
         @include icon($icon-toggle-down);
       }
@@ -102,7 +99,6 @@
 
     // collapse
     & .fa-caret-square-right {
-
       &:before {
         @include icon($icon-caret-square-o-right);
       }
@@ -110,7 +106,6 @@
 
     // collapse
     & .fa-plus {
-
       &:before {
         @include icon($icon-plus);
       }
@@ -118,7 +113,6 @@
 
     // delete
     & .fa-times {
-
       &:before {
         @include icon($icon-times);
       }
@@ -126,7 +120,6 @@
   }
 
   & > &--row {
-
     & > h3 {
       display: none;
     }

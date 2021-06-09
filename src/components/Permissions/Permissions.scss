@@ -1,3 +1,4 @@
+@use 'styles/library';
 .Permissions {
   $size: 1.6em;
   $border-size: 0.2em;
@@ -44,16 +45,14 @@
   }
 
   & .ATTEST {
-
     &:before {
-      content: 'A';
+      content: "A";
     }
   }
 
   & .DELEGATE {
-
     &:before {
-      content: 'D';
+      content: "D";
     }
   }
 
@@ -79,7 +78,7 @@
       @include transform-origin(50%, 50%);
       @include transform(translateX(-50%) translateY(-50%) rotate(-45deg));
 
-      content: '';
+      content: "";
       position: absolute;
       width: 130%;
       height: $border-size;

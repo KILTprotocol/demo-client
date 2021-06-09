@@ -1,5 +1,5 @@
+@use 'styles/library';
 .DelegationDetailView {
-
   & .delegationNodeContainer {
     @include labeledCard;
 
@@ -11,13 +11,12 @@
     width: 100%;
     padding: {
       right: $base-padding/4;
-      bottom: 8*$base-button-height;
+      bottom: 8 * $base-button-height;
       left: $base-padding/4;
     }
     overflow: auto;
 
     & > .DelegationNode {
-
       &:before,
       &:after {
         display: none;

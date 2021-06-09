@@ -1,7 +1,7 @@
+@use 'styles/library';
 .MyClaimCreateView {
-
   & h1 {
-    @include h1('Claim');
+    @include h1("Claim");
   }
 
   & .Claim-base {
