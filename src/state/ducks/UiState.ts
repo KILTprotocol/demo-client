@@ -333,7 +333,9 @@ const getBlockingNotifications = createSelector(
 )
 
 const getStateCurrentTask = (state: ReduxState): TaskProps | undefined =>
-  state.uiState.get('currentTask').get(0)
+  // TODO: conflicting with its declaration, this does NOT return an Immutable.List
+  // @ts-ignore
+  state.uiState.get('currentTask')[0]
 
 const getCurrentTask = createSelector(
   [getStateCurrentTask],
