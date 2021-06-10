@@ -1,6 +1,6 @@
 @use "sass:math";
 
-@import 'styles/library';
+@use 'styles/library' as *;
 .schema-based-json-editor {
   width: 100%;
   margin: {

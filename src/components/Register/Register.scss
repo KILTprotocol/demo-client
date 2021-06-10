@@ -1,4 +1,4 @@
-@import 'styles/library';
+@use 'styles/library' as *;
 .Register {
   & form {
     position: relative;

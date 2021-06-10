@@ -1,6 +1,6 @@
 @use "sass:math";
 
-@import 'styles/library';
+@use 'styles/library' as *;
 .Permissions {
   $size: 1.6em;
   $border-size: 0.2em;

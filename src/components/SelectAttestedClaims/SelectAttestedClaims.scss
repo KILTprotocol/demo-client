@@ -1,4 +1,4 @@
-@import 'styles/library';
+@use 'styles/library' as *;
 .SelectAttestedClaims {
   & .cType-container {
     @include labeledCard;

@@ -1,4 +1,4 @@
-@import 'styles/library';
+@use 'styles/library' as *;
 .IdentityView {
   position: relative;
   padding: $base-padding;

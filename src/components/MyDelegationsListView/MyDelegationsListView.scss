@@ -1,4 +1,4 @@
-@import 'styles/library';
+@use 'styles/library' as *;
 .MyDelegationsListView {
   & table {
     @include table;

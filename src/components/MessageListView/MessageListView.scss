@@ -1,6 +1,6 @@
 @use "sass:math";
 
-@import 'styles/library';
+@use 'styles/library' as *;
 .MessageListView {
   & table {
     @include table;

@@ -1,6 +1,6 @@
 @use "sass:math";
 
-@import 'styles/library';
+@use 'styles/library' as *;
 .Utilities {
   & h1 {
     @include h1("Settings");

@@ -1,6 +1,6 @@
 @use "sass:math";
 
-@import 'styles/library';
+@use 'styles/library' as *;
 .react-json-view {
   padding: math.div($base-padding, 2);
   line-height: 1.2;

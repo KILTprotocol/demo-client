@@ -1,6 +1,6 @@
 @use "sass:math";
 
-@import 'styles/library';
+@use 'styles/library' as *;
 
 .BlockUi {
   $z-index: $z-index-modal + 100;

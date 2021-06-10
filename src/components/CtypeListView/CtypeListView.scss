@@ -1,4 +1,4 @@
-@import 'styles/library';
+@use 'styles/library' as *;
 .CtypeListView {
   & table {
     @include table;
