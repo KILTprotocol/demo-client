@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 .MessageDetailView {
   & h4 {
@@ -29,7 +31,7 @@
         style: solid;
         color: $color-grey-light;
       }
-      padding: $base-padding/4 $base-padding/2;
+      padding: math.div($base-padding, 4) math.div($base-padding, 2);
     }
   }
 

@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 
 .MessageView {
@@ -19,7 +21,7 @@
 
     & .actions {
       margin: {
-        bottom: -$base-padding/2;
+        bottom: math.div(-$base-padding, 2);
       }
       padding: {
         top: 0;

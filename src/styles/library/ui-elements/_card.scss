@@ -1,8 +1,11 @@
-$labeledCardActions-padding-outer: $base-padding/2;
-$labeledCardActions-padding-inner: $base-padding/2;
+@use "sass:color";
+@use "sass:math";
+
+$labeledCardActions-padding-outer: math.div($base-padding, 2);
+$labeledCardActions-padding-inner: math.div($base-padding, 2);
 
 @mixin card {
-  @include box-shadow(2px 2px 5px transparentize($color-black, 0.9));
+  @include box-shadow(2px 2px 5px color.adjust($color-black, $alpha: -0.9));
   @include border-radius($base-border-radius);
 
   position: relative;
@@ -24,7 +27,7 @@ $labeledCardActions-padding-inner: $base-padding/2;
   $max-width: calc(100% + #{$base-padding});
   @if($buttons > 0){
     $placeForButtons: $buttons * $base-button-height + ($buttons - 1) * $labeledCardActions-padding-inner + $labeledCardActions-padding-outer;
-    $max-width: calc(100% - #{$placeForButtons - $base-padding/2});
+    $max-width: calc(100% - #{$placeForButtons - math.div($base-padding, 2)});
   }
 
   @include border-radius($base-border-radius);
@@ -32,13 +35,13 @@ $labeledCardActions-padding-inner: $base-padding/2;
   position: relative;
   display: inline-block;
   bottom: 1em;
-  left: -$base-padding/2;
+  left: math.div(-$base-padding, 2);
   max-width: $max-width;
   margin: {
     top: 0;
     bottom: -$base-padding;
   };
-  padding: $base-padding/4 $base-padding;
+  padding: math.div($base-padding, 4) $base-padding;
   border: $base-border;
   background: $color-white;
   line-height: 1.2;
@@ -58,7 +61,7 @@ $labeledCardActions-padding-inner: $base-padding/2;
 @mixin labeledCardActions {
   position: absolute;
   top: -20px;
-  right: $base-padding/2;
+  right: math.div($base-padding, 2);
   padding: 0 $labeledCardActions-padding-outer;
   background: $color-white;
 

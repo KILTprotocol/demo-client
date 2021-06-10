@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import '~select2-component/dist/select2.min.css';
 @import "styles/select2-overrides";
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,600&subset=latin');
@@ -103,8 +105,8 @@ input {
     @include button-secondary;
 
     margin: {
-      left: $base-padding/2;
-      bottom: $base-padding/2;
+      left: math.div($base-padding, 2);
+      bottom: math.div($base-padding, 2);
     }
 
     section > & {
@@ -161,7 +163,7 @@ a[href],
     position: absolute;
     right: 0;
     bottom: -$time-size * $line-height;
-    padding-left: $base-padding/4;
+    padding-left: math.div($base-padding, 4);
     font-size: $time-size;
   }
 }

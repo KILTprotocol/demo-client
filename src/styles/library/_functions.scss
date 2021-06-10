@@ -1,12 +1,14 @@
+@use "sass:math";
+
 @function pxToEm($px, $basePx: $font-size-base) {
-    @return $pixels / $context * 1em;
+    @return math.div($pixels, $context) * 1em;
 }
 
 @function getIconSize($desiredIconSize: $base-button-icon-size) {
 
     // ratio measured exemplary with $icon-ic_close
     // to get that icon in 16px size we need to set a font-size of 24px
-    $ratio: 24px / 16px;
+    $ratio: math.div(24px, 16px);
 
     @return $desiredIconSize * $ratio;
 }
@@ -16,7 +18,7 @@
     $x1: $x0;
 
     @for $i from 1 through 10 {
-        $x1: $x0 - ($x0 * $x0 - abs($r)) / (2 * $x0);
+        $x1: $x0 - math.div($x0 * $x0 - math.abs($r), 2 * $x0);
         $x0: $x1;
     }
 
@@ -24,5 +26,5 @@
 }
 
 @function getActionTdWidth($countButtons){
-    @return $countButtons * ($base-button-height + $base-padding/2) + 2 * $cell-padding-h - $base-padding/2 + 2px;
+    @return $countButtons * ($base-button-height + $base-padding/2) + 2 * $cell-padding-h - math.div($base-padding, 2) + 2px;
 }

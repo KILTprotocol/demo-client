@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 .MessageListView {
   & table {
@@ -73,7 +75,7 @@
 
       color: $color-danger;
       margin: {
-        right: $base-padding/4;
+        right: math.div($base-padding, 4);
       }
     }
   }

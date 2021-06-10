@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 
 .RequestAttestation {
@@ -61,8 +63,8 @@
       @include button-primary;
 
       margin:{
-        left: $base-padding/2;
-        right: $base-padding/2;
+        left: math.div($base-padding, 2);
+        right: math.div($base-padding, 2);
       }
 
       &:last-child {
@@ -80,7 +82,7 @@
       @include button-secondary;
 
       margin: {
-        left: $base-padding/2;
+        left: math.div($base-padding, 2);
       }
       vertical-align: middle;
     }

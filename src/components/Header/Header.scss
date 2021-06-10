@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 .Header {
   position: fixed;
@@ -21,7 +23,7 @@
     @include button-icon-only($icon-navicon, 20px);
 
     margin: {
-      right: $base-padding/2;
+      right: math.div($base-padding, 2);
     }
     color: $color-white;
 
@@ -39,7 +41,7 @@
     align-items: center;
 
     & > * {
-      margin-left: $base-padding/2;
+      margin-left: math.div($base-padding, 2);
     }
   }
 
@@ -132,7 +134,7 @@
             display: block;
             width: $icon-size;
             height: $icon-size;
-            margin-right: $base-padding/2;
+            margin-right: math.div($base-padding, 2);
             background: {
               position: center;
               repeat: no-repeat;
@@ -194,7 +196,7 @@
         }
 
         & a {
-          padding: $base-padding/4 0;
+          padding: math.div($base-padding, 4) 0;
           margin: {
             right: $base-padding;
           }
@@ -219,7 +221,7 @@
 
 .debugModeLabel {
   $fontSize: 12px;
-  $margin: $base-padding/4;
+  $margin: math.div($base-padding, 4);
 
   @include transform-origin(left, top);
   @include transform(rotate(-90deg));

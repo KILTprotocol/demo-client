@@ -1,4 +1,6 @@
 // usage: @include aspectRatio((16:9), false)
+@use "sass:math";
+
 @mixin aspectRatio($aspectRatio, $setChildStyles: true) {
     position: relative;
 
@@ -9,7 +11,7 @@
             position: relative;
             display: block;
             width: 100%;
-            padding-top: $height / $width * 100%;
+            padding-top: math.div($height, $width) * 100%;
         }
 
         @if ($setChildStyles) {

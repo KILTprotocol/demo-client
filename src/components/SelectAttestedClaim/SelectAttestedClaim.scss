@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 .SelectAttestedClaim {
   @include card;
@@ -32,7 +34,7 @@
 
     & label {
       margin: {
-        top: $base-padding/2;
+        top: math.div($base-padding, 2);
       }
 
       &.selected-all {

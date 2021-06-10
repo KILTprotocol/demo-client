@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 
 .WalletAdd {
@@ -51,7 +53,7 @@
       @include button-icon-only($icon-refresh, 16px);
 
       border: none;
-      margin-left: $base-padding/2;
+      margin-left: math.div($base-padding, 2);
     }
 
     & div {
@@ -91,7 +93,7 @@
       @extend %centerHV;
 
       position: absolute;
-      left: $checkbox-size/2;
+      left: math.div($checkbox-size, 2);
     }
 
     &:before {

@@ -1,3 +1,5 @@
+@use "sass:math";
+
 %extended-triangle {
     display: block;
     width: 0;
@@ -9,51 +11,51 @@
 // HELPER FUNCTIONS
 
 @function strip-units($number) {
-    @return $number / ($number * 0 + 1);
+    @return math.div($number, $number * 0 + 1);
 }
 
 @function getWidthWithBorder ($triangleWidth, $triangleHeight, $borderWidth) {
     $unit: $triangleWidth + $triangleHeight + $borderWidth;
-    $unit: $unit / strip-units($unit);
+    $unit: math.div($unit, strip-units($unit));
     $triangleWidth: strip-units($triangleWidth);
     $triangleHeight: strip-units($triangleHeight);
     $borderWidth: strip-units($borderWidth);
-    $newWidth: $triangleWidth + ($borderWidth * sqrt($triangleWidth*$triangleWidth + $triangleHeight*$triangleHeight)/$triangleHeight);
+    $newWidth: $triangleWidth + math.div($borderWidth * sqrt($triangleWidth*$triangleWidth + $triangleHeight*$triangleHeight), $triangleHeight);
     @return $newWidth * $unit;
 }
 
 @function getHeightWithBorder ($triangleWidth, $triangleHeight, $borderWidth) {
     $unit: $triangleWidth + $triangleHeight + $borderWidth;
-    $unit: $unit / strip-units($unit);
+    $unit: math.div($unit, strip-units($unit));
     $triangleWidth: strip-units($triangleWidth);
     $triangleHeight: strip-units($triangleHeight);
     $borderWidth: strip-units($borderWidth);
-    $newWidth: $triangleWidth + ($borderWidth * sqrt($triangleWidth*$triangleWidth + $triangleHeight*$triangleHeight)/$triangleHeight);
+    $newWidth: $triangleWidth + math.div($borderWidth * sqrt($triangleWidth*$triangleWidth + $triangleHeight*$triangleHeight), $triangleHeight);
     @return $newWidth * $unit;
 }
 
 // TRIANGLES
 
 @mixin triangle-up($triangleWidth, $triangleHeight, $triangleColor) {
-    border-width: 0 ($triangleWidth/2) $triangleHeight ($triangleWidth/2);
+    border-width: 0 math.div($triangleWidth, 2) $triangleHeight math.div($triangleWidth, 2);
     border-color: transparent transparent $triangleColor transparent;
     @extend %extended-triangle;
 }
 
 @mixin triangle-right($triangleWidth, $triangleHeight, $triangleColor) {
-    border-width: ($triangleHeight/2) 0 ($triangleHeight/2) $triangleWidth;
+    border-width: math.div($triangleHeight, 2) 0 math.div($triangleHeight, 2) $triangleWidth;
     border-color: transparent transparent transparent $triangleColor;
     @extend %extended-triangle;
 }
 
 @mixin triangle-down($triangleWidth, $triangleHeight, $triangleColor) {
-    border-width: $triangleHeight ($triangleWidth/2) 0 ($triangleWidth/2);
+    border-width: $triangleHeight math.div($triangleWidth, 2) 0 math.div($triangleWidth, 2);
     border-color: $triangleColor transparent transparent transparent;
     @extend %extended-triangle;
 }
 
 @mixin triangle-left($triangleWidth, $triangleHeight, $triangleColor) {
-    border-width: ($triangleHeight/2) $triangleWidth ($triangleHeight/2) 0;
+    border-width: math.div($triangleHeight, 2) $triangleWidth math.div($triangleHeight, 2) 0;
     border-color: transparent $triangleColor transparent transparent;
     @extend %extended-triangle;
 }
@@ -62,24 +64,24 @@
 
 @mixin triangle-up-border($triangleWidth, $triangleHeight, $borderColor, $borderWidth) {
     $newTriangleWidth: getWidthWithBorder($triangleWidth, $triangleHeight, $borderWidth);
-    $newTriangleHeight: $triangleHeight * $newTriangleWidth / $triangleWidth;
+    $newTriangleHeight: math.div($triangleHeight * $newTriangleWidth, $triangleWidth);
     @include triangle-up($newTriangleWidth, $newTriangleHeight, $borderColor);
 }
 
 @mixin triangle-right-border($triangleWidth, $triangleHeight, $borderColor, $borderWidth) {
     $newTriangleWidth: getWidthWithBorder($triangleWidth, $triangleHeight, $borderWidth);
-    $newTriangleHeight: $triangleHeight * $newTriangleWidth / $triangleWidth;
+    $newTriangleHeight: math.div($triangleHeight * $newTriangleWidth, $triangleWidth);
     @include triangle-right($newTriangleWidth, $newTriangleHeight, $borderColor);
 }
 
 @mixin triangle-down-border($triangleWidth, $triangleHeight, $borderColor, $borderWidth) {
     $newTriangleWidth: getWidthWithBorder($triangleWidth, $triangleHeight, $borderWidth);
-    $newTriangleHeight: $triangleHeight * $newTriangleWidth / $triangleWidth;
+    $newTriangleHeight: math.div($triangleHeight * $newTriangleWidth, $triangleWidth);
     @include triangle-down($newTriangleWidth, $newTriangleHeight, $borderColor);
 }
 
 @mixin triangle-left-border($triangleWidth, $triangleHeight, $borderColor, $borderWidth) {
     $newTriangleWidth: getWidthWithBorder($triangleWidth, $triangleHeight, $borderWidth);
-    $newTriangleHeight: $triangleHeight * $newTriangleWidth / $triangleWidth;
+    $newTriangleHeight: math.div($triangleHeight * $newTriangleWidth, $triangleWidth);
     @include triangle-left($newTriangleWidth, $newTriangleHeight, $borderColor);
 }

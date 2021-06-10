@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 
 .ContactList {
@@ -27,7 +29,7 @@
 
     & button {
       margin:{
-        left: $base-padding / 2;
+        left: math.div($base-padding, 2);
       }
     }
   }

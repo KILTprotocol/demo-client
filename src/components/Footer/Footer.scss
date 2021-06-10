@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 .Footer {
   position: fixed;
@@ -7,7 +9,7 @@
   width: 100%;
   max-width: none !important;
   border-top: $base-border;
-  padding: $base-padding/4 !important;
+  padding: math.div($base-padding, 4) !important;
   background: $color-white;
   text-align: center;
   font-size: 12px;

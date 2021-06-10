@@ -1,3 +1,5 @@
+@use "sass:math";
+
 %enlargeTouchArea {
 
     html.touch & {
@@ -12,7 +14,7 @@
             height: $height;
             width: 100%;
             top: 50%;
-            margin-top: -$height/2;
+            margin-top: math.div(-$height, 2);
         }
     }
 }

@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 
 .Balance {
@@ -31,7 +33,7 @@
         @extend %centerV;
 
         position: absolute;
-        right: $base-padding/2;
+        right: math.div($base-padding, 2);
       }
     }
   }

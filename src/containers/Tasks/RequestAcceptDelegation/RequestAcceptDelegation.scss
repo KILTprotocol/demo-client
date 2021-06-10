@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 
 .RequestAcceptDelegation {
@@ -20,7 +22,7 @@
 
       display: block;
       margin: {
-        top: $base-padding/2;
+        top: math.div($base-padding, 2);
       }
 
       &:first-child {

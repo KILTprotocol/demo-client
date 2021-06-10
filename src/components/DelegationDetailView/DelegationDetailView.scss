@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 .DelegationDetailView {
   & .delegationNodeContainer {
@@ -10,9 +12,9 @@
     display: inline-block;
     width: 100%;
     padding: {
-      right: $base-padding/4;
+      right: math.div($base-padding, 4);
       bottom: 8 * $base-button-height;
-      left: $base-padding/4;
+      left: math.div($base-padding, 4);
     }
     overflow: auto;
 
@@ -26,8 +28,8 @@
 
   & .viewTypeLabel {
     position: absolute;
-    top: $base-padding/4;
-    right: $base-padding/2;
+    top: math.div($base-padding, 4);
+    right: math.div($base-padding, 2);
     font-size: 10px;
     color: $color-grey;
   }

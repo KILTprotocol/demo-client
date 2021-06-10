@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @mixin baseFont {
   font-family: 'Montserrat', 'Helvetica Neue', Arial, Helvetica, sans-serif;
   font-weight: 400;
@@ -124,8 +126,8 @@
   & button,
   & a {
     margin: {
-      left: $base-padding/2;
-      bottom: $base-padding/2;
+      left: math.div($base-padding, 2);
+      bottom: math.div($base-padding, 2);
     }
 
     &:first-child {

@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import 'styles/library';
 .DelegationNode {
   $identiconSize: 24px;
@@ -5,8 +7,8 @@
   $marginLeft: 2 * $base-padding;
   $lineWidth: 2px;
   $lineIdenticonDistance: 0;
-  $addLineHeight: $base-padding/2;
-  $labelPadding: $base-padding/4;
+  $addLineHeight: math.div($base-padding, 2);
+  $labelPadding: math.div($base-padding, 4);
 
   position: relative;
   width: auto;
@@ -48,9 +50,9 @@
 
       display: inline-block;
       margin: {
-        right: $base-padding/2;
-        bottom: $base-padding/4;
-        left: $base-padding/4;
+        right: math.div($base-padding, 2);
+        bottom: math.div($base-padding, 4);
+        left: math.div($base-padding, 4);
       }
       font-size: 18px;
     }
@@ -141,9 +143,9 @@
     content: "";
     position: absolute;
     top: -$marginTop + $lineIdenticonDistance - $labelPadding;
-    left: $identiconSize/2 - $lineWidth/2 - $marginLeft + $labelPadding;
-    height: $marginTop + $identiconSize/2 + $labelPadding;
-    width: $marginLeft - $identiconSize/2 - $lineIdenticonDistance -
+    left: math.div($identiconSize, 2) - math.div($lineWidth, 2) - $marginLeft + $labelPadding;
+    height: $marginTop + math.div($identiconSize, 2) + $labelPadding;
+    width: $marginLeft - math.div($identiconSize, 2) - $lineIdenticonDistance -
       $labelPadding;
     border: {
       color: $color-grey;
@@ -191,7 +193,7 @@
 
     &:after {
       top: -$addLineHeight - $lineWidth;
-      left: calc(50% - #{$lineWidth/2});
+      left: calc(50% - #{math.div($lineWidth, 2)});
       height: $addLineHeight;
       border: {
         width: 0 0 0 $lineWidth;
@@ -213,14 +215,14 @@
 
   & .getSiblings {
     display: none;
-    top: $marginTop + $identiconSize/2 + $addLineHeight - $marginTop +
+    top: $marginTop + math.div($identiconSize, 2) + $addLineHeight - $marginTop +
       $lineIdenticonDistance + $labelPadding;
-    left: $identiconSize/2 - $marginLeft + $labelPadding;
+    left: math.div($identiconSize, 2) - $marginLeft + $labelPadding;
   }
 
   & .getChildren {
     bottom: 0 - 2 * $labelPadding;
-    left: $marginLeft + $identiconSize/2 - $marginLeft + $labelPadding;
+    left: $marginLeft + math.div($identiconSize, 2) - $marginLeft + $labelPadding;
   }
 
   & .Spinner {
@@ -237,7 +239,7 @@
 
   &:last-child {
     &:before {
-      height: $marginTop + $identiconSize/2 + $labelPadding;
+      height: $marginTop + math.div($identiconSize, 2) + $labelPadding;
     }
 
     & > .getSiblings {
