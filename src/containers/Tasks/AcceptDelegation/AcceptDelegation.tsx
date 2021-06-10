@@ -110,12 +110,14 @@ class AcceptDelegation extends React.Component<Props, State> {
       throw new Error(`Root node not found for node ${parentId}`)
     }
 
-    const newDelegationNode = new DelegationNode(
+    const newDelegationNode = new DelegationNode({
       id,
-      rootNode.id,
+      rootId: rootNode.id,
       account,
       permissions,
-      parentId
+      parentId,
+      revoked: false
+    }
     )
 
     return selectedIdentity.identity.signStr(newDelegationNode.generateHash())
@@ -158,10 +160,10 @@ class AcceptDelegation extends React.Component<Props, State> {
             delegationId={parentId}
             focusedNodeAlias={
               metaData &&
-              typeof metaData === 'object' &&
-              !Array.isArray(metaData) &&
-              metaData.alias &&
-              typeof metaData.alias === 'string'
+                typeof metaData === 'object' &&
+                !Array.isArray(metaData) &&
+                metaData.alias &&
+                typeof metaData.alias === 'string'
                 ? metaData.alias
                 : undefined
             }

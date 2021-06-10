@@ -26,13 +26,14 @@ type Actions = Array<{
 }>
 
 class MyClaimListView extends React.Component<Props, State> {
-  private selectCTypesModal: SelectCTypesModal | null
+  private selectCTypesModal: React.RefObject<SelectCTypesModal>
 
   constructor(props: Props) {
     super(props)
 
     this.openCTypeModal = this.openCTypeModal.bind(this)
     this.createClaimFromCType = this.createClaimFromCType.bind(this)
+    this.selectCTypesModal = React.createRef()
   }
 
   private getActions(claimEntry: Claims.Entry): Actions {
@@ -68,8 +69,8 @@ class MyClaimListView extends React.Component<Props, State> {
   }
 
   private openCTypeModal(): void {
-    if (this.selectCTypesModal) {
-      this.selectCTypesModal.show()
+    if (this.selectCTypesModal.current) {
+      this.selectCTypesModal.current.show()
     }
   }
 
@@ -110,13 +111,12 @@ class MyClaimListView extends React.Component<Props, State> {
                   </td>
                   <td
                     className={`status 
-                      ${
-                        claimEntry.attestedClaims.find(
-                          ({ attestation }) =>
-                            attestation && !attestation.revoked
-                        )
-                          ? 'attested'
-                          : 'revoked'
+                      ${claimEntry.attestedClaims.find(
+                      ({ attestation }) =>
+                        attestation && !attestation.revoked
+                    )
+                        ? 'attested'
+                        : 'revoked'
                       }`}
                   />
                   <td className="actionsTd">
@@ -136,9 +136,9 @@ class MyClaimListView extends React.Component<Props, State> {
         </div>
 
         <SelectCTypesModal
-          ref={el => {
-            this.selectCTypesModal = el
-          }}
+          ref={
+            this.selectCTypesModal
+          }
           onConfirm={this.createClaimFromCType}
         />
       </section>

@@ -73,8 +73,8 @@ type StateProps = {
 }
 
 type OwnProps = {
-  cTypeHashes?: Array<ICType['hash'] | null>
-  context?: 'default' | 'terms'
+  cTypeHashes?: Array<ICType['hash']>
+  context?: 'default' | 'term'
   onChange: (claimSelectionData: ClaimSelectionData) => void
 }
 
@@ -169,8 +169,8 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     const relevantClaimEntries =
       cTypeHashes && cTypeHashes.length
         ? claimEntries.filter((claimEntry: Claims.Entry) =>
-            cTypeHashes.includes(claimEntry.claim.cTypeHash)
-          )
+          cTypeHashes.includes(claimEntry.claim.cTypeHash)
+        )
         : claimEntries
 
     return groupBy(

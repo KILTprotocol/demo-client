@@ -188,9 +188,9 @@ const getAllAttestations = (state: ReduxState): Entry[] => {
 
 const getAttestations = createSelector(
   [Wallet.getSelectedIdentity, getAllAttestations],
-  (selectedIdentity: IMyIdentity, entries: Entry[]) => {
+  (selectedIdentity: IMyIdentity | undefined, entries: Entry[]): Entry[] => {
     return entries.filter((entry: Entry) => {
-      return entry.attestation.owner === selectedIdentity.identity.address
+      return entry.attestation.owner === selectedIdentity?.identity.address
     })
   }
 )

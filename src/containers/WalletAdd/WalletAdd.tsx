@@ -67,8 +67,9 @@ class WalletAdd extends React.Component<Props, State> {
   }
 
   private setMySigningKeyPairType = (
-    selectedKeyPairType: OptionsKeyPairType
+    selectedKeyPairType: OptionsKeyPairType | undefined | null
   ): void => {
+    if (!selectedKeyPairType) return
     this.setState({
       mySigningKeyPairType: selectedKeyPairType,
     })
@@ -233,6 +234,8 @@ class WalletAdd extends React.Component<Props, State> {
               <Select
                 options={keypairTypeOptions}
                 value={mySigningKeyPairType}
+                isMulti={false}
+                // @ts-ignore
                 onChange={this.setMySigningKeyPairType}
               />
             </div>

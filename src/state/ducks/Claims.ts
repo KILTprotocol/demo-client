@@ -136,10 +136,9 @@ class Store {
       })
     }
 
-    const claims = {}
+    const claims: Record<string, Entry> = {}
 
-    Object.keys(claimsStateSerialized.claims).forEach(i => {
-      const o = claimsStateSerialized.claims[i]
+    Object.values(claimsStateSerialized.claims).forEach(o => {
       try {
         const claim = JSON.parse(o.claim) as IClaim
         const attestedClaims: IAttestedClaim[] = o.attestedClaims
@@ -403,7 +402,8 @@ const getAllClaims = (state: ReduxState): Entry[] => {
 
 const getClaims = createSelector(
   [Wallet.getSelectedIdentity, getAllClaims],
-  (selectedIdentity: IMyIdentity, entries: Entry[]) => {
+  (selectedIdentity: IMyIdentity | undefined, entries: Entry[]): Entry[] => {
+    if (!selectedIdentity) return []
     return entries.filter((entry: Entry) => {
       return (
         entry &&

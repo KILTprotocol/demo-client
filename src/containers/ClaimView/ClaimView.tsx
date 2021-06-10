@@ -64,8 +64,8 @@ class ClaimView extends React.Component<Props, State> {
     )
   }
 
-  private claimIdToAttest: Claims.Entry['id']
-  private claimIdToLegitimate: Claims.Entry['id']
+  private claimIdToAttest: Claims.Entry['id'] | undefined
+  private claimIdToLegitimate: Claims.Entry['id'] | undefined
 
   constructor(props: Props) {
     super(props)
@@ -130,9 +130,10 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   private finishSelectAttesters(selectedAttesters: IContact[]): void {
-    const claim = this.resolveClaim(
-      this.claimIdToLegitimate || this.claimIdToAttest
-    )
+    const claimId = this.claimIdToLegitimate || this.claimIdToAttest
+    const claim = claimId ? this.resolveClaim(
+      claimId
+    ) : undefined
 
     if (claim) {
       if (this.claimIdToLegitimate) {

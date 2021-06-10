@@ -22,7 +22,7 @@ type State = {
 }
 
 class SelectContactsModal extends React.Component<Props, State> {
-  private modal: Modal | null
+  private modal: React.RefObject<Modal>
 
   public static defaultProps: Partial<Props> = {
     closeMenuOnSelect: true,
@@ -38,6 +38,7 @@ class SelectContactsModal extends React.Component<Props, State> {
       selectedContacts: [],
     }
     this.onSelectContacts = this.onSelectContacts.bind(this)
+    this.modal = React.createRef()
   }
 
   private onSelectContacts(selectedContacts: IContact[]): void {
@@ -54,14 +55,14 @@ class SelectContactsModal extends React.Component<Props, State> {
   }
 
   public show(): void {
-    if (this.modal) {
-      this.modal.show()
+    if (this.modal.current) {
+      this.modal.current.show()
     }
   }
 
   public hide(): void {
-    if (this.modal) {
-      this.modal.hide()
+    if (this.modal.current) {
+      this.modal.current.hide()
     }
   }
 
@@ -95,9 +96,9 @@ class SelectContactsModal extends React.Component<Props, State> {
 
     return (
       <Modal
-        ref={el => {
-          this.modal = el
-        }}
+        ref={
+          this.modal
+        }
         className="small"
         type={ModalType.CONFIRM}
         header={finalHeader}

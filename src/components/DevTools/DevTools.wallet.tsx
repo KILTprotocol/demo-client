@@ -22,7 +22,7 @@ class BsIdentity {
     updateCallback?: UpdateCallback
   ): Promise<void | IMyIdentity> {
     const identityLabels = Object.keys(BsIdentity.pool)
-    const requests = identityLabels.reduce((promiseChain, bsIdentityKey) => {
+    const requests = identityLabels.reduce<Promise<void | IMyIdentity>>((promiseChain, bsIdentityKey) => {
       return promiseChain.then(() => {
         if (updateCallback) {
           updateCallback(BsIdentity.pool[bsIdentityKey])
@@ -50,8 +50,8 @@ class BsIdentity {
     const selectedIdentity:
       | IMyIdentity
       | undefined = Wallet.getSelectedIdentity(
-      persistentStoreInstance.store.getState()
-    )
+        persistentStoreInstance.store.getState()
+      )
 
     return new Promise((resolve, reject) => {
       if (!selectedIdentity) {

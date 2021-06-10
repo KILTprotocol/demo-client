@@ -53,6 +53,7 @@ type SerializedState = {
 
 export class PersistentStore {
   public get store(): Store {
+    if (!this.storeInternal) throw Error('store not initialized')
     return this.storeInternal
   }
 
@@ -88,7 +89,7 @@ export class PersistentStore {
     return JSON.stringify(obj)
   }
 
-  private storeInternal: Store
+  private storeInternal: Store | undefined
 
   public static createSalt(): void {
     const salt = Crypto.u8aToHex(nacl.randomBytes(24))
@@ -98,7 +99,7 @@ export class PersistentStore {
   public static async createLocalState(password: string): Promise<void> {
     const hashedPassword = await PersistentStore.getHashedPassword(password)
     const combinedReducers = PersistentStore.getCombinedReducers()
-    const state = combinedReducers({} as State, { type: '' })
+    const state = combinedReducers({} as State, { type: '', payload: undefined })
     PersistentStore.serializeEncryptAndStore(state, hashedPassword)
   }
 
@@ -181,7 +182,7 @@ export class PersistentStore {
     const hashedPassword = await PersistentStore.getHashedPassword(password)
     this.storeInternal.subscribe(() => {
       PersistentStore.serializeEncryptAndStore(
-        this.storeInternal.getState(),
+        this.storeInternal?.getState(),
         hashedPassword
       )
     })

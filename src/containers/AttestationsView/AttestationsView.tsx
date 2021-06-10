@@ -32,7 +32,7 @@ type State = {
 }
 
 class AttestationsView extends React.Component<Props, State> {
-  private claimHash: HTMLInputElement | null
+  private claimHash: HTMLInputElement | undefined
 
   constructor(props: Props) {
     super(props)

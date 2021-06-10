@@ -1,7 +1,7 @@
 import {
   Attestation,
   DelegationNode as SDKDelegationNode,
-  DelegationRootNode,
+  DelegationRootNode as SDKDelegationRootNode,
   SDKErrors,
   BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
@@ -47,7 +47,7 @@ export enum ViewType {
 }
 
 export type DelegationsTreeNode = {
-  delegation: SDKDelegationNode | DelegationRootNode
+  delegation: SDKDelegationNode | SDKDelegationRootNode
   childNodes: DelegationsTreeNode[]
 }
 
@@ -210,13 +210,13 @@ class DelegationNode extends React.Component<Props, State> {
     this.setState({
       gettingChildren: true,
     })
-    const children: IDelegationNode[] = await delegation.getChildren()
+    const children: SDKDelegationNode[] = await delegation.getChildren()
 
     this.setState({
       gettingChildren: false,
       gotChildren: true,
       node: {
-        childNodes: children.map((childNode: SDKDelegationNode) => {
+        childNodes: children.map((childNode: SDKDelegationNode | SDKDelegationRootNode) => {
           return {
             childNodes: [],
             delegation: childNode,
@@ -294,11 +294,10 @@ class DelegationNode extends React.Component<Props, State> {
     )
 
     const blockUi: BlockUi = FeedbackService.addBlockUi({
-      headline: `Revoking Attestations for Delegation \n'${
-        myDelegation
+      headline: `Revoking Attestations for Delegation \n'${myDelegation
           ? myDelegation.metaData.alias
           : `${delegation.id.substr(0, 10)} …`
-      }'`,
+        }'`,
     })
 
     const { steps } = await delegation.findAncestorOwnedBy(

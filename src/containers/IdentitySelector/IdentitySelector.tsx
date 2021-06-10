@@ -55,7 +55,8 @@ class IdentitySelector extends React.Component<Props, State> {
     )
   }
 
-  private selectIdentity = (selectedOption: SelectIdentityOption): void => {
+  private selectIdentity = (selectedOption: SelectIdentityOption | undefined | null): void => {
+    if (!selectedOption) return
     const { history, selectIdentity } = this.props
     if (selectedOption.value === 'create') {
       history.push('/wallet/add')
@@ -100,6 +101,7 @@ class IdentitySelector extends React.Component<Props, State> {
           name="selectIdentity"
           options={identityOptions}
           value={selectedOption}
+          // @ts-ignore
           onChange={this.selectIdentity}
         />
       </section>
@@ -117,7 +119,7 @@ const mapDispatchToProps: DispatchProps = {
     Wallet.Store.selectIdentityAction(address),
 }
 
-export default connect<StateProps, DispatchProps>(
+export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withRouter(IdentitySelector))

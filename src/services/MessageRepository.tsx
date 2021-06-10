@@ -189,17 +189,17 @@ class MessageRepository {
             .filter(
               message =>
                 message.body.type !==
-                  MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES ||
+                MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES ||
                 Array.isArray(message.body.content)
             )
         )
       })
   }
 
-  public static async dispatchMessage(message: Message): Promise<Response> {
+  public static async dispatchMessage(message: IEncryptedMessage): Promise<Response> {
     const response = await fetch(`${MessageRepository.URL}`, {
       ...BasePostParams,
-      body: JSON.stringify(message.encrypt()),
+      body: JSON.stringify(message),
     })
     if (!response.ok) {
       throw new Error(response.statusText)
@@ -215,13 +215,13 @@ class MessageRepository {
     try {
       let message: Message = new Message(
         messageBody,
-        sender.identity,
+        sender.identity.getPublicIdentity(),
         receiver.publicIdentity
       )
 
       message = await MessageRepository.handleDebugMode(message)
 
-      return MessageRepository.dispatchMessage(message)
+      return MessageRepository.dispatchMessage(message.encrypt(sender.identity, receiver.publicIdentity))
         .then(() => {
           notifySuccess(
             `Message '${messageBody.type}' to receiver ${receiver.metaData
@@ -341,8 +341,7 @@ class MessageRepository {
   private static handleMultiAddressErrors(errors: Error[]): void {
     if (errors.length) {
       notifyFailure(
-        `Could not send message to ${
-          errors.length > 1 ? 'these addresses' : 'this address'
+        `Could not send message to ${errors.length > 1 ? 'these addresses' : 'this address'
         }: ${errors.join(', ')}`,
         false
       )

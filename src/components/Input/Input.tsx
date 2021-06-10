@@ -16,7 +16,7 @@ type Props = {
 type State = {}
 
 class Input extends React.Component<Props, State> {
-  private inputElement: HTMLInputElement | null
+  private inputElement: HTMLInputElement | undefined
 
   public static defaultProps = {
     type: 'text',

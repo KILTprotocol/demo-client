@@ -30,8 +30,8 @@ import './MessageDetailView.scss'
 
 type Props = {
   message: IMessageOutput
-  onDelete: (message: IMessageOutput) => void
-  onCancel: (id: string) => void
+  onDelete?: (message: IMessageOutput) => void
+  onCancel?: (id: string) => void
 }
 
 type State = {

@@ -1,4 +1,3 @@
-import { IMessage } from '@kiltprotocol/types'
 import React from 'react'
 
 import MessageRepository, {
@@ -16,8 +15,8 @@ type CreateReceiveErrors = { createdAt: string[]; receivedAt: string[] }
 
 type Props = {
   messages: IMessageOutput[]
-  onDelete: (message: IMessage) => void
-  onOpen: (message: IMessage) => void
+  onDelete: (message: IMessageOutput) => void
+  onOpen: (message: IMessageOutput) => void
 }
 
 type State = {}
@@ -76,12 +75,12 @@ class MessageListView extends React.Component<Props, State> {
     ))
   }
 
-  private handleDelete(message: IMessage): void {
+  private handleDelete(message: IMessageOutput): void {
     const { onDelete } = this.props
     onDelete(message)
   }
 
-  private openMessage(message: IMessage): void {
+  private openMessage(message: IMessageOutput): void {
     const { onOpen } = this.props
     onOpen(message)
   }

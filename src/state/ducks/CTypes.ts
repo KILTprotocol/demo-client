@@ -100,7 +100,7 @@ const getStateCType = (
 
 const getCType = createSelector(
   [getStateCType],
-  (cType: ICTypeWithMetadata) => cType
+  (cType: ICTypeWithMetadata | undefined) => cType
 )
 
 export { Store, getCTypes, getCType }

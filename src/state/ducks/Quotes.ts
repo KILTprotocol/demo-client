@@ -64,7 +64,7 @@ class Store {
         quotes: Immutable.Map(),
       })
     }
-    const quoteEntries = {}
+    const quoteEntries: Record<string, Entry> = {}
 
     quoteStateSerialized.quotes.forEach(serializedQuote => {
       try {
@@ -167,12 +167,12 @@ const getAllQuotes = (state: ReduxState): Entry[] =>
 
 const getAllMyQuotes = createSelector(
   [Wallet.getSelectedIdentity, getAllQuotes],
-  (selectedIdentity: IMyIdentity, entries: Entry[]) => {
+  (selectedIdentity: IMyIdentity | undefined, entries: Entry[]) => {
     return entries.filter((entry: Entry) => {
       return (
         entry &&
         entry.quote &&
-        entry.owner === selectedIdentity.identity.address
+        entry.owner === selectedIdentity?.identity.address
       )
     })
   }

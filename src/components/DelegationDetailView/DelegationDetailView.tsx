@@ -1,6 +1,6 @@
 import {
-  DelegationBaseNode,
   DelegationNode as SDKDelegationNode,
+  DelegationRootNode as SDKDelegationRootNode,
 } from '@kiltprotocol/sdk-js'
 import { IDelegationBaseNode, IDelegationRootNode } from '@kiltprotocol/types'
 import React, { useState, useEffect } from 'react'
@@ -37,8 +37,8 @@ type Props = StateProps & OwnProps
 
 const getNode = async (
   id: IDelegationBaseNode['id']
-): Promise<DelegationBaseNode> => {
-  let node: DelegationBaseNode | null = await DelegationsService.lookupNodeById(
+): Promise<SDKDelegationNode | SDKDelegationRootNode> => {
+  let node: SDKDelegationNode | SDKDelegationRootNode | null = await DelegationsService.lookupNodeById(
     id
   )
   if (!node) {
@@ -67,7 +67,7 @@ const DelegationDetailView: React.FunctionComponent<Props> = ({
 
   useEffect(() => {
     getNode(delegationId)
-      .then(async (delegationNode: SDKDelegationNode) => {
+      .then(async (delegationNode: SDKDelegationNode | SDKDelegationRootNode) => {
         const treeNode: DelegationsTreeNode = {
           childNodes: [],
           delegation: delegationNode,

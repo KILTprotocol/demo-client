@@ -11,7 +11,7 @@ import { BasePostParams } from './BaseRepository'
 class CTypeRepository {
   public static async findByHash(
     hash: ICType['hash']
-  ): Promise<void | ICTypeWithMetadata> {
+  ): Promise<undefined | ICTypeWithMetadata> {
     const storedCType = CTypes.getCType(
       persistentStoreInstance.store.getState(),
       hash
@@ -35,6 +35,7 @@ class CTypeRepository {
       })
       .catch(() => {
         console.error(`Could not fetch CType with hash '${hash}'`)
+        return undefined
       })
   }
 

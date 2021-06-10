@@ -167,7 +167,7 @@ const getStateContact = (
 
 const getContact = createSelector(
   [getStateContact],
-  (contact: IContact) => contact
+  (contact: IContact | undefined) => contact
 )
 
 export { Store, getContacts, getContact, getMyContacts }

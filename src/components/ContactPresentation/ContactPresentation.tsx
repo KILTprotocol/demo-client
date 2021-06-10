@@ -186,7 +186,7 @@ class ContactPresentation extends React.Component<Props, State> {
   private setMyIdentity(): void {
     const { address } = this.props
 
-    const myIdentity: IMyIdentity = Wallet.getIdentity(
+    const myIdentity: IMyIdentity | undefined = Wallet.getIdentity(
       persistentStoreInstance.store.getState(),
       address
     )

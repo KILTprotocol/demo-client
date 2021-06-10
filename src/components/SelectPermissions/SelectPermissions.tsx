@@ -30,19 +30,20 @@ class SelectPermissions extends React.Component<Props> {
       <div className="permissions">
         <h2>Select permissions</h2>
         <div>
-          {Object.keys(Permission)
-            .filter(
-              (permission: string) => typeof Permission[permission] === 'number'
+          {
+            Object.values(Permission).filter(
+              (permission): permission is number => typeof permission === 'number'
             )
-            .map((permission: string) => (
-              <label key={permission}>
-                <input
-                  type="checkbox"
-                  onChange={this.change.bind(this, Permission[permission])}
-                />
-                <span>{permission}</span>
-              </label>
-            ))}
+              .map((permission: Permission) =>
+                <label key={permission}>
+                  <input
+                    type="checkbox"
+                    onChange={this.change.bind(this, permission)}
+                  />
+                  <span>{permission}</span>
+                </label>
+              )
+          }
         </div>
       </div>
     )

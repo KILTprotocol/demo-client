@@ -222,7 +222,7 @@ const getStateIdentities = (state: ReduxState): State['identities'] =>
 const getSelectedIdentity = createSelector(
   [getStateSelectedIdentity, getStateIdentities],
   (
-    selectedIdentity: IMyIdentity['identity']['address'],
+    selectedIdentity: IMyIdentity['identity']['address'] | null,
     identities: State['identities']
   ) => {
     if (!selectedIdentity) {
@@ -260,6 +260,6 @@ const getStateIdentity = (
   address: PublicIdentity['address']
 ): IMyIdentity | undefined => state.wallet.get('identities').get(address)
 
-const getIdentity = createSelector([getStateIdentity], (entry: Entry) => entry)
+const getIdentity = createSelector([getStateIdentity], (entry: Entry | undefined) => entry)
 
 export { Store, getSelectedIdentity, getAllIdentities, getIdentity }

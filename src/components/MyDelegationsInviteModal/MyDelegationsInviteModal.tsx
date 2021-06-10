@@ -60,7 +60,7 @@ type State = {
 }
 
 class MyDelegationsInviteModal extends React.Component<Props, State> {
-  private modal: Modal | null
+  private ref: React.RefObject<Modal>
 
   constructor(props: Props) {
     super(props)
@@ -87,6 +87,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
     this.filterDelegations = this.filterDelegations.bind(this)
     this.changeDelegations = this.changeDelegations.bind(this)
     this.setSelectDelegationsOpen = this.setSelectDelegationsOpen.bind(this)
+    this.ref = React.createRef()
   }
 
   public componentDidMount(): void {
@@ -94,7 +95,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 
     this.createPools(
       contactsPool ||
-        Contacts.getMyContacts(persistentStoreInstance.store.getState()),
+      Contacts.getMyContacts(persistentStoreInstance.store.getState()),
       delegationsPool || myDelegations
     )
   }
@@ -113,9 +114,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 
     return (
       <Modal
-        ref={el => {
-          this.modal = el
-        }}
+        ref={this.ref}
         catchBackdropClick={contacts.isSelectOpen || delegations.isSelectOpen}
         className="small"
         header={`Please select ${selectables.join(', ')}`}
@@ -282,14 +281,14 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
   }
 
   public show(): void {
-    if (this.modal) {
-      this.modal.show()
+    if (this.ref.current) {
+      this.ref.current.show()
     }
   }
 
   public hide(): void {
-    if (this.modal) {
-      this.modal.hide()
+    if (this.ref.current) {
+      this.ref.current.hide()
     }
   }
 

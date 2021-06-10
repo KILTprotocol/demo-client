@@ -45,7 +45,7 @@ class BsClaim {
     updateCallback?: UpdateCallback
   ): Promise<void | Claim> {
     const claimKeys = Object.keys(BsClaim.pool)
-    const requests = claimKeys.reduce((promiseChain, bsClaimKey) => {
+    const requests = claimKeys.reduce<Promise<void | Claim>>((promiseChain, bsClaimKey) => {
       return promiseChain.then(() => {
         if (updateCallback) {
           updateCallback(bsClaimKey)

@@ -21,7 +21,7 @@ const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const requiresIdentity = (
-  WrappedComponent: ComponentType,
+  WrappedComponent: ComponentType<any>,
   additionalProps?: { [key: string]: any }
 ) => {
   return connect(mapStateToProps)((props: Props) => {

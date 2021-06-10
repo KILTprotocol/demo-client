@@ -68,8 +68,8 @@ class CTypePresentation extends React.Component<Props, State> {
   private setCType(): void {
     const { cTypeHash } = this.props
 
-    CTypeRepository.findByHash(cTypeHash).then((_cType: ICTypeWithMetadata) => {
-      this.setState({ cType: _cType })
+    CTypeRepository.findByHash(cTypeHash).then((cType: ICTypeWithMetadata | undefined) => {
+      this.setState({ cType })
     })
   }
 

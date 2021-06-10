@@ -332,12 +332,12 @@ const getBlockingNotifications = createSelector(
   (blockingNotifications: IBlockingNotification[]) => blockingNotifications
 )
 
-const getStateCurrentTask = (state: ReduxState): TaskProps =>
-  state.uiState.get('currentTask')[0]
+const getStateCurrentTask = (state: ReduxState): TaskProps | undefined =>
+  state.uiState.get('currentTask').get(0)
 
 const getCurrentTask = createSelector(
   [getStateCurrentTask],
-  (currentTask: TaskProps) => currentTask
+  (currentTask: TaskProps | undefined) => currentTask
 )
 
 const getStateDebugMode = (state: ReduxState): boolean =>

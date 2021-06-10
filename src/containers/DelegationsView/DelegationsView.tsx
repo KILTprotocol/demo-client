@@ -45,7 +45,7 @@ type State = {
 }
 
 class DelegationsView extends React.Component<Props, State> {
-  private selectCTypesModal: SelectCTypesModal | null
+  private selectCTypesModal: React.RefObject<SelectCTypesModal>
 
   constructor(props: Props) {
     super(props)
@@ -56,6 +56,7 @@ class DelegationsView extends React.Component<Props, State> {
     this.deleteDelegation = this.deleteDelegation.bind(this)
     this.createDelegation = this.createDelegation.bind(this)
     this.onSelectCType = this.onSelectCType.bind(this)
+    this.selectCTypesModal = React.createRef()
   }
 
   public componentDidMount(): void {
@@ -136,7 +137,7 @@ class DelegationsView extends React.Component<Props, State> {
     if (removeDelegation) {
       safeDelete(
         `${isPCR ? 'PCR' : 'delegation'} '${delegation.metaData.alias ||
-          delegation.id}'`,
+        delegation.id}'`,
         () => {
           removeDelegation(delegation)
         }
@@ -155,8 +156,8 @@ class DelegationsView extends React.Component<Props, State> {
   }
 
   private createDelegation(): void {
-    if (this.selectCTypesModal) {
-      this.selectCTypesModal.show()
+    if (this.selectCTypesModal.current) {
+      this.selectCTypesModal.current.show()
     }
   }
 
@@ -190,9 +191,9 @@ class DelegationsView extends React.Component<Props, State> {
           />
         )}
         <SelectCTypesModal
-          ref={el => {
-            this.selectCTypesModal = el
-          }}
+          ref={
+            this.selectCTypesModal
+          }
           placeholder="Select cType#{multi}…"
           onConfirm={this.onSelectCType}
         />
@@ -215,7 +216,7 @@ const mapDispatchToProps: DispatchProps = {
     Delegations.Store.removeDelegationAction(delegation),
 }
 
-export default connect<StateProps, DispatchProps, OwnProps>(
+export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withRouter(DelegationsView))

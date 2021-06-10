@@ -1,7 +1,8 @@
 import React, { ReactNode } from 'react'
 import isEqual from 'lodash/isEqual'
 import Select, { createFilter } from 'react-select'
-import { Config } from 'react-select/lib/filters'
+import type { Config } from 'react-select/lib/filters'
+import type { ValueType } from 'react-select/lib/types'
 
 import * as Delegations from '../../state/ducks/Delegations'
 import { DelegationType, IMyDelegation } from '../../state/ducks/Delegations'
@@ -66,7 +67,8 @@ class SelectDelegations extends React.Component<Props, State> {
     }
   }
 
-  private onChange(selectedOptions: SelectOption | SelectOption[]): void {
+  // the select is a single- or multiselect; single values or an array of values must be expected
+  private onChange(selectedOptions: ValueType<SelectOption>): void {
     const { onChange } = this.props
     const { delegations } = this.state
 

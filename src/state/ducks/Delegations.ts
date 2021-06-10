@@ -161,10 +161,10 @@ const getAllStateDelegations = (state: ReduxState): IMyDelegation[] =>
 
 const getAllDelegations = createSelector(
   [Wallet.getSelectedIdentity, getAllStateDelegations],
-  (selectedIdentity: IMyIdentity, myDelegations: IMyDelegation[]) => {
+  (selectedIdentity: IMyIdentity | undefined, myDelegations: IMyDelegation[]): IMyDelegation[] => {
     return myDelegations.filter(
       (myDelegation: IMyDelegation) =>
-        myDelegation.account === selectedIdentity.identity.address
+        myDelegation.account === selectedIdentity?.identity.address
     )
   }
 )

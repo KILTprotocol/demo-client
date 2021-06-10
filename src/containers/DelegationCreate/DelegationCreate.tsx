@@ -69,10 +69,12 @@ class DelegationCreate extends React.Component<Props, State> {
     if (selectedIdentity) {
       this.setState({
         alias,
-        delegation: new DelegationRootNode(
-          UUID.generate(),
-          cTypeHash,
-          selectedIdentity.identity.address
+        delegation: new DelegationRootNode({
+          id: UUID.generate(),
+          cTypeHash: cTypeHash,
+          account: selectedIdentity.identity.address,
+          revoked: false
+        }
         ),
       })
     }

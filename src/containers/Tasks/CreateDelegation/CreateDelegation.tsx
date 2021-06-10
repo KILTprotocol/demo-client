@@ -91,12 +91,14 @@ class CreateDelegation extends React.Component<Props, State> {
       optionalParentId = parentId
     }
 
-    const newDelegationNode = new DelegationNode(
+    const newDelegationNode = new DelegationNode({
       id,
       rootId,
       account,
       permissions,
-      optionalParentId
+      parentId: optionalParentId,
+      revoked: false
+    }
     )
 
     await DelegationService.storeOnChain(newDelegationNode, signatures.invitee)

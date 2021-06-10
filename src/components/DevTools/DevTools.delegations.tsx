@@ -93,12 +93,14 @@ class BsDelegation {
         permission => Permission[permission]
       )
     }
-    const delegation = new DelegationNode(
-      UUID.generate(),
-      rootData.rootDelegation.id,
-      ownerIdentity.identity.address,
-      newPermissions,
-      parentData.delegation.id
+    const delegation = new DelegationNode({
+      id: UUID.generate(),
+      rootId: rootData.rootDelegation.id,
+      account: ownerIdentity.identity.address,
+      permissions: newPermissions,
+      parentId: parentData.delegation.id,
+      revoked: false
+    }
     )
 
     const signature = ownerIdentity.identity.signStr(delegation.generateHash())
@@ -174,8 +176,7 @@ class BsDelegation {
     const { alias, children, cTypeKey, ownerKey } = bsDelegationData
     if (!alias || !cTypeKey) {
       throw new Error(
-        `Invalid delegation data'${
-          bsDelegationKey ? ` for ${bsDelegationKey}` : ''
+        `Invalid delegation data'${bsDelegationKey ? ` for ${bsDelegationKey}` : ''
         }'`
       )
     }
@@ -188,10 +189,12 @@ class BsDelegation {
     }
 
     // await creation
-    const rootDelegation = new DelegationRootNode(
-      UUID.generate(),
-      cType.cType.hash,
-      ownerIdentity.identity.address
+    const rootDelegation = new DelegationRootNode({
+      id: UUID.generate(),
+      cTypeHash: cType.cType.hash,
+      account: ownerIdentity.identity.address,
+      revoked: false
+    }
     )
     await DelegationsService.storeRoot(rootDelegation, alias, isPCR)
 

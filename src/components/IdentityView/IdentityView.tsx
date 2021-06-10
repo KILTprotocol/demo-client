@@ -122,7 +122,7 @@ class IdentityView extends React.Component<Props, State> {
       balance = Balances.getBalance(
         persistentStoreInstance.store.getState(),
         contact.publicIdentity.address
-      )
+      ) || balance
     }
     const classes = ['IdentityView', selected ? 'selected' : '']
     const publicIdentityWithServiceAddress = {

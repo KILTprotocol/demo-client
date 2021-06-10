@@ -47,11 +47,12 @@ function setup(): ISetup {
       signingKeyPairType: 'ed25519',
     })
 
-    const delegationRoot = new DelegationRootNode(
-      DELEGATION_ROOT_ID,
-      ctype.hash,
-      root.address
-    )
+    const delegationRoot = new DelegationRootNode({
+      id: DELEGATION_ROOT_ID,
+      cTypeHash: ctype.hash,
+      account: root.address,
+      revoked: false,
+    })
 
     cachedSetup = {
       root,
@@ -65,16 +66,19 @@ function setup(): ISetup {
 async function newDelegation(delegate: IMyIdentity): Promise<void> {
   const { root, delegationRoot } = setup()
 
-  const delegationNode = new DelegationNode(
-    UUID.generate(),
-    delegationRoot.id,
-    delegate.identity.address,
-    [Permission.ATTEST]
-  )
+  const delegationNode = new DelegationNode({
+    id: UUID.generate(),
+    rootId: delegationRoot.id,
+    account: delegate.identity.address,
+    permissions: [Permission.ATTEST],
+    revoked: false,
+  })
   const signature = delegate.identity.signStr(delegationNode.generateHash())
   const tx = await delegationNode.store(signature)
   await BlockchainUtils.signAndSubmitTx(tx, root, { resolveOn: IS_IN_BLOCK })
-  notifySuccess(`Delegation successfully created for ${delegate.metaData.name}`)
+  notifySuccess(
+    `Delegation successfully created for ${delegate.metaData.name}`
+  )
   await DelegationsService.importDelegation(
     delegationNode.id,
     'AntiCov Attester',
@@ -119,10 +123,10 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
     // sending root owner message for importing the root
     const message = new Kilt.Message(
       messageBody,
-      root,
+      root.getPublicIdentity(),
       root.getPublicIdentity()
     )
-    await MessageRepository.dispatchMessage(message)
+    await MessageRepository.dispatchMessage(message.encrypt(root,root.getPublicIdentity()))
     notifySuccess(`Sent Delegation Root to AntiCov root authority.`)
   }
 }
