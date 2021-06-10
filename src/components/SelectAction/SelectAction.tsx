@@ -1,5 +1,6 @@
 import React from 'react'
 import Select from 'react-select'
+import { ValueType } from 'react-select/lib/types'
 
 import './SelectAction.scss'
 
@@ -20,11 +21,11 @@ type Props = {
 
 class SelectAction extends React.Component<Props> {
   // the select is a single select, so we expect a single value
-  private executeAction = (selectedActionOption: SelectActionOption | null | undefined): void => {
+  private executeAction = (selectedActionOption: ValueType<SelectActionOption>): void => {
     if (!selectedActionOption) return
     const { actions } = this.props
     const action = actions.find(
-      (_action: Action) => _action.label === selectedActionOption.value
+      (_action: Action) => _action.label === (selectedActionOption as SelectActionOption).value
     )
 
     if (action) {
@@ -68,7 +69,6 @@ class SelectAction extends React.Component<Props> {
             label: 'Select action…',
             value: '',
           }}
-          // @ts-ignore
           onChange={this.executeAction}
         />
       </section>

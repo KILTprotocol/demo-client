@@ -15,6 +15,7 @@ import {
 import { IMyIdentity } from '../../types/Contact'
 
 import './IdentitySelector.scss'
+import { ValueType } from 'react-select/lib/types'
 
 const addIdentity = {
   label: `Create an identity`,
@@ -55,13 +56,13 @@ class IdentitySelector extends React.Component<Props, State> {
     )
   }
 
-  private selectIdentity = (selectedOption: SelectIdentityOption | undefined | null): void => {
+  private selectIdentity = (selectedOption: ValueType<SelectIdentityOption>): void => {
     if (!selectedOption) return
     const { history, selectIdentity } = this.props
-    if (selectedOption.value === 'create') {
+    if ((selectedOption as SelectIdentityOption).value === 'create') {
       history.push('/wallet/add')
     } else {
-      selectIdentity(selectedOption.value)
+      selectIdentity((selectedOption as SelectIdentityOption).value)
     }
   }
 
@@ -97,11 +98,9 @@ class IdentitySelector extends React.Component<Props, State> {
           classNamePrefix="react-select"
           isClearable={false}
           isSearchable={false}
-          isMulti={false}
           name="selectIdentity"
           options={identityOptions}
           value={selectedOption}
-          // @ts-ignore
           onChange={this.selectIdentity}
         />
       </section>
