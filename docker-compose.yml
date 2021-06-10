@@ -35,10 +35,10 @@ services:
     image: kiltprotocol/demo-services:develop
     environment:
       - NODE_ENV=docker-compose
-      - MONGODB_HOST=mongodb
+      - MONGODB_HOST=mongodb://mongodb?authSource=admin
       - MONGODB_USER=mongoadmin
       - MONGODB_PASS=secret
-      - FAUCET_ACCOUNT=0x7220d0fa050ba8d1a6938ceae0aa78a7c8e6d9a684c275e551237747cb2bd53f
+      - FAUCET_ACCOUNT=0xcdfd6024d2b0eba27d54cc92a44cd9a627c69b2dbda15ed7e58085425119ae03
       - BOOT_NODE_ADDRESS=ws://mashnet-node:9944
     ports:
       - 3000:3000
@@ -46,7 +46,7 @@ services:
       - mongodb
       - mashnet-node
   mashnet-node:
-    image: kiltprotocol/mashnet-node:develop
+    image: kiltprotocol/mashnet-node
     ports:
       - 9944:9944
     command: --dev --ws-port 9944 --ws-external
@@ -55,7 +55,7 @@ services:
       context: .
       target: develop
       args:
-        - NODE_VERSION=10
+        - NODE_VERSION=14
     volumes:
       - ./src:/app/src
     environment:
