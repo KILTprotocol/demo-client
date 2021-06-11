@@ -2,7 +2,7 @@ import { Permission } from '@kiltprotocol/types'
 import isEqual from 'lodash/isEqual'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
-import { Redirect, RouteComponentProps, withRouter } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 import { ViewType } from '../../components/DelegationNode/DelegationNode'
 import DelegationDetailView from '../../components/DelegationDetailView/DelegationDetailView'
@@ -41,7 +41,6 @@ type State = {
 
   currentDelegation?: IMyDelegation
   invitePermissions?: Permission[]
-  redirect?: string
 }
 
 class DelegationsView extends React.Component<Props, State> {
@@ -60,49 +59,27 @@ class DelegationsView extends React.Component<Props, State> {
   }
 
   public componentDidMount(): void {
-    const { delegationEntries, isPCR, match } = this.props
-    const { params, url } = match
+    const { delegationEntries, match } = this.props
+    const { params } = match
     const { delegationId } = params
 
     this.filterDelegationEntries(delegationEntries, () => {
       if (delegationId) {
         const delegation = this.loadDelegationForId(delegationId)
         if (delegation) {
-          if (!delegation.isPCR !== !isPCR) {
-            const redirect = url.replace(
-              /^\/.*\//,
-              delegation.isPCR ? '/pcrs/' : '/delegations/'
-            )
-            this.setState({ redirect })
-          } else {
-            this.setState({
-              currentDelegation: this.loadDelegationForId(delegationId),
-            })
-          }
-        } else {
           this.setState({
-            redirect: isPCR ? '/pcrs' : '/delegations',
+            currentDelegation: this.loadDelegationForId(delegationId),
           })
-        }
+        } 
       }
     })
   }
 
   public componentDidUpdate(prevProps: Props): void {
-    const { delegationEntries, isPCR, selectedIdentity } = this.props
+    const { delegationEntries, selectedIdentity } = this.props
 
     if (!selectedIdentity || !prevProps.selectedIdentity) {
       throw new Error('No selected Identity')
-    }
-
-    if (
-      prevProps.selectedIdentity.identity.address !==
-      selectedIdentity.identity.address
-    ) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({
-        redirect: isPCR ? '/pcrs' : '/delegations',
-      })
     }
     if (!isEqual(prevProps.delegationEntries, delegationEntries)) {
       this.filterDelegationEntries(delegationEntries)
@@ -164,11 +141,7 @@ class DelegationsView extends React.Component<Props, State> {
   public render(): JSX.Element {
     const { isPCR, match } = this.props
     const { delegationId } = match.params
-    const { delegationEntries, currentDelegation, redirect } = this.state
-
-    if (redirect) {
-      return <Redirect to={redirect} />
-    }
+    const { delegationEntries, currentDelegation } = this.state
 
     return (
       <section

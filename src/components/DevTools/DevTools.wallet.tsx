@@ -91,7 +91,6 @@ class BsIdentity {
           );
           BalanceUtilities.connect(newIdentity);
           notifySuccess(`Identity ${alias} successfully created.`);
-          console.log("Working?");
           resolve(newIdentity);
         }
       );
