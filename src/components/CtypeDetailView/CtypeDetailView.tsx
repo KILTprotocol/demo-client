@@ -24,9 +24,11 @@ class CtypeDetailView extends React.Component<Props, State> {
 
   public componentDidMount(): void {
     const { cTypeHash } = this.props
-    CTypeRepository.findByHash(cTypeHash).then((cType: ICTypeWithMetadata | undefined) => {
-      this.setState({ cType })
-    })
+    CTypeRepository.findByHash(cTypeHash).then(
+      (cType: ICTypeWithMetadata | undefined) => {
+        this.setState({ cType })
+      }
+    )
   }
 
   public render(): JSX.Element {

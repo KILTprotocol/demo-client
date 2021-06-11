@@ -91,7 +91,9 @@ class Utilities extends React.Component<Props> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   debugMode: UiState.getDebugMode(state),
 })
 

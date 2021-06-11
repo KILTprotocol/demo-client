@@ -70,7 +70,7 @@ class DelegationsView extends React.Component<Props, State> {
           this.setState({
             currentDelegation: this.loadDelegationForId(delegationId),
           })
-        } 
+        }
       }
     })
   }
@@ -113,8 +113,9 @@ class DelegationsView extends React.Component<Props, State> {
     const { removeDelegation, isPCR } = this.props
     if (removeDelegation) {
       safeDelete(
-        `${isPCR ? 'PCR' : 'delegation'} '${delegation.metaData.alias ||
-        delegation.id}'`,
+        `${isPCR ? 'PCR' : 'delegation'} '${
+          delegation.metaData.alias || delegation.id
+        }'`,
         () => {
           removeDelegation(delegation)
         }
@@ -164,9 +165,7 @@ class DelegationsView extends React.Component<Props, State> {
           />
         )}
         <SelectCTypesModal
-          ref={
-            this.selectCTypesModal
-          }
+          ref={this.selectCTypesModal}
           placeholder="Select cType#{multi}…"
           onConfirm={this.onSelectCType}
         />
@@ -175,11 +174,9 @@ class DelegationsView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   delegationEntries: Delegations.getAllDelegations(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

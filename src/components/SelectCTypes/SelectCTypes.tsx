@@ -64,7 +64,7 @@ class SelectCTypes extends React.Component<Props, State> {
           this.setState({ cTypes: fetchedCTypes })
           this.initPreSelection()
         })
-        .catch(error => {
+        .catch((error) => {
           ErrorService.logWithNotification({
             error,
             message: 'Could not fetch cTypes',
@@ -83,11 +83,8 @@ class SelectCTypes extends React.Component<Props, State> {
     const { cTypes } = this.state
 
     // normalize selectedOptions to Array
-    const selectedOptionValues: Array<SelectOption['value']> = (Array.isArray(
-      selectedOptions
-    )
-      ? selectedOptions
-      : [selectedOptions]
+    const selectedOptionValues: Array<SelectOption['value']> = (
+      Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.baseValue)
 
     const selectedCTypes: ICTypeWithMetadata[] = cTypes.filter(

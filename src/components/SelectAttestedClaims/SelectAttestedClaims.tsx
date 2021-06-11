@@ -169,8 +169,8 @@ class SelectAttestedClaims extends React.Component<Props, State> {
     const relevantClaimEntries =
       cTypeHashes && cTypeHashes.length
         ? claimEntries.filter((claimEntry: Claims.Entry) =>
-          cTypeHashes.includes(claimEntry.claim.cTypeHash)
-        )
+            cTypeHashes.includes(claimEntry.claim.cTypeHash)
+          )
         : claimEntries
 
     return groupBy(
@@ -213,11 +213,9 @@ class SelectAttestedClaims extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   claimEntries: Claims.getClaims(state),
 })
 

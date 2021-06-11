@@ -32,7 +32,10 @@ class Permissions extends React.Component<Props> {
             return (
               <span
                 key={permission}
-                title={Permissions.getPermissionTitle(Permission[permission], allowed)}
+                title={Permissions.getPermissionTitle(
+                  Permission[permission],
+                  allowed
+                )}
                 className={`${permission} ${allowed ? 'allowed' : 'denied'}`}
               />
             )

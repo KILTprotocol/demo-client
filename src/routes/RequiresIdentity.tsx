@@ -14,7 +14,9 @@ type StateProps = {
 
 type Props = StateProps
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   identities: Wallet.getAllIdentities(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

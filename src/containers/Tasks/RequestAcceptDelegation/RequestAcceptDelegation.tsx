@@ -260,7 +260,7 @@ const mapStateToProps: MapStateToProps<
   StateProps,
   RequestAcceptDelegationProps,
   ReduxState
-> = state => ({
+> = (state) => ({
   debugMode: UiState.getDebugMode(state),
   myDelegations: Delegations.getAllDelegations(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),

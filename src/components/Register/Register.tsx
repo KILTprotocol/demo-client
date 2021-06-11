@@ -36,7 +36,7 @@ const Register: React.FC<Props> = ({ submit }) => {
       <p>Please create password</p>
       <form
         className="Login"
-        onSubmit={e => {
+        onSubmit={(e) => {
           e.preventDefault()
           handleSubmit()
         }}
@@ -48,7 +48,7 @@ const Register: React.FC<Props> = ({ submit }) => {
               <input
                 value={password}
                 type="password"
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </label>

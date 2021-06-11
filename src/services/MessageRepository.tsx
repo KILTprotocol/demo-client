@@ -146,7 +146,7 @@ class MessageRepository {
     myIdentity: Identity
   ): Promise<IMessageOutput[]> {
     return fetch(`${MessageRepository.URL}/inbox/${myIdentity.address}`)
-      .then(response => response.json())
+      .then((response) => response.json())
       .then((encryptedMessages: IEncryptedMessage[]) => {
         const decryptedMesssages = encryptedMessages.map(
           (encryptedMessage: IEncryptedMessage) => {
@@ -187,16 +187,18 @@ class MessageRepository {
             .filter(filterArray)
             // TODO: check message structure via SDK
             .filter(
-              message =>
+              (message) =>
                 message.body.type !==
-                MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES ||
+                  MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES ||
                 Array.isArray(message.body.content)
             )
         )
       })
   }
 
-  public static async dispatchMessage(message: IEncryptedMessage): Promise<Response> {
+  public static async dispatchMessage(
+    message: IEncryptedMessage
+  ): Promise<Response> {
     const response = await fetch(`${MessageRepository.URL}`, {
       ...BasePostParams,
       body: JSON.stringify(message),
@@ -221,14 +223,17 @@ class MessageRepository {
 
       message = await MessageRepository.handleDebugMode(message)
 
-      return MessageRepository.dispatchMessage(message.encrypt(sender.identity, receiver.publicIdentity))
+      return MessageRepository.dispatchMessage(
+        message.encrypt(sender.identity, receiver.publicIdentity)
+      )
         .then(() => {
           notifySuccess(
-            `Message '${messageBody.type}' to receiver ${receiver.metaData
-              .name || receiver.publicIdentity.address} successfully sent.`
+            `Message '${messageBody.type}' to receiver ${
+              receiver.metaData.name || receiver.publicIdentity.address
+            } successfully sent.`
           )
         })
-        .catch(error => {
+        .catch((error) => {
           errorService.logWithNotification({
             error,
             message: `Could not send message '${messageBody.type}' to receiver '${receiver.metaData.name}'`,
@@ -273,16 +278,17 @@ class MessageRepository {
 
       case MessageBodyType.REQUEST_CLAIMS_FOR_CTYPES:
         return (message.body as IRequestClaimsForCTypes).content
-          .map(val => val.cTypeHash)
+          .map((val) => val.cTypeHash)
           .filter(Boolean)
       case MessageBodyType.SUBMIT_CLAIMS_FOR_CTYPES: {
-        const cTypeHashes = (message.body as ISubmitClaimsForCTypes).content.map(
-          attestedClaim => attestedClaim.request.claim.cTypeHash
-        )
-        const uniqueCTypeHashes: Array<ICType['cType']['hash']> = cTypeHashes.filter(
-          (cTypeHash: ICType['cType']['hash'], index: number) =>
-            cTypeHashes.indexOf(cTypeHash) === index
-        )
+        const cTypeHashes = (
+          message.body as ISubmitClaimsForCTypes
+        ).content.map((attestedClaim) => attestedClaim.request.claim.cTypeHash)
+        const uniqueCTypeHashes: Array<ICType['cType']['hash']> =
+          cTypeHashes.filter(
+            (cTypeHash: ICType['cType']['hash'], index: number) =>
+              cTypeHashes.indexOf(cTypeHash) === index
+          )
         return uniqueCTypeHashes
       }
 
@@ -306,7 +312,7 @@ class MessageRepository {
     let manipulatedMessage = cloneDeep(message)
 
     if (debugMode) {
-      return new Promise<Message>(resolve => {
+      return new Promise<Message>((resolve) => {
         FeedbackService.addBlockingNotification({
           header: 'Manipulate your message before sending',
           message: (
@@ -341,7 +347,8 @@ class MessageRepository {
   private static handleMultiAddressErrors(errors: Error[]): void {
     if (errors.length) {
       notifyFailure(
-        `Could not send message to ${errors.length > 1 ? 'these addresses' : 'this address'
+        `Could not send message to ${
+          errors.length > 1 ? 'these addresses' : 'this address'
         }: ${errors.join(', ')}`,
         false
       )

@@ -81,7 +81,7 @@ class MessageView extends React.Component<Props, State> {
               this.fetchMessages()
               notification.remove()
             })
-            .catch(error => {
+            .catch((error) => {
               errorService.log({
                 error,
                 message: `Could not delete message ${message.messageId}`,
@@ -126,7 +126,7 @@ class MessageView extends React.Component<Props, State> {
           })
           blockUi.remove()
         })
-        .catch(error => {
+        .catch((error) => {
           errorService.log({
             error,
             message: `Could not retrieve messages for identity ${selectedIdentity.identity.address}`,
@@ -155,9 +155,7 @@ class MessageView extends React.Component<Props, State> {
         )}
         {!!currentMessage && (
           <Modal
-            ref={
-              this.messageModal
-            }
+            ref={this.messageModal}
             showOnInit
             type={ModalType.BLANK}
             header={
@@ -184,7 +182,9 @@ class MessageView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

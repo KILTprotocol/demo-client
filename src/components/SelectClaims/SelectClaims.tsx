@@ -101,11 +101,8 @@ class SelectClaims extends React.Component<Props, State> {
   // the select is a single- or multiselect; single values or an array of values must be expected
   private onChange(selectedOptions: ValueType<SelectOption>): void {
     const { claims } = this.state
-    const selectedOptionValues: Array<SelectOption['value']> = (Array.isArray(
-      selectedOptions
-    )
-      ? selectedOptions
-      : [selectedOptions]
+    const selectedOptionValues: Array<SelectOption['value']> = (
+      Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.value)
 
     const selectedClaims: Claims.Entry[] = claims.filter(
@@ -158,9 +155,9 @@ class SelectClaims extends React.Component<Props, State> {
     } = this.props
     const { showSelectCTypesModal } = this.state
 
-    const defaultOptions = (
-      preSelectedClaimEntries || []
-    ).map((claim: Claims.Entry) => SelectClaims.getOption(claim))
+    const defaultOptions = (preSelectedClaimEntries || []).map(
+      (claim: Claims.Entry) => SelectClaims.getOption(claim)
+    )
 
     let selectedClaims
     if (claims && claims.length) {

@@ -127,17 +127,14 @@ class DevTools extends React.Component<Props> {
       { label: 'With messages', with: true },
     ]
 
-    const selectedIdentity:
-      | IMyIdentity
-      | undefined = Wallet.getSelectedIdentity(
-        persistentStoreInstance.store.getState()
-      )
+    const selectedIdentity: IMyIdentity | undefined =
+      Wallet.getSelectedIdentity(persistentStoreInstance.store.getState())
 
     const balance: BN | undefined = selectedIdentity
       ? Balances.getBalance(
-        persistentStoreInstance.store.getState(),
-        selectedIdentity.identity.address
-      )
+          persistentStoreInstance.store.getState(),
+          selectedIdentity.identity.address
+        )
       : new BN(0)
 
     const minBalanceForBootstrap = ENDOWMENT.add(BalanceUtils.TRANSACTION_FEE)

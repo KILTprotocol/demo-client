@@ -73,11 +73,8 @@ class SelectDelegations extends React.Component<Props, State> {
     const { delegations } = this.state
 
     // normalize selectedOptions to Array
-    const selectedOptionValues: Array<SelectOption['value']> = (Array.isArray(
-      selectedOptions
-    )
-      ? selectedOptions
-      : [selectedOptions]
+    const selectedOptionValues: Array<SelectOption['value']> = (
+      Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.baseValue)
 
     const selectedDelegations: IMyDelegation[] = delegations.filter(
@@ -154,13 +151,13 @@ class SelectDelegations extends React.Component<Props, State> {
     } = this.props
     const { delegations } = this.state
 
-    const options: SelectOption[] = delegations.map(delegation =>
+    const options: SelectOption[] = delegations.map((delegation) =>
       SelectDelegations.getOption(delegation)
     )
 
     let defaultOptions: SelectOption[] = []
     if (defaultValues) {
-      defaultOptions = defaultValues.map(delegation =>
+      defaultOptions = defaultValues.map((delegation) =>
         SelectDelegations.getOption(delegation)
       )
     }

@@ -216,12 +216,14 @@ class DelegationNode extends React.Component<Props, State> {
       gettingChildren: false,
       gotChildren: true,
       node: {
-        childNodes: children.map((childNode: SDKDelegationNode | SDKDelegationRootNode) => {
-          return {
-            childNodes: [],
-            delegation: childNode,
-          } as DelegationsTreeNode
-        }),
+        childNodes: children.map(
+          (childNode: SDKDelegationNode | SDKDelegationRootNode) => {
+            return {
+              childNodes: [],
+              delegation: childNode,
+            } as DelegationsTreeNode
+          }
+        ),
         delegation,
       } as DelegationsTreeNode,
     })
@@ -257,7 +259,7 @@ class DelegationNode extends React.Component<Props, State> {
             blockUi.remove()
             notifySuccess(<span>Delegation successfully revoked</span>, true)
           })
-          .catch(error => {
+          .catch((error) => {
             blockUi.remove()
             errorService.log(error)
             notifyError(error)
@@ -294,10 +296,11 @@ class DelegationNode extends React.Component<Props, State> {
     )
 
     const blockUi: BlockUi = FeedbackService.addBlockUi({
-      headline: `Revoking Attestations for Delegation \n'${myDelegation
+      headline: `Revoking Attestations for Delegation \n'${
+        myDelegation
           ? myDelegation.metaData.alias
           : `${delegation.id.substr(0, 10)} …`
-        }'`,
+      }'`,
     })
 
     const { steps } = await delegation.findAncestorOwnedBy(
@@ -330,7 +333,7 @@ class DelegationNode extends React.Component<Props, State> {
         return result
       }),
       true
-    ).then(result => {
+    ).then((result) => {
       blockUi.remove()
       if (result.successes.length) {
         notifySuccess(

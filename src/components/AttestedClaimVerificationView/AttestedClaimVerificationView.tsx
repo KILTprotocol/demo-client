@@ -41,7 +41,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     const { attestedClaim } = this.props
 
     CTypeRepository.findByHash(attestedClaim.attestation.cTypeHash).then(
-      _cType => {
+      (_cType) => {
         if (_cType) this.setState({ cType: _cType })
       }
     )
@@ -90,7 +90,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
     let properties: Array<{ key: string; label: string; value: string }> = []
     if (cType) {
       const propertyNames = Object.keys(cType.cType.schema.properties)
-      properties = propertyNames.map(propertyName => {
+      properties = propertyNames.map((propertyName) => {
         const label = getCtypePropertyTitle(propertyName, {
           // TODO: What the hell? Why do we have two so similar types for a ctype with metadata?
           cType: cType.cType,
@@ -111,7 +111,7 @@ class AttestedClaimVerificationView extends React.Component<Props, State> {
       const propertyNames: string[] = Object.keys(
         attestedClaim.request.claim.contents
       )
-      properties = propertyNames.map(propertyName => {
+      properties = propertyNames.map((propertyName) => {
         return {
           key: propertyName,
           label: propertyName,

@@ -157,9 +157,7 @@ class Balance extends React.Component<Props, State> {
         <div className="select-contact">
           <label>Select contact</label>
           <SelectContacts
-            ref={
-              this.selectContacts
-            }
+            ref={this.selectContacts}
             isMulti={false}
             closeMenuOnSelect
             onChange={this.onSelectTransferToContact}
@@ -273,7 +271,9 @@ class Balance extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => {
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => {
   return {
     balances: Balances.getBalances(state),
   }

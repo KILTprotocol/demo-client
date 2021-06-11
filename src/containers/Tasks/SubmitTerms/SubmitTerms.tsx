@@ -157,12 +157,8 @@ class SubmitTerms extends React.Component<Props, State> {
       onFinished,
       saveAttestersQuote,
     } = this.props
-    const {
-      claim,
-      selectedDelegation,
-      withPreFilledClaim,
-      quoteData,
-    } = this.state
+    const { claim, selectedDelegation, withPreFilledClaim, quoteData } =
+      this.state
 
     if (enablePreFilledClaim && !withPreFilledClaim) {
       delete claim.contents

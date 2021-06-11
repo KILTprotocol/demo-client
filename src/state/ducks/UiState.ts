@@ -136,16 +136,18 @@ class Store {
       }
       // Blocking Notifications
       case Store.ACTIONS.BLOCKING_NOTIFICATION_ADD: {
-        const blockingNotification: IBlockingNotification = (action as IAddBlockingNotificationAction)
-          .payload
+        const blockingNotification: IBlockingNotification = (
+          action as IAddBlockingNotificationAction
+        ).payload
         return state.setIn(
           ['blockingNotifications', blockingNotification.id],
           blockingNotification
         )
       }
       case Store.ACTIONS.BLOCKING_NOTIFICATION_REMOVE: {
-        const blockingNotificationId = (action as IRemoveBlockingNotificationAction)
-          .payload
+        const blockingNotificationId = (
+          action as IRemoveBlockingNotificationAction
+        ).payload
         return state.deleteIn(['blockingNotifications', blockingNotificationId])
       }
       // Block Ui

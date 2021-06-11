@@ -52,42 +52,42 @@ class AttestationsView extends React.Component<Props, State> {
     })
   }
 
-  private revokeAttestation = (
-    attestationListModel?: AttestationListModel
-  ): (() => void) => () => {
-    if (attestationListModel) {
-      const blockUi: BlockUi = FeedbackService.addBlockUi({
-        headline: 'Revoking attestation',
-      })
-      AttestationService.revokeAttestation(attestationListModel.attestation)
-        .then(() => {
-          blockUi.remove()
+  private revokeAttestation =
+    (attestationListModel?: AttestationListModel): (() => void) =>
+    () => {
+      if (attestationListModel) {
+        const blockUi: BlockUi = FeedbackService.addBlockUi({
+          headline: 'Revoking attestation',
         })
-        .catch(error => {
-          blockUi.remove()
-          notifyError(error)
-        })
+        AttestationService.revokeAttestation(attestationListModel.attestation)
+          .then(() => {
+            blockUi.remove()
+          })
+          .catch((error) => {
+            blockUi.remove()
+            notifyError(error)
+          })
+      }
     }
-  }
 
-  private deleteAttestation = (
-    attestationListModel?: AttestationListModel
-  ): (() => void) => () => {
-    if (attestationListModel) {
-      safeDelete(
-        <span>
-          the attestation with the claim hash &apos;
-          <ShortHash>{attestationListModel.attestation.claimHash}</ShortHash>
-          &apos;
-        </span>,
-        () => {
-          AttestationService.removeFromStore(
-            attestationListModel.attestation.claimHash
-          )
-        }
-      )
+  private deleteAttestation =
+    (attestationListModel?: AttestationListModel): (() => void) =>
+    () => {
+      if (attestationListModel) {
+        safeDelete(
+          <span>
+            the attestation with the claim hash &apos;
+            <ShortHash>{attestationListModel.attestation.claimHash}</ShortHash>
+            &apos;
+          </span>,
+          () => {
+            AttestationService.removeFromStore(
+              attestationListModel.attestation.claimHash
+            )
+          }
+        )
+      }
     }
-  }
 
   private manuallyRevoke(): void {
     const { claimHashToRevoke } = this.state
@@ -101,7 +101,7 @@ class AttestationsView extends React.Component<Props, State> {
           blockUi.remove()
           this.setState({ claimHashToRevoke: '' })
         })
-        .catch(error => {
+        .catch((error) => {
           blockUi.remove()
           notifyError(error)
         })
@@ -200,7 +200,9 @@ class AttestationsView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   attestations: Attestations.getAttestations(state),
 })
 

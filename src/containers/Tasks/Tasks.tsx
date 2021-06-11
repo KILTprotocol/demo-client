@@ -377,7 +377,9 @@ class Tasks extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   currentTask: UiState.getCurrentTask(state),
 })
 

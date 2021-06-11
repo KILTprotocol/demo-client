@@ -2,7 +2,7 @@ import { IClaim, MessageBodyType } from '@kiltprotocol/types'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
-import {  RouteComponentProps, withRouter } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 import SelectContactsModal from '../../components/Modal/SelectContactsModal'
 import MyClaimDetailView from '../../components/MyClaimDetailView/MyClaimDetailView'
 import MyClaimListView from '../../components/MyClaimListView/MyClaimListView'
@@ -117,9 +117,7 @@ class ClaimView extends React.Component<Props> {
 
   private finishSelectAttesters(selectedAttesters: IContact[]): void {
     const claimId = this.claimIdToLegitimate || this.claimIdToAttest
-    const claim = claimId ? this.resolveClaim(
-      claimId
-    ) : undefined
+    const claim = claimId ? this.resolveClaim(claimId) : undefined
 
     if (claim) {
       if (this.claimIdToLegitimate) {
@@ -170,7 +168,7 @@ class ClaimView extends React.Component<Props> {
     if (isDetailView) {
       currentClaimEntry = this.getCurrentClaimEntry(claimId)
     }
-    // Removing redirect 
+    // Removing redirect
 
     return (
       <section className="ClaimView">
@@ -203,7 +201,9 @@ class ClaimView extends React.Component<Props> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   claimEntries: Claims.getClaims(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

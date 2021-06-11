@@ -60,9 +60,7 @@ class CtypeView extends React.Component<Props> {
         {cTypeHash && <CTypeDetailView cTypeHash={cTypeHash} />}
         {!cTypeHash && <CTypeListView onRequestTerm={this.requestTerm} />}
         <SelectContactsModal
-          ref={
-            this.selectAttestersModal
-          }
+          ref={this.selectAttestersModal}
           placeholder="Select attester#{multi}…"
           onCancel={this.cancelSelectAttesters}
           onConfirm={this.finishSelectAttesters}

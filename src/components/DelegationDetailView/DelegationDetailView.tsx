@@ -38,9 +38,8 @@ type Props = StateProps & OwnProps
 const getNode = async (
   id: IDelegationBaseNode['id']
 ): Promise<SDKDelegationNode | SDKDelegationRootNode> => {
-  let node: SDKDelegationNode | SDKDelegationRootNode | null = await DelegationsService.lookupNodeById(
-    id
-  )
+  let node: SDKDelegationNode | SDKDelegationRootNode | null =
+    await DelegationsService.lookupNodeById(id)
   if (!node) {
     node = await DelegationsService.lookupRootNodeById(id)
   }
@@ -67,20 +66,24 @@ const DelegationDetailView: React.FunctionComponent<Props> = ({
 
   useEffect(() => {
     getNode(delegationId)
-      .then(async (delegationNode: SDKDelegationNode | SDKDelegationRootNode) => {
-        const treeNode: DelegationsTreeNode = {
-          childNodes: [],
-          delegation: delegationNode,
-        }
-        const newRootNode = await DelegationsService.findRootNode(
-          treeNode.delegation.id
-        )
-        setRootNode(newRootNode)
+      .then(
+        async (delegationNode: SDKDelegationNode | SDKDelegationRootNode) => {
+          const treeNode: DelegationsTreeNode = {
+            childNodes: [],
+            delegation: delegationNode,
+          }
+          const newRootNode = await DelegationsService.findRootNode(
+            treeNode.delegation.id
+          )
+          setRootNode(newRootNode)
 
-        const parentTreeNode = await DelegationsService.resolveParent(treeNode)
-        setDelegationsTreeNode(parentTreeNode || treeNode)
-      })
-      .catch(error => {
+          const parentTreeNode = await DelegationsService.resolveParent(
+            treeNode
+          )
+          setDelegationsTreeNode(parentTreeNode || treeNode)
+        }
+      )
+      .catch((error) => {
         console.log('error', error)
       })
   }, [delegationId])
@@ -132,11 +135,9 @@ const DelegationDetailView: React.FunctionComponent<Props> = ({
   )
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

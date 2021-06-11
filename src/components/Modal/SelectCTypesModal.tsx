@@ -43,14 +43,13 @@ class SelectCTypesModal extends React.Component<Props, State> {
     this.setState({ selectedCTypes })
   }
 
-  private setSelectCTypesOpen = (
-    isSelectCTypesOpen: boolean,
-    delay = 0
-  ) => () => {
-    setTimeout(() => {
-      this.setState({ isSelectCTypesOpen })
-    }, delay)
-  }
+  private setSelectCTypesOpen =
+    (isSelectCTypesOpen: boolean, delay = 0) =>
+    () => {
+      setTimeout(() => {
+        this.setState({ isSelectCTypesOpen })
+      }, delay)
+    }
 
   public show(): void {
     if (this.modal.current) {
@@ -94,9 +93,7 @@ class SelectCTypesModal extends React.Component<Props, State> {
 
     return (
       <Modal
-        ref={
-          this.modal
-        }
+        ref={this.modal}
         className="small"
         type={ModalType.CONFIRM}
         header={finalHeader}

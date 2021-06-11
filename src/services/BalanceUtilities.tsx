@@ -79,7 +79,7 @@ class BalanceUtilities {
       </div>
     )
     Balance.makeTransfer(receiverAddress, transferAmount)
-      .then(tx =>
+      .then((tx) =>
         BlockchainUtils.signAndSubmitTx(tx, myIdentity.identity, {
           resolveOn: BlockchainUtils.IS_FINALIZED,
         })
@@ -108,7 +108,7 @@ class BalanceUtilities {
           </div>
         )
       })
-      .catch(error => {
+      .catch((error) => {
         errorService.log({
           error,
           message: '1010: Invalid Transaction',

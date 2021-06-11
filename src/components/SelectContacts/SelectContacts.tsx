@@ -108,11 +108,8 @@ class SelectContacts extends React.Component<Props, State> {
     })
 
     // normalize selectedOptions to Array
-    const selectedOptionValues: Array<SelectOption['value']> = (Array.isArray(
-      selectedOptions
-    )
-      ? selectedOptions
-      : [selectedOptions]
+    const selectedOptionValues: Array<SelectOption['value']> = (
+      Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.baseValue)
 
     const selectedContacts: IContact[] = contacts.filter((contact: IContact) =>
@@ -182,7 +179,7 @@ class SelectContacts extends React.Component<Props, State> {
     } = this.props
     const { contacts, preSelectedContacts, value } = this.state
 
-    const options: SelectOption[] = contacts.map(contact =>
+    const options: SelectOption[] = contacts.map((contact) =>
       SelectContacts.getOption(contact)
     )
 

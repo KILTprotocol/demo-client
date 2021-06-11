@@ -95,7 +95,7 @@ class MyClaimListView extends React.Component<Props, State> {
               </tr>
             </thead>
             <tbody>
-              {claimStore.map(claimEntry => (
+              {claimStore.map((claimEntry) => (
                 <tr key={claimEntry.id}>
                   <td className="alias">
                     <Link to={`/claim/${claimEntry.id}`}>
@@ -111,12 +111,13 @@ class MyClaimListView extends React.Component<Props, State> {
                   </td>
                   <td
                     className={`status 
-                      ${claimEntry.attestedClaims.find(
-                      ({ attestation }) =>
-                        attestation && !attestation.revoked
-                    )
-                        ? 'attested'
-                        : 'revoked'
+                      ${
+                        claimEntry.attestedClaims.find(
+                          ({ attestation }) =>
+                            attestation && !attestation.revoked
+                        )
+                          ? 'attested'
+                          : 'revoked'
                       }`}
                   />
                   <td className="actionsTd">
@@ -136,9 +137,7 @@ class MyClaimListView extends React.Component<Props, State> {
         </div>
 
         <SelectCTypesModal
-          ref={
-            this.selectCTypesModal
-          }
+          ref={this.selectCTypesModal}
           onConfirm={this.createClaimFromCType}
         />
       </section>

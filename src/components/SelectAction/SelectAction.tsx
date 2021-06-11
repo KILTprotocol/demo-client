@@ -21,11 +21,14 @@ type Props = {
 
 class SelectAction extends React.Component<Props> {
   // the select is a single select, so we expect a single value
-  private executeAction = (selectedActionOption: ValueType<SelectActionOption>): void => {
+  private executeAction = (
+    selectedActionOption: ValueType<SelectActionOption>
+  ): void => {
     if (!selectedActionOption) return
     const { actions } = this.props
     const action = actions.find(
-      (_action: Action) => _action.label === (selectedActionOption as SelectActionOption).value
+      (_action: Action) =>
+        _action.label === (selectedActionOption as SelectActionOption).value
     )
 
     if (action) {
@@ -41,10 +44,10 @@ class SelectAction extends React.Component<Props> {
         if (
           index &&
           action.label.substr(0, action.label.indexOf(' ')) !==
-          actions[index - 1].label.substr(
-            0,
-            actions[index - 1].label.indexOf(' ')
-          )
+            actions[index - 1].label.substr(
+              0,
+              actions[index - 1].label.indexOf(' ')
+            )
         ) {
           classes.push(`groupAt-${index}`)
         }

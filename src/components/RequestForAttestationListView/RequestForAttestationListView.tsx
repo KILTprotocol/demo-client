@@ -48,7 +48,7 @@ const RequestForAttestationListView: React.FunctionComponent<Props> = ({
         </thead>
 
         {requestForAttestations &&
-          requestForAttestations.map(val => {
+          requestForAttestations.map((val) => {
             const { requestForAttestation, attesterAddress } = val
             return (
               <tbody key={requestForAttestation.rootHash}>

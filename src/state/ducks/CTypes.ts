@@ -82,10 +82,7 @@ class Store {
 }
 
 const getStateCTypes = (state: ReduxState): ICTypeWithMetadata[] => {
-  return state.cTypes
-    .get('cTypes')
-    .toList()
-    .toArray()
+  return state.cTypes.get('cTypes').toList().toArray()
 }
 
 const getCTypes = createSelector(

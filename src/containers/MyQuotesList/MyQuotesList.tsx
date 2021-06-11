@@ -86,11 +86,9 @@ class MyQuotesList extends React.Component<Props> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   quoteEntries: Quotes.getAllMyQuotes(state),
 })
 

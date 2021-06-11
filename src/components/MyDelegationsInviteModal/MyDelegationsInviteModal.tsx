@@ -95,7 +95,7 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
 
     this.createPools(
       contactsPool ||
-      Contacts.getMyContacts(persistentStoreInstance.store.getState()),
+        Contacts.getMyContacts(persistentStoreInstance.store.getState()),
       delegationsPool || myDelegations
     )
   }
@@ -389,11 +389,9 @@ class MyDelegationsInviteModal extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   myDelegations: Delegations.getAllDelegations(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

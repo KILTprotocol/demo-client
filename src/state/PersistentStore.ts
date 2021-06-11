@@ -99,7 +99,10 @@ export class PersistentStore {
   public static async createLocalState(password: string): Promise<void> {
     const hashedPassword = await PersistentStore.getHashedPassword(password)
     const combinedReducers = PersistentStore.getCombinedReducers()
-    const state = combinedReducers({} as State, { type: '', payload: undefined })
+    const state = combinedReducers({} as State, {
+      type: '',
+      payload: undefined,
+    })
     PersistentStore.serializeEncryptAndStore(state, hashedPassword)
   }
 

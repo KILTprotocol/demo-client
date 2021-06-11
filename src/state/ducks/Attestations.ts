@@ -68,7 +68,7 @@ class Store {
 
     const attestationEntries: Entry[] = []
     attestationsStateSerialized.attestations.forEach(
-      serializedAttestatation => {
+      (serializedAttestatation) => {
         try {
           const attestationAsJson = JSON.parse(serializedAttestatation)
           const iAttestation = attestationAsJson.attestation as IAttestation
@@ -102,7 +102,7 @@ class Store {
     switch (action.type) {
       case Store.ACTIONS.SAVE_ATTESTATION: {
         const attestationEntry: Entry = (action as ISaveAction).payload
-        return state.update('attestations', attestations => {
+        return state.update('attestations', (attestations) => {
           return attestations
             .filter((entry: Entry) => {
               return (
@@ -180,10 +180,7 @@ class Store {
 }
 
 const getAllAttestations = (state: ReduxState): Entry[] => {
-  return state.attestations
-    .get('attestations')
-    .toList()
-    .toArray()
+  return state.attestations.get('attestations').toList().toArray()
 }
 
 const getAttestations = createSelector(

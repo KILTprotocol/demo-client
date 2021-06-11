@@ -140,14 +140,14 @@ class DidService {
   private static readonly URL_RESOLVER = {
     resolve: async (url: string): Promise<object | undefined> => {
       return fetch(url)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) {
             throw Error(response.statusText)
           }
           return response
         })
-        .then(response => response.json())
-        .then(result => (typeof result === 'object' ? result : undefined))
+        .then((response) => response.json())
+        .then((result) => (typeof result === 'object' ? result : undefined))
     },
   } as IURLResolver
 }

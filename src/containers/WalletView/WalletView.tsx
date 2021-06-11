@@ -41,7 +41,7 @@ class WalletView extends React.Component<Props> {
         )
         blockUi.remove()
       })
-      .catch(err => {
+      .catch((err) => {
         notifyError(err)
         blockUi.remove()
       })
@@ -59,7 +59,7 @@ class WalletView extends React.Component<Props> {
           )
           blockUi.remove()
         })
-        .catch(err => {
+        .catch((err) => {
           notifyError(err)
           blockUi.remove()
         })
@@ -127,7 +127,9 @@ class WalletView extends React.Component<Props> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   identities: Wallet.getAllIdentities(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

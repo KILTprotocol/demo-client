@@ -45,14 +45,13 @@ class SelectContactsModal extends React.Component<Props, State> {
     this.setState({ selectedContacts })
   }
 
-  private setSelectContactsOpen = (
-    isSelectContactsOpen: boolean,
-    delay = 0
-  ) => () => {
-    setTimeout(() => {
-      this.setState({ isSelectContactsOpen })
-    }, delay)
-  }
+  private setSelectContactsOpen =
+    (isSelectContactsOpen: boolean, delay = 0) =>
+    () => {
+      setTimeout(() => {
+        this.setState({ isSelectContactsOpen })
+      }, delay)
+    }
 
   public show(): void {
     if (this.modal.current) {
@@ -96,9 +95,7 @@ class SelectContactsModal extends React.Component<Props, State> {
 
     return (
       <Modal
-        ref={
-          this.modal
-        }
+        ref={this.modal}
         className="small"
         type={ModalType.CONFIRM}
         header={finalHeader}

@@ -58,7 +58,7 @@ Promise.chain = (
           .then((success: any) => {
             result.successes.push(success)
           })
-          .catch(error => {
+          .catch((error) => {
             result.errors.push(error)
           })
       }

@@ -56,7 +56,9 @@ class IdentitySelector extends React.Component<Props, State> {
     )
   }
 
-  private selectIdentity = (selectedOption: ValueType<SelectIdentityOption>): void => {
+  private selectIdentity = (
+    selectedOption: ValueType<SelectIdentityOption>
+  ): void => {
     if (!selectedOption) return
     const { history, selectIdentity } = this.props
     if ((selectedOption as SelectIdentityOption).value === 'create') {
@@ -108,7 +110,9 @@ class IdentitySelector extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   myIdentities: Wallet.getAllIdentities(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

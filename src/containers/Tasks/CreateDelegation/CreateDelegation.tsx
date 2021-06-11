@@ -78,9 +78,8 @@ class CreateDelegation extends React.Component<Props, State> {
       headline: `Creating ${isPCR ? 'PCR member' : 'delegation'}`,
     })
 
-    const rootNode: IDelegationRootNode | null = await DelegationService.findRootNode(
-      parentId
-    )
+    const rootNode: IDelegationRootNode | null =
+      await DelegationService.findRootNode(parentId)
     if (!rootNode) {
       notifyFailure(`${isPCR ? 'PCR root' : 'Root delegation'} not found`)
       return
@@ -97,9 +96,8 @@ class CreateDelegation extends React.Component<Props, State> {
       account,
       permissions,
       parentId: optionalParentId,
-      revoked: false
-    }
-    )
+      revoked: false,
+    })
 
     await DelegationService.storeOnChain(newDelegationNode, signatures.invitee)
       .then(() => {
@@ -109,7 +107,7 @@ class CreateDelegation extends React.Component<Props, State> {
         blockUi.remove()
         this.replyToInvitee()
       })
-      .catch(error => {
+      .catch((error) => {
         blockUi.remove()
         errorService.log({
           error,
@@ -206,11 +204,9 @@ class CreateDelegation extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   myDelegations: Delegations.getDelegations(state),
 })
 

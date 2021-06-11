@@ -83,12 +83,8 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 
   private getRevokeAttestationsAction(): Action | undefined {
-    const {
-      debugMode,
-      delegation,
-      isMyChild,
-      onRevokeAttestations,
-    } = this.props
+    const { debugMode, delegation, isMyChild, onRevokeAttestations } =
+      this.props
 
     if (!delegation || !onRevokeAttestations) {
       return undefined
@@ -171,11 +167,9 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   debugMode: UiState.getDebugMode(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

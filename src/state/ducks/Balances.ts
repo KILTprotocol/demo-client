@@ -88,6 +88,9 @@ const getStateBalance = (
   address: IMyIdentity['identity']['address']
 ): BN | undefined => state.balances.get('balances').get(address)
 
-const getBalance = createSelector([getStateBalance], (entry: BN | undefined) => entry)
+const getBalance = createSelector(
+  [getStateBalance],
+  (entry: BN | undefined) => entry
+)
 
 export { Store, getBalance, getBalances }

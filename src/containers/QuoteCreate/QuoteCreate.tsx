@@ -52,7 +52,7 @@ class QuoteCreate extends React.Component<Props, State> {
     }
     const quote = value
     const result: Record<string, unknown> = {}
-    Object.keys(value.cost.tax).forEach(entryKey => {
+    Object.keys(value.cost.tax).forEach((entryKey) => {
       result[entryKey] = value.cost.tax[entryKey]
     })
     quote.cost.tax = result

@@ -59,7 +59,8 @@ export type BsDelegationsPool = {
 }
 
 class BsDelegation {
-  public static delegationsPool: BsDelegationsPool = delegationsPool as BsDelegationsPool
+  public static delegationsPool: BsDelegationsPool =
+    delegationsPool as BsDelegationsPool
   public static pcrPool: BsDelegationsPool = pcrPool as BsDelegationsPool
 
   public static async createDelegation(
@@ -90,7 +91,7 @@ class BsDelegation {
       newPermissions = [Permission.ATTEST]
     } else {
       newPermissions = (permissions || []).map(
-        permission => Permission[permission]
+        (permission) => Permission[permission]
       )
     }
     const delegation = new DelegationNode({
@@ -99,9 +100,8 @@ class BsDelegation {
       account: ownerIdentity.identity.address,
       permissions: newPermissions,
       parentId: parentData.delegation.id,
-      revoked: false
-    }
-    )
+      revoked: false,
+    })
 
     const signature = ownerIdentity.identity.signStr(delegation.generateHash())
     const metaData = { alias }
@@ -176,7 +176,8 @@ class BsDelegation {
     const { alias, children, cTypeKey, ownerKey } = bsDelegationData
     if (!alias || !cTypeKey) {
       throw new Error(
-        `Invalid delegation data'${bsDelegationKey ? ` for ${bsDelegationKey}` : ''
+        `Invalid delegation data'${
+          bsDelegationKey ? ` for ${bsDelegationKey}` : ''
         }'`
       )
     }
@@ -193,9 +194,8 @@ class BsDelegation {
       id: UUID.generate(),
       cTypeHash: cType.cType.hash,
       account: ownerIdentity.identity.address,
-      revoked: false
-    }
-    )
+      revoked: false,
+    })
     await DelegationsService.storeRoot(rootDelegation, alias, isPCR)
 
     if (children) {
@@ -292,7 +292,7 @@ class BsDelegation {
     }
     // dive deeper
     return Promise.all(
-      Object.keys(pool).map(async bsDelegationPoolKey => {
+      Object.keys(pool).map(async (bsDelegationPoolKey) => {
         const { children } = pool[bsDelegationPoolKey]
         if (children) {
           return BsDelegation.getDelegationByKeyFromPool(
@@ -304,7 +304,7 @@ class BsDelegation {
       })
     ).then((results: Array<BsDelegationsPoolElement | undefined>) => {
       // remove undefined values und return first match
-      return results.filter(result => result)[0]
+      return results.filter((result) => result)[0]
     })
   }
 
@@ -318,20 +318,17 @@ class BsDelegation {
     parentData: ParentData,
     delegationDataForMessages: DelegationDataForMessages
   ): Promise<void> {
-    const {
-      delegation,
-      isPCR,
-      ownerIdentity,
-      signature,
-    } = delegationDataForMessages
+    const { delegation, isPCR, ownerIdentity, signature } =
+      delegationDataForMessages
 
-    const delegationData: IRequestAcceptDelegation['content']['delegationData'] = {
-      account: parentData.ownerIdentity.identity.address,
-      id: delegation.id,
-      isPCR,
-      parentId: parentData.delegation.id,
-      permissions: delegation.permissions,
-    }
+    const delegationData: IRequestAcceptDelegation['content']['delegationData'] =
+      {
+        account: parentData.ownerIdentity.identity.address,
+        id: delegation.id,
+        isPCR,
+        parentId: parentData.delegation.id,
+        permissions: delegation.permissions,
+      }
 
     // send invitation from inviter(parentIdentity) to invitee (ownerIdentity)
     const requestAcceptDelegation: IRequestAcceptDelegation = {

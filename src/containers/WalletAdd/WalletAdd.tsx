@@ -72,7 +72,7 @@ class WalletAdd extends React.Component<Props, State> {
   ): void => {
     if (!selectedKeyPairType) return
     this.setState({
-      mySigningKeyPairType: (selectedKeyPairType  as OptionsKeyPairType),
+      mySigningKeyPairType: selectedKeyPairType as OptionsKeyPairType,
     })
   }
 
@@ -99,13 +99,8 @@ class WalletAdd extends React.Component<Props, State> {
   }
 
   private async addIdentity(): Promise<void> {
-    const {
-      alias,
-      myPhrase,
-      randomPhrase,
-      useMyPhrase,
-      mySigningKeyPairType,
-    } = this.state
+    const { alias, myPhrase, randomPhrase, useMyPhrase, mySigningKeyPairType } =
+      this.state
     const { history, saveIdentity } = this.props
 
     let identity

@@ -22,13 +22,13 @@ class CTypeRepository {
     }
 
     return fetch(`${CTypeRepository.URL}/${hash}`)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw Error(response.statusText)
         }
         return response
       })
-      .then(response => response.json())
+      .then((response) => response.json())
       .then((cType: ICTypeWithMetadata) => {
         persistentStoreInstance.store.dispatch(CTypes.Store.addCType(cType))
         return cType
@@ -41,7 +41,7 @@ class CTypeRepository {
 
   public static async findAll(): Promise<ICTypeWithMetadata[]> {
     return fetch(`${CTypeRepository.URL}`)
-      .then(response => response.json())
+      .then((response) => response.json())
       .then((cTypes: ICTypeWithMetadata[]) => {
         persistentStoreInstance.store.dispatch(CTypes.Store.addCTypes(cTypes))
         return CTypes.getCTypes(persistentStoreInstance.store.getState())
