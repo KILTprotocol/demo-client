@@ -60,11 +60,14 @@ class IdentitySelector extends React.Component<Props, State> {
     selectedOption: ValueType<SelectIdentityOption>
   ): void => {
     if (!selectedOption) return
+    if (Array.isArray(selectedOption) || selectedOption instanceof Array) {
+      throw new Error('The selected identity can not be an array.')
+    }
     const { history, selectIdentity } = this.props
-    if ((selectedOption as SelectIdentityOption).value === 'create') {
+    if (selectedOption.value === 'create') {
       history.push('/wallet/add')
     } else {
-      selectIdentity((selectedOption as SelectIdentityOption).value)
+      selectIdentity(selectedOption.value)
     }
   }
 
@@ -104,15 +107,14 @@ class IdentitySelector extends React.Component<Props, State> {
           options={identityOptions}
           value={selectedOption}
           onChange={this.selectIdentity}
+          isMulti={false}
         />
       </section>
     )
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
-  state
-) => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
   myIdentities: Wallet.getAllIdentities(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
