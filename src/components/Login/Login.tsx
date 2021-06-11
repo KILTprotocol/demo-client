@@ -13,7 +13,7 @@ const Login: React.FC<Props> = ({ submit }) => {
       <h2>Existing User</h2>
       <p>Please login</p>
       <form
-        onSubmit={e => {
+        onSubmit={(e) => {
           e.preventDefault()
           submit(password)
         }}
@@ -25,7 +25,7 @@ const Login: React.FC<Props> = ({ submit }) => {
               <input
                 value={password}
                 type="password"
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </label>

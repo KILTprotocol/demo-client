@@ -145,10 +145,7 @@ class Store {
 }
 
 const getStateContacts = (state: ReduxState): IContact[] => {
-  return state.contacts
-    .get('contacts')
-    .toList()
-    .toArray()
+  return state.contacts.get('contacts').toList().toArray()
 }
 
 const getContacts = createSelector(
@@ -167,7 +164,7 @@ const getStateContact = (
 
 const getContact = createSelector(
   [getStateContact],
-  (contact: IContact) => contact
+  (contact: IContact | undefined) => contact
 )
 
 export { Store, getContacts, getContact, getMyContacts }

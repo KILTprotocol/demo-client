@@ -95,11 +95,8 @@ class MyClaimDetailView extends Component<Props, State> {
   }
 
   public render(): JSX.Element {
-    const {
-      claimEntry,
-      hideAttestedClaims,
-      hideRequestForAttestation,
-    }: Props = this.props
+    const { claimEntry, hideAttestedClaims, hideRequestForAttestation }: Props =
+      this.props
     const { attestedClaims } = claimEntry
 
     return attestedClaims ? (

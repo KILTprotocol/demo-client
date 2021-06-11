@@ -94,7 +94,7 @@ class QuoteView extends React.Component<Props, State> {
               attesterAddress={receiverAddress}
               cTypeHash={claim?.cTypeHash}
               onCancel={this.onCancelQuote}
-              newQuote={quote => this.confirmQuote(quote)}
+              newQuote={(quote) => this.confirmQuote(quote)}
             />
           </section>
         )}
@@ -103,11 +103,9 @@ class QuoteView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   quoteEntries: Quotes.getAllMyQuotes(state),
 })
 

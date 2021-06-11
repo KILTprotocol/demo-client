@@ -47,11 +47,12 @@ function setup(): ISetup {
       signingKeyPairType: 'ed25519',
     })
 
-    const delegationRoot = new DelegationRootNode(
-      DELEGATION_ROOT_ID,
-      ctype.hash,
-      root.address
-    )
+    const delegationRoot = new DelegationRootNode({
+      id: DELEGATION_ROOT_ID,
+      cTypeHash: ctype.hash,
+      account: root.address,
+      revoked: false,
+    })
 
     cachedSetup = {
       root,
@@ -65,12 +66,13 @@ function setup(): ISetup {
 async function newDelegation(delegate: IMyIdentity): Promise<void> {
   const { root, delegationRoot } = setup()
 
-  const delegationNode = new DelegationNode(
-    UUID.generate(),
-    delegationRoot.id,
-    delegate.identity.address,
-    [Permission.ATTEST]
-  )
+  const delegationNode = new DelegationNode({
+    id: UUID.generate(),
+    rootId: delegationRoot.id,
+    account: delegate.identity.address,
+    permissions: [Permission.ATTEST],
+    revoked: false,
+  })
   const signature = delegate.identity.signStr(delegationNode.generateHash())
   const tx = await delegationNode.store(signature)
   await BlockchainUtils.signAndSubmitTx(tx, root, { resolveOn: IS_IN_BLOCK })
@@ -104,7 +106,8 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
     })
     notifySuccess(`CTYPE ${metadata.title.default} successfully created.`)
   }
-  // delegationRoot.verify() is unreliable when using the currently released mashnet-node &   // workaround is checking the ctype hash of the query result; it is 0x000... if it doesn't exist on chain
+  // delegationRoot.verify() is unreliable when using the currently released mashnet-node &
+  // workaround is checking the ctype hash of the query result; it is 0x000... if it doesn't exist on chain
   const queriedRoot = await DelegationRootNode.query(delegationRoot.id)
   if (queriedRoot?.cTypeHash !== ctype.hash) {
     const tx = await delegationRoot.store()
@@ -119,10 +122,12 @@ async function verifyOrAddCtypeAndRoot(): Promise<void> {
     // sending root owner message for importing the root
     const message = new Kilt.Message(
       messageBody,
-      root,
+      root.getPublicIdentity(),
       root.getPublicIdentity()
     )
-    await MessageRepository.dispatchMessage(message)
+    await MessageRepository.dispatchMessage(
+      message.encrypt(root, root.getPublicIdentity())
+    )
     notifySuccess(`Sent Delegation Root to AntiCov root authority.`)
   }
 }
@@ -134,7 +139,7 @@ export async function setupAndDelegate(delegate: IMyIdentity): Promise<void> {
   })
   try {
     blockUi.updateMessage('Transferring funds to AntiCov authority')
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       BalanceUtilities.makeTransfer(delegate, root.address, new BN(4), () =>
         resolve()
       )

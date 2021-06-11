@@ -1,3 +1,6 @@
+@use "sass:math";
+
+@use 'styles/library' as *;
 .Modal {
   z-index: $z-index-modal;
   display: flex;
@@ -26,7 +29,7 @@
     position: relative;
     z-index: $z-index-modal + 2;
     width: 100%;
-    max-width: 1024px - 2*$base-padding;
+    max-width: 1024px - 2 * $base-padding;
     margin: auto;
     background: $color-white;
     border: $base-border;
@@ -39,7 +42,7 @@
     @include baseFont-bold;
 
     position: relative;
-    padding: $base-padding/2 $base-padding;
+    padding: math.div($base-padding, 2) $base-padding;
     border: {
       bottom: $base-border;
     }
@@ -64,16 +67,16 @@
   }
 
   & .body {
-    padding: $base-padding/2 $base-padding;
+    padding: math.div($base-padding, 2) $base-padding;
     line-height: 1.6;
 
     & footer {
-      margin: $base-padding (-$base-padding) (-$base-padding/2);
+      margin: $base-padding (-$base-padding) math.div(-$base-padding, 2);
     }
   }
 
   & footer {
-    padding: $base-padding/2 $base-padding 0;
+    padding: math.div($base-padding, 2) $base-padding 0;
     text-align: right;
     border: {
       top: $base-border;
@@ -83,8 +86,8 @@
       @include button-secondary;
 
       margin: {
-        left: $base-padding/2;
-        bottom: $base-padding/2;
+        left: math.div($base-padding, 2);
+        bottom: math.div($base-padding, 2);
       }
 
       &.confirm {
@@ -94,7 +97,6 @@
   }
 
   &.small {
-
     & > .container {
       max-width: 640px;
     }

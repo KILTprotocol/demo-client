@@ -1,3 +1,5 @@
+@use 'styles/library' as *;
+
 .IdentitySelector {
   @include react-select;
   @include react-select-right;

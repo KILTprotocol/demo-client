@@ -1,3 +1,6 @@
+@use "sass:color";
+@use "styles/library/variables" as *;
+
 @mixin react-select {
 
   & input[type=text] {
@@ -43,7 +46,7 @@
       white-space: nowrap;
 
       &--is-selected {
-        background: transparentize($color-primary, 0.8) !important;
+        background: color.adjust($color-primary, $alpha: -0.8) !important;
       }
 
       &--is-focused,

@@ -2,7 +2,7 @@ import { IClaim, MessageBodyType } from '@kiltprotocol/types'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
 
-import { Redirect, RouteComponentProps, withRouter } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 import SelectContactsModal from '../../components/Modal/SelectContactsModal'
 import MyClaimDetailView from '../../components/MyClaimDetailView/MyClaimDetailView'
 import MyClaimListView from '../../components/MyClaimListView/MyClaimListView'
@@ -36,11 +36,7 @@ type Props = RouteComponentProps<{ claimId: Claims.Entry['id'] }> &
   StateProps &
   DispatchProps
 
-type State = {
-  redirect?: string
-}
-
-class ClaimView extends React.Component<Props, State> {
+class ClaimView extends React.Component<Props> {
   private static requestTerm(claimEntry: Claims.Entry): void {
     persistentStoreInstance.store.dispatch(
       UiState.Store.updateCurrentTaskAction({
@@ -64,8 +60,8 @@ class ClaimView extends React.Component<Props, State> {
     )
   }
 
-  private claimIdToAttest: Claims.Entry['id']
-  private claimIdToLegitimate: Claims.Entry['id']
+  private claimIdToAttest: Claims.Entry['id'] | undefined
+  private claimIdToLegitimate: Claims.Entry['id'] | undefined
 
   constructor(props: Props) {
     super(props)
@@ -88,16 +84,6 @@ class ClaimView extends React.Component<Props, State> {
     const { selectedIdentity } = this.props
     if (!selectedIdentity || !prevProps.selectedIdentity) {
       throw new Error('No selected Identity')
-    }
-
-    if (
-      prevProps.selectedIdentity.identity.address !==
-      selectedIdentity.identity.address
-    ) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({
-        redirect: '/claim',
-      })
     }
   }
 
@@ -130,9 +116,8 @@ class ClaimView extends React.Component<Props, State> {
   }
 
   private finishSelectAttesters(selectedAttesters: IContact[]): void {
-    const claim = this.resolveClaim(
-      this.claimIdToLegitimate || this.claimIdToAttest
-    )
+    const claimId = this.claimIdToLegitimate || this.claimIdToAttest
+    const claim = claimId ? this.resolveClaim(claimId) : undefined
 
     if (claim) {
       if (this.claimIdToLegitimate) {
@@ -176,7 +161,6 @@ class ClaimView extends React.Component<Props, State> {
   public render(): JSX.Element {
     const { claimEntries, match } = this.props
     const { claimId } = match.params
-    const { redirect } = this.state
 
     const isDetailView = this.isDetailView()
 
@@ -184,10 +168,7 @@ class ClaimView extends React.Component<Props, State> {
     if (isDetailView) {
       currentClaimEntry = this.getCurrentClaimEntry(claimId)
     }
-
-    if (redirect) {
-      return <Redirect to={redirect} />
-    }
+    // Removing redirect
 
     return (
       <section className="ClaimView">
@@ -220,7 +201,9 @@ class ClaimView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   claimEntries: Claims.getClaims(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

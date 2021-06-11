@@ -127,13 +127,10 @@ class DevTools extends React.Component<Props> {
       { label: 'With messages', with: true },
     ]
 
-    const selectedIdentity:
-      | IMyIdentity
-      | undefined = Wallet.getSelectedIdentity(
-      persistentStoreInstance.store.getState()
-    )
+    const selectedIdentity: IMyIdentity | undefined =
+      Wallet.getSelectedIdentity(persistentStoreInstance.store.getState())
 
-    const balance: BN = selectedIdentity
+    const balance: BN | undefined = selectedIdentity
       ? Balances.getBalance(
           persistentStoreInstance.store.getState(),
           selectedIdentity.identity.address

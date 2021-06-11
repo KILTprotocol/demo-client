@@ -67,9 +67,8 @@ class Store {
       }))
       .toArray()
 
-    const selectedIdentity:
-      | IMyIdentity['identity']['address']
-      | null = state.get('selectedIdentity')
+    const selectedIdentity: IMyIdentity['identity']['address'] | null =
+      state.get('selectedIdentity')
     if (selectedIdentity) {
       wallet.selectedAddress = selectedIdentity
     }
@@ -222,7 +221,7 @@ const getStateIdentities = (state: ReduxState): State['identities'] =>
 const getSelectedIdentity = createSelector(
   [getStateSelectedIdentity, getStateIdentities],
   (
-    selectedIdentity: IMyIdentity['identity']['address'],
+    selectedIdentity: IMyIdentity['identity']['address'] | null,
     identities: State['identities']
   ) => {
     if (!selectedIdentity) {
@@ -233,10 +232,7 @@ const getSelectedIdentity = createSelector(
 )
 
 const getStateAllIdentities = (state: ReduxState): IMyIdentity[] =>
-  state.wallet
-    .get('identities')
-    .toList()
-    .toArray()
+  state.wallet.get('identities').toList().toArray()
 
 const getAllIdentities = createSelector(
   [getStateAllIdentities],
@@ -260,6 +256,9 @@ const getStateIdentity = (
   address: PublicIdentity['address']
 ): IMyIdentity | undefined => state.wallet.get('identities').get(address)
 
-const getIdentity = createSelector([getStateIdentity], (entry: Entry) => entry)
+const getIdentity = createSelector(
+  [getStateIdentity],
+  (entry: Entry | undefined) => entry
+)
 
 export { Store, getSelectedIdentity, getAllIdentities, getIdentity }

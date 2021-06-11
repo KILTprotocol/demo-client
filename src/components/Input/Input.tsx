@@ -16,7 +16,7 @@ type Props = {
 type State = {}
 
 class Input extends React.Component<Props, State> {
-  private inputElement: HTMLInputElement | null
+  private inputElement: HTMLInputElement | undefined
 
   public static defaultProps = {
     type: 'text',
@@ -39,17 +39,8 @@ class Input extends React.Component<Props, State> {
   }
 
   public render(): JSX.Element {
-    const {
-      className,
-      id,
-      name,
-      min,
-      max,
-      onChange,
-      onSubmit,
-      type,
-      value,
-    } = this.props
+    const { className, id, name, min, max, onChange, onSubmit, type, value } =
+      this.props
 
     let onKeyUp
     if (onSubmit) {

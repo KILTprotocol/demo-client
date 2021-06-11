@@ -42,13 +42,12 @@ const ImportAttestation: React.FC<Props> = ({
   addAttestedClaimToClaim,
   removeRequestForAttestation,
 }) => {
-  const [requestForAttestationEntry, setRequestForAttestation] = useState<
-    IRequestForAttestation
-  >()
+  const [requestForAttestationEntry, setRequestForAttestation] =
+    useState<IRequestForAttestation>()
   const [claimId, setClaimId] = useState<Claims.Entry['id']>()
 
   useEffect(() => {
-    claims.forEach(claim => {
+    claims.forEach((claim) => {
       let newRequestForAttestation
       let newClaimId
       claim.requestForAttestations.forEach(
@@ -119,11 +118,9 @@ const ImportAttestation: React.FC<Props> = ({
   )
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   claims: Claims.getClaims(state),
 })
 

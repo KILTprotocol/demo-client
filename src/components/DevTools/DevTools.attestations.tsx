@@ -46,7 +46,8 @@ type BsAttestedClaims = {
 }
 
 class BsAttestation {
-  public static pool: BsAttestationsPool = attestationsPool as BsAttestationsPool
+  public static pool: BsAttestationsPool =
+    attestationsPool as BsAttestationsPool
 
   public static async createAttestation(
     bsAttestationData: BsAttestationsPoolElement,
@@ -76,20 +77,22 @@ class BsAttestation {
     BsIdentity.selectIdentity(claimerIdentity)
     const claimToAttest: Claims.Entry = await BsClaim.getClaimByKey(claimKey)
 
-    const requestForAttestation: RequestForAttestation = await BsAttestation.getRequestForAttestation(
-      bsAttestationData,
-      claimToAttest,
-      bsAttestedClaims,
-      claimerIdentity
-    )
+    const requestForAttestation: RequestForAttestation =
+      await BsAttestation.getRequestForAttestation(
+        bsAttestationData,
+        claimToAttest,
+        bsAttestedClaims,
+        claimerIdentity
+      )
 
-    const attestedClaim: AttestedClaim = await BsAttestation.attesterAttestsClaim(
-      bsAttestationData,
-      bsAttestationKey,
-      bsAttestedClaims,
-      claimerIdentity,
-      requestForAttestation
-    )
+    const attestedClaim: AttestedClaim =
+      await BsAttestation.attesterAttestsClaim(
+        bsAttestationData,
+        bsAttestationKey,
+        bsAttestedClaims,
+        claimerIdentity,
+        requestForAttestation
+      )
 
     const attesterIdentity: IMyIdentity = await BsIdentity.getByKey(attesterKey)
 
@@ -181,7 +184,7 @@ class BsAttestation {
     let termsFromPool: AttestedClaim[] = []
     if (terms && Array.isArray(terms) && terms.length) {
       termsFromPool = await Promise.all(
-        terms.map(bsAttestationKey => {
+        terms.map((bsAttestationKey) => {
           const bsAttestedClaim = bsAttestedClaims[bsAttestationKey]
           if (bsAttestedClaim) {
             return Promise.resolve(bsAttestedClaim)

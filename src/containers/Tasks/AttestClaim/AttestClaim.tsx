@@ -98,7 +98,7 @@ class AttestClaim extends React.Component<Props, State> {
           onFinished()
         }
       })
-      .catch(error => {
+      .catch((error) => {
         blockUi.remove()
         notifyError(error)
       })

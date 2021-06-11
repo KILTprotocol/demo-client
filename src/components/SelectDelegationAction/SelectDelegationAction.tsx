@@ -83,12 +83,8 @@ class SelectDelegationAction extends React.Component<Props> {
   }
 
   private getRevokeAttestationsAction(): Action | undefined {
-    const {
-      debugMode,
-      delegation,
-      isMyChild,
-      onRevokeAttestations,
-    } = this.props
+    const { debugMode, delegation, isMyChild, onRevokeAttestations } =
+      this.props
 
     if (!delegation || !onRevokeAttestations) {
       return undefined
@@ -153,29 +149,27 @@ class SelectDelegationAction extends React.Component<Props> {
   public render(): JSX.Element {
     const { className } = this.props
 
-    const actions: Array<Action | undefined> = [
+    const actions: Array<Action> = [
       this.getInviteAction(),
       this.getDeleteAction(),
       this.getRevokeDelegationAction(),
       this.getRevokeAttestationsAction(),
       this.getQRCodeAction(),
-    ].filter((action: Action) => action)
+    ].filter((action: Action | undefined): action is Action => !!action)
 
     return (
       <section className="SelectDelegationAction">
         {!!actions.length && (
-          <SelectAction className={className} actions={actions as Action[]} />
+          <SelectAction className={className} actions={actions} />
         )}
       </section>
     )
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   debugMode: UiState.getDebugMode(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

@@ -1,5 +1,7 @@
-.MyDelegationsInviteModal {
+@use "sass:math";
 
+@use 'styles/library' as *;
+.MyDelegationsInviteModal {
   & .permissions,
   & .contactsSelect,
   & .delegationsSelect {
@@ -7,13 +9,12 @@
   }
 
   & .permissions {
-
     & label {
       @include checkbox;
 
       display: block;
       margin: {
-        top: $base-padding/2;
+        top: math.div($base-padding, 2);
       }
 
       &:first-child {
@@ -29,7 +30,6 @@
   }
 
   & button {
-
     &.invite {
       @include button-primary;
     }

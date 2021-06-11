@@ -73,8 +73,8 @@ type StateProps = {
 }
 
 type OwnProps = {
-  cTypeHashes?: Array<ICType['hash'] | null>
-  context?: 'default' | 'terms'
+  cTypeHashes?: Array<ICType['hash']>
+  context?: 'default' | 'term'
   onChange: (claimSelectionData: ClaimSelectionData) => void
 }
 
@@ -213,11 +213,9 @@ class SelectAttestedClaims extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   claimEntries: Claims.getClaims(state),
 })
 

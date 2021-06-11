@@ -18,6 +18,7 @@ import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IContact, IMyIdentity } from '../../types/Contact'
 
 import './WalletAdd.scss'
+import type { ValueType } from 'react-select'
 
 type OptionsKeyPairType = {
   label: string
@@ -67,10 +68,11 @@ class WalletAdd extends React.Component<Props, State> {
   }
 
   private setMySigningKeyPairType = (
-    selectedKeyPairType: OptionsKeyPairType
+    selectedKeyPairType: ValueType<OptionsKeyPairType, false>
   ): void => {
+    if (!selectedKeyPairType) return
     this.setState({
-      mySigningKeyPairType: selectedKeyPairType,
+      mySigningKeyPairType: selectedKeyPairType as OptionsKeyPairType,
     })
   }
 
@@ -97,13 +99,8 @@ class WalletAdd extends React.Component<Props, State> {
   }
 
   private async addIdentity(): Promise<void> {
-    const {
-      alias,
-      myPhrase,
-      randomPhrase,
-      useMyPhrase,
-      mySigningKeyPairType,
-    } = this.state
+    const { alias, myPhrase, randomPhrase, useMyPhrase, mySigningKeyPairType } =
+      this.state
     const { history, saveIdentity } = this.props
 
     let identity
@@ -233,6 +230,7 @@ class WalletAdd extends React.Component<Props, State> {
               <Select
                 options={keypairTypeOptions}
                 value={mySigningKeyPairType}
+                isMulti={false}
                 onChange={this.setMySigningKeyPairType}
               />
             </div>

@@ -68,9 +68,11 @@ class CTypePresentation extends React.Component<Props, State> {
   private setCType(): void {
     const { cTypeHash } = this.props
 
-    CTypeRepository.findByHash(cTypeHash).then((_cType: ICTypeWithMetadata) => {
-      this.setState({ cType: _cType })
-    })
+    CTypeRepository.findByHash(cTypeHash).then(
+      (cType: ICTypeWithMetadata | undefined) => {
+        this.setState({ cType })
+      }
+    )
   }
 
   private getActions(): Action[] {
@@ -175,14 +177,8 @@ class CTypePresentation extends React.Component<Props, State> {
   }
 
   public render(): JSX.Element {
-    const {
-      cTypeHash,
-      inline,
-      interactive,
-      fullSizeActions,
-      right,
-      size,
-    } = this.props
+    const { cTypeHash, inline, interactive, fullSizeActions, right, size } =
+      this.props
     const { cType } = this.state
 
     let actions: Action[] = []

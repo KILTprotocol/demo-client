@@ -23,7 +23,7 @@ type State = {
 }
 
 class SelectCTypesModal extends React.Component<Props, State> {
-  private modal: Modal | null
+  private modal: React.RefObject<Modal>
 
   public static defaultProps = {
     placeholder: `Select cType#{multi}`,
@@ -36,30 +36,30 @@ class SelectCTypesModal extends React.Component<Props, State> {
       selectedCTypes: [],
     }
     this.onSelectCTypes = this.onSelectCTypes.bind(this)
+    this.modal = React.createRef()
   }
 
   private onSelectCTypes(selectedCTypes: ICTypeWithMetadata[]): void {
     this.setState({ selectedCTypes })
   }
 
-  private setSelectCTypesOpen = (
-    isSelectCTypesOpen: boolean,
-    delay = 0
-  ) => () => {
-    setTimeout(() => {
-      this.setState({ isSelectCTypesOpen })
-    }, delay)
-  }
+  private setSelectCTypesOpen =
+    (isSelectCTypesOpen: boolean, delay = 0) =>
+    () => {
+      setTimeout(() => {
+        this.setState({ isSelectCTypesOpen })
+      }, delay)
+    }
 
   public show(): void {
-    if (this.modal) {
-      this.modal.show()
+    if (this.modal.current) {
+      this.modal.current.show()
     }
   }
 
   public hide(): void {
-    if (this.modal) {
-      this.modal.hide()
+    if (this.modal.current) {
+      this.modal.current.hide()
     }
   }
 
@@ -93,9 +93,7 @@ class SelectCTypesModal extends React.Component<Props, State> {
 
     return (
       <Modal
-        ref={el => {
-          this.modal = el
-        }}
+        ref={this.modal}
         className="small"
         type={ModalType.CONFIRM}
         header={finalHeader}

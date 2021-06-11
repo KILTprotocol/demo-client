@@ -23,17 +23,22 @@ class Permissions extends React.Component<Props> {
 
     return (
       <section className="Permissions">
-        {Object.keys(Permission)
+        {Object.values(Permission)
           .filter(
-            (permission: string) => typeof Permission[permission] === 'number'
+            (permission): permission is number => typeof permission === 'number'
           )
-          .map((permission: string) => {
-            const allowed = permissions.includes(Permission[permission])
+          .map((permission: Permission) => {
+            const allowed = permissions.includes(permission)
             return (
               <span
                 key={permission}
-                title={Permissions.getPermissionTitle(permission, allowed)}
-                className={`${permission} ${allowed ? 'allowed' : 'denied'}`}
+                title={Permissions.getPermissionTitle(
+                  Permission[permission],
+                  allowed
+                )}
+                className={`${Permission[permission]} ${
+                  allowed ? 'allowed' : 'denied'
+                }`}
               />
             )
           })}

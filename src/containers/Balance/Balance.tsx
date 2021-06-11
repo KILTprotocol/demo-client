@@ -44,7 +44,7 @@ type State = {
 }
 
 class Balance extends React.Component<Props, State> {
-  private selectContacts: SelectContacts | null
+  private selectContacts: React.RefObject<SelectContacts>
 
   constructor(props: Props) {
     super(props)
@@ -60,6 +60,7 @@ class Balance extends React.Component<Props, State> {
     this.onSelectTransferToContact = this.onSelectTransferToContact.bind(this)
 
     this.identityCheck = this.identityCheck.bind(this)
+    this.selectContacts = React.createRef()
   }
 
   private onSelectTransferToContact(selectedContacts: IContact[]): void {
@@ -156,9 +157,7 @@ class Balance extends React.Component<Props, State> {
         <div className="select-contact">
           <label>Select contact</label>
           <SelectContacts
-            ref={el => {
-              this.selectContacts = el
-            }}
+            ref={this.selectContacts}
             isMulti={false}
             closeMenuOnSelect
             onChange={this.onSelectTransferToContact}
@@ -243,8 +242,8 @@ class Balance extends React.Component<Props, State> {
 
   private resetContacts(): void {
     const { selectContacts } = this
-    if (selectContacts) {
-      selectContacts.reset()
+    if (selectContacts.current) {
+      selectContacts.current.reset()
     }
   }
 
@@ -272,7 +271,9 @@ class Balance extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => {
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => {
   return {
     balances: Balances.getBalances(state),
   }

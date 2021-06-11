@@ -1,7 +1,11 @@
+@use "sass:math";
+
+@use 'colors';
+
 // MARGIN / PADDING
 $base-padding: 20px;
-$cell-padding-h: $base-padding/2;
-$cell-padding-v: $base-padding/4;
+$cell-padding-h: math.div($base-padding, 2);
+$cell-padding-v: math.div($base-padding, 4);
 
 // SIZES
 $base-content-max-width: 1024px;
@@ -16,7 +20,7 @@ $base-transition: all $base-transition-time ease-in-out;
 // BORDER
 $base-border-radius: 4px;
 $base-border-width: 1px;
-$base-border: $base-border-width solid $color-grey;
+$base-border: $base-border-width solid colors.$color-grey;
 
 // MISC
 $z-index-content: 1;

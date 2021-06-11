@@ -1,3 +1,7 @@
+@use "sass:math";
+
+@use 'styles/library' as *;
+
 .AttestationsView {
 
   & h1 {
@@ -16,7 +20,7 @@
     & input {
       flex-grow: 1;
       margin: {
-        right: $base-padding/2;
+        right: math.div($base-padding, 2);
       }
     }
 

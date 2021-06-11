@@ -1,7 +1,9 @@
+@use "sass:math";
+
 @mixin fadeInOut($duration: 1s, $fadeDuration: $base-transition-time) {
     $animationCounter: $animationCounter + 1 !global;
     $wholeDuration: $duration + 2*$fadeDuration;
-    $endFadeIn: $fadeDuration / $wholeDuration * 100%;
+    $endFadeIn: math.div($fadeDuration, $wholeDuration) * 100%;
     $startFadeOut: 100% - $endFadeIn;
 
     @include keyframes(fadeInOut#{$animationCounter}) {
@@ -18,7 +20,7 @@
 @mixin animate($duration: $base-transition-time, $delay: 0s) {
     $animationCounter: $animationCounter + 1 !global;
     $wholeDuration: $delay + $duration;
-    $endDelay: $delay / $wholeDuration * 100%;
+    $endDelay: math.div($delay, $wholeDuration) * 100%;
     $startAnimation: 100% - $endDelay;
 
     @include keyframes(animate#{$animationCounter}) {
