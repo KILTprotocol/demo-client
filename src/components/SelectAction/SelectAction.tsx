@@ -1,6 +1,6 @@
 import React from 'react'
 import Select from 'react-select'
-import { ValueType } from 'react-select/lib/types'
+import type { ValueType } from 'react-select/lib/types'
 
 import './SelectAction.scss'
 

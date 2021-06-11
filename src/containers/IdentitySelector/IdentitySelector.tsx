@@ -15,7 +15,7 @@ import {
 import { IMyIdentity } from '../../types/Contact'
 
 import './IdentitySelector.scss'
-import { ValueType } from 'react-select/lib/types'
+import type { ValueType } from 'react-select/lib/types'
 
 const addIdentity = {
   label: `Create an identity`,

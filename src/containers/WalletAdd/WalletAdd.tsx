@@ -18,7 +18,7 @@ import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IContact, IMyIdentity } from '../../types/Contact'
 
 import './WalletAdd.scss'
-import { ValueType } from 'react-select/lib/types'
+import type { ValueType } from 'react-select/lib/types'
 
 type OptionsKeyPairType = {
   label: string
