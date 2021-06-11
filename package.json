@@ -10,9 +10,13 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "@types/jest": "^26.0.15",
+    "@types/lodash": "^4.14.170",
     "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/react-router-dom": "5.1.7",
+    "@types/react-select": "^2.0.0",
+    "@types/react-test-renderer": "^17.0.1",
     "compass-mixins": "^0.12.10",
     "immutable": "^4.0.0-rc.12",
     "react": "^17.0.2",
@@ -25,6 +29,7 @@
     "react-schema-based-json-editor": "^8.2.1",
     "react-scripts": "4.0.3",
     "react-select": "^2.2.0",
+    "react-test-renderer": "^17.0.2",
     "reselect": "^4.0.0",
     "sass": "^1.34.1",
     "scrypt-js": "^3.0.1",
@@ -75,13 +80,8 @@
     ]
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.170",
-    "@types/react-router-dom": "5.1.7",
-    "@types/react-select": "^2.0.0",
-    "@types/react-test-renderer": "^17.0.1",
     "husky": "^6.0.0",
     "lint-staged": "^11.0.0",
-    "prettier": "^2.3.1",
-    "react-test-renderer": "^17.0.2"
+    "prettier": "^2.3.1"
   }
 }
