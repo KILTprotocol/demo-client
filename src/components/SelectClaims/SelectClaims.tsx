@@ -1,8 +1,7 @@
 import React, { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
-import type { Config } from 'react-select/lib/filters'
-import type { ValueType } from 'react-select/lib/types'
+import type { ValueType } from 'react-select'
 
 import * as Claims from '../../state/ducks/Claims'
 import * as UiState from '../../state/ducks/UiState'
@@ -35,7 +34,7 @@ type State = {
 }
 
 class SelectClaims extends React.Component<Props, State> {
-  private filterConfig: Config = {
+  private filterConfig: Parameters<typeof createFilter>[0] = {
     ignoreAccents: true,
     ignoreCase: true,
     matchFrom: 'any',
@@ -99,7 +98,11 @@ class SelectClaims extends React.Component<Props, State> {
   }
 
   // the select is a single- or multiselect; single values or an array of values must be expected
-  private onChange(selectedOptions: ValueType<SelectOption>): void {
+  private onChange(
+    selectedOptions:
+      | ValueType<SelectOption, true>
+      | ValueType<SelectOption, false>
+  ): void {
     const { claims } = this.state
     const selectedOptionValues: Array<SelectOption['value']> = (
       Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]

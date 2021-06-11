@@ -18,7 +18,7 @@ import { persistentStoreInstance } from '../../state/PersistentStore'
 import { IContact, IMyIdentity } from '../../types/Contact'
 
 import './WalletAdd.scss'
-import type { ValueType } from 'react-select/lib/types'
+import type { ValueType } from 'react-select'
 
 type OptionsKeyPairType = {
   label: string
@@ -68,7 +68,7 @@ class WalletAdd extends React.Component<Props, State> {
   }
 
   private setMySigningKeyPairType = (
-    selectedKeyPairType: ValueType<OptionsKeyPairType>
+    selectedKeyPairType: ValueType<OptionsKeyPairType, false>
   ): void => {
     if (!selectedKeyPairType) return
     this.setState({

@@ -15,7 +15,7 @@ import {
 import { IMyIdentity } from '../../types/Contact'
 
 import './IdentitySelector.scss'
-import type { ValueType } from 'react-select/lib/types'
+import type { ValueType } from 'react-select'
 
 const addIdentity = {
   label: `Create an identity`,
@@ -57,7 +57,7 @@ class IdentitySelector extends React.Component<Props, State> {
   }
 
   private selectIdentity = (
-    selectedOption: ValueType<SelectIdentityOption>
+    selectedOption: ValueType<SelectIdentityOption, false>
   ): void => {
     if (!selectedOption) return
     if (Array.isArray(selectedOption) || selectedOption instanceof Array) {
@@ -114,7 +114,9 @@ class IdentitySelector extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   myIdentities: Wallet.getAllIdentities(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })

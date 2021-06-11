@@ -2,8 +2,7 @@ import isEqual from 'lodash/isEqual'
 import React, { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
-import type { Config } from 'react-select/lib/filters'
-import type { ValueType } from 'react-select/lib/types'
+import type { ValueType } from 'react-select'
 import filterArray from '../../utils/filterArray'
 
 import ContactRepository from '../../services/ContactRepository'
@@ -39,7 +38,7 @@ type State = {
 }
 
 class SelectContacts extends React.Component<Props, State> {
-  private filterConfig: Config = {
+  private filterConfig: Parameters<typeof createFilter>[0] = {
     ignoreAccents: true,
     ignoreCase: true,
     matchFrom: 'any',
@@ -99,7 +98,11 @@ class SelectContacts extends React.Component<Props, State> {
   }
 
   // the select is a single- or multiselect; single values or an array of values must be expected
-  private onChange(selectedOptions: ValueType<SelectOption>): void {
+  private onChange(
+    selectedOptions:
+      | ValueType<SelectOption, true>
+      | ValueType<SelectOption, false>
+  ): void {
     const { onChange } = this.props
     const { contacts } = this.state
 
