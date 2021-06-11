@@ -60,9 +60,6 @@ class IdentitySelector extends React.Component<Props, State> {
     selectedOption: ValueType<SelectIdentityOption, false>
   ): void => {
     if (!selectedOption) return
-    if (Array.isArray(selectedOption) || selectedOption instanceof Array) {
-      throw new Error('The selected identity can not be an array.')
-    }
     const { history, selectIdentity } = this.props
     if (selectedOption.value === 'create') {
       history.push('/wallet/add')
