@@ -36,7 +36,9 @@ class Permissions extends React.Component<Props> {
                   Permission[permission],
                   allowed
                 )}
-                className={`${Permission[permission]} ${allowed ? 'allowed' : 'denied'}`}
+                className={`${Permission[permission]} ${
+                  allowed ? 'allowed' : 'denied'
+                }`}
               />
             )
           })}
