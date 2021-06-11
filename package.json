@@ -40,7 +40,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "format": "prettier --write 'src/**/*.tsx' 'src/**/*.ts'",
+    "format": "prettier --write 'src/**/*.{ts,tsx,json}'",
     "lint": "eslint 'src/**/*.tsx' 'src/**/*.ts'",
     "lint:fix": "yarn lint --fix"
   },
@@ -52,9 +52,15 @@
   },
   "husky": {
     "hooks": {
+      "pre-commit": "lint-staged",
       "pre-push": "yarn lint",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx,json}": [
+      "prettier --write"
+    ]
   },
   "browserslist": {
     "production": [
@@ -74,6 +80,7 @@
     "@types/react-select": "^2.0.0",
     "@types/react-test-renderer": "^17.0.1",
     "husky": "^6.0.0",
+    "lint-staged": "^11.0.0",
     "prettier": "^2.3.1",
     "react-test-renderer": "^17.0.2"
   }
