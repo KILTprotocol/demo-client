@@ -41,7 +41,7 @@ services:
       - FAUCET_ACCOUNT=0xcdfd6024d2b0eba27d54cc92a44cd9a627c69b2dbda15ed7e58085425119ae03
       - BOOT_NODE_ADDRESS=ws://mashnet-node:9944
     ports:
-      - 3000:3000
+      - 3001:3000
     depends_on:
       - mongodb
       - mashnet-node
@@ -59,7 +59,7 @@ services:
     volumes:
       - ./src:/app/src
     environment:
-      - REACT_APP_SERVICE_HOST=//127.0.0.1:3000
+      - REACT_APP_SERVICE_HOST=//127.0.0.1:3001
       - REACT_APP_NODE_HOST=ws://127.0.0.1:9944
       - REACT_APP_FAUCET_URL=http://127.0.0.1:3002
       # if you experience issues where the watcher does not trigger rebuilds
@@ -67,7 +67,7 @@ services:
       #- CHOKIDAR_USEPOLLING=true
 
     ports:
-      - 3001:3001
+      - 3000:3000
     command: yarn start
     depends_on:
       - services
