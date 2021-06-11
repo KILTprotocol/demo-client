@@ -72,6 +72,11 @@
       "@commitlint/config-conventional"
     ]
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@polkadot|@babel/runtime/helpers/esm/)"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
