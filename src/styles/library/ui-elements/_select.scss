@@ -1,4 +1,6 @@
 @use "sass:color";
+@use "styles/library/variables" as *;
+
 @mixin react-select {
 
   & input[type=text] {

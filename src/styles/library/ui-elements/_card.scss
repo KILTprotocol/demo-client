@@ -1,5 +1,6 @@
 @use "sass:color";
 @use "sass:math";
+@use "styles/library/variables" as *;
 
 $labeledCardActions-padding-outer: math.div($base-padding, 2);
 $labeledCardActions-padding-inner: math.div($base-padding, 2);

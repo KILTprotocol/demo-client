@@ -1,4 +1,5 @@
 @use "sass:math";
+@use "styles/library/variables" as *;
 
 @mixin input {
   @include border-radius($base-border-radius);

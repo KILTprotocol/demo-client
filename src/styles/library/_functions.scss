@@ -1,4 +1,5 @@
 @use "sass:math";
+@use "styles/library/variables" as *;
 
 @function pxToEm($px, $basePx: $font-size-base) {
     @return math.div($pixels, $context) * 1em;

@@ -3,9 +3,8 @@
 @use 'styles/library' as *;
 @use "styles/select2-overrides" as *;
 
-@import '~select2-component/dist/select2.min.css';
+@use "select2-component/dist/select2.min.css";
 @import 'https://fonts.googleapis.com/css?family=Montserrat:400,600&subset=latin';
-
 @font-face {
   font-family: '#{$icomoon-font-family}';
   src: url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?qxwohx');
