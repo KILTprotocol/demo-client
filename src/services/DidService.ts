@@ -88,18 +88,13 @@ class DidService {
     } as IContact)
 
     const tx = await did.store()
-    const status = await BlockchainUtils.signAndSubmitTx(
-      tx,
-      myIdentity.identity,
-      {
-        resolveOn: IS_IN_BLOCK,
-      }
-    )
-    if (status.isError) {
+    await BlockchainUtils.signAndSubmitTx(tx, myIdentity.identity, {
+      resolveOn: IS_IN_BLOCK,
+    }).catch(() => {
       throw new Error(
         `Error creating DID for identity ${myIdentity.metaData.name}`
       )
-    }
+    })
 
     persistentStoreInstance.store.dispatch(
       Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
