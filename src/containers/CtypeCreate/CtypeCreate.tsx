@@ -107,11 +107,11 @@ class CTypeCreate extends React.Component<Props, State> {
           resolveOn: BlockchainUtils.IS_IN_BLOCK,
         }
       )
-      tx.then(() => {
-        blockUi.updateMessage(
-          `CTYPE stored on blockchain,\nnow registering CTYPE`
-        ) // TODO: add onrejected when sdk provides error handling
-      })
+        .then(() => {
+          blockUi.updateMessage(
+            `CTYPE stored on blockchain,\nnow registering CTYPE`
+          ) // TODO: add onrejected when sdk provides error handling
+        })
         .catch((error) => {
           errorService.log({
             error,
