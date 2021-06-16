@@ -250,7 +250,7 @@ class ContactPresentation extends React.Component<Props, State> {
     } else if (myIdentity) {
       name = myIdentity.metaData.name
     } else if (address) {
-      name = address.substr(0, 20)
+      name = address
     }
 
     let actions: Action[] = []
