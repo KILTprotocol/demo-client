@@ -1,6 +1,6 @@
 {
   "name": "kilt-demo-client",
-  "version": "0.22.0",
+  "version": "0.22.0-rc.2",
   "license": "BSD-4-Clause",
   "private": true,
   "dependencies": {
