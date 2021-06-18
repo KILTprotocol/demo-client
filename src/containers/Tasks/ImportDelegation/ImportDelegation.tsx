@@ -1,6 +1,7 @@
 import { IDelegationBaseNode } from '@kiltprotocol/types'
 import React from 'react'
 import DelegationDetailView from '../../../components/DelegationDetailView/DelegationDetailView'
+import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 import DelegationsService from '../../../services/DelegationsService'
 import { notifyFailure, notifySuccess } from '../../../services/FeedbackService'
 import * as Delegations from '../../../state/ducks/Delegations'
@@ -83,7 +84,11 @@ class ImportDelegation extends React.Component<Props, State> {
           </div>
         </section>
 
-        <DelegationDetailView delegationId={delegationId} isPCR={isPCR} />
+        <DelegationDetailView
+          delegationId={delegationId}
+          isPCR={isPCR}
+          viewType={ViewType.Present}
+        />
 
         <div className="actions">
           <button type="button" onClick={this.onCancel}>

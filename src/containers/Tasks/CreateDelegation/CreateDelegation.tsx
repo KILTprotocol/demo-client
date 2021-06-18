@@ -28,6 +28,7 @@ import { IContact } from '../../../types/Contact'
 import { BlockUi } from '../../../types/UserFeedback'
 
 import './CreateDelegation.scss'
+import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 
 type StateProps = {
   myDelegations: IMyDelegation[]
@@ -177,6 +178,7 @@ class CreateDelegation extends React.Component<Props, State> {
           <DelegationDetailView
             delegationId={delegationData.parentId}
             isPCR={isPCR}
+            viewType={ViewType.OnCreation}
           />
 
           <div className="actions">

@@ -20,6 +20,7 @@ import { IContact, IMyIdentity } from '../../../types/Contact'
 import DelegationsService from '../../../services/DelegationsService'
 
 import './AcceptDelegation.scss'
+import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 
 type StateProps = {
   selectedIdentity?: IMyIdentity
@@ -162,6 +163,7 @@ class AcceptDelegation extends React.Component<Props, State> {
                 : undefined
             }
             isPCR={isPCR}
+            viewType={ViewType.OnCreation}
           />
 
           <div className="actions">

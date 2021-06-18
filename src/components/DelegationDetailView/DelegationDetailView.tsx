@@ -26,11 +26,11 @@ type StateProps = {
 
 type OwnProps = {
   delegationId: IDelegationBaseNode['id']
+  viewType: ViewType
 
   editable?: boolean
   focusedNodeAlias?: IMyDelegation['metaData']['alias']
   isPCR?: boolean
-  viewType?: ViewType
 }
 
 type Props = StateProps & OwnProps

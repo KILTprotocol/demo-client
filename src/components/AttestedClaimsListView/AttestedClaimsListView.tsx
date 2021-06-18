@@ -38,9 +38,10 @@ const LABELS: ILabels = {
 
 type Props = {
   attestedClaims: IAttestedClaim[]
-  context?: 'terms'
+  currentDelegationViewType: ViewType
   delegationId: IDelegationNode['id'] | null
-  currentDelegationViewType?: ViewType
+
+  context?: 'terms'
 
   onToggleChildOpen?: (closeCallback?: () => void | undefined) => void
 }
@@ -59,7 +60,10 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     )
   }
 
-  static defaultProps: { delegationId: null }
+  static defaultProps: {
+    delegationId: null
+    currentDelegationViewType: ViewType.Present
+  }
 
   constructor(props: Props) {
     super(props)

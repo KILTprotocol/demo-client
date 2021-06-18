@@ -61,13 +61,13 @@ type Props = {
   node: DelegationsTreeNode
   selectedIdentity: IMyIdentity
   focusedNodeId: DelegationsTreeNode['delegation']['id']
+  viewType: ViewType
 
   editable?: boolean
   focusedNodeAlias?: IMyDelegation['metaData']['alias']
   gotSiblings?: true
   gettingSiblings?: boolean
   isMyChild?: boolean
-  viewType?: ViewType
 
   onGetChildren?: () => void
 }
