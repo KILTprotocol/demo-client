@@ -9,7 +9,6 @@ import {
 import { connect } from 'react-redux'
 import QuoteServices from '../../../services/QuoteServices'
 import AttestedClaimsListView from '../../../components/AttestedClaimsListView/AttestedClaimsListView'
-import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 
 import MyClaimCreateView from '../../../components/MyClaimCreateView/MyClaimCreateView'
 import MyClaimDetailView from '../../../components/MyClaimDetailView/MyClaimDetailView'
