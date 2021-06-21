@@ -248,7 +248,6 @@ class RequestAttestation extends React.Component<Props, State> {
             attestedClaims={terms}
             delegationId={delegationId}
             context="terms"
-            currentDelegationViewType={ViewType.Present}
           />
         )}
 

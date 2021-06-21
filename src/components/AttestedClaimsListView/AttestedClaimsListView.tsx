@@ -60,9 +60,9 @@ class AttestedClaimsListView extends React.Component<Props, State> {
     )
   }
 
-  static defaultProps: {
-    delegationId: null
-    currentDelegationViewType: ViewType.Present
+  static defaultProps = {
+    delegationId: null,
+    currentDelegationViewType: ViewType.Present,
   }
 
   constructor(props: Props) {
@@ -72,6 +72,7 @@ class AttestedClaimsListView extends React.Component<Props, State> {
       props.context && LABELS[props.context] ? props.context : 'default'
 
     this.state = {
+      ...this.state,
       labels: LABELS[context],
     }
 
