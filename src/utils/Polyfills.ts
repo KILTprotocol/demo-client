@@ -1,5 +1,4 @@
 declare global {
-  // eslint-disable-next-line @typescript-eslint/interface-name-prefix
   interface PromiseConstructor {
     any<T>(
       arrayOfPromises: Array<T | PromiseLike<T>>
@@ -59,7 +58,7 @@ Promise.chain = (
           .then((success: any) => {
             result.successes.push(success)
           })
-          .catch(error => {
+          .catch((error) => {
             result.errors.push(error)
           })
       }

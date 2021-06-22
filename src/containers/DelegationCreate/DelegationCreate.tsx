@@ -69,11 +69,12 @@ class DelegationCreate extends React.Component<Props, State> {
     if (selectedIdentity) {
       this.setState({
         alias,
-        delegation: new DelegationRootNode(
-          UUID.generate(),
-          cTypeHash,
-          selectedIdentity.identity.address
-        ),
+        delegation: new DelegationRootNode({
+          id: UUID.generate(),
+          cTypeHash: cTypeHash,
+          account: selectedIdentity.identity.address,
+          revoked: false,
+        }),
       })
     }
   }
@@ -100,7 +101,7 @@ class DelegationCreate extends React.Component<Props, State> {
           notifySuccess('Delegation successfully created')
           history.push('/delegations')
         })
-        .catch(error => {
+        .catch((error) => {
           blockUi.remove()
           notifyError(error)
         })
@@ -161,11 +162,9 @@ class DelegationCreate extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

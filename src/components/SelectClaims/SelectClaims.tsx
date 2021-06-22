@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
-import { Config } from 'react-select/lib/filters'
+import type { ValueType } from 'react-select'
 
 import * as Claims from '../../state/ducks/Claims'
 import * as UiState from '../../state/ducks/UiState'
@@ -34,7 +34,7 @@ type State = {
 }
 
 class SelectClaims extends React.Component<Props, State> {
-  private filterConfig: Config = {
+  private filterConfig: Parameters<typeof createFilter>[0] = {
     ignoreAccents: true,
     ignoreCase: true,
     matchFrom: 'any',
@@ -79,19 +79,17 @@ class SelectClaims extends React.Component<Props, State> {
   }
 
   private static getOption(claim: Claims.Entry): SelectOption {
-    {
-      const isApproved =
-        claim.attestedClaims &&
-        claim.attestedClaims.find(({ attestation }) => !attestation.revoked)
-      return {
-        baseValue: claim.meta.alias,
-        label: (
-          <span className={isApproved ? 'attested' : 'revoked'}>
-            {claim.meta.alias}
-          </span>
-        ),
-        value: claim.id,
-      }
+    const isApproved =
+      claim.attestedClaims &&
+      claim.attestedClaims.find(({ attestation }) => !attestation.revoked)
+    return {
+      baseValue: claim.meta.alias,
+      label: (
+        <span className={isApproved ? 'attested' : 'revoked'}>
+          {claim.meta.alias}
+        </span>
+      ),
+      value: claim.id,
     }
   }
 
@@ -99,13 +97,15 @@ class SelectClaims extends React.Component<Props, State> {
     this.goToClaimCreate(selectedCtypes[0].cType.hash)
   }
 
-  private onChange(selectedOptions: SelectOption | SelectOption[]): void {
+  // the select is a single- or multiselect; single values or an array of values must be expected
+  private onChange(
+    selectedOptions:
+      | ValueType<SelectOption, true>
+      | ValueType<SelectOption, false>
+  ): void {
     const { claims } = this.state
-    const selectedOptionValues: Array<SelectOption['value']> = (Array.isArray(
-      selectedOptions
-    )
-      ? selectedOptions
-      : [selectedOptions]
+    const selectedOptionValues: Array<SelectOption['value']> = (
+      Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.value)
 
     const selectedClaims: Claims.Entry[] = claims.filter(
@@ -158,9 +158,9 @@ class SelectClaims extends React.Component<Props, State> {
     } = this.props
     const { showSelectCTypesModal } = this.state
 
-    const defaultOptions = (
-      preSelectedClaimEntries || []
-    ).map((claim: Claims.Entry) => SelectClaims.getOption(claim))
+    const defaultOptions = (preSelectedClaimEntries || []).map(
+      (claim: Claims.Entry) => SelectClaims.getOption(claim)
+    )
 
     let selectedClaims
     if (claims && claims.length) {

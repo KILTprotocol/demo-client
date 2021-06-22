@@ -1,3 +1,7 @@
+@use "sass:math";
+
+@use 'styles/library' as *;
+
 .ContactList {
 
   & h1 {
@@ -25,7 +29,7 @@
 
     & button {
       margin:{
-        left: $base-padding / 2;
+        left: math.div($base-padding, 2);
       }
     }
   }

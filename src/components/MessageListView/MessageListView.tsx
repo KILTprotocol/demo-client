@@ -1,4 +1,3 @@
-import { IMessage } from '@kiltprotocol/types'
 import React from 'react'
 
 import MessageRepository, {
@@ -16,8 +15,8 @@ type CreateReceiveErrors = { createdAt: string[]; receivedAt: string[] }
 
 type Props = {
   messages: IMessageOutput[]
-  onDelete: (message: IMessage) => void
-  onOpen: (message: IMessage) => void
+  onDelete: (message: IMessageOutput) => void
+  onOpen: (message: IMessageOutput) => void
 }
 
 type State = {}
@@ -63,9 +62,8 @@ class MessageListView extends React.Component<Props, State> {
   }
 
   private static getCTypePresentations(message: IMessageOutput): JSX.Element[] {
-    const cTypeHashes: Array<ICType['cType']['hash']> = MessageRepository.getCTypeHashes(
-      message
-    )
+    const cTypeHashes: Array<ICType['cType']['hash']> =
+      MessageRepository.getCTypeHashes(message)
     return cTypeHashes.map((cTypeHash: ICType['cType']['hash']) => (
       <CTypePresentation
         key={cTypeHash}
@@ -76,12 +74,12 @@ class MessageListView extends React.Component<Props, State> {
     ))
   }
 
-  private handleDelete(message: IMessage): void {
+  private handleDelete(message: IMessageOutput): void {
     const { onDelete } = this.props
     onDelete(message)
   }
 
-  private openMessage(message: IMessage): void {
+  private openMessage(message: IMessageOutput): void {
     const { onOpen } = this.props
     onOpen(message)
   }
@@ -128,9 +126,8 @@ class MessageListView extends React.Component<Props, State> {
             </thead>
             <tbody>
               {messages.map((message: IMessageOutput) => {
-                const createReceiveErrors = MessageListView.getCreateReceiveErrors(
-                  message
-                )
+                const createReceiveErrors =
+                  MessageListView.getCreateReceiveErrors(message)
                 const created = MessageListView.getDateTime(
                   message.createdAt,
                   createReceiveErrors.createdAt

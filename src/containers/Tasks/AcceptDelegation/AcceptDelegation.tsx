@@ -20,6 +20,7 @@ import { IContact, IMyIdentity } from '../../../types/Contact'
 import DelegationsService from '../../../services/DelegationsService'
 
 import './AcceptDelegation.scss'
+import { ViewType } from '../../../components/DelegationNode/DelegationNode'
 
 type StateProps = {
   selectedIdentity?: IMyIdentity
@@ -63,12 +64,8 @@ class AcceptDelegation extends React.Component<Props, State> {
   }
 
   private async signAndReply(): Promise<void> {
-    const {
-      delegationData,
-      inviterAddress,
-      onFinished,
-      signatures,
-    } = this.props
+    const { delegationData, inviterAddress, onFinished, signatures } =
+      this.props
 
     const signature = await this.signNewDelegationNode(delegationData)
 
@@ -102,21 +99,21 @@ class AcceptDelegation extends React.Component<Props, State> {
       throw new Error('No selected Identity')
     }
 
-    const rootNode: IDelegationRootNode | null = await DelegationsService.findRootNode(
-      parentId
-    )
+    const rootNode: IDelegationRootNode | null =
+      await DelegationsService.findRootNode(parentId)
     if (!rootNode) {
       notifyFailure('Cannot sign: unable to find root node')
       throw new Error(`Root node not found for node ${parentId}`)
     }
 
-    const newDelegationNode = new DelegationNode(
+    const newDelegationNode = new DelegationNode({
       id,
-      rootNode.id,
+      rootId: rootNode.id,
       account,
       permissions,
-      parentId
-    )
+      parentId,
+      revoked: false,
+    })
 
     return selectedIdentity.identity.signStr(newDelegationNode.generateHash())
   }
@@ -166,6 +163,7 @@ class AcceptDelegation extends React.Component<Props, State> {
                 : undefined
             }
             isPCR={isPCR}
+            viewType={ViewType.OnCreation}
           />
 
           <div className="actions">
@@ -193,11 +191,9 @@ class AcceptDelegation extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

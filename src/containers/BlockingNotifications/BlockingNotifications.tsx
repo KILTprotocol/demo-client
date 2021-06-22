@@ -66,7 +66,9 @@ class BlockingNotifications extends Component<Props> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   notifications: UiState.getBlockingNotifications(state),
 })
 

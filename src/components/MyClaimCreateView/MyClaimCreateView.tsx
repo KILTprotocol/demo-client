@@ -65,11 +65,11 @@ class MyClaimCreateView extends Component<Props, State> {
     })
 
     CTypeRepository.findByHash(cTypeHash)
-      .then((dbCtype: ICTypeWithMetadata) => {
+      .then((dbCtype: ICTypeWithMetadata | undefined) => {
         this.setState({ cType: dbCtype })
         blockUi.remove()
       })
-      .catch(error => {
+      .catch((error) => {
         errorService.log({
           error,
           message: `could not retrieve CTYPE with key ${cTypeHash}`,
@@ -80,11 +80,13 @@ class MyClaimCreateView extends Component<Props, State> {
       })
   }
 
-  private updateClaim(contents: Claim['contents']): void {
+  private updateClaim(value: common.ValueType, _isValid: boolean): void {
     const { partialClaim } = this.state
-    this.setState({
-      partialClaim: { ...partialClaim, contents: { ...contents } },
-    })
+    if (_isValid && typeof value === 'object' && !Array.isArray(value)) {
+      this.setState({
+        partialClaim: { ...partialClaim, contents: { ...value } },
+      })
+    }
   }
 
   private handleCancel(): void {
@@ -176,11 +178,9 @@ class MyClaimCreateView extends Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

@@ -1,6 +1,6 @@
 on:
   release:
-    types: [created]
+    types: [released]
 
 name: Release
 
@@ -40,20 +40,6 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-    - name: Configure Kubernetes
-      env:
-        KUBECONFIG: '${{ github.workspace }}/.kube/kubeconfig'
-      run: |
-        mkdir -p '${{ github.workspace }}/.kube' \
-          && echo '${{ secrets.KUBE_CONFIG}}' | base64 -d > $KUBECONFIG
-
-    - name: Set new image
-      env:
-        IMAGE: ${{ steps.build-image.outputs.image }}
-        KUBECONFIG: '${{ github.workspace }}/.kube/kubeconfig'
-      run: |
-        kubectl -n testnet set image deployment/client-deployment client-container=$IMAGE
 
   buildDocker:
     name: Build image and push to Docker Hub

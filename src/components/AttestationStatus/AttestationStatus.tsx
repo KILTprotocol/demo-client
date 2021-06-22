@@ -14,7 +14,7 @@ import Spinner from '../Spinner/Spinner'
 
 import './AttestationStatus.scss'
 
-const enum STATUS {
+enum STATUS {
   PENDING = 'pending',
   UNVERIFIED = 'unverified',
   ATTESTED = 'attested',
@@ -127,11 +127,9 @@ class AttestationStatus extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   attestationStatusCycle: UiState.getAttestationStatusCycle(state),
 })
 

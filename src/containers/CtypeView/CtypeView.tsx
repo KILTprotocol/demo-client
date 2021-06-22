@@ -13,8 +13,8 @@ import './CtypeView.scss'
 type Props = RouteComponentProps<{ cTypeHash: string }>
 
 class CtypeView extends React.Component<Props> {
-  private selectAttestersModal: SelectContactsModal | null
-  private cTypeToLegitimate: ICTypeWithMetadata
+  private selectAttestersModal: React.RefObject<SelectContactsModal>
+  private cTypeToLegitimate: ICTypeWithMetadata | undefined
 
   constructor(props: Props) {
     super(props)
@@ -22,24 +22,25 @@ class CtypeView extends React.Component<Props> {
 
     this.cancelSelectAttesters = this.cancelSelectAttesters.bind(this)
     this.finishSelectAttesters = this.finishSelectAttesters.bind(this)
+    this.selectAttestersModal = React.createRef()
   }
 
   private requestTerm(cType: ICTypeWithMetadata): void {
-    if (cType && this.selectAttestersModal) {
+    if (cType && this.selectAttestersModal.current) {
       this.cTypeToLegitimate = cType
-      this.selectAttestersModal.show()
+      this.selectAttestersModal.current.show()
     }
   }
 
   private cancelSelectAttesters(): void {
     delete this.cTypeToLegitimate
-    if (this.selectAttestersModal) {
-      this.selectAttestersModal.hide()
+    if (this.selectAttestersModal.current) {
+      this.selectAttestersModal.current.hide()
     }
   }
 
   private finishSelectAttesters(selectedAttesters: IContact[]): void {
-    if (this.cTypeToLegitimate.cType.hash) {
+    if (this.cTypeToLegitimate?.cType.hash) {
       attestationWorkflow.requestTerms(
         [{ cTypeHash: this.cTypeToLegitimate.cType.hash }],
         selectedAttesters.map(
@@ -59,9 +60,7 @@ class CtypeView extends React.Component<Props> {
         {cTypeHash && <CTypeDetailView cTypeHash={cTypeHash} />}
         {!cTypeHash && <CTypeListView onRequestTerm={this.requestTerm} />}
         <SelectContactsModal
-          ref={el => {
-            this.selectAttestersModal = el
-          }}
+          ref={this.selectAttestersModal}
           placeholder="Select attester#{multi}…"
           onCancel={this.cancelSelectAttesters}
           onConfirm={this.finishSelectAttesters}

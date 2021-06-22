@@ -17,11 +17,11 @@ type State = {
 }
 
 class ChainStats extends React.Component<Props, State> {
-  private blockchain: IBlockchainApi
+  private blockchain?: IBlockchainApi
 
   private mounted = false
 
-  private nodeWebsocketAddress: string
+  private nodeWebsocketAddress?: string
 
   constructor(props: Props) {
     super(props)

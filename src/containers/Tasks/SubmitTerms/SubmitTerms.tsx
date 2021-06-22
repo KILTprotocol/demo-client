@@ -1,6 +1,5 @@
 import { Quote } from '@kiltprotocol/sdk-js'
 import {
-  IClaim,
   PartialClaim,
   IPublicIdentity,
   IQuote,
@@ -75,7 +74,7 @@ class SubmitTerms extends React.Component<Props, State> {
     const { claim } = this.state
 
     CTypeRepository.findByHash(claim.cTypeHash).then(
-      (cType: ICTypeWithMetadata) => {
+      (cType: ICTypeWithMetadata | undefined) => {
         this.setState({
           cType,
         })
@@ -125,7 +124,11 @@ class SubmitTerms extends React.Component<Props, State> {
     })
   }
 
-  private updateClaim(contents: IClaim['contents']): void {
+  private updateClaim(contents: common.ValueType): void {
+    if (!contents || typeof contents !== 'object' || Array.isArray(contents)) {
+      console.warn('user input is not a JSON object')
+      return
+    }
     const { claim } = this.state
     this.setState({
       claim: {
@@ -154,12 +157,8 @@ class SubmitTerms extends React.Component<Props, State> {
       onFinished,
       saveAttestersQuote,
     } = this.props
-    const {
-      claim,
-      selectedDelegation,
-      withPreFilledClaim,
-      quoteData,
-    } = this.state
+    const { claim, selectedDelegation, withPreFilledClaim, quoteData } =
+      this.state
 
     if (enablePreFilledClaim && !withPreFilledClaim) {
       delete claim.contents

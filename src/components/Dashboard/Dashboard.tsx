@@ -38,7 +38,7 @@ const Dashboard: React.FC<Props> = ({ selectedIdentity }) => {
         )
         blockUi.remove()
       })
-      .catch(err => {
+      .catch((err) => {
         notifyError(err)
         blockUi.remove()
       })
@@ -66,7 +66,9 @@ const Dashboard: React.FC<Props> = ({ selectedIdentity }) => {
   )
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

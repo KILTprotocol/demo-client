@@ -145,7 +145,7 @@ class AttestationWorkflow {
       { legitimations, delegationId }
     )
 
-    attesterAddresses.forEach(attesterAddress =>
+    attesterAddresses.forEach((attesterAddress) =>
       RequestForAttestationService.saveInStore(
         requestForAttestation,
         attesterAddress

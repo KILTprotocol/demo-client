@@ -43,7 +43,9 @@ class BlockUi extends Component<Props> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   blockUis: UiState.getBlockUis(state),
 })
 

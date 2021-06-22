@@ -1,3 +1,7 @@
+@use "sass:math";
+
+@use 'styles/library' as *;
+
 .Notifications {
   $z-index: $z-index-header + -1;
 
@@ -9,7 +13,7 @@
   right: 0;
   max-width: $notification-width + 2 * $base-padding !important;
   max-height: calc(100% - #{$header-height});
-  padding: 0 0 $base-padding/2 0 !important;
+  padding: 0 0 math.div($base-padding, 2) 0 !important;
   overflow: auto;
 
   & header {
@@ -18,13 +22,13 @@
     display: flex;
     align-items: center;
     margin: {
-      bottom: $base-padding/2;
+      bottom: math.div($base-padding, 2);
     }
     font-size: 12px;
 
     &:before {
       margin: {
-        right: $base-padding/2;
+        right: math.div($base-padding, 2);
       }
     }
   }
@@ -35,8 +39,8 @@
 
     position: relative;
     display: block;
-    margin: $base-padding/2 $base-padding/2 0 0;
-    padding: $base-padding/2;
+    margin: math.div($base-padding, 2) math.div($base-padding, 2) 0 0;
+    padding: math.div($base-padding, 2);
     background: white;
     font-size: 14px;
 

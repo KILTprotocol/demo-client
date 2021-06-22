@@ -1,3 +1,6 @@
+@use "sass:math";
+@use "styles/library/variables" as *;
+
 @mixin presentation {
 
   &,
@@ -34,8 +37,8 @@
     @include baseFont;
 
     padding:{
-      right: $base-padding/4;
-      left: $base-padding/4;
+      right: math.div($base-padding, 4);
+      left: math.div($base-padding, 4);
     }
     font-size: 16px;
 
@@ -49,7 +52,7 @@
 
   &.inline {
     display: inline-flex;
-    margin-left: $base-padding/2;
+    margin-left: math.div($base-padding, 2);
     vertical-align: middle;
   }
 
@@ -82,7 +85,7 @@
     &.fullSizeActions {
       min-height: $base-button-height;
       padding: {
-        right: $fullSizeActionWidth - $base-button-height + $base-padding/2;
+        right: $fullSizeActionWidth - $base-button-height + math.div($base-padding, 2);
       }
     }
 
@@ -102,7 +105,7 @@
 
   position: absolute;
   top: 0;
-  right: $base-padding/2;
+  right: math.div($base-padding, 2);
   padding: 0 !important;
   border: 5px solid $color-white;
 

@@ -4,8 +4,6 @@ import * as common from 'schema-based-json-editor'
 import CTypeInputModel from '../../utils/CtypeUtils/CtypeInputSchema'
 import SchemaEditor from '../SchemaEditor/SchemaEditor'
 
-import './CtypeEditor.scss'
-
 type Props = {
   // input
   connected: boolean

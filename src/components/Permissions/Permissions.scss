@@ -1,3 +1,6 @@
+@use "sass:math";
+
+@use 'styles/library' as *;
 .Permissions {
   $size: 1.6em;
   $border-size: 0.2em;
@@ -6,8 +9,8 @@
 
   display: inline-block;
   margin: {
-    right: $base-padding/4;
-    left: $base-padding/4;
+    right: math.div($base-padding, 4);
+    left: math.div($base-padding, 4);
   }
   font-size: 10px;
   line-height: 0;
@@ -20,7 +23,7 @@
     width: $size;
     height: $size;
     margin: {
-      left: $base-padding/4;
+      left: math.div($base-padding, 4);
     }
     border: $border-size solid transparent;
     background: $color-white;
@@ -44,16 +47,14 @@
   }
 
   & .ATTEST {
-
     &:before {
-      content: 'A';
+      content: "A";
     }
   }
 
   & .DELEGATE {
-
     &:before {
-      content: 'D';
+      content: "D";
     }
   }
 
@@ -79,7 +80,7 @@
       @include transform-origin(50%, 50%);
       @include transform(translateX(-50%) translateY(-50%) rotate(-45deg));
 
-      content: '';
+      content: "";
       position: absolute;
       width: 130%;
       height: $border-size;

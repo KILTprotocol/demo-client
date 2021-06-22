@@ -26,13 +26,14 @@ type Actions = Array<{
 }>
 
 class MyClaimListView extends React.Component<Props, State> {
-  private selectCTypesModal: SelectCTypesModal | null
+  private selectCTypesModal: React.RefObject<SelectCTypesModal>
 
   constructor(props: Props) {
     super(props)
 
     this.openCTypeModal = this.openCTypeModal.bind(this)
     this.createClaimFromCType = this.createClaimFromCType.bind(this)
+    this.selectCTypesModal = React.createRef()
   }
 
   private getActions(claimEntry: Claims.Entry): Actions {
@@ -68,8 +69,8 @@ class MyClaimListView extends React.Component<Props, State> {
   }
 
   private openCTypeModal(): void {
-    if (this.selectCTypesModal) {
-      this.selectCTypesModal.show()
+    if (this.selectCTypesModal.current) {
+      this.selectCTypesModal.current.show()
     }
   }
 
@@ -94,7 +95,7 @@ class MyClaimListView extends React.Component<Props, State> {
               </tr>
             </thead>
             <tbody>
-              {claimStore.map(claimEntry => (
+              {claimStore.map((claimEntry) => (
                 <tr key={claimEntry.id}>
                   <td className="alias">
                     <Link to={`/claim/${claimEntry.id}`}>
@@ -136,9 +137,7 @@ class MyClaimListView extends React.Component<Props, State> {
         </div>
 
         <SelectCTypesModal
-          ref={el => {
-            this.selectCTypesModal = el
-          }}
+          ref={this.selectCTypesModal}
           onConfirm={this.createClaimFromCType}
         />
       </section>

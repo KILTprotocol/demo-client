@@ -119,10 +119,11 @@ class IdentityView extends React.Component<Props, State> {
 
     let balance = new BN(0)
     if (contact) {
-      balance = Balances.getBalance(
-        persistentStoreInstance.store.getState(),
-        contact.publicIdentity.address
-      )
+      balance =
+        Balances.getBalance(
+          persistentStoreInstance.store.getState(),
+          contact.publicIdentity.address
+        ) || balance
     }
     const classes = ['IdentityView', selected ? 'selected' : '']
     const publicIdentityWithServiceAddress = {
@@ -279,11 +280,9 @@ class IdentityView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   contacts: Contacts.getContacts(state),
 })
 

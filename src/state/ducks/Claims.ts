@@ -111,7 +111,7 @@ class Store {
     serialized.claims = state
       .get('claims')
       .toList()
-      .map(claimEntry => {
+      .map((claimEntry) => {
         return {
           attestedClaims: JSON.stringify(claimEntry.attestedClaims),
           claim: JSON.stringify(claimEntry.claim),
@@ -136,18 +136,16 @@ class Store {
       })
     }
 
-    const claims = {}
+    const claims: Record<string, Entry> = {}
 
-    Object.keys(claimsStateSerialized.claims).forEach(i => {
-      const o = claimsStateSerialized.claims[i]
+    Object.values(claimsStateSerialized.claims).forEach((o) => {
       try {
         const claim = JSON.parse(o.claim) as IClaim
         const attestedClaims: IAttestedClaim[] = o.attestedClaims
           ? (JSON.parse(o.attestedClaims) as IAttestedClaim[])
           : []
-        const requestForAttestations: RequestForAttestationWithAttesterAddress = o.requestForAttestations
-          ? JSON.parse(o.requestForAttestations)
-          : []
+        const requestForAttestations: RequestForAttestationWithAttesterAddress =
+          o.requestForAttestations ? JSON.parse(o.requestForAttestations) : []
         const entry = {
           attestedClaims,
           requestForAttestations,
@@ -190,10 +188,8 @@ class Store {
         return state.deleteIn(['claims', (action as IRemoveAction).payload])
       }
       case Store.ACTIONS.ATTESTED_CLAIM_ADD: {
-        const {
-          claimId,
-          attestedClaim,
-        } = (action as IAddAttestedClaimAction).payload
+        const { claimId, attestedClaim } = (action as IAddAttestedClaimAction)
+          .payload
 
         let attestedClaims =
           state.getIn(['claims', claimId, 'attestedClaims']) || []
@@ -238,11 +234,9 @@ class Store {
         return state.setIn(['claims'], claims)
       }
       case Store.ACTIONS.REQUEST_FOR_ATTESTATION_ADD: {
-        const {
-          requestForAttestation,
-          attesterAddress,
-          claimId,
-        } = (action as IAddRequestForAttestationAction).payload
+        const { requestForAttestation, attesterAddress, claimId } = (
+          action as IAddRequestForAttestationAction
+        ).payload
 
         let requestForAttestations =
           state.getIn(['claims', claimId, 'requestForAttestations']) || []
@@ -264,10 +258,9 @@ class Store {
         )
       }
       case Store.ACTIONS.REQUEST_FOR_ATTESTATION_REMOVE: {
-        const {
-          claimId,
-          rootHash,
-        } = (action as IRemoveRequestForAttestationAction).payload
+        const { claimId, rootHash } = (
+          action as IRemoveRequestForAttestationAction
+        ).payload
         const setIns: Array<Iterable<any>> = []
         let claims = state.get('claims')
 
@@ -395,15 +388,13 @@ class Store {
 }
 
 const getAllClaims = (state: ReduxState): Entry[] => {
-  return state.claims
-    .get('claims')
-    .toList()
-    .toArray()
+  return state.claims.get('claims').toList().toArray()
 }
 
 const getClaims = createSelector(
   [Wallet.getSelectedIdentity, getAllClaims],
-  (selectedIdentity: IMyIdentity, entries: Entry[]) => {
+  (selectedIdentity: IMyIdentity | undefined, entries: Entry[]): Entry[] => {
+    if (!selectedIdentity) return []
     return entries.filter((entry: Entry) => {
       return (
         entry &&

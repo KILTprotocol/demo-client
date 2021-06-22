@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import isEqual from 'lodash/isEqual'
 import Select, { createFilter } from 'react-select'
-import { Config } from 'react-select/lib/filters'
+import type { ValueType } from 'react-select'
 
 import * as Delegations from '../../state/ducks/Delegations'
 import { DelegationType, IMyDelegation } from '../../state/ducks/Delegations'
@@ -34,7 +34,7 @@ type State = {
 }
 
 class SelectDelegations extends React.Component<Props, State> {
-  private filterConfig: Config = {
+  private filterConfig: Parameters<typeof createFilter>[0] = {
     ignoreAccents: true,
     ignoreCase: true,
     matchFrom: 'any',
@@ -66,16 +66,18 @@ class SelectDelegations extends React.Component<Props, State> {
     }
   }
 
-  private onChange(selectedOptions: SelectOption | SelectOption[]): void {
+  // the select is a single- or multiselect; single values or an array of values must be expected
+  private onChange(
+    selectedOptions:
+      | ValueType<SelectOption, true>
+      | ValueType<SelectOption, false>
+  ): void {
     const { onChange } = this.props
     const { delegations } = this.state
 
     // normalize selectedOptions to Array
-    const selectedOptionValues: Array<SelectOption['value']> = (Array.isArray(
-      selectedOptions
-    )
-      ? selectedOptions
-      : [selectedOptions]
+    const selectedOptionValues: Array<SelectOption['value']> = (
+      Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.baseValue)
 
     const selectedDelegations: IMyDelegation[] = delegations.filter(
@@ -152,13 +154,13 @@ class SelectDelegations extends React.Component<Props, State> {
     } = this.props
     const { delegations } = this.state
 
-    const options: SelectOption[] = delegations.map(delegation =>
+    const options: SelectOption[] = delegations.map((delegation) =>
       SelectDelegations.getOption(delegation)
     )
 
     let defaultOptions: SelectOption[] = []
     if (defaultValues) {
-      defaultOptions = defaultValues.map(delegation =>
+      defaultOptions = defaultValues.map((delegation) =>
         SelectDelegations.getOption(delegation)
       )
     }

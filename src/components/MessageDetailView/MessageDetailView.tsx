@@ -30,8 +30,8 @@ import './MessageDetailView.scss'
 
 type Props = {
   message: IMessageOutput
-  onDelete: (message: IMessageOutput) => void
-  onCancel: (id: string) => void
+  onDelete?: (message: IMessageOutput) => void
+  onCancel?: (id: string) => void
 }
 
 type State = {
@@ -42,9 +42,8 @@ type State = {
 
 class MessageDetailView extends React.Component<Props, State> {
   private static canDisplayContentAsCode(message: IMessageOutput): boolean {
-    const messageBodyType:
-      | MessageBodyType
-      | undefined = MessageDetailView.getMessageBodyType(message)
+    const messageBodyType: MessageBodyType | undefined =
+      MessageDetailView.getMessageBodyType(message)
 
     return messageBodyType !== undefined
   }
@@ -95,9 +94,8 @@ class MessageDetailView extends React.Component<Props, State> {
       return undefined
     }
 
-    const messageBodyType:
-      | MessageBodyType
-      | undefined = MessageDetailView.getMessageBodyType(message)
+    const messageBodyType: MessageBodyType | undefined =
+      MessageDetailView.getMessageBodyType(message)
 
     switch (messageBodyType) {
       case MessageBodyType.REQUEST_TERMS: {
@@ -175,7 +173,7 @@ class MessageDetailView extends React.Component<Props, State> {
           <SubmitClaimsForCType
             receiverAddresses={[message.senderAddress]}
             cTypeHashes={(message.body as IRequestClaimsForCTypes).content.map(
-              val => val.cTypeHash
+              (val) => val.cTypeHash
             )}
             onCancel={this.handleCancel}
             onFinished={this.handleDelete}
@@ -217,10 +215,9 @@ class MessageDetailView extends React.Component<Props, State> {
         )
       }
       case MessageBodyType.INFORM_CREATE_DELEGATION: {
-        const {
-          delegationId,
-          isPCR,
-        } = (message.body as IInformCreateDelegation).content
+        const { delegationId, isPCR } = (
+          message.body as IInformCreateDelegation
+        ).content
         return (
           <ImportDelegation
             delegationId={delegationId}

@@ -1,7 +1,9 @@
-.Utilities {
+@use "sass:math";
 
+@use 'styles/library' as *;
+.Utilities {
   & h1 {
-    @include h1('Settings');
+    @include h1("Settings");
   }
 
   & > section {
@@ -12,8 +14,8 @@
     @include button-secondary;
 
     margin: {
-      left: $base-padding / 2;
-      bottom: $base-padding / 2;
+      left: math.div($base-padding, 2);
+      bottom: math.div($base-padding, 2);
     }
 
     &:first-child {
@@ -24,9 +26,7 @@
   }
 
   & .DevTools {
-
     & > div {
-
       & > div {
         margin: {
           top: $base-padding;
@@ -36,20 +36,18 @@
   }
 
   & .versions {
-
     & > div {
       @include label-input-combo;
     }
   }
 
   & .debugMode {
-
     & > div {
       @include checkbox;
     }
   }
 
   & .reset {
-    margin-top: 20px
+    margin-top: 20px;
   }
 }

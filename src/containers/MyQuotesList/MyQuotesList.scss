@@ -1,3 +1,5 @@
+@use 'styles/library' as *;
+
 .MyQuotesList {
   @include labeledCard;
   & h1 {

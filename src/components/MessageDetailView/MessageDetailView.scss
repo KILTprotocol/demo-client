@@ -1,3 +1,6 @@
+@use "sass:math";
+
+@use 'styles/library' as *;
 .MessageDetailView {
   & h4 {
     display: flex;
@@ -28,7 +31,7 @@
         style: solid;
         color: $color-grey-light;
       }
-      padding: $base-padding/4 $base-padding/2;
+      padding: math.div($base-padding, 4) math.div($base-padding, 2);
     }
   }
 

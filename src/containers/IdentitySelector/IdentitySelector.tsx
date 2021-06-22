@@ -15,6 +15,7 @@ import {
 import { IMyIdentity } from '../../types/Contact'
 
 import './IdentitySelector.scss'
+import type { ValueType } from 'react-select'
 
 const addIdentity = {
   label: `Create an identity`,
@@ -55,7 +56,10 @@ class IdentitySelector extends React.Component<Props, State> {
     )
   }
 
-  private selectIdentity = (selectedOption: SelectIdentityOption): void => {
+  private selectIdentity = (
+    selectedOption: ValueType<SelectIdentityOption, false>
+  ): void => {
+    if (!selectedOption) return
     const { history, selectIdentity } = this.props
     if (selectedOption.value === 'create') {
       history.push('/wallet/add')
@@ -96,18 +100,20 @@ class IdentitySelector extends React.Component<Props, State> {
           classNamePrefix="react-select"
           isClearable={false}
           isSearchable={false}
-          isMulti={false}
           name="selectIdentity"
           options={identityOptions}
           value={selectedOption}
           onChange={this.selectIdentity}
+          isMulti={false}
         />
       </section>
     )
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   myIdentities: Wallet.getAllIdentities(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
@@ -117,7 +123,7 @@ const mapDispatchToProps: DispatchProps = {
     Wallet.Store.selectIdentityAction(address),
 }
 
-export default connect<StateProps, DispatchProps>(
+export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withRouter(IdentitySelector))

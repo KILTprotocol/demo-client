@@ -1,3 +1,6 @@
+@use "sass:math";
+@use "styles/library/variables" as *;
+
 @mixin input {
   @include border-radius($base-border-radius);
   @include transition($base-transition);
@@ -7,7 +10,7 @@
   }
 
   height: $base-input-height;
-  padding: 0 $base-padding/2;
+  padding: 0 math.div($base-padding, 2);
   border: $base-border;
   line-height: $base-input-height;
   outline: none;
@@ -29,7 +32,7 @@
     & + span {
       position: relative;
       padding: {
-        left: $checkbox-radio-size + $base-padding/2;
+        left: $checkbox-radio-size + math.div($base-padding, 2);
       }
 
       &:before,
@@ -39,8 +42,8 @@
         content: '';
         position: absolute;
         display: block;
-        top: $checkbox-radio-size/2;
-        left: $checkbox-radio-size/2;
+        top: math.div($checkbox-radio-size, 2);
+        left: math.div($checkbox-radio-size, 2);
       }
 
       &:before {

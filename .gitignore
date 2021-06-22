@@ -1,8 +1,9 @@
-# See https://help.github.com/ignore-files/ for more about ignoring files.
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
 /node_modules
-/.yalc
+/.pnp
+.pnp.js
 
 # testing
 /coverage
@@ -17,13 +18,8 @@
 .env.test.local
 .env.production.local
 
+env-config.js
+
 npm-debug.log*
-package-lock.json
 yarn-debug.log*
 yarn-error.log*
-/src/dist/
-*.iml
-
-# Temporary env files
-/public/env-config.js
-env-config.js

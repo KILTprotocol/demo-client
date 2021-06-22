@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual'
 import React, { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import Select, { createFilter } from 'react-select'
-import { Config } from 'react-select/lib/filters'
+import type { ValueType } from 'react-select'
 import filterArray from '../../utils/filterArray'
 
 import ContactRepository from '../../services/ContactRepository'
@@ -38,7 +38,7 @@ type State = {
 }
 
 class SelectContacts extends React.Component<Props, State> {
-  private filterConfig: Config = {
+  private filterConfig: Parameters<typeof createFilter>[0] = {
     ignoreAccents: true,
     ignoreCase: true,
     matchFrom: 'any',
@@ -97,7 +97,12 @@ class SelectContacts extends React.Component<Props, State> {
     }
   }
 
-  private onChange(selectedOptions: SelectOption | SelectOption[]): void {
+  // the select is a single- or multiselect; single values or an array of values must be expected
+  private onChange(
+    selectedOptions:
+      | ValueType<SelectOption, true>
+      | ValueType<SelectOption, false>
+  ): void {
     const { onChange } = this.props
     const { contacts } = this.state
 
@@ -106,11 +111,8 @@ class SelectContacts extends React.Component<Props, State> {
     })
 
     // normalize selectedOptions to Array
-    const selectedOptionValues: Array<SelectOption['value']> = (Array.isArray(
-      selectedOptions
-    )
-      ? selectedOptions
-      : [selectedOptions]
+    const selectedOptionValues: Array<SelectOption['value']> = (
+      Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]
     ).map((selectedOption: SelectOption) => selectedOption.baseValue)
 
     const selectedContacts: IContact[] = contacts.filter((contact: IContact) =>
@@ -180,7 +182,7 @@ class SelectContacts extends React.Component<Props, State> {
     } = this.props
     const { contacts, preSelectedContacts, value } = this.state
 
-    const options: SelectOption[] = contacts.map(contact =>
+    const options: SelectOption[] = contacts.map((contact) =>
       SelectContacts.getOption(contact)
     )
 

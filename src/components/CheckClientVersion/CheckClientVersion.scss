@@ -1,3 +1,4 @@
+@use 'styles/library' as *;
 .CheckClientVersion {
   position: fixed;
   z-index: $z-index-modal - 1;
@@ -6,7 +7,7 @@
   bottom: 0;
   left: 0;
   max-width: 100% !important;
-  background: $color-white  ;
+  background: $color-white;
 
   & .Spinner,
   & .connecting {
@@ -20,7 +21,6 @@
     @include transform(translateX(-50%) translateY(-50%) scale(0.4));
 
     & .lds-ring {
-
       & div {
         width: 180px;
         height: 180px;

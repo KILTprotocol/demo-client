@@ -1,3 +1,7 @@
+@use "sass:math";
+
+@use 'styles/library' as *;
+
 .BlockUi {
   $z-index: $z-index-modal + 100;
 
@@ -53,7 +57,7 @@
       left: 100%;
       bottom: 0;
       margin: {
-        left: $base-padding/4;
+        left: math.div($base-padding, 4);
       }
       animation: dotdotdot 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
       white-space: nowrap;
