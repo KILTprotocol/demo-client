@@ -31,6 +31,8 @@ jobs:
         run: yarn upgrade @kiltprotocol/sdk-js@dev
 
       - name: Test demo-client
+        env:
+          CI: false
         run: |
           yarn lint
           yarn build
