@@ -1,10 +1,10 @@
 {
   "name": "kilt-demo-client",
-  "version": "0.22.0-rc.4",
+  "version": "0.23.0",
   "license": "BSD-4-Clause",
   "private": true,
   "dependencies": {
-    "@kiltprotocol/sdk-js": "^0.22.0-rc.1",
+    "@kiltprotocol/sdk-js": "^0.22.0",
     "@polkadot/ui-identicon": "^0.33.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
