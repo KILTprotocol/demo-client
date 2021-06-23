@@ -10,6 +10,11 @@
 
     z-index: $z-index + 10;
 
+    & .body {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
     & header {
       display: flex;
       align-items: center;

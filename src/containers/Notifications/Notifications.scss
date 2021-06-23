@@ -44,6 +44,11 @@
     background: white;
     font-size: 14px;
 
+    & .body {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
     &.SUCCESS {
 
       & header {

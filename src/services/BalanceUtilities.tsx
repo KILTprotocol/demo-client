@@ -75,7 +75,7 @@ class BalanceUtilities {
         <span>Transfer of </span>
         <KiltToken amount={transferAmount} />
         <span> to </span>
-        <ContactPresentation address={receiverAddress} inline /> initiated.
+        <ContactPresentation address={receiverAddress} /> initiated.
       </div>
     )
     Balance.makeTransfer(receiverAddress, transferAmount)
@@ -90,23 +90,12 @@ class BalanceUtilities {
             <span>Successfully transferred </span>
             <KiltToken amount={transferAmount} />
             <span> to </span>
-            <ContactPresentation address={receiverAddress} inline />.
+            <ContactPresentation address={receiverAddress} />
           </div>
         )
         if (successCallback) {
           successCallback()
         }
-      })
-      .then(() => {
-        notify(
-          <div>
-            <span>Transfer of </span>
-            <KiltToken amount={transferAmount} />
-            <span> to </span>
-            <ContactPresentation address={receiverAddress} inline />
-            <span> initiated.</span>
-          </div>
-        )
       })
       .catch((error) => {
         errorService.log({
