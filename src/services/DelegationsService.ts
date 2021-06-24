@@ -151,7 +151,8 @@ class DelegationsService {
   public static async resolveParent(
     currentNode: DelegationsTreeNode
   ): Promise<DelegationsTreeNode> {
-    const parentDelegation: IDelegationBaseNode | null = await currentNode.delegation.getParent()
+    const parentDelegation: IDelegationBaseNode | null =
+      await currentNode.delegation.getParent()
 
     if (!parentDelegation) {
       return currentNode

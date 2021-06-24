@@ -75,10 +75,8 @@ class AttestationService {
     const attestation = Attestation.fromAttestation(iAttestation)
     const selectedIdentity = AttestationService.getIdentity()
 
-    const delegationTreeTraversalSteps = await DelegationNodeUtils.countNodeDepth(
-      selectedIdentity,
-      attestation
-    )
+    const delegationTreeTraversalSteps =
+      await DelegationNodeUtils.countNodeDepth(selectedIdentity, attestation)
 
     if (!selectedIdentity) {
       throw new Error('No identity selected')
@@ -113,10 +111,8 @@ class AttestationService {
     if (attestation === null) {
       throw SDKErrors.ERROR_NOT_FOUND('Attestation not on chain')
     }
-    const delegationTreeTraversalSteps = await DelegationNodeUtils.countNodeDepth(
-      selectedIdentity,
-      attestation
-    )
+    const delegationTreeTraversalSteps =
+      await DelegationNodeUtils.countNodeDepth(selectedIdentity, attestation)
 
     try {
       const tx = await attestation.revoke(delegationTreeTraversalSteps)
@@ -143,9 +139,8 @@ class AttestationService {
   public static async verifyAttestatedClaim(
     attestedClaim: IAttestedClaim
   ): Promise<boolean> {
-    const initialisedAttestedClaim = AttestedClaim.fromAttestedClaim(
-      attestedClaim
-    )
+    const initialisedAttestedClaim =
+      AttestedClaim.fromAttestedClaim(attestedClaim)
     return initialisedAttestedClaim.verify()
   }
 

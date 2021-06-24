@@ -29,7 +29,7 @@ type State = {
 }
 
 class MessageView extends React.Component<Props, State> {
-  private messageModal: Modal | null
+  private messageModal: React.RefObject<Modal>
 
   constructor(props: Props) {
     super(props)
@@ -39,6 +39,7 @@ class MessageView extends React.Component<Props, State> {
     this.onDeleteMessage = this.onDeleteMessage.bind(this)
     this.onOpenMessage = this.onOpenMessage.bind(this)
     this.onCloseMessage = this.onCloseMessage.bind(this)
+    this.messageModal = React.createRef()
   }
 
   public componentDidMount(): void {
@@ -80,7 +81,7 @@ class MessageView extends React.Component<Props, State> {
               this.fetchMessages()
               notification.remove()
             })
-            .catch(error => {
+            .catch((error) => {
               errorService.log({
                 error,
                 message: `Could not delete message ${message.messageId}`,
@@ -100,8 +101,8 @@ class MessageView extends React.Component<Props, State> {
         currentMessage: message,
       },
       () => {
-        if (this.messageModal) {
-          this.messageModal.show()
+        if (this.messageModal.current) {
+          this.messageModal.current.show()
         }
       }
     )
@@ -125,7 +126,7 @@ class MessageView extends React.Component<Props, State> {
           })
           blockUi.remove()
         })
-        .catch(error => {
+        .catch((error) => {
           errorService.log({
             error,
             message: `Could not retrieve messages for identity ${selectedIdentity.identity.address}`,
@@ -154,9 +155,7 @@ class MessageView extends React.Component<Props, State> {
         )}
         {!!currentMessage && (
           <Modal
-            ref={el => {
-              this.messageModal = el
-            }}
+            ref={this.messageModal}
             showOnInit
             type={ModalType.BLANK}
             header={
@@ -183,8 +182,10 @@ class MessageView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
-export default connect<StateProps>(mapStateToProps)(MessageView)
+export default connect(mapStateToProps)(MessageView)

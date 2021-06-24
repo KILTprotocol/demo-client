@@ -27,15 +27,16 @@ class BsCType {
     const ownerIdentity = (await BsIdentity.getByKey(bsCTypeData.owner))
       .identity
     const cType = CType.fromSchema(bsCTypeData.schema, ownerIdentity.address)
-    const tx = cType.store()
-    await BlockchainUtils.signAndSubmitTx(await tx, ownerIdentity, {
+    const tx = await cType.store()
+    const extrinsic = BlockchainUtils.signAndSubmitTx(tx, ownerIdentity, {
       resolveOn: BlockchainUtils.IS_IN_BLOCK,
     })
-    return tx
-      .catch(error => {
+
+    return extrinsic
+      .catch((error: ChainHelpers.ExtrinsicError) => {
         if (
-          error ===
-          ChainHelpers.ExtrinsicErrors.CType.ERROR_CTYPE_ALREADY_EXISTS
+          error.errorCode ===
+          ChainHelpers.ExtrinsicErrors.CType.ERROR_CTYPE_ALREADY_EXISTS.code
         ) {
           notifyError(error, false)
         } else throw error
@@ -56,7 +57,7 @@ class BsCType {
           `CTYPE ${bsCTypeData.metadata.title.default} successfully created.`
         )
       })
-      .catch(error => {
+      .catch((error) => {
         errorService.log({
           error,
           message: 'Could not submit CTYPE',

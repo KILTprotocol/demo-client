@@ -40,7 +40,7 @@ export const fromInputModel = (
     properties: {},
   }
 
-  const properties = {}
+  const properties: Record<string, typeof schema['properties']['']> = {}
   ctypeInput.properties.forEach((p: ICTypeInputProperty) => {
     const { title, $id, ...rest } = p
     properties[$id] = rest

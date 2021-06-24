@@ -22,14 +22,16 @@ class BsIdentity {
     updateCallback?: UpdateCallback
   ): Promise<void | IMyIdentity> {
     const identityLabels = Object.keys(BsIdentity.pool)
-    const requests = identityLabels.reduce((promiseChain, bsIdentityKey) => {
-      return promiseChain.then(() => {
+    const requests = identityLabels.reduce<Promise<void | IMyIdentity>>(
+      async (promiseChain, bsIdentityKey) => {
+        await promiseChain
         if (updateCallback) {
           updateCallback(BsIdentity.pool[bsIdentityKey])
         }
-        return BsIdentity.create(BsIdentity.pool[bsIdentityKey])
-      })
-    }, Promise.resolve())
+        return await BsIdentity.create(BsIdentity.pool[bsIdentityKey])
+      },
+      Promise.resolve()
+    )
     return requests
   }
 
@@ -47,11 +49,8 @@ class BsIdentity {
     phrase: string,
     alias: string
   ): Promise<void | IMyIdentity> {
-    const selectedIdentity:
-      | IMyIdentity
-      | undefined = Wallet.getSelectedIdentity(
-      persistentStoreInstance.store.getState()
-    )
+    const selectedIdentity: IMyIdentity | undefined =
+      Wallet.getSelectedIdentity(persistentStoreInstance.store.getState())
 
     return new Promise((resolve, reject) => {
       if (!selectedIdentity) {
@@ -74,6 +73,7 @@ class BsIdentity {
 
           const newIdentity = {
             identity,
+            keypairType: 'ed25519',
             metaData: {
               name: alias,
             },
@@ -91,7 +91,6 @@ class BsIdentity {
           )
           BalanceUtilities.connect(newIdentity)
           notifySuccess(`Identity ${alias} successfully created.`)
-
           resolve(newIdentity)
         }
       )
@@ -105,7 +104,7 @@ class BsIdentity {
       persistentStoreInstance.store.getState()
     )
     const identity = identities.find(
-      value => value.metaData.name === BsIdentity.pool[bsIdentitiesPoolKey]
+      (value) => value.metaData.name === BsIdentity.pool[bsIdentitiesPoolKey]
     )
     if (identity) {
       return Promise.resolve(identity)

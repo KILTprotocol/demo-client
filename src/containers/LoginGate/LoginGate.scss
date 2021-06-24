@@ -1,3 +1,5 @@
+@use 'styles/library' as *;
+
 .LoginGate {
   & .header {
     flex-direction: row;

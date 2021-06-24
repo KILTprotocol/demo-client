@@ -155,7 +155,9 @@ class ContactList extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   myContacts: Contacts.getMyContacts(state),
 })
 

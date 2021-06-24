@@ -1,3 +1,6 @@
+@use "sass:math";
+
+@use 'styles/library' as *;
 .Header {
   position: fixed;
   z-index: $z-index-header;
@@ -20,7 +23,7 @@
     @include button-icon-only($icon-navicon, 20px);
 
     margin: {
-      right: $base-padding/2;
+      right: math.div($base-padding, 2);
     }
     color: $color-white;
 
@@ -38,7 +41,7 @@
     align-items: center;
 
     & > * {
-      margin-left: $base-padding/2;
+      margin-left: math.div($base-padding, 2);
     }
   }
 
@@ -53,14 +56,12 @@
   }
 
   &.open-navigation {
-
     & .Navigation {
       display: block;
     }
   }
 
-  @include breakpoint('phone-tablet-only'){
-
+  @include breakpoint("phone-tablet-only") {
     & .Navigation {
       $icon-size: 24px;
 
@@ -81,7 +82,7 @@
       }
 
       &:before {
-        content: '';
+        content: "";
         position: absolute;
         top: $header-height;
         left: 0;
@@ -102,7 +103,6 @@
         }
 
         &.current {
-
           & a {
             background: transparent;
             color: $color-primary;
@@ -130,11 +130,11 @@
           }
 
           &:before {
-            content: '';
+            content: "";
             display: block;
             width: $icon-size;
             height: $icon-size;
-            margin-right: $base-padding/2;
+            margin-right: math.div($base-padding, 2);
             background: {
               position: center;
               repeat: no-repeat;
@@ -143,19 +143,24 @@
           }
         }
 
-        $icons: (dashboard: 'Identity', attestations: 'Claim-attested', wallet: 'Wallet', ctype: 'Ctype', claim: 'Claim', utilities: 'Settings', contacts: 'Contact', messages: 'Message');
+        $icons: (
+          dashboard: "Identity",
+          attestations: "Claim-attested",
+          wallet: "Wallet",
+          ctype: "Ctype",
+          claim: "Claim",
+          utilities: "Settings",
+          contacts: "Contact",
+          messages: "Message",
+        );
 
         @each $class, $icon in $icons {
-
-          @if ($icon != '') {
-
+          @if ($icon != "") {
             &.#{$class} {
-
               & a {
-
                 &:before {
                   background: {
-                    image: url('~src/assets/#{$icon}.svg')
+                    image: url("../../assets/#{$icon}.svg");
                   }
                 }
               }
@@ -166,8 +171,7 @@
     }
   }
 
-  @include breakpoint('desktop') {
-
+  @include breakpoint("desktop") {
     & .menu {
       display: none;
       pointer-events: none;
@@ -186,14 +190,13 @@
         display: inline-block;
 
         &.current {
-
           & a {
             color: $color-primary !important;
           }
         }
 
         & a {
-          padding: $base-padding/4 0;
+          padding: math.div($base-padding, 4) 0;
           margin: {
             right: $base-padding;
           }
@@ -218,7 +221,7 @@
 
 .debugModeLabel {
   $fontSize: 12px;
-  $margin: $base-padding/4;
+  $margin: math.div($base-padding, 4);
 
   @include transform-origin(left, top);
   @include transform(rotate(-90deg));

@@ -107,12 +107,12 @@ class CTypeCreate extends React.Component<Props, State> {
           resolveOn: BlockchainUtils.IS_IN_BLOCK,
         }
       )
-      tx.then(() => {
-        blockUi.updateMessage(
-          `CTYPE stored on blockchain,\nnow registering CTYPE`
-        ) // TODO: add onrejected when sdk provides error handling
-      })
-        .catch(error => {
+        .then(() => {
+          blockUi.updateMessage(
+            `CTYPE stored on blockchain,\nnow registering CTYPE`
+          ) // TODO: add onrejected when sdk provides error handling
+        })
+        .catch((error) => {
           errorService.log({
             error,
             message: 'Could not submit CTYPE to the Blockchain',
@@ -130,7 +130,7 @@ class CTypeCreate extends React.Component<Props, State> {
               ) // something better?
               history.push('/cType')
             })
-            .catch(error => {
+            .catch((error) => {
               errorService.log({
                 error,
                 message: 'Could not submit CTYPE to the Registry',
@@ -161,7 +161,9 @@ class CTypeCreate extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 

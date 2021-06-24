@@ -1,3 +1,5 @@
+@use "sass:list";
+@use "sass:string";
 @mixin responsiveColumn($columnWidths) {
 
     & th,
@@ -5,15 +7,15 @@
 
         &:not([colspan]) {
 
-            @for $columnWidthIndex from 1 through length($columnWidths) {
+            @for $columnWidthIndex from 1 through list.length($columnWidths) {
 
-                $columnWidth: nth($columnWidths, $columnWidthIndex);
+                $columnWidth: list.nth($columnWidths, $columnWidthIndex);
 
                 &:nth-child(#{$columnWidthIndex}) {
                     @if $columnWidth == false {
                         display: none;
                     } @else if (type-of($columnWidth) == string) {
-                        width: 100% * str-length($columnWidth);
+                        width: 100% * string.length($columnWidth);
                         display: table-cell;
                     } @else {
                         width: $columnWidth;

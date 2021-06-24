@@ -136,16 +136,18 @@ class Store {
       }
       // Blocking Notifications
       case Store.ACTIONS.BLOCKING_NOTIFICATION_ADD: {
-        const blockingNotification: IBlockingNotification = (action as IAddBlockingNotificationAction)
-          .payload
+        const blockingNotification: IBlockingNotification = (
+          action as IAddBlockingNotificationAction
+        ).payload
         return state.setIn(
           ['blockingNotifications', blockingNotification.id],
           blockingNotification
         )
       }
       case Store.ACTIONS.BLOCKING_NOTIFICATION_REMOVE: {
-        const blockingNotificationId = (action as IRemoveBlockingNotificationAction)
-          .payload
+        const blockingNotificationId = (
+          action as IRemoveBlockingNotificationAction
+        ).payload
         return state.deleteIn(['blockingNotifications', blockingNotificationId])
       }
       // Block Ui
@@ -332,12 +334,14 @@ const getBlockingNotifications = createSelector(
   (blockingNotifications: IBlockingNotification[]) => blockingNotifications
 )
 
-const getStateCurrentTask = (state: ReduxState): TaskProps =>
+const getStateCurrentTask = (state: ReduxState): TaskProps | undefined =>
+  // TODO: conflicting with its declaration, this does NOT return an Immutable.List
+  // @ts-ignore
   state.uiState.get('currentTask')[0]
 
 const getCurrentTask = createSelector(
   [getStateCurrentTask],
-  (currentTask: TaskProps) => currentTask
+  (currentTask: TaskProps | undefined) => currentTask
 )
 
 const getStateDebugMode = (state: ReduxState): boolean =>

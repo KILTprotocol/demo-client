@@ -1,3 +1,6 @@
+@use "sass:math";
+@use "styles/library/variables/colors";
+
 @mixin ellipsis {
     white-space: nowrap;
     overflow: hidden;
@@ -58,7 +61,7 @@
             right: 0;
             left: 0;
             height: $height - 0.1em;
-            background-color: $color-background;
+            background-color: colors.$color-background;
         }
 
         & div {
@@ -67,7 +70,7 @@
             color: transparent;
 
             &::first-line {
-                color: $color-grey-dark;
+                color: colors.$color-grey-dark;
             }
         }
     }
@@ -95,12 +98,12 @@
 
         & .start {
             left: 0;
-            padding-right: $ellipsisWidth/2;
+            padding-right: math.div($ellipsisWidth, 2);
         }
 
         & .end {
             right: 0;
-            padding-left: $ellipsisWidth/2;
+            padding-left: math.div($ellipsisWidth, 2);
 
             & b {
                 float: right;

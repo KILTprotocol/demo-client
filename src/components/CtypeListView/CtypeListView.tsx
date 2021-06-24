@@ -60,7 +60,7 @@ class CtypeListView extends React.Component<Props, State> {
               </tr>
             </thead>
             <tbody>
-              {cTypes.map(cType => (
+              {cTypes.map((cType) => (
                 <tr key={cType.cType.hash}>
                   <td className="ctype-author">
                     <CTypePresentation
@@ -110,11 +110,9 @@ class CtypeListView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   cTypes: CTypes.getCTypes(state),
 })
 

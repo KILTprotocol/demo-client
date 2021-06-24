@@ -75,11 +75,11 @@ class BalanceUtilities {
         <span>Transfer of </span>
         <KiltToken amount={transferAmount} />
         <span> to </span>
-        <ContactPresentation address={receiverAddress} inline /> initiated.
+        <ContactPresentation address={receiverAddress} /> initiated.
       </div>
     )
     Balance.makeTransfer(receiverAddress, transferAmount)
-      .then(tx =>
+      .then((tx) =>
         BlockchainUtils.signAndSubmitTx(tx, myIdentity.identity, {
           resolveOn: BlockchainUtils.IS_IN_BLOCK,
         })
@@ -90,25 +90,14 @@ class BalanceUtilities {
             <span>Successfully transferred </span>
             <KiltToken amount={transferAmount} />
             <span> to </span>
-            <ContactPresentation address={receiverAddress} inline />.
+            <ContactPresentation address={receiverAddress} />
           </div>
         )
         if (successCallback) {
           successCallback()
         }
       })
-      .then(() => {
-        notify(
-          <div>
-            <span>Transfer of </span>
-            <KiltToken amount={transferAmount} />
-            <span> to </span>
-            <ContactPresentation address={receiverAddress} inline />
-            <span> initiated.</span>
-          </div>
-        )
-      })
-      .catch(error => {
+      .catch((error) => {
         errorService.log({
           error,
           message: '1010: Invalid Transaction',

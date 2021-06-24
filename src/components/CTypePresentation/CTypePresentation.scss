@@ -1,8 +1,8 @@
+@use 'styles/library' as *;
 .CTypePresentation {
   @include presentation;
 
   & > a {
-
     & .ui--IdentityIcon {
       cursor: pointer;
     }

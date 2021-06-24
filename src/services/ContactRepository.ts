@@ -31,7 +31,7 @@ class ContactRepository {
       ...BasePostParams,
       body: JSON.stringify(contact),
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw Error(response.statusText)
         }
@@ -42,7 +42,7 @@ class ContactRepository {
           Contacts.Store.addContact(contact)
         )
       })
-      .catch(error => {
+      .catch((error) => {
         ErrorService.log({
           error,
           message: `Could not add contact`,
@@ -76,8 +76,8 @@ class ContactRepository {
         resolve: (url: string) => {
           // TODO: build/use correct resolver
           return fetch(url)
-            .then(response => response.json())
-            .then(response => response.did)
+            .then((response) => response.json())
+            .then((response) => response.did)
         },
       }
     )

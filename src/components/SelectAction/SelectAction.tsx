@@ -1,5 +1,6 @@
 import React from 'react'
 import Select from 'react-select'
+import type { ValueType } from 'react-select'
 
 import './SelectAction.scss'
 
@@ -19,7 +20,11 @@ type Props = {
 }
 
 class SelectAction extends React.Component<Props> {
-  private executeAction = (selectedActionOption: SelectActionOption): void => {
+  // the select is a single select, so we expect a single value
+  private executeAction = (
+    selectedActionOption: ValueType<SelectActionOption, false>
+  ): void => {
+    if (!selectedActionOption) return
     const { actions } = this.props
     const action = actions.find(
       (_action: Action) => _action.label === selectedActionOption.value

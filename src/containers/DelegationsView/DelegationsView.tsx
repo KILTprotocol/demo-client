@@ -2,7 +2,7 @@ import { Permission } from '@kiltprotocol/types'
 import isEqual from 'lodash/isEqual'
 import React from 'react'
 import { connect, MapStateToProps } from 'react-redux'
-import { Redirect, RouteComponentProps, withRouter } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 import { ViewType } from '../../components/DelegationNode/DelegationNode'
 import DelegationDetailView from '../../components/DelegationDetailView/DelegationDetailView'
@@ -41,11 +41,10 @@ type State = {
 
   currentDelegation?: IMyDelegation
   invitePermissions?: Permission[]
-  redirect?: string
 }
 
 class DelegationsView extends React.Component<Props, State> {
-  private selectCTypesModal: SelectCTypesModal | null
+  private selectCTypesModal: React.RefObject<SelectCTypesModal>
 
   constructor(props: Props) {
     super(props)
@@ -56,31 +55,20 @@ class DelegationsView extends React.Component<Props, State> {
     this.deleteDelegation = this.deleteDelegation.bind(this)
     this.createDelegation = this.createDelegation.bind(this)
     this.onSelectCType = this.onSelectCType.bind(this)
+    this.selectCTypesModal = React.createRef()
   }
 
   public componentDidMount(): void {
-    const { delegationEntries, isPCR, match } = this.props
-    const { params, url } = match
+    const { delegationEntries, match } = this.props
+    const { params } = match
     const { delegationId } = params
 
     this.filterDelegationEntries(delegationEntries, () => {
       if (delegationId) {
         const delegation = this.loadDelegationForId(delegationId)
         if (delegation) {
-          if (!delegation.isPCR !== !isPCR) {
-            const redirect = url.replace(
-              /^\/.*\//,
-              delegation.isPCR ? '/pcrs/' : '/delegations/'
-            )
-            this.setState({ redirect })
-          } else {
-            this.setState({
-              currentDelegation: this.loadDelegationForId(delegationId),
-            })
-          }
-        } else {
           this.setState({
-            redirect: isPCR ? '/pcrs' : '/delegations',
+            currentDelegation: this.loadDelegationForId(delegationId),
           })
         }
       }
@@ -88,20 +76,10 @@ class DelegationsView extends React.Component<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Props): void {
-    const { delegationEntries, isPCR, selectedIdentity } = this.props
+    const { delegationEntries, selectedIdentity } = this.props
 
     if (!selectedIdentity || !prevProps.selectedIdentity) {
       throw new Error('No selected Identity')
-    }
-
-    if (
-      prevProps.selectedIdentity.identity.address !==
-      selectedIdentity.identity.address
-    ) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({
-        redirect: isPCR ? '/pcrs' : '/delegations',
-      })
     }
     if (!isEqual(prevProps.delegationEntries, delegationEntries)) {
       this.filterDelegationEntries(delegationEntries)
@@ -135,8 +113,9 @@ class DelegationsView extends React.Component<Props, State> {
     const { removeDelegation, isPCR } = this.props
     if (removeDelegation) {
       safeDelete(
-        `${isPCR ? 'PCR' : 'delegation'} '${delegation.metaData.alias ||
-          delegation.id}'`,
+        `${isPCR ? 'PCR' : 'delegation'} '${
+          delegation.metaData.alias || delegation.id
+        }'`,
         () => {
           removeDelegation(delegation)
         }
@@ -155,19 +134,15 @@ class DelegationsView extends React.Component<Props, State> {
   }
 
   private createDelegation(): void {
-    if (this.selectCTypesModal) {
-      this.selectCTypesModal.show()
+    if (this.selectCTypesModal.current) {
+      this.selectCTypesModal.current.show()
     }
   }
 
   public render(): JSX.Element {
     const { isPCR, match } = this.props
     const { delegationId } = match.params
-    const { delegationEntries, currentDelegation, redirect } = this.state
-
-    if (redirect) {
-      return <Redirect to={redirect} />
-    }
+    const { delegationEntries, currentDelegation } = this.state
 
     return (
       <section
@@ -190,9 +165,7 @@ class DelegationsView extends React.Component<Props, State> {
           />
         )}
         <SelectCTypesModal
-          ref={el => {
-            this.selectCTypesModal = el
-          }}
+          ref={this.selectCTypesModal}
           placeholder="Select cType#{multi}…"
           onConfirm={this.onSelectCType}
         />
@@ -201,11 +174,9 @@ class DelegationsView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<
-  StateProps,
-  OwnProps,
-  ReduxState
-> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, OwnProps, ReduxState> = (
+  state
+) => ({
   delegationEntries: Delegations.getAllDelegations(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
@@ -215,7 +186,7 @@ const mapDispatchToProps: DispatchProps = {
     Delegations.Store.removeDelegationAction(delegation),
 }
 
-export default connect<StateProps, DispatchProps, OwnProps>(
+export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withRouter(DelegationsView))

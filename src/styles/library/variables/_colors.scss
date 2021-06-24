@@ -1,3 +1,4 @@
+@use "sass:color";
 // BASE COLORS
 $color-black: #000;
 $color-white: #fff;
@@ -11,7 +12,7 @@ $color-purple: #4f405c;
 
 // BACKGROUNDS
 $color-background: #f2efee;
-$color-background-backdrop: transparentize($color-black, 0.5);
+$color-background-backdrop: color.adjust($color-black, $alpha: -0.5);
 
 // PRIMARY
 $color-primary: #ef5a28;
@@ -28,5 +29,5 @@ $color-font: $color-grey-dark;
 $color-font-inverted: $color-white;
 
 // HIGHLIGHTS
-$highlight-active: transparentize($color-primary, 0.3);
-$highlight-related: transparentize($color-primary, 0.8);
+$highlight-active: color.adjust($color-primary, $alpha: -0.3);
+$highlight-related: color.adjust($color-primary, $alpha: -0.8);

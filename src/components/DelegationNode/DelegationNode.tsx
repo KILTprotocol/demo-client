@@ -1,7 +1,7 @@
 import {
   Attestation,
   DelegationNode as SDKDelegationNode,
-  DelegationRootNode,
+  DelegationRootNode as SDKDelegationRootNode,
   SDKErrors,
   BlockchainUtils,
 } from '@kiltprotocol/sdk-js'
@@ -47,7 +47,7 @@ export enum ViewType {
 }
 
 export type DelegationsTreeNode = {
-  delegation: SDKDelegationNode | DelegationRootNode
+  delegation: SDKDelegationNode | SDKDelegationRootNode
   childNodes: DelegationsTreeNode[]
 }
 
@@ -61,13 +61,13 @@ type Props = {
   node: DelegationsTreeNode
   selectedIdentity: IMyIdentity
   focusedNodeId: DelegationsTreeNode['delegation']['id']
+  viewType: ViewType
 
   editable?: boolean
   focusedNodeAlias?: IMyDelegation['metaData']['alias']
   gotSiblings?: true
   gettingSiblings?: boolean
   isMyChild?: boolean
-  viewType?: ViewType
 
   onGetChildren?: () => void
 }
@@ -210,18 +210,20 @@ class DelegationNode extends React.Component<Props, State> {
     this.setState({
       gettingChildren: true,
     })
-    const children: IDelegationNode[] = await delegation.getChildren()
+    const children: SDKDelegationNode[] = await delegation.getChildren()
 
     this.setState({
       gettingChildren: false,
       gotChildren: true,
       node: {
-        childNodes: children.map((childNode: SDKDelegationNode) => {
-          return {
-            childNodes: [],
-            delegation: childNode,
-          } as DelegationsTreeNode
-        }),
+        childNodes: children.map(
+          (childNode: SDKDelegationNode | SDKDelegationRootNode) => {
+            return {
+              childNodes: [],
+              delegation: childNode,
+            } as DelegationsTreeNode
+          }
+        ),
         delegation,
       } as DelegationsTreeNode,
     })
@@ -257,7 +259,7 @@ class DelegationNode extends React.Component<Props, State> {
             blockUi.remove()
             notifySuccess(<span>Delegation successfully revoked</span>, true)
           })
-          .catch(error => {
+          .catch((error) => {
             blockUi.remove()
             errorService.log(error)
             notifyError(error)
@@ -331,7 +333,7 @@ class DelegationNode extends React.Component<Props, State> {
         return result
       }),
       true
-    ).then(result => {
+    ).then((result) => {
       blockUi.remove()
       if (result.successes.length) {
         notifySuccess(

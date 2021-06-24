@@ -58,7 +58,7 @@ export type TaskProps =
     }
 
 type StateProps = {
-  currentTask: TaskProps
+  currentTask?: TaskProps
 }
 
 type DispatchProps = {
@@ -96,7 +96,7 @@ class Tasks extends React.Component<Props, State> {
     const { currentTask } = this.props
     if (
       !!currentTask !== !!prevProps.currentTask ||
-      currentTask.objective !== prevProps.currentTask.objective
+      currentTask?.objective !== prevProps.currentTask?.objective
     ) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(initialState)
@@ -377,7 +377,9 @@ class Tasks extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   currentTask: UiState.getCurrentTask(state),
 })
 

@@ -70,7 +70,7 @@ class TestUserFeedback extends React.Component<Props, State> {
     notifySuccess('Example for Success')
   }
 
-  private notificationTimeout: number
+  private notificationTimeout: number | undefined
 
   constructor(props: Props) {
     super(props)

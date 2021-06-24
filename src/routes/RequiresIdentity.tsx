@@ -14,14 +14,16 @@ type StateProps = {
 
 type Props = StateProps
 
-const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = state => ({
+const mapStateToProps: MapStateToProps<StateProps, {}, ReduxState> = (
+  state
+) => ({
   identities: Wallet.getAllIdentities(state),
   selectedIdentity: Wallet.getSelectedIdentity(state),
 })
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const requiresIdentity = (
-  WrappedComponent: ComponentType,
+  WrappedComponent: ComponentType<any>,
   additionalProps?: { [key: string]: any }
 ) => {
   return connect(mapStateToProps)((props: Props) => {

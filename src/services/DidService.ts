@@ -88,18 +88,13 @@ class DidService {
     } as IContact)
 
     const tx = await did.store()
-    const status = await BlockchainUtils.signAndSubmitTx(
-      tx,
-      myIdentity.identity,
-      {
-        resolveOn: IS_IN_BLOCK,
-      }
-    )
-    if (status.isError) {
+    await BlockchainUtils.signAndSubmitTx(tx, myIdentity.identity, {
+      resolveOn: IS_IN_BLOCK,
+    }).catch(() => {
       throw new Error(
         `Error creating DID for identity ${myIdentity.metaData.name}`
       )
-    }
+    })
 
     persistentStoreInstance.store.dispatch(
       Wallet.Store.updateIdentityAction(myIdentity.identity.address, {
@@ -140,14 +135,14 @@ class DidService {
   private static readonly URL_RESOLVER = {
     resolve: async (url: string): Promise<object | undefined> => {
       return fetch(url)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) {
             throw Error(response.statusText)
           }
           return response
         })
-        .then(response => response.json())
-        .then(result => (typeof result === 'object' ? result : undefined))
+        .then((response) => response.json())
+        .then((result) => (typeof result === 'object' ? result : undefined))
     },
   } as IURLResolver
 }

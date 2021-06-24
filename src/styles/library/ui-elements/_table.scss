@@ -1,3 +1,5 @@
+@use "styles/library/variables" as *;
+
 @mixin defaultScheme {
 
   & > td {

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { v4 as uuid } from 'uuid'
+import { UUID } from '@kiltprotocol/utils'
 
 import { ModalType } from '../components/Modal/Modal'
 import * as UiState from '../state/ducks/UiState'
@@ -18,7 +18,7 @@ class FeedbackService {
     type,
   }: Partial<INotification>): Partial<INotification> {
     const created = Date.now()
-    const id = uuid()
+    const id = UUID.generate()
     return {
       className,
       created,
@@ -108,7 +108,7 @@ class FeedbackService {
 
   public static addBlockUi({ headline, message }: Partial<BlockUi>): BlockUi {
     const created = Date.now()
-    const id = uuid()
+    const id = UUID.generate()
     const blockUi: Partial<BlockUi> = { created, id, headline, message }
 
     blockUi.remove = () => {

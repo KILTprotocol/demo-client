@@ -45,15 +45,18 @@ class QuoteCreate extends React.Component<Props, State> {
     this.updateValue = this.updateValue.bind(this)
   }
 
-  public updateValue = (value: IQuote): void => {
+  public updateValue = (value: common.ValueType): void => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      console.warn('user input is not a JSON object')
+      return
+    }
     const quote = value
-    const result = {}
-    Object.keys(value.cost.tax).forEach(entryKey => {
+    const result: Record<string, unknown> = {}
+    Object.keys(value.cost.tax).forEach((entryKey) => {
       result[entryKey] = value.cost.tax[entryKey]
     })
     quote.cost.tax = result
-
-    this.setState({ quote })
+    this.setState({ quote: quote as IQuote })
   }
 
   private handleChange = (date: Date): void => {
