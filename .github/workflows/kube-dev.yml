@@ -44,17 +44,3 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$SHA_IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
         echo "::set-output name=image-sha::$ECR_REGISTRY/$ECR_REPOSITORY:$SHA_IMAGE_TAG"
-
-    - name: Configure Kubernetes
-      env:
-        KUBECONFIG: '${{ github.workspace }}/.kube/kubeconfig'
-      run: |
-        mkdir -p '${{ github.workspace }}/.kube' \
-          && echo '${{ secrets.KUBE_CONFIG}}' | base64 -d > $KUBECONFIG
-
-    - name: Set new image
-      env:
-        IMAGE: ${{ steps.build-image.outputs.image-sha }}
-        KUBECONFIG: '${{ github.workspace }}/.kube/kubeconfig'
-      run: |
-        kubectl -n devnet set image deployment/client-deployment client-container=$IMAGE
